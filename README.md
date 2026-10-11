@@ -51,7 +51,7 @@ graded before scaling up.
 | `A_reconstructed` | Backward reconstruction | Final = a real, cited arXiv CS paper introduction or Wikipedia CS section. Earlier steps written *backwards* from it under strict rules ([spec](docs/reconstruction_spec.md)): no new facts, only the source's real citations. | Clean, aligned stages exactly matching outline → fill → cite → polish | Intermediate drafts are model-written (distilled), not real human drafts |
 | `B_wiki_history` | Real revision history | Snapshots of a Wikipedia CS article's actual edit history, from first version to today (reverted edits skipped). | Real human process; citations accrue naturally | Stages are not labeled; growth is uneven; whole articles are long |
 | `C_github_commits` | Real git history | Successive commits of a real design document (Rust RFCs, Python PEPs) from first draft to accepted text. | Real drafting by the authors; several start from an outline template | Design docs, not essays; citations are mostly links, not references |
-| `D_mix` | Mix | 7 A-type rows + 3 B-type rows (different documents from A and B). | Tests whether the two kinds combine | — |
+| `D_mix` | Mix | 7 A-type rows (5 arXiv intros + ENIAC, Dijkstra's algorithm) + 3 B-type rows (Huffman coding, Levenshtein distance, Rabin–Karp). No document appears in A or B. | Tests whether the two kinds combine | — |
 
 ## The two granularities
 
@@ -80,10 +80,36 @@ from the history so that consecutive steps are roughly equal amounts of progress
 `provenance` says where each step's text came from: `reconstructed`, `source`, `source_title`,
 `enwiki rev <id> (<date>)`, or `commit <sha> (<date>)`.
 
+## What's in the trial
+
+| file | rows | steps | mean final length (words) | documents |
+|---|---|---|---|---|
+| A_reconstructed | 10 | 5 / 9 | 1,169 | arXiv: Gated SAEs, Vigenère key length, palindrome/square streaming, residential-proxy traffic, Z3alpha SMT strategies · Wikipedia: Turing machine, Halting problem, Quicksort (History); Hash table (Hash function); Lambda calculus (History) |
+| B_wiki_history | 10 | 5 / 9 | 2,371 | Bloom filter, Skip list, Merkle tree, Trie, Rope, Fenwick tree, Bogosort, Byzantine fault, Two Generals' Problem, Dining philosophers |
+| C_github_commits | 10 | 5 / 9 | 2,610 | Rust RFCs: or-patterns, trait alias, feature unification, destructuring assignment, `black_box` · PEPs 318, 308, 479, 526, 378 |
+| D_mix | 10 | 5 / 9 | 1,590 | arXiv: Tao, query expansion for cross-encoders, upsampling fairness, OOD via normalizing flows, attention bridges · Wikipedia: ENIAC, Dijkstra's algorithm · histories: Huffman coding, Levenshtein distance, Rabin–Karp |
+
 ## Reviewing
 
-Human-readable versions of every file are in [`review/`](review/) — one page per file with a summary
-table and each step in a collapsible block.
+Start at [`review/`](review/README.md): one folder per file, each with an index table and one page per
+row showing every step (collapsible) plus per-step word count, citation count, similarity to final and
+provenance.
+
+## Known issues (trial)
+
+* **A, arXiv rows**: papers that cite by author name read like "[9] and [10] recently used…" because
+  names are replaced by numbered markers in extraction. Uncited drafts say "prior work…" instead of
+  inventing names.
+* **A/D, Wikipedia rows**: Wikipedia `{{rp}}` page locators survive as ": 2" after some markers; they
+  appear only in the final and revised steps.
+* **B**: real histories are uneven. Levenshtein distance (D) jumps from 0.17 to 1.0 similarity in its
+  last step because the article was substantially rewritten in September 2026. Rope has a single
+  reference; Rabin–Karp has none inline (its sources are a general bibliography), so neither shows a
+  citation stage. Whole articles are long (Bloom filter's final is ~7,500 words).
+* **C**: some documents arrive nearly complete in one commit (e.g. the or-patterns RFC goes from a
+  269-word stub to 2,893 words in one commit). Citations in RFCs/PEPs are mostly links, so
+  `citation_count` (bracketed numeric markers) is approximate there.
+* `similarity_to_final` is word-level `difflib` ratio; it is a progress signal, not a quality score.
 
 ## Sources and licenses
 
