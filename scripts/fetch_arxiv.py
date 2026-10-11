@@ -51,6 +51,8 @@ def main(aid, sec_re="introduction"):
         junk.decompose()
     blocks = []
     for el in sec.select("h3, h4, .ltx_para > p, .ltx_para > .ltx_itemize li, .ltx_para > .ltx_enumerate li"):
+        if el.name == "p" and el.find_parent("li"):
+            continue  # list items wrap their own ltx_para > p; emit the item once, as a bullet
         t = clean(el.get_text(" "))
         t = re.sub(r"\s+([,.;:)])", r"\1", t).replace("( ", "(")
         if not t: continue

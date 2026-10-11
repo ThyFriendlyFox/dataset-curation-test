@@ -20,8 +20,8 @@ S = lambda *p: os.path.join(ROOT, "sources", *p)
 
 A_ROWS = ["arxiv_2404.16014", "arxiv_2312.09956", "arxiv_2309.14788", "arxiv_2404.10610", "arxiv_2401.17159",
           "wiki_Turing_machine", "wiki_Halting_problem", "wiki_Quicksort", "wiki_Hash_table", "wiki_Lambda_calculus"]
-D_A_ROWS = ["arxiv_2404.10921", "arxiv_2311.09175", "arxiv_2401.13555",
-            "wiki_ENIAC", "wiki_Garbage_collection_computer_science", "wiki_Dijkstras_algorithm", "wiki_Publickey_cryptography"]
+D_A_ROWS = ["arxiv_2404.10921", "arxiv_2311.09175", "arxiv_2401.13555", "arxiv_2402.06537", "arxiv_2404.17918",
+            "wiki_ENIAC", "wiki_Dijkstras_algorithm"]
 B_ALL = ["Bloom_filter", "Skip_list", "Merkle_tree", "Trie", "Rope_data_structure", "Fenwick_tree", "Bogosort",
          "Byzantine_fault", "Two_Generals_Problem", "Dining_philosophers_problem", "Huffman_coding",
          "Levenshtein_distance", "RabinKarp_algorithm"]
@@ -59,19 +59,34 @@ def step(i, name, text, final_text, provenance):
 
 
 def pick(pool, k, final_text):
-    """Choose k versions from a chronological pool: first + final always, the rest spaced evenly by
-    similarity to the final text (so steps are roughly equal amounts of progress), kept in time order."""
+    """Choose k versions from a chronological pool, always including the first and the final one.
+
+    Picks the in-order subset that maximizes the smallest step of progress (gain in similarity to the
+    final text) between consecutive snapshots; ties go to the most even spacing. This avoids
+    near-duplicate "no-op" steps and regressions where the history allows it."""
     sims = [similarity(v["full_text"], final_text) for v in pool]
-    chosen = [0]
-    lo = sims[0]
-    for j in range(1, k - 1):
-        target = lo + (1 - lo) * j / (k - 1)
-        cands = [i for i in range(chosen[-1] + 1, len(pool) - 1) if i not in chosen]
-        if not cands:
-            break
-        chosen.append(min(cands, key=lambda i: (abs(sims[i] - target), i)))
-    chosen.append(len(pool) - 1)
-    return [pool[i] for i in chosen]
+    n = len(pool)
+    if n <= k:
+        return pool
+    # best[j][i]: (min gain, -sum of squared gains) for a path of j+1 picks ending at index i
+    NEG = (-9.0, 0.0)
+    best = [[NEG] * n for _ in range(k)]
+    back = [[-1] * n for _ in range(k)]
+    best[0][0] = (9.0, 0.0)
+    for j in range(1, k):
+        for i in range(j, n):
+            for p in range(j - 1, i):
+                if best[j - 1][p] == NEG:
+                    continue
+                g = sims[i] - sims[p]
+                cand = (min(best[j - 1][p][0], g), best[j - 1][p][1] - g * g)
+                if cand > best[j][i]:
+                    best[j][i], back[j][i] = cand, p
+    idx, i = [], n - 1
+    for j in range(k - 1, -1, -1):
+        idx.append(i)
+        i = back[j][i]
+    return [pool[i] for i in reversed(idx)]
 
 
 # ---------- A: reconstructed ----------
@@ -95,6 +110,12 @@ def a_row(name, variant):
     }
 
 
+def snapshot_names(k):
+    """Step names for B/C rows: 'title' then k real versions, the last being the final text."""
+    middle = [f"revision_{i}" for i in range(1, k)] if k != 4 else ["earliest_version", "early_revision", "late_revision"]
+    return ["title"] + middle + ["final"]
+
+
 # ---------- B: Wikipedia revision history ----------
 def b_row(name, variant):
     src = load(S("wiki_history", f"{name}.json"))
@@ -102,12 +123,10 @@ def b_row(name, variant):
     final = pool[-1]["full_text"]
     k = 8 if variant == "9step" else 4
     snaps = pick(pool, k, final)
-    names = ["title"] + ([f"revision_{i}" for i in range(1, k)] if variant == "9step" else
-                         ["earliest_version", "early_revision", "late_revision"])
-    names[-1] = "final"
+    names = snapshot_names(k)
     steps = [step(0, "title", src["title"], final, "source_title")]
     for j, s in enumerate(snaps, start=1):
-        steps.append(step(j, names[j] if j < len(names) else "final", s["full_text"], final,
+        steps.append(step(j, names[j], s["full_text"], final,
                           f"enwiki rev {s['revid']} ({s['timestamp'][:10]})"))
     return {
         "id": f"B-{name}", "approach": "wiki_history", "doc_type": "encyclopedia_article", "title": src["title"],
@@ -125,9 +144,7 @@ def c_row(name, variant):
     final = pool[-1]["full_text"]
     k = 8 if variant == "9step" else 4
     snaps = pick(pool, k, final)
-    names = ["title"] + ([f"revision_{i}" for i in range(1, k)] if variant == "9step" else
-                         ["earliest_version", "early_revision", "late_revision"])
-    names[-1] = "final"
+    names = snapshot_names(k)
     steps = [step(0, "title", src["title"], final, "source_title")]
     for j, v in enumerate(snaps, start=1):
         steps.append(step(j, names[j], v["full_text"], final, f"commit {v['commit'][:10]} ({v['date'][:10]})"))

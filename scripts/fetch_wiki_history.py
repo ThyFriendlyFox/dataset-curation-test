@@ -37,9 +37,16 @@ def history(title):
         cont = d["continue"]
 
 
-def wikitext(revid):
-    d = get({"action": "query", "prop": "revisions", "revids": revid, "rvprop": "content", "rvslots": "main"})
-    return d["query"]["pages"][0]["revisions"][0]["slots"]["main"]["content"]
+def wikitexts(revids, batch=10):
+    """Content of many revisions; batched (one request per `batch` revids) to stay under rate limits."""
+    out = {}
+    for i in range(0, len(revids), batch):
+        d = get({"action": "query", "prop": "revisions", "revids": "|".join(map(str, revids[i:i + batch])),
+                 "rvprop": "ids|content", "rvslots": "main"})
+        for page in d["query"]["pages"]:
+            for r in page.get("revisions", []):
+                out[r["revid"]] = r["slots"]["main"].get("content", "")
+    return out
 
 
 def main(title):
@@ -56,8 +63,9 @@ def main(title):
     if pool[-1]["revid"] != final["revid"]:
         pool.append(final)
     snaps = []
+    raws = wikitexts([r["revid"] for r in pool])
     for r in pool:
-        raw = wikitext(r["revid"])
+        raw = raws.get(r["revid"], "")
         if raw.lstrip().upper().startswith("#REDIRECT"):
             continue
         text, refs = convert(raw)
