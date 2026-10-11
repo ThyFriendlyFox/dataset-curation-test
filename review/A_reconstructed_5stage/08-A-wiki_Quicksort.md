@@ -1,0 +1,113 @@
+# 8. Quicksort — History
+
+`A-wiki_Quicksort` · [A_reconstructed_5stage](README.md)
+
+Source: <https://en.wikipedia.org/w/index.php?title=Quicksort&oldid=1377696753> · License: https://creativecommons.org/licenses/by-sa/4.0/
+
+| step | name | words | citations | similarity to final | provenance |
+|---|---|---|---|---|---|
+| 0 | prompt | 27 | 0 | 0.03 | reconstructed |
+| 1 | outline | 310 | 0 | 0.41 | reconstructed |
+| 2 | rough_draft | 523 | 0 | 0.66 | reconstructed |
+| 3 | cited_draft | 711 | 9 | 0.83 | reconstructed |
+| 4 | final | 690 | 9 | 1.00 | source |
+
+<details><summary><b>Step 0 — prompt</b> (27 words)</summary>
+
+````text
+Write the History section of the Wikipedia article on quicksort, covering how Hoare invented it, how it spread into standard libraries, and the later analysis and refinements.
+````
+
+</details>
+
+<details><summary><b>Step 1 — outline</b> (310 words)</summary>
+
+````text
+- Invention
+  - 1959, Tony Hoare, visiting student at Moscow State University
+  - working on machine translation project for the National Physical Laboratory
+  - needed to sort words in Russian sentences before lookup in Russian-English dictionary (alphabetical, on magnetic tape)
+  - first idea insertion sort -> too slow -> new idea
+  - partition part written in Mercury Autocode; trouble with list of unsorted segments
+  - back in England: asked to write code for Shellsort; told boss he knew faster algorithm; boss bet a sixpence; boss lost
+  - paper with theoretical analysis: The Computer Journal Volume 5, Issue 1, 1962, Pages 10–16
+  - later learned ALGOL + recursion -> improved version in ALGOL in Communications of the Association for Computing Machinery (premier CS journal of the time)
+  - ALGOL code: CACM Volume 4, Issue 7 July 1961, pp 321, Algorithm 63: partition and Algorithm 64: Quicksort
+- Adoption
+  - Unix default library sort subroutine
+  - name of C standard library subroutine qsort
+  - reference implementation of Java
+- Sedgewick
+  - PhD thesis 1975, milestone in study of Quicksort
+  - resolved open problems on pivot selection schemes: Samplesort, adaptive partitioning by Van Emden
+  - derived expected number of comparisons and swaps
+- Bentley and McIlroy, 1993
+  - improvements for programming libraries
+  - technique for equal elements
+  - pseudomedian of nine: sample of nine, groups of three, median of the three medians
+- Lomuto
+  - Bentley, Programming Pearls: simpler, compact partitioning scheme, attributed to Nico Lomuto
+  - Bentley used Hoare's version for years, never really understood it; Lomuto's simple enough to prove correct
+  - same essay: "most beautiful code I had ever written"
+  - popularized by textbook Introduction to Algorithms
+  - inferior to Hoare's: three times more swaps on average; O (n 2) when all elements equal
+- McIlroy, 1998: AntiQuicksort (aqsort), adversarial data on-the-fly, drives even his 1993 variant into quadratic behavior
+````
+
+</details>
+
+<details><summary><b>Step 2 — rough_draft</b> (523 words)</summary>
+
+````text
+Tony Hoare developed the quicksort algorithm in 1959, when he was a visiting student at Moscow State University. Hoare was at that time working on a machine translation project for the National Physical Laboratory. As part of the translation process he needed to sort the words in Russian sentences before he looked them up in a Russian-English dictionary, which was on magnetic tape in alphabetical order. His first idea was insertion sort, but he recognized that it would be slow, so he came up with a new idea. He wrote the partition part in Mercury Autocode, but he had trouble dealing with the list of unsorted segments. When he returned to England he was asked to write code for Shellsort. Hoare told his boss that he knew of a faster algorithm and his boss bet a sixpence that he did not. In the end his boss accepted that he lost the bet. Hoare published a paper about his algorithm, which included a theoretical analysis, in The Computer Journal Volume 5, Issue 1, 1962, Pages 10–16. Later Hoare learned about ALGOL and that it was able to do recursion, and this enabled him to publish an improved version of the algorithm in ALGOL in Communications of the Association for Computing Machinery, which was the premier computer science journal at the time. The ALGOL code was published in Communications of the ACM (CACM), Volume 4, Issue 7 July 1961, pp 321 Algorithm 63: partition and Algorithm 64: Quicksort.
+
+Quicksort was widely adopted, for example it appeared in Unix as the default library sort subroutine. So it lent its name to the C standard library subroutine qsort and it was also in the reference implementation of Java.
+
+Robert Sedgewick's PhD thesis in 1975 is considered a milestone in the study of Quicksort. In it he resolved many open problems about the analysis of various pivot selection schemes, including Samplesort and adaptive partitioning by Van Emden, and he also derived the expected number of comparisons and swaps. In 1993 Jon Bentley and Doug McIlroy incorporated various improvements for use in programming libraries. These included a technique for dealing with equal elements and a pivot scheme that is called pseudomedian of nine, where a sample of nine elements is split into groups of three and then the median of the three medians from the three groups is chosen. In his book Programming Pearls, Bentley described another partitioning scheme that was simpler and compact, and he attributed it to Nico Lomuto. Bentley later wrote that he used Hoare's version for years but never really understood it, but Lomuto's version was simple enough to prove correct. In the same essay Bentley described Quicksort as the "most beautiful code I had ever written". Lomuto's partition scheme was also popularized by the textbook Introduction to Algorithms, though it is inferior to Hoare's scheme because on average it does three times more swaps and it degrades to O (n 2) runtime when all elements are equal. In 1998 McIlroy would further produce an AntiQuicksort (aqsort) function, which produces adversarial data on-the-fly and consistently drives even his 1993 variant of Quicksort into quadratic behavior.
+````
+
+</details>
+
+<details><summary><b>Step 3 — cited_draft</b> (711 words)</summary>
+
+````text
+Tony Hoare developed the quicksort algorithm in 1959, when he was a visiting student at Moscow State University. Hoare was at that time working on a machine translation project for the National Physical Laboratory. As part of the translation process he needed to sort the words in Russian sentences before he looked them up in a Russian-English dictionary, which was on magnetic tape in alphabetical order [1]. His first idea was insertion sort, but he recognized that it would be slow, so he came up with a new idea. He wrote the partition part in Mercury Autocode, but he had trouble dealing with the list of unsorted segments. When he returned to England he was asked to write code for Shellsort. Hoare told his boss that he knew of a faster algorithm and his boss bet a sixpence that he did not. In the end his boss accepted that he lost the bet. Hoare published a paper about his algorithm, which included a theoretical analysis, in The Computer Journal Volume 5, Issue 1, 1962, Pages 10–16. Later Hoare learned about ALGOL and that it was able to do recursion, and this enabled him to publish an improved version of the algorithm in ALGOL in Communications of the Association for Computing Machinery, which was the premier computer science journal at the time [2,3]. The ALGOL code was published in Communications of the ACM (CACM), Volume 4, Issue 7 July 1961, pp 321 Algorithm 63: partition and Algorithm 64: Quicksort.
+
+Quicksort was widely adopted, for example it appeared in Unix as the default library sort subroutine. So it lent its name to the C standard library subroutine qsort [4] and it was also in the reference implementation of Java.
+
+Robert Sedgewick's PhD thesis in 1975 is considered a milestone in the study of Quicksort. In it he resolved many open problems about the analysis of various pivot selection schemes, including Samplesort and adaptive partitioning by Van Emden [5], and he also derived the expected number of comparisons and swaps [4]. In 1993 Jon Bentley and Doug McIlroy incorporated various improvements for use in programming libraries. These included a technique for dealing with equal elements and a pivot scheme that is called pseudomedian of nine, where a sample of nine elements is split into groups of three and then the median of the three medians from the three groups is chosen [4]. In his book Programming Pearls, Bentley described another partitioning scheme that was simpler and compact, and he attributed it to Nico Lomuto. Bentley later wrote that he used Hoare's version for years but never really understood it, but Lomuto's version was simple enough to prove correct [6]. In the same essay Bentley described Quicksort as the "most beautiful code I had ever written". Lomuto's partition scheme was also popularized by the textbook Introduction to Algorithms, though it is inferior to Hoare's scheme because on average it does three times more swaps and it degrades to O (n 2) runtime when all elements are equal [7]. In 1998 McIlroy would further produce an AntiQuicksort (aqsort) function, which produces adversarial data on-the-fly and consistently drives even his 1993 variant of Quicksort into quadratic behavior [8].
+
+References:
+[1] Shustek, L. (2009). "Interview: An interview with C.A.R. Hoare". Comm. ACM. 52 (3): 38– 41. doi: 10.1145/1467247.1467261. S2CID 1868477.
+[2] Hoare, C. A. R. (1961). "Algorithm 64: Quicksort". Comm. ACM. 4 (7): 321. doi: 10.1145/366622.366644.
+[3] "My Quickshort interview with Sir Tony Hoare, the inventor of Quicksort". Marcelo M De Barros. 15 March 2015.
+[4] Bentley, Jon L.; McIlroy, M. Douglas (1993). "Engineering a sort function". Software: Practice and Experience. 23 (11): 1249– 1265. doi: 10.1002/spe.4380231105. S2CID 8822797.
+[5] Van Emden, M. H. (1 November 1970). "Algorithms 402: Increasing the Efficiency of Quicksort". Commun. ACM. 13 (11): 693– 694. doi: 10.1145/362790.362803. ISSN 0001-0782. S2CID 4774719.
+[6] Bentley, Jon (2007). "The most beautiful code I never wrote". In Oram, Andy; Wilson, Greg (eds.). Beautiful Code: Leading Programmers Explain How They Think. O'Reilly Media. p. 30. ISBN 978-0-596-51004-6.
+[7] "Quicksort Partitioning: Hoare vs. Lomuto". cs.stackexchange.com. Retrieved 3 August 2015.
+[8] McIlroy, M. D. (10 April 1999). "A killer adversary for quicksort" (PDF). Software: Practice and Experience. 29 (4): 341– 344. doi: 10.1002/(SICI)1097-024X(19990410)29:4 < 341::AID-SPE237 > 3.0.CO; 2-R. S2CID 35935409.
+````
+
+</details>
+
+<details><summary><b>Step 4 — final</b> (690 words)</summary>
+
+````text
+The quicksort algorithm was developed in 1959 by Tony Hoare while he was a visiting student at Moscow State University. At that time, Hoare was working on a machine translation project for the National Physical Laboratory. As a part of the translation process, he needed to sort the words in Russian sentences before looking them up in a Russian-English dictionary, which was in alphabetical order on magnetic tape. [1] After recognizing that his first idea, insertion sort, would be slow, he came up with a new idea. He wrote the partition part in Mercury Autocode but had trouble dealing with the list of unsorted segments. On return to England, he was asked to write code for Shellsort. Hoare mentioned to his boss that he knew of a faster algorithm, and his boss bet a sixpence that he did not. His boss ultimately accepted that he had lost the bet. Hoare published a paper about his algorithm, including a theoretical analysis, in The Computer Journal Volume 5, Issue 1, 1962, Pages 10–16. Later, Hoare learned about ALGOL and its ability to do recursion, which enabled him to publish an improved version of the algorithm in ALGOL in Communications of the Association for Computing Machinery, the premier computer science journal of the time. [2,3] The ALGOL code is published in Communications of the ACM (CACM), Volume 4, Issue 7 July 1961, pp 321 Algorithm 63: partition and Algorithm 64: Quicksort.
+
+Quicksort gained widespread adoption, appearing, for example, in Unix as the default library sort subroutine. Hence, it lent its name to the C standard library subroutine qsort [4] and in the reference implementation of Java.
+
+Robert Sedgewick 's PhD thesis in 1975 is considered a milestone in the study of Quicksort where he resolved many open problems related to the analysis of various pivot selection schemes including Samplesort, adaptive partitioning by Van Emden [5] as well as derivation of expected number of comparisons and swaps. [4] Jon Bentley and Doug McIlroy in 1993 incorporated various improvements for use in programming libraries, including a technique to deal with equal elements and a pivot scheme known as pseudomedian of nine, where a sample of nine elements is divided into groups of three and then the median of the three medians from three groups is chosen. [4] Bentley described another simpler and compact partitioning scheme in his book Programming Pearls that he attributed to Nico Lomuto. Later Bentley wrote that he used Hoare's version for years but never really understood it but Lomuto's version was simple enough to prove correct. [6] Bentley described Quicksort as the "most beautiful code I had ever written" in the same essay. Lomuto's partition scheme was also popularized by the textbook Introduction to Algorithms although it is inferior to Hoare's scheme because it does three times more swaps on average and degrades to O (n 2) runtime when all elements are equal. [7] McIlroy would further produce an AntiQuicksort (aqsort) function in 1998, which consistently drives even his 1993 variant of Quicksort into quadratic behavior by producing adversarial data on-the-fly. [8]
+
+References:
+[1] Shustek, L. (2009). "Interview: An interview with C.A.R. Hoare". Comm. ACM. 52 (3): 38– 41. doi: 10.1145/1467247.1467261. S2CID 1868477.
+[2] Hoare, C. A. R. (1961). "Algorithm 64: Quicksort". Comm. ACM. 4 (7): 321. doi: 10.1145/366622.366644.
+[3] "My Quickshort interview with Sir Tony Hoare, the inventor of Quicksort". Marcelo M De Barros. 15 March 2015.
+[4] Bentley, Jon L.; McIlroy, M. Douglas (1993). "Engineering a sort function". Software: Practice and Experience. 23 (11): 1249– 1265. doi: 10.1002/spe.4380231105. S2CID 8822797.
+[5] Van Emden, M. H. (1 November 1970). "Algorithms 402: Increasing the Efficiency of Quicksort". Commun. ACM. 13 (11): 693– 694. doi: 10.1145/362790.362803. ISSN 0001-0782. S2CID 4774719.
+[6] Bentley, Jon (2007). "The most beautiful code I never wrote". In Oram, Andy; Wilson, Greg (eds.). Beautiful Code: Leading Programmers Explain How They Think. O'Reilly Media. p. 30. ISBN 978-0-596-51004-6.
+[7] "Quicksort Partitioning: Hoare vs. Lomuto". cs.stackexchange.com. Retrieved 3 August 2015.
+[8] McIlroy, M. D. (10 April 1999). "A killer adversary for quicksort" (PDF). Software: Practice and Experience. 29 (4): 341– 344. doi: 10.1002/(SICI)1097-024X(19990410)29:4 < 341::AID-SPE237 > 3.0.CO; 2-R. S2CID 35935409.
+````
+
+</details>

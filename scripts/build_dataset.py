@@ -179,25 +179,34 @@ def write(fname, rows):
 
 
 def review(fname, rows):
-    os.makedirs(os.path.join(ROOT, "review"), exist_ok=True)
-    out = [f"# {fname}\n", f"{len(rows)} rows. Mark each row **pass / fail** — row ids are the headings.\n",
-           "| # | id | title | steps | words (first→last) | citations (first→last) |", "|---|---|---|---|---|---|"]
+    """Human-readable pages: review/<fname>/README.md (index) + one page per row (GitHub won't
+    render a single multi-MB markdown file)."""
+    d = os.path.join(ROOT, "review", fname)
+    os.makedirs(d, exist_ok=True)
+    for old in glob.glob(os.path.join(d, "*.md")):
+        os.remove(old)
+    index = [f"# {fname}\n", f"{len(rows)} rows. Open a row, read its steps top to bottom, and mark it **pass / fail** "
+             "(by row number or id).\n",
+             "| # | id | title | steps | words (first→last) | citations (first→last) |", "|---|---|---|---|---|---|"]
     for i, r in enumerate(rows, 1):
         s = r["steps"]
-        out.append(f"| {i} | `{r['id']}` | {r['title'][:60]} | {len(s)} | {s[1]['word_count']}→{s[-1]['word_count']} "
-                   f"| {s[1]['citation_count']}→{s[-1]['citation_count']} |")
-    for i, r in enumerate(rows, 1):
-        out += [f"\n---\n\n## {i}. `{r['id']}` — {r['title']}\n",
-                f"Source: <{r['source']['url']}> · License: {r['source']['license']} · {r['source']['notes']}\n",
-                "| step | name | words | citations | similarity to final | provenance |", "|---|---|---|---|---|---|"]
-        out += [f"| {s['step']} | {s['name']} | {s['word_count']} | {s['citation_count']} | {s['similarity_to_final']:.2f} | {s['provenance']} |"
-                for s in r["steps"]]
-        for s in r["steps"]:
-            body = s["text"].replace("```", "ˋˋˋ")  # keep code fences inside a step from breaking the page
-            out.append(f"\n<details><summary><b>Step {s['step']} — {s['name']}</b> ({s['word_count']} words)</summary>\n\n"
+        page = f"{i:02d}-{r['id']}.md"
+        index.append(f"| {i} | [`{r['id']}`]({page}) | {r['title'][:70]} | {len(s)} | {s[1]['word_count']}→{s[-1]['word_count']} "
+                     f"| {s[1]['citation_count']}→{s[-1]['citation_count']} |")
+        out = [f"# {i}. {r['title']}\n", f"`{r['id']}` · [{fname}](README.md)\n",
+               f"Source: <{r['source']['url']}> · License: {r['source']['license']}"
+               + (f" · {r['source']['notes']}" if r['source']['notes'] else "") + "\n",
+               "| step | name | words | citations | similarity to final | provenance |", "|---|---|---|---|---|---|"]
+        out += [f"| {x['step']} | {x['name']} | {x['word_count']} | {x['citation_count']} | {x['similarity_to_final']:.2f} | {x['provenance']} |"
+                for x in s]
+        for x in s:
+            body = x["text"].replace("````", "ˋˋˋˋ")  # keep the step's own fences from closing ours
+            out.append(f"\n<details><summary><b>Step {x['step']} — {x['name']}</b> ({x['word_count']} words)</summary>\n\n"
                        f"````text\n{body}\n````\n\n</details>")
-    with open(os.path.join(ROOT, "review", f"{fname}.md"), "w", encoding="utf-8") as f:
-        f.write("\n".join(out) + "\n")
+        with open(os.path.join(d, page), "w", encoding="utf-8") as f:
+            f.write("\n".join(out) + "\n")
+    with open(os.path.join(d, "README.md"), "w", encoding="utf-8") as f:
+        f.write("\n".join(index) + "\n")
 
 
 def main():
