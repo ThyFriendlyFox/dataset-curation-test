@@ -12,7 +12,7 @@ from wikitext import convert
 
 UA = {"User-Agent": "dataset-curation-test/0.1 (https://github.com/ThyFriendlyFox/dataset-curation-test) python-requests"}
 API = "https://en.wikipedia.org/w/api.php"
-POOL = 25  # candidate revisions kept per article
+POOL = 16  # per sampling angle; ~35-45 candidate revisions per article after merging
 
 
 def get(params):
@@ -56,14 +56,23 @@ def main(title):
     title, revs = history(title)
     good = [r for r in revs if "mw-reverted" not in r.get("tags", []) and r["size"] > 300]
     final = revs[-1]
-    # Pool: spread candidates by byte size growth so early stubs and late polish are both covered.
-    target = [final["size"] * (i / (POOL - 1)) ** 1.5 for i in range(POOL)]
-    pool = []
-    for t in target:
-        r = next((r for r in good if r["size"] >= t), final)
-        if r["revid"] not in [p["revid"] for p in pool]:
-            pool.append(r)
-    if pool[-1]["revid"] != final["revid"]:
+    # Candidate pool, from three angles (articles reach full size early and are then rewritten for
+    # years at similar size, so size alone misses the late, near-final versions):
+    #   1. byte-size growth (stub → full length)
+    #   2. evenly spaced through the edit history
+    #   3. geometrically closer to the present (n/2, n/4, ... edits before the current version)
+    n = len(good)
+    picks = set()
+    for i in range(POOL):
+        t = final["size"] * (i / (POOL - 1)) ** 1.5
+        picks.add(next((j for j, r in enumerate(good) if r["size"] >= t), n - 1))
+        picks.add(round((n - 1) * i / (POOL - 1)))
+    step = n // 2
+    while step >= 1:
+        picks.add(n - 1 - step)
+        step //= 2
+    pool = [good[j] for j in sorted(p for p in picks if 0 <= p < n)]
+    if not pool or pool[-1]["revid"] != final["revid"]:
         pool.append(final)
     snaps = []
     raws = wikitexts([r["revid"] for r in pool])
