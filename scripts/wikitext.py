@@ -54,7 +54,7 @@ def convert(wikitext):
                 return ""
             nums[key] = len(nums) + 1
             refs.append({"n": nums[key], "text": body})
-        return f"[{nums[key]}]"
+        return f"⟦c{nums[key]}⟧"  # placeholder: literal "[0]" (array indexing etc.) must not look like a citation
 
     for tag in code.filter_tags(recursive=True, matches=lambda n: str(n.tag).lower() == "ref"):
         try:
@@ -101,16 +101,15 @@ def convert(wikitext):
         if skip:
             continue
         line = re.sub(r"\s+", " ", line).strip()
-        line = re.sub(r"\]\s*\[", ",", line)
         if line and not re.fullmatch(r"[\W\d_]*", line):
             blocks.append(line)
     out = "\n\n".join(blocks)
-    # Renumber so markers appear in order of first use in the surviving text.
+    # Group adjacent citation placeholders, renumber by first use in the surviving text, render as [n,m].
     order = []
-    for m in re.finditer(r"\[([\d,]+)\]", out):
-        for n in m.group(1).split(","):
-            if int(n) not in order: order.append(int(n))
+    for m in re.finditer(r"⟦c(\d+)⟧", out):
+        if int(m.group(1)) not in order: order.append(int(m.group(1)))
     remap = {old: i + 1 for i, old in enumerate(order)}
-    out = re.sub(r"\[([\d,]+)\]", lambda m: "[" + ",".join(str(remap[int(n)]) for n in m.group(1).split(",")) + "]", out)
+    out = re.sub(r"(?:⟦c\d+⟧\s*)*⟦c\d+⟧", lambda m: "[" + ",".join(
+        dict.fromkeys(str(remap[int(n)]) for n in re.findall(r"⟦c(\d+)⟧", m.group(0)))) + "]", out)
     by_old = {r["n"]: r["text"] for r in refs}
     return out, [{"n": remap[o], "text": by_old[o]} for o in order]
