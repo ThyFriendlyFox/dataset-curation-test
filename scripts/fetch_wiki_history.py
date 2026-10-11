@@ -16,12 +16,15 @@ POOL = 25  # candidate revisions kept per article
 
 
 def get(params):
-    for wait in (1, 10, 30, 60, 120):
+    """GET with patient backoff on 429, honoring Retry-After (Wikimedia rate-limits shared egress IPs)."""
+    wait = 1
+    for _ in range(15):
         time.sleep(wait)
         r = requests.get(API, params={**params, "format": "json", "formatversion": 2}, headers=UA, timeout=60)
         if r.status_code != 429:
             r.raise_for_status()
             return r.json()
+        wait = min(300, max(int(r.headers.get("retry-after") or 30) + 5, wait * 2))
     r.raise_for_status()
 
 

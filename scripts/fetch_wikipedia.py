@@ -11,13 +11,15 @@ UA = {"User-Agent": "dataset-curation-test/0.1 (https://github.com/ThyFriendlyFo
 
 
 def get(url, **kw):
-    """GET with backoff on 429 (Wikimedia rate limits anonymous REST traffic)."""
-    for wait in (0, 10, 30, 60, 120):
+    """GET with patient backoff on 429, honoring Retry-After (Wikimedia rate-limits shared egress IPs)."""
+    wait = 0
+    for _ in range(15):
         time.sleep(wait)
         r = requests.get(url, headers=UA, timeout=60, **kw)
         if r.status_code != 429:
             r.raise_for_status()
             return r
+        wait = min(300, max(int(r.headers.get("retry-after") or 30) + 5, wait * 2))
     r.raise_for_status()
 
 
