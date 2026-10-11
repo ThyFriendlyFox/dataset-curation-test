@@ -74,7 +74,7 @@ def main(title):
         text, refs = convert(raw)
         snaps.append({"revid": r["revid"], "timestamp": r["timestamp"], "bytes": r["size"],
                       "comment": r.get("comment", ""), "word_count": len(text.split()),
-                      "text": text, "references": refs})
+                      "text": text, "references": refs, "wikitext": raw})  # raw kept so conversion can be redone offline
     json.dump({
         "source_type": "wikipedia_revision_history", "source_id": f"enwiki:{title}",
         "title": title, "authors": "Wikipedia contributors",

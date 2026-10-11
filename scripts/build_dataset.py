@@ -14,6 +14,7 @@ Usage: python3 scripts/build_dataset.py   (writes data/*.parquet, data/*.jsonl, 
 import difflib, glob, json, os, re
 import pyarrow as pa
 import pyarrow.parquet as pq
+from wikitext import convert
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 S = lambda *p: os.path.join(ROOT, "sources", *p)
@@ -119,7 +120,13 @@ def snapshot_names(k):
 # ---------- B: Wikipedia revision history ----------
 def b_row(name, variant):
     src = load(S("wiki_history", f"{name}.json"))
-    pool = [{**s, "full_text": with_refs(s["text"], s["references"])} for s in src["snapshots"] if s["word_count"] >= 20]
+    pool = []
+    for s in src["snapshots"]:
+        if "wikitext" in s:  # re-convert with the current converter
+            s = {**s, **dict(zip(("text", "references"), convert(s["wikitext"])))}
+            s["word_count"] = len(s["text"].split())
+        if s["word_count"] >= 20:
+            pool.append({**s, "full_text": with_refs(s["text"], s["references"])})
     final = pool[-1]["full_text"]
     k = 8 if variant == "9step" else 4
     snaps = pick(pool, k, final)

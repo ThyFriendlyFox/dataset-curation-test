@@ -61,8 +61,16 @@ def convert(wikitext):
             code.replace(tag, ref_marker(tag))
         except ValueError:
             pass  # already removed with a parent node
-    for tag in code.filter_tags(matches=lambda n: str(n.tag).lower() in ("references", "gallery", "table", "math", "syntaxhighlight", "source", "pre", "score")):
+    for tag in code.filter_tags(matches=lambda n: str(n.tag).lower() == "math"):
+        try: code.replace(tag, " " + str(tag.contents).strip() + " ")  # keep formulas as TeX
+        except ValueError: pass
+    for tag in code.filter_tags(matches=lambda n: str(n.tag).lower() in ("references", "gallery", "table", "syntaxhighlight", "source", "pre", "score")):
         try: code.remove(tag)
+        except ValueError: pass
+    for h in code.filter_headings():
+        title = re.sub(r"\s+", " ", mwp.parse(str(h.title)).strip_code()).strip()
+        # placeholder: a literal "#" at line start would be re-parsed as a wikitext list item
+        try: code.replace(h, "\n" + ("⟦H2⟧ " if h.level <= 2 else "⟦H3⟧ ") + title + "\n")
         except ValueError: pass
     for t in code.filter_templates(recursive=False):
         name = str(t.name).strip().lower()
@@ -80,15 +88,15 @@ def convert(wikitext):
                 code.remove(link)
         except ValueError:
             pass
-    text = code.strip_code(normalize=True, collapse=True)
+    text = code.strip_code(normalize=True, collapse=True).replace("⟦H2⟧", "##").replace("⟦H3⟧", "###")
     text = re.sub(r"\{\|.*?\|\}", "", text, flags=re.S)  # leftover tables
     blocks, skip = [], False
     for line in text.split("\n"):
-        m = re.match(r"^(=+)\s*(.*?)\s*\1\s*$", line.strip())
+        m = re.match(r"^(#{2,3}) (.*)$", line.strip())
         if m:
-            skip = bool(DROP_SECTIONS.match(m.group(2)))
+            skip = bool(DROP_SECTIONS.match(m.group(2).strip()))
             if not skip:
-                blocks.append(("## " if len(m.group(1)) <= 2 else "### ") + m.group(2))
+                blocks.append(m.group(1) + " " + m.group(2).strip())
             continue
         if skip:
             continue
