@@ -1,0 +1,224 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2404.10921",
+  "title": "Tao: Re-Thinking DL-based Microarchitecture Simulation",
+  "authors": "Santosh Pandey, Amir Yazdanbakhsh, Hang Liu",
+  "year": "2024",
+  "categories": [
+    "cs.AR",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2404.10921",
+  "html_url": "https://arxiv.org/html/2404.10921",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1129,
+  "text": "Since its inception, microarchitecture simulators rapidly become the most commonly used tools in computer architecture-related research (see the report [1]). As of today, computer architecture simulation is the textbook standard and virtually used in any architecture explorations, e.g., design space exploration [2,3,4,5], microarchitectural bottleneck analysis [6,7], workload characterization [8,9] among many others [10,11]. As a common practice, architecture researchers often use popular software architecture simulators to incorporate their radical new ideas. The updated simulator is then used to execute the programs of interest (i.e., benchmarks). The simulation yields a range of metrics that characterize the execution of benchmarks, with the level of detail in the simulation dictating the specificity of these metrics. Such output metrics provide feedback to the researcher for further explorations and/or decision makings. Due to the significance, many simulators have been built over the decades with different abstractions where each abstraction provides a tradeoff between speed, accuracy and detail (please see [12,13,14,15] for more details).\n\n## 1.1. Related work and motivations\n\nThe quest towards a fast, accurate and detailed cycle-level architecture simulation has never stopped. This cohort of researchers have mainly dedicated their efforts into three prominent paradigms, i.e., execution-driven simulation [16,17,18,11,19,20,21,22], trace-driven simulation [23,24,25,26,27,28], and recently the DL-based simulation [29,30,31,32] (see [12,14,33,34] for more types of architecture simulations). Below, we briefly discuss these simulation methodologies with the motivations for our work, i.e., Tao.\n\nMotivation (i). Execution-driven simulation offers the most detailed and accurate framework, although this comes at the cost of extremely slow speed and high maintenance overhead. Figure 1 (a) presents the workflow of this paradigm. Takes as input of an executable for a program 1, this simulation approach uses software components to simulate the functionality and timing information of all components of a target processor. The output statistics contain the runtime behaviors of the hardware when the executable runs through the simulator, including CPI, branch mispredictions, cache misses and many other performance metrics. These performance metrics aid in microarchitectural bottleneck analysis and hardware design exploration. The milestone projects of this line of efforts encompass SimpleScalar [18], SESC [17], and gem5 [16]. The simulation throughput of a detailed execution-driven simulation is often around five orders of magnitude slower than a real processor. Various statistical approaches have been proposed to accelerate the microarchitecture simulation by only simulating representative [35] or a fraction of instructions [36] from the benchmark.\n\nMotivation (ii). Trace-driven simulation faces accuracy concerns in pursuit of higher throughput than execution-driven simulations [37,38]. Figure 1 (b) illustrates this method. For program 1, trace-driven simulation derives the detailed trace of the program on a particular microarchitecture. Subsequently, it simulates that trace on a different microarchitecture and derives the microarchitecture statistics. Shade [23], MacSim [24] and MASE [39] are some of the popular trace-driven simulators. Trace-driven simulation is mostly used to explore the design of specific microarchitecture components like cache and memory. The reference trace captures the events related to CPU core, and cache and memory on \\mu Arch A. During simulation on a different \\mu Arch B, the events related to CPU cores are rapidly replayed, while the events related to memory and cache are simulated in detail for \\mu Arch B. Replaying the events related to the CPU core is significantly faster than simulating them. Further, because simulating the CPU core-related instructions dominates the overall simulation cost [40], trace-driven simulation provides decent speedup over the execution-driven counterpart. However, reusing the same trace for different microarchitectures leads to accuracy concerns as the execution order of different memory instructions can vary (see [41]).\n\nMotivation (iii). Emerging DL-based simulations are remarkably fast and can provide comparable cycle-level accuracy, whereas hits three roadblocks: limited output metrics, expensive microarchitecture specific trace generation, and restricted microarchitecture support. Notably, for the DL model of trained microarchitecture, the state-of-the-art DL simulator, i.e., SimNet [29,32] can achieve >1,000 \\times higher throughput than the execution-driven simulator, i.e., gem5. The substantial increase in throughput is attributed to replacing the highly irregular and heterogeneous simulation with DL models that are accelerator-friendly and parallelizable. DL-based simulators, illustrated in Figure 1 (c), typically follow a two-step process to model the performance of a program: Step (i), a DL model specific to a \\mu Arch A is trained using a detailed trace of a program 1 generated through simulation on \\mu Arch A. Step (ii), this trained model is generalized to predict output metrics for the traces of unseen programs, i.e., program 2 for the same \\mu Arch A. However, existing DL-based simulators only predict one output metric, i.e., CPI. Further, because they need low-level microarchitectural performance metrics like branch misprediction and cache misses as the input, one needs to generate microarchitecture specific traces for simulating the same program on different architectures. When the overhead for generating the trace and training the model is accounted for, DL-based simulators can be upto 17 \\times slower than execution-driven simulator gem5 when simulating 1 billion instructions.\n\nIn summary, the mainstream cycle-level microarchitecture simulations excel and fall short at different aspects, i.e., speed, accuracy, and/or simulation details (i.e., # of output metrics). Particularly, (i) although execution-driven simulation offers the desired accuracy and detail, its slow throughput limits its application scenarios. (ii) Trace-driven simulation achieves decent acceleration by reusing traces but sacrifices accuracy and fails to provide significant speedups. (iii) DL-based simulations promise impressive throughput but fail to provide crucial microarchitectural performance metrics and introduce substantial overheads from trace regeneration and model re-training.\n\n## 1.2. Contributions\n\nDeparting from the designs and desired goals from the aforementioned three paradigms, this paper redesigns DL-based cycle-level microarchitecture simulator. Particularly, we take as input the functional and detailed traces train a DL-based simulator, support a set of desired performance metrics of interest and fast microarchitecture exploration, achieving the comparable accuracy as execution-driven simulation, and an order of magnitude higher throughput than the state-of-the-art DL-driven simulator, i.e., SimNet. Figure 1 (d) illustrates the workflow of our system, which encompasses the following three contributions:\n\n- • First, we introduce a unique training dataset design so that the subsequent simulation (i.e., inference) only needs light-weighted and reusable functional trace as inputs.\n\nFirst, we introduce a unique training dataset design so that the subsequent simulation (i.e., inference) only needs light-weighted and reusable functional trace as inputs.\n\n- • Second, for predicting a variety of performance metrics of interest, we propose an DL model with separate embedding and self-attention based performance prediction layers.\n\nSecond, for predicting a variety of performance metrics of interest, we propose an DL model with separate embedding and self-attention based performance prediction layers.\n\n- • Third, we introduce transfer learning techniques to rapidly explore various microarchitectures. This includes architecture agnostic embedding layers and judicious training dataset selection.\n\nThird, we introduce transfer learning techniques to rapidly explore various microarchitectures. This includes architecture agnostic embedding layers and judicious training dataset selection.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib66",
+      "text": "Skadron et al . (2003) Kevin Skadron, Margaret Martonosi, David I August, Mark D Hill, David J Lilja, and Vijay S Pai. 2003. Challenges in computer architecture evaluation. Computer 36, 8 (2003), 30–36."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib35",
+      "text": "Joseph et al . (2006b) PJ Joseph, Kapil Vaswani, and Matthew J Thazhuthaveetil. 2006b. Construction and use of linear regression models for processor performance analysis. In The Twelfth International Symposium on High-Performance Computer Architecture, 2006. IEEE, 99–108."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib40",
+      "text": "Kim et al . (2018) Ryan Gary Kim, Janardhan Rao Doppa, and Partha Pratim Pande. 2018. Machine learning for design space exploration and optimization of manycore systems. In 2018 IEEE/ACM International Conference on Computer-Aided Design (ICCAD) . IEEE, 1–6."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib74",
+      "text": "Yazdanbakhsh et al . (2021) Amir Yazdanbakhsh, Christof Angermueller, Berkin Akin, Yanqi Zhou, Albin Jones, Milad Hashemi, Kevin Swersky, Satrajit Chatterjee, Ravi Narayanaswami, and James Laudon. 2021. Apollo: Transferable architecture exploration. arXiv preprint arXiv:2102.01723 (2021)."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib41",
+      "text": "Krishnan et al . (2023) Srivatsan Krishnan, Amir Yazdanbakhsh, Shvetank Prakash, Jason Jabbour, Ikechukwu Uchendu, Susobhan Ghosh, Behzad Boroujerdian, Daniel Richins, Devashree Tripathy, Aleksandra Faust, et al . 2023. Archgym: An open-source gymnasium for machine learning assisted architecture design. In Proceedings of the 50th Annual International Symposium on Computer Architecture . 1–16."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib28",
+      "text": "Fields et al . (2003) Brian A Fields, Rastislav Bodik, Mark D Hill, and Chris J Newburn. 2003. Using interaction costs for microarchitectural bottleneck analysis. In Proceedings. 36th Annual IEEE/ACM International Symposium on Microarchitecture, 2003. MICRO-36. IEEE, 228–239."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib9",
+      "text": "Bai et al . (2023) Chen Bai, Jiayi Huang, Xuechao Wei, Yuzhe Ma, Sicheng Li, Hongzhong Zheng, Bei Yu, and Yuan Xie. 2023. ArchExplorer: Microarchitecture exploration via bottleneck analysis. In Proceedings of the 56th Annual IEEE/ACM International Symposium on Microarchitecture . 268–282."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib32",
+      "text": "Hoste and Eeckhout (2007) Kenneth Hoste and Lieven Eeckhout. 2007. Microarchitecture-independent workload characterization. IEEE micro 27, 3 (2007), 63–72."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib57",
+      "text": "Najaf-Abadi and Rotenberg (2008) Hashem H Najaf-Abadi and Eric Rotenberg. 2008. Configurational workload characterization. In ISPASS 2008-IEEE International Symposium on Performance Analysis of Systems and software . IEEE, 147–156."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib51",
+      "text": "Lim et al . (2014) Jieun Lim, Nagesh B Lakshminarayana, Hyesoon Kim, William Song, Sudhakar Yalamanchili, and Wonyong Sung. 2014. Power modeling for GPU architectures using McPAT. ACM Transactions on Design Automation of Electronic Systems (TODAES) 19, 3 (2014), 1–24."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib75",
+      "text": "Ye et al . (2000) Wu Ye, Narayanan Vijaykrishnan, Mahmut Kandemir, and Mary Jane Irwin. 2000. The design and use of simplepower: a cycle-accurate energy estimation tool. In Proceedings of the 37th Annual Design Automation Conference . 340–345."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib13",
+      "text": "Brais et al . (2020) Hadi Brais, Rajshekar Kalayappan, and Preeti Ranjan Panda. 2020. A survey of cache simulators. ACM Computing Surveys (CSUR) 53, 1 (2020), 1–32."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib70",
+      "text": "Uhlig and Mudge (1997) Richard A Uhlig and Trevor N Mudge. 1997. Trace-driven memory simulation: A survey. ACM Computing Surveys (CSUR) 29, 2 (1997), 128–170."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib19",
+      "text": "Carlson et al . (2011) Trevor E Carlson, Wim Heirman, and Lieven Eeckhout. 2011. Sniper: Exploring the level of abstraction for scalable and accurate parallel multi-core simulation. In Proceedings of 2011 International Conference for High Performance Computing, Networking, Storage and Analysis . 1–12."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib3",
+      "text": "Akram and Sawalha (2019) Ayaz Akram and Lina Sawalha. 2019. A survey of computer architecture simulation techniques and tools. Ieee Access 7 (2019), 78120–78145."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib12",
+      "text": "Binkert et al . (2011) Nathan Binkert, Bradford Beckmann, Gabriel Black, Steven K Reinhardt, Ali Saidi, Arkaprava Basu, Joel Hestness, Derek R Hower, Tushar Krishna, Somayeh Sardashti, et al . 2011. The gem5 simulator. ACM SIGARCH computer architecture news 39, 2 (2011), 1–7."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib58",
+      "text": "Ortego and Sack (2004) Pablo Montesinos Ortego and Paul Sack. 2004. SESC: SuperESCalar simulator. In 17 th Euro micro conference on real time systems (ECRTS’05) . Citeseer, 1–4."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib8",
+      "text": "Austin et al . (2002) Todd Austin, Eric Larson, and Dan Ernst. 2002. SimpleScalar: An infrastructure for computer system modeling. Computer 35, 2 (2002), 59–67."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib37",
+      "text": "Kanev et al . (2012) Svilen Kanev, Gu-Yeon Wei, and David Brooks. 2012. XIOSim: power-performance modeling of mobile x86 cores. In Proceedings of the 2012 ACM/IEEE international symposium on Low power electronics and design . 267–272."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib2",
+      "text": "Ahn et al . (2013) Jung Ho Ahn, Sheng Li, O Seongil, and Norman P Jouppi. 2013. McSimA+: A manycore simulator with application-level+ simulation and detailed microarchitecture modeling. In 2013 IEEE International Symposium on Performance Analysis of Systems and Software (ISPASS) . IEEE, 74–85."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib56",
+      "text": "Miller et al . (2010) Jason E Miller, Harshad Kasture, George Kurian, Charles Gruenwald, Nathan Beckmann, Christopher Celio, Jonathan Eastep, and Anant Agarwal. 2010. Graphite: A distributed parallel simulator for multicores. In HPCA-16 2010 The Sixteenth International Symposium on High-Performance Computer Architecture . IEEE, 1–12."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib62",
+      "text": "Sanchez and Kozyrakis (2013) Daniel Sanchez and Christos Kozyrakis. 2013. ZSim: Fast and accurate microarchitectural simulation of thousand-core systems. ACM SIGARCH Computer architecture news 41, 3 (2013), 475–486."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib22",
+      "text": "Cmelik and Keppel (1994) Bob Cmelik and David Keppel. 1994. Shade: A fast instruction-set simulator for execution profiling. In Proceedings of the 1994 ACM SIGMETRICS conference on Measurement and modeling of computer systems . 128–137."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib39",
+      "text": "Kim et al . (2012) Hyesoon Kim, Jaekyu Lee, Nagesh B Lakshminarayana, Jaewoong Sim, Jieun Lim, and Tri Pho. 2012. Macsim: A cpu-gpu heterogeneous simulation framework user guide. Georgia Institute of Technology (2012)."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib5",
+      "text": "Alomar et al . (2023) Abdullah Alomar, Pouya Hamadanian, Arash Nasr-Esfahany, Anish Agarwal, Mohammad Alizadeh, and Devavrat Shah. 2023. CausalSim: A Causal Framework for Unbiased Trace-Driven Simulation. In 20th USENIX Symposium on Networked Systems Design and Implementation (NSDI 23) . 1115–1147."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib61",
+      "text": "Rico et al . (2011) Alejandro Rico, Alejandro Duran, Felipe Cabarcas, Yoav Etsion, Alex Ramirez, and Mateo Valero. 2011. Trace-driven simulation of multithreaded applications. In (IEEE ISPASS) IEEE International Symposium on Performance Analysis of Systems and Software . IEEE, 87–96."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib6",
+      "text": "Arafa et al . (2021) Yehia Arafa, Abdel-Hameed Badawy, Ammar ElWazir, Atanu Barai, Ali Eker, Gopinath Chennupati, Nandakishore Santhi, and Stephan Eidenbenz. 2021. Hybrid, scalable, trace-driven performance modeling of GPGPUs. In Proceedings of the International Conference for High Performance Computing, Networking, Storage and Analysis . 1–15."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib38",
+      "text": "Khairy et al . (2020) Mahmoud Khairy, Zhesheng Shen, Tor M Aamodt, and Timothy G Rogers. 2020. Accel-Sim: An extensible simulation framework for validated GPU modeling. In 2020 ACM/IEEE 47th Annual International Symposium on Computer Architecture (ISCA) . IEEE, 473–486."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib49",
+      "text": "Li et al . (2022) Lingda Li, Santosh Pandey, Thomas Flynn, Hang Liu, Noel Wheeler, and Adolfy Hoisie. 2022. SimNet: Accurate and High-Performance Computer Architecture Simulation Using Deep Learning. Proc. ACM Meas. Anal. Comput. Syst. 6, 2, Article 25 (jun 2022), 24 pages. https://doi.org/10.1145/3530891"
+    },
+    {
+      "n": 30,
+      "id": "bib.bib55",
+      "text": "Mendis et al . (2019) Charith Mendis, Alex Renda, Saman Amarasinghe, and Michael Carbin. 2019. Ithemal: Accurate, portable and fast basic block throughput estimation using deep neural networks. In International Conference on machine learning . PMLR, 4505–4515."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib68",
+      "text": "Sỳkora et al . (2022) Ondřej Sỳkora, Phitchaya Mangpo Phothilimthana, Charith Mendis, and Amir Yazdanbakhsh. 2022. GRANITE: A Graph Neural Network Model for Basic Block Throughput Estimation. In 2022 IEEE International Symposium on Workload Characterization (IISWC) . IEEE, 14–26."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib60",
+      "text": "Pandey et al . (2022) Santosh Pandey, Lingda Li, Thomas Flynn, Adolfy Hoisie, and Hang Liu. 2022. Scalable deep learning-based microarchitecture simulation on GPUs. In SC22: International Conference for High Performance Computing, Networking, Storage and Analysis . IEEE, 1–15."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib69",
+      "text": "Ubal et al . (2012) Rafael Ubal, Byunghyun Jang, Perhaad Mistry, Dana Schaa, and David Kaeli. 2012. Multi2Sim: A simulation framework for CPU-GPU computing. In Proceedings of the 21st international conference on Parallel architectures and compilation techniques . 335–344."
+    },
+    {
+      "n": 34,
+      "id": "bib.bib11",
+      "text": "Bellard (2005) Fabrice Bellard. 2005. QEMU, a fast and portable dynamic translator.. In USENIX annual technical conference, FREENIX Track , Vol. 41. California, USA, 46."
+    },
+    {
+      "n": 35,
+      "id": "bib.bib65",
+      "text": "Sherwood et al . (2002) Timothy Sherwood, Erez Perelman, Greg Hamerly, and Brad Calder. 2002. Automatically characterizing large scale program behavior. ACM SIGPLAN Notices 37, 10 (2002), 45–57."
+    },
+    {
+      "n": 36,
+      "id": "bib.bib73",
+      "text": "Wunderlich et al . (2003) Roland E Wunderlich, Thomas F Wenisch, Babak Falsafi, and James C Hoe. 2003. SMARTS: Accelerating microarchitecture simulation via rigorous statistical sampling. In Proceedings of the 30th annual international symposium on Computer architecture . 84–97."
+    },
+    {
+      "n": 37,
+      "id": "bib.bib29",
+      "text": "Goldschmidt and Hennessy (1993) Stephen R Goldschmidt and John L Hennessy. 1993. The accuracy of trace-driven simulations of multiprocessors. ACM SIGMETRICS Performance Evaluation Review 21, 1 (1993), 146–157."
+    },
+    {
+      "n": 38,
+      "id": "bib.bib26",
+      "text": "Elrabaa et al . (2017) Muhammad ES Elrabaa, Ayman Hroub, Muhamed F Mudawar, Amran Al-Aghbari, Mohammed Al-Asli, and Ahmad Khayyat. 2017. A very fast trace-driven simulation platform for chip-multiprocessors architectural explorations. IEEE Transactions on Parallel and Distributed Systems 28, 11 (2017), 3033–3045."
+    },
+    {
+      "n": 39,
+      "id": "bib.bib42",
+      "text": "Larson et al . (2001) Eric Larson, Saugata Chatterjee, and Todd M Austin. 2001. MASE: a novel infrastructure for detailed microarchitectural modeling.. In ISPASS , Vol. 1. 9."
+    },
+    {
+      "n": 40,
+      "id": "bib.bib17",
+      "text": "Butko et al . (2015) Anastasiia Butko, Rafael Garibotti, Luciano Ost, Vianney Lapotre, Abdoulaye Gamatie, Gilles Sassatelli, and Chris Adeniyi-Jones. 2015. A trace-driven approach for fast and accurate simulation of manycore architectures. In The 20th Asia and South Pacific Design Automation Conference . IEEE, 707–712."
+    },
+    {
+      "n": 41,
+      "id": "bib.bib45",
+      "text": "Lee et al . (2009) Kiyeon Lee, Shayne Evans, and Sangyeun Cho. 2009. Accurately approximating superscalar processor performance from traces. In 2009 IEEE International Symposium on Performance Analysis of Systems and Software . IEEE, 238–248."
+    }
+  ]
+}

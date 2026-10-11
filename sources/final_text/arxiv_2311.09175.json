@@ -1,0 +1,84 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2311.09175",
+  "title": "Can Query Expansion Improve Generalization of Strong Cross-Encoder Rankers?",
+  "authors": "Minghan Li, Honglei Zhuang, Kai Hui, Zhen Qin, Jimmy Lin, Rolf Jagerman, Xuanhui Wang, Michael Bendersky",
+  "year": "2024",
+  "categories": [
+    "cs.IR",
+    "cs.AI"
+  ],
+  "url": "https://arxiv.org/abs/2311.09175",
+  "html_url": "https://arxiv.org/html/2311.09175",
+  "license": "http://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Introduction",
+  "word_count": 506,
+  "text": "Query expansion has been a core technique in information retrieval for over half a century [1,2,3]. The goal is to increase the retrieval accuracy by adding additional terms to the query. Conventional methods such as RM3 [4] leverage pseudo relevance feedback (PRF) to select terms from the documents retrieved for the original query as expansions [5]. Recently, large language models (LLMs) demonstrate their effectiveness in generating expansion terms for retrieval, which is known as generative query expansion [6,7]. However, both methods or their combinations are mainly considered for improving the recall and precision of first-stage retrievers, yet their influence on the generalization of second-stage, cross-encoder rerankers remains under-explored.\n\nThis problem is interesting as additional terms usually contain more information about the query, yet it is rarely used in cross-encoder ranking. A recent study from [10] explores generative query expansion for different retrievers and rankers. They found that weaker models benefit more from expansions while stronger rankers are hurt in most times. This counter-intuitive observation calls for further examination of current expansion methods and whether there is a way to improve the results of strong rankers using query expansion. To verify the conclusion, we also apply some popular query expansion methods to two state-of-the-art cross-encoder rankers, RankT5 [8] and MonoT5 [9]. As shown in Table 1, the results are consistent with [10] where we observe that the nDCG@10 scores of both rankers on TREC DL 2019/2020 and BEIR are compromised using either PRF or LLMs. More results are shown in Section 4 and 5.\n\nIn this work, we identify two important steps for successfully using query expansion in cross-encoder rankers, which are not well explored by existing work focusing on retrievers: high-quality keyword generation and minimal-disruptive query modification. First, cross-encoder rankers mainly aim to improve precision-related metrics such as nDCG@10 which are sensitive to noisy keywords, while retrievers care more about recall where some low-quality expanded keywords are less influential. Therefore, strong rankers such as RankT5 have higher demand on the generation quality. Second, cross-encoder rankers are heavily based on token interactions, making them sensitive to the distributional shift in queries (e.g., number of tokens, input formats) compared to retrievers. Therefore, inserting documents in a query [7] might be less desirable.\n\nIn our experiments, we find that the most effective way is to first use an LLM to generate high-quality, short keywords through a reasoning chain [11]. We then follow self-consistency [12] to run the above process multiple times to filter noisy keywords and select top-k candidates, ensuring the quality of the generated keywords. To mitigate distributional shift in query, we insert each keyword independently with the query and use reciprocal rank weighting [13] to combine the ranking results. Our pipeline manages to improve the nDCG@10 over the baselines for cross-encoder rankers such as RankT5 [8] on both BEIR and TREC DL 2019/2020, while other baselines that have been found effective for retrievers fail to improve such strong rankers. Our study provides a preliminary yet novel research foundation for researchers to explore query expansion for cross-encoder rankers.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib36",
+      "text": "Salton (1971) Gerard Salton. 1971. The SMART retrieval system—experiments in automatic document processing . Prentice-Hall, Inc."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib34",
+      "text": "Robertson and Jones (1976) Stephen E Robertson and K Sparck Jones. 1976. Relevance weighting of search terms. Journal of the American Society for Information science 27, 3 (1976), 129–146."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib2",
+      "text": "Abdul-Jaleel et al . (2004) Nasreen Abdul-Jaleel, James Allan, W Bruce Croft, Fernando Diaz, Leah Larkey, Xiaoyan Li, Mark D Smucker, and Courtney Wade. 2004. UMass at TREC 2004: Novelty and HARD. Computer Science Department Faculty Publication Series (2004), 189."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib20",
+      "text": "Lavrenko and Croft (2001) Victor Lavrenko and W. Bruce Croft. 2001. Relevance Based Language Models (SIGIR ’01) . Association for Computing Machinery, New York, NY, USA, 120–127."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib21",
+      "text": "Li et al . (2023) Hang Li, Ahmed Mourad, Shengyao Zhuang, Bevan Koopman, and Guido Zuccon. 2023. Pseudo Relevance Feedback with Deep Language Models and Dense Retrievers: Successes and Pitfalls. ACM Trans. Inf. Syst. 41, 3, Article 62 (apr 2023), 40 pages."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib18",
+      "text": "Jagerman et al . (2023) Rolf Jagerman, Honglei Zhuang, Zhen Qin, Xuanhui Wang, and Michael Bendersky. 2023. Query Expansion by Prompting Large Language Models. arXiv preprint arXiv:2305.03653 (2023)."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib41",
+      "text": "Wang et al . (2023c) Liang Wang, Nan Yang, and Furu Wei. 2023c. Query2doc: Query Expansion with Large Language Models. In Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing , Houda Bouamor, Juan Pino, and Kalika Bali (Eds.). Association for Computational Linguistics, Singapore, 9414–9423. https://doi.org/10.18653/v1/2023.emnlp-main.585"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib50",
+      "text": "Zhuang et al . (2023) Honglei Zhuang, Zhen Qin, Rolf Jagerman, Kai Hui, Ji Ma, Jing Lu, Jianmo Ni, Xuanhui Wang, and Michael Bendersky. 2023. RankT5: Fine-Tuning T5 for Text Ranking with Ranking Losses (SIGIR ’23) . Association for Computing Machinery, New York, NY, USA, 2308–2313."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib29",
+      "text": "Nogueira et al . (2020) Rodrigo Nogueira, Zhiying Jiang, Ronak Pradeep, and Jimmy Lin. 2020. Document Ranking with a Pretrained Sequence-to-Sequence Model. In Findings of the Association for Computational Linguistics: EMNLP 2020 , Trevor Cohn, Yulan He, and Yang Liu (Eds.). Association for Computational Linguistics, Online, 708–718. https://doi.org/10.18653/v1/2020.findings-emnlp.63"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib45",
+      "text": "Weller et al . (2023) Orion Weller, Kyle Lo, David Wadden, Dawn Lawrie, Benjamin Van Durme, Arman Cohan, and Luca Soldaini. 2023. When do Generative Query and Document Expansions Fail? A Comprehensive Study Across Methods, Retrievers, and Datasets."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib44",
+      "text": "Wei et al . (2022) Jason Wei, Xuezhi Wang, Dale Schuurmans, Maarten Bosma, brian ichter, Fei Xia, Ed Chi, Quoc V Le, and Denny Zhou. 2022. Chain-of-Thought Prompting Elicits Reasoning in Large Language Models. In Advances in Neural Information Processing Systems , S. Koyejo, S. Mohamed, A. Agarwal, D. Belgrave, K. Cho, and A. Oh (Eds.), Vol. 35. Curran Associates, Inc., 24824–24837. https://proceedings.neurips.cc/paper_files/paper/2022/file/9d5609613524ecf4f15af0f7b31abca4-Paper-Conference.pdf"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib43",
+      "text": "Wang et al . (2023b) Xuezhi Wang, Jason Wei, Dale Schuurmans, Quoc V Le, Ed H. Chi, Sharan Narang, Aakanksha Chowdhery, and Denny Zhou. 2023b. Self-Consistency Improves Chain of Thought Reasoning in Language Models. In The Eleventh International Conference on Learning Representations . https://openreview.net/forum?id=1PL1NIMMrw"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib11",
+      "text": "Cormack et al . (2009) Gordon V. Cormack, Charles L A Clarke, and Stefan Buettcher. 2009. Reciprocal Rank Fusion Outperforms Condorcet and Individual Rank Learning Methods. In Proceedings of the 32nd International ACM SIGIR Conference on Research and Development in Information Retrieval (Boston, MA, USA) (SIGIR ’09) . Association for Computing Machinery, New York, NY, USA, 758–759. https://doi.org/10.1145/1571941.1572114"
+    }
+  ]
+}

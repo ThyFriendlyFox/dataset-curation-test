@@ -1,0 +1,95 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2401.17159",
+  "title": "Layered and Staged Monte Carlo Tree Search for SMT Strategy Synthesis",
+  "authors": "Zhengyang Lu, Stefan Siemer, Piyush Jha, Joel Day, Florin Manea, Vijay Ganesh",
+  "year": "2024",
+  "categories": [
+    "cs.AI",
+    "cs.LO",
+    "cs.SE"
+  ],
+  "url": "https://arxiv.org/abs/2401.17159",
+  "html_url": "https://arxiv.org/html/2401.17159",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1236,
+  "text": "Satisfiability Modulo Theories (SMT) solvers [1] are key tools in diverse fields such as software engineering [2], verification [3], security [4], and artificial intelligence [5]. It has long been observed that no single solver or algorithm excels across all instances of a given SMT logic or of a problem class. As a result, modern SMT solvers, such as Z3 [6], offer user-controllable strategies [7], enabling users to customize a decision procedure for their class of instances. A strategy can be thought of as an algorithmic recipe for selecting, sequencing, and parameterizing tactics. Each tactic is a well-defined algorithmic proof rule or symbolic reasoning step, provided by the solver. For example, propagate-values is a Z3 tactic that propagates equalities, while sat and smt are the tactic wrappers of the main SAT and SMT solver in Z3. A strategy builds a decision procedure by combining tactics, as shown in an exemplar strategy (if is-pb (then propagate-values sat) smt). This strategy specifies a solving algorithm that, given an input instance, applies propagate-values followed by sat if the instance is a pseudo-boolean problem (as checked using is-pb), or applies smt otherwise.\n\nDefault solver strategies are typically optimized for well-established benchmarks, such as those in the SMT-LIB library [8]. However, as the scope of SMT applications continues to grow rapidly, users frequently encounter specialized, evolving, and unprecedented classes of instances. In these scenarios, the default or the existing customized strategies might not be as effective. Consequently, there arises a need for novel customized strategies, specifically designed to efficiently address the unique challenges posed by users’ specific problems. Traditionally, this task of strategy customization has been undertaken by human experts through extensive experimentation and benchmark analysis. However, even with their expertise and efforts, the task remains challenging due to the intricate interactions among tactics and the vast search space for potential strategies.\n\nEarly attempts have been made to synthesize SMT strategies automatically. For instance, StratEVO [9] searches for an optimal strategy using evolutionary algorithms, while FastSMT [10] synthesizes a tailored strategy using imitation learning and decision tree learning techniques. While these methods show promise in automating strategy customization, they suffer from issues such as a lack of robustness, limited interpretability, and extensive training times.\n\nTo address these issues, we introduce a novel SMT strategy synthesis method that employs Monte Carlo Tree Search (MCTS). MCTS is a heuristic search algorithm, widely applied in computer board game players as a lookahead planning algorithm [11]. Its prominence further escalated following its successful integration into the groundbreaking deep reinforcement learning systems AlphaGo [12] and AlphaZero [13], where MCTS was employed as a policy improvement operator. Recently, MCTS has shown remarkable success as a standalone algorithm in solving complex symbolic or combinatorial search problems, as evidenced in Khalil et al. [14] and Sun et al. [15]. Its key strengths, including its ability to effectively balance exploration and exploitation and its adaptiveness to the nuances of varied search problems, make it an excellent method for such challenging tasks. Our work is the first to apply MCTS to the SMT strategy synthesis problem.\n\n## 1.1 The Strategy Synthesis Problem\n\nThe SMT strategy synthesis problem is defined as automatically identifying an optimal strategy that yields the best performance for a given benchmark set P. This performance is typically measured in terms of metrics such as the number of P -instances successfully solved within a specified wallclock timeout t. P is intended to be a representative subset of the broader benchmark set Q, which is of interest to the user, with the expectation that a strategy performing well on P generalizes effectively to Q. It is important to note that due to the infinite nature of the strategy search space and the empirical approach to strategy evaluation, finding a rigorously optimal solution is impractical. Consequently, our objective is to discover a near-optimal solution within a reasonable search time, based on empirical measurements. This research focuses on strategy synthesis for Z3, a solver that is widely regarded as one of the most prevalent SMT solvers in use today.\n\n## 1.2 Our Contributions\n\n- 1. Z3alpha: An MCTS-based Strategy Synthesizing Solver: We present a novel MCTS-based framework, dubbed Z3alpha, for the SMT strategy synthesis problem, which automatically constructs tailored solver strategies for a given class of problem instances. To the best of our knowledge, Z3alpha is the first MCTS-based method developed for the SMT strategy synthesis problem.\n\nZ3alpha: An MCTS-based Strategy Synthesizing Solver: We present a novel MCTS-based framework, dubbed Z3alpha, for the SMT strategy synthesis problem, which automatically constructs tailored solver strategies for a given class of problem instances. To the best of our knowledge, Z3alpha is the first MCTS-based method developed for the SMT strategy synthesis problem.\n\n- 2. Layered and Staged MCTS: To address the unique challenges inherent to strategy synthesis, that cannot be solved by the conventional MCTS alone, we develop two innovative heuristics, namely, layered search and staged search on top of the MCTS framework. The layered search method effectively narrows the search space by treating certain auxiliary tasks as independent search problems. On the other hand, the staged search technique segments the entire search problem into sequential sub-problems, enabling the use of results from early stages to expedite the search in later stages. Together, these two techniques work symbiotically to enhance the search efficiency and effectiveness in finding the optimal strategy, an essential improvement given the time-consuming nature of strategy evaluations.\n\nLayered and Staged MCTS: To address the unique challenges inherent to strategy synthesis, that cannot be solved by the conventional MCTS alone, we develop two innovative heuristics, namely, layered search and staged search on top of the MCTS framework. The layered search method effectively narrows the search space by treating certain auxiliary tasks as independent search problems. On the other hand, the staged search technique segments the entire search problem into sequential sub-problems, enabling the use of results from early stages to expedite the search in later stages. Together, these two techniques work symbiotically to enhance the search efficiency and effectiveness in finding the optimal strategy, an essential improvement given the time-consuming nature of strategy evaluations.\n\n- 3. Extensive Experimental Evaluation: We implemented our proposed method, dubbed Z3alpha, on top of the leading SMT solver Z3. To assess its performance, we conducted comprehensive experiments, comparing Z3alpha with the state-of-the-art (SOTA) synthesis tool FastSMT, as well as Z3 ’s own handcrafted default strategy and the CVC5 solver. These experiments spanned a broad spectrum, including instances from six different SMT logics (namely, QF_{BV, LIA, LRA, NIA, NRA, S}), representing a wide range of problem sizes and solver runtimes. Across all experiments, Z3alpha consistently demonstrated superior and robust performance. This impressive performance strongly highlights the benefits of automatic strategy customization, promoting broader adoption of user-controllable strategies within the SMT community.\n\nExtensive Experimental Evaluation: We implemented our proposed method, dubbed Z3alpha, on top of the leading SMT solver Z3. To assess its performance, we conducted comprehensive experiments, comparing Z3alpha with the state-of-the-art (SOTA) synthesis tool FastSMT, as well as Z3 ’s own handcrafted default strategy and the CVC5 solver. These experiments spanned a broad spectrum, including instances from six different SMT logics (namely, QF_{BV, LIA, LRA, NIA, NRA, S}), representing a wide range of problem sizes and solver runtimes. Across all experiments, Z3alpha consistently demonstrated superior and robust performance. This impressive performance strongly highlights the benefits of automatic strategy customization, promoting broader adoption of user-controllable strategies within the SMT community.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib11",
+      "text": "De Moura and Bjørner [2011] Leonardo De Moura and Nikolaj Bjørner. Satisfiability modulo theories: introduction and applications. Communications of the ACM , 54(9):69–77, 2011."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib7",
+      "text": "Cadar et al. [2008] Cristian Cadar, Vijay Ganesh, Peter M Pawlowski, David L Dill, and Dawson R Engler. EXE: Automatically generating inputs of death. ACM Transactions on Information and System Security (TISSEC) , 12(2):1–38, 2008."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib15",
+      "text": "Gurfinkel et al. [2015] Arie Gurfinkel, Temesghen Kahsai, Anvesh Komuravelli, and Jorge A Navas. The SeaHorn verification framework. In International Conference on Computer Aided Verification , pages 343–361. Springer, 2015."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib33",
+      "text": "Song et al. [2008] Dawn Song, David Brumley, Heng Yin, Juan Caballero, Ivan Jager, Min Gyung Kang, Zhenkai Liang, James Newsome, Pongsin Poosankam, and Prateek Saxena. BitBlaze: A new approach to computer security via binary analysis. In Information Systems Security: 4th International Conference, ICISS 2008, Hyderabad, India, December 16-20, 2008. Proceedings 4 , pages 1–25. Springer, 2008."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib26",
+      "text": "Pulina and Tacchella [2012] Luca Pulina and Armando Tacchella. Challenging SMT solvers to verify neural networks. Ai Communications , 25(2):117–135, 2012."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib10",
+      "text": "De Moura and Bjørner [2008] Leonardo De Moura and Nikolaj Bjørner. Z3: An efficient SMT solver. In International conference on Tools and Algorithms for the Construction and Analysis of Systems , pages 337–340. Springer, 2008."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib12",
+      "text": "De Moura and Passmore [2013] Leonardo De Moura and Grant Olney Passmore. The strategy challenge in SMT solving. Automated Reasoning and Mathematics: Essays in Memory of William W. McCune , pages 15–44, 2013."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib2",
+      "text": "Barrett et al. [2016] Clark Barrett, Pascal Fontaine, and Cesare Tinelli. The satisfiability modulo theories library (SMT-LIB). http://smtlib.cs.uiowa.edu/index.shtml , 2016. Accessed: 2024-01-16."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib27",
+      "text": "Ramírez et al. [2016] Nicolás Gálvez Ramírez, Youssef Hamadi, Eric Monfroy, and Frédéric Saubion. Evolving SMT strategies. In 2016 IEEE 28th International Conference on Tools with Artificial Intelligence (ICTAI) , pages 247–254. IEEE, 2016."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib1",
+      "text": "Balunovic et al. [2018] Mislav Balunovic, Pavol Bielik, and Martin Vechev. Learning to solve SMT formulas. In Advances in Neural Information Processing Systems 31 , pages 10337–10348. Curran Associates, 2018."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib6",
+      "text": "Browne et al. [2012] Cameron B Browne, Edward Powley, Daniel Whitehouse, Simon M Lucas, Peter I Cowling, Philipp Rohlfshagen, Stephen Tavener, Diego Perez, Spyridon Samothrakis, and Simon Colton. A survey of monte carlo tree search methods. IEEE Transactions on Computational Intelligence and AI in games , 4(1):1–43, 2012."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib31",
+      "text": "Silver et al. [2016] David Silver, Aja Huang, Chris J Maddison, Arthur Guez, Laurent Sifre, George Van Den Driessche, Julian Schrittwieser, Ioannis Antonoglou, Veda Panneershelvam, Marc Lanctot, et al. Mastering the game of go with deep neural networks and tree search. nature , 529(7587):484–489, 2016."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib32",
+      "text": "Silver et al. [2017] David Silver, Thomas Hubert, Julian Schrittwieser, Ioannis Antonoglou, Matthew Lai, Arthur Guez, Marc Lanctot, Laurent Sifre, Dharshan Kumaran, Thore Graepel, et al. Mastering chess and shogi by self-play with a general reinforcement learning algorithm. arXiv preprint arXiv:1712.01815 , 2017."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib18",
+      "text": "Khalil et al. [2022] Elias B Khalil, Pashootan Vaezipoor, and Bistra Dilkina. Finding backdoors to integer programs: a monte carlo tree search framework. In Proceedings of the AAAI Conference on Artificial Intelligence , volume 36, pages 3786–3795, 2022."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib34",
+      "text": "Sun et al. [2023] Fangzheng Sun, Yang Liu, Jian-Xun Wang, and Hao Sun. Symbolic physics learner: Discovering governing equations via monte carlo tree search. In The Eleventh International Conference on Learning Representations, ICLR 2023, Kigali, Rwanda, May 1-5, 2023 . OpenReview.net, 2023."
+    }
+  ]
+}
