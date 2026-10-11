@@ -56,7 +56,8 @@ def main(title, sec_re, revid=None):
     for m in sec.select(".mwe-math-element"):  # keep formulas as their TeX source
         tex = (m.find("math") or {}).get("alttext", "")
         m.replace_with(re.sub(r"^\{\\displaystyle\s*(.*)\}$", r"\1", tex.strip(), flags=re.S))
-    for junk in sec.select("figure, table, style, .mw-empty-elt, .hatnote, .shortdescription"):
+    # inline maintenance tags ("[citation needed]", "[update]", "[self-published source?]") are editor notes
+    for junk in sec.select("figure, table, style, .mw-empty-elt, .hatnote, .shortdescription, sup.noprint, .Inline-Template"):
         junk.decompose()
     blocks = []
     # dd/dt are ':'/';' indented blocks (often quotations); text sitting directly in a blockquote
