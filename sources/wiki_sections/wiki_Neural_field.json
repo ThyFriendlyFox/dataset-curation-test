@@ -1,0 +1,50 @@
+{
+  "source_type": "encyclopedia_article",
+  "source_id": "enwiki:Neural field#rev1341227228",
+  "title": "Neural field",
+  "authors": "Wikipedia contributors",
+  "year": "2026",
+  "url": "https://en.wikipedia.org/w/index.php?title=Neural_field&oldid=1341227228",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Conditional neural fields",
+  "word_count": 690,
+  "text": "In many real-world cases, however, learning a single field is not enough. For example, when reconstructing 3D vehicle shapes from Lidar data, it is desirable to have a machine learning model that can work with arbitrary shapes (e.g., a car, a bicycle, a truck, etc.). The solution is to include additional parameters, the latent variables (or latent code) \\boldsymbol{z} \\in \\R^d , to vary the field and adapt it to diverse tasks.[1]\n\n### Latent code production\n\nWhen dealing with conditional neural fields, the first design choice is represented by the way in which the latent code is produced. Specifically, two main strategies can be identified:[1]\n\nEncoder: the latent code is the output of a second neural network, acting as an encoder. During training, the loss function is the objective used to learn the parameters of both the neural field and the encoder.[2]\n\nAuto-decoding: each training example has its own latent code, jointly trained with the neural field parameters. When the model has to process new examples (i.e., not originally present in the training dataset), a small optimization problem is solved, keeping the network parameters fixed and only learning the new latent variables.[3]\n\nSince the latter strategy requires additional optimization steps at inference time, it sacrifices speed, but keeps the overall model smaller. Moreover, despite being simpler to implement, an encoder may harm the generalization capabilities of the model.[1] For example, when dealing with a physical scalar field f : \\R^2 \\rightarrow \\R (e.g., the pressure of a 2D fluid), an auto-decoder-based conditional neural field can map a single point to the corresponding value of the field, following a learned latent code \\boldsymbol{z} .[4] However, if the latent variables were produced by an encoder, it would require access to the entire set of points and corresponding values (e.g. as a regular grid or a mesh graph), leading to a less robust model.[1]\n\n### Global and local conditioning\n\nIn a neural field with global conditioning, the latent code does not depend on the input and, hence, it offers a global representation (e.g., the overall shape of a vehicle). However, depending on the task, it may be more useful to divide the domain of \\boldsymbol{x} in several subdomains, and learn different latent codes for each of them (e.g., splitting a large and complex scene in sub-scenes for a more efficient rendering). This is called local conditioning.[1]\n\n### Conditioning strategies\n\nThere are several strategies to include the conditioning information in the neural field. In the general mathematical framework, conditioning the neural field with the latent variables is equivalent to mapping them to a subset \\boldsymbol{\\theta}^{*} of the neural field parameters:[1] \\boldsymbol{\\theta}^{*} = \\Gamma(\\boldsymbol{z}) In practice, notable strategies are:\n\nConcatenation: the neural field receives, as input, the concatenation of the original input \\boldsymbol{x} with the latent codes \\boldsymbol{z} . For feed-forward neural networks, this is equivalent to setting \\boldsymbol{\\theta}^{*} as the bias of the first layer and \\Gamma(\\boldsymbol{z}) as an affine transformation.[1]\n\nHypernetworks: a hypernetwork is a neural network that outputs the parameters of another neural network.[5] Specifically, it consists of approximating \\Gamma(\\boldsymbol{z}) with a neural network \\hat\\Gamma_{\\gamma}(\\boldsymbol{z}) , where \\boldsymbol{\\gamma} are the trainable parameters of the hypernetwork. This approach is the most general, as it allows to learn the optimal mapping from latent codes to neural field parameters. However, hypernetworks are associated to larger computational and memory complexity, due to the large number of trainable parameters. Hence, leaner approaches have been developed. For example, in the Feature-wise Linear Modulation (FiLM), the hypernetwork only produces scale and bias coefficients for the neural field layers.[1,6]\n\n### Meta-learning\n\nInstead of relying on the latent code to adapt the neural field to a specific task, it is also possible to exploit gradient-based meta-learning. In this case, the neural field is seen as the specialization of an underlying meta-neural-field, whose parameters are modified to fit the specific task, through a few steps of gradient descent.[7,8] An extension of this meta-learning framework is the CAVIA algorithm, that splits the trainable parameters in context-specific and shared groups, improving parallelization and interpretability, while reducing meta-overfitting. This strategy is similar to the auto-decoding conditional neural field, but the training procedure is substantially different.[9]",
+  "references": [
+    {
+      "n": 1,
+      "text": "Xie, Yiheng. (2022). Neural Fields in Visual Computing and Beyond. Computer Graphics Forum. doi:10.1111/cgf.14505"
+    },
+    {
+      "n": 2,
+      "text": "Qi, Charles R.. (2016). PointNet: Deep Learning on Point Sets for 3D Classification and Segmentation."
+    },
+    {
+      "n": 3,
+      "text": "(2019). DeepSDF: Learning Continuous Signed Distance Functions for Shape Representation."
+    },
+    {
+      "n": 4,
+      "text": "Serrano, Louis. (2023). Operator Learning with Neural Fields: Tackling PDEs on General Geometries."
+    },
+    {
+      "n": 5,
+      "text": "Ha, David. (2016). HyperNetworks."
+    },
+    {
+      "n": 6,
+      "text": "Perez, Ethan. (2017). FiLM: Visual Reasoning with a General Conditioning Layer."
+    },
+    {
+      "n": 7,
+      "text": "Finn, Chelsea. (2017). Model-Agnostic Meta-Learning for Fast Adaptation of Deep Networks."
+    },
+    {
+      "n": 8,
+      "text": "Sitzmann, Vincent. (2020). MetaSDF: Meta-learning Signed Distance Functions."
+    },
+    {
+      "n": 9,
+      "text": "(2018). Fast Context Adaptation via Meta-Learning."
+    }
+  ]
+}

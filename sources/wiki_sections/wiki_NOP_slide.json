@@ -1,0 +1,30 @@
+{
+  "source_type": "encyclopedia_article",
+  "source_id": "enwiki:NOP slide#rev1365300516",
+  "title": "NOP slide",
+  "authors": "Wikipedia contributors",
+  "year": "2026",
+  "url": "https://en.wikipedia.org/w/index.php?title=NOP_slide&oldid=1365300516",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Exploit",
+  "word_count": 583,
+  "text": "A NOP slide is the oldest and most widely known technique for exploiting stack buffer overflows.[1] It solves the problem of finding the exact address of the buffer by effectively increasing the size of the target area. To do this, much larger sections of the stack are corrupted with the no-op machine instruction. At the end of the attacker-supplied data, after the no-op instructions, the attacker places an instruction to perform a relative jump to the top of the buffer where the shellcode is located. This collection of no-ops is referred to as the \"NOP slide\" because if the return address is overwritten with any address within the no-op region of the buffer, the execution will \"slide\" down the no-ops until it is redirected to the actual malicious code by the jump at the end. This technique requires the attacker to guess where on the stack the NOP slide is instead of the comparatively small shellcode.[2]\n\nBecause of the popularity of this technique, many vendors of intrusion prevention systems will search for this pattern of no-op machine instructions in an attempt to detect shellcode in use. A NOP slide does not necessarily contain only traditional no-op machine instructions; any instruction that does not corrupt the machine state to a point where the shellcode will not run can be used in place of the hardware assisted no-op. As a result, it has become common practice for exploit writers to compose the NOP slide with randomly chosen instructions which will have no real effect on the shellcode execution.[3]\n\nWhile this method greatly improves the chances that an attack will be successful, it is not without problems. Exploits using this technique still must rely on some amount of luck that they will guess offsets on the stack that are within the NOP sled region.[4] An incorrect guess will usually result in the target program crashing and could alert the system administrator to the attacker's activities. Another problem is that the NOP slide requires a much larger amount of memory in which to hold a NOP slide large enough to be of any use. This can be a problem when the allocated size of the affected buffer is too small and the current depth of the stack is shallow (i.e., there is not much space from the end of the current stack frame to the start of the stack). Despite its problems, the NOP slide is often the only method that will work for a given platform, environment, or situation, and as such it is still an important technique.\n\nThe entropy of a NOP slide is dependent upon the constraints placed on it. If it can be determined that certain registers are not in use (that is to say, they will be set to a known value before their next use), instructions which manipulate them arbitrarily may be used in the NOP slide. Additionally, if the alignment of both the NOP slide and the instruction pointer are deterministic, multi-byte instructions can be used in a NOP slide without regard to the results of unaligned execution. If the input providing the attack vector into which the NOP slide and payload are to be introduced are filtered (such as accepting only printable characters), the field of possible instructions for inclusion is limited. While instructions that are part of an architecture extension (such as SSE) may frequently be irrelevant to program state, they cannot be used in a NOP slide targeting a computer on which the extension is not supported.",
+  "references": [
+    {
+      "n": 1,
+      "text": "Vangelis. (2004-12-08). Stack-based Overflow Exploit: Introduction to Classical and Advanced Overflow Technique. Wowhacker via Neworder. http://www.neworder.box.sk/newsread.php?newsid=12476"
+    },
+    {
+      "n": 2,
+      "text": "Buffer Overflows Demystified. Enderunix.org. http://www.enderunix.org/docs/en/bof-eng.txt"
+    },
+    {
+      "n": 3,
+      "text": "(2005). STRIDE: Polymorphic Sled Detection through Instruction Sequence Analysis. IFIP International Information Security Conference. http://dcs.ics.forth.gr/Activities/papers/stride-IFIP-SEC05.pdf"
+    },
+    {
+      "n": 4,
+      "text": "(September 2004). Buffer Overflow. http://c0re.23.nu/~chris/presentations/overflow2005.pdf"
+    }
+  ]
+}

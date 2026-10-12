@@ -1,0 +1,38 @@
+{
+  "source_type": "encyclopedia_article",
+  "source_id": "enwiki:Mutual exclusion#rev1366280185",
+  "title": "Mutual exclusion",
+  "authors": "Wikipedia contributors",
+  "year": "2026",
+  "url": "https://en.wikipedia.org/w/index.php?title=Mutual_exclusion&oldid=1366280185",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Enforcing mutual exclusion",
+  "word_count": 573,
+  "text": "### Hardware solutions\n\nOn uni-processor systems, the simplest solution to achieve mutual exclusion is to disable interrupts during a process's critical section. This will prevent any interrupt service routines from running (effectively preventing a process from being preempted). Although this solution is effective, it leads to many problems. If a critical section is long, then the system clock will drift every time a critical section is executed because the timer interrupt is no longer serviced, so tracking time is impossible during the critical section. Also, if a process halts during its critical section, control will never be returned to another process, effectively halting the entire system. A more elegant method for achieving mutual exclusion is the busy-wait.\n\nBusy-waiting is effective for both uniprocessor and multiprocessor systems. The use of shared memory and an atomic test-and-set instruction provide the mutual exclusion. A process can test-and-set on a location in shared memory, and since the operation is atomic, only one process can set the flag at a time. Any process that is unsuccessful in setting the flag can either go on to do other tasks and try again later, release the processor to another process and try again later, or continue to loop while checking the flag until it is successful in acquiring it. Preemption is still possible, so this method allows the system to continue to function—even if a process halts while holding the lock.\n\nSeveral other atomic operations can be used to provide mutual exclusion of data structures; most notable of these is compare-and-swap (CAS). CAS can be used to achieve wait-free mutual exclusion for any shared data structure by creating a linked list where each node represents the desired operation to be performed. CAS is then used to change the pointers in the linked list[1] during the insertion of a new node. Only one process can be successful in its CAS; all other processes attempting to add a node at the same time will have to try again. Each process can then keep a local copy of the data structure, and upon traversing the linked list, can perform each operation from the list on its local copy.\n\n### Software solutions\n\nIn addition to hardware-supported solutions, some software solutions exist that use busy waiting to achieve mutual exclusion. Examples include:\n\nDekker's algorithm\n\nPeterson's algorithm\n\nLamport's bakery algorithm[2]\n\nSzymański's algorithm\n\nTaubenfeld's black-white bakery algorithm[3]\n\nMaekawa's algorithm\n\nThese algorithms do not work if out-of-order execution is used on the platform that executes them. Programmers have to specify strict ordering on the memory operations within a thread.[4]\n\nIt is often preferable to use synchronization facilities provided by an operating system’s multithreading library, which can take advantage of hardware support when available but fall back on software mechanisms when necessary. For example, when an operating system’s lock facility is used and a thread attempts to acquire a lock that is already held, the operating system may suspend the thread via a context switch and schedule another runnable thread, or place the processor into a low-power state if no other thread is available to run. As a result, most modern mutual exclusion techniques aim to reduce latency and busy-waiting by relying on queuing and context switching. However, if the overhead of suspending and later restoring a thread is demonstrably greater than the time the thread would spend waiting for the lock to become available in a specific scenario, then spinlocks can be an acceptable solution in that context.[5,6]",
+  "references": [
+    {
+      "n": 1,
+      "text": "Harris, Timothy L.. (2001). A Pragmatic Implementation of Non-blocking Linked-lists. Distributed Computing. doi:10.1007/3-540-45414-4_21"
+    },
+    {
+      "n": 2,
+      "text": "Lamport, Leslie. (August 1974). A new solution of Dijkstra's concurrent programming problem. Communications of the ACM. doi:10.1145/361082.361093"
+    },
+    {
+      "n": 3,
+      "text": "Taubenfeld, \"The Black-White Bakery Algorithm\". In Proc. Distributed Computing, 18th international conference, DISC 2004. Vol 18, 56–70, 2004"
+    },
+    {
+      "n": 4,
+      "text": "Holzmann, Gerard J.. (1 October 2007). The Design of a Multicore Extension of the SPIN Model Checker. IEEE Transactions on Software Engineering. doi:10.1109/TSE.2007.70724"
+    },
+    {
+      "n": 5,
+      "text": "Silberschatz, Abraham. (2018). Operating System Concepts. Wiley."
+    },
+    {
+      "n": 6,
+      "text": "Herlihy, Maurice. (2012). The Art of Multiprocessor Programming. Morgan Kaufmann."
+    }
+  ]
+}

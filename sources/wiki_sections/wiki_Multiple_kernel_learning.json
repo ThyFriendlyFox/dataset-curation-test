@@ -1,0 +1,66 @@
+{
+  "source_type": "encyclopedia_article",
+  "source_id": "enwiki:Multiple kernel learning#rev1369302851",
+  "title": "Multiple kernel learning",
+  "authors": "Wikipedia contributors",
+  "year": "2026",
+  "url": "https://en.wikipedia.org/w/index.php?title=Multiple_kernel_learning&oldid=1369302851",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Algorithms",
+  "word_count": 1174,
+  "text": "Multiple kernel learning algorithms have been developed for supervised, semi-supervised, as well as unsupervised learning. Most work has been done on the supervised learning case with linear combinations of kernels, however, many algorithms have been developed. The basic idea behind multiple kernel learning algorithms is to add an extra parameter to the minimization problem of the learning algorithm. As an example, consider the case of supervised learning of a linear combination of a set of n kernels K . We introduce a new kernel K'=\\sum_{i=1}^n\\beta_iK_i , where \\beta is a vector of coefficients for each kernel. Because the kernels are additive (due to properties of reproducing kernel Hilbert spaces), this new function is still a kernel. For a set of data X with labels Y , the minimization problem can then be written as\n\n\\min_{\\beta,c}\\Epsilon(Y, K'c)+R(K,c)\n\nwhere \\Epsilon is an error function and R is a regularization term. \\Epsilon is typically the square loss function (Tikhonov regularization) or the hinge loss function (for SVM algorithms), and R is usually an \\ell_n norm or some combination of the norms (i.e. elastic net regularization). This optimization problem can then be solved by standard optimization methods. Adaptations of existing techniques such as the Sequential Minimal Optimization have also been developed for multiple kernel SVM-based methods.[1]\n\n### Supervised learning\n\nFor supervised learning, there are many other algorithms that use different methods to learn the form of the kernel. The following categorization has been proposed by Gonen and Alpaydın (2011)[2]\n\n### Fixed rules approaches\n\nFixed rules approaches such as the linear combination algorithm described above use rules to set the combination of the kernels. These do not require parameterization and use rules like summation and multiplication to combine the kernels. The weighting is learned in the algorithm. Other examples of fixed rules include pairwise kernels, which are of the form\n\nk((x_{1i}, x_{1j}),(x_{2i},x_{2j}))=k(x_{1i},x_{2i})k(x_{1j},x_{2j})+k(x_{1i},x_{2j})k(x_{1j},x_{2i}) .\n\nThese pairwise approaches have been used in predicting protein-protein interactions.[3]\n\n### Heuristic approaches\n\nThese algorithms use a combination function that is parameterized. The parameters are generally defined for each individual kernel based on single-kernel performance or some computation from the kernel matrix. Examples of these include the kernel from Tenabe et al. (2008).[4] Letting \\pi_m be the accuracy obtained using only K_m , and letting \\delta be a threshold less than the minimum of the single-kernel accuracies, we can define\n\n\\beta_m=\\frac{\\pi_m-\\delta}{\\sum_{h=1}^{n}(\\pi_h-\\delta)}\n\nOther approaches use a definition of kernel similarity, such as\n\nA(K_1,K_2)=\\frac{\\langle K_1,K_2 \\rangle}{\\sqrt{\\langle K_1,K_1 \\rangle\\langle K_2,K_2\\rangle}}\n\nUsing this measure, Qui and Lane (2009)[5] used the following heuristic to define\n\n\\beta_m=\\frac{A(K_m,YY^T)}{\\sum_{h=1}^{n}A(K_h,YY^T)}\n\n### Optimization approaches\n\nThese approaches solve an optimization problem to determine parameters for the kernel combination function. This has been done with similarity measures and structural risk minimization approaches. For similarity measures such as the one defined above, the problem can be formulated as follows:[6]\n\n\\max_{\\beta,\\operatorname{tr}(K'_{tra})=1,K'\\ge0} A(K'_{tra},YY^T).\n\nwhere K'_{tra} is the kernel of the training set.\n\nStructural risk minimization approaches that have been used include linear approaches, such as that used by Lanckriet et al. (2002).[7] We can define the implausibility of a kernel \\omega(K) to be the value of the objective function after solving a canonical SVM problem. We can then solve the following minimization problem:\n\n\\min_{\\operatorname{tr}(K'_{tra})=c}\\omega(K'_{tra})\n\nwhere c is a positive constant.\n\nMany other variations exist on the same idea, with different methods of refining and solving the problem, e.g. with nonnegative weights for individual kernels and using non-linear combinations of kernels.\n\n### Bayesian approaches\n\nBayesian approaches put priors on the kernel parameters and learn the parameter values from the priors and the base algorithm. For example, the decision function can be written as\n\nf(x)=\\sum^n_{i=0}\\alpha_i\\sum^p_{m=1}\\eta_mK_m(x_i^m,x^m)\n\n\\eta can be modeled with a Dirichlet prior and \\alpha can be modeled with a zero-mean Gaussian and an inverse gamma variance prior. This model is then optimized using a customized multinomial probit approach with a Gibbs sampler.\n\n[8]\n\nThese methods have been used successfully in applications such as protein fold recognition and protein homology problems [9,10]\n\n### Boosting approaches\n\nBoosting approaches add new kernels iteratively until some stopping criteria that is a function of performance is reached. An example of this is the MARK model developed by Bennett et al. (2002) [11]\n\nf(x)=\\sum_{i=1}^N\\sum_{m=1}^P\\alpha_i^mK_m(x_i^m,x^m)+b\n\nThe parameters \\alpha_i^m and b are learned by gradient descent on a coordinate basis. In this way, each iteration of the descent algorithm identifies the best kernel column to choose at each particular iteration and adds that to the combined kernel. The model is then rerun to generate the optimal weights \\alpha_i and b .\n\n### Semisupervised learning\n\nSemisupervised learning approaches to multiple kernel learning are similar to other extensions of supervised learning approaches. An inductive procedure has been developed that uses a log-likelihood empirical loss and group LASSO regularization with conditional expectation consensus on unlabeled data for image categorization. We can define the problem as follows. Let L={(x_i,y_i)} be the labeled data, and let U={x_i} be the set of unlabeled data. Then, we can write the decision function as follows.\n\nf(x)=\\alpha_0+\\sum_{i=1}^\\alpha_iK_i(x)\n\nThe problem can be written as\n\n\\min_f L(f) + \\lambda R(f)+\\gamma\\Theta(f)\n\nwhere L is the loss function (weighted negative log-likelihood in this case), R is the regularization parameter (Group LASSO in this case), and \\Theta is the conditional expectation consensus (CEC) penalty on unlabeled data. The CEC penalty is defined as follows. Let the marginal kernel density for all the data be\n\ng^{\\pi}_m(x)=\\langle\\phi^{\\pi}_m,\\psi_m(x)\\rangle\n\nwhere \\psi_m(x)=[K_m(x_1,x),\\ldots,K_m(x_L,x)]^T (the kernel distance between the labeled data and all of the labeled and unlabeled data) and \\phi^{\\pi}_m is a non-negative random vector with a 2-norm of 1. The value of \\Pi is the number of times each kernel is projected. Expectation regularization is then performed on the MKD, resulting in a reference expectation q^{pi}_m(y|g^{\\pi}_m(x)) and model expectation p^{\\pi}_m(f(x)|g^{\\pi}_m(x)) . Then, we define\n\n\\Theta=\\frac{1}{\\Pi} \\sum^{\\Pi}_{\\pi=1}\\sum^{M}_{m=1} D(q^{pi}_m(y|g^{\\pi}_m(x))||p^{\\pi}_m(f(x)|g^{\\pi}_m(x)))\n\nwhere D(Q||P)=\\sum_iQ(i)\\ln\\frac{Q(i)}{P(i)} is the Kullback–Leibler divergence. The combined minimization problem is optimized using a modified block gradient descent algorithm. For more information, see Wang et al.[12]\n\n### Unsupervised learning\n\nUnsupervised multiple kernel learning algorithms have also been proposed by Zhuang et al. The problem is defined as follows. Let U={x_i} be a set of unlabeled data. The kernel definition is the linear combined kernel K'=\\sum_{i=1}^M\\beta_iK_m . In this problem, the data needs to be \"clustered\" into groups based on the kernel distances. Let B_i be a group or cluster of which x_i is a member. We define the loss function as \\sum^n_{i=1}\\left\\Vert x_i - \\sum_{x_j\\in B_i} K(x_i,x_j)x_j\\right\\Vert^2 . Furthermore, we minimize the distortion by minimizing \\sum_{i=1}^n\\sum_{x_j\\in B_i}K(x_i,x_j)\\left\\Vert x_i - x_j \\right\\Vert^2 . Finally, we add a regularization term to avoid overfitting. Combining these terms, we can write the minimization problem as follows.\n\n\\min_{\\beta,B}\\sum^n_{i=1}\\left\\Vert x_i - \\sum_{x_j\\in B_i} K(x_i,x_j)x_j\\right\\Vert^2 + \\gamma_1\\sum_{i=1}^n\\sum_{x_j\\in B_i}K(x_i,x_j)\\left\\Vert x_i - x_j \\right\\Vert^2 + \\gamma_2\\sum_i |B_i|\n\nwhere . One formulation of this is defined as follows. Let D\\in {0,1}^{n\\times n} be a matrix such that D_{ij}=1 means that x_i and x_j are neighbors. Then, B_i={x_j:D_{ij}=1} . Note that these groups must be learned as well. Zhuang et al. solve this problem by an alternating minimization method for K and the groups B_i . For more information, see Zhuang et al.[13]",
+  "references": [
+    {
+      "n": 1,
+      "text": "Francis R. Bach, Gert R. G. Lanckriet, and Michael I. Jordan. 2004. Multiple kernel learning, conic duality, and the SMO algorithm. In Proceedings of the twenty-first international conference on Machine learning (ICML '04). ACM, New York, NY, USA"
+    },
+    {
+      "n": 2,
+      "text": "Mehmet Gönen, Ethem Alpaydın. Multiple Kernel Learning Algorithms Jour. Mach. Learn. Res. 12(Jul):2211−2268, 2011"
+    },
+    {
+      "n": 3,
+      "text": "Ben-Hur, A. and Noble W.S. Kernel methods for predicting protein-protein interactions. Bioinformatics. 2005 Jun;21 Suppl 1:i38-46."
+    },
+    {
+      "n": 4,
+      "text": "Hiroaki Tanabe, Tu Bao Ho, Canh Hao Nguyen, and Saori Kawasaki. Simple but effective methods for combining kernels in computational biology. In Proceedings of IEEE International Conference on Research, Innovation and Vision for the Future, 2008."
+    },
+    {
+      "n": 5,
+      "text": "Shibin Qiu and Terran Lane. A framework for multiple kernel support vector regression and its applications to siRNA efficacy prediction. IEEE/ACM Transactions on Computational Biology and Bioinformatics, 6(2):190–199, 2009"
+    },
+    {
+      "n": 6,
+      "text": "Gert R. G. Lanckriet, Nello Cristianini, Peter Bartlett, Laurent El Ghaoui, and Michael I. Jordan. Learning the kernel matrix with semidefinite programming. Journal of Machine Learning Research, 5:27–72, 2004a"
+    },
+    {
+      "n": 7,
+      "text": "Gert R. G. Lanckriet, Nello Cristianini, Peter Bartlett, Laurent El Ghaoui, and Michael I. Jordan. Learning the kernel matrix with semidefinite programming. In Proceedings of the 19th International Conference on Machine Learning, 2002"
+    },
+    {
+      "n": 8,
+      "text": "Mark Girolami and Simon Rogers. Hierarchic Bayesian models for kernel learning. In Proceedings of the 22nd International Conference on Machine Learning, 2005"
+    },
+    {
+      "n": 9,
+      "text": "Theodoros Damoulas and Mark A. Girolami. Combining feature spaces for classification. Pattern Recognition, 42(11):2671–2683, 2009"
+    },
+    {
+      "n": 10,
+      "text": "Theodoros Damoulas and Mark A. Girolami. Probabilistic multi-class multi-kernel learning: On protein fold recognition and remote homology detection. Bioinformatics, 24(10):1264–1270, 2008"
+    },
+    {
+      "n": 11,
+      "text": "Kristin P. Bennett, Michinari Momma, and Mark J. Embrechts. MARK: A boosting algorithm for heterogeneous kernel models. In Proceedings of the 8th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining, 2002"
+    },
+    {
+      "n": 12,
+      "text": "Wang, Shuhui et al. S3MKL: Scalable Semi-Supervised Multiple Kernel Learning for Real-World Image Applications. IEEE TRANSACTIONS ON MULTIMEDIA, VOL. 14, NO. 4, AUGUST 2012"
+    },
+    {
+      "n": 13,
+      "text": "J. Zhuang, J. Wang, S.C.H. Hoi & X. Lan. Unsupervised Multiple Kernel Learning. Jour. Mach. Learn. Res. 20:129–144, 2011"
+    }
+  ]
+}

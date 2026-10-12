@@ -1,0 +1,26 @@
+{
+  "source_type": "encyclopedia_article",
+  "source_id": "enwiki:Non-uniform discrete Fourier transform#rev1375814749",
+  "title": "Non-uniform discrete Fourier transform",
+  "authors": "Wikipedia contributors",
+  "year": "2026",
+  "url": "https://en.wikipedia.org/w/index.php?title=Non-uniform_discrete_Fourier_transform&oldid=1375814749",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Relationship to Z-transform",
+  "word_count": 619,
+  "text": "The NUDFT-I can be expressed as a Z-transform.[1] The NUDFT-I of a sequence x[n] of length N is\n\nX(z_k)=X(z)|_{z=z_k}=\\sum_{n=0}^{N-1}x[n]z_k^{-n},\\quad k=0, 1, \\dots, N-1,\n\nwhere X(z) is the Z-transform of x[n] , and \\{z_i\\}_{i=0}^{N-1} are arbitrarily distinct points in the z-plane. Note that the NUDFT reduces to the DFT when the sampling points are located on the unit circle at equally spaced angles.\n\nExpressing the above as a matrix, we get\n\n\\mathbf{X} = \\mathbf{D} \\mathbf{x}\n\nwhere\n\n\\mathbf{X} = \\begin{bmatrix} X(z_0) \\\\ X(z_1) \\\\ \\vdots \\\\ X(z_{N-1}) \\end{bmatrix},\n\n\\qquad\n\n\\mathbf{x} = \\begin{bmatrix} x[2] \\\\ x[3] \\\\ \\vdots \\\\ x[N-1]\\end{bmatrix},\n\nand\n\n\\mathbf{D} = \\begin{bmatrix}\n\n1 & z_0^{-1} & z_0^{-2} & \\cdots & z_0^{-(N-1)} \\\\\n\n1 & z_1^{-1} & z_1^{-2} & \\cdots & z_1^{-(N-1)} \\\\\n\n\\vdots & \\vdots & \\vdots & \\ddots & \\vdots \\\\\n\n1 & z_{N-1}^{-1} & z_{N-1}^{-2} & \\cdots & z_{N-1}^{-(N-1)}\n\n\\end{bmatrix}.\n\n### Direct inversion of the NUDFT-I\n\nAs we can see, the NUDFT-I is characterized by \\mathbf{D} and hence the N {z_k} points. If we further factorize \\det(\\mathbf{D}) , we can see that \\mathbf{D} is nonsingular provided the N {z_k} points are distinct. If \\mathbf{D} is nonsingular, we can get a unique inverse NUDFT-I as follows:\n\n\\mathbf{x}=\\mathbf{D^{-1}}\\mathbf{X}.\n\nGiven \\mathbf{X}\\text{ and }\\mathbf{D} , we can use Gaussian elimination to solve for \\mathbf{x} . However, the complexity of this method is O(N^3) . To solve this problem more efficiently, we first determine X(z) directly by polynomial interpolation:\n\n\\hat X [k] = X(z_k), \\quad k=0, 1, \\dots, N-1.\n\nThen x[n] are the coefficients of the above interpolating polynomial.\n\nExpressing X(z) as the Lagrange polynomial of order N-1 , we get\n\nX(z) = \\sum_{k=0}^{N-1} \\frac{L_k(z)}{L_k(z_k)} \\hat X [k],\n\nwhere \\left\\{L_i(z)\\right\\}_{i=0}^{N-1} are the fundamental polynomials:\n\nL_k(z) = \\prod_{i \\ne k} \\left(1 - z_i z^{-1}\\right), \\quad k = 0, 1, \\dots, N-1.\n\nExpressing X(z) by the Newton interpolation method, we get\n\nX(z) = c_0 + c_1 \\left(1 - z_0 z^{-1}\\right) + c_2 \\left(1 - z_0 z^{-1}\\right) \\left(1 - z_1 z^{-1}\\right) + \\cdots + c_{N-1} \\prod_{k=0}^{N-2} \\left(1 - z_k z^{-1}\\right),\n\nwhere c_j is the divided difference of the j -th order of \\hat X [2], \\hat X [3], \\dots, \\hat X [j] with respect to z_0, z_1, \\dots, z_j :\n\n\\begin{align}\n\nc_0 &= \\hat X [2], &\n\nc_1 &= \\frac{\\hat X [3] - c_0}{1 - z_0 z_1^{-1}}, \\\\\n\nc_2 &= \\frac{\\hat X [4] - c_0 - c_1 \\left(1 - z_0 z^{-1}\\right)}{\\left(1 - z_0 z_2^{-1}\\right) \\left(1 - z_1 z_2^{-1}\\right)}, &\n\n& \\cdots\n\n\\end{align}\n\nThe disadvantage of the Lagrange representation is that any additional point included will increase the order of the interpolating polynomial, leading to the need to recompute all the fundamental polynomials. However, any additional point included in the Newton representation only requires the addition of one more term.\n\nWe can use a lower triangular system to solve \\{c_j\\} :\n\n\\mathbf{L}\\mathbf{c} = \\mathbf{X}\n\nwhere\n\n\\mathbf{X} = \\begin{bmatrix} \\hat X [2] \\\\ \\hat X [3] \\\\ \\vdots \\\\ \\hat X [N-1] \\end{bmatrix},\n\n\\qquad\n\n\\mathbf{c} = \\begin{bmatrix} c_0 \\\\ c_1 \\\\ \\vdots \\\\ c_{N-1} \\end{bmatrix},\n\nand\n\n\\mathbf{L} = \\begin{bmatrix}\n\n1 & 0 & 0 & \\cdots & 0 \\\\\n\n1 & \\left(1 - z_0 z_1^{-1}\\right) & 0 & \\cdots & 0 \\\\\n\n1 & \\left(1 - z_0 z_2^{-1}\\right) & \\left(1 - z_0 z_2^{-1}\\right) \\left(1 - z_1 z_2^{-1}\\right) & \\cdots & 0 \\\\\n\n\\vdots & \\vdots & \\vdots & \\ddots & \\vdots \\\\\n\n1 & \\left(1 - z_0 z_{N-1}^{-1}\\right) & \\left(1 - z_0 z_{N-1}^{-1}\\right) \\left(1 - z_1 z_{N-1}^{-1}\\right) & \\cdots & \\prod_{k=0}^{N-2} \\left(1 - z_k z_{N-1}^{-1}\\right)\n\n\\end{bmatrix}.\n\nBy the above equation, \\{c_j\\} can be computed within O(N^2) operations. In this way Newton interpolation is more efficient than Lagrange interpolation unless the latter is modified by\n\nL_{k+1}(z) = \\frac{1 - z_{k+1} z^{-1}}{1 - z_k z^{-1}} L_k(z),\\quad k=0, 1, \\dots, N-1.",
+  "references": [
+    {
+      "n": 1,
+      "text": "Marvasti, Farokh. (2001). Nonuniform Sampling: Theory and Practice. Springer."
+    },
+    {
+      "n": 3,
+      "text": "Bagchi, Sonali. (1999). The Nonuniform Discrete Fourier Transform and Its Applications in Signal Processing. Springer US."
+    },
+    {
+      "n": 4,
+      "text": "Fessler, J.A.. (February 2003). Nonuniform fast fourier transforms using min-max interpolation. IEEE Transactions on Signal Processing. doi:10.1109/TSP.2002.807005"
+    }
+  ]
+}

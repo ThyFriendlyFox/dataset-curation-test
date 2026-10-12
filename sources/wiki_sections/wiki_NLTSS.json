@@ -1,0 +1,30 @@
+{
+  "source_type": "encyclopedia_article",
+  "source_id": "enwiki:NLTSS#rev1310237830",
+  "title": "NLTSS",
+  "authors": "Wikipedia contributors",
+  "year": "2025",
+  "url": "https://en.wikipedia.org/w/index.php?title=NLTSS&oldid=1310237830",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Implementation and design issues",
+  "word_count": 540,
+  "text": "The biggest knock against NLTSS during its production lifetime was performance. The one performance issue that affected users most was file access latency. This generally wasn't a significant problem for disk input/output (I/O), but the systems that NLTSS ran on also supported a significant complement of very low latency solid state disks with access times under 10 microseconds. The initial latencies for file operations under NLTSS were comparable to the latency for solid state disk access and significantly higher than the LTSS latency for such access. To improve file access latency under NLTSS the implementation was changed significantly to put the most latency sensitive processes (in particular the file server) \"in the kernel\". This effort wasn't as significant as it might at first sound as all NLTSS servers worked on a multithreading model. What this change really amounted to was to move the threads responsible for file server services from a separate file server process into the kernel \"process\". Communication to users was unchanged (still through buffer tables, LINCS tokens, etc.), but file operations avoided some significant context changes that were the primary cause of the higher latencies over what the older LTSS and the competing Cray Time Sharing System provided. This change did significantly (~3x) improve the latency of file I/O operations, but it also meant that the file server became a trusted part of the kernel (by implementation, not by design).\n\nA second implementation issue with NLTSS related to the security/integrity of its capability as data implementation. This implementation used a password capability model (e.g., see Control by Password).[1] With this model any person or process that could get access to the memory space of a process would have the authority to access the capability represented by the data found in that memory. Some system architects (e.g., Andrew S. Tanenbaum, the architect of the Amoeba distributed operating system) have suggested that this property of access to memory implying access to capabilities is not an inherent problem. In the environment of NLTSS, it sometimes happened that people took program memory dumps to others for analysis. Because of this and other concerns, such password capabilities were considered a vulnerability in NLTSS. A design was done to protect against this vulnerability, the Control by Public Key Encryption[2] mechanism. This mechanism wasn't put into production in NLTSS both because of its significant performance cost and because users weren't aware of the vulnerability from password capabilities. Modern advances in cryptography would make such protection for capabilities practical, especially for Internet/Web capabilities (e.g., see YURLs[3] or WideWORD).[4]\n\nA design issue with NLTSS that wasn't considered until years after it was removed from production was its open network architecture. In NLTSS processes were considered as virtual processors in a network with no firewalls or other restrictions. Any process could communicate freely to any other. This meant that it was not possible to do confinement even in the sense of limiting direct communication, e.g., vs. limiting covert channels such as \"wall banging\". To correct this problem NLTSS would have to require capabilities to enable communication. Late development work on NLTSS such as \"stream numbers\" was getting close to such a facility, but by the time active development stopped in 1988, communication in NLTSS was still unconfined.",
+  "references": [
+    {
+      "n": 1,
+      "text": "Managing Domains in a Network Operating System. webstart.com. http://www.webstart.com/jed/papers/Managing-Domains/#s8"
+    },
+    {
+      "n": 2,
+      "text": "Managing Domains in a Network Operating System. webstart.com. http://www.webstart.com/jed/papers/Managing-Domains/#s13"
+    },
+    {
+      "n": 3,
+      "text": "YURL. Waterken Inc.. http://www.waterken.com/dev/YURL/"
+    },
+    {
+      "n": 4,
+      "text": "Home. wideword.net. https://wideword.net/"
+    }
+  ]
+}

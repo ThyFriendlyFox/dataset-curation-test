@@ -1,0 +1,26 @@
+{
+  "source_type": "encyclopedia_article",
+  "source_id": "enwiki:NOVA (filesystem)#rev1344350696",
+  "title": "NOVA (filesystem)",
+  "authors": "Wikipedia contributors",
+  "year": "2026",
+  "url": "https://en.wikipedia.org/w/index.php?title=NOVA_%28filesystem%29&oldid=1344350696",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Filesystem",
+  "word_count": 577,
+  "text": "NOVA was developed at the University of California, San Diego, in the Non-Volatile Systems Laboratory of the Computer Science and Engineering Department.[1,2] Patches were initially made available for version 4.12 of the Linux kernel.[3] it is limited to x86-64 Linux, and not ready for merging with the upstream kernel.[2]\n\n### Log structure\n\nNOVA is primarily a log-structured file system, but it differs from other log-structured file systems in several respects. First, rather than using a single log for the entire file system, each inode has its own, dedicated log that records the updates to the inode.[2] This allows for increased concurrency in file operations, since different threads can operate on inodes in parallel. Second, the logs do not contain file data, but only metadata updates, resulting in smaller logs. Third, the logs are not stored in physically contiguous memory. Instead, NOVA stores the logs in a linked list of 4 KB memory pages.\n\nNOVA uses the logs to provide atomicity for operations that affect a single file (e.g., writing to a file or modifying its metadata). To do this, NOVA writes a log entry to empty space past the end of the log and then atomically updates the inode's pointer to the log tail.\n\n### Copy-on-write\n\nNOVA uses copy-on-write (COW) to update file data. When a program writes data to a file, NOVA allocates some unused memory pages to hold the data and writes the data into them. Then, it appends a log entry to the inode's log that points to the new pages and describes their logical location in the file. Since appending the log entry is atomic, the write is also atomic.\n\n### Journaling\n\nSome file operations (e.g., moving a file from one directory to another) require modifying multiple inodes. To make these operations atomic, NOVA uses a simple journaling mechanism. First, it writes the new log entries to ends of the inodes that the operation will affect, then it uses the journal to record the necessary updates to the inodes' log tail pointers. Next, it marks the journal as committed and applies the updates to the tail pointers.\n\n### Metadata protection\n\nNOVA uses replication and checksums to provide protection against metadata corruption due to media errors and software bugs. Every metadata structure (e.g., inodes, superblocks, and log entries) contains a CRC-32 checksum that allows NOVA to detect if structures contents have changed with its knowledge. NOVA also stores two copies of each data structure – the \"primary\" and the \"replica\" – and stores them far from one another in memory.\n\nWhenever NOVA accesses a metadata structure, it first recomputes the checksum on both the primary and the replica. If either check results in a mismatch, NOVA repairs the damage using the other copy. If neither checksum matches, then the structure is lost and NOVA returns an error.\n\n### Data protection\n\nNOVA uses RAID 4 to protect file data. It divides each 4 KB page into 512-byte strips and stores a parity strip in a dedicated region of persistent memory. It also computes (and stores a replica of) a CRC-32 checksum for the eight data strips and the parity strip.\n\nWhen NOVA reads a page, it confirms the checksum on each strip. If one of the strips is corrupt, it tries to recover the strip using the parity bits. If no other strips have experienced data corruption, recovery will succeed. Otherwise, recovery fails, the contents of the page are lost, and NOVA returns an error.",
+  "references": [
+    {
+      "n": 1,
+      "text": "NOVA: The Newest Linux File-System, Designed For Persistent Memory - Phoronix. Phoronix. https://www.phoronix.com/scan.php?page=news_item&px=NOVA-File-System"
+    },
+    {
+      "n": 2,
+      "text": "The NOVA filesystem [LWN.net]. LWN.net. https://lwn.net/Articles/729812/"
+    },
+    {
+      "n": 3,
+      "text": "NOVA: a new file system for persistent memory [LWN.net]. LWN.net. https://lwn.net/Articles/729770/"
+    }
+  ]
+}

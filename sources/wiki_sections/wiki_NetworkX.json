@@ -1,0 +1,62 @@
+{
+  "source_type": "encyclopedia_article",
+  "source_id": "enwiki:NetworkX#rev1368885731",
+  "title": "NetworkX",
+  "authors": "Wikipedia contributors",
+  "year": "2026",
+  "url": "https://en.wikipedia.org/w/index.php?title=NetworkX&oldid=1368885731",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Graph layouts",
+  "word_count": 1230,
+  "text": "NetworkX provides various layout algorithms for visualizing graphs in two-dimensional space. These layout algorithms determine the positions of nodes and edges in a graph visualization, aiming to reveal its structure and relationships effectively.\n\n### Spring layout\n\nThe Spring Layout in NetworkX is a popular way to visualize graphs using a force-directed algorithm. It's based on the Fruchterman-Reingold model, which works like a virtual physics simulation. Each node in your graph is a charged particle that repels other nodes, while the edges act like springs that pull connected nodes closer together. This balance creates a layout where the graph naturally spreads out into an informative shape.\n\nAs the algorithm runs, it tries to reduce the overall \"energy\" of the system by adjusting the positions of the nodes step by step. The result often highlights patterns in the graph—like clusters or groups of nodes that are tightly connected. It works best for small to medium-sized graphs, where clarity and appearance are important.\n\nYou can create this layout in NetworkX using the spring_layout() function, found in networkx.drawing.layout. The function gives you a few options to customize the layout, you can control the distance between nodes with the k parameter or decide how many iterations the simulation should run. It lets you lay out the graph in more than two dimensions by setting the dim parameter.\n\nThis layout method is used for interactive and exploratory visualizations. The spring layout often reveals the structure of the graph in a intuitive and readable way[1]\n\n### Spectral layout\n\nThe Spectral layout is based on the spectral properties of the graph's adjacency matrix. It uses the eigenvalues and eigenvectors of the adjacency matrix to position nodes in a low-dimensional space. Spectral layout tends to emphasize the global structure of the graph, making it useful for identifying clusters and communities.[2]\n\n### How the spectral layout work\n\nSource:[3]\n\nConstruct the Laplacian matrix of the graph.\n\nA Laplacian matrix L of a graph is defined as L=D-A , where D is the degree matrix (a diagonal matrix where D_{ii} is the degree of vertex i) and A is the adjacency matrix.\n\nFor a graph G with n vertices, the adjacency matrix A is an n × n matrix where A_{ij} = 1 if there is an edge between vertex i and vertex i and A_{ij} = 0 otherwise.\n\nThe Laplacian matrix has eigenvalues and corresponding eigenvectors that encode the graph's structural properties.[4]\n\nCompute the eigenvectors corresponding to the smallest non-zero eigenvalues.[5]\n\nUse these eigenvectors as coordinate values for positioning vertices.[6]\n\nX-coordinates come from the second eigenvector (associated with the second-smallest eigenvalue), and Y-coordinates come from the third eigenvector.[6]\n\nScale and center the resulting layout as needed.\n\n### Why it reveals the network's structure\n\nNodes in dense clusters have similar eigenvector entries, causing them to group spatially.[7]\n\nThe Fiedler vector (second eigenvector) minimizes the ratio cut, separating the graph into clusters with minimal interconnections.[8]\n\nIn the plot above, we observe that the spectral layout helps capture the global and communal structures embedded in the graph. Comparing both layouts, we see that the spectral layout keeps nodes belonging to the same community closely packed, thereby capturing communities more easily as compared to the spring layout.[9]\n\n### Codes for implementing the plot\n\n### Circular layout\n\nThe Circular layout arranges nodes evenly around a circle, with edges drawn as straight lines connecting them. This layout is particularly suitable for visualizing cyclic or symmetric graphs, where the arrangement of nodes along the circle reflects the underlying topology of the graph.[10]\n\n### Shell layout\n\nThe Shell layout organizes nodes into concentric circles or shells based on their distance from a specified center. Nodes within the same shell have the same distance from the center, while edges are drawn radially between nodes in adjacent shells. Shell layout is often used for visualizing hierarchical or tree structures.[11]\n\n### Sample code\n\n### Kamada–Kawai layout\n\nThe Kamada–Kawai layout algorithm positions nodes based on their pairwise distances, aiming to minimize the total energy of the system. It takes into account both the graph's topology and edge lengths, resulting in a layout that emphasizes geometric accuracy and readability.[12]\n\n### Random Layout\n\nRandom layout assigns each node a random position inside the unit square (or specified box). It's trivial and fast—O(n)—but gives no information about graph structure. Use it as a baseline to compare against more meaningful layouts, or when you just need an initial seeding for iterative algorithms. It's also handy for stress-testing your rendering pipeline.\n\n### Planar Layout\n\nPlanar layout attempts to compute an embedding for planar graphs (graphs with no edge crossings) using graph combinatorial embedding. If the graph isn't planar, it raises an exception. Planar embeddings exactly preserve the topology of planar networks—useful for circuit schematics, maps, or any truly planar structure. When it works, edges don't cross, giving a clean representation. It's linear‐time but only applicable to planar graphs.\n\n### Fruchterman–Reingold Layout\n\nAlthough \"spring layout\" and \"Fruchterman–Reingold\" are often used interchangeably, NetworkX exposes both via spring_layout and fruchterman_reingold_layout. Internally they share the same physics-based algorithm. You can tweak attraction/repulsion constants, number of iterations, and temperature schedules. It produces an \"organic\" network view that highlights dense subgraphs. Use it when you want a familiar force-directed aesthetic with customizable parameters.\n\n### Spiral Layout\n\nSpiral layout places nodes along an outward spiral, one after another in node order. It's deterministic and extremely fast—useful for very large graphs where more expensive layouts would be too slow. Although it doesn't use graph connectivity, you can impose ordering to reveal sequences or ranking. Because the spiral arms grow apart as they wind out, it can reduce overlap compared to a pure line or circle. It's primarily a novelty, but useful for displaying long chains or temporal orderings.\n\n### Bipartite Layout\n\nBipartite layout is specialized for two‐set graphs: it places one node set on a horizontal line at y=0 and the other at y=1. You must supply the two partitions (e.g. via a node attribute or explicit list). Edges then connect vertically between layers, making the bipartite structure immediately clear. It's ideal for affiliation networks, two‐mode data, or any graph with exactly two types of nodes. Positioning along the x-axis is usually automatic, but you can override via the align or manual x-coordinates.\n\n### Multipartite Layout\n\nMultipartite layout generalizes bipartite: it places nodes in multiple horizontal layers (or \"partitions\") based on a node attribute (e.g. layer). Each partition is drawn on its own y-coordinate rung, and edges run between adjacent layers by default. This makes it perfect for multilevel DAGs, workflow diagrams, or any graph with more than two strata. You control the vertical spacing and ordering within each layer. It's computed in linear time after grouping nodes by their partition key.\n\n### BFS Layout\n\nBFS layout (in our demo implemented via shell layout on BFS layers) arranges nodes by their distance from a source node. All nodes at distance d go to shell d. This visually encodes hop count from the root, so you see exactly how far each node lies in the graph. It's perfect for shortest-path or reachability visualizations. Because it uses pure breadth-first search, it's linear (O(n + m)) to compute.\n\n### Usage\n\nNetworkX provides functions for applying different layout algorithms to graphs and visualizing the results using Matplotlib or other plotting libraries. Users can specify the desired layout algorithm when calling the drawing functions, allowing for flexible and customizable graph visualizations.",
+  "references": [
+    {
+      "n": 1,
+      "text": "spring_layout — NetworkX 3.3 documentation. networkx.org. https://networkx.org/documentation/stable/reference/generated/networkx.drawing.layout.spring_layout.html"
+    },
+    {
+      "n": 2,
+      "text": "spectral_layout — NetworkX 3.3 documentation. networkx.org. https://networkx.org/documentation/stable/reference/generated/networkx.drawing.layout.spectral_layout.html"
+    },
+    {
+      "n": 3,
+      "text": "Spectral Graph Layout Method. maplesoft.com. https://www.maplesoft.com/support/help/Maple/view.aspx?path=GraphTheory%2FLayouts%2FSpectral"
+    },
+    {
+      "n": 4,
+      "text": "Spectral Clustering. MIT. https://people.csail.mit.edu/dsontag/courses/ml14/notes/Luxburg07_tutorial_spectral_clustering.pdf"
+    },
+    {
+      "n": 5,
+      "text": "A property of eigenvectors of nonnegative symmetric matrices and its application to graph. theory. https://dml.cz/bitstream/handle/10338.dmlcz/101357/CzechMathJ_25-1975-4_12.pdf"
+    },
+    {
+      "n": 6,
+      "text": "Graph draw Notes. Pennsylvania State University. https://sites.psu.edu/cmus2013/wp-content/uploads/sites/4312/2013/10/Graph_draw_Notes.pdf"
+    },
+    {
+      "n": 7,
+      "text": "Spectral Graph Layout Method. MIT. https://people.csail.mit.edu/dsontag/courses/ml14/notes/Luxburg07_tutorial_spectral_clustering.pdf"
+    },
+    {
+      "n": 8,
+      "text": "Spectral methods for graph drawing and synthesis of integrated circuits. upc.edu. https://upcommons.upc.edu/bitstream/handle/2117/352115/159660.pdf;jsessionid=701DD2372B0FA57B94D3DAD08C53F248?sequence=1"
+    },
+    {
+      "n": 9,
+      "text": "Graph reduction with spectral and cut guarantees. https://arxiv.org/pdf/1808.10650.pdf"
+    },
+    {
+      "n": 10,
+      "text": "circular_layout — NetworkX 3.3 documentation. networkx.org. https://networkx.org/documentation/stable/reference/generated/networkx.drawing.layout.circular_layout.html"
+    },
+    {
+      "n": 11,
+      "text": "shell_layout — NetworkX 3.3 documentation. networkx.org. https://networkx.org/documentation/stable/reference/generated/networkx.drawing.layout.shell_layout.html"
+    },
+    {
+      "n": 12,
+      "text": "kamada_kawai_layout — NetworkX 3.3 documentation. networkx.org. https://networkx.org/documentation/stable/reference/generated/networkx.drawing.layout.kamada_kawai_layout.html"
+    }
+  ]
+}
