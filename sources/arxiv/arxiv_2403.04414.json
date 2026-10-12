@@ -1,0 +1,78 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.04414",
+  "title": "A methodology to automatically optimize dynamic memory managers applying grammatical evolution",
+  "authors": "JosÃ© L. Risco-MartÃ­n, J. Manuel Colmenar, J. Ignacio Hidalgo, Juan Lanchares, Josefa DÃ­az",
+  "year": "2024",
+  "categories": [
+    "cs.AR"
+  ],
+  "url": "https://arxiv.org/abs/2403.04414",
+  "html_url": "https://arxiv.org/html/2403.04414",
+  "license": "http://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Introduction",
+  "word_count": 912,
+  "text": "Nowadays, multimedia applications are mostly developed using C++. This kind of software programs tend to make intensive use of dynamic memory due to their inherent data management. However, in C++, dynamic memory is allocated via the operator new() and deallocated by the operator delete(), which are mapped directly to the malloc() and free() functions of the standard C library in most compilers. Therefore, the creation and destruction of objects is managed by a general-purpose memory allocator, which may provide good runtime and low memory usage for a wide range of applications [1,2].\n\nHowever, using specialized Dynamic Memory Managers (DMMs) that take advantage of application-specific behavior can dramatically improve application performance [3,4]. In this regard, three out of the twelve integer benchmarks included in SPEC (parser, gcc, and vpr [5]) and several server applications, use one or more custom DMMs [6].\n\nOn the one hand, studies have shown that dynamic memory management can consume up to 38% of the execution time in C++ applications [7]. Thus, the performance of dynamic memory management can have a substantial effect on the overall performance of C++ applications. On the other hand, new multimedia devices must rely on dynamic memory for a very significant part of their functionality due to the inherent unpredictability of the input data. These devices also integrate multiple services such as multimedia and wireless network communications which also compete for memory space. Then, the dynamic memory management influences the global memory usage of the system [8]. Finally, energy consumption has become a real issue in overall system design due to circuit reliability and packaging costs [9]. However, it has been recently proved that the DMM consumes only a 1% of the total enery consumption by the memory subsystem usually in the execution of a given application [10]. Thus, the energy consumption by the DMM is not relevant on this case and the optimization of the dynamic memory subsystem has two goals that cannot be seen independently: performance and memory usage. There cannot exist a memory allocator that delivers the best performance and least memory usage for all programs. However, a custom memory allocator that works best for a particular program can be developed using grammatical evolution [11].\n\nTo reach higher performance, programmers often write their own ad hoc custom memory allocators as macros or monolithic functions in order to avoid function call overhead. This approach, implemented to improve application performance, is enshrined in the best practices of skilled computer programmers [12]. Nonetheless, this kind of code is brittle and hard to maintain or reuse, and as the application evolves, it can be difficult to adapt the memory allocator as the application requirements vary. Moreover, writing these memory allocators is both error-prone and difficult. Indeed custom and efficient memory allocators are complicated pieces of software that require a substantial engineering effort.\n\nIn this work, we have developed a framework based on grammatical evolution to automatically design optimized DMMs for a target application, minimizing memory usage and maximizing performance. Figure 1(c) depicts the optimization process. First, as Figure 1(a) shows, we run the application under study together with an instrumentation tool, which logs all the required information into an external file: identification of the object created/deleted, operation (allocation or deallocation) object size in bytes and memory address. Since all the DMM exploration process is performed simulating the generated DMMs with the profiling report, this task must be done just once. In the following phase, as Figure 1(b) shows, we automatically examine all the information contained in the profiling report, obtaining a specialized grammar for the target system. As a result, some incomplete rules in the original grammar (see Section 5), such as the different block sizes, are automatically defined according to the obtained profiling. To this end, we have developed a tool called Grammar Generator. The last phase is the optimization process. As Figure 1(c) depicts, this phase consists of a Grammatical Evolution Algorithm (GEA) that takes the grammar generated in the previous phase and the profiling report of the application as inputs. GEA is supported by a DMM simulator that tests the behavior of every DMM generated by the grammar applied to the application. Our GEA is constantly generating different DMM implementations from the grammar file. When a DMM is generated (\\mathit{DMM(j)} in Figure 1(c)), it is received by the DMM simulator. Then, the simulator emulates the behavior of the application, debugging every line in the profiling report. Such emulation does not de/allocate memory from the computer like the real application, but maintains useful information about how the structure of the selected DMM evolves in time. After the profiling report has been simulated, the DMM simulator returns back the fitness of the current DMM to the GEA. The fitness is computed as a weighted sum of the performance and memory usage by the proposed DMM for the target device and application under study. Finally, the DMM with lowest fitness is returned as solution (optimized DMM).\n\nThe rest of the paper is organized as follows. First, Section 2 describes some recent advances in the area of DMMs. Next, Section 3 defines the design space of memory allocators. Then, Section 4 details the design and implementation of the DMM simulator, as well as some configuration examples. Section 5 details how grammatical evolution is applied to the DMM optimization. Section 6 shows our experimental methodology, presenting the six benchmarks selected, whereas Section 7 shows the results for these benchmarks. Finally, Section 8 draws conclusions and future work.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "M. S. Johnstone, P. R. Wilson, The memory fragmentation problem: solved?, SIGPLAN Not. 34 (3) (1999) 26–36. doi:http://doi.acm.org/10.1145/301589.286864 ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "Doug Lea. A memory allocator., http://g.oswego.edu/dl/html/malloc.html (2010)."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "D. A. Barrett, B. G. Zorn, Using lifetime predictors to improve memory allocation performance, SIGPLAN Not. 28 (6) (1993) 187–196. doi:http://doi.acm.org/10.1145/173262.155108 ."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "D. Grunwald, B. Zorn, CustoMalloc: efficient synthesized memory allocators, Softw. Pract. Exper. 23 (8) (1993) 851–869."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "SPEC, Standard Performance Evaluation Corporation, Available at: http://www.spec.org (2013)."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "E. D. Berger, B. G. Zorn, K. S. McKinley, Composing high-performance memory allocators, in: PLDI ’01: Proceedings of the ACM SIGPLAN 2001 conference on Programming language design and implementation, ACM, New York, NY, USA, 2001, pp. 114–124. doi:http://doi.acm.org/10.1145/378795.378821 ."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "B. Calder, D. Grunwald, B. Zorn, Quantifying behavioral differences between C and C++ programs, Journal of Programming Languages 2 (1995) 313–351."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "D. Atienza, J. M. Mendias, S. Mamagkakis, D. Soudris, F. Catthoor, Systematic dynamic memory management design methodology for reduced memory footprint, ACM Trans. Des. Autom. Electron. Syst. 11 (2) (2006) 465–489. doi:http://doi.acm.org/10.1145/1142155.1142165 ."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "N. Vijaykrishnan, M. Kandemir, M. J. Irwin, H. S. Kim, W. Ye, D. Duarte, Evaluating integrated hardware-software optimizations using a unified energy estimation framework, IEEE Trans. Comput. 52 (1) (2003) 59–76. doi:http://dx.doi.org/10.1109/TC.2003.1159754 ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "J. Díaz, J. M. Colmenar, J. L. Risco-Martín, J. L. Ayala, O. Garnica, Quantifying the Impact of Dynamic Memory Managers into Memory-Intensive Applications, in: SCSC 2011: Summer Computer Simulation Conference, 2011, pp. 1–10."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "J. L. Risco-Martin, D. Atienza, R. Gonzalo, J. I. Hidalgo, Optimization of dynamic memory managers for embedded systems using grammatical evolution, in: GECCO ’09: Proceedings of the 11th Annual conference on Genetic and evolutionary computation, ACM, New York, NY, USA, 2009, pp. 1609–1616. doi:http://doi.acm.org/10.1145/1569901.1570116 ."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "S. Meyers, More effective C++: 35 new ways to improve your programs and designs, Addison-Wesley Longman Publishing Co., Inc., 1995."
+    }
+  ]
+}

@@ -1,0 +1,193 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2206.05880",
+  "title": "Confident Sinkhorn Allocation for Pseudo-Labeling",
+  "authors": "Vu Nguyen, Hisham Husain, Sachin Farfade, Anton van den Hengel",
+  "year": "2024",
+  "categories": [
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2206.05880",
+  "html_url": "https://arxiv.org/html/2206.05880",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 802,
+  "text": "The impact of machine learning continues to grow in fields as disparate as biology [1,2], quantum technology [3,4,5], brain stimulation [6,7], and computer vision [8,9,10]. Much of this impact depends on the availability of large numbers of annotated examples for the machine learning models to be trained on. The data annotation task by which such labeled data is created is often expensive, and sometimes impossible, however. Rare genetic diseases, stock market events, and cyber-security threats, for example, are hard to annotate due to the volumes of data involved, the rate at which the significant characteristics change, or both.\n\n## Related work.\n\nFortunately, for some classification tasks, we can overcome a scarcity of labeled data using semi-supervised learning (SSL) [11,12,13,14]. SSL exploits an additional set of unlabeled data with the goal of improving on the performance that might be achieved using labeled data alone [15,16,17,18].\n\nDomain specific: Semi-supervised learning for image and language data has made rapid progress [19,20,21] largely by exploiting the inherent spatial and semantic structure of images [22] and language [23]. This is achieved typically either using pretext tasks [22,24] or contrastive learning [25,26]. Both approaches assume that specific transformations applied to each data element will not affect the associated label.\n\nGreedy pseudo-labeling: A simple and effective SSL method is pseudo-labeling (PL) [27], which generates ‘pseudo-labels’ for unlabeled samples using a model trained on labeled data. A label k is assigned to an unlabeled sample \\textbf{x}_{i} if the predicted class probability is over a predefined threshold \\gamma as\n\nwhere \\gamma\\in[0,1] is a threshold used to produce hard labels and p(y_{i}=k\\mid\\textbf{x}_{i}) is the predictive probability of the i -th data point belonging to the class k. A classifier can then be trained using both the original labeled data and the newly pseudo-labeled data. Pseudo-labeling is naturally an iterative process, with the next round of pseudo-labels being generated using the most-recently trained classifier. The key advantage of pseudo-labeling is that it does not inherently require domain assumptions and can be applied to most domains, including tabular data where domain knowledge is not available, as opposed to images and languages.\n\nGreedy PL with uncertainty: [33] propose an uncertainty-aware pseudo-label selection (UPS) that aims to reduce the noise in the training process by using the uncertainty score – together with the probability score for making assignments:\n\nwhere \\gamma_{u} is an additional threshold on the uncertainty level and \\mathcal{U}(p) is the uncertainty of a prediction p. As shown in [33], selecting predictions with low uncertainties greatly reduces the effect of poor calibration, thus improving robustness and generalization.\n\nHowever, the aforementioned works in PL are greedy in assigning the labels by simply comparing the prediction value against a predefined threshold \\gamma irrespective of the relative prediction values across samples and classes. Such greedy strategies will be sensitive to the choice of thresholds and even carefully tune the threshold may not result in the same way as non-greedy algorithm, shown in Fig. 4.\n\nNon-greedy pseudo-labeling: FlexMatch [28] adaptively selects a threshold \\gamma_{k} for each class based on the level of difficulty. This threshold is adapted using the predictions across classes. However, the selection process is still heuristic in comparing the prediction score with an adjusted threshold. Recently, [34] provide a novel view in connecting the pseudo-labeling assignment task to optimal transport problem, called SLA, which inspires our work. SLA and FlexMatch are better than existing PL in that their non-greedy label assignments not only use the single prediction value but also consider the relative importance of this value across rows and columns in a holistic way. However, both SLA and FlexMatch can overconfidently assign labels to noise samples and have not considered utilizing uncertainty values in making assignments.\n\nContributions. We propose here a semi-supervised learning method that does not require any domain-specific assumption for the data. We hypothesize that this is by far the most common case for the vast volumes of data that exist. Our method Confident Sinkhorn Allocation (CSA) is theoretically driven by the role of uncertainty in robust label assignment in SSL. CSA utilizes Sinkhorn’s algorithm [35] to assign labels to only the data samples with high confidence scores. By learning the label assignment with optimal transport, CSA eliminates the need to predefine the heuristic thresholds used in existing pseudo-labeling methods, which can be greedy. The proposed CSA is widely applicable to various data domains, and could be used in concert with consistency-based approaches [21], but is particularly useful for data domain where pretext tasks and data augmentation are not applicable, such as tabular data. Finally, we study theoretically the pseudo-labelling process when training on labeled set and predicting unlabeled data using a PAC-Bayes generalization bound. Particularly, we extend and improve the existing PAC-Bayes bounds with Kullback-Leibler (KL) divergence by presenting the first result making use of the Integral Probability Metrics (see Sec. 2.4).",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib30",
+      "text": "Libbrecht, M. W. and Noble, W. S. Machine learning applications in genetics and genomics. Nature Reviews Genetics , 16(6):321–332, 2015."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib49",
+      "text": "Tunyasuvunakool, K., Adler, J., Wu, Z., Green, T., Zielinski, M., Žídek, A., Bridgland, A., Cowie, A., Meyer, C., Laydon, A., et al. Highly accurate protein structure prediction for the human proteome. Nature , 596(7873):590–596, 2021."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib5",
+      "text": "Biamonte, J., Wittek, P., Pancotti, N., Rebentrost, P., Wiebe, N., and Lloyd, S. Quantum machine learning. Nature , 549(7671):195–202, 2017."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib52",
+      "text": "van Esbroeck, N. M., Lennon, D. T., Moon, H., Nguyen, V., Vigneau, F., Camenzind, L. C., Yu, L., Zumbühl, D. M., Briggs, G. A. D., Sejdinovic, D., et al. Quantum device fine-tuning using unsupervised embedding learning. New Journal of Physics , 22(9):095003, 2020."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib38",
+      "text": "Nguyen, V., Orbell, S., Lennon, D. T., Moon, H., Vigneau, F., Camenzind, L. C., Yu, L., Zumbühl, D. M., Briggs, G. A. D., Osborne, M. A., et al. Deep reinforcement learning for efficient measurement of quantum devices. npj Quantum Information , 7(1):1–9, 2021."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "Boutet, A., Madhavan, R., Elias, G. J., Joel, S. E., Gramer, R., Ranjan, M., Paramanandam, V., Xu, D., Germann, J., Loh, A., et al. Predicting optimal deep brain stimulation parameters for parkinsonś disease using functional mri and machine learning. Nature communications , 12(1):1–13, 2021."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib50",
+      "text": "van Bueren, N. E., Reed, T. L., Nguyen, V., Sheffield, J. G., van der Ven, S. H., Osborne, M. A., Kroesbergen, E. H., and Cohen Kadosh, R. Personalized brain stimulation for effective neurointervention across participants. PLoS computational biology , 17(9):e1008886, 2021."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib16",
+      "text": "Esteva, A., Chou, K., Yeung, S., Naik, N., Madani, A., Mottaghi, A., Liu, Y., Topol, E., Dean, J., and Socher, R. Deep learning-enabled medical computer vision. NPJ digital medicine , 4(1):1–9, 2021."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib59",
+      "text": "Yoon, S., Chandra, A., and Vahedi, G. Stripenn detects architectural stripes from chromatin conformation data using computer vision. Nature Communications , 13(1):1–14, 2022."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib31",
+      "text": "Long, A., Yin, W., Ajanthan, T., Nguyen, V., Purkait, P., Garg, R., Blair, A., Shen, C., and van den Hengel, A. Retrieval augmented classification for long-tail visual recognition. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pp. 6959–6969, 2022."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib63",
+      "text": "Zhu, X. J. Semi-supervised learning literature survey. 2005."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib21",
+      "text": "Huang, Z., Xue, C., Han, B., Yang, J., and Gong, C. Universal semi-supervised learning. Advances in Neural Information Processing Systems , 34, 2021."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib26",
+      "text": "Killamsetty, K., Zhao, X., Chen, F., and Iyer, R. Retrieve: Coreset selection for efficient and robust semi-supervised learning. Advances in Neural Information Processing Systems , 34, 2021."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib40",
+      "text": "Olsson, V., Tranheden, W., Pinto, J., and Svensson, L. Classmix: Segmentation-based data augmentation for semi-supervised learning. In Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision , pp. 1369–1378, 2021."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib29",
+      "text": "Lee, K., Lee, K., Shin, J., and Lee, H. Overcoming catastrophic forgetting with unlabeled data in the wild. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pp. 312–321, 2019."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib7",
+      "text": "Carmon, Y., Raghunathan, A., Schmidt, L., Duchi, J. C., and Liang, P. S. Unlabeled data improves adversarial robustness. Advances in Neural Information Processing Systems , 32, 2019."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib43",
+      "text": "Ren, Z., Yeh, R., and Schwing, A. Not all unlabeled data are equal: Learning to weight data in semi-supervised learning. Advances in Neural Information Processing Systems , 33:21786–21797, 2020."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib23",
+      "text": "Islam, A., Chen, C.-F. R., Panda, R., Karlinsky, L., Feris, R., and Radke, R. J. Dynamic distillation network for cross-domain few-shot recognition with unlabeled data. Advances in Neural Information Processing Systems , 34:3584–3595, 2021."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib41",
+      "text": "Oymak, S. and Gulcu, T. C. A theoretical characterization of semi-supervised learning with self-training for gaussian mixture models. In International Conference on Artificial Intelligence and Statistics , pp. 3601–3609. PMLR, 2021."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib62",
+      "text": "Zhou, Z.-H. Semi-supervised learning. In Machine Learning , pp. 315–341. Springer, 2021."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib47",
+      "text": "Sohn, K., Berthelot, D., Carlini, N., Zhang, Z., Zhang, H., Raffel, C. A., Cubuk, E. D., Kurakin, A., and Li, C.-L. Fixmatch: Simplifying semi-supervised learning with consistency and confidence. Advances in Neural Information Processing Systems , 33, 2020."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib27",
+      "text": "Komodakis, N. and Gidaris, S. Unsupervised representation learning by predicting image rotations. In International Conference on Learning Representations (ICLR) , 2018."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib25",
+      "text": "Kenton, J. D. M.-W. C. and Toutanova, L. K. Bert: Pre-training of deep bidirectional transformers for language understanding. In Proceedings of NAACL-HLT , pp. 4171–4186, 2019."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib1",
+      "text": "Alexey, D., Fischer, P., Tobias, J., Springenberg, M. R., and Brox, T. Discriminative, unsupervised feature learning with exemplar convolutional, neural networks. IEEE Transactions on Pattern Analysis and Machine Intelligence , 38(9):1734–1747, 2016."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib51",
+      "text": "Van den Oord, A., Li, Y., and Vinyals, O. Representation learning with contrastive predictive coding. arXiv e-prints , pp. arXiv–1807, 2018."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib9",
+      "text": "Chen, T., Kornblith, S., Norouzi, M., and Hinton, G. A simple framework for contrastive learning of visual representations. In International conference on machine learning , pp. 1597–1607. PMLR, 2020."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib28",
+      "text": "Lee, D.-H. et al. Pseudo-label: The simple and efficient semi-supervised learning method for deep neural networks. In Workshop on challenges in representation learning, ICML , volume 3, pp. 896, 2013."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib61",
+      "text": "Zhang, B., Wang, Y., Hou, W., Wu, H., Wang, J., Okumura, M., and Shinozaki, T. Flexmatch: Boosting semi-supervised learning with curriculum pseudo labeling. Advances in Neural Information Processing Systems , 34, 2021."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib58",
+      "text": "Yoon, J., Zhang, Y., Jordon, J., and van der Schaar, M. Vime: Extending the success of self-and semi-supervised learning to tabular domain. Advances in Neural Information Processing Systems , 33:11033–11043, 2020."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib4",
+      "text": "Berthelot, D., Carlini, N., Goodfellow, I., Papernot, N., Oliver, A., and Raffel, C. A. Mixmatch: A holistic approach to semi-supervised learning. Advances in Neural Information Processing Systems , 32, 2019."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib56",
+      "text": "Xu, Y., Shang, L., Ye, J., Qian, Q., Li, Y.-F., Sun, B., Li, H., and Jin, R. Dash: Semi-supervised learning with dynamic thresholding. In International Conference on Machine Learning , pp. 11525–11536. PMLR, 2021."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib20",
+      "text": "Guo, L.-Z. and Li, Y.-F. Class-imbalanced semi-supervised learning with adaptive thresholding. In International Conference on Machine Learning , pp. 8082–8094. PMLR, 2022."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib44",
+      "text": "Rizve, M. N., Duarte, K., Rawat, Y. S., and Shah, M. In defense of pseudo-labeling: An uncertainty-aware pseudo-label selection framework for semi-supervised learning. In International Conference on Learning Representations , 2021."
+    },
+    {
+      "n": 34,
+      "id": "bib.bib48",
+      "text": "Tai, K. S., Bailis, P. D., and Valiant, G. Sinkhorn label allocation: Semi-supervised classification via annealed self-training. In International Conference on Machine Learning , pp. 10065–10075. PMLR, 2021."
+    },
+    {
+      "n": 35,
+      "id": "bib.bib11",
+      "text": "Cuturi, M. Sinkhorn distances: Lightspeed computation of optimal transport. Advances in neural information processing systems , 26:2292–2300, 2013."
+    }
+  ]
+}

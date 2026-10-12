@@ -1,0 +1,93 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.02723",
+  "title": "Minimum Topology Attacks for Graph Neural Networks",
+  "authors": "Mengmei Zhang, Xiao Wang, Chuan Shi, Lingjuan Lyu, Tianchi Yang, Junping Du",
+  "year": "2024",
+  "categories": [
+    "cs.AI"
+  ],
+  "url": "https://arxiv.org/abs/2403.02723",
+  "html_url": "https://arxiv.org/html/2403.02723",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 946,
+  "text": "Graph is commonly used to model many real-world relationships, such as social networks, citation networks, and e-commerce networks. Recently, there has been a surge of interest in Graph Neural Networks (GNNs) for representation learning of graphs, which combine node feature and topology with neural networks and have achieved outstanding performance in various application areas [1].\n\nDespite the great success, GNNs have been proved to often suffer from adversarial attacks [2,3], especially for topology attacks where the attacker tries to slightly manipulate topology to modify the decision of GNNs. Recent research has developed stronger topology attack methods [4,5,6,7,8] to explore the robustness of GNNs. Specifically, existing works all belong to the fixed-budget topology attacks, i.e., for each node, the attacker finds the most adversarial perturbations within a given budget (i.e., a fixed number of perturbed edges). Usually, the budget of each node is heuristically specified as the same value or based on the node degree, and then it will keep unchanged once specified.\n\nHowever, in the real-world graph, each node has unique feature and topology, and thus has varying adversarial robustness. It naturally raises a fundamental question: Are the previous fixed-budget topology attacks truly suitable for evaluating the robustness of GNNs? On the one hand, usually, an effective topology attack should lead to the misclassification of the target node and keeps it invisible, e.g., the topology cannot be modified too much. On the other hand, considering varied distribution of each node, evaluating the robustness of GNNs on node level can help better understand the robustness. Unfortunately, the fixed-budget perturbation cannot satisfy the above requirements. First, for each node, the heuristically specified budget is usually not optimal: no successful perturbation can be found when the specified budget is too small, while for the large one, the redundant perturbations will hurt the invisibility. As illustrated in Fig. 1, given blue (class c_{1}) target node v, existing fixed-budget topology attacks aim to maximally change the prediction (color) of v by modifying a fixed number of edges. Only perturbing one edge (budget \\Delta_{1}=1), the attacker fails to find a successful perturbation \\boldsymbol{\\delta}_{1} to cross purple (class c_{2}) or green (class c_{3}) decision boundary. While perturbing four edges (\\Delta_{2}=4) will cross the boundary too much, hurting the invisibility of the attack. The above analysis shows that there is a dilemma between a fixed budget and an effective attack. Second, given the fixed budget, the total accuracy of all target nodes under attacks can be used to evaluate the robustness of GNNs, while evaluating the adversarial robustness of a sample (e.g., a node) amounts to finding the minimum perturbation for misclassification of it [9].\n\nClearly, the fixed budget restricts the potential of attack methods due to the different robustness of each node. Henceforth, we propose a new orthogonal minimum-budget topology attack, which aims at adaptively finding the minimum budget that is sufficient for a successful attack for each node. Thus the attacker can adapt to the robustness of each node as the green dotted line in Fig. 1. Moreover, if we can adaptively find the budget for each node, we can provide a better understanding or more insights on node robustness, uncertainty, etc.\n\nIn essence, the minimum-budget attacks are inherently different from the fixed-budget. The attacker with a fixed budget in Fig. 1 aims to flip \\Delta_{2} edges to maximally cross the decision boundary. Obviously, this is a combinatorial optimization problem constrained by \\Delta_{2}. To solve it, exiting topology attacks often greedily flip edges for \\Delta_{2} times [2,10,11]. Further, some works use Projected Gradient Descent (PGD) to project the combination of perturbed edges within the \\Delta_{2} -limited space (grey dotted circle) [12,4,13]. While the attacker with an adaptive budget will learn a minimum perturbation (green dotted circle \\Delta_{v}^{\\star}) for crossing the decision boundary, which is challenging. With misclassification guarantee of non-convex GNN, the minimum-budget topology attack is essentially a non-convex constrained optimization problem, where PGD-based model can not be directly used [14]. And the greedy-based model is too myopic to find a good solution [15]. Grid search or binary search on budget for each node is also unbearable in practice.\n\nIn this paper, we propose a novel Mi nimum- B udget T opology att ack method for GNNs named MiBTack based on dynamic projected gradient descent, in order to solve the above challenges. Specifically, we decouple the budget and perturbation, turning the non-convex constrained optimization to alternatively solve the easier convex constrained optimization and update the budget separately. In each iteration, we search for the most adversarial topology attacks under the current budget with PGD and then the budget is enlarged or reduced based on whether these attacks succeed. Through repeatedly crossing the green decision boundary, MiBTack can find the optimal budget \\Delta^{\\star}_{v}, namely the green dotted circle centered at node v as shown in Fig. 1, which is tangent to the green decision boundary. Finally, our MiBTack can successfully attack (0 ACC) all target nodes with minimum budget.\n\nThe contributions of this paper are summarized as follows:\n\n\\bullet We highlight the inherent bottleneck of existing fixed-budget topology attacks, then we propose an orthogonal type of topology attack for GNN, which aims to adaptively find minimum budget for a successful attack. The proposed attacks are highly threatening and can be used to quantify the node-level adversarial robustness.\n\n\\bullet We propose an effective minimum-budget attack model MiBTack based on a differentiable dynamic projected gradient descent module, in order to solve the involving non-convex constraint on discrete topology.\n\n\\bullet Extensive experiments on four real-world datasets and three GNNs show that our MiBTack can produce successful attacks with minimum perturbed edges. With the obtained minimum budgets, we also explore the relationships between robustness, topology and uncertainty.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib45",
+      "text": "Zhou et al . (2020) Jie Zhou, Ganqu Cui, Zhengyan Zhang, Cheng Yang, Zhiyuan Liu, and Maosong Sun. 2020. Graph Neural Networks: A Review of Methods and Applications. ArXiv abs/1812.08434 (2020)."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib48",
+      "text": "Zügner et al . (2018) Daniel Zügner, Amir Akbarnejad, and Stephan Günnemann. 2018. Adversarial Attacks on Neural Networks for Graph Data. In KDD . 2847–2856."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib8",
+      "text": "Dai et al . (2018) Hanjun Dai, Hui Li, Tian Tian, Xin Huang, Lin Wang, Jun Zhu, and Le Song. 2018. Adversarial Attack on Graph Structured Data. In Proceedings of the 35th International Conference on Machine Learning, ICML 2018, Stockholmsmässan, Stockholm, Sweden, July 10-15, 2018 (Proceedings of Machine Learning Research, Vol. 80) . PMLR, 1123–1132."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib39",
+      "text": "Xu et al . (2019) Kaidi Xu, Hongge Chen, Sijia Liu, Pin-Yu Chen, Tsui-Wei Weng, Mingyi Hong, and Xue Lin. 2019. Topology Attack and Defense for Graph Neural Networks: An Optimization Perspective. ArXiv abs/1906.04214 (2019)."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib44",
+      "text": "Zheng et al . (2021) Qinkai Zheng, Xu Zou, Yuxiao Dong, Yukuo Cen, Da Yin, Jiarong Xu, Yang Yang, and Jie Tang. 2021. Graph Robustness Benchmark: Benchmarking the Adversarial Robustness of Graph Machine Learning. ArXiv abs/2111.04314 (2021)."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib10",
+      "text": "Geisler et al . (2021) Simon Geisler, Tobias Schmidt, Hakan Şirin, Daniel Zügner, Aleksandar Bojchevski, and Stephan Günnemann. 2021. Robustness of graph neural networks at scale. Advances in Neural Information Processing Systems 34 (2021), 7637–7649."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib34",
+      "text": "Wang et al . (2022a) Zhengyi Wang, Zhongkai Hao, Ziqiao Wang, Hang Su, and Jun Zhu. 2022a. Cluster Attack: Query-based Adversarial Attacks on Graph with Graph-Dependent Priors. In IJCAI ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib30",
+      "text": "Wang et al . (2022b) Binghui Wang, Youqin Li, and Pan Zhou. 2022b. Bandits for Structure Perturbation-based Black-box Attacks to Graph Neural Networks with Theoretical Guarantees. 2022 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) (2022), 13369–13377."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib26",
+      "text": "Rony et al . (2019) Jérôme Rony, Luiz G. Hafemann, Luiz Oliveira, Ismail Ben Ayed, Robert Sabourin, and Eric Granger. 2019. Decoupling Direction and Norm for Efficient Gradient-Based L2 Adversarial Attacks and Defenses. CVPR (2019), 4317–4325."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib49",
+      "text": "Zügner and Günnemann (2019) Daniel Zügner and Stephan Günnemann. 2019. Adversarial Attacks on Graph Neural Networks via Meta Learning. In 7th International Conference on Learning Representations, ICLR 2019, New Orleans, LA, USA, May 6-9, 2019 . OpenReview.net."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib6",
+      "text": "Chang et al . (2020) Heng Chang, Yu Rong, Tingyang Xu, Wenbing Huang, Honglei Zhang, Peng Cui, Wenwu Zhu, and Junzhou Huang. 2020. A Restricted Black-box Adversarial Framework Towards Attacking Graph Embedding Models. AAAI."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib28",
+      "text": "Sun et al . (2018) Mingjie Sun, Jian Tang, Huichen Li, Bo Li, Chaowei Xiao, Yao Chen, and Dawn Xiaodong Song. 2018. Data Poisoning Attack against Unsupervised Node Embedding Methods. ArXiv abs/1810.12881 (2018)."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib42",
+      "text": "Zhang et al . (2021) He Zhang, Bang Wu, Xiangwen Yang, Chuan Zhou, Shuo Wang, Xingliang Yuan, and Shirui Pan. 2021. Projective Ranking: A Transferable Evasion Attack Method on Graph Neural Networks. Proceedings of the 30th ACM International Conference on Information & Knowledge Management (2021)."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib24",
+      "text": "Pintor et al . (2021) Maura Pintor, Fabio Roli, Wieland Brendel, and Battista Biggio. 2021. Fast Minimum-norm Adversarial Attacks through Adaptive Norm Constraints. ArXiv abs/2102.12827 (2021)."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib21",
+      "text": "Liu et al . (2019) Xuanqing Liu, Si Si, Xiaojin Zhu, Yang Li, and Cho-Jui Hsieh. 2019. A Unified Framework for Data Poisoning Attack to Graph-based Semi-supervised Learning. In NeurIPS ."
+    }
+  ]
+}

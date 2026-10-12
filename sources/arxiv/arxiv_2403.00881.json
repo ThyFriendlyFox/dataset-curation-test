@@ -1,0 +1,125 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.00881",
+  "title": "FedRDMA: Communication-Efficient Cross-Silo Federated LLM via Chunked RDMA Transmission",
+  "authors": "Zeling Zhang, Dongqi Cai, Yiran Zhang, Mengwei Xu, Shangguang Wang, Ao Zhou",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.DC",
+    "cs.NI"
+  ],
+  "url": "https://arxiv.org/abs/2403.00881",
+  "html_url": "https://arxiv.org/html/2403.00881",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 453,
+  "text": "## Cross-silo FedLLM\n\nLarge Language Models (LLMs) have demonstrated remarkable proficiency in handling generic machine learning tasks [1,2,3,4,5]. This advancement has led numerous companies to develop their LLMs for various applications, including computational phenotyping and medical information extraction in the medical field [6,7], as well as data mining and generation from text in the financial sector [8,9]. Amid concerns regarding data privacy [10] and the challenge of isolated training data [11,12], federated learning (FL) has emerged as the predominant method for collaboratively training LLMs without sharing raw data, known as FedLLM [13,14,15,16,17]. This study concentrates on cross-silo FedLLM, where the clients are powerful industrial servers equipped with high bandwidth and computational resources.\n\n## Cross-silo FedLLM Communication Overhead\n\nAlthough acquiring more powerful GPUs can lessen computation overhead, addressing the communication overhead on WANs remains a formidable challenge, even with high bandwidth. For instance, when federating full-tuning of the GPT-2 model (117M parameters) [18] with two NVIDIA A800 80G GPUs and 10Gbps bandwidth, it still takes 45.9s to transfer the model weights per round, accounting for more than 44.97% of the total FL time. This delay stems from repeated memory copies and context switchings due to the TCP protocol stack and the inherent delay of WAN itself, as will be elaborated in § 2.1.\n\n## Communication-Efficient RDMA\n\nRemote Direct Memory Access (RDMA) is a technique that has recently become widely used to reduce communication overhead in local-area network (LAN) distributed machine learning [19,20]. It could directly transfer data between the memories of two RDMA-enabled servers, bypassing the CPU and OS kernel, which could reduce the communication overhead by up to 98.8% as shown in § 2.2. However, RDMA requires a lossless network environment to fullfill its potential, making it nearly impractical on WANs. This is because packet loss and delays, common on WANs, can lead to numerous retransmissions, which is unaccpectable by RDMA [21], thus disminishing RDMA’s performance improvemen tor even causing transmission failures.\n\n## Our Solution: FedRDMA\n\nInspired by the modular parameters in LLMs, we propose FedRDMA to manage the application layer traffic flow by transferring small packets in a chunked, sequential, and smooth manner. To further enhance performance, we design a RDMA memory pool with in-place buffering and reversed receiving strategy to effectively reassemble chunks. Our contributions are as follows:\n\n- • We conduct preliminary experiments to demonstrate that, despite the high bandwidth and computation resources, cross-silo FedLLM still suffers from high communication overhead.\n\n- • We propose FedRDMA, a communication-efficient cross-silo FedLLM system featuring chunked RDMA transmission and a series of optimizations.\n\n- • We implement FedRDMA atop the industrial FedLLM framework FATE and conduct extensive experiments to demonstrate it saves up to 3.8 \\times communication time compared to TCP-based FedLLM systems.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "(1) Joshua Robinson, Christopher Michael Rytting, and David Wingate, “Leveraging large language models for multiple choice question answering,” arXiv preprint arXiv:2210.12353 , 2022."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "(2) Jiaxian Guo, Junnan Li, Dongxu Li, Anthony Meng Huat Tiong, Boyang Li, Dacheng Tao, and Steven Hoi, “From images to textual prompts: Zero-shot visual question answering with frozen large language models,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2023, pp. 10867–10877."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "(3) Wenxuan Zhang, Yue Deng, Bing Liu, Sinno Jialin Pan, and Lidong Bing, “Sentiment analysis in the era of large language models: A reality check,” arXiv preprint arXiv:2305.15005 , 2023."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "(4) Xiaofei Sun, Xiaoya Li, Jiwei Li, Fei Wu, Shangwei Guo, Tianwei Zhang, and Guoyin Wang, “Text classification via large language models,” arXiv preprint arXiv:2305.08377 , 2023."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "(5) Youngjin Chae and Thomas Davidson, “Large language models for text classification: From zero-shot learning to fine-tuning,” Open Science Foundation , 2023."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "(6) Zexian Zeng, Yu Deng, Xiaoyu Li, Tristan Naumann, and Yuan Luo, “Natural language processing for ehr-based computational phenotyping,” IEEE/ACM transactions on computational biology and bioinformatics , vol. 16, no. 1, pp. 139–153, 2018."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "(7) Akshay Goel, Almog Gueta, Omry Gilon, Chang Liu, Sofia Erell, Lan Huong Nguyen, Xiaohong Hao, Bolous Jaber, Shashir Reddy, Rupesh Kartha, et al., “Llms accelerate annotation for medical information extraction,” in Machine Learning for Health (ML4H) . PMLR, 2023, pp. 82–100."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "(8) Allen H Huang, Hui Wang, and Yi Yang, “Finbert: A large language model for extracting information from financial text,” Contemporary Accounting Research , vol. 40, no. 2, pp. 806–841, 2023."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "(9) Yi Yang, Mark Christopher Siy Uy, and Allen Huang, “Finbert: A pretrained language model for financial communications,” arXiv preprint arXiv:2006.08097 , 2020."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "(10) Paul Voigt and Axel Von dem Bussche, “The eu general data protection regulation (gdpr),” A Practical Guide, 1st Ed., Cham: Springer International Publishing , vol. 10, no. 3152676, pp. 10–5555, 2017."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "(11) Qiang Yang, Yang Liu, Tianjian Chen, and Yongxin Tong, “Federated machine learning: Concept and applications,” ACM Transactions on Intelligent Systems and Technology (TIST) , vol. 10, no. 2, pp. 1–19, 2019."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "(12) Qinbin Li, Zeyi Wen, Zhaomin Wu, Sixu Hu, Naibo Wang, Yuan Li, Xu Liu, and Bingsheng He, “A survey on federated learning systems: Vision, hype and reality for data privacy and protection,” IEEE Transactions on Knowledge and Data Engineering , 2021."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "(13) Dongqi Cai, Shangguang Wang, Yaozong Wu, Felix Xiaozhu Lin, and Mengwei Xu, “Federated few-shot learning for mobile nlp,” in Proceedings of the 29th Annual International Conference on Mobile Computing and Networking , 2023, pp. 1–17."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "(14) Dongqi Cai, Yaozong Wu, Shangguang Wang, Felix Xiaozhu Lin, and Mengwei Xu, “Efficient federated learning for modern nlp,” in Proceedings of the 29th Annual International Conference on Mobile Computing and Networking , 2023, pp. 1–16."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "(15) Mengwei Xu, Yaozong Wu, Dongqi Cai, Xiang Li, and Shangguang Wang, “Federated fine-tuning of billion-sized language models across mobile devices,” arXiv preprint arXiv:2308.13894 , 2023."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "(16) Chaochao Chen, Xiaohua Feng, Jun Zhou, Jianwei Yin, and Xiaolin Zheng, “Federated large language model: A position paper,” arXiv preprint arXiv:2307.08925 , 2023."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "(17) Jujia Zhao, Wenjie Wang, Chen Xu, Zhaochun Ren, See-Kiong Ng, and Tat-Seng Chua, “Llm-based federated recommendation,” arXiv preprint arXiv:2402.09959 , 2024."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "(18) Alec Radford, Jeffrey Wu, Rewon Child, David Luan, Dario Amodei, Ilya Sutskever, et al., “Language models are unsupervised multitask learners,” OpenAI blog , vol. 1, no. 8, pp. 9, 2019."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "(19) Jilong Xue, Youshan Miao, Cheng Chen, Ming Wu, Lintao Zhang, and Lidong Zhou, “Fast distributed deep learning over rdma,” in Proceedings of the Fourteenth EuroSys Conference 2019 , 2019, pp. 1–14."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "(20) Feng Tian, Yang Zhang, Wei Ye, Cheng Jin, Ziyan Wu, and Zhi-Li Zhang, “Accelerating distributed deep learning using multi-path rdma in data center networks,” in Proceedings of the ACM SIGCOMM Symposium on SDN Research (SOSR) , 2021, pp. 88–100."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "(21) Chuanxiong Guo, Haitao Wu, Zhong Deng, Gaurav Soni, Jianxi Ye, Jitu Padhye, and Marina Lipshteyn, “Rdma over commodity ethernet at scale,” in Proceedings of the 2016 ACM SIGCOMM Conference , 2016, pp. 202–215."
+    }
+  ]
+}

@@ -1,0 +1,158 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.01733",
+  "title": "3D Hand Reconstruction via Aggregating Intra and Inter Graphs Guided by Prior Knowledge for Hand-Object Interaction Scenario",
+  "authors": "Feng Shuang, Wenbo He, Shaodong Li",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2403.01733",
+  "html_url": "https://arxiv.org/html/2403.01733",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1068,
+  "text": "3D hand reconstruction has been widely used in human-machine interaction [1] [2], virtual and augmented reality [3] [4] [5] [6], sign language recognition and translation [7], and has made great progress in recent years. But it is still challenging to robust to occlusion, particularly when the hand is severely occluded under hand-object interaction scenario.\n\nThe current approaches of 3D hand reconstruction focus on recovering highly accurate and plausible 3D hand meshes. Those approaches can be generally categorized into model-based and model-free approaches. Model-based approaches [8] [9] [10] [11] refer to utilize a parametric model with strong prior knowledge of hand and regress parametric representation in terms of shape and pose. Among the approaches in recent years, MANO [12] as statistical parametric model is the most widely used and shows great advantages in reconstructing physical plausible hand model when facing the challenges of object-occlusion, self-occlusion and low resolution. However, the regression of accurate MANO parameters from RGB image is a highly nonlinear mapping process, and will be limited since the MANO parameter model is constructed using limited hand samples. In contrast, Model-free approaches [13] [14] [15] [16] directly regresses to the coordinates of 3D hand mesh vertices and joints, and no longer employ predefined parameterized model. Model-free approaches can recover highly accurate 3D hand meshes and joints because of measuring an average joint or vertex position error directly. However, model-free approaches can not robust to meet physical plausibility because of without prior information of hand shape and pose when facing challenging environment variations.\n\nTherefore, it is necessary to combine the benefits of model-based and model-free approaches. Most recently, Jiang et al. [17] propose a probabilistic model that estimate the prior probability distribution of joints and vertices with incorporating a model-based network as a prior-net. Yu et al. [18] leverage direct mesh fitting for alignment accuracy and guidance from MANO for plausibility. Motivated by the above observations, our ultimate goal is to reconstruct both highly accurate and physical plausible hand model with the benefits of model-based and model-free methods for challenging hand-occlusion. In this work, we propose a 3D hand reconstruction network cascading MANO and Model-free method that consists of initial stage and refinement stage. In the initial stage, MANO with 3D pose and shape priors is used to reconstruct physical plausible hand meshes, but it is challenging to regress accurate MANO parameters with severe hand-occlusion from RGB image. Then in the refinement stage, the model-free method guided by MANO is used to further improve the accuracy of the reconstruction.\n\nIn the initial stage, we aim to obtain the high-quality MANO model in hand-object interaction scenario. In the regression of MANO parameters, the previous works [8] [19] [11] use CNN to encode the extracted hand image features and 2D heatmaps as a latent feature, and then transfer the latent feature to the pose decoder to obtain MANO parameters. However, those methods don’t distinguish the pose and shape parameters and the mapping from the abstract image feature to the MANO parameter space is highly non-linear. Some approaches [20] [21] [18] employ MLP or Transformer to regress MANO parameters from concrete 3D joints, but those methods depend on the accurate 3D joints estimation in the previous stage. Due to the severe hand-occlusion and inherent depth ambiguity of monocular RGB images, it is not easy to obtain accurate 3D joints. In this work, we propose a novel MANO pose parameters regression module based on SemGCN that can achieve the mapping of MANO pose parameters directly from 2D joints. Previous methods [21] [22] [23] [24] have demonstrated that Graph Convolutional Network(GCN) can finish the encoding of 3D pose space features exploiting the topological structure information of 2D joints. Compared with ordinary GCN, SemGCN [24] can further adaptively model connection strength to capture semantic information among joints, which strengthen the connection between occluded and unoccluded joints. We employ SemGCN to complete the encoding of 3D MANO pose parameters space through exploiting 2D joints information, which avoids the process of highly nonlinear mapping from abstract image feature and no longer depends on accurate 3D joints.\n\nIn the refinement stage, we aim to effectively refine the hand meshes and joints using model-free method guided by MANO from the initial stage. For enhancing the hand mesh and joint feature representation, the previous works [10] [25] [26] employ GCN to aggregate adjacent mesh vertex and joint feature through modeling neighborhood vertex-vertex and joint-joint interactions respectively. However, those methods ignore the correlation between vertex and joint that weaken feature enhancement. To capture the correlation between vertices and joints, the common methods [9] [16] [11] use the pre-defined regression matrix from MANO, but the matrix is designed to only map MANO-derived meshes to joints. Recently, the methods [17] [16] use 2D spatial attention mechanism to capture the correlation of vertex-joint to improve feature representation. Motivated by the above observation, we propose a vertex-joint mutual graph-attention model to jointly enhancing mesh vertex and joint feature from the initial stage. Specifically, our proposed refinement model is made up of a stack of basic blocks of the similar structure, which consists of a GCN layer and a mutual attention. GCN is employed to model the dependencies of vertex-vertex and joint-joint for aggregating intra-graph node features. And mutual attention is devised to capture the correlation between vertices and joints for aggregating inter-graph node features.\n\nIn summary, our contributions are as follows:\n\n- 1. We propose a 3D hand reconstruction pipeline combining the benefits of model-based and model-free approaches for hand-object interaction scenario, which balance accuracy and physical plausibility to improve the precision of hand meshes and joints estimation.\n\n- 2. We present a novel MANO pose parameters regression module from 2D joints directly, which avoids the process of highly nonlinear mapping from abstract image feature and no longer depends on accurate 3D joints.\n\n- 3. We propose a vertex-joint mutual graph-attention model guided by MANO that can jointly refine hand mesh vertices and joints, which model the dependencies of vertex-vertex and joint-joint and capture the correlation of vertex-joint for aggregating intra-graph and inter-graph node features.\n\n- 4. We demonstrate the effectiveness of our method by conducting comprehensive experiments on two benchmark datasets: Dex-YCB [27] and HO3Dv2 [28] that contain severe hand occlusion. Compared with the state-of-the-art methods, our method achieves a competitive performance. Moreover, we further perform ablation studies to highlight the effectiveness of our proposed model and its major components on the HO3DV2 dataset.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "N. Conci, P. Ceresato, and F. G. De Natale, “Natural human-machine interface using an interactive virtual blackboard,” in 2007 IEEE International Conference on Image Processing , vol. 5. IEEE, 2007, pp. V–181."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "R. Yin, D. Wang, S. Zhao, Z. Lou, and G. Shen, “Wearable sensors-enabled human–machine interaction systems: from design to application,” Advanced Functional Materials , vol. 31, no. 11, p. 2008936, 2021."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib5",
+      "text": "S. Han, B. Liu, R. Cabezas, C. D. Twigg, P. Zhang, J. Petkau, T.-H. Yu, C.-J. Tai, M. Akbay, Z. Wang et al. , “Megatrack: monochrome egocentric articulated hand-tracking for virtual reality,” ACM Transactions on Graphics (ToG) , vol. 39, no. 4, pp. 87–1, 2020."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib3",
+      "text": "S. Jung and C. E. Hughes, “Body ownership in virtual reality,” in 2016 international conference on collaboration technologies and systems (CTS) . IEEE, 2016, pp. 597–600."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib6",
+      "text": "F. Mueller, M. Davis, F. Bernard, O. Sotnychenko, M. Verschoor, M. A. Otaduy, D. Casas, and C. Theobalt, “Real-time pose and shape reconstruction of two interacting hands with a single depth camera,” ACM Transactions on Graphics (ToG) , vol. 38, no. 4, pp. 1–13, 2019."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib4",
+      "text": "J. Wang, F. Mueller, F. Bernard, S. Sorli, O. Sotnychenko, N. Qian, M. A. Otaduy, D. Casas, and C. Theobalt, “Rgb2hands: real-time tracking of 3d hand interactions from monocular rgb video,” ACM Transactions on Graphics (ToG) , vol. 39, no. 6, pp. 1–16, 2020."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "X. Liang, A. Angelopoulou, E. Kapetanios, B. Woll, R. Al Batat, and T. Woolfe, “A multi-modal machine learning approach and toolkit to automate recognition of early stages of dementia among british sign language users,” in Computer Vision–ECCV 2020 Workshops: Glasgow, UK, August 23–28, 2020, Proceedings, Part II 16 . Springer, 2020, pp. 278–293."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib11",
+      "text": "A. Boukhayma, R. d. Bem, and P. H. Torr, “3d hand shape and pose from images in the wild,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2019, pp. 10 843–10 852."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "Y. Chen, Z. Tu, D. Kang, L. Bao, Y. Zhang, X. Zhe, R. Chen, and J. Yuan, “Model-based 3d hand reconstruction via self-supervised learning,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2021, pp. 10 451–10 460."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib8",
+      "text": "L. Ge, Z. Ren, Y. Li, Z. Xue, Y. Wang, J. Cai, and J. Yuan, “3d hand shape and pose estimation from a single rgb image,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2019, pp. 10 833–10 842."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib10",
+      "text": "J. Park, Y. Oh, G. Moon, H. Choi, and K. M. Lee, “Handoccnet: Occlusion-robust 3d hand mesh estimation network,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2022, pp. 1496–1505."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "J. Romero, D. Tzionas, and M. J. Black, “Embodied hands: Modeling and capturing hands and bodies together,” arXiv preprint arXiv:2201.02610 , 2022."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib14",
+      "text": "H. Choi, G. Moon, and K. M. Lee, “Pose2mesh: Graph convolutional network for 3d human pose and mesh recovery from a 2d human pose,” in Computer Vision–ECCV 2020: 16th European Conference, Glasgow, UK, August 23–28, 2020, Proceedings, Part VII 16 . Springer, 2020, pp. 769–787."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib16",
+      "text": "S. Hampali, S. D. Sarkar, M. Rad, and V. Lepetit, “Keypoint transformer: Solving joint identification in challenging hands and object interactions for accurate 3d pose estimation,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2022, pp. 11 090–11 100."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib13",
+      "text": "N. Kolotouros, G. Pavlakos, and K. Daniilidis, “Convolutional mesh regression for single-image human shape reconstruction,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2019, pp. 4501–4510."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib15",
+      "text": "K. Lin, L. Wang, and Z. Liu, “End-to-end human pose and mesh reconstruction with transformers,” in Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , 2021, pp. 1954–1963."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "Z. Jiang, H. Rahmani, S. Black, and B. M. Williams, “A probabilistic attention model with occlusion-aware texture regression for 3d hand reconstruction from a single rgb image,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2023, pp. 758–767."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "Z. Yu, C. Li, L. Yang, X. Zheng, M. B. Mi, G. H. Lee, and A. Yao, “Overcoming the trade-off between accuracy and plausibility in 3d hand shape reconstruction,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2023, pp. 544–553."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "S. Liu, H. Jiang, J. Xu, S. Liu, and X. Wang, “Semi-supervised 3d hand-object poses estimation with interactions in time,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2021, pp. 14 687–14 697."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib21",
+      "text": "C. Gao, Y. Yang, and W. Li, “3d interacting hand pose and shape estimation from a single rgb image,” Neurocomputing , vol. 474, pp. 25–36, 2022."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib20",
+      "text": "L. Huang, J. Tan, J. Meng, J. Liu, and J. Yuan, “Hot-net: Non-autoregressive transformer for 3d hand-object pose estimation,” in Proceedings of the 28th ACM International Conference on Multimedia , 2020, pp. 3136–3145."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib24",
+      "text": "V.-T. Le, T.-H. Tran, V.-N. Hoang, V.-H. Le, T.-L. Le, and H. Vu, “Sst-gcn: Structure aware spatial-temporal gcn for 3d hand pose estimation,” in 2021 13th International Conference on Knowledge and Systems Engineering (KSE) . IEEE, 2021, pp. 1–6."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib23",
+      "text": "G. Moon and K. M. Lee, “I2l-meshnet: Image-to-lixel prediction network for accurate 3d human pose and mesh estimation from a single rgb image,” in Computer Vision–ECCV 2020: 16th European Conference, Glasgow, UK, August 23–28, 2020, Proceedings, Part VII 16 . Springer, 2020, pp. 752–768."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib22",
+      "text": "L. Zhao, X. Peng, Y. Tian, M. Kapadia, and D. N. Metaxas, “Semantic graph convolutional networks for 3d human pose regression,” in Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , 2019, pp. 3425–3435."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib26",
+      "text": "X. Tang, T. Wang, and C.-W. Fu, “Towards accurate alignment in real-time 3d hand-mesh reconstruction,” in Proceedings of the IEEE/CVF International Conference on Computer Vision , 2021, pp. 11 698–11 707."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib25",
+      "text": "T. H. E. Tse, K. I. Kim, A. Leonardis, and H. J. Chang, “Collaborative learning for hand and object reconstruction with attention-guided graph convolution,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2022, pp. 1664–1674."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib44",
+      "text": "Y.-W. Chao, W. Yang, Y. Xiang, P. Molchanov, A. Handa, J. Tremblay, Y. S. Narang, K. Van Wyk, U. Iqbal, S. Birchfield et al. , “Dexycb: A benchmark for capturing hand grasping of objects,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2021, pp. 9044–9053."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib40",
+      "text": "S. H. Shivakumar, M. Rad, M. Oberweger, and V. Lepetit, “Honnotate: A method for 3d annotation of hand and object poses,” in 2020 IEEE/CVF Conference on Computer Vision and Pattern Recognition: CVPR 2020 , 2020, pp. 3193–3203."
+    }
+  ]
+}

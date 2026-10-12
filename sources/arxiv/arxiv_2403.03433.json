@@ -1,0 +1,53 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.03433",
+  "title": "I3DE: An IDE for Inspecting Inconsistencies in PL/SQL Code",
+  "authors": "Jiangshan Liu, Shuang Liu, Junjie Chen",
+  "year": "2024",
+  "categories": [
+    "cs.SE"
+  ],
+  "url": "https://arxiv.org/abs/2403.03433",
+  "html_url": "https://arxiv.org/html/2403.03433",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 714,
+  "text": "PL/SQL serves as a procedural extension to SQL within a Database Management System (DBMS) [1]. Unlike SQL, there is no standardized specification for PL/SQL [2], and the lengthy and incomplete development documentation of DBMS creates barriers to programmers’ understanding of PL/SQL. This could naturally lead to inconsistencies between their understanding of the PL/SQL semantics and the semantics actually implemented in the DBMS. In addition, our investigation [3] conducted with a sample of 57 PL/SQL programmers and developers involved in the design and implementation of PL/SQL engines, substantiates this observation. The results showed that 76.92% of the PL/SQL programmers understood PL/SQL semantics based on their previous experience with SQL, 69.23% of the developers implemented the PL/SQL engines (e.g., PosgreSQL [1] and openGauss [4]) relying on their experience with other procedural languages and 46.15% of the developers also rely on their own personal experience and understanding. Therefore, DBMS developers and PL/SQL programmers may have inconsistent understanding about the PL/SQL semantics.\n\nInconsistent understanding of PL/SQL semantics between PL/SQL programmers and DBMS developers (we use inconsistency for short in the rest of the paper) could easily result in misuse or even bugs with serious consequences. For instance, Figure 1 illustrates that PL/pgSQL code containing inconsistencies could be risky to SQL injection. In this context, PL/pgSQL receives a CHAR type parameter (line 1) as input. In SQL, the default length of CHAR(n) is 1, and any type conversion to an unspecified length CHAR is truncated to the first character [5]. However, PL/pgSQL engine does not conduct automatic truncation on CHAR type parameters, and passes the input text as it is. When we pass the parameter ‘2 OR TRUE’ (line 8) to the function, a programmer with SQL experience may expect an automatic truncation to a CHAR type, yet in PL/pgSQL, there is no such automatic truncation and thus the full-length parameter is passed and concatenated to the command in line 3 (|| is the string concatenation operator). Therefore, the where expression is evaluated to truth, which triggers the update operation. The update set the userpass to default, which is a typical SQL injection.\n\nThe identification and mitigation of potentially harmful inconsistencies lie within the purview of the programmer, presenting a challenging task [6]. One of the most viable and practical solution is to leverage Integrated Development Environments (IDEs) to alert programmers to these inconsistencies during their programming phase. Currently, various IDEs extensively support database development through native features or plugins [7], but no IDE has yet been able to warn programmers about such inconsistencies in PL/SQL.\n\nIn this paper, we present I 3 DE, a user-friendly IntelliJ plugin that inspects inconsistencies in PL/SQL code through two modes, i.e., dynamic mode and static mode. The dynamic mode automatically executes the PL/SQL programs with our metamorphic testing based inspection engine and reports potential inconsistencies. The static mode relies on three types of pre-defined patterns to inspect the inconsistencies. The dynamic mode could help us inspect more inconsistencies while the static mode is effective in inconsistency inspection. Note that the inconsistencies inspected in the dynamic mode can be encoded in the patterns used in static mode, which enriches the patterns and at the same time maintains effectiveness.\n\nWe conducted a user study on I 3 DE to evaluate its effectiveness in helping programmers identify and avoid inconsistencies. Participants were divided into experiment group and control group, where the experiment group completes the task with the aid of I 3 DE, while the control group completes the task on their own. Results indicate that, compared to the control group, the experiment group utilizing I 3 DE demonstrated an 87.5% increase in correctness rate for identifying and correcting inconsistencies, with a corresponding speed improvement of 98.96%.\n\nTo summarize, we made the following contributions.\n\n- • We first observed the potential issues that are introduced by the inconsistent understanding of PL/SQL semantics by PL/SQL programmers and DBMS developers, and propose a metamorphic testing-based approach for inspecting inconsistencies in PL/SQL code.\n\n- • We developed I 3 DE- an IDE plugin designed to rapidly and accurately identify inconsistencies in PL/SQL code during actual programming. We made I 3 DE publicly available online at https://github.com/JiangshanLiu/PLSQLIC3.\n\n- • We conduct a user study with 16 volunteers of various PL/SQL experiences to evaluate the effectiveness of I 3 DE.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib6",
+      "text": "Group (2023b) The PostgreSQL Global Development Group. 2023b. PL/pgSQL Overview. https://www.postgresql.org/docs/current/plpgsql-overview.html##PLPGSQL-OVERVIEW . accessed: November 2023."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib7",
+      "text": "Group (2023c) The PostgreSQL Global Development Group. 2023c. Porting from Oracle PL/SQL. https://www.postgresql.org/docs/current/plpgsql-porting.html##PLPGSQL-PORTING . accessed: November 2023."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib14",
+      "text": "Liu (2023) Jiangshan Liu. 2023. Detecting inconsistencies in PL/SQL code through software testing methods. https://jiangshanliu.github.io/PLSQLIC3/web . accessed: November 2023."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib20",
+      "text": "openGauss (2023) openGauss. 2023. PL/pgSQL Functions. https://docs-opengauss.osinfra.cn/en/docs/latest/docs/SQLReference/pl-pgsql-functions.html . accessed: November 2023."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "Group (2023a) The PostgreSQL Global Development Group. 2023a. Character Types. https://www.postgresql.org/docs/current/datatype-character.html##DATATYPE-CHARACTER . accessed: November 2023."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib19",
+      "text": "Nuseibeh et al . (2001) Bashar Nuseibeh, Steve Easterbrook, and Alessandra Russo. 2001. Making inconsistency respectable in software development. Journal of systems and software 58, 2 (2001), 171–180."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib10",
+      "text": "JetBrains (2023) JetBrains. 2023. JetBrains Tools for Data Science & Big Data. https://www.jetbrains.com/data-tools/ . accessed: November 2023."
+    }
+  ]
+}

@@ -1,0 +1,138 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.04437",
+  "title": "StableDrag: Stable Dragging for Point-based Image Editing",
+  "authors": "Yutao Cui, Xiaotong Zhao, Guozhen Zhang, Shengming Cao, Kai Ma, Limin Wang",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2403.04437",
+  "html_url": "https://arxiv.org/html/2403.04437",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 885,
+  "text": "Controllable image editing with generative models [1,2,3,4,5,6] has achieved remarkable achievements in the past few years, which can customize the generative results for further refinement purposes. Recently the pioneering DragGAN [7] has largely pushed forward accurate image editing with interactive point-based manipulation, that is, driving semantic objects based on user-input handle points toward the corresponding target points. DragGAN formulates a novel dragging technique, primarily contains motion supervision and point tracking, where the former supervises the local patches around the handle points to move towards the target points step by step, while the latter is responsible for locating the updated handle points at each step.\n\nDespite the great success of DragGAN, its editing ability is still constrained by the inherent model capacity and generality of generative adversarial networks. Therefore, recent works [8,9] resort to diffusion models [10,11,12,13,14,15,16,17,18,19,20] for high-quality drag-style image editing. A representative work DragDiffusion [8] explores to adapt the dragging scheme to diffusion models, i.e., first fine-tuning a LoRA, then optimizing the latent at a single diffusion step, finally denoising the optimized latent based on MasaCtrl [21]. For the key component of diffusion latent optimization, it directly follows the DragGAN’s convention of iteratively conducting motion supervision and point tracking. We analyze that the current dragging scheme still suffers from the following issues. i) Inaccurate point tracking. These methods leverage the feature difference as the similarity measurement to track the updated handle points, which is insufficient to precisely locate the right ones from the distractors (i.e., the around misleading points with similar content). Especially in diffusion models, since the features are sampled from the intermediate diffusion process with much noise injection, the updated points become increasingly challenging to be distinguished from their local surroundings. This may lead to unsatisfactory dragging outcomes, as showcased by the examples of the Mona Lisa portrait and the vase in Fig. 1. ii) Incomplete motion supervision. During the motion supervision process, the latent may not be adequately optimized at certain steps, resulting in a deterioration of the manipulation quality (see examples of the elephant and the woman in Fig. 1) as well as the point tracking drift. In diffusion models, the latent is more stable and harder to manipulate than GAN’s [8], especially when fine-tuning the LoRA on a specific image, which may aggravate the problem.\n\nConsidering the aforementioned issues, we argue that there are two primary principles for designing a more stable dragging framework. First, a robust yet efficient point tracking method is required, to avoid locating the incorrect points and increasing much latency, thus enabling the point-based drag to be precise. Second, we should guarantee the motion supervision to be complete at each optimization step, so as to keep the editing content as high-quality as possible across all the manipulation process, and fully unleash the strong restoring power of generative models. In addition, complete motion supervision can enhance the similarity between the content of the given handle points and the updated points, preventing the accumulation of tracking errors.\n\nDriven by the above analysis, we re-formulate the dragging scheme of point tracking and motion supervision in DragGAN and DragDiffusion, and present a more stable dragging framework for point-based image editing, coined as StableDrag. Specifically, inspired by the success in visual object tracking [22,23,24], we try to derive a simple yet powerful point tracking model, in the form of a convolution filter, from a discriminative learning loss. This model is capable of suppressing the tracking confidence score of the distractor points as well as enhancing that of the handle points. At the beginning of the manipulation steps, we update the tracking model weights under the supervision of a tailored similarity learning function. Once the tracking model is prepared, we employ it, in conjunction with the original feature difference method for robust and precise point tracking. Notably, this approach scarcely increases inference latency, since we only need to optimize the simple tracking model (i.e., a single convolution filter) at the initial manipulation step. Furthermore, we design a confidence-based latent enhancement strategy, to make motion supervision complete enough at each step. In detail, we utilize the tracking confidence score of the handle points to assess the quality of the current manipulation process. Normally, we use the same manner of motion supervision as DragDiffusion. Nevertheless, when the quality score falls below an acceptable threshold, we employ the template features (i.e., the initial features of the given start handle points) to supervise that of the current handle points’ content, until its confidence score is satisfactory. Thanks to the unique designs for dragging scheme, we instantiate two types of image editing models including StableDrag-GAN and StableDrag-Diff, built on GAN and Diffusion models respectively, which attains more stable and precise drag performance. Our contributions are summarized as follows:\n\n- \\bullet We propose a discriminative point tracking method, which allows the model to accurately distinguish the updated handle points from the distractor ones, hence promoting the stability of dragging.\n\n- \\bullet We devise a confidence-based latent enhancement strategy for motion supervision, which can improve the optimization quality at each manipulation step.\n\n- \\bullet Under these designs, we build StableDrag, a point-based image editing framework, upon different generative models including GAN and Stable Diffusion. Through extensive qualitative experiments on a variety of examples and quantitative assessment on DragBench [8], we demonstrate the effectiveness of our StableDrag-GAN and StableDrag-Diff.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib30",
+      "text": "Kingma, D.P., Welling, M.: Auto-encoding variational bayes. arXiv preprint arXiv:1312.6114 (2013)"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib40",
+      "text": "Mirza, M., Osindero, S.: Conditional generative adversarial nets. arXiv preprint arXiv:1411.1784 (2014)"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib19",
+      "text": "Goodfellow, I.J., Pouget-Abadie, J., Mirza, M., Xu, B., Warde-Farley, D., Ozair, S., Courville, A.C., Bengio, Y.: Generative adversarial nets. In: NeurIPS (2014)"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib25",
+      "text": "Karras, T., Laine, S., Aila, T.: A style-based generator architecture for generative adversarial networks. In: CVPR (2019)"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib27",
+      "text": "Karras, T., Laine, S., Aittala, M., Hellsten, J., Lehtinen, J., Aila, T.: Analyzing and improving the image quality of StyleGAN. In: CVPR (2020)"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib36",
+      "text": "Ling, P., Chen, L., Zhang, P., Chen, H., Jin, Y.: Freedrag: Point tracking is not you need for interactive point-based image editing. arXiv preprint arXiv:2307.04684 (2023)"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib43",
+      "text": "Pan, X., Tewari, A., Leimkühler, T., Liu, L., Meka, A., Theobalt, C.: Drag your GAN: Interactive point-based manipulation on the generative image manifold. arXiv preprint arXiv:2305.10973 (2023)"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib50",
+      "text": "Shi, Y., Xue, C., Pan, J., Zhang, W., Tan, V.Y., Bai, S.: Dragdiffusion: Harnessing diffusion models for interactive point-based image editing. arXiv preprint arXiv:2306.14435 (2023)"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib41",
+      "text": "Mou, C., Wang, X., Song, J., Shan, Y., Zhang, J.: Dragondiffusion: Enabling drag-style manipulation on diffusion models. arXiv preprint arXiv:2307.02421 (2023)"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib23",
+      "text": "Ho, J., Jain, A., Abbeel, P.: Denoising diffusion probabilistic models. In: NeurIPS (2020)"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib13",
+      "text": "Dhariwal, P., Nichol, A.: Diffusion models beat GANs on image synthesis. In: NeurIPS (2021)"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib48",
+      "text": "Rombach, R., Blattmann, A., Lorenz, D., Esser, P., Ommer, B.: High-resolution image synthesis with latent diffusion models. In: CVPR (2022)"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib46",
+      "text": "Ramesh, A., Dhariwal, P., Nichol, A., Chu, C., Chen, M.: Hierarchical text-conditional image generation with CLIP latents. arXiv preprint arXiv:2204.06125 (2022)"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib16",
+      "text": "Esser, P., Rombach, R., Blattmann, A., Ommer, B.: ImageBART: Bidirectional context with multinomial diffusion for autoregressive image synthesis. In: NeurIPS (2021)"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib20",
+      "text": "Gu, S., Chen, D., Bao, J., Wen, F., Zhang, B., Chen, D., Yuan, L., Guo, B.: Vector quantized diffusion model for text-to-image synthesis. In: CVPR (2022)"
+    },
+    {
+      "n": 16,
+      "id": "bib.bib42",
+      "text": "Nichol, A., Dhariwal, P., Ramesh, A., Shyam, P., Mishkin, P., McGrew, B., Sutskever, I., Chen, M.: GLIDE: Towards photorealistic image generation and editing with text-guided diffusion models. arXiv preprint arXiv:2112.10741 (2021)"
+    },
+    {
+      "n": 17,
+      "id": "bib.bib49",
+      "text": "Saharia, C., Chan, W., Saxena, S., Li, L., Whang, J., Denton, E., Ghasemipour, S.K.S., Ayan, B.K., Mahdavi, S.S., Lopes, R.G., et al.: Photorealistic text-to-image diffusion models with deep language understanding. arXiv preprint arXiv:2205.11487 (2022)"
+    },
+    {
+      "n": 18,
+      "id": "bib.bib17",
+      "text": "Gal, R., Alaluf, Y., Atzmon, Y., Patashnik, O., Bermano, A.H., Chechik, G., Cohen-Or, D.: An image is worth one word: Personalizing text-to-image generation using textual inversion. In: ICLR (2023)"
+    },
+    {
+      "n": 19,
+      "id": "bib.bib31",
+      "text": "Kumari, N., Zhang, B., Zhang, R., Shechtman, E., Zhu, J.Y.: Multi-concept customization of text-to-image diffusion. arXiv preprint arXiv:2212.04488 (2022)"
+    },
+    {
+      "n": 20,
+      "id": "bib.bib28",
+      "text": "Kawar, B., Zada, S., Lang, O., Tov, O., Chang, H., Dekel, T., Mosseri, I., Irani, M.: Imagic: Text-based real image editing with diffusion models. arXiv preprint arXiv:2210.09276 (2022)"
+    },
+    {
+      "n": 21,
+      "id": "bib.bib7",
+      "text": "Cao, M., Wang, X., Qi, Z., Shan, Y., Qie, X., Zheng, Y.: Masactrl: Tuning-free mutual self-attention control for consistent image synthesis and editing. arXiv preprint arXiv:2304.08465 (2023)"
+    },
+    {
+      "n": 22,
+      "id": "bib.bib4",
+      "text": "Bertinetto, L., Valmadre, J., Henriques, J.F., Vedaldi, A., Torr, P.H.S.: Fully-convolutional siamese networks for object tracking. In: ECCV Workshops (2016)"
+    },
+    {
+      "n": 23,
+      "id": "bib.bib12",
+      "text": "Danelljan, M., Bhat, G., Khan, F.S., Felsberg, M.: ATOM: accurate tracking by overlap maximization. In: CVPR (2019)"
+    },
+    {
+      "n": 24,
+      "id": "bib.bib10",
+      "text": "Cui, Y., Jiang, C., Wang, L., Wu, G.: Mixformer: End-to-end tracking with iterative mixed attention. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (2022)"
+    }
+  ]
+}

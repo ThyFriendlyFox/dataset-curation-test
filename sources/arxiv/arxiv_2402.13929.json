@@ -1,0 +1,205 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2402.13929",
+  "title": "SDXL-Lightning: Progressive Adversarial Diffusion Distillation",
+  "authors": "Shanchuan Lin, Anran Wang, Xiao Yang",
+  "year": "2024",
+  "categories": [
+    "cs.CV",
+    "cs.AI",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2402.13929",
+  "html_url": "https://arxiv.org/html/2402.13929",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 517,
+  "text": "Diffusion models [1,2,3] are a rising class of generative models that has achieved state-of-the-art results in a wide range of applications, such as text-to-image [4,5,6,7,8,9,10], text-to-video [11,12,13,14,15,16], and image-to-video [15], etc. However, the iterative generation process of diffusion models is slow and computationally expansive. How to generate high-quality samples faster is an actively researched area and is the main focus of our work.\n\nConceptually, the generation involves a probability flow that gradually transports samples between the data and the noise probability distribution. The diffusion model learns to predict the gradient at any location of this flow. The generation is simply transporting samples from the noise distribution to the data distribution by following the predicted gradient through the flow. Because the flow is complex and curved, the generation must take a small step at a time. Formally, the flow can be expressed as an ordinary differential equation (ODE) [3]. In practice, generating a high-quality data sample requires more than 50 inference steps.\n\nDifferent approaches to reduce the number of inference steps have been researched. Prior works have proposed better ODE solvers to account for the curving nature of the flow [17,18,19,20,21,22]. Others have proposed formulations to make the flow straighter [23,24]. Nonetheless, these approaches generally still require more than 20 inference steps.\n\nModel distillation [25,26,27,28,29,30,31,32,33,34], on the other hand, can achieve high-quality samples under 10 inference steps. Instead of predicting the gradient at the current flow location, it changes the model to directly predict the next flow location much farther ahead. Existing methods can achieve good results using 4 or 8 inference steps, but the quality is still not production-acceptable using 1 or 2 inference steps. Our method falls under the model distillation umbrella and achieves much superior quality compared to existing methods.\n\nOur method combines the best of both worlds from progressive [25] and adversarial distillation [29]. Progressive distillation ensures that the distilled model follows the same probability flow and has the same mode coverage as the original model. However, progressive distillation with mean squared error (MSE) loss produces blurry results under 8 inference steps and we provide theoretical analysis in our paper. To mitigate the issue, we use adversarial loss at every stage of the distillation to strike a balance between quality and mode coverage. Progressive distillation also brings an additional benefit, i.e., for multi-step sampling, our model predicts the next location on the ODE trajectory instead of jumping to the ODE trajectory endpoints every time by other distillation approaches [26,29,32]. This better preserves the original model behavior and facilitates better compatibility with LoRA modules [35] and control plugins [36,11,37].\n\nFurthermore, our paper proposes innovative discriminator design, loss objectives, and stable training techniques. Specifically, we use the pre-trained diffusion UNet encoder as the discriminator backbone and fully operate in latent space. We propose two adversarial loss objectives to trade off sample quality and mode coverage. We investigate the implication of diffusion schedules and output formulation. We discuss techniques to stabilize the adversarial training.\n\nOur distillation method produces new state-of-the-art SDXL [4] models that support one-step/few-step generation at 1024px resolution. We open-source our distilled models as SDXL-Lightning.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib14",
+      "text": "Jonathan Ho, Ajay Jain, and Pieter Abbeel. Denoising diffusion probabilistic models. In Hugo Larochelle, Marc’Aurelio Ranzato, Raia Hadsell, Maria-Florina Balcan, and Hsuan-Tien Lin, editors, Advances in Neural Information Processing Systems 33: Annual Conference on Neural Information Processing Systems 2020, NeurIPS 2020, December 6-12, 2020, virtual , 2020."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib63",
+      "text": "Jascha Sohl-Dickstein, Eric A. Weiss, Niru Maheswaranathan, and Surya Ganguli. Deep unsupervised learning using nonequilibrium thermodynamics. In Francis R. Bach and David M. Blei, editors, Proceedings of the 32nd International Conference on Machine Learning, ICML 2015, Lille, France, 6-11 July 2015 , volume 37 of JMLR Workshop and Conference Proceedings , pages 2256–2265. JMLR.org, 2015."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib67",
+      "text": "Yang Song, Jascha Sohl-Dickstein, Diederik P Kingma, Abhishek Kumar, Stefano Ermon, and Ben Poole. Score-based generative modeling through stochastic differential equations. In International Conference on Learning Representations , 2021."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib44",
+      "text": "Dustin Podell, Zion English, Kyle Lacey, Andreas Blattmann, Tim Dockhorn, Jonas Müller, Joe Penna, and Robin Rombach. SDXL: Improving latent diffusion models for high-resolution image synthesis. In The Twelfth International Conference on Learning Representations , 2024."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib51",
+      "text": "Robin Rombach, A. Blattmann, Dominik Lorenz, Patrick Esser, and Björn Ommer. High-resolution image synthesis with latent diffusion models. 2022 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 10674–10685, 2021."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib53",
+      "text": "Chitwan Saharia, William Chan, Saurabh Saxena, Lala Li, Jay Whang, Emily Denton, Seyed Kamyar Seyed Ghasemipour, Raphael Gontijo-Lopes, Burcu Karagol Ayan, Tim Salimans, Jonathan Ho, David J. Fleet, and Mohammad Norouzi. Photorealistic text-to-image diffusion models with deep language understanding. In Alice H. Oh, Alekh Agarwal, Danielle Belgrave, and Kyunghyun Cho, editors, Advances in Neural Information Processing Systems , 2022."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib5",
+      "text": "Junsong Chen, Jincheng YU, Chongjian GE, Lewei Yao, Enze Xie, Zhongdao Wang, James Kwok, Ping Luo, Huchuan Lu, and Zhenguo Li. Pixart-$\\alpha$: Fast training of diffusion transformer for photorealistic text-to-image synthesis. In The Twelfth International Conference on Learning Representations , 2024."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib49",
+      "text": "Aditya Ramesh, Prafulla Dhariwal, Alex Nichol, Casey Chu, and Mark Chen. Hierarchical text-conditional image generation with clip latents, 2022."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib79",
+      "text": "Chuanxia Zheng, Long Tung Vuong, Jianfei Cai, and Dinh Phung. MoVQ: Modulating quantized vectors for high-fidelity image generation. In Alice H. Oh, Alekh Agarwal, Danielle Belgrave, and Kyunghyun Cho, editors, Advances in Neural Information Processing Systems , 2022."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib43",
+      "text": "Pablo Pernias, Dominic Rampas, Mats Leon Richter, Christopher Pal, and Marc Aubreville. Würstchen: An efficient architecture for large-scale text-to-image diffusion models. In The Twelfth International Conference on Learning Representations , 2024."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib10",
+      "text": "Yuwei Guo, Ceyuan Yang, Anyi Rao, Zhengyang Liang, Yaohui Wang, Yu Qiao, Maneesh Agrawala, Dahua Lin, and Bo Dai. Animatediff: Animate your personalized text-to-image diffusion models without specific tuning. In The Twelfth International Conference on Learning Representations , 2024."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib3",
+      "text": "A. Blattmann, Robin Rombach, Huan Ling, Tim Dockhorn, Seung Wook Kim, Sanja Fidler, and Karsten Kreis. Align your latents: High-resolution video synthesis with latent diffusion models. 2023 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 22563–22575, 2023."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib80",
+      "text": "Daquan Zhou, Weimin Wang, Hanshu Yan, Weiwei Lv, Yizhe Zhu, and Jiashi Feng. Magicvideo: Efficient video generation with latent diffusion models, 2023."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib13",
+      "text": "Jonathan Ho, William Chan, Chitwan Saharia, Jay Whang, Ruiqi Gao, Alexey Gritsenko, Diederik P. Kingma, Ben Poole, Mohammad Norouzi, David J. Fleet, and Tim Salimans. Imagen video: High definition video generation with diffusion models, 2022."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib2",
+      "text": "Andreas Blattmann, Tim Dockhorn, Sumith Kulal, Daniel Mendelevitch, Maciej Kilian, Dominik Lorenz, Yam Levi, Zion English, Vikram Voleti, Adam Letts, Varun Jampani, and Robin Rombach. Stable video diffusion: Scaling latent video diffusion models to large datasets, 2023."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib62",
+      "text": "Uriel Singer, Adam Polyak, Thomas Hayes, Xi Yin, Jie An, Songyang Zhang, Qiyuan Hu, Harry Yang, Oron Ashual, Oran Gafni, Devi Parikh, Sonal Gupta, and Yaniv Taigman. Make-a-video: Text-to-video generation without text-video data. In The Eleventh International Conference on Learning Representations , 2023."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib64",
+      "text": "Jiaming Song, Chenlin Meng, and Stefano Ermon. Denoising diffusion implicit models. In International Conference on Learning Representations , 2021."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib34",
+      "text": "Cheng Lu, Yuhao Zhou, Fan Bao, Jianfei Chen, Chongxuan Li, and Jun Zhu. DPM-solver: A fast ODE solver for diffusion probabilistic model sampling in around 10 steps. In Alice H. Oh, Alekh Agarwal, Danielle Belgrave, and Kyunghyun Cho, editors, Advances in Neural Information Processing Systems , 2022."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib35",
+      "text": "Cheng Lu, Yuhao Zhou, Fan Bao, Jianfei Chen, Chongxuan Li, and Jun Zhu. Dpm-solver++: Fast solver for guided sampling of diffusion probabilistic models, 2023."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib19",
+      "text": "Tero Karras, Miika Aittala, Timo Aila, and Samuli Laine. Elucidating the design space of diffusion-based generative models. In Alice H. Oh, Alekh Agarwal, Danielle Belgrave, and Kyunghyun Cho, editors, Advances in Neural Information Processing Systems , 2022."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib30",
+      "text": "Luping Liu, Yi Ren, Zhijie Lin, and Zhou Zhao. Pseudo numerical methods for diffusion models on manifolds. In International Conference on Learning Representations , 2022."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib78",
+      "text": "Wenliang Zhao, Lujia Bai, Yongming Rao, Jie Zhou, and Jiwen Lu. Unipc: A unified predictor-corrector framework for fast sampling of diffusion models. NeurIPS , 2023."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib31",
+      "text": "Xingchao Liu, Chengyue Gong, and Qiang Liu. Flow straight and fast: Learning to generate and transfer data with rectified flow, 2022."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib29",
+      "text": "Yaron Lipman, Ricky T. Q. Chen, Heli Ben-Hamu, Maximilian Nickel, and Matthew Le. Flow matching for generative modeling. In The Eleventh International Conference on Learning Representations , 2023."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib54",
+      "text": "Tim Salimans and Jonathan Ho. Progressive distillation for fast sampling of diffusion models. In International Conference on Learning Representations , 2022."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib66",
+      "text": "Yang Song, Prafulla Dhariwal, Mark Chen, and Ilya Sutskever. Consistency models. In International Conference on Machine Learning , 2023."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib65",
+      "text": "Yang Song and Prafulla Dhariwal. Improved techniques for training consistency models. In The Twelfth International Conference on Learning Representations , 2024."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib22",
+      "text": "Dongjun Kim, Chieh-Hsin Lai, Wei-Hsiang Liao, Naoki Murata, Yuhta Takida, Toshimitsu Uesaka, Yutong He, Yuki Mitsufuji, and Stefano Ermon. Consistency trajectory models: Learning probability flow ODE trajectory of diffusion. In The Twelfth International Conference on Learning Representations , 2024."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib58",
+      "text": "Axel Sauer, Dominik Lorenz, Andreas Blattmann, and Robin Rombach. Adversarial diffusion distillation, 2023."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib36",
+      "text": "Simian Luo, Yiqin Tan, Longbo Huang, Jian Li, and Hang Zhao. Latent consistency models: Synthesizing high-resolution images with few-step inference, 2023."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib37",
+      "text": "Simian Luo, Yiqin Tan, Suraj Patil, Daniel Gu, Patrick von Platen, Apolinário Passos, Longbo Huang, Jian Li, and Hang Zhao. Lcm-lora: A universal stable-diffusion acceleration module, 2023."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib75",
+      "text": "Tianwei Yin, Michaël Gharbi, Richard Zhang, Eli Shechtman, Fredo Durand, William T. Freeman, and Taesung Park. One-step diffusion with distribution matching distillation, 2023."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib32",
+      "text": "Xingchao Liu, Xiwen Zhang, Jianzhu Ma, Jian Peng, and qiang liu. Instaflow: One step is enough for high-quality diffusion-based text-to-image generation. In The Twelfth International Conference on Learning Representations , 2024."
+    },
+    {
+      "n": 34,
+      "id": "bib.bib73",
+      "text": "Yanwu Xu, Yang Zhao, Zhisheng Xiao, and Tingbo Hou. Ufogen: You forward once large scale text-to-image generation via diffusion gans, 2023."
+    },
+    {
+      "n": 35,
+      "id": "bib.bib16",
+      "text": "Edward J Hu, yelong shen, Phillip Wallis, Zeyuan Allen-Zhu, Yuanzhi Li, Shean Wang, Lu Wang, and Weizhu Chen. LoRA: Low-rank adaptation of large language models. In International Conference on Learning Representations , 2022."
+    },
+    {
+      "n": 36,
+      "id": "bib.bib76",
+      "text": "Lvmin Zhang, Anyi Rao, and Maneesh Agrawala. Adding conditional control to text-to-image diffusion models. 2023 IEEE/CVF International Conference on Computer Vision (ICCV) , pages 3813–3824, 2023."
+    },
+    {
+      "n": 37,
+      "id": "bib.bib74",
+      "text": "Hu Ye, Jun Zhang, Sibo Liu, Xiao Han, and Wei Yang. Ip-adapter: Text compatible image prompt adapter for text-to-image diffusion models, 2023."
+    }
+  ]
+}

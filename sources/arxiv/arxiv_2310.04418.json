@@ -1,0 +1,128 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2310.04418",
+  "title": "Functional Interpolation for Relative Positions Improves Long Context Transformers",
+  "authors": "Shanda Li, Chong You, Guru Guruganesh, Joshua Ainslie, Santiago Ontanon, Manzil Zaheer, Sumit Sanghai, Yiming Yang, Sanjiv Kumar, Srinadh Bhojanapalli",
+  "year": "2024",
+  "categories": [
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2310.04418",
+  "html_url": "https://arxiv.org/html/2310.04418",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 875,
+  "text": "Transformer based Language Models have demonstrated state-of-the-art zero-shot performance on many natural language processing tasks [1], enabling increasingly longer context applications such as chat bots [2,3] and long document summarization and question answering [4,5,6]. However, the accuracy of these models usually drops quickly for inputs longer than the ones used during training [7,8,9] – which are usually relatively short (e.g. 2048 for LLaMA [10,11]) to avoid the expensive quadratic attention cost during training. This has led to a significant interest in improving length generalization of Transformers - where we train the model using shorter inputs (e.g. 2048) and test the models performance on longer inputs (e.g. 8192) [7,8,12,13,14,15].\n\nTransformers are fundamentally permutation equivariant, and are agnostic to input sequence ordering [16,17]. They rely on position encodings to learn the ordering of input tokens. Popular position encodings such as Absolute Positional Encoding (APE) [16] and more recent Rotary Positional Encoding (RoPE) [19] do not generalize to longer contexts than seen during training [20]. T5’s relative positional encoding [21] generalizes to longer contexts by using the same representation for all out of distribution (OOD) sequence lengths, but suffers from slow vector operations on modern accelerators [7]. Another line of recent work promotes length generalization by encoding specific inductive biases on how attention should decay with sequence length [7,12,13]. More recently, [20] show that having no position encodings in decoder-only models can have better length generalization, albeit for small-scale synthetic tasks.\n\nIn this work we take a functional approach to learn the relative position biases, instead of having hard coded inductive biases, towards training language models with length generalization (focusing on decoder-only models). We propose FIRE (F unctional I nterpolation for R elative Positional E ncoding) method that i) uses a learnable function to map the input positions to biases, and ii) uses a progressive interpolation technique, which ensures bounded input for the position encoding function for all input sequence lengths, thereby enabling length generalization.\n\nA functional approach to learn the biases allows the model to adapt to the given task instead of always having the same inductive bias, e.g. bias towards nearby tokens as in [7,12,13]. In particular we use an MLP to learn these biases, which we theoretically prove can represent several popular methods such as T5’s RPE, Alibi, and Kerple in a parameter efficient manner. In fact, all our experiments use a tiny MLP with a hidden size of 32, which is also accelerator-friendly unlike T5’s RPE. Next, our progressive interpolation technique normalizes the query-key relative distance by the query position. Since for causal attention in language models the relative distance is always between 0 and the query position, progressive interpolation results in an output that is always bounded between [0,1]. This results in a bounded input to the position encoding function for all input sequence lengths, leading to better generalization performance. As a result, with increasingly longer sequence lengths, the positional inputs will form progressively finer grids, interpolating the positional encoding function on [0,1].\n\nInspired by the existing methods, we incorporate the following two transformations into FIRE, which we find helpful to improve the model quality. i) To encourage locality bias in FIRE, we apply the popular \\log transformation [21,12] to the relative distance before feeding it to the MLP, which amplifies the input differences for local tokens. ii) Next we modify progressive interpolation with a learnable threshold in the normalizer to yield exact distances for shorter contexts. Note that both these transformations do not limit the ability of the model to learn arbitrary biases. In fact we show that FIRE learns to pay more attention to far away contexts in some attention heads.\n\nWe conduct an extensive empirical study to demonstrate the effectiveness of FIRE for length generalization. We benchmark FIRE as well as other positional encoding approaches on a wide range of real-world language modeling (C4, arXiv, and Github), long text benchmark (SCROLLS), zero-shot long-context question answering (NarrativeQA), and natural language understanding benchmarks (GLUE/SuperGLUE). Our empirical results show the strong length generalization performance and long text modeling capability of FIRE. Our experiments on standard natural language understanding benchmarks show that FIRE is competitive on short sequence tasks as well. We further visualize the learned positional encoding of FIRE showing that it learns diverse patterns, beyond just locality bias.\n\nThe main contributions of our paper are summarized below:\n\n- • We propose FIRE, a new functional relative positional encoding method. Using progressive interpolation, FIRE is able to transform arbitrary input lengths into bounded domain, followed by a learned mapping.\n\n- • We theoretically prove that FIRE can represent popular position encodings such as T5’s RPE, Alibi, and Kerple, thereby unifying a class of existing position encoding approaches.\n\n- • We empirically show strong length generalization behavior of FIRE, significantly improving over existing methods in zero-shot and finetuning settings on a wide range of datasets and benchmarks. For instance, it consistently delivers strongest performance on C4 language modeling across various sequence lengths, outperforming the best baseline by 2.28 perplexity points (Fig. 1). On SCROLLS long text benchmark, FIRE surpasses all the competing methods on average by over 1 point (Table 1).\n\n- • We present visualization of learned position embeddings of FIRE model showing that it can learn both local and anti-local position biases.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib3",
+      "text": "Brown et al. (2020) Tom Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared D Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, et al. Language models are few-shot learners. Advances in neural information processing systems , 33:1877–1901, 2020."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib47",
+      "text": "Roller et al. (2021) Stephen Roller, Emily Dinan, Naman Goyal, Da Ju, Mary Williamson, Yinhan Liu, Jing Xu, Myle Ott, Eric Michael Smith, Y-Lan Boureau, et al. Recipes for building an open-domain chatbot. In Proceedings of the 16th Conference of the European Chapter of the Association for Computational Linguistics: Main Volume , pp. 300–325, 2021."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib63",
+      "text": "Zhang et al. (2020b) Yizhe Zhang, Siqi Sun, Michel Galley, Yen-Chun Chen, Chris Brockett, Xiang Gao, Jianfeng Gao, Jingjing Liu, and William B Dolan. Dialogpt: Large-scale generative pre-training for conversational response generation. In Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics: System Demonstrations , pp. 270–278, 2020b."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib62",
+      "text": "Zhang et al. (2020a) Jingqing Zhang, Yao Zhao, Mohammad Saleh, and Peter Liu. Pegasus: Pre-training with extracted gap-sentences for abstractive summarization. In International Conference on Machine Learning , pp. 11328–11339. PMLR, 2020a."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib22",
+      "text": "Guo et al. (2022) Mandy Guo, Joshua Ainslie, David C Uthus, Santiago Ontanon, Jianmo Ni, Yun-Hsuan Sung, and Yinfei Yang. Longt5: Efficient text-to-text transformer for long sequences. In Findings of the Association for Computational Linguistics: NAACL 2022 , pp. 724–736, 2022."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib1",
+      "text": "Ainslie et al. (2023) Joshua Ainslie, Tao Lei, Michiel de Jong, Santiago Ontañón, Siddhartha Brahma, Yury Zemlyanskiy, David Uthus, Mandy Guo, James Lee-Thorp, Yi Tay, et al. Colt5: Faster long-range transformers with conditional computation. arXiv preprint arXiv:2303.09752 , 2023."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib44",
+      "text": "Press et al. (2022) Ofir Press, Noah Smith, and Mike Lewis. Train short, test long: Attention with linear biases enables input length extrapolation. In International Conference on Learning Representations , 2022. URL https://openreview.net/forum?id=R8sQPpGCv0 ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib2",
+      "text": "Anil et al. (2022) Cem Anil, Yuhuai Wu, Anders Andreassen, Aitor Lewkowycz, Vedant Misra, Vinay Ramasesh, Ambrose Slone, Guy Gur-Ari, Ethan Dyer, and Behnam Neyshabur. Exploring length generalization in large language models. Advances in Neural Information Processing Systems , 35:38546–38556, 2022."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib15",
+      "text": "Deletang et al. (2023) Gregoire Deletang, Anian Ruoss, Jordi Grau-Moya, Tim Genewein, Li Kevin Wenliang, Elliot Catt, Chris Cundy, Marcus Hutter, Shane Legg, Joel Veness, and Pedro A Ortega. Neural networks and the chomsky hierarchy. In The Eleventh International Conference on Learning Representations , 2023. URL https://openreview.net/forum?id=WbxHAzkeQcn ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib52",
+      "text": "Touvron et al. (2023a) Hugo Touvron, Thibaut Lavril, Gautier Izacard, Xavier Martinet, Marie-Anne Lachaux, Timothée Lacroix, Baptiste Rozière, Naman Goyal, Eric Hambro, Faisal Azhar, et al. Llama: Open and efficient foundation language models. arXiv preprint arXiv:2302.13971 , 2023a."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib53",
+      "text": "Touvron et al. (2023b) Hugo Touvron, Louis Martin, Kevin Stone, Peter Albert, Amjad Almahairi, Yasmine Babaei, Nikolay Bashlykov, Soumya Batra, Prajjwal Bhargava, Shruti Bhosale, et al. Llama 2: Open foundation and fine-tuned chat models. arXiv preprint arXiv:2307.09288 , 2023b."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib7",
+      "text": "Chi et al. (2022) Ta-Chung Chi, Ting-Han Fan, Peter J Ramadge, and Alexander Rudnicky. Kerple: Kernelized relative positional embedding for length extrapolation. Advances in Neural Information Processing Systems , 35:8386–8399, 2022."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib8",
+      "text": "Chi et al. (2023) Ta-Chung Chi, Ting-Han Fan, Alexander Rudnicky, and Peter Ramadge. Dissecting transformer length extrapolation via the lens of receptive field analysis. In Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) , pp. 13522–13537, 2023."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib11",
+      "text": "Chowdhury & Caragea (2023) Jishnu Ray Chowdhury and Cornelia Caragea. Monotonic location attention for length generalization. arXiv preprint arXiv:2305.20019 , 2023."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib6",
+      "text": "Chen et al. (2023) Shouyuan Chen, Sherman Wong, Liangjian Chen, and Yuandong Tian. Extending context window of large language models via positional interpolation. arXiv preprint arXiv:2306.15595 , 2023."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib54",
+      "text": "Vaswani et al. (2017) Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N Gomez, Łukasz Kaiser, and Illia Polosukhin. Attention is all you need. In Advances in Neural Information Processing Systems , pp. 6000–6010, 2017."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib60",
+      "text": "Yun et al. (2019) Chulhee Yun, Srinadh Bhojanapalli, Ankit Singh Rawat, Sashank Reddi, and Sanjiv Kumar. Are transformers universal approximators of sequence-to-sequence functions? In International Conference on Learning Representations , 2019."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib24",
+      "text": "Haviv et al. (2022) Adi Haviv, Ori Ram, Ofir Press, Peter Izsak, and Omer Levy. Transformer language models without positional encodings still learn positional information. In Findings of the Association for Computational Linguistics: EMNLP 2022 , pp. 1382–1390, 2022."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib51",
+      "text": "Su et al. (2021) Jianlin Su, Yu Lu, Shengfeng Pan, Bo Wen, and Yunfeng Liu. Roformer: Enhanced transformer with rotary position embedding. arXiv preprint arXiv:2104.09864 , 2021."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib27",
+      "text": "Kazemnejad et al. (2023) Amirhossein Kazemnejad, Inkit Padhi, Karthikeyan Natesan Ramamurthy, Payel Das, and Siva Reddy. The impact of positional encoding on length generalization in transformers. arXiv preprint arXiv:2305.19466 , 2023."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib46",
+      "text": "Raffel et al. (2019) Colin Raffel, Noam Shazeer, Adam Roberts, Katherine Lee, Sharan Narang, Michael Matena, Yanqi Zhou, Wei Li, and Peter J Liu. Exploring the limits of transfer learning with a unified text-to-text transformer. arXiv preprint arXiv:1910.10683 , 2019."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib5",
+      "text": "Chen et al. (2021) Pu-Chin Chen, Henry Tsai, Srinadh Bhojanapalli, Hyung Won Chung, Yin-Wen Chang, and Chun-Sung Ferng. A simple and effective positional encoding for transformers. arXiv preprint arXiv:2104.08698 , 2021."
+    }
+  ]
+}

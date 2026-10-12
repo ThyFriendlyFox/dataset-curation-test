@@ -1,0 +1,153 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2402.18146",
+  "title": "3DSFLabelling: Boosting 3D Scene Flow Estimation by Pseudo Auto-labelling",
+  "authors": "Chaokang Jiang, Guangming Wang, Jiuming Liu, Hesheng Wang, Zhuang Ma, Zhenqiang Liu, Zhujin Liang, Yi Shan, Dalong Du",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2402.18146",
+  "html_url": "https://arxiv.org/html/2402.18146",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 715,
+  "text": "3D scene flow estimation through deducing per-point motion filed from consecutive frames of point clouds, serves a critical role across various applications, encompassing motion prediction [1,2], anomaly motion detection [3], 3D object detection [4,5], and dynamic point cloud accumulation [6]. With the advancing of deep learning on point clouds [7,8], many works [9,10,11,12,13,14,15] have developed the learning-based methods to estimate per-point motion from 3D point clouds. Some state-of-the-art methods [12,14,15] have reduced the average 3D EndPoint Error (EPE3D) to a few centimetres on the KITTI Scene Flow dataset (stereoKITTI) [16,17]. However, due to the scarcity of scene flow labels, these methods rely heavily on synthetic datasets such as FlyingThings3D (FT3D) [18] for network training.\n\nWhen evaluated on the stereoKITTI dataset [16,17], PV-RAFT [19] demonstrates an average EPE3D of just 0.056m. However, when evaluated on the Argoverse dataset [20], the EPE3D metric astonishingly exceeds 10m [21]. Therefore, learning 3D scene flow on synthetic dataset [18] has a large gap with real-world application. Jin et al. [13] recently introduce a new synthetic dataset, GTA-SF, simulating LiDAR scans for autonomous driving. They propose a teacher-student domain adaptation framework to reduce the gap between synthetic and real datasets and improve some performance of 3D scene flow estimation. However, their performance is still poor in real-world LiDAR data because of ideal sensor models and lack of scene variety. Ideally, models should learn from real sensor data in the autonomous driving field. However, labelling each point’s 3D motion vector for the 3D scene flow task is extremely costly. This has driven many works [22,23,12,24,9,25] towards unsupervised or self-supervised learning of 3D scene flow. Although these methods have achieved reasonable accuracy, they still fall behind supervised methods, highlighting the importance of real sensor data and corresponding 3D scene flow labels.\n\nIn this work, we address three key challenges in the field of autonomous driving: the reliance on synthetic datasets that still have a poor generalization with real-world scenarios, the scarcity of scene flow labels in actual driving scenes, and the poor performance of existing 3D scene flow estimation networks on real LiDAR data. Inspired by the rigid motion assumptions in RigidFlow [24] and RSF [27], we propose a novel scene flow auto-labelling approach that leverages the characteristics of rigid motion prevalent in autonomous driving scenarios (Fig. 1). Specifically, we utilize 3D anchor boxes to segment 3D objects in point clouds. The attributes of each object-level box are not only position and size but also rotation, translation, motion status, and normal vector attributes. By leveraging the constrained loss functions for the box parameters and inter-frame association, we optimize the attributes of the boxes, subsequently combining these parameters with the source point cloud to produce a realistic target point cloud. Importantly, the generated target point cloud maintains a one-to-one correspondence with the source point cloud, enabling the efficient generation of pseudo 3D scene flow labels.\n\nTo capture a more diverse range of motion patterns, we introduce a novel data augmentation strategy for 3D scene flow auto-labelling. Utilizing the attributes of each box, we simulate the rotations, translations, and motion status of both the ego vehicle and surrounding environment by adding Gaussian noise to these attributes. Consequently, we obtain numerous 3D scene flow labels with diverse motions that closely resemble real-world scenarios, furnishing the neural network with rich real training data and significantly improving the generalization capabilities of learning-based methods. Experimental results validate that our pseudo-label generation strategy consistently achieves state-of-the-art scene flow estimation results across various models [10,14,15] and datasets [16,20,26] (Fig. 2).\n\nIn summary, our contributions are as follows:\n\n- • We propose a new framework for the automatic labelling of 3D scene flow pseudo-labels, significantly enhancing the accuracy of current scene flow estimation models, and effectively addressing the scarcity of 3D flow labels in autonomous driving.\n\n- • We propose a universal 3D box optimization method with multiple motion attributes. Building upon this, we further introduce a plug-and-play 3D scene flow augmentation module with global-local motions and motion status. This allows for flexible motion adjustment of ego-motion and dynamic environments, setting a new benchmark for scene flow data augmentation.\n\n- • Our method achieves state-of-the-art performance on KITTI, nuScenes, and Argoverse LiDAR datasets. Impressively, our approach surpasses all supervised and unsupervised methods without requiring any synthesising data and manual scene flow labels.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib44",
+      "text": "Pengxiang Wu, Siheng Chen, and Dimitris N Metaxas. Motionnet: Joint perception and motion prediction for autonomous driving based on bird’s eye view maps. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 11385–11395, 2020a."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib29",
+      "text": "Mahyar Najibi, Jingwei Ji, Yin Zhou, Charles R Qi, Xinchen Yan, Scott Ettinger, and Dragomir Anguelov. Motion inspired unsupervised perception and prediction in autonomous driving. In European Conference on Computer Vision , pages 424–443. Springer, 2022."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib15",
+      "text": "Hafsa Iqbal, Abdulla Al-Kaff, Pablo Marin, Lucio Marcenaro, David Martin Gomez, and Carlo Regazzoni. Detection of abnormal motion by estimating scene flows of point clouds for autonomous driving. In 2021 IEEE International Intelligent Transportation Systems Conference (ITSC) , pages 2788–2793. IEEE, 2021."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib8",
+      "text": "Emeç Erçelik, Ekim Yurtsever, Mingyu Liu, Zhijie Yang, Hanzhen Zhang, Pınar Topçam, Maximilian Listl, Yılmaz Kaan Caylı, and Alois Knoll. 3d object detection with a self-supervised lidar scene flow backbone. In European Conference on Computer Vision , pages 247–265. Springer, 2022."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib46",
+      "text": "Yi Zhang, Yuwen Ye, Zhiyu Xiang, and Jiaqi Gu. Sdp-net: Scene flow based real-time object detection and prediction from sequential 3d point clouds. In Proceedings of the Asian Conference on Computer Vision , 2020."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib14",
+      "text": "Shengyu Huang, Zan Gojcic, Jiahui Huang, Andreas Wieser, and Konrad Schindler. Dynamic 3d scene analysis by point cloud accumulation. In European Conference on Computer Vision , pages 674–690. Springer, 2022."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib33",
+      "text": "Charles R Qi, Hao Su, Kaichun Mo, and Leonidas J Guibas. Pointnet: Deep learning on point sets for 3d classification and segmentation. In Proceedings of the IEEE conference on computer vision and pattern recognition , pages 652–660, 2017a."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib34",
+      "text": "Charles Ruizhongtai Qi, Li Yi, Hao Su, and Leonidas J Guibas. Pointnet++: Deep hierarchical feature learning on point sets in a metric space. Advances in neural information processing systems , 30, 2017b."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib24",
+      "text": "Xingyu Liu, Charles R Qi, and Leonidas J Guibas. Flownet3d: Learning scene flow in 3d point clouds. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 529–537, 2019."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib32",
+      "text": "Gilles Puy, Alexandre Boulch, and Renaud Marlet. Flot: Scene flow on point clouds guided by optimal transport. In ECCV 2020: 16th European Conference, Glasgow, UK, August 23–28, 2020, Proceedings, Part XXVIII 16 , pages 527–544, 2020."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib9",
+      "text": "Jingyun Fu, Zhiyu Xiang, Chengyu Qiao, and Tingming Bai. Pt-flownet: Scene flow estimation on point clouds with point transformer. IEEE Robotics and Automation Letters , 8(5):2566–2573, 2023."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib35",
+      "text": "Yaqi Shen, Le Hui, Jin Xie, and Jian Yang. Self-supervised 3d scene flow estimation guided by superpoints. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 5271–5280, 2023."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib17",
+      "text": "Zhao Jin, Yinjie Lei, Naveed Akhtar, Haifeng Li, and Munawar Hayat. Deformation and correspondence aware unsupervised synthetic-to-real scene flow estimation for point clouds. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 7233–7243, 2022."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib4",
+      "text": "Wencan Cheng and Jong Hwan Ko. Multi-scale bidirectional recurrent network with hybrid correlation for point cloud based scene flow estimation. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 10041–10050, 2023."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib47",
+      "text": "Yushan Zhang, Johan Edstedt, Bastian Wandt, Per-Erik Forssén, Maria Magnusson, and Michael Felsberg. Gmsf: Global matching scene flow. arXiv preprint arXiv:2305.17432 , 2023."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib26",
+      "text": "Moritz Menze, Christian Heipke, and Andreas Geiger. Joint 3d estimation of vehicles and scene flow. ISPRS annals of the photogrammetry, remote sensing and spatial information sciences , 2:427–434, 2015."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib27",
+      "text": "Moritz Menze, Christian Heipke, and Andreas Geiger. Object scene flow. ISPRS Journal of Photogrammetry and Remote Sensing , 140:60–76, 2018."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib25",
+      "text": "Nikolaus Mayer, Eddy Ilg, Philip Hausser, Philipp Fischer, Daniel Cremers, Alexey Dosovitskiy, and Thomas Brox. A large dataset to train convolutional networks for disparity, optical flow, and scene flow estimation. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition , pages 4040–4048, 2016."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib43",
+      "text": "Yi Wei, Ziyi Wang, Yongming Rao, Jiwen Lu, and Jie Zhou. Pv-raft: Point-voxel correlation fields for scene flow estimation of point clouds. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 6954–6963, 2021."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib3",
+      "text": "Ming-Fang Chang, John Lambert, Patsorn Sangkloy, Jagjeet Singh, Slawomir Bak, Andrew Hartnett, De Wang, Peter Carr, Simon Lucey, Deva Ramanan, et al. Argoverse: 3d tracking and forecasting with rich maps. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 8748–8757, 2019."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib23",
+      "text": "Xueqian Li, Jianqiao Zheng, Francesco Ferroni, Jhony Kaesemodel Pontes, and Simon Lucey. Fast neural scene flow. In Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV) , pages 9878–9890, 2023."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib6",
+      "text": "Fangqiang Ding, Zhijun Pan, Yimin Deng, Jianning Deng, and Chris Xiaoxuan Lu. Self-supervised scene flow estimation with 4-d automotive radar. IEEE Robotics and Automation Letters , 7(3):8233–8240, 2022."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib28",
+      "text": "Himangi Mittal, Brian Okorn, and David Held. Just go with the flow: Self-supervised scene flow estimation. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 11177–11185, 2020."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib21",
+      "text": "Ruibo Li, Chi Zhang, Guosheng Lin, Zhe Wang, and Chunhua Shen. Rigidflow: Self-supervised scene flow learning on point clouds by local rigidity prior. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 16959–16968, 2022b."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib40",
+      "text": "Guangming Wang, Chaokang Jiang, Zehang Shen, Yanzi Miao, and Hesheng Wang. Sfgan: Unsupervised generative adversarial learning of 3d scene flow from the 3d scene self. Advanced Intelligent Systems , 4(4):2100197, 2022b."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib2",
+      "text": "Holger Caesar, Varun Bankiti, Alex H Lang, Sourabh Vora, Venice Erin Liong, Qiang Xu, Anush Krishnan, Yu Pan, Giancarlo Baldan, and Oscar Beijbom. nuscenes: A multimodal dataset for autonomous driving. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 11621–11631, 2020."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib5",
+      "text": "David Deng and Avideh Zakhor. Rsf: Optimizing rigid scene flow from 3d point clouds without labels. In Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision , pages 1277–1286, 2023."
+    }
+  ]
+}

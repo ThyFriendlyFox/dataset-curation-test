@@ -1,0 +1,114 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2402.13711",
+  "title": "DSLR: Diversity Enhancement and Structure Learning for Rehearsal-based Graph Continual Learning",
+  "authors": "Seungyoon Choi, Wonjoong Kim, Sungwon Kim, Yeonjun In, Sein Kim, Chanyoung Park",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.AI"
+  ],
+  "url": "https://arxiv.org/abs/2402.13711",
+  "html_url": "https://arxiv.org/html/2402.13711",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1025,
+  "text": "Training a new model for every large stream of new data is not only time-consuming but also cost-intensive. Hence, continual learning [1,2,3,4,5,6,7,8] has become crucial in addressing this challenge. Continual learning emphasizes efficient learning from newly introduced data without retraining the model on the entire dataset, enabling the preservation of previously acquired knowledge. However, there is a risk of forgetting the previously acquired knowledge when the model is trained on new data, resulting in the performance decline. This phenomenon is referred to as catastrophic forgetting, and the ultimate goal of continual learning models is to mitigate catastrophic forgetting.\n\nContinual learning approaches are broadly categorized into the regularization-based approach [9,10,11,12,6], architectural approach [2], and rehearsal-based approach [4,13,6,14,7]. The rehearsal-based approach, which will be investigated in this paper, involves storing a small amount of data from the current task for later use when training subsequent tasks. This collection of data is referred to as the replay buffer. The rehearsal-based approach is widely recognized as the most effective for addressing continual learning among other approaches for continual learning [15].\n\nOne of the state-of-the-art rehearsal-based approaches for graph continual learning (GCL), named ER-GNN [7], selects the most representative nodes for each class and stores them in a replay buffer for later use in training subsequent tasks. Specifically, ER-GNN proposed the mean feature (MF) approach, which computes the average of the node features in each class, and store nodes that are close to the average of each class in the replay buffer. However, while this approach considers the class representativeness of each replayed node, we argue that the diversity of the replayed nodes within each class is overlooked. Fig. 1 (a) shows nodes belonging to two different classes in Citeseer dataset, along with the replayed nodes for each class obtained using MF. We observe that the replayed nodes for each class are mainly concentrated around the center of each class in the embedding space, incurring a potential risk of overfitting to nodes residing in those regions, which aggravates catastrophic forgetting. As a simple remedy for considering both the class representativeness and the diversity within each class of the replayed nodes, we devise a coverage-based diversity (CD) approach for selecting nodes to be replayed. By doing so, the replayed nodes can be evenly distributed across the embedding space of each class (See Fig. 1 (b)), indicating that overfitting to specific regions can be alleviated.\n\nHowever, we observed that emphasizing the diversity aspect using CD can lead to another issue: some replayed nodes (i.e., those near the decision boundary as shown in Fig. 1 (b)) would be inevitably connected to many nodes from different classes. Concretely, Table 1 shows that using CD instead of MF leads to a lower homophily ratio of the replayed nodes for each class. This in turn results in a low homophily ratio of the replayed nodes, which is harmful for training Graph Neural Networks (GNNs) whose performance is known to degrade on graphs with a low homophily ratio [16,17] (See Fig. 2 where the replayed nodes with a lower homophily incurs the model to more severely forget previously acquired knowledge). On the other hand, it is important to note that the increase in the forgetting performance begins to slow down beyond a certain point, and the variance begins to increase. This indicates that simply increasing the homophily ratio of the replay buffer deteriorates the model robustness, and thus is not an effective remedy.\n\nIn the light of these issues regarding the replay buffer of rehearsal-based approaches for GCL, we propose a GCL model named D iversity enhancement and S tructure L earning for R ehearsal-based graph continual learning (DSLR), that consists of two major components: Component 1 – Selecting the replayed nodes aiming at considering both the class representativeness and the diversity within each class, and Component 2 – Reformulating the graph structure aiming encouraging the replayed nodes to be connected to truly informative neighbors. Note that we define truly informative neighbors as those that not only belong to the same class with the target node (i.e., homophily), but also share similar structure (i.e., structural proximity).\n\nMore precisely, we devise a coverage-based diversity (CD) approach for selecting nodes to be replayed (Component 1). The main idea of CD is to select diverse nodes while considering the class representativeness, ensuring that the replayed nodes effectively represent the entire embedding space of their own classes, which helps alleviate catastrophic forgetting. On the other hand, as the rehearsal-based approach heavily relies on a few replayed nodes to retain knowledge obtained from previous tasks, involving the replayed nodes that have irrelevant neighbors in the model training may have a significant detrimental impact on model performance. To address this issue, we adopt graph structure learning (GSL) [18,17,19] to reformulate the graph structure in a way that allows the replayed nodes to be connected to truly informative neighbors, so that high-quality information can be propagated into the replayed nodes through message passing (Component 2). The main idea of GSL is to add informative neighbors to the replayed nodes, and selectively delete edges between replayed nodes and their neighbors, both of which contribute to enhancing the effectiveness of the replay buffer. More precisely, we train a link predictor using both the class labels and the graph structure to capture the homophily and structural proximity, respectively, which helps us discover truly informative neighbors of the replayed nodes. Last but not least, we devise an efficient candidate selection method to improve the scalability of the graph structure learning.\n\nOur contributions are summarized as follows:\n\n- (1) We emphasize the consideration of diversity when selecting the replayed nodes, a factor that has been overlooked in existing methods, to ensure that replayed nodes can effectively represent the entire data of their respective class.\n\n- (2) We present a novel discovery that emphasizes the substantial influence of the quality of neighbors surrounding the replayed nodes on the overall model performance. To this end, we adopt the graph structure learning to ensure that the replayed nodes are connected to truly informative neighbors.\n\n- (3) Extensive experiments show that DSLR outperforms state-of-the-art GCL methods, even with a small replay buffer size.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib24",
+      "text": "Mallya and Lazebnik (2018) Arun Mallya and Svetlana Lazebnik. 2018. Packnet: Adding multiple tasks to a single network by iterative pruning. In Proceedings of the IEEE conference on Computer Vision and Pattern Recognition . 7765–7773."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib42",
+      "text": "Yoon et al . (2017) Jaehong Yoon, Eunho Yang, Jeongtae Lee, and Sung Ju Hwang. 2017. Lifelong learning with dynamically expandable networks. arXiv preprint arXiv:1708.01547 (2017)."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib41",
+      "text": "Yoon et al . (2021) Jaehong Yoon, Divyam Madaan, Eunho Yang, and Sung Ju Hwang. 2021. Online coreset selection for rehearsal-based continual learning. arXiv preprint arXiv:2106.01085 (2021)."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib22",
+      "text": "Madaan et al . (2021) Divyam Madaan, Jaehong Yoon, Yuanchun Li, Yunxin Liu, and Sung Ju Hwang. 2021. Representational continuity for unsupervised continual learning. In International Conference on Learning Representations ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib25",
+      "text": "Rakaraddi et al . (2022) Appan Rakaraddi, Lam Siew Kei, Mahardhika Pratama, and Marcus De Carvalho. 2022. Reinforced Continual Learning for Graphs. In Proceedings of the 31st ACM International Conference on Information & Knowledge Management . 1666–1674."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib35",
+      "text": "Wang et al . (2020b) Junshan Wang, Guojie Song, Yi Wu, and Liang Wang. 2020b. Streaming graph neural networks via continual learning. In Proceedings of the 29th ACM International Conference on Information & Knowledge Management . 1515–1524."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib47",
+      "text": "Zhou and Cao (2021) Fan Zhou and Chengtai Cao. 2021. Overcoming catastrophic forgetting in graph neural networks with experience replay. In Proceedings of the AAAI Conference on Artificial Intelligence , Vol. 35. 4714–4722."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib34",
+      "text": "Wang et al . (2022a) Chen Wang, Yuheng Qiu, Dasong Gao, and Sebastian Scherer. 2022a. Lifelong graph learning. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition . 13719–13728."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib40",
+      "text": "Yoon et al . (2019) Jaehong Yoon, Saehoon Kim, Eunho Yang, and Sung Ju Hwang. 2019. Scalable and order-robust continual learning with additive parameter decomposition. arXiv preprint arXiv:1902.09432 (2019)."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib15",
+      "text": "Hung et al . (2019) Ching-Yi Hung, Cheng-Hao Tu, Cheng-En Wu, Chien-Hung Chen, Yi-Ming Chan, and Chu-Song Chen. 2019. Compacting, picking and growing for unforgetting continual learning. Advances in Neural Information Processing Systems 32 (2019)."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib17",
+      "text": "Kirkpatrick et al . (2017) James Kirkpatrick, Razvan Pascanu, Neil Rabinowitz, Joel Veness, Guillaume Desjardins, Andrei A Rusu, Kieran Milan, John Quan, Tiago Ramalho, Agnieszka Grabska-Barwinska, et al . 2017. Overcoming catastrophic forgetting in neural networks. Proceedings of the national academy of sciences 114, 13 (2017), 3521–3526."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib20",
+      "text": "Liu et al . (2021) Huihui Liu, Yiding Yang, and Xinchao Wang. 2021. Overcoming catastrophic forgetting in graph neural networks. In Proceedings of the AAAI Conference on Artificial Intelligence , Vol. 35. 8653–8661."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib28",
+      "text": "Shin et al . (2017) Hanul Shin, Jung Kwon Lee, Jaehong Kim, and Jiwon Kim. 2017. Continual learning with deep generative replay. Advances in neural information processing systems 30 (2017)."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib36",
+      "text": "Wang et al . (2022b) Junshan Wang, Wenhao Zhu, Guojie Song, and Liang Wang. 2022b. Streaming Graph Neural Networks with Generative Replay. In Proceedings of the 28th ACM SIGKDD Conference on Knowledge Discovery and Data Mining . 1878–1888."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib3",
+      "text": "Carta et al . (2021) Antonio Carta, Andrea Cossu, Federico Errica, and Davide Bacciu. 2021. Catastrophic forgetting in deep graph networks: an introductory benchmark for graph classification. arXiv preprint arXiv:2103.11750 (2021)."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib6",
+      "text": "Choi et al . (2022) Yoonhyuk Choi, Jiho Choi, Taewook Ko, Hyungho Byun, and Chong-Kwon Kim. 2022. Finding Heterophilic Neighbors via Confidence-based Subgraph Matching for Semi-supervised Node Classification. In Proceedings of the 31st ACM International Conference on Information & Knowledge Management . 283–292."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib46",
+      "text": "Zhao et al . (2021) Tong Zhao, Yozen Liu, Leonardo Neves, Oliver Woodford, Meng Jiang, and Neil Shah. 2021. Data augmentation for graph neural networks. In Proceedings of the aaai conference on artificial intelligence , Vol. 35. 11015–11023."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib48",
+      "text": "Zhu et al . (2021) Yanqiao Zhu, Weizhi Xu, Jinghao Zhang, Yuanqi Du, Jieyu Zhang, Qiang Liu, Carl Yang, and Shu Wu. 2021. A survey on graph structure learning: Progress and opportunities. arXiv e-prints (2021), arXiv–2103."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib4",
+      "text": "Chen et al . (2020a) Deli Chen, Yankai Lin, Wei Li, Peng Li, Jie Zhou, and Xu Sun. 2020a. Measuring and relieving the over-smoothing problem for graph neural networks from the topological view. In Proceedings of the AAAI conference on artificial intelligence , Vol. 34. 3438–3445."
+    }
+  ]
+}

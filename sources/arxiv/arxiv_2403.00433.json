@@ -1,0 +1,108 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.00433",
+  "title": "Jiagu: Optimizing Serverless Computing Resource Utilization with Harmonized Efficiency and Practicability",
+  "authors": "Qingyuan Liu, Yanning Yang, Dong Du, Yubin Xia, Ping Zhang, Jia Feng, James Larus, Haibo Chen",
+  "year": "2024",
+  "categories": [
+    "cs.DC"
+  ],
+  "url": "https://arxiv.org/abs/2403.00433",
+  "html_url": "https://arxiv.org/html/2403.00433",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1180,
+  "text": "Serverless computing [1] simplifies the management of cloud applications with features like on-demand execution and autoscaling. Through autoscaling, cloud providers are able to dynamically deploy zero to numerous instances to run a specific function in response to real-time demands, optimizing performance and cost efficiency. Critical to this process are two main components: the autoscaler and the scheduler. The autoscaler utilizes a predefined threshold for each function, called saturated value (e.g., requests per second, or RPS), and triggers the creation of new instances as needed when the live load approaches this threshold [2,3]. By doing so, the autoscaler prevents instances from becoming overloaded and guarantees performance, which is generally measured in terms of Quality-of-Service (QoS). When the autoscaler triggers the creation of a new instance, the scheduler is responsible for scheduling the instance to a suitable node. In making these assignments, the scheduler accounts for various aspects, including whether a node can meet a function’s resource requirements which developers manually define.\n\nHowever, current serverless systems still fall short on efficiently utilizing resources. According to traces from AliCloud [4] and our public cloud (i.e., Huawei Cloud, a top-five IaaS provider [5]), most serverless functions can only utilize a small portion of allocated resources. As illustrated in Figure 1, the issue mainly results from two factors. First, to guarantee performance, users usually consider the worst case, and thus specify excessive resources to instances. Even if instances are processing saturated load of requests, they cannot utilize the allocated resources. This causes the resource wastage of part ① in Figure 1. Second, in practice, user loads served by each instance continuously fluctuate. Under-loaded instances usually require fewer resources and are less able to utilize the resources, resulting in resource wastage of part ② in Figure 1.\n\nTo mitigate the two issues, nowadays serverless systems can leverage overcommitment [4,6] and autoscaling [7]. First, for part ① in Figure 1, overcommitment is an intuitive solution, i.e., deploy more instances on a server. This approach could be implemented by the scheduler, as the scheduler is responsible for deciding how instances are deployed. Second, for part ②, it could be helpful to reduce the load fluctuations within instances, trying to keep the load close to the saturated load for each instance. This can be achieved by the autoscaler, which is responsible for observing load fluctuations and adjusting the number of instances accordingly.\n\nNevertheless, it is challenging to apply the two approaches while achieving effectiveness with practical cost. First, since overcommitment may lead to performance degradation and QoS violation, it is a common practice to predict performance before scheduling an instance to avoid QoS violation. However, it is challenging to accurately predict instances’ performance with a practical cost. Although prior predictor-based schedulers have made great progress [4,8,9,10,11,12,13], they fall short in achieving both high accuracy and low cost, since the two goals can be a trade-off: making accurate prediction requires considering complex interference on multiple resources imposed by highly heterogeneous colocated functions, but the complex computation inevitably introduces high overheads. For example, some prior works predict with specially designed machine learning models [8], which is costly for scheduling. Since cold start latency mainly consists of scheduling latency and instance initialization latency, with initialization being optimized by a lot of work to even < 1ms, scheduling with inference (\\sim 20ms or higher) could become a new bottleneck [14]. To compromise, nowadays public clouds still use heuristic policies for scheduling, thus failing to accurately predict performance and providing limited improvement in resource utilization.\n\nSecond, to efficiently utilize resources under load fluctuation, the autoscaler needs to quickly respond to the load variation, evict instances and free the resources when the load drops. Intuitively, the faster autoscaling can react to load fluctuations, the more efficiently resources can be used. However, more sensitive and frequent scaling also means more additional cold starts, resulting in the trade-off between resource utilization and cold start overheads. It is challenging to achieve both goals simultaneously.\n\nWe present two key insights to tackle the aforementioned challenges. First, the trade-off between scheduling costs and efficiency is due to the fact that these complex decisions need to be made at the time of scheduling, which involves costly predictions. Therefore, it can be beneficial if we decouple prediction and decision making. Specifically, we can predict in advance the performance of possible incoming instances and save the results. If the incoming instance matches the advance predicted scenario, the scheduling can be made by directly checking the prepared decisions without model inference. This provides a scheduling fast path.\n\nSecond, the trade-off between resource utilization and cold starts arises from that instances do not release resources until they are evicted. Instead, we can decouple resource releasing and instance eviction. Specifically, operations like sending requests to fewer instances could achieve similar effect of releasing resources as eviction. Releasing resources without instance eviction can be less costly, and thus can be applied with higher sensitivity for better resource utilization.\n\nInspired by the two insights, we propose Jiagu, a serverless system that harmonizes efficiency and practicability in improving resource utilization, tackling the challenges with two techniques. First, Jiagu achieves accurate and low cost performance prediction with pre-decision scheduling, which decouples prediction and decision making, providing a scheduling fast path without inference. For every deployed function on a server, Jiagu predicts in advance their capacities on that server with a model. A function’s capacity means the maximum number of its instances can be deployed on the server under the interference of current neighbors without violating everyone’s QoS. To schedule a new instance of a deployed function, Jiagu only needs to compare the function’s capacity with the number of its instances to determine whether the scheduling can be successful or not. Moreover, Jiagu designs an asynchronous update approach, which keeps the capacities up-to-date without incurring model inference to the scheduling critical path, and applies a concurrency-aware scheduling to batch the scheduling of concurrent incoming instances when load spikes occur. Results with real-world patterns show that >80% scheduling goes through the fast path.\n\nSecond, Jiagu designs a dual-staged scaling method. When load drops, before instances are evicted, Jiagu first adjusts the routing with a higher sensitivity, sending requests to fewer instances, thus releasing some of the instances’ resources. Then, if the load rises again before idle instances are evicted, Jiagu can get the instances working again by re-routing with minimum overhead. Third, to cope with the case where a node is full and causes idle instances on it can not be converted to the saturated state, Jiagu migrates idle instances to other nodes in advance to hide the overhead of the required cold starts.\n\nWe present a prototype of Jiagu based on an open-source serverless system, OpenFaaS [15]. We evaluate it using ServerlessBench [16], FunctionBench [17], and applications with real-world traces from Huawei Cloud. The results show that on real-world traces, compared to a state-of-the-art model-based serverless scheduler [8], Jiagu incurs 81.0%–93.7% lower scheduling costs and 57.4%–69.3% lower cold start latency with cfork [18]. It also achieves the highest resource utilization compared to all baseline schedulers (54.8% higher instance density than Kubernetes).",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib35",
+      "text": "Jonas et al . (2019) Eric Jonas, Johann Schleier-Smith, Vikram Sreekanti, Chia-Che Tsai, Anurag Khandelwal, Qifan Pu, Vaishaal Shankar, Joao Carreira, Karl Krauth, Neeraja Yadwadkar, et al . 2019. Cloud programming simplified: A berkeley view on serverless computing. arXiv preprint arXiv:1902.03383 (2019)."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib6",
+      "text": "kna (2023) 2023. Knative Autoscaling. https://knative.dev/docs/serving/autoscaling/ ."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib9",
+      "text": "ope (2023b) 2023b. Openfaas Autoscaling. https://docs.openfaas.com/architecture/autoscaling/ ."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib67",
+      "text": "Tian et al . (2022) Huangshi Tian, Suyi Li, Ao Wang, Wei Wang, Tianlong Wu, and Haoran Yang. 2022. Owl: Performance-Aware Scheduling for Resource-Efficient Function-as-a-Service Cloud. In Proceedings of the 13th Symposium on Cloud Computing (San Francisco, California) (SoCC ’22) . Association for Computing Machinery, New York, NY, USA, 78–93. https://doi.org/10.1145/3542929.3563470"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "gar (2023) 2023. Gartner Says Worldwide IaaS Public Cloud Services Market Grew 41.4% in 2021. https://www.gartner.com/en/newsroom/press-releases/2022-06-02-gartner-says-worldwide-iaas-public-cloud-services-market-grew-41-percent-in-2021."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib41",
+      "text": "Li et al . (2023) Suyi Li, Wei Wang, Jun Yang, Guangzhen Chen, and Daohe Lu. 2023. Golgi: Performance-Aware, Resource-Efficient Function Scheduling for Serverless Computing. In Proceedings of the 2023 ACM Symposium on Cloud Computing (<conf-loc>, <city>Santa Cruz</city>, <state>CA</state>, <country>USA</country>, </conf-loc>) (SoCC ’23) . Association for Computing Machinery, New York, NY, USA, 32–47. https://doi.org/10.1145/3620678.3624645"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib55",
+      "text": "Qiu et al . (2023) Haoran Qiu, Weichao Mao, Chen Wang, Hubertus Franke, Alaa Youssef, Zbigniew T. Kalbarczyk, Tamer Başar, and Ravishankar K. Iyer. 2023. AWARE: Automate Workload Autoscaling with Reinforcement Learning in Production Cloud Systems. In 2023 USENIX Annual Technical Conference (USENIX ATC 23) . USENIX Association, Boston, MA, 387–402. https://www.usenix.org/conference/atc23/presentation/qiu-haoran"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib80",
+      "text": "Zhao et al . (2021) Laiping Zhao, Yanan Yang, Yiming Li, Xian Zhou, and Keqiu Li. 2021. Understanding, Predicting and Scheduling Serverless Workloads under Partial Interference. In Proceedings of the International Conference for High Performance Computing, Networking, Storage and Analysis (St. Louis, Missouri) (SC ’21) . Association for Computing Machinery, New York, NY, USA, Article 22, 15 pages. https://doi.org/10.1145/3458817.3476215"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib23",
+      "text": "Delimitrou and Kozyrakis (2013) Christina Delimitrou and Christos Kozyrakis. 2013. Paragon: QoS-Aware Scheduling for Heterogeneous Datacenters. In Proceedings of the Eighteenth International Conference on Architectural Support for Programming Languages and Operating Systems (Houston, Texas, USA) (ASPLOS ’13) . Association for Computing Machinery, New York, NY, USA, 77–88. https://doi.org/10.1145/2451116.2451125"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib48",
+      "text": "Mars et al . (2011) Jason Mars, Lingjia Tang, Robert Hundt, Kevin Skadron, and Mary Lou Soffa. 2011. Bubble-Up: Increasing Utilization in Modern Warehouse Scale Computers via Sensible Co-Locations. In Proceedings of the 44th Annual IEEE/ACM International Symposium on Microarchitecture (Porto Alegre, Brazil) (MICRO-44) . Association for Computing Machinery, New York, NY, USA, 248–259. https://doi.org/10.1145/2155620.2155650"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib49",
+      "text": "Mishra et al . (2017) Nikita Mishra, John D. Lafferty, and Henry Hoffmann. 2017. ESP: A Machine Learning Approach to Predicting Application Interference. In 2017 IEEE International Conference on Autonomic Computing (ICAC) . 125–134. https://doi.org/10.1109/ICAC.2017.29"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib71",
+      "text": "Xu et al . (2018) Ran Xu, Subrata Mitra, Jason Rahman, Peter Bai, Bowen Zhou, Greg Bronevetsky, and Saurabh Bagchi. 2018. Pythia: Improving Datacenter Utilization via Precise Contention Prediction for Multiple Co-Located Workloads. In Proceedings of the 19th International Middleware Conference (Rennes, France) (Middleware ’18) . Association for Computing Machinery, New York, NY, USA, 146–160. https://doi.org/10.1145/3274808.3274820"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib47",
+      "text": "Mars and Tang (2013) Jason Mars and Lingjia Tang. 2013. Whare-Map: Heterogeneity in \"Homogeneous\" Warehouse-Scale Computers. In Proceedings of the 40th Annual International Symposium on Computer Architecture (Tel-Aviv, Israel) (ISCA ’13) . Association for Computing Machinery, New York, NY, USA, 619–630. https://doi.org/10.1145/2485922.2485975"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib43",
+      "text": "Liu et al . (2023) Qingyuan Liu, Dong Du, Yubin Xia, Ping Zhang, and Haibo Chen. 2023. The Gap Between Serverless Research and Real-World Systems. In Proceedings of the 2023 ACM Symposium on Cloud Computing (, Santa Cruz, CA, USA,) (SoCC ’23) . Association for Computing Machinery, New York, NY, USA, 475–485. https://doi.org/10.1145/3620678.3624785"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib8",
+      "text": "ope (2023a) 2023a. OpenFaaS - Serverless Functions Made Simple. https://www.openfaas.com ."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib73",
+      "text": "Yu et al . (2020) Tianyi Yu, Qingyuan Liu, Dong Du, Yubin Xia, Binyu Zang, Ziqian Lu, Pingchao Yang, Chenggang Qin, and Haibo Chen. 2020. Characterizing Serverless Platforms with ServerlessBench. In Proceedings of the ACM Symposium on Cloud Computing (SoCC ’20) . Association for Computing Machinery. https://doi.org/10.1145/3419111.3421280"
+    },
+    {
+      "n": 17,
+      "id": "bib.bib37",
+      "text": "Kim and Lee (2019) Jeongchul Kim and Kyungyong Lee. 2019. Practical cloud workloads for serverless faas. In Proceedings of the ACM Symposium on Cloud Computing . 477–477."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib26",
+      "text": "Du et al . (2022) Dong Du, Qingyuan Liu, Xueqiang Jiang, Yubin Xia, Binyu Zang, and Haibo Chen. 2022. Serverless Computing on Heterogeneous Computers. In Proceedings of the 27th ACM International Conference on Architectural Support for Programming Languages and Operating Systems (Lausanne, Switzerland) (ASPLOS 2022) . Association for Computing Machinery, New York, NY, USA, 797–813. https://doi.org/10.1145/3503222.3507732"
+    }
+  ]
+}

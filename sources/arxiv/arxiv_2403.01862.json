@@ -1,0 +1,129 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.01862",
+  "title": "MTS: Bringing Multi-Tenancy to Virtual Networking",
+  "authors": "Kashyap Thimmaraju, Saad Hermak, GÃ¡bor RÃ©tvÃ¡ri, Stefan Schmid",
+  "year": "2024",
+  "categories": [
+    "cs.CR",
+    "cs.NI"
+  ],
+  "url": "https://arxiv.org/abs/2403.01862",
+  "html_url": "https://arxiv.org/html/2403.01862",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1189,
+  "text": "Security landscape of cloud virtual networking. Datacenters have become a critical infrastructure of our digital society, and with the fast growth of data centric applications and AI/ML workloads, dependability requirements on cloud computing will further increase [1]. At the heart of an efficiently operating datacenter lies the idea of resource sharing and multi-tenancy: independent instances (e.g., applications or tenants) can utilize a given infrastructure concurrently, including the compute, storage, networking, and management resources deployed at the data center, in a physically integrated but logically isolated manner [2,3].\n\nAt the level of the data center communication network, isolation is provided by the network virtualization architecture. Key to network virtualization is the virtual switch (vswitch), a network component located in the Host virtualization layer of the (edge) servers that connects tenants’ compute and storage resources (e.g., Virtual Machines (VMs), storage volumes, etc.), provisioned at the server, to the rest of the data center and the public Internet [2,4,5].\n\nMulti-tenancy is typically provided in this design by (i) deploying the vswitches with the server’s Host operating system/hypervisor (e.g, Open vSwitch aka OvS [6]); (ii) using flow-table-level isolation: the vswitch’s flow tables are divided into per-tenant logical datapaths that are populated with sufficient flow table entries to link tenants’ data-center-bound resources into a common interconnected workspace [2,4,5]; and (iii) overlay networks using a tunneling protocol, e.g., VXLAN [7], to connect tenants’ resources into a single workspace. Alternatives to this Host-based vswitch model [6], e.g., NIC-based vswitch solutions [8,9] and FPGA-based designs [10], share the main trait that the logical datapaths have a common networking substrate (vswitch).\n\nDespite the wide-scale deployment [11,10,8], the level of (logical and performance) isolation provided by vswitches is not yet well-understood. For example, Thimmaraju et al. [12] uncovered a serious isolation problem with a popular virtual switch (OvS). An adversary could not only break out of the VM and attack all applications on the Host, but could also manifest as a worm, and compromise an entire datacenter in a few minutes. Csikor et al. [13] identified a severe performance isolation vulnerability, also in OvS, which results in a low-resource cross-tenant denial-of-service attack. Such attacks may exacerbate concerns surrounding the security and adoption of public clouds (that is already a major worry across cloud users [14]).\n\nIndeed, a closer look at the cloud virtual networking best-practice, whereby per-tenant logical datapaths are deployed on a single Host-based vswitch using flow-table-level isolation [2,4,5], reveals that the current state-of-the-art violates basically all relevant secure system design principles [15,16]. First, the principle of least privilege would require that any system component should be given only the minimum set of privileges necessary to complete its task, yet we see that vswitch code typically executes on the Host with administrator, or what is worse, with full kernel privilege [17,18], even though this would not be absolutely necessary (see Sec. 3). Second, untrusted user code directly interacts with the vswitch and hence with the Host OS, e.g., it may send arbitrary packets from VMs, query statistics, or even install flow table entries through side channels [13], which violates the secure design principle of complete mediation. But most importantly, the shared vswitch design goes directly against the principle of the least common mechanism, which would minimize the amount of resources common to more than one tenant.\n\nSecure vswitch design. The main motivation for our work is the observation that current virtual switch architectures are not well-suited for multi-tenancy. This observation leads us to revisit the fundamental design of secure vswitches. Hence, in this paper, we present, implement, and evaluate a multi-tenant (virtual) switch architecture, \\emph{MTS}, which extends the benefits of multi-tenancy to the vswitch in a secure manner, without imposing prohibitive resource requirements or jeopardizing performance.\n\nFig. 1 illustrates the key idea underlying the \\emph{MTS} design, by showing the security-performance-resource tradeoffs for different architectures. The current vswitch architecture is shown in Fig. 1 (a), whereby per-tenant logical datapaths share a common (physical or software) switch component deployed at the Host hypervisor layer (in the rest of this paper, we shall sometimes refer to this design point as the “Baseline”). As we argued above, this design is fundamentally insecure [12,13] as it violates basic secure design principles, like least privilege, complete mediation, or the least common mechanism. In \\emph{MTS}, we address the least privilege principle by the compartmentalization of the vswitches (Fig. 1 (b)): by moving the vswitches into a dedicated vswitch VM, we can prevent an attacker from compromising the Host via the vswitch [19]. Then, we establish a secure communication channel between the tenant VMs and the vswitch VM via a trusted hardware technique, Single Root Input/Output Virtualization, or SR-IOV, a common feature implemented in most modern NICs and motherboards [20,8]. Thus, all tenant-to-tenant and tenant-Host networking is completely mediated via the SR-IOV NIC. Adopting Google’s extra security layer design principle [21] which requires that between any untrusted and trusted component, there have to be at least two distinct security boundaries [22,3], we introduce a second level of isolation by moving the vswitch, deployed into the vswitch VM, to the user space. Hence, at least two independent security mechanisms need to fail (user-kernel separation and VM-isolation) for the untrusted tenant code to gain access to the Host.\n\nInterestingly, we are able to show the resultant secure vswitch design, which we call the single vswitch VM design, does not come at the cost of performance; just the contrary, our evaluations show that we can considerably improve throughput and latency, for a relatively small price in resources. Finally, we introduce a “hardened” \\emph{MTS} design that we call the multiple vswitch VMs design (Fig. 1 (c)), whereby, in line with the principle of the least common mechanism, we further separate the vswitch by creating multiple separate vswitch VMs, one for each tenant (or based on security zones/classes). This way, we can maintain full network isolation for multiple tenants.\n\nContributions. Our main contributions in this paper are:\n\n- • We identify requirements and design principles that can prevent the virtual switch from being a liability to virtualization in the cloud, and we carefully apply these principles to revisit multi-tenancy in virtual networking.\n\n- • We present \\emph{MTS}, a secure vswitch design whereby the vswitch is moved into a separate VM that prevents malicious tenants from compromising the Host via the virtual switch, and we also show a “hardened” \\emph{MTS} design that also prevents compromising other tenants’ virtual networks through the vswitch. All our designs are incrementally deployable, providing an inexpensive deployment experience for cloud operators.\n\n- • We report on extensive experiments with our MTS prototype and we find a noteworthy improvement (1.5-2x) in throughput compared to the Baseline, with similar or better latency for an extra CPU. We build our prototype from off-the-shelf commodity components and existing software; MTS and the data from this paper are available at: https://www.github.com/securedataplane\n\nOrganization. We dive deeper into designing a secure vswitch in Section 2. In Section 3 we elaborate on MTS and report on two evaluations in Sections 4 and 5. We enter a discussion of MTS in Section 6, review related work in Section 7 and finally draw conclusions in Section 8.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib13",
+      "text": "Columbus, L. Roundup Of Cloud Computing Forecasts And Market Estimates. https://www.forbes.com/sites/louiscolumbus/2018/09/23/roundup-of-cloud-computing-forecasts-and-market-estimates-2018/ , 2017. Accessed: 09-01-2019."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib38",
+      "text": "Koponen, T., Amidon, K., Balland, P., Casado, M., Chanda, A., Fulton, B., Ganichev, I., Gross, J., Ingram, P., Jackson, E., Lambeth, A., Lenglet, R., Li, S.-H., Padmanabhan, A., Pettit, J., Pfaff, B., Ramanathan, R., Shenker, S., Shieh, A., Stribling, J., Thakkar, P., Wendlandt, D., Yip, A., and Zhang, R. Network virtualization in multi-tenant datacenters. In Proc. Usenix Networked Systems Design and Implementation (NSDI) (2014)."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib23",
+      "text": "Frazelle, J. Hard multi-tenancy in kubernetes. https://blog.jessfraz.com/post/hard-multi-tenancy-in-kubernetes , 2018. Accessed: 09-01-2019."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib33",
+      "text": "Jain, R., and Paul, S. Network virtualization and software defined networking for cloud computing: a survey. IEEE Communication Magazine 51 , 11 (2013)."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib54",
+      "text": "Pettit, J., Pfaff, B., Wright, C., and Venugopal, M. OVN, Bringing Native Virtual Networking to OVS. https://networkheresy.com/2015/01/13/ovn-bringing-native-virtual-networking-to-ovs/ , 2015. Accessed: 27-01-2017."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib56",
+      "text": "Pfaff, B., Pettit, J., Koponen, T., Jackson, E., Zhou, A., Rajahalme, J., Gross, J., Wang, A., Stringer, J., Shelar, P., Amidon, K., and Casado, M. The design and implementation of Open vSwitch. In Proc. Usenix Networked Systems Design and Implementation (NSDI) (2015)."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib73",
+      "text": "Virtual extensible local area network (VXLAN): A framework for overlaying virtualized layer 2 networks over layer 3 network. https://tools.ietf.org/html/rfc7348 . Accessed: 01-06-2016."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib35",
+      "text": "Jing, C. Zero-Copy Optimization for Alibaba Cloud Smart NIC Solution. http://www.alibabacloud.com/blog/zero-copy-optimization-for-alibaba-cloud-smart-nic-solution_593986 , 2018. Accessed: 03-01-2019."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib27",
+      "text": "Gospodarek, A. The Rise of SmartNICs – offloading dataplane traffic to…software. https://youtu.be/AGSy51VlKaM , 2017. Open vSwitch Conference."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib22",
+      "text": "Firestone, D., Putnam, A., Mundkur, S., Chiou, D., Dabagh, A., Andrewartha, M., Angepat, H., Bhanu, V., Caulfield, A., Chung, E., Chandrappa, H. K., Chaturmohta, S., Humphrey, M., Lavier, J., Lam, N., Liu, F., Ovtcharov, K., Padhye, J., Popuri, G., Raindel, S., Sapre, T., Shaw, M., Silva, G., Sivakumar, M., Srivastava, N., Verma, A., Zuhair, Q., Bansal, D., Burger, D., Vaid, K., Maltz, D. A., and Greenberg, A. Azure accelerated networking: Smartnics in the public cloud. In Proc. Usenix Networked Systems Design and Implementation (NSDI) (2018)."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib16",
+      "text": "Dalton, M., Schultz, D., Adriaens, J., Arefin, A., Gupta, A., Fahs, B., Rubinstein, D., Zermeno, E. C., Rubow, E., Docauer, J. A., Alpert, J., Ai, J., Olson, J., DeCabooter, K., de Kruijf, M., Hua, N., Lewis, N., Kasinadhuni, N., Crepaldi, R., Krishnan, S., Venkata, S., Richter, Y., Naik, U., and Vahdat, A. Andromeda: Performance, isolation, and velocity at scale in cloud network virtualization. In Proc. Usenix Networked Systems Design and Implementation (NSDI) (2018)."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib69",
+      "text": "Thimmaraju, K., Shastry, B., Fiebig, T., Hetzelt, F., Seifert, J.-P., Feldmann, A., and Schmid, S. Taking control of sdn-based cloud systems via the data plane. In Proc. ACM Symposium on SDN Research (SOSR) (2018)."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib15",
+      "text": "Csikor, L., Rothenberg, C., Pezaros, D. P., Schmid, S., Toka, L., and Rétvári, G. Policy injection: A cloud dataplane dos attack. In Proc. ACM SIGCOMM Posters and Demos (2018)."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib62",
+      "text": "SecuritytWeek . CSA’s cloud adoption, practices and priorities survey report. http://www.securityweek.com/data-security-concerns-still-challenge , 2015. Accessed: 09-01-2019."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib61",
+      "text": "Saltzer, J. H., and Schroeder, M. D. The protection of information in computer systems. Proceedings of the IEEE 63 , 9 (1975), 1278–1308."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib9",
+      "text": "Bishop, M. A. Introduction to computer security , vol. 50. Addison-Wesley Boston, 2005."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib72",
+      "text": "VMware . VMware ESX 4.0 Update 1 Release Notes. https://bit.ly/2sFTuTy , 2009. Accessed: 05-06-2018."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib28",
+      "text": "Honda, M., Huici, F., Lettieri, G., and Rizzo, L. mswitch: a highly-scalable, modular software switch. In Proc. ACM Symposium on SDN Research (SOSR) (2015)."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib34",
+      "text": "Jin, X., Keller, E., and Rexford, J. Virtual switching without a hypervisor for a more secure cloud. In Proc. USENIX Workshop on Hot Topics in Management of Internet, Cloud, and Enterprise Networks and Services (HotICE) (2012)."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib4",
+      "text": "AWS . Enhanced Networking on Linux. https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/enhanced-networking.html , 2018. Accessed: 24-01-2018."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib1",
+      "text": "Allclair, T. Secure Container Isolation: Problem Statement & Solution Space. https://docs.google.com/document/d/1QQ5u1RBDLXWvC8K3pscTtTRThsOeBSts_imYEoRyw8A , 2018. Accessed: 05-01-2019."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib7",
+      "text": "Beaupré, A. Updates in container isolation. https://lwn.net/Articles/754433 , 2018. Accessed: 09-01-2019."
+    }
+  ]
+}

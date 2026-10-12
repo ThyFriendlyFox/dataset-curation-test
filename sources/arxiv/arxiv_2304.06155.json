@@ -1,0 +1,89 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2304.06155",
+  "title": "Skyline Operators for Document Spanners",
+  "authors": "Antoine Amarilli, Benny Kimelfeld, SÃ©bastien LabbÃ©, Stefan Mengel",
+  "year": "2024",
+  "categories": [
+    "cs.DB",
+    "cs.FL"
+  ],
+  "url": "https://arxiv.org/abs/2304.06155",
+  "html_url": "https://arxiv.org/html/2304.06155",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1147,
+  "text": "The framework of document spanners [1] is an established formalism to express declarative information extraction tasks. A spanner specifies the possible ways to assign variables over a textual document, producing so-called mappings which are the result of the extraction: each mapping assigns the variables to a factor of the document, called a span. The spanner formalism has been defined in terms of several operators, in particular regular operations extended with capture variables (corresponding to so-called regular spanners), operators from relational algebra (which can sometimes be translated into regular expressions), string equality (the so-called core spanners), etc.\n\nExisting operators do not give a simple way to extract mappings that are maximal according to some criteria. However, there are natural cases in which some mappings are preferred to others. In fact, traditional declarative systems for information extraction provide explicit mechanisms for restricting the extracted spans to the maximal ones according to different comparisons. IBM’s SystemT [2] has the consolidation rules such as “contained-within” (where a span dominates its subspans) and “left-to-right” (where a span dominates all shorter spans that begin at the same position). Similarly, the GATE system [3] features controls such as “Appelt” (which is similar to SystemT’s “left-to-right”). Alternatively, in the schemaless context of document spanners where we can assign spans to only a subset of variables [4], we may want to only capture spans which assign a maximal subset of the variables and cannot be extended by assigning more variables; in the spirit, for instance, of the relational full disjunction [5] or the OPTIONAL operator of SPARQL [6].\n\nTo explore the expressive power of operators such as controls and consolidators, Fagin et al. [7] proposed a framework that enriches document spanners with a previous concept of prioritized repairs [8]. There, they defined the notion of a “denial preference-generating dependency” (denial pgd) that expresses the binary domination relationship using the underlying spanner language. When this relationship is transitive, the result of applying the denial pgd is precisely the set of maximal tuples. However, they did not address the computational complexity of this operator and, consequently, it has been left open. (Moreover, their study does not apply to the schemaless context.)\n\nThe notion of maximal matches has been abundantly studied in other areas of database research, where it is called the skyline operator [9]. Intuitively, the skyline of a set of results under a partial order relation is the set of the results that are maximal, i.e., are not dominated by another result. The complexity of skyline computation has been investigated under many dimensions, e.g., I/O access [10], parallel computation [11], or noisy comparisons [12]. However, we are not aware of a study of the complexity of this operator to extract the maximal matches of document spanners. This is the focus of the present paper.\n\n## Contributions.\n\nWe present our contributions together with the structure of the paper. After some necessary preliminaries (Section 2), we first introduce in Section 3 the skyline operator. The operator is defined as extracting the maximal mappings of a spanner on a document with respect to a partial order on the mapping, which we call a domination relation. In particular, we define the span inclusion, span length, variable inclusion, and left-to-right domination relations, which cover the examples presented above.\n\nTo allow for a unified study of these operators, and similarly to [7], we propose a general model where the domination relations are themselves expressed as document spanners. More precisely, a domination rule is a spanner that defines a domination relation on every document: it indicates which mappings dominates which other mappings, by intuitively capturing pairs (m,m^{\\prime}) that indicate that m^{\\prime} dominates m. We also focus on so-called variable-wise rules, where the domination relation on mappings can be defined as a product of relations on spans. In other words, a variable-wise rule is a spanner expressing which spans dominate which spans, and the domination relation on mappings is obtained in a pointwise fashion across the variables, like the ceteris paribus semantics for preference handling in artificial intelligence [13] or Pareto-optimal points for skyline queries on multidimensional data [12]. All examples introduced earlier can be expressed in this variable-wise way.\n\nWe then begin our study of how to evaluate the skyline operator on document spanners, and start in Section 4 with the question of expressiveness: does the operator strictly increase the expressive power of spanner formalisms, or can it be rewritten using existing operators? We show that regular spanners are closed under the skyline operator, generalizing a result of [7] to the schemaless context. By contrast, we show that core spanners are not closed under skylines, even for the fixed variable inclusion or span inclusion domination relations, again generalizing a result of [7].\n\nNext, we explore the question of whether it is possible to tractably rewrite the skyline operator into regular spanners, to allow for efficient evaluation like, e.g., the polynomial-time compilation of the join operator in the schema-based context (see [14], Lemma 4.4.7). We present in Section 5 a lower bound establishing that this is not the case: even for variable inclusion domination, applying the skyline operator to a spanner expressed as a sequential variable-set automaton (VA) incurs a necessary exponential blowup. This result is shown by identifying a connection between VAs and nondeterministic read-once branching programs (NROBPs). This general-purpose method can be used outside of the context of skylines, and in fact we also use it to show a result of independent interest: there are regex-formulas on which the natural join operator incurs an unavoidable exponential blowup (Theorem 5.5).\n\nWe then move in Section 6 from state complexity to the computational complexity of skyline evaluation for regular spanners. This task is clearly tractable in data complexity, i.e., for a fixed spanner and domination rule: we simply compute all captured mappings, and filter out the non-maximal ones. More interestingly, assuming \\mathsf{P}\\neq\\mathsf{NP}, we show that the task is intractable in combined complexity, i.e., as a function of the input spanner (Theorem 6.3), already in the case of the variable inclusion relation. Hence, we cannot tractably evaluate the skyline operator in combined complexity, even without compiling it to an explicit VA.\n\nLastly, we study in more detail how the complexity of skyline computation depends on the fixed domination relation: are there non-trivial domination rules for which skyline computation is tractable in combined complexity? We show in Section 7 a sufficient condition on domination rules which is satisfied by all example rules that we mentioned and which implies (conditional) intractability (Theorem 7.5). We then show that, for a class of domination rules called variable-inclusion-like rules, a variant of this condition can be used for a dichotomy to classify which of these rules enjoy tractable skyline computation (Theorem 7.7). We finish with examples of tractable and intractable rules in the general case.\n\nWe conclude in Section 8. For reasons of space, most proofs are deferred to the Appendix.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib10",
+      "text": "Ronald Fagin, Benny Kimelfeld, Frederick Reiss, and Stijn Vansummeren. Document spanners: A formal approach to information extraction. J. ACM , 62(2):12, 2015. URL: http://doi.acm.org/10.1145/2699442 , doi:10.1145/2699442 ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib18",
+      "text": "Yunyao Li, Frederick Reiss, and Laura Chiticariu. SystemT: A declarative information extraction system. In ACL , 2011."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib9",
+      "text": "Hamish Cunningham, Kevin Humphreys, Robert J. Gaizauskas, and Yorick Wilks. GATE - a general architecture for text engineering. In ANLP . ACL, 1997."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib19",
+      "text": "Francisco Maturana, Cristian Riveros, and Domagoj Vrgoc. Document spanners for extracting incomplete information: Expressiveness and complexity. In PODS , 2018."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib14",
+      "text": "César A. Galindo-Legaria. Outerjoins as disjunctions. SIGMOD Rec. , 23(2), 1994. doi:10.1145/191843.191908 ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib2",
+      "text": "Shqiponja Ahmetaj, Wolfgang Fischl, Markus Kröll, Reinhard Pichler, Mantas Šimkus, and Sebastian Skritek. The challenge of optional matching in SPARQL. In FoIKS , 2016."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib11",
+      "text": "Ronald Fagin, Benny Kimelfeld, Frederick Reiss, and Stijn Vansummeren. Declarative cleaning of inconsistencies in information extraction. ACM Trans. Database Syst. , 41(1), 2016. URL: http://doi.acm.org/10.1145/2877202 , doi:10.1145/2877202 ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib27",
+      "text": "Slawek Staworko, Jan Chomicki, and Jerzy Marcinkowski. Prioritized repairing and consistent query answering in relational databases. Ann. Math. Artif. Intell. , 64(2-3), 2012."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib5",
+      "text": "Stephan Börzsönyi, Donald Kossmann, and Konrad Stocker. The skyline operator. In ICDE . IEEE, 2001."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib26",
+      "text": "Cheng Sheng and Yufei Tao. Worst-case I/O-efficient skyline algorithms. ACM Transactions on Database Systems (TODS) , 37(4), 2012."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib1",
+      "text": "Foto N. Afrati, Paraschos Koutris, Dan Suciu, and Jeffrey D. Ullman. Parallel skyline queries. In ICDT , 2012."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib17",
+      "text": "Benoit Groz and Tova Milo. Skyline queries with noisy comparisons. In PODS , 2015."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib6",
+      "text": "Craig Boutilier, Ronen I. Brafman, Carmel Domshlak, Holger H. Hoos, and David Poole. CP-nets: A tool for representing and reasoning with conditional ceteris paribus preference statements. J. Artif. Intell. Res. , 21, 2004. doi:10.1613/jair.1234 ."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib20",
+      "text": "Liat Peterfreund. The Complexity of Relational Queries over Extractions from Text . PhD thesis, Technion - Computer Science Department, 2019."
+    }
+  ]
+}

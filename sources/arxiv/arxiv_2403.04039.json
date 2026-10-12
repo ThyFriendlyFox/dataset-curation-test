@@ -1,0 +1,90 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.04039",
+  "title": "Sample size planning for conditional counterfactual mean estimation with a K-armed randomized experiment",
+  "authors": "Gabriel Ruiz",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "stat.ME",
+    "stat.ML"
+  ],
+  "url": "https://arxiv.org/abs/2403.04039",
+  "html_url": "https://arxiv.org/html/2403.04039",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 964,
+  "text": "Randomized experiments (REs) are, in some sense, the gold standard for establishing causality. Although external validity is not guaranteed [1], REs are a good starting point when they can be conducted. To this end, we consider the problem of sample size planning when we would like to contrast K treatment groups. Noting the realistic possibility that the potential outcomes across possible treatments for one individual need not be similar to the potential outcomes of another individual, we consider sample size planning in the context of conditional counterfactual means, where the conditioning is with respect to baseline features.\n\nWe note that reasoning about treatment effects at an individual-level is difficult, if not impossible [2], even with an infinitely sized sample. For example, see [3] for the limited statistical inference that is possible on the distribution of individual treatment effects. For a goal that is more immediately within reach, we turn our sample size planning problem into one that attempts to study counterfactuals based on their average at the sub-group-level, such as defined by, but not limited to, a causal regression tree [4] or a policy tree [5,6]. We work under the flexibility that the sub-groups can be learned by any machine learning model that partitions the space of baseline co-variates, or features, into disjoint subsets. We illustrate an example partition of the feature space using a policy tree [5,6] in Section 3.\n\nIn determining a sufficient sample size, we require a desired margin of error, frequentist confidence-level, model complexity–the number of subsets in the partition, and plausible bounds on outcome variation. In practice, this can be tuned to comply with realistic sample size constraints. Once these parameters are specified, the sufficient sample size needed requires that we enforce a minimum sample size constraint in each subset for each treatment group. To attain nominal guarantees with such a partition, we require honest prediction [4,7] wherein outcomes for a holdout set in the training data are omitted from the partition splitting rules to be learned.\n\nThe key in our sample size planning is that in reasoning about the effect of K treatments across such a partition, we are conducting a simultaneous inference of means. Given that mistakes are more likely with an increased number of simultaneous inferences, a sufficient sample size is needed to ensure a desired accuracy. We formalize the amount that is sufficient in Propositions 2.1, A.1, and A.2.\n\nIn the remainder of this section, we introduce our estimator and its super-population analogue. In section 2, we discuss the ”high confidence” inference guarantee we are after, assumptions, and the main result that allows us to determine sample size as in the example shown in Figure 1. Given a fixed sample size budget, we discuss in § 2.4 how our result allows us to invert the question to one about the feasible number of treatment arms or partition complexity (e.g. number of decision tree leaves). Next, Section 3 empirically evaluates whether our main result holds using a semi-synthetic simulation from a large publicly available a/b test. Finally, Section 4 concludes with a discussion of limitations and possible extensions.\n\n## 1.1 Feature space partitioning model for conditional counterfactual means\n\nSuppose we have treatments w=1,\\dots,K we would like to contrast. We have data of baseline covariates, treatment exposure, and outcome tuples \\{(X_{i},W_{i},Y_{i})\\}_{i=1}^{n} with which we would like to approximate the non-trivial conditional counterfactual mean function,\n\nAdditionally, it can be of interest to study the pair-wise differences of these means, known as the conditional average treatment effect (CATE) function:\n\nHere, \\left\\{Y_{i}(w),Y_{i}(w^{\\prime})\\right\\} are known as potential outcomes [8,9], and equivalently as counterfactuals [10,11]. These represent individual i ’s hypothetical outcomes when we force, typically in a randomized experiment, the exposure variable W_{i} to be w or w^{\\prime}.\n\nSuppose we partition the feature space into L\\geq 1 subsets\n\nDenote:\n\nas the mapping that assigns \\ell(x)=l if x\\in\\mathcal{X}_{l}. We will call l=1,\\dots,L a leaf, as it is helpful to think of the partition of \\mathcal{X} as arising from a decision tree [12]. Denote the prediction indices in group w=1,\\dots,K in leaf l=1,\\dots,L as\n\nand let its sample size be denoted by\n\nHere, \\mathcal{S}\\subset\\{1,\\dots,n\\} denotes the holdouts for honest prediction [4,7].\n\nMaking use of the partition of the feature space, suppose our approximation of \\mu^{*}(x,w) is given by\n\nthe sample mean outcome in treatment group w and leaf \\ell(x). Meanwhile, the approximation to \\tau^{*}(x,w,w^{\\prime}), denoted as \\hat{\\tau}(x,w,w^{\\prime}), is given by:\n\nan estimator that is in strong analogy to, but which the partition mapping \\ell(x) need not be limited to, the causal decision trees of [4].\n\n## 1.1.1 A manageable inference target in practice\n\nLet (X_{n+1},W_{n+1},Y_{n+1}) be a new independent draw such that\n\nWhile we mean to approximate the population-level quantity \\mu^{*}(x,w), the population-analogue of \\hat{\\mu}(x,w) is actually\n\nThis will be the target of our inference.\n\nNote that \\mathcal{I}(w,l) is random because the tuples (X_{i},W_{i}) it is based on are random. Conditional on \\mathcal{I}(w,\\ell(x)), we have that \\hat{\\mu}(x,w) is unbiased for \\mu(x,w) by its construction:\n\nThe estimator \\hat{\\mu}(x,w) is also unbiased for the conditional mean of an individual’s counterfactual outcome\n\nprovided the balancing score condition\n\nholds [8,13,9,14,11]. This condition holds in a randomized experiment setting when X_{i} are pre-treatment features that are independent of treatment assignment. Importantly, this balancing condition with respect to the discrete partition mapping \\ell(x) need not hold outside of the experimental setting.\n\nWe similarly have that conditional on \\mathcal{I}(w,\\ell(x)) and \\mathcal{I}(w^{\\prime},\\ell(x)), \\hat{\\tau}(x,w,w^{\\prime}) is unbiased for\n\nThe goal of our work will be to ensure the sets \\mathcal{I}(w,l) across (w,l)\\in\\left\\{1,\\dots,K\\right\\}\\times\\left\\{1,\\dots,L\\right\\} have sufficient indices to provide a desired high-confidence accuracy guarantee on \\mu(x,w). In addition to accurate inference on \\tau(x,w,w^{\\prime}), we show such a guarantee also implies accurate inference on the best outcome across treatment arms, on average, in leaf \\ell(x): \\max_{w}\\mu(x,w). We infer the latter quantity using its empirical analogue: \\max_{w}\\hat{\\mu}(x,w).",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib15",
+      "text": "Lei et al., (2023) Lei, L., Sahoo, R., and Wager, S. (2023). Policy learning under biased sample selection. arXiv , 2304.11735."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib25",
+      "text": "Vegetabile, (2021) Vegetabile, B. G. (2021). On the Distinction Between ”Conditional Average Treatment Effects” (CATE) and ”Individual Treatment Effects” (ITE) Under Ignorability Assumptions. arXiv , 2108.04939."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib22",
+      "text": "Ruiz and Padilla, (2022) Ruiz, G. and Padilla, O. H. M. (2022). Non-asymptotic confidence bands on the probability an individual benefits from treatment (PIBT). arXiv , 2205.09094."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib1",
+      "text": "Athey and Imbens, (2016) Athey, S. and Imbens, G. (2016). Recursive partitioning for heterogeneous causal effects. Proceedings of the National Academy of Sciences , 113(27):7353–7360."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib3",
+      "text": "Athey and Wager, (2021) Athey, S. and Wager, S. (2021). Policy Learning With Observational Data. Econometrica , 89(1):133–161."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib23",
+      "text": "Sverdrup et al., (2020) Sverdrup, E., Kanodia, A., Zhou, Z., Athey, S., and Wager, S. (2020). policytree: Policy learning via doubly robust empirical welfare maximization over trees. Journal of Open Source Software , 5(50):2232."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib2",
+      "text": "Athey et al., (2019) Athey, S., Tibshirani, J., and Wager, S. (2019). Generalized random forests. The Annals of Statistics , 47(2):1148 – 1178."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib20",
+      "text": "Rosenbaum and Rubin, (1983) Rosenbaum, P. R. and Rubin, D. B. (1983). The central role of the propensity score in observational studies for causal effects. Biometrika , 70(1):41–55."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib12",
+      "text": "Imbens and Rubin, (2015) Imbens, G. W. and Rubin, D. B. (2015). Causal Inference for Statistics, Social, and Biomedical Sciences: An Introduction . Cambridge University Press."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib18",
+      "text": "Pearl, (2000) Pearl, J. (2000). Causality: Models, reasoning, and inference 47cambridge university presscambridge, united kingdom. pearl, j. 2000. Causality: models, reasoning, and inference , 47."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib10",
+      "text": "Hernan and Robins, (2023) Hernan, M. and Robins, J. (2023). Causal Inference . Chapman & Hall/CRC Monographs on Statistics & Applied Probab. CRC Press."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib6",
+      "text": "Breiman et al., (2017) Breiman, L., Friedman, J. H., Olshen, R. A., and Stone, C. J. (2017). Classification And Regression Trees . Routledge."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib11",
+      "text": "Imbens, (2004) Imbens, G. W. (2004). Nonparametric Estimation of Average Treatment Effects Under Exogeneity: A Review. The Review of Economics and Statistics , 86(1):4–29."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib8",
+      "text": "D’Amour et al., (2021) D’Amour, A., Ding, P., Feller, A., Lei, L., and Sekhon, J. (2021). Overlap in observational studies with high-dimensional covariates. Journal of Econometrics , 221(2):644–654."
+    }
+  ]
+}

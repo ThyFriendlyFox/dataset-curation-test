@@ -1,0 +1,173 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2402.16641",
+  "title": "Towards Open-ended Visual Quality Comparison",
+  "authors": "Haoning Wu, Hanwei Zhu, Zicheng Zhang, Erli Zhang, Chaofeng Chen, Liang Liao, Chunyi Li, Annan Wang, Wenxiu Sun, Qiong Yan, Xiaohong Liu, Guangtao Zhai, Shiqi Wang, Weisi Lin",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2402.16641",
+  "html_url": "https://arxiv.org/html/2402.16641",
+  "license": "http://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Introduction",
+  "word_count": 978,
+  "text": "Image quality assessment (IQA) has been an important domain in visual computing, as it provides effective recommendation [1] on high-quality visual contents and valuable guidance [2,3,4] for potential improvements. Most recently, several pioneer studies [5,6,7] have explored large multi-modality models (LMMs, e.g. GPT-4V) [8,9,10,11,12,13], on expanding IQA from giving a scalar score (e.g. 3.457) to the open-ended scenarios, that allows evaluations in response to open-range questions, and provide detailed reasonings beyond an overall score.\n\nWhile these studies sufficiently emulate human ability on IQA, they also suffer from the same drawback as human: ambiguity on absolute evaluations. For instance, as shown in Fig. 2 (a), different human observers hold different standards on the exposure level on single images, and henceforth provide diversified absolute evaluations. Nevertheless, while asked to compare the exposure level of the images, all observers agree with the rank (1)>(2)>(3)>(4) (Fig. 2 (b)); all observers also agree that (1) has the highest exposure, though not all choose the option high while evaluating it independently. Given this observation, comparison has been a traditional human study setting for quality evaluation [14] and adopted by a wide range of existing subjective studies [15,16,17,2,18]. Furthermore, to avoid the ambiguity, the comparative settings are also predomintantly adopted [4,2] while applying IQA algorithms for improvement guidance.\n\nWhile comparison has widely-recognized significance for IQA, existing related datasets [15] and methods [19,20] are generally based on overall quality comparison and have not extended to the open-ended scenarios; on the other hand, open-source LMMs [5,10,12] are usually only fine-tuned with single image instruction tuning datasets [21,22,23] and proved to lack enough capability even on two image comparison settings [24,25]. While these gaps have clearly indicated the need of a specific instruction tuning dataset for visual quality comparison, it is too expensive to collect such a dataset from human. To avoid costly human labors, we propose an alternative strategy to collect the training dataset, named Co llaborative Instruct ion Tuning from Weak Supervisors (Co-Instruct). Specifically, we adopt two non-perfect supervisors: 1) Merge2Compare (Fig. 3 (a)). Originated from single image quality descriptions on 19K images as labeled by human in the Q-Pathway [5] dataset, we randomly match them into 100K groups (2-4 images per group) with removing the most similar descriptions with an text embedding model [26]. Then, we prompt a single-modal large language model (LLM) [27] to compare multiple human descriptions in a group, and “ merge ” them into 100K pseudo comparisons. 2) Teach2Compare (Fig. 3 (b)). Observing that GPT-4V has especially high accuracy on pairwise settings [25,24] among existing LMMs, following existing practices [28,29], we leverage GPT-4V responses to further expand our dataset. We collect 9K unlabeled images and randomly match into 30K image groups (also 2-4 images per group), and obtain GPT-4V responses on both caption-like general comparisons and question-answer pairs for comparisons. By integrating Q-Instruct-200K [5] (on single images), Merge2Compare, and Teach2Compare, we construct the Co-Instruct-562K, the first instruction tuning dataset for open-ended visual quality comparison.\n\nTo correctly refer to each specific image during conversation, we define a specific image-text interleaved format [13] to handle multi-image cases, as follows: User: The first image: <img {}_{\\texttt{0}} > The second image: <img {}_{\\texttt{1}} >... <query> Assistant: <response>\n\nMoreover, as we need to feed multiple images together to the LLM decoder, adopting the most popular LLaVA [21,30,10] structure that linearly projects visual embeddings will exceed the context window of the language models [31] and cause errors. Henceforth, we adopt an alternative visual abstractor structure [11] to first reduce visual token length (from 1,025 to 65 tokens per image), and then concatenate them with text embeddings to pass to language decoders. By learning from the Co-Instruct-562K dataset and the specially-designed input structure, we present the Co-Instruct, with up to 86% improvements than its baseline [11], and 61% better than the state-of-the-art open-source LMM. More importantly, despite using GPT-4V as one of its teachers, it still surpasses the GPT-4V teacher in a variety of multi-choice question (MCQ) benchmarks, and matches GPT-4V ability in scenarios requiring detailed language reasonings.\n\nAfter training the model Co-Instruct, our another concern is the lack of abundant evaluation settings on multi-image comparison: while Q-Bench [6,24] series have covered multiple formats on single images and image pairs, there is no existing evaluation scenario for quality comparison beyond two images. To complement this evaluation setting, we construct the MICBench. Specifically, the MICBench contains 2,000 multi-choice questions (MCQ) comparing the quality or related attributes among a group of three or four images (each half), in which over half of the questions are Which questions (e.g. which image has highest clarity?). Aiming to extract an image with a specific quality-related appearance from a group, Which questions are the most important questions related to image comparison. Despite Which questions, the MICBench also includes Yes-or-No questions and other question types (What/How/How-Many, etc) to provide a holistic benchmark setting for multi-image quality comparison.\n\nIn summary, we conduct a systematical study towards open-ended visual quality comparison. Our contributions can be summarized as three-fold:\n\n- 1. We construct the first instruction-tuning dataset for visual quality comparison, the Co-Instruct-562K. With data collected from two “ weak supervisors ”, Merge2Compare (LLM-merged comparisons) and Teach2Compare (GPT-4V pseudo-labeled comparisons), our public dataset significantly expands the capabilities of open-source LMMs on visual comparative settings.\n\n- 2. We propose the most capable model for open-ended visual comparison, the Co-Instruct. With image-text interleaved input format and fine-tuned with the Co-Instruct-562K dataset, it significantly outperforms existing methods (and even GPT-4V) in multiple open-ended visual comparison tasks. With open weights, it allows for broader application than proprietary models.\n\n- 3. We construct the benchmark, the MICBench, as the first benchmark to evaluate LMMs for quality comparison on multiple images (more than two). It covers 2,000 diverse-type open-range MCQs related to visual quality comparison among three or four images. The MICBench contributes to more holistic evaluation studies on the visual quality comparison problem.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib57",
+      "text": "Yim, J.G., Wang, Y., Birkbeck, N., Adsumilli, B.: Subjective quality assessment for youtube UGC dataset. In: IEEE ICIP. pp. 1–5 (2020)"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib53",
+      "text": "Xu, J., Liu, X., Wu, Y., Tong, Y., Li, Q., Ding, M., Tang, J., Dong, Y.: ImageReward: Learning and evaluating human preferences for text-to-image generation. CoRR abs/2304.05977 (2023)"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib61",
+      "text": "Zhang, C., Su, S., Zhu, Y., Yan, Q., Sun, J., Zhang, Y.: Exploring and evaluating image restoration potential in dynamic scenes. In: IEEE CVPR. pp. 2057–2066 (2022)"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib65",
+      "text": "Zhang, W., Liu, Y., Dong, C., Qiao, Y.: RankSRGan: Generative adversarial networks with ranker for image super-resolution. In: ICCV. pp. 3096–3105 (2019)"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib50",
+      "text": "Wu, H., Zhang, Z., Zhang, E., Chen, C., Liao, L., Wang, A., Xu, K., Li, C., Hou, J., Zhai, G., et al.: Q-instruct: Improving low-level visual abilities for multi-modality foundation models. CoRR abs/2311.06783 (2023)"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib49",
+      "text": "Wu, H., Zhang, Z., Zhang, E., Chen, C., Liao, L., Wang, A., Li, C., Sun, W., Yan, Q., Zhai, G., Lin, W.: Q-Bench: A benchmark for general-purpose foundation models on low-level vision. In: ICLR (2024)"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib51",
+      "text": "Wu, H., Zhang, Z., Zhang, W., Chen, C., Liao, L., Li, C., Gao, Y., Wang, A., Zhang, E., Sun, W., et al.: Q-Align: Teaching lmms for visual scoring via discrete text-defined levels. CoRR abs/2312.17090 (2023)"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib34",
+      "text": "OpenAI: Gpt-4 technical report (2023)"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "Google: Gemini Pro (2023), https://deepmind.google/technologies/gemini"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib25",
+      "text": "Liu, H., Li, C., Li, Y., Lee, Y.J.: Improved baselines with visual instruction tuning. CoRR abs/2310.03744 (2023)"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib56",
+      "text": "Ye, Q., Xu, H., Ye, J., Yan, M., Liu, H., Qian, Q., Zhang, J., Huang, F., Zhou, J.: mPLUG-Owl2: Revolutionizing multi-modal large language model with modality collaboration. CoRR abs/2311.04257 (2023)"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib4",
+      "text": "Dai, W., Li, J., Li, D., Tiong, A.M.H., Zhao, J., Wang, W., Li, B., Fung, P., Hoi, S.: InstructBLIP: Towards general-purpose vision-language models with instruction tuning. CoRR abs/2305.06500 (2023)"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib5",
+      "text": "Dong, X., Zhang, P., Zang, Y., Cao, Y., Wang, B., Ouyang, L., Wei, X., Zhang, S., Duan, H., Cao, M., Zhang, W., Li, Y., Yan, H., Gao, Y., Zhang, X., Li, W., Li, J., Chen, K., He, C., Zhang, X., Qiao, Y., Lin, D., Wang, J.: InternLM-XComposer2: Mastering free-form text-image composition and comprehension in vision-language large model. CoRR abs/2401.16420 (2024)"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib43",
+      "text": "Tsukida, K., Gupta, M.R.: How to analyze paired comparison data (Technical Report UWEETR-2011-0004, University of Washington, 2011), https://api.semanticscholar.org/CorpusID:15425240"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib35",
+      "text": "Prashnani, E., Cai, H., Mostofi, Y., Sen, P.: PieAPP: Perceptual image-error assessment through pairwise preference. In: IEEE CVPR. pp. 1808–1817 (2018)"
+    },
+    {
+      "n": 16,
+      "id": "bib.bib62",
+      "text": "Zhang, R., Isola, P., Efros, A.A., Shechtman, E., Wang, O.: The unreasonable effectiveness of deep features as a perceptual metric. In: IEEE CVPR. pp. 586–595 (2018)"
+    },
+    {
+      "n": 17,
+      "id": "bib.bib10",
+      "text": "Gu, J., Cai, H., Chen, H., Ye, X., Ren, J., Dong, C.: PIPAL: A large-scale image quality assessment dataset for perceptual image restoration. In: ECCV. pp. 633–651 (2020)"
+    },
+    {
+      "n": 18,
+      "id": "bib.bib52",
+      "text": "Wu, X., Sun, K., Zhu, F., Zhao, R., Li, H.: Better aligning text-to-image models with human preference. CoRR abs/2303.14420 (2023)"
+    },
+    {
+      "n": 19,
+      "id": "bib.bib63",
+      "text": "Zhang, W., Ma, K., Zhai, G., Yang, X.: Uncertainty-aware blind image quality assessment in the laboratory and wild. IEEE TIP 30 , 3474–3486 (2021)"
+    },
+    {
+      "n": 20,
+      "id": "bib.bib28",
+      "text": "Liu, X., Van De Weijer, J., Bagdanov, A.D.: Exploiting unlabeled data in cnns by self-supervised learning to rank. IEEE TPAMI 41 (8), 1862–1878 (2019)"
+    },
+    {
+      "n": 21,
+      "id": "bib.bib26",
+      "text": "Liu, H., Li, C., Wu, Q., Lee, Y.J.: Visual instruction tuning. CoRR abs/2304.08485 (2023)"
+    },
+    {
+      "n": 22,
+      "id": "bib.bib13",
+      "text": "Hudson, D.A., Manning, C.D.: GQA: A new dataset for real-world visual reasoning and compositional question answering. In: IEEE CVPR. pp. 6700–6709 (2019)"
+    },
+    {
+      "n": 23,
+      "id": "bib.bib1",
+      "text": "Antol, S., Agrawal, A., Lu, J., Mitchell, M., Batra, D., Zitnick, C.L., Parikh, D.: VQA: Visual Question Answering. In: IEEE ICCV. pp. 2425–2433 (2015)"
+    },
+    {
+      "n": 24,
+      "id": "bib.bib67",
+      "text": "Zhang, Z., Wu, H., Zhang, E., Zhai, G., Lin, W.: A benchmark for multi-modal foundation models on low-level vision: from single images to pairs. CoRR abs/2402.07116 (2024)"
+    },
+    {
+      "n": 25,
+      "id": "bib.bib69",
+      "text": "Zhu, H., Sui, X., Chen, B., Liu, X., Chen, P., Fang, Y., Wang, S.: 2AFC prompting of large multimodal models for image quality assessment. CoRR abs/2402.01162 (2024)"
+    },
+    {
+      "n": 26,
+      "id": "bib.bib44",
+      "text": "Wang, L., Yang, N., Huang, X., Yang, L., Majumder, R., Wei, F.: Improving text embeddings with large language models. CoRR abs/2401.00368 (2024)"
+    },
+    {
+      "n": 27,
+      "id": "bib.bib16",
+      "text": "Jiang, A.Q., Sablayrolles, A., Roux, A., Mensch, A., Savary, B., Bamford, C., Chaplot, D.S., de las Casas, D., Hanna, E.B., Bressand, F., Lengyel, G., Bour, G., Lample, G., Lavaud, L.R., Saulnier, L., Lachaux, M.A., Stock, P., Subramanian, S., Yang, S., Antoniak, S., Scao, T.L., Gervet, T., Lavril, T., Wang, T., Lacroix, T., Sayed, W.E.: Mixtral of experts. CoRR abs/2401.04088 (2024)"
+    },
+    {
+      "n": 28,
+      "id": "bib.bib2",
+      "text": "Chen, L., Li, J., Dong, X., Zhang, P., He, C., Wang, J., Zhao, F., Lin, D.: ShareGPT4V: Improving large multi-modal models with better captions. CoRR abs/2311.12793 (2023)"
+    },
+    {
+      "n": 29,
+      "id": "bib.bib17",
+      "text": "LAION: LAION GPT-4V dataset. https://huggingface.co/datasets/laion/gpt4v-dataset (2023)"
+    },
+    {
+      "n": 30,
+      "id": "bib.bib39",
+      "text": "SkunkworksAI: BakLLaVA (2024), https://github.com/SkunkworksAI/BakLLaVA"
+    },
+    {
+      "n": 31,
+      "id": "bib.bib42",
+      "text": "Touvron, H., Martin, L., Stone, K., Albert, P., Almahairi, A., Babaei, Y., Bashlykov, N., Batra, S., Bhargava, P., Bhosale, S., Bikel, D., Blecher, L., Ferrer, C.C., Chen, M., Cucurull, G., Esiobu, D., Fernandes, J., Fu, J., Fu, W., Fuller, B., Gao, C., Goswami, V., Goyal, N., Hartshorn, A., Hosseini, S., Hou, R., Inan, H., Kardas, M., Kerkez, V., Khabsa, M., Kloumann, I., Korenev, A., Koura, P.S., Lachaux, M.A., Lavril, T., Lee, J., Liskovich, D., Lu, Y., Mao, Y., Martinet, X., Mihaylov, T., Mishra, P., Molybog, I., Nie, Y., Poulton, A., Reizenstein, J., Rungta, R., Saladi, K., Schelten, A., Silva, R., Smith, E.M., Subramanian, R., Tan, X.E., Tang, B., Taylor, R., Williams, A., Kuan, J.X., Xu, P., Yan, Z., Zarov, I., Zhang, Y., Fan, A., Kambadur, M., Narang, S., Rodriguez, A., Stojnic, R., Edunov, S., Scialom, T.: Llama 2: Open foundation and fine-tuned chat models. CoRR abs/2307.09288 (2023)"
+    }
+  ]
+}

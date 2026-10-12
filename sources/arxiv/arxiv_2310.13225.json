@@ -1,0 +1,99 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2310.13225",
+  "title": "Scalable Neural Network Kernels",
+  "authors": "Arijit Sehanobish, Krzysztof Choromanski, Yunfan Zhao, Avinava Dubey, Valerii Likhosherstov",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.AI"
+  ],
+  "url": "https://arxiv.org/abs/2310.13225",
+  "html_url": "https://arxiv.org/html/2310.13225",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 964,
+  "text": "Consider a kernel function: \\mathrm{K}:\\mathbb{R}^{d}\\times\\mathbb{R}^{d}\\rightarrow\\mathbb{R}, taking as input two feature vectors encoding latent embeddings of their corresponding objects and returning their similarity. Kernel methods are among the most theoretically principled approaches to statistical machine learning (ML) and have proven effective in numerous real-world problems [1,2]. Despite their theoretical guarantees and applicability in a rich spectrum of ML settings, the main drawback of these techniques is a high computational complexity, at least quadratic in the size N of the training dataset. For example, the kernel regression has time complexity \\mathcal{O}(N^{3}).\n\nTo address this issue, [3] proposed to construct a random feature (RF) map \\Phi:\\mathbb{R}^{d}\\rightarrow\\mathbb{R}^{m} that transforms an input point \\mathbf{z} to a finite-dimensional feature vector \\Phi(\\mathbf{z})\\in\\mathbb{R}^{m} such that: \\mathrm{K}(\\mathbf{x},\\mathbf{y})=\\mathbb{E}[\\Phi(\\mathbf{x})^{\\top}\\Phi(\\mathbf{y})] (effectively approximately linearizing kernel function). Approximating general kernels \\mathrm{K}(\\mathbf{x},\\mathbf{y}) via linear (dot-product) kernels \\mathrm{K}(\\mathbf{x},\\mathbf{y})\\approx\\widehat{\\mathbf{x}}^{\\top}\\widehat{\\mathbf{y}} for \\widehat{\\mathbf{z}}=\\Phi(\\mathbf{z}) drastically changes computational complexity landscape, which is now dominated by the number m of random features, thus providing computational gains if m\\ll N. Since their seminal work, there has been a variety of works proposing random features for a broad range of kernels like Gaussian, Matern [4] and polynomial [5,6,7].\n\nIn the meantime, with the advances in: the optimization algorithms for deep ML architectures and the accelerators’ hardware, neural network (NN) models [8,9,10] have become predominant in machine learning.\n\nThe feedforward layer (FFL) is the core computational module of NNs and is of the following form:\n\nfor \\mathbf{x}\\in\\mathbb{R}^{d},\\mathbf{W}\\in\\mathbb{R}^{l\\times d},\\mathbf{b}\\in\\mathbb{R}^{l} (bias) and an activation function f:\\mathbb{R}\\rightarrow\\mathbb{R} (applied element-wise). The expressiveness of deep NNs, far surpassing standard kernel methods, comes from stacking together several FFLs, each encoding non-linear mapping with learnable \\mathbf{W},\\mathbf{b}.\n\nIn this work, we draw a deep connection between scalable kernel methods and neural networks. We reinterpret the FFL as outputting the expected vector of dot-products of: (1) the latent embeddings of the input \\mathbf{x} and (2) the parameters: \\mathbf{W},\\mathbf{b} of the FFL, effectively disentangling input from model’s parameters in the computational graph, only to connect them in the final computation via the dot-product kernel. To be more specific, we think about the FFL as the following transformation:\n\nwhere mappings: \\Phi_{f}:\\mathbb{R}^{d}\\rightarrow\\mathbb{R}^{m}, \\Psi_{f}:\\mathbb{R}^{d}\\times\\mathbb{R}\\rightarrow\\mathbb{R}^{m} satisfy: f(\\mathbf{w}^{\\top}\\mathbf{x}+b)=\\mathbb{E}[\\Phi_{f}(\\mathbf{x})^{\\top}\\Psi_{f}(\\mathbf{w},b)] and \\mathbf{w}^{0},...\\mathbf{w}^{l-1} are the transposed rows of \\mathbf{W}. Then, in the instantiation of the layer the expectations are dropped out. Rewriting an FFL in terms of two towers: one corresponding to the input and one to its learnable parameters has several advantages:\n\n- 1. network compression: in the above formulation, instead of transforming layer parameters with \\Psi_{f}, one can directly learn vectors \\Psi_{f}(\\mathbf{w}^{i},b_{i}) for i=0,...,l-1. Then the number of trainable parameters becomes O(lm) rather than O(ld) and for m\\ll d the layer effectively has a reduced number of parameters.\n\n- 2. computational savings: if RFs can be constructed in time o(dl) per point and m\\ll d, the overall time complexity o(dl) of the FFL (given pre-computed embeddings \\Psi_{f}(\\mathbf{w}^{i},b_{i})) is sub-quadratic in layers’ dimensionalities,\n\n- 3. deep NN bundling process: a two-tower representation can be used iteratively to compactify multiple FFLs of NNs, the process we refer to as neural network bundling (Sec. 3.3); this also leads to the computational gains.\n\n- 4. deep NNs as scalable kernels: the extreme version of the bundling procedure, involving all the layers, provides a two-tower factorization of the entire deep NN with several potential practical and theoretical implications (Sec. 3.3). In particular, it leads to an explicit formula for the optimal parameters of the fully-bundled network under several loss objectives (e.g. mean squared loss), opening a possibility to bypass backpropagation.\n\nIn order to find mappings: \\Phi_{f}, \\Psi_{f} from Eq. 2, we develop a new bounded random feature map mechanism, called universal random features (or URFs) that leads to the unbiased estimation of f(\\mathbf{w}^{\\top}\\mathbf{x}+b) as long as f has a well-defined Fourier Transform (FT), either in the classical Riemannian or distributional sense. To derive URFs, we combine Fourier analysis techniques with recent methods for softmax-kernel estimation from [11].\n\nNote: We do not put any additional assumptions regarding f, in particular f is not required to be differentiable. Furthermore, function \\mathrm{K}_{f} does not need to be positive semi-definite. This is critical for applications in neural networks, where the activation function f usually does not correspond to a positive semi-definite kernel.\n\nTo summarize, our main contributions in this paper are as follows:\n\n- • We introduce the scalable neural network kernel module (SNNK) as a replacement of a traditional FFL (Sec. 3), providing the disentanglement of the network’s input and its parameter-set before final dot-product computation, as given in Eq. 2 (see also: Fig. 1).\n\n- • We accompany SNNKs with our universal random features mechanism (URFs) to efficiently: (1) construct mappings \\Phi_{f} and \\Psi_{f} from Eq. 2 and consequently: (2) implement SNNKs (Sec. 3.1). We provide explicit formulae for URFs for trigonometric maps. Those produce SNNK-based replacements of the SIREN networks from [12].\n\n- • We propose new NN-layers corresponding to the specific SNNK instantiation, called \\mathrm{ReLU} - \\mathrm{SNNK} (Sec. 3.2), that we found particularly effective in downstream applications (see: Sec. 4.3.2). We show that they are related to the class of the arc-cosine kernels [13]. We also demonstrate using them that SNNKs are strictly more expressive than regular FFLs, as allowing to compute the functions of the inputs and parameters that cannot be defined as point-wise transformed vectors of their dot-products.\n\n- • We introduce the neural network compactification process, that we refer to as neural network bundling, leveraging SNNKs (see: Sec. 3.3 and Fig. 1).\n\n- • We provide an exhaustive empirical evaluation of SNNKs, from point-wise kernel estimation to the adapter-based Transformers’ fine-tuning, providing about 5x reduction of the number of trainable parameters (Sec. 4).\n\nCommonly used methods for compressing neural networks are pruning [14], distillation [15] and quantization [16]. Compressing neural networks via SNNKs is novel and completely orthogonal to these methods and can be combined with such.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib51",
+      "text": "Schölkopf & Smola (2002) Bernhard Schölkopf and Alexander J. Smola. Learning with kernels : support vector machines, regularization, optimization, and beyond . Adaptive computation and machine learning. MIT Press, 2002. URL http://www.worldcat.org/oclc/48970254 ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib31",
+      "text": "Kontorovich et al. (2008) Leonid Kontorovich, Corinna Cortes, and Mehryar Mohri. Kernel methods for learning languages. Theor. Comput. Sci. , 405(3):223–236, 2008. doi: 10.1016/j.tcs.2008.06.037 . URL https://doi.org/10.1016/j.tcs.2008.06.037 ."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib46",
+      "text": "Rahimi & Recht (2007) Ali Rahimi and Benjamin Recht. Random features for large-scale kernel machines. In J. Platt, D. Koller, Y. Singer, and S. Roweis (eds.), Advances in Neural Information Processing Systems , volume 20. Curran Associates, Inc., 2007. URL https://proceedings.neurips.cc/paper_files/paper/2007/file/013a006f03dbc5392effeb8f18fda755-Paper.pdf ."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib7",
+      "text": "Choromanski et al. (2018) Krzysztof Choromanski, Mark Rowland, Tamás Sarlós, Vikas Sindhwani, Richard E. Turner, and Adrian Weller. The geometry of random features. In Amos J. Storkey and Fernando Pérez-Cruz (eds.), International Conference on Artificial Intelligence and Statistics, AISTATS 2018, 9-11 April 2018, Playa Blanca, Lanzarote, Canary Islands, Spain , volume 84 of Proceedings of Machine Learning Research , pp. 1–9. PMLR, 2018. URL http://proceedings.mlr.press/v84/choromanski18a.html ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib28",
+      "text": "Kar & Karnick (2012) Purushottam Kar and Harish Karnick. Random feature maps for dot product kernels. In Neil D. Lawrence and Mark Girolami (eds.), Proceedings of the Fifteenth International Conference on Artificial Intelligence and Statistics , volume 22 of Proceedings of Machine Learning Research , pp. 583–591, La Palma, Canary Islands, 21–23 Apr 2012. PMLR. URL https://proceedings.mlr.press/v22/kar12.html ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib54",
+      "text": "Wacker et al. (2022a) Jonas Wacker, Motonobu Kanagawa, and Maurizio Filippone. Improved random features for dot product kernels. arXiv preprint arXiv:2201.08712 , 2022a."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib55",
+      "text": "Wacker et al. (2022b) Jonas Wacker, Ruben Ohana, and Maurizio Filippone. Complex-to-real random features for polynomial kernels. arXiv preprint arXiv:2202.02031 , 2022b."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib17",
+      "text": "Goodfellow et al. (2016) Ian J. Goodfellow, Yoshua Bengio, and Aaron C. Courville. Deep Learning . Adaptive computation and machine learning. MIT Press, 2016. ISBN 978-0-262-03561-3. URL http://www.deeplearningbook.org/ ."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib50",
+      "text": "Schmidhuber (2014) Jürgen Schmidhuber. Deep learning in neural networks: An overview. CoRR , abs/1404.7828, 2014. URL http://arxiv.org/abs/1404.7828 ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib34",
+      "text": "LeCun et al. (2015) Yann LeCun, Yoshua Bengio, and Geoffrey E. Hinton. Deep learning. Nat. , 521(7553):436–444, 2015. doi: 10.1038/nature14539 . URL https://doi.org/10.1038/nature14539 ."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib37",
+      "text": "Likhosherstov et al. (2022) Valerii Likhosherstov, Krzysztof Marcin Choromanski, Kumar Avinava Dubey, Frederick Liu, Tamás Sarlós, and Adrian Weller. Chefs’ random tables: Non-trigonometric random features. In NeurIPS , 2022. URL http://papers.nips.cc/paper_files/paper/2022/hash/df2d62b96a4003203450cf89cd338bb7-Abstract-Conference.html ."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib53",
+      "text": "Sitzmann et al. (2020) Vincent Sitzmann, Julien N.P. Martel, Alexander W. Bergman, David B. Lindell, and Gordon Wetzstein. Implicit neural representations with periodic activation functions. In Proc. NeurIPS , 2020."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib6",
+      "text": "Cho & Saul (2011) Youngmin Cho and Lawrence K. Saul. Analysis and extension of arc-cosine kernels for large margin classification. CoRR , abs/1112.3712, 2011. URL http://arxiv.org/abs/1112.3712 ."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib36",
+      "text": "Liang et al. (2021) Tailin Liang, John Glossner, Lei Wang, Shaobo Shi, and Xiaotong Zhang. Pruning and quantization for deep neural network acceleration: A survey, 2021."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib18",
+      "text": "Gou et al. (2021) Jianping Gou, Baosheng Yu, Stephen J. Maybank, and Dacheng Tao. Knowledge distillation: A survey. Int. J. Comput. Vision , 129(6):1789–1819, jun 2021. ISSN 0920-5691. doi: 10.1007/s11263-021-01453-z . URL https://doi.org/10.1007/s11263-021-01453-z ."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib15",
+      "text": "Gholami et al. (2021) Amir Gholami, Sehoon Kim, Zhen Dong, Zhewei Yao, Michael W. Mahoney, and Kurt Keutzer. A survey of quantization methods for efficient neural network inference. CoRR , abs/2103.13630, 2021. URL https://arxiv.org/abs/2103.13630 ."
+    }
+  ]
+}

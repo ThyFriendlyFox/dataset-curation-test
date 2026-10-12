@@ -1,0 +1,50 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.00743",
+  "title": "Neural Acceleration of Incomplete Cholesky Preconditioners",
+  "authors": "Joshua Dennis Booth, Hongyang Sun, Trevor Garnett",
+  "year": "2024",
+  "categories": [
+    "cs.DC",
+    "cs.NA",
+    "math.NA"
+  ],
+  "url": "https://arxiv.org/abs/2403.00743",
+  "html_url": "https://arxiv.org/html/2403.00743",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 597,
+  "text": "Scientific applications in many domains depend on the solution of sparse linear systems. While traditional Gaussian elimination-based methods (i.e., direct methods for factorizing) offer the best numerical stability, iterative methods dominate implementations in distributed-memory systems and accelerators (i.e., GPUs). The reason is that iterative methods require less memory and utilize vectorized operations in many cases. A common iterative method for symmetric positive definite (SPD) systems is the Preconditioned Conjugate Gradient method (PCG) [1,2] as it only relies on sparse matrix-vector multiplication (SpMV) and sparse triangular solve (Stri). However, the question of generating “good” preconditioners for a generic SPD system can be more of an art than a science. Incomplete sparse factorization methods, e.g., incomplete Cholesky, are black box methods that are typically used to generate these preconditioners. These methods normally require trying techniques such as scaling, shifting, and identifying fill-in to achieve the desired reduction in iterations. However, the algorithm of incomplete factorization tends to be difficult to parallelize due to the low computational intensity, i.e., the ratio of the number of floating point operations to memory accesses [3]. In this work, we explore the use of neural acceleration to generate a preconditioner in order to automate this process for scientific application users and better utilize the heterogeneous computing environments common in high-performance computing.\n\nNeural acceleration is the method of replacing key computationally expensive kernels in code with very simple and cheap artificial neural networks [4,5]. The idea is aimed at modern workloads that execute on heterogeneous systems. These systems commonly contain GPU accelerators that are optimized for the dense tensor computations utilized in training neural networks. These neural networks are small enough to easily be trained and executed during compile time or in parallel to the application. In order to utilize neural acceleration, the coder flags functions that are computationally expensive but may not suffer from being approximated by a neural network. Normally, a small amount of information is provided about the function, such as expected inputs, outputs, and computational flow. A cheap neural network is then trained on the GPU. At the time of execution, the neural network can be utilized on the GPU in place of the function call.\n\nThe use of neural acceleration for generating a preconditioner is ideal as these preconditioners are normally an approximation of the input sparse matrix and the computation of the preconditioner can be less than ideal due to low computational intensity. Moreover, many techniques are being developed for sparse computations of neural networks on GPUs due to the growing importance of graph neural networks [6]. However, the question exists if a neural network could be utilized in this relatively simple manner. In order to explore this, we consider the case of generating a preconditioner for PCG based on the computational flow of incomplete Cholesky factorization.\n\nIn particular, we explore a neural acceleration method for generating an incomplete Cholesky factorization with zero fill-in that performs as good as or better than a tuned incomplete Cholesky factorization without the overhead of trying different techniques. As such, our method works as a black box for a wide range of sparse matrices and works for our own test suite of sparse matrices while most traditional methods fail in some cases. Our contributions are as follows:\n\n- • A method to generate a high-quality preconditioner with a given sparsity pattern using neural networks (Section III);\n\n- • A comparison of our method to other standard incomplete factorization methods that utilize a given sparsity pattern (Section V);\n\n- • An analysis of timing costs to justify the use of neural acceleration (Section VI);",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "M. R. Hestenes and E. Stiefel, “Methods of conjugate gradients for solving linear systems,” Journal of research of the National Bureau of Standards , vol. 49, pp. 409–436, 1952."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "Y. Saad, Iterative Methods for Sparse Linear Systems , 2nd ed. Philadelphia, PA, USA: Society for Industrial and Applied Mathematics, 2003."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "J. D. Booth and G. Bolet, “An on-node scalable sparse incomplete LU factorization for a many-core iterative solver with javelin,” Parallel Comput. , vol. 94-95, p. 102622, 2020."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "H. Esmaeilzadeh, A. Sampson, L. Ceze, and D. Burger, “Neural acceleration for general-purpose approximate programs,” Communications of the ACM , vol. 58, no. 1, pp. 105–115, 2014."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "A. Yazdanbakhsh, J. Park, H. Sharma, P. Lotfi-Kamran, and H. Esmaeilzadeh, “Neural acceleration for gpu throughput processors,” in 2015 48th Annual IEEE/ACM International Symposium on Microarchitecture (MICRO) , 2015, pp. 482–493."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "K. Kiningham, P. Levis, and C. Ré, “Grip: A graph neural network accelerator architecture,” IEEE Transactions on Computers , vol. 72, no. 4, pp. 914–925, 2023."
+    }
+  ]
+}

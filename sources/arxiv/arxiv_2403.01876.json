@@ -1,0 +1,63 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.01876",
+  "title": "DÃ©jÃ Vu: KV-cache Streaming for Fast, Fault-tolerant Generative LLM Serving",
+  "authors": "Foteini Strati, Sara Mcallister, Amar Phanishayee, Jakub Tarnawski, Ana Klimovic",
+  "year": "2024",
+  "categories": [
+    "cs.DC"
+  ],
+  "url": "https://arxiv.org/abs/2403.01876",
+  "html_url": "https://arxiv.org/html/2403.01876",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 566,
+  "text": "Large Language Models (LLMs) like GPT-3 [1], OPT [2] and BLOOM [3] are widely used in chatbots [4], code generation, and text summarization [5]. Two key trends in generative LLM inference have changed the landscape of ML model serving. First, large model sizes, input sequence lengths, and consequently large intermediate inference state lead to high memory footprint for LLM inference. Figure 1 shows the GPU memory required to serve various generative LLMs with a 2K sequence length; their memory footprint greatly exceeds the capacity of a single GPU, mandating parallelization across many high-end GPUs (including tensor-model and pipeline parallel execution). Second, for low latency serving, these LLMs use a Key-Value Cache to store prior computations as individual tokens are generated for each request [6]. While ML inference is traditionally stateless, the use of KV cache makes generative LLM inference stateful.\n\nGiven these trends, we identify three key challenges in stateful, distributed large-scale LLM serving. First, we observe a substantial latency discrepancy (up to 2 orders of magnitude) between two phases of LLM serving, which leads to expensive GPU underutilization. Prompt processing depends on the input size and is compute bound. Meanwhile, token generation is memory bandwidth-bound and the time to generate a token is nearly constant when using the KV cache. Processing both prompts and tokens in the same pipeline introduces pipeline bubbles, where GPUs idle.\n\nSecond, state-of-the-art LLM serving systems like FasterTransformer vastly overprovision the KV cache in pipeline parallel setups by allocating GPU memory for all microbatches upfront [7]. Since the KV cache is only used by one microbatch at a time, there is an opportunity to allocate GPU memory more efficiently.\n\nThird, existing LLM serving systems do not efficiently handle failures or preemptions, which often occur in large-scale GPU deployments [8,9]. Upon a failure, the LLM serving system crashes and stalls all in-flight requests. When KV cache state is lost, current systems process requests from scratch. These redundant computations severely increase end-to-end request latency.\n\nTo address the above challenges for pipeline-parallel distributed inference, we propose DéjàVu, an efficient and fault-tolerant LLM serving system, based on KV cache streaming. First, DéjàVu disaggregates prompt processing from token generation and optimizes the number of machines for each stage to satisfy GPU memory capacity constraints and avoid GPU idle times. Second, to effectively use GPU memory capacity, DéjàVu swaps KV cache state per-microbatch between the GPU and CPU, maximizing GPU memory allocation for each microbatch being processed. Third, DéjàVu replicates KV cache state to avoid losing state and employs fast recovery mechanism to minimize lost work on failures.\n\nThe core component in DéjàVu that enables all these optimizations is an efficient and versatile KV cache streaming library, DéjàVuLib. We build DéjàVuLib as a modular set of primitives that enable fast streaming for diverse configurations, such as streaming between local or remote machines and for a variety of different KV cache structures.\n\nWe evaluate DéjàVu under different use cases. In pipeline parallel setups without failures, DéjàVu improves LLM serving throughput by up to 2 \\times compared to FasterTransformer. We show that DéjàVu microbatch swapping can improve throughput by up to 1.8 \\times by accommodating larger batch size for models that already fit in the given deployment. This enables serving even larger models that might not fit using existing state-of-the-art LLM systems. In the presence of system failures, DéjàVu reduces microbatch latency by 1.54 \\times compared to non-fault-tolerant systems.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib4",
+      "text": "Brown et al. (2020) Tom Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared D Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, Sandhini Agarwal, Ariel Herbert-Voss, Gretchen Krueger, Tom Henighan, Rewon Child, Aditya Ramesh, Daniel Ziegler, Jeffrey Wu, Clemens Winter, Chris Hesse, Mark Chen, Eric Sigler, Mateusz Litwin, Scott Gray, Benjamin Chess, Jack Clark, Christopher Berner, Sam McCandlish, Alec Radford, Ilya Sutskever, and Dario Amodei. Language models are few-shot learners. In H. Larochelle, M. Ranzato, R. Hadsell, M.F. Balcan, and H. Lin, editors, Advances in Neural Information Processing Systems , volume 33, pages 1877–1901. Curran Associates, Inc., 2020. URL https://proceedings.neurips.cc/paper_files/paper/2020/file/1457c0d6bfcb4967418bfb8ac142f64a-Paper.pdf ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib33",
+      "text": "Zhang et al. (2022) Susan Zhang, Stephen Roller, Naman Goyal, Mikel Artetxe, Moya Chen, Shuohui Chen, Christopher Dewan, Mona Diab, Xian Li, Xi Victoria Lin, Todor Mihaylov, Myle Ott, Sam Shleifer, Kurt Shuster, Daniel Simig, Punit Singh Koura, Anjali Sridhar, Tianlu Wang, and Luke Zettlemoyer. Opt: Open pre-trained transformer language models, 2022."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib30",
+      "text": "Workshop (2023) BigScience Workshop. Bloom: A 176b-parameter open-access multilingual language model, 2023."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib22",
+      "text": "OpenAI (2023) OpenAI. Openai developer platform. https://platform.openai.com/overview , 2023."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib9",
+      "text": "Github (2023) Github. Github copilot. https://github.com/features/copilot , 2023."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib13",
+      "text": "Kwon et al. (2023) Woosuk Kwon, Zhuohan Li, Siyuan Zhuang, Ying Sheng, Lianmin Zheng, Cody Hao Yu, Joseph Gonzalez, Hao Zhang, and Ion Stoica. Efficient memory management for large language model serving with pagedattention. In Proceedings of the 29th Symposium on Operating Systems Principles , SOSP ’23, page 611–626, New York, NY, USA, 2023. Association for Computing Machinery. ISBN 9798400702297. doi: 10.1145/3600006.3613165 . URL https://doi.org/10.1145/3600006.3613165 ."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib20",
+      "text": "NVIDIA (2023b) NVIDIA. Nvidia fastertransformer. https://github.com/NVIDIA/FasterTransformer , 2023b."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "Eisenman et al. (2022) Assaf Eisenman, Kiran Kumar Matam, Steven Ingram, Dheevatsa Mudigere, Raghuraman Krishnamoorthi, Krishnakumar Nair, Misha Smelyanskiy, and Murali Annavaram. Check-N-Run: a checkpointing system for training deep learning recommendation models. In 19th USENIX Symposium on Networked Systems Design and Implementation (NSDI 22) , pages 929–943, Renton, WA, April 2022. USENIX Association. ISBN 978-1-939133-27-4. URL https://www.usenix.org/conference/nsdi22/presentation/eisenman ."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib10",
+      "text": "Jeon et al. (2019) Myeongjae Jeon, Shivaram Venkataraman, Amar Phanishayee, Junjie Qian, Wencong Xiao, and Fan Yang. Analysis of Large-Scale Multi-Tenant GPU clusters for DNN training workloads. In 2019 USENIX Annual Technical Conference (USENIX ATC 19) , pages 947–960, Renton, WA, July 2019. USENIX Association. ISBN 978-1-939133-03-8. URL https://www.usenix.org/conference/atc19/presentation/jeon ."
+    }
+  ]
+}

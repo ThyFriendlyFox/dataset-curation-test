@@ -1,0 +1,168 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2401.02880",
+  "title": "Lotto: Secure Participant Selection against Adversarial Servers in Federated Learning",
+  "authors": "Zhifeng Jiang, Peng Ye, Shiqi He, Wei Wang, Ruichuan Chen, Bo Li",
+  "year": "2024",
+  "categories": [
+    "cs.CR"
+  ],
+  "url": "https://arxiv.org/abs/2401.02880",
+  "html_url": "https://arxiv.org/html/2401.02880",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 914,
+  "text": "Edge devices, such as smartphones and laptops, are becoming increasingly powerful and can collaborate to build high-quality machine learning (ML) models using data collected on the devices [1]. To protect data privacy, major companies like Google and Apple have adopted federated learning (FL) [2] for tasks in computer vision (CV) and natural language processing (NLP) across client devices [3,4,5]. In FL, a server dynamically samples a small subset of clients from a large population in each training round. The sampled clients, aka participants, compute individual local updates using their own data and upload only the updates to the server for global aggregation, without revealing the training data [6].\n\nHowever, simply keeping client data undisclosed is insufficient to preserve data privacy. Recent studies have shown that sensitive data can be leaked through individual updates during FL training [7,8,9,10,11], and it is also possible to infer a client’s data from trained models [12,13,14,15] by exploiting their ability to memorize information [13,14]. To minimize data leakage, current FL systems use secure aggregation techniques [16,6,17] to ensure that adversaries only learn the aggregated updates, not individual ones. Additionally, these systems may employ distributed differential privacy (DP) [18,19,20] to limit the extent of data leakage from the aggregated update (section 2.2). Since the server may not always be trusted, these privacy-enhancing techniques commonly assume that the majority of the participants act honestly and can jointly detect and prevent server misbehavior.\n\nNonetheless, this assumption may not hold in practice – an adversarial server can strategically select compromised clients with whom it colludes, resulting in a practical attack. While the overall client population is large, the number of participants selected in each round is often limited to a few hundred for efficiency reasons [6]. Consequently, even if the majority of the population is honest (e.g., 99% out of 100,000 clients), the server can still select enough adversaries to create a dishonest majority among participants.\n\nThe presence of a dishonest majority undermines the downstream privacy-enhancing techniques, leading to significant security vulnerabilities. As shown in section 2.3, the privacy guarantees provided by distributed DP degrade rapidly as the dishonest cohort expands [18,19,20]. Additionally, secure aggregation can only tolerate a certain proportion of clients colluding with the server; exceeding this limit would enable the adversary to reconstruct a client’s update [16]. It is hence crucial to prevent the server from maliciously manipulating the client selection process.\n\nDespite its importance, this problem remains largely unaddressed in the literature. The main challenge arises from the use of a central server in the cross-device FL scenarios [1]. In the absence of efficient peer-to-peer communication across a vast array of heterogeneous devices [21,22], the server acts as a central hub for facilitating message exchanges between clients. Since the server is untrusted, an honest client lack a reliable view of other clients, such as their availability, utility, and integrity. Consequently, it is difficult for a client to verify whether the server has correctly executed the prescribed participant selection algorithm, as this requires the true knowledge of and/or inputs from other clients.\n\nIn this paper, we present Lotto, a novel framework that enables secure participant selection in FL for the first time. Lotto aims to provide the following desired property: among the selected participants, the proportion of the compromised ones approximately aligns with the base rate of dishonest clients in the overall population. Lotto uses verifiable randomness in the selection process.\n\nSpecifically, to achieve secure random selection [2], Lotto allows each client in the population to determine its participation in a training round by computing verifiable random functions (VRFs) [23,24] using its secret key and public inputs. When a client chooses to participate, Lotto collects the generated randomness and the associated VRF proof, which can be verified by other participants to ensure the integrity and validity of the randomness. This approach ensures that each client’s participation is provably independent, fair, and unpredictable for other clients. However, it is still possible for an adversarial server to exploit this process and increase the number of dishonest clients by, for example, sending incorrect and/or a selectively chosen messages. To mitigate such misconduct, Lotto lets honest clients verify critical messages, adding an additional layer of security. Lotto provably ensures that the compromised fraction of selected participants remains close to the base rate in the population (section 3.4).\n\nLotto also provides security guarantee for more advanced algorithms, referred to as informed selection, which are commonly used in FL to select the best-performing participants for optimal training efficiency [25,26,27,28,29,30]. These algorithms rely on client-specific measurements, such as processing speed and data quality, which are difficult to verify. Instead of precisely following the selection logic of these algorithms, Lotto approximates them by transforming an informed selection problem into a random one. To achieve this, it lets the server refine the client pool by excluding a small fraction of low-quality clients based on the specified measurements. Lotto then performs secure random selection within the refined pool. Although an adversarial server may attempt to manipulate this process by excluding honest clients, the security of Lotto’s random selection ensures that any advantage it gains is provably small (section 3.5).\n\nWe have implemented Lotto as a library (section 4) and evaluated its performance with various FL tasks in a large EC2 cluster configured to emulate a cross-device scenario (section 5). Compared to insecure selection algorithms, Lotto slightly increases the duration of each training round by less than 10% while achieving comparable or even better time-to-accuracy performance and inducing negligible network cost.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib36",
+      "text": "Peter Kairouz, H Brendan McMahan, Brendan Avent, Aurélien Bellet, Mehdi Bennis, Arjun Nitin Bhagoji, Keith Bonawitz, Zachary Charles, Graham Cormode, Rachel Cummings, et al. Advances and open problems in federated learning. Foundations and Trends in Machine Learning , 14(1), 2021."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib44",
+      "text": "Brendan McMahan, Eider Moore, Daniel Ramage, Seth Hampson, and Blaise Aguera y Arcas. Communication-efficient learning of deep networks from decentralized data. In AISTATS , 2017."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib31",
+      "text": "Filip Granqvist, Matt Seigel, Rogier Van Dalen, Aine Cahill, Stephen Shum, and Matthias Paulik. Improving on-device speaker verification using federated learning with privacy. In Interspeech , 2020."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib56",
+      "text": "Congzheng Song, Filip Granqvist, and Kunal Talwar. Flair: Federated learning annotated image repository. In NeurIPS , 2022."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib66",
+      "text": "Zheng Xu, Yanxiang Zhang, Galen Andrew, Christopher A Choquette-Choo, Peter Kairouz, H Brendan McMahan, Jesse Rosenstock, and Yuanbo Zhang. Federated learning of gboard language models with differential privacy. In ACL , 2023."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib11",
+      "text": "Keith Bonawitz, Hubert Eichner, Wolfgang Grieskamp, Dzmitry Huba, Alex Ingerman, Vladimir Ivanov, Chloe Kiddon, Jakub Konečnỳ, Stefano Mazzocchi, H Brendan McMahan, et al. Towards federated learning at scale: System design. In MLSys , 2019."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib28",
+      "text": "Jonas Geiping, Hartmut Bauermeister, Hannah Dröge, and Michael Moeller. Inverting gradients-how easy is it to break privacy in federated learning? In NeurIPS , 2020."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib68",
+      "text": "Hongxu Yin, Arun Mallya, Arash Vahdat, Jose M Alvarez, Jan Kautz, and Pavlo Molchanov. See through gradients: Image batch recovery via gradinversion. In CVPR , 2021."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib64",
+      "text": "Junxiao Wang, Song Guo, Xin Xie, and Heng Qi. Protect privacy from gradient leakage attack in federated learning. In INFOCOM , 2022."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib71",
+      "text": "Joshua C Zhao, Atul Sharma, Ahmed Roushdy Elkordy, Yahya H Ezzeldin, Salman Avestimehr, and Saurabh Bagchi. Secure aggregation in federated learning is not private: Leaking user data at large scale through model modification. In arXiv:2303.12233 , 2023."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib69",
+      "text": "Kai Yue, Richeng Jin, Chau-Wai Wong, Dror Baron, and Huaiyu Dai. Gradient obfuscation gives a false sense of security in federated learning. In Security , 2023."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib53",
+      "text": "Reza Shokri, Marco Stronati, Congzheng Song, and Vitaly Shmatikov. Membership inference attacks against machine learning models. In S&P , 2017."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib16",
+      "text": "Nicholas Carlini, Chang Liu, Úlfar Erlingsson, Jernej Kos, and Dawn Song. The secret sharer: Evaluating and testing unintended memorization in neural networks. In Security , 2019."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib57",
+      "text": "Congzheng Song and Vitaly Shmatikov. Auditing data provenance in text-generation models. In KDD , 2019."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib46",
+      "text": "Milad Nasr, Reza Shokri, and Amir Houmansadr. Comprehensive privacy analysis of deep learning: Passive and active white-box inference attacks against centralized and federated learning. In S&P , 2019."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib12",
+      "text": "Keith Bonawitz, Vladimir Ivanov, Ben Kreuter, Antonio Marcedone, H Brendan McMahan, Sarvar Patel, Daniel Ramage, Aaron Segal, and Karn Seth. Practical secure aggregation for privacy-preserving machine learning. In CCS , 2017."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib8",
+      "text": "James Henry Bell, Kallista A Bonawitz, Adrià Gascón, Tancrède Lepoint, and Mariana Raykova. Secure single-server aggregation with (poly) logarithmic overhead. In CCS , 2020."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib35",
+      "text": "Peter Kairouz, Ziyu Liu, and Thomas Steinke. The distributed discrete gaussian mechanism for federated learning with secure aggregation. In ICML , 2021."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib6",
+      "text": "Naman Agarwal, Peter Kairouz, and Ziyu Liu. The Skellam mechanism for differentially private federated learning. In NeurIPS , 2021."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib58",
+      "text": "Timothy Stevens, Christian Skalka, Christelle Vincent, John Ring, Samuel Clark, and Joseph Near. Efficient differentially private secure aggregation for federated learning via hardness of learning with errors. In Security , 2022."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib67",
+      "text": "Chengxu Yang, Qipeng Wang, Mengwei Xu, Zhenpeng Chen, Kaigui Bian, Yunxin Liu, and Xuanzhe Liu. Characterizing impacts of heterogeneity in federated learning upon large-scale smartphone data. In WWW , 2021."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib38",
+      "text": "Fan Lai, Yinwei Dai, Sanjay Singapuram, Jiachen Liu, Xiangfeng Zhu, Harsha Madhyastha, and Mosharaf Chowdhury. Fedscale: Benchmarking model and system performance of federated learning at scale. In ICML , 2022."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib23",
+      "text": "Yevgeniy Dodis and Aleksandr Yampolskiy. A verifiable random function with short proofs and keys. In PKC , 2005."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib45",
+      "text": "Silvio Micali, Michael Rabin, and Salil Vadhan. Verifiable random functions. In FOCS , 1999."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib70",
+      "text": "Wenyu Zhang, Xiumin Wang, Pan Zhou, Weiwei Wu, and Xinglin Zhang. Client selection for federated learning with non-iid data in mobile edge computing. IEEE Access , 9:24462–24474, 2021."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib47",
+      "text": "Takayuki Nishio and Ryo Yonetani. Client selection for federated learning with heterogeneous resources in mobile edge. In ICC , 2019."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib61",
+      "text": "Hao Wang, Zakhary Kaplan, Di Niu, and Baochun Li. Optimizing federated learning on non-iid data with reinforcement learning. In INFOCOM , 2020."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib17",
+      "text": "Zheng Chai, Ahsan Ali, Syed Zawad, Stacey Truex, Ali Anwar, Nathalie Baracaldo, Yi Zhou, Heiko Ludwig, Feng Yan, and Yue Cheng. Tifl: A tier-based federated learning system. In HPDC , 2020."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib39",
+      "text": "Fan Lai, Xiangfeng Zhu, Harsha V Madhyastha, and Mosharaf Chowdhury. Oort: Efficient federated learning via guided participant selection. In OSDI , 2021."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib37",
+      "text": "Young Geun Kim and Carole-Jean Wu. Autofl: Enabling heterogeneity-aware energy efficient federated learning. In MICRO , 2021."
+    }
+  ]
+}

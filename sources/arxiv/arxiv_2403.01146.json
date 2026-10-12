@@ -1,0 +1,78 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.01146",
+  "title": "Mutation Analysis with Execution Taints",
+  "authors": "Rahul Gopinath, Philipp Goerz",
+  "year": "2024",
+  "categories": [
+    "cs.SE"
+  ],
+  "url": "https://arxiv.org/abs/2403.01146",
+  "html_url": "https://arxiv.org/html/2403.01146",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 964,
+  "text": "Mutation analysis is the gold standard for evaluating the quality of software test suites. It is one of the very few techniques that can actually evaluate the quality of oracles provided by software test suites. Unfortunately, mutation analysis is also one of the most costly methods for test suite evaluation. The problem is that traditional mutation analysis requires generation and independent evaluation of each syntactic variant (mutant) by the test suite [1]. This means that one needs to execute the entire test suite as many times as the number of mutants at worst. This can be reduced to some extent by running each test case only on those mutants whose mutation site is covered by the test case [2]. However, this still leaves a large number of mutants to evaluate independently. For example, Fig. 1 includes four possible mutations: m_{1} in Line 4, m_{2} and m_{3} in Line 7 and m_{4} in Line 14. With traditional mutation analysis (Fig. 2(a)), this would require five executions including the execution of original to determine coverage of the test suite, and four from each of the four mutants.\n\nNumerous previous researchers have noticed that traditional mutation analysis is highly redundant, and significant execution cost savings can be achieved if one can eliminate some of these redundancies. Researchers have focused on eliminating these redundancies to make mutation analysis more efficient. Just and Fraser [3] showed that not all the mutants need to be executed independently. Some mutants result in the same value, and hence the same infected state, and only some of these are propagated. Hence, one can partition states resulting from mutations, and only those resulting in unique propagated states need to be evaluated independently. For example, in Fig. 1, when INPUT=1, execution of m_{1} results in the same state as the original. Hence, the partitioned state execution (Fig. 2(b)) skips the execution of M_{1}.\n\nIn split-stream execution [4,5,6], a mutant is forked when the mutation is executed at runtime, which shares the execution path until the execution of the mutation. For example, when one executes the program (Fig. 1) with say INPUT=1, at each mutation, a new process is spawned. This results in a total of four new processes at the end (Fig. 2(c)), but with the initial execution until the mutation shared with the original.\n\nThe equivalence-modulo state approach [7] is the latest such technique, and it combines the advantages of state-partitioning and split-stream executions. The idea is to fork only if the mutation leads to a new unique state. This technique is even more efficient, skipping M_{1} and sharing the execution path between original and also between mutants (Fig. 2(d)).\n\nThat is, the current state of the art [7] is very efficient in eliminating the causes of redundant execution until the point where mutations cause a divergence in state. However, the biggest cause of redundancy of execution is not the pre-divergence execution. There is no solution yet for avoiding redundant execution in the post-divergence execution phase when a forked execution restarts following the execution of the original. For example, the modulo-state execution (Fig. 2(d)) forks a new mutant process from the original after executing Line 7 and this mutant process forks again in the second loop when M_{3} and M_{4} diverge. However, in each of these processes, the function process(i) is called with exactly the same arguments because i is never mutated in these mutants.\n\nIn this paper, we propose mutation analysis with execution taints as a way to achieve much lower redundancy than previously known methods. Our proposal is based on three observations:\n\nThe first observation is that many mutants do not produce a change in the control-flow from the original. For example, in Fig. 1, the line Line 7 is mutated in mutants M2 and M3 resulting in different values for a. Even though the value of a is different in the original and mutants, since a never influences the control-flow, the actual execution flow of the original and the mutant is exactly the same. That is, except for the values affected by the mutation, the other steps of execution are the same. Hence, one can reduce the cost of mutation analysis if such common execution steps can be shared between such mutants and the original program.\n\nOur second observation is that for such mutations that does not change control flow, one can consider the mutation to have introduced a unique taint in the computation, and this taint can be propagated dynamically to any values using the results of the computation using standard taint propagation through dynamic data-flow. Such taints can be propagated using standard techniques in most languages even if the language runtime does not have direct support for taint propagation [11,12]. We do not simply propagate a taint flag. As long as there is no control-flow divergence, we propagate the results of computations involving mutations in the same taint. We call such taints value taints of corresponding values. The computations involving such value taints are called execution taints of the main computation.\n\nOur third observation is that even when there is a control-flow divergence, it is possible to limit the impact of diverged control-flow to the function containing the mutation using merge-back of execution and judicious use of memoization.\n\nUsing these three observations, our technique (Fig. 2(e)) can perform extremely efficient mutation analysis limiting both pre and post mutation redundancies.\n\n## Contributions\n\n- • We propose a complete framework for avoiding redundancy in mutant execution including both pre-divergence and post-divergence stages.\n\n- • Our execution taints is a lightweight mechanism that repurposes dynamic data-flow taints for mutation analysis.\n\n- • We propose a novel memoization strategy for sharing computational results across mutants.\n\n- • We propose a comprehensive solution to the problem of sharing single-use resources by mutants during forking.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "R. Gopinath, “On the limits of mutation analysis,” dissertation, Oregon State University, 2017. [Online]. Available: https://rahul.gopinath.org/resources/icse2016/gopinath2016on.pdf"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "D. Schuler and A. Zeller, “Javalanche: Efficient mutation testing for java,” in Proceedings of the 7th joint meeting of the European software engineering conference and the ACM SIGSOFT symposium on The foundations of software engineering , 2009, pp. 297–298."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "R. Just, M. D. Ernst, and G. Fraser, “Efficient mutation analysis by propagating and partitioning infected execution states,” in Proceedings of the 2014 International Symposium on Software Testing and Analysis . ACM, 2014, pp. 315–326."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "K. N. King and A. J. Offutt, “A fortran language system for mutation-based software testing,” Software: Practice and Experience , vol. 21, no. 7, pp. 685–718, 1991."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "R. Gopinath, C. Jensen, and A. Groce, “Topsy-turvy: a smarter and faster parallelization of mutation analysis,” in Proceedings of the 38th International Conference on Software Engineering Companion , 2016, pp. 740–743."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "S. Tokumoto, H. Yoshida, K. Sakamoto, and S. Honiden, “Muvm: Higher order mutation analysis virtual machine for c,” in 2016 IEEE International Conference on Software Testing, Verification and Validation (ICST) . IEEE, 2016, pp. 320–329."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "B. Wang, Y. Xiong, Y. Shi, L. Zhang, and D. Hao, “Faster mutation analysis via equivalence modulo states,” in Proceedings of the 26th ACM SIGSOFT International Symposium on Software Testing and Analysis , 2017, pp. 295–306."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "J. Allen, “Perl version 5.8. 8 documentation-perlsec,” http://perldoc.perl.org/perlsec.pdf , 2006, accessed: 2018-07-30."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "B. Livshits, “Dynamic taint tracking in managed runtimes,” https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/tr-6.pdf , Microsoft Research Technical Report, Tech. Rep. MSR-TR-2012-114, 2012."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "V. Haldar, D. Chandra, and M. Franz, “Dynamic taint propagation for java,” in 21st Annual Computer Security Applications Conference (ACSAC’05) . IEEE, 2005, pp. 9–pp."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "J. J. Conti and A. Russo, “A taint mode for python via a library,” in Nordic Conference on Secure IT Systems . Springer, 2010, pp. 210–222."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "A. Zeller, R. Gopinath, M. Böhme, G. Fraser, and C. Holler, “Tracking information flow,” in The Fuzzing Book . CISPA Helmholtz Center for Information Security, 2021, retrieved 2021-11-13 17:58:11+01:00. [Online]. Available: https://www.fuzzingbook.org/html/InformationFlow.html"
+    }
+  ]
+}

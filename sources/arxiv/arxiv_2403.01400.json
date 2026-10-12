@@ -1,0 +1,119 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.01400",
+  "title": "Decoupling Weighing and Selecting for Integrating Multiple Graph Pre-training Tasks",
+  "authors": "Tianyu Fan, Lirong Wu, Yufei Huang, Haitao Lin, Cheng Tan, Zhangyang Gao, Stan Z. Li",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.AI"
+  ],
+  "url": "https://arxiv.org/abs/2403.01400",
+  "html_url": "https://arxiv.org/html/2403.01400",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 923,
+  "text": "Relationships between entities in various real-world applications, such as social media, molecules, and transportation, can be naturally modeled as graphs. Graph Neural Networks (GNNs) [1,2,3,4,5] have demonstrated their powerful capabilities to handle relation-dependent tasks. However, most of the existing work in GNNs is focused on supervised or semi-supervised settings, which require labeled data and hence are expensive and limited. Recent advances in graph pre-training [6,7,8] are aimed to reduce the need for annotated labels and enable training on massive unlabeled data. The primary purpose of graph pre-training is to extract informative knowledge from massive unlabeled data and the learned knowledge can then be transferred to some specific downstream tasks. While hundreds of graph pre-training tasks have been proposed in this regard [9,10,11,12,13,14], as shown in Fig. 1(a), there is no single pre-training task that performs best for all datasets.\n\nTherefore, integrating or more specifically linearly weighing multiple tasks, has emerged as a more effective approach than designing more complex tasks. For example, AutoSSL [15] combines the weights of task losses based on a pseudo-homophily measure, and ParetoGNN [16] reconciles pre-training tasks by dynamically assigning weights that promote the Pareto optimality. Another related work is AUX-TS [17], which also adaptively combines different tasks, but this combination appears in the fine-tuning stage. However, all three works perform task weighing in a global manner, ignoring the fact that different instances (e.g., nodes in a social network or graphs in a molecular dataset) may have their own specificities. To solve this, AGSSL [18] has been proposed to learn instance-level task weighing strategies during the fine-tuning stage. Nonetheless, these works to weigh all tasks focus only on the importance issue, but ignore the compatibility issue, i.e., the possible conflicts between different tasks, which cannot be resolved by simply weighing all tasks. More seriously, as the task pool expands, compatibility issue becomes more severe, which deprives existing methods of the ability to keep gaining performance growth. Therefore, it is necessary to select some tasks to solve it. In addition, previous works have only evaluated their effectiveness on node-level tasks but neglected graph-level tasks. We have summarized the properties of these methods in Table. 1 and compared them with WAS.\n\nWe would like to raise several issues through investigation on several classical graph pre-training tasks, including AttrMask (AM), ContextPred (CP) [10], EdgePred (EP) [1], GPT-GNN [19], GraphCL [12], GraphLoG [20], and InfoGraph (IG) [9], as shown in Fig. 1(c). Let us first draw an interesting conclusion: both importance weighing and task selecting of tasks are quite important, where the former addresses the issue of task importance, while the latter addresses the issue of task compatibility.\n\nFig. 1(b) compares the performance under varying importance weights \\lambda when combining AM and CP. We can see that the best performance is achieved at \\lambda\\!=\\!0.4. While task weighing focuses on the importance of each task, it neglects compatibility between different tasks, which limits existing methods from achieving higher performance. The results in Fig. 1(c) illustrate the huge impact of the compatibility issue when integrating multiple tasks. It can be seen that not all combinations can bring performance improvements, and some of them even degrade performance (combination of AM and GraphCL brings a -7.08 drop), which highlights the necessity of selecting suitable task combinations. Note that Fig. 1(c) shows only the combination between two tasks. As the task pool expands, such combinations become more complex, and conflicts between different tasks may become more severe.\n\nBased on the above investigations, here we would like to ask: How to address the importance and compatibility issues between different tasks when integrating them during the fine-tuning stage? We identified two key issues in the combining process: (1) task selecting – how to select an optimal combination from a given task pool based on the task compatibility, (2) importance weighing – how to weigh the importance of the selected tasks. These two are obviously related or collaborative. More important tasks should be selected more, but selecting tasks based solely on importance can lead to severe task conflicts. While previous works, AutoSSL, ParetoGNN, AUX-TS, and AGSSL, have focused on importance weighing, they have all overlooked task selecting, which has deprived them of the ability to keep gaining performance growth as the task pool grows larger.\n\nIn this paper, we propose a novel framework, W eigh A nd S elect (WAS) for task selecting and importance weighing. The two collaborative processes are combined in decoupled siamese networks, where (1) an optimal combination of tasks is selected for each instance based on a sampling distribution calculated based on the task compatibility, and (2) task weights are then calculated for the selected tasks according to their importance. To the best of our knowledge, this work is the first attempt to use the weighing & selecting strategy for integrating multiple graph pre-training tasks. Extensive experiments on 16 datasets show that WAS can achieve comparable performance to other leading counterparts for both node-level and graph-level tasks. Our contributions are summarized as follows: (1) We show the limitations of current weighing -only schemes and demonstrate the importance of task selecting process. (2) To the best of our knowledge, we are the first to identify two important collaborative processes: select and weigh; we provide extensive experiments to explain in detail why the collaboration of the two is important, how it differs from the weighing -only based methods and why do the two processes need to be decoupled. (3) We propose a novel framework to adaptively, dynamically, and compatibly select and weigh multiple pre-training tasks for each instance separately.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib5",
+      "text": "Hamilton et al. (2017) William L Hamilton, Rex Ying, and Jure Leskovec. Inductive representation learning on large graphs. arXiv preprint arXiv:1706.02216 , 2017."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib47",
+      "text": "Veličković et al. (2017) Petar Veličković, Guillem Cucurull, Arantxa Casanova, Adriana Romero, Pietro Lio, and Yoshua Bengio. Graph attention networks. arXiv preprint arXiv:1710.10903 , 2017."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib56",
+      "text": "Wu et al. (2023a) Lirong Wu, Haitao Lin, Bozhen Hu, Cheng Tan, Zhangyang Gao, Zicheng Liu, and Stan Z Li. Beyond homophily and homogeneity assumption: Relation-based frequency adaptive graph neural networks. IEEE Transactions on Neural Networks and Learning Systems , 2023a."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib60",
+      "text": "Wu et al. (2023e) Lirong Wu, Cheng Tan, Zihan Liu, Zhangyang Gao, Haitao Lin, and Stan Z Li. Learning to augment graph structure for both homophily and heterophily graphs. In Joint European Conference on Machine Learning and Knowledge Discovery in Databases , pp. 3–18. Springer, 2023e."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib54",
+      "text": "Wu et al. (2022c) Lirong Wu, Jun Xia, Zhangyang Gao, Haitao Lin, Cheng Tan, and Stan Z Li. Graphmixup: Improving class-imbalanced node classification by reinforcement mixup and self-supervised context prediction. In Joint European Conference on Machine Learning and Knowledge Discovery in Databases , pp. 519–535. Springer, 2022c."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib51",
+      "text": "Wu et al. (2021) Lirong Wu, Haitao Lin, Cheng Tan, Zhangyang Gao, and Stan Z Li. Self-supervised learning on graphs: Contrastive, generative, or predictive. IEEE Transactions on Knowledge and Data Engineering , 2021."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib64",
+      "text": "Xie et al. (2021) Yaochen Xie, Zhao Xu, Zhengyang Wang, and Shuiwang Ji. Self-supervised learning of graph neural networks: A unified review. arXiv preprint arXiv:2102.10757 , 2021."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib28",
+      "text": "Liu et al. (2021c) Yixin Liu, Shirui Pan, Ming Jin, Chuan Zhou, Feng Xia, and Philip S Yu. Graph self-supervised learning: A survey. arXiv preprint arXiv:2103.00111 , 2021c."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib43",
+      "text": "Sun et al. (2019) Fan-Yun Sun, Jordan Hoffmann, Vikas Verma, and Jian Tang. Infograph: Unsupervised and semi-supervised graph-level representation learning via mutual information maximization. arXiv preprint arXiv:1908.01000 , 2019."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib13",
+      "text": "Hu et al. (2020b) Weihua Hu, Bowen Liu, Joseph Gomes, Marinka Zitnik, Percy Liang, Vijay Pande, and Jure Leskovec. Strategies for pre-training graph neural networks. In International Conference on Learning Representations , 2020b. URL https://openreview.net/forum?id=HJlWWJSFDH ."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib78",
+      "text": "Zhu et al. (2020b) Yanqiao Zhu, Yichen Xu, Feng Yu, Qiang Liu, Shu Wu, and Liang Wang. Deep graph contrastive representation learning. arXiv preprint arXiv:2006.04131 , 2020b."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib68",
+      "text": "You et al. (2020a) Yuning You, Tianlong Chen, Yongduo Sui, Ting Chen, Zhangyang Wang, and Yang Shen. Graph contrastive learning with augmentations. In H. Larochelle, M. Ranzato, R. Hadsell, M. F. Balcan, and H. Lin (eds.), Advances in Neural Information Processing Systems , volume 33, pp. 5812–5823. Curran Associates, Inc., 2020a. URL https://proceedings.neurips.cc/paper/2020/file/3fe230348e9a12c13120749e3f9fa4cd-Paper.pdf ."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib74",
+      "text": "Zhang et al. (2020) Hanlin Zhang, Shuai Lin, Weiyang Liu, Pan Zhou, Jian Tang, Xiaodan Liang, and Eric P Xing. Iterative graph self-distillation. arXiv preprint arXiv:2010.12609 , 2020."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib59",
+      "text": "Wu et al. (2023d) Lirong Wu, Haitao Lin, Zihan Liu, Zicheng Liu, Yufei Huang, and Stan Z Li. Homophily-enhanced self-supervision for graph structure learning: Insights and directions. IEEE Transactions on Neural Networks and Learning Systems , 2023d."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib18",
+      "text": "Jin et al. (2021) Wei Jin, Xiaorui Liu, Xiangyu Zhao, Yao Ma, Neil Shah, and Jiliang Tang. Automated self-supervised learning for graphs. arXiv preprint arXiv:2106.05470 , 2021."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib19",
+      "text": "Ju et al. (2022) Mingxuan Ju, Tong Zhao, Qianlong Wen, Wenhao Yu, Neil Shah, Yanfang Ye, and Chuxu Zhang. Multi-task self-supervised graph neural networks enable stronger task generalization. arXiv preprint arXiv:2210.02016 , 2022."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib6",
+      "text": "Han et al. (2021) Xueting Han, Zhenhuan Huang, Bang An, and Jing Bai. Adaptive transfer learning on graph neural networks. In Proceedings of the 27th ACM SIGKDD Conference on Knowledge Discovery & Data Mining , pp. 565–574, 2021."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib52",
+      "text": "Wu et al. (2022a) Lirong Wu, Yufei Huang, Haitao Lin, Zicheng Liu, Tianyu Fan, and Stan Z. Li. Automated graph self-supervised learning via multi-teacher knowledge distillation. arXiv preprint arXiv:2210.02099 , 2022a."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib14",
+      "text": "Hu et al. (2020c) Ziniu Hu, Yuxiao Dong, Kuansan Wang, Kai-Wei Chang, and Yizhou Sun. Gpt-gnn: Generative pre-training of graph neural networks. In Proceedings of the 26th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining , pp. 1857–1867, 2020c."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib66",
+      "text": "Xu et al. (2021) Minghao Xu, Hang Wang, Bingbing Ni, Hongyu Guo, and Jian Tang. Self-supervised graph-level representation learning with local and global structure. In International Conference on Machine Learning , pp. 11548–11558. PMLR, 2021."
+    }
+  ]
+}

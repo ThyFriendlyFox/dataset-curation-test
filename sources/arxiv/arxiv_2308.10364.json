@@ -1,0 +1,114 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2308.10364",
+  "title": "SE(3) Equivariant Augmented Coupling Flows",
+  "authors": "Laurence I. Midgley, Vincent Stimper, Javier AntorÃ¡n, Emile Mathieu, Bernhard SchÃ¶lkopf, JosÃ© Miguel HernÃ¡ndez-Lobato",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "physics.comp-ph"
+  ],
+  "url": "https://arxiv.org/abs/2308.10364",
+  "html_url": "https://arxiv.org/html/2308.10364",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 612,
+  "text": "Modeling the distribution of a molecule’s configurations at equilibrium, known as the Boltzmann distribution, is a promising application of deep generative models [1]. While the unnormalized density of the Boltzmann distribution can be obtained via physical modeling, sampling from it typically requires molecular dynamics (MD) simulations, which are expensive and produce correlated samples. A promising alternative is to rely on surrogate deep generative models, known as Boltzmann generators. We can draw independent samples from these and debias any expectations estimated with the samples via importance weighting. The Boltzmann distribution typically admits rotation and translation symmetries, known as the Special Euclidean group \\mathrm{SE}(3), as well as permutation symmetry. These constraints are important to incorporate into the model as they improve training efficiency and generalization [2,3,4]. Other key desiderata of Boltzmann generators are that they allow for fast sampling and density evaluation. These are necessary for energy-based training, that is, training using the Boltzmann distribution’s unnormalized density [1,5,6]. Training by energy is critical, as it prevents the model quality from being constrained by the quality and quantity of MD samples.\n\nExisting coupling flows which approximate the Boltzmann distribution of molecules are at least partially defined over internal coordinates, i.e. bond distances, bond angles, and dihedral angles [7,8,9,6], which are \\mathrm{SE}(3) invariant. However, the definition of these depends on the molecular graph and they are non-unique for most graphs. Furthermore, models parameterized in internal coordinates struggle to capture interactions among nodes far apart in the graph and cannot capture the permutation invariance of some atoms. Thus, they are not suitable for particle systems such as LJ13 [4]. \\mathrm{SE}(3) equivariance constraints have been applied to continuous normalizing flows (CNFs) operating on Cartesian coordinates [4,10], and to the closely related diffusion models [11,12,13]. These models are built upon \\mathrm{SE}(3) equivariant graph neural networks (GNNs) [14,15,3]. These architectures can be applied to any molecular graph [16], enabling a single generative model to generalize across many molecules. Alas, sampling and evaluating the density of CNFs and diffusion models typically requires thousands of neural network evaluations [17], preventing them from being trained by energy. As such, presently no Boltzmann generator exists that (i) acts on Euclidean coordinates of atoms (ii) enforces \\mathrm{SE}(3) equivariance, and (iii) allows for fast sampling.\n\nTo address this gap, we propose a flexible \\mathrm{SE}(3) equivariant coupling flow that operates on the Cartesian coordinates of atoms, allowing for fast sampling and density evaluation. Our contributions are:\n\n- • We extend coupling layers to be \\mathrm{SE}(3) equivariant by augmenting their input space with auxiliary variables [18] which can be acted upon on by \\mathrm{SE}(3). We update the atom positions conditioned on the auxiliary variables by first projecting the atoms into an \\mathrm{SE}(3) -invariant space and then applying a standard normalizing flow transform before projecting its output back onto the equivariant space.\n\n- • We demonstrate that, when trained by maximum likelihood, our flow matches the performance of existing \\mathrm{SE}(3) CNFs and diffusion models as well as coupling flows operating on internal coordinates on molecular generation tasks. Our flow is more than 10 times faster to sample from than \\mathrm{SE}(3) CNFs and diffusion models. Concurrently with [19], we are the first to learn the full Boltzmann distribution of alanine dipeptide solely in Cartesian coordinates.\n\n- • We demonstrate our flow in the energy-based training setting on DW4 and LJ13, where parameters are learned using only the molecular energy function. Energy-based training of CNFs or diffusion models is intractable due to slow sampling and density evaluation. Flows operating on internal coordinates are not able to capture the permutation invariance of these problems. Hence, our flow is the only existing permutation and \\mathrm{SE}(3) equivariant method that can tractably be applied there.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib33",
+      "text": "Noé et al. [2019] Frank Noé, Simon Olsson, Jonas Köhler, and Hao Wu. Boltzmann generators: Sampling equilibrium states of many-body systems with deep learning. Science , 365(6457):eaaw1147, 2019. doi: 10.1126/science.aaw1147 . URL https://www.science.org/doi/abs/10.1126/science.aaw1147 ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib5",
+      "text": "Cohen and Welling [2017] Taco S. Cohen and Max Welling. Steerable cnns. International Conference on Learning Representations , 2017."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib2",
+      "text": "Batzner et al. [2022] Simon Batzner, Albert Musaelian, Lixin Sun, Mario Geiger, Jonathan P Mailoa, Mordechai Kornbluth, Nicola Molinari, Tess E Smidt, and Boris Kozinsky. E(3)-equivariant graph neural networks for data-efficient and accurate interatomic potentials. Nature communications , 13(1):2453, 2022."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib22",
+      "text": "Köhler et al. [2020] Jonas Köhler, Leon Klein, and Frank Noé. Equivariant flows: Exact likelihood generative learning for symmetric densities. In Proceedings of the 37th International Conference on Machine Learning, ICML 2020, 13-18 July 2020, Virtual Event , volume 119 of Proceedings of Machine Learning Research , pages 5361–5370. PMLR, 2020. URL http://proceedings.mlr.press/v119/kohler20a.html ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib43",
+      "text": "Stimper et al. [2022] Vincent Stimper, Bernhard Schölkopf, and José Miguel Hernández-Lobato. Resampling Base Distributions of Normalizing Flows. In Proceedings of The 25th International Conference on Artificial Intelligence and Statistics , volume 151, pages 4915–4936, 2022."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib29",
+      "text": "Midgley et al. [2023] Laurence Illing Midgley, Vincent Stimper, Gregor N. C. Simm, Bernhard Schölkopf, and José Miguel Hernández-Lobato. Flow annealed importance sampling bootstrap. International Conference on Learning Representations , 2023."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib47",
+      "text": "Wu et al. [2020] Hao Wu, Jonas Köhler, and Frank Noé. Stochastic normalizing flows. In Hugo Larochelle, Marc’Aurelio Ranzato, Raia Hadsell, Maria-Florina Balcan, and Hsuan-Tien Lin, editors, Advances in Neural Information Processing Systems 33: Annual Conference on Neural Information Processing Systems 2020, NeurIPS 2020, December 6-12, 2020, virtual , 2020. URL https://proceedings.neurips.cc/paper/2020/hash/41d80bfc327ef980528426fc810a6d7a-Abstract.html ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib4",
+      "text": "Campbell et al. [2021] Andrew Campbell, Wenlong Chen, Vincent Stimper, Jose Miguel Hernandez-Lobato, and Yichuan Zhang. A gradient based strategy for Hamiltonian Monte Carlo hyperparameter optimization. In Proceedings of the 38th International Conference on Machine Learning , pages 1238–1248. PMLR, 2021."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib23",
+      "text": "Köhler et al. [2023a] Jonas Köhler, Yaoyi Chen, Andreas Krämer, Cecilia Clementi, and Frank Noé. Flow-matching: Efficient coarse-graining of molecular dynamics without forces. Journal of Chemical Theory and Computation , 19(3):942–952, 2023a. doi: 10.1021/acs.jctc.3c00016 ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib40",
+      "text": "Satorras et al. [2021a] Victor Garcia Satorras, Emiel Hoogeboom, Fabian Fuchs, Ingmar Posner, and Max Welling. E(n) equivariant normalizing flows. In Marc’Aurelio Ranzato, Alina Beygelzimer, Yann N. Dauphin, Percy Liang, and Jennifer Wortman Vaughan, editors, Advances in Neural Information Processing Systems 34: Annual Conference on Neural Information Processing Systems 2021, NeurIPS 2021, December 6-14, 2021, virtual , pages 4181–4192, 2021a. URL https://proceedings.neurips.cc/paper/2021/hash/21b5680d80f75a616096f2e791affac6-Abstract.html ."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib49",
+      "text": "Xu et al. [2022] Minkai Xu, Lantao Yu, Yang Song, Chence Shi, Stefano Ermon, and Jian Tang. GeoDiff: A Geometric Diffusion Model for Molecular Conformation Generation. In International Conference on Learning Representations , 2022."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib14",
+      "text": "Hoogeboom et al. [2022] Emiel Hoogeboom, Victor Garcia Satorras, Clément Vignac, and Max Welling. Equivariant diffusion for molecule generation in 3d. In Kamalika Chaudhuri, Stefanie Jegelka, Le Song, Csaba Szepesvári, Gang Niu, and Sivan Sabato, editors, International Conference on Machine Learning, ICML 2022, 17-23 July 2022, Baltimore, Maryland, USA , volume 162 of Proceedings of Machine Learning Research , pages 8867–8887. PMLR, 2022. URL https://proceedings.mlr.press/v162/hoogeboom22a.html ."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib50",
+      "text": "Yim et al. [2023] Jason Yim, Brian L. Trippe, Valentin De Bortoli, Emile Mathieu, Arnaud Doucet, Regina Barzilay, and Tommi S. Jaakkola. SE(3) diffusion model with application to protein backbone generation. 202:40001–40039, 2023."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib41",
+      "text": "Satorras et al. [2021b] Victor Garcia Satorras, Emiel Hoogeboom, and Max Welling. E(n) equivariant graph neural networks. In Marina Meila and Tong Zhang, editors, Proceedings of the 38th International Conference on Machine Learning, ICML 2021, 18-24 July 2021, Virtual Event , volume 139 of Proceedings of Machine Learning Research , pages 9323–9332. PMLR, 2021b. URL http://proceedings.mlr.press/v139/satorras21a.html ."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib11",
+      "text": "Geiger and Smidt [2022] Mario Geiger and Tess E. Smidt. e3nn: Euclidean neural networks. CoRR , abs/2207.09453, 2022. doi: 10.48550/arXiv.2207.09453 . URL https://doi.org/10.48550/arXiv.2207.09453 ."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "Jing et al. [2022] Bowen Jing, Gabriele Corso, Jeffrey Chang, Regina Barzilay, and Tommi S. Jaakkola. Torsional diffusion for molecular conformer generation. CoRR , abs/2206.01729, 2022. doi: 10.48550/arXiv.2206.01729 . URL https://doi.org/10.48550/arXiv.2206.01729 ."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib48",
+      "text": "Xiao et al. [2022] Zhisheng Xiao, Karsten Kreis, and Arash Vahdat. Tackling the generative learning trilemma with denoising diffusion gans. In The Tenth International Conference on Learning Representations, ICLR 2022, Virtual Event, April 25-29, 2022 . OpenReview.net, 2022. URL https://openreview.net/forum?id=JprM0p-q0Co ."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib15",
+      "text": "Huang et al. [2020] Chin-Wei Huang, Laurent Dinh, and Aaron Courville. Augmented normalizing flows: Bridging the gap between generative flows and latent variable models. arXiv preprint arXiv:2002.07101 , 2020."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib21",
+      "text": "Klein et al. [2023b] Leon Klein, Andreas Krämer, and Frank Noé. Equivariant flow matching. arXiv preprint arXiv:2306.15030 , 2023b."
+    }
+  ]
+}

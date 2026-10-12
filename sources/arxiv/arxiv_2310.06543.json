@@ -1,0 +1,198 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2310.06543",
+  "title": "An Edge-Aware Graph Autoencoder Trained on Scale-Imbalanced Data for Traveling Salesman Problems",
+  "authors": "Shiqing Liu, Xueming Yan, Yaochu Jin",
+  "year": "2024",
+  "categories": [
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2310.06543",
+  "html_url": "https://arxiv.org/html/2310.06543",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1253,
+  "text": "Combinatorial optimization problems (COPs) exist in many practical applications of operational research (OR). Most COPs are NP-hard and difficult to solve within a polynomial time [1]. As an important field of research on COPs, routing problems arise in various application scenarios such as logistics, transportation, urban planning, and supply chain management. Generally, routing problems involve planning route scheduling solutions for a group of vehicles under constrained conditions to make deliveries or provide services to a set of locations efficiently. The target is to minimize the total traveling distance or overhead with all constraints being satisfied [2]. The traveling salesman problem (TSP) is one of the most intensively studied routing problems, which aims to find the shortest path to traverse a set of given locations once and return to the initial location.\n\nAs an NP-hard problem, it is non-trivial to find an efficient polynomial-time solution via an enumeration search for TSPs with even only hundreds of cities. Traditional methods for solving TSPs and other optimization problems can be generally categorized into mathematical solvers [3,4,5] and hand-crafted heuristics [6,7,8,9]. A representative of exact solvers is Concorde [3], which incorporates both cutting-plane and branch-and-bound approaches for solving TSPs. For small and medium-sized problems, exact TSP solvers can find optimal solutions with guarantees. However, for large-scale instances, it will be intractable for exact solvers to get an exact solution within a reasonable amount of time due to the exponential growth of the computational complexity. To alleviate this limitation, evolutionary algorithms (EAs) are adopted to solve TSPs and proven to be well-suited for exploring a large search space. However, population-based EAs often require a large number of function evaluations, leading to huge computational costs, especially when the evaluations are time-consuming. Additionally, EAs are unable to learn from existing historical data, and even minor modifications to the problem require restarting the search from scratch.\n\nAn alternative, known as neural combinatorial optimization (NCO) [10,1], has been explored in the machine learning community from the perspective of data-driven optimization [11,12,1]. Instead of hand-crafted heuristics, NCO trains neural networks in an end-to-end manner to solve any combinatorial problems by learning directly from existing instances. Early work on learning-based approaches for routing problems can be traced back to Hopfield networks [13] and template models [14]. With the compelling performance of sequence-to-sequence models [15,16], Vinyals et al. proposed a Pointer Network [17] with an attention mechanism [18] to output TSP tours in a sequential manner. In a similar work proposed by Bello et al. [10], the Pointer Network is trained by an Actor-Critic reinforcement learning strategy instead of supervised learning [17].\n\nWith the development of graph representation learning [19,20,21], NP-hard routing problems are reconsidered as sequential decision tasks on graphs [22]. Consequently, there has been a recent surge of work on training graph neural networks (GNNs) [23,24,25] to solve COPs such as routing problems [26,22,27], facility location problems [28] and graph coloring problems [29]. Compared to OR solvers, GNN-based methods have achieved competitive performance on small problem instances [27,22,30,31]. Once trained, a GNN-based solver can generate approximate optimal solutions in a very short period of inference time, making it favorable for real-time decision-making. End-to-end learning for TSPs can be categorized into autoregressive and non-autoregressive approaches, depending on how solutions are generated. In autoregressive methods, a TSP tour is constructed regressively by identifying one city at a step [30,10,32,33]. By contrast, non-autoregressive approaches make predictions for arbitrarily large graphs in a one-shot fashion [26,22,34,27]. In an early work [26], Nowak et al. trained GNNs to output the prediction as an adjacency matrix of the input graph, which is further converted into feasible solutions by beam search. Joshi et al. [22] built on ideas from [26] and introduced the residual gated graph ConvNet [35] for solving TSP. By extending the work in [22], Fu et al. [36] replaced the beam search with reinforcement learning techniques. The output heatmaps are fed into the Monte Carlo tree search for TSP tours.\n\nHowever, existing work on data-driven NCO approaches for TSPs suffers from distinct drawbacks. First, most learning-based solvers are only trained on fixed-sized TSP instances [33,32,22,17], which exhibit poor generalization ability on test cases with a number of cities different from that of the training data [27]. Secondly, training such a solver often requires millions of TSP instances with optimal solutions to achieve a competitive performance, assuming that the model has sufficient labeled data as its training dataset. However, it is non-trivial to satisfy this assumption in practice since NP-hard problems usually have a limited number of imbalanced optimized instances, which contain more small-scale cases and fewer large-scale cases.\n\nIn this paper, we propose an edge-aware graph autoencoder (EdgeGAE) framework for solving TSPs by learning from imbalanced data. In contrast to the traditional TSP solvers that take TSP as a route planning task and decide the next city to visit step by step, this work reformulates TSP as a link prediction task on the graph. Each city is treated as a node on the graph, and the optimal route can be represented by the connections between nodes. The encoder-decoder structure is widely adopted for traditional link prediction tasks in graph representation learning. Nevertheless, the conventional graph autoencoder (GAE) fails to solve TSP tasks, as its encoding-decoding process only considers node features, overlooking the importance of edge information for TSP. Considering that the quality of solutions to routing problems relies highly on the edge features (i.e., Euclidean distances), we modify the encoder with residual gated graph convolutions for the message-passing process to learn explicit edge embeddings in the latent space. To alleviate the limitation of inner products where only nodes are involved, we design an edge-centered decoder model that incorporates both the edge and corresponding node embeddings for the link prediction task. We adopt an active sampling (AS) strategy during the training process by incorporating oversampling and undersampling to deal with the imbalanced distribution of training data. The proposed framework is evaluated on TSP instances with different sizes up to hundreds of cities and compared with state-of-the-art learning-based methods in terms of the optimal gap and the F1 score. Distinct from the traditional learning-based TSP solvers, the main contributions of this work are summarized as follows:\n\n- 1. We first transform the TSP from a traditional path planning problem to a link prediction task in the field of graph representation learning. Drawing on this, we redesign the structure of the vanilla graph autoencoder and propose an edge-aware graph autoencoder model to accommodate the TSP characteristics.\n\n- 2. We tackle the challenge of extremely imbalanced data distribution by introducing a random active sampling strategy into the end-to-end training process. The incorporation of oversampling and undersampling enables our model to retain strong generalization performance with only a few large-scale training samples.\n\n- 3. To validate the model performance in scale-imbalanced optimization scenarios, we construct a benchmark dataset comprising 50,000 TSP instances with varying scales, ranging from 50 to 500 cities. The data follows an extremely imbalanced distribution where the number of instances is inversely proportional to the number of cities. Comprehensive experiments based on the benchmark demonstrate that the proposed EdgeGAE outperforms other learning-based methods for solving TSPs.\n\nThe remainder of this article is organized as follows. Section II gives a literature review of existing work on learning-based NCO methods for TSPs and their generalization ability. Section III provides the problem formulation and elaborates the proposed methodology in detail. The experimental results and analyses of these results are presented in Section IV. Section V concludes the paper and outlines future work.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "Y. Bengio, A. Lodi, A. Prouvost, Machine learning for combinatorial optimization: a methodological tour d’horizon, European Journal of Operational Research 290 (2021) 405–421."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "Y. Xu, M. Fang, L. Chen, G. Xu, Y. Du, C. Zhang, Reinforcement learning with multiple relational attention for solving vehicle routing problems, IEEE Transactions on Cybernetics 52 (2022) 11107–11120."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "D. Sanches, D. Whitley, R. Tinós, Improving an exact solver for the traveling salesman problem using partition crossover, in: Proceedings of the Genetic and Evolutionary Computation Conference, 2017, pp. 337–344."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "D. J. Rosenkrantz, R. E. Stearns, P. M. Lewis, II, An analysis of several heuristics for the traveling salesman problem, SIAM journal on computing 6 (1977) 563–581."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "K. Helsgaun, An extension of the lin-kernighan-helsgaun tsp solver for constrained traveling salesman and vehicle routing problems (2017)."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "J. Cui, L. Wu, X. Huang, D. Xu, C. Liu, W. Xiao, Multi-strategy adaptable ant colony optimization algorithm and its application in robot path planning, Knowledge-Based Systems (2024) 111459."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "S. Wang, B. Ding, Y. Jin, A multi-factorial evolutionary algorithm with asynchronous optimization processes for solving the robust influence maximization problem, IEEE Computational Intelligence Magazine 18 (2023a) 41–53."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "S. Wang, Y. Jin, M. Cai, Enhancing the robustness of networks against multiple damage models using a multifactorial evolutionary algorithm, IEEE Transactions on Systems, Man, and Cybernetics: Systems (2023b)."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "S. Wang, X. Tan, Solving the robust influence maximization problem on multi-layer networks via a memetic algorithm, Applied Soft Computing 121 (2022) 108750."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "I. Bello, H. Pham, Q. V. Le, M. Norouzi, S. Bengio, Neural combinatorial optimization with reinforcement learning, in: International Conference on Learning Representations, 2017."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "Y. Jin, H. Wang, T. Chugh, D. Guo, K. Miettinen, Data-driven evolutionary optimization: An overview and case studies, IEEE Transactions on Evolutionary Computation 23 (2018) 442–458."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "Y. Jin, H. Wang, C. Sun, Data-driven evolutionary optimization, Springer, 2021."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "J. J. Hopfield, D. W. Tank, “neural” computation of decisions in optimization problems, Biological cybernetics 52 (1985) 141–152."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "B. Angeniol, G. D. L. C. Vaubois, J.-Y. Le Texier, Self-organizing feature maps and the travelling salesman problem, Neural Networks 1 (1988) 289–293."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "I. Sutskever, O. Vinyals, Q. V. Le, Sequence to sequence learning with neural networks, Advances in Neural Information Processing Systems 27 (2014)."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "Y. Wu, M. Schuster, Z. Chen, Q. V. Le, M. Norouzi, W. Macherey, M. Krikun, Y. Cao, Q. Gao, K. Macherey, et al., Google’s neural machine translation system: Bridging the gap between human and machine translation, arXiv preprint arXiv:1609.08144 (2016)."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "O. Vinyals, M. Fortunato, N. Jaitly, Pointer networks, Advances in Neural Information Processing Systems 28 (2015)."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "D. Bahdanau, K. Cho, Y. Bengio, Neural machine translation by jointly learning to align and translate, arXiv preprint arXiv:1409.0473 (2014)."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "F. Chen, Y.-C. Wang, B. Wang, C.-C. J. Kuo, Graph representation learning: a survey, APSIPA Transactions on Signal and Information Processing 9 (2020) e15."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "J. Zhao, K. H. Cheong, Obfuscating community structure in complex network with evolutionary divide-and-conquer strategy, IEEE Transactions on Evolutionary Computation (2023)."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "J. Zhao, Z. Wang, J. Cao, K. H. Cheong, A self-adaptive evolutionary deception framework for community structure, IEEE Transactions on Systems, Man, and Cybernetics: Systems (2023)."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib22",
+      "text": "C. K. Joshi, T. Laurent, X. Bresson, An efficient graph convolutional network technique for the travelling salesman problem, arXiv preprint arXiv:1906.01227 (2019)."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib23",
+      "text": "T. N. Kipf, M. Welling, Semi-supervised classification with graph convolutional networks, in: International Conference on Learning Representations, 2017."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib24",
+      "text": "P. Veličković, G. Cucurull, A. Casanova, A. Romero, P. Liò, Y. Bengio, Graph attention networks, in: International Conference on Learning Representations, 2018."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib25",
+      "text": "K. Xu, W. Hu, J. Leskovec, S. Jegelka, How powerful are graph neural networks?, arXiv preprint arXiv:1810.00826 (2018)."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib26",
+      "text": "A. Nowak, S. Villar, A. S. Bandeira, J. Bruna, Revised note on learning quadratic assignment with graph neural networks, in: 2018 IEEE Data Science Workshop, IEEE, 2018, pp. 1–5."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib27",
+      "text": "C. K. Joshi, Q. Cappart, L.-M. Rousseau, T. Laurent, Learning the travelling salesperson problem requires rethinking generalization, Constraints 27 (2022) 70–98."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib28",
+      "text": "S. Liu, X. Yan, Y. Jin, End-to-end pareto set prediction with graph neural networks for multi-objective facility location, in: Proceedings of the 12th International Conference on Evolutionary Multi-Criterion Optimization, Springer, 2023, pp. 147–161."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib29",
+      "text": "X. Wang, X. Yan, Y. Jin, A graph neural network with negative message passing for graph coloring, arXiv preprint arXiv:2301.11164 (2023)."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib30",
+      "text": "H. Dai, E. Khalil, Y. Zhang, B. Dilkina, L. Song, Learning combinatorial optimization algorithms over graphs, Advances in Neural Information Processing Systems 30 (2017)."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib31",
+      "text": "Z. Li, Q. Chen, V. Koltun, Combinatorial optimization with graph convolutional networks and guided tree search, Advances in neural information processing systems 31 (2018)."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib32",
+      "text": "M. Deudon, P. Cournut, A. Lacoste, Y. Adulyasak, L.-M. Rousseau, Learning heuristics for the TSP by policy gradient, in: Integration of Constraint Programming, Artificial Intelligence, and Operations Research: 15th International Conference, CPAIOR 2018, Springer, 2018, pp. 170–181."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib33",
+      "text": "W. Kool, H. van Hoof, M. Welling, Attention, learn to solve routing problems!, in: International Conference on Learning Representations, 2019."
+    },
+    {
+      "n": 34,
+      "id": "bib.bib34",
+      "text": "V. P. Dwivedi, C. K. Joshi, T. Laurent, Y. Bengio, X. Bresson, Benchmarking graph neural networks, arXiv preprint arXiv:2003.00982 (2020)."
+    },
+    {
+      "n": 35,
+      "id": "bib.bib35",
+      "text": "X. Bresson, T. Laurent, Residual gated graph convnets, arXiv preprint arXiv:1711.07553 (2017)."
+    },
+    {
+      "n": 36,
+      "id": "bib.bib36",
+      "text": "Z.-H. Fu, K.-B. Qiu, H. Zha, Generalize a small pre-trained model to arbitrarily large tsp instances, in: Proceedings of the AAAI Conference on Artificial Intelligence, volume 35, 2021, pp. 7474–7482."
+    }
+  ]
+}

@@ -1,0 +1,135 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2306.09305",
+  "title": "Fast Training of Diffusion Models with Masked Transformers",
+  "authors": "Hongkai Zheng, Weili Nie, Arash Vahdat, Anima Anandkumar",
+  "year": "2024",
+  "categories": [
+    "cs.CV",
+    "cs.AI",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2306.09305",
+  "html_url": "https://arxiv.org/html/2306.09305",
+  "license": "http://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Introduction",
+  "word_count": 937,
+  "text": "Diffusion models [2,3,4] have become the most popular class of deep generative models, due to their superior image generation performance [5], particularly in synthesizing high-quality and diverse images with text inputs [6,7,8,9]. Their strong generation performance has enabled many applications, including image-to-image translation [10,11], personalized creation [12,13] and model robustness [14,15]. Large-scale training of these models is essential for their capabilities of generating realistic images and creative art. However, training these models requires a large amount of computational resources and time, which remains a major bottleneck for further scaling them up. For example, the original stable diffusion [7] was trained on 256 A100 GPUs for more than 24 days. While the training cost can be reduced to 13 days on 256 A100 GPUs with improved infrastructure and implementation [16], it is still inaccessible to most researchers and practitioners. Thus, improving the training efficiency of diffusion models is still an open question.\n\nIn the representation learning community, masked training is widely used to improve training efficiency in domains such as natural language processing [17], computer vision [18], and vision-language understanding [19]. Masked training significantly reduces the overall training time and memory, especially in vision applications [18,19]. In addition, masked training is an effective self-supervised learning technique that does not sacrifice the representation learning quality, as high redundancy in the visual appearance allows the model to learn from unmasked patches. Here, masked training relies heavily on the transformer architecture [20] since they operate on patches, and it is natural to mask a subset of them.\n\nMasked training, however, cannot be directly applied to diffusion models since current diffusion models mostly use U-Net [21] as the standard network backbone, with some modifications [3,4,5]. The convolutions in U-Net operate on regular dense grids, making it challenging to incorporate masked tokens and train with a random subset of the input patches. Thus, applying masked training techniques to U-Net models is not straightforward.\n\nRecently, a few works [1,22] show that replacing the U-Net architecture with vision transformers (ViT) [23] as the backbone of diffusion models can achieve similar or even better performance across standard image generation benchmarks. In particular, Diffusion Transformer (DiT) [1] inherits the best practices of ViTs without relying on the U-Net inductive bias, demonstrating the scalability of the DiT backbone for diffusion models. Similar to standard ViTs, training DiTs is computationally expensive, requiring millions of iterations. However, this opens up new opportunities for efficient training of large transformer-based diffusion models.\n\nIn this work, we leverage the transformer structure of DiTs to enable masked modeling for significantly faster and cheaper training. Our main hypothesis is that images contain significant redundancy in the pixel space. Thus, it is possible to train diffusion models by minimizing the denoising score matching (DSM) loss on only a subset of pixels. Masked training has two main advantages: 1) It enables us to pass only a small subset of image patches to the network, which largely reduces the computational cost per iteration. 2) It allows us to augment the training data with multiple views, which can improve the training performance, particularly in limited-data settings.\n\nDriven by this hypothesis, we propose an efficient approach to train large transformer-based diffusion models, termed Masked Diffusion Transformer (MaskDiT). We first adopt an asymmetric encoder-decoder architecture, where the transformer encoder only operates on the unmasked patches, and a lightweight transformer decoder operates on the complete set of patches. We then design a new training objective, consisting of two parts: 1) predicting the score of unmasked patches via the DSM loss, and 2) reconstructing the masked patches of the input via the mean square error (MSE) loss. This provides a global knowledge of the complete image that prevents the diffusion model from overfitting to the unmasked patches. For simplicity, we apply the same masking ratio (e.g., 50%) across all the diffusion timesteps during training. After training, we finetune the model without masking to close the distribution gap between training and inference and this incurs only a minimal amount of overhead (less than 6% of the total training cost).\n\nBy randomly removing 50% patches of training images, our method reduces the per-iteration training cost by 2\\times. With our proposed new architecture and new training objective, MaskDiT can also achieve similar performance to the DiT counterpart with fewer training steps, leading to much smaller overall training costs. In the class-conditional ImageNet-256 \\times 256 generation benchmark, MaskDiT achieves an FID of 5.69 without guidance, which outperforms previous (non-cascaded) diffusion models, and it achieves an FID of 2.28 with guidance, which is comparable to the state-of-the-art models. To achieve the result of FID 2.28, the total training cost of MaskDiT is 273 hours on 8 \\times A100 GPUs, which is only 31% of the DiT’s training time. For class-conditional ImageNet-512 \\times 512, MaskDiT achieves an FID of 10.79 without guidance and 2.50 with guidance, outperforming DiT-XL/2 and prior diffusion models. The total training cost is 209 A100 GPU days, which is about 29% of that of DiT-XL/2, validating the scalability and effectiveness of MaskDiT. All these results show that our method provides a significantly better training efficiency in wall-clock time.\n\nOur main contributions are summarized as follows:\n\n- • We propose a new approach for fast training of diffusion models with masked transformers by randomly masking out a high proportion (50%) of input patches.\n\n- • For masked training, we introduce an asymmetric encoder-decoder architecture and a new training objective that predicts the score of unmasked patches and reconstructs masked patches.\n\n- • We show our method has faster training speed and less memory consumption while achieving comparable generation performance, implying its scalability to large diffusion models.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib33",
+      "text": "Peebles & Xie (2022) William Peebles and Saining Xie. Scalable diffusion models with transformers. arXiv preprint arXiv:2212.09748 , 2022."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib44",
+      "text": "Sohl-Dickstein et al. (2015) Jascha Sohl-Dickstein, Eric Weiss, Niru Maheswaranathan, and Surya Ganguli. Deep unsupervised learning using nonequilibrium thermodynamics. In International Conference on Machine Learning , pp. 2256–2265. PMLR, 2015."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib20",
+      "text": "Ho et al. (2020) Jonathan Ho, Ajay Jain, and Pieter Abbeel. Denoising diffusion probabilistic models. Advances in Neural Information Processing Systems , 33:6840–6851, 2020."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib46",
+      "text": "Song et al. (2021b) Yang Song, Jascha Sohl-Dickstein, Diederik P Kingma, Abhishek Kumar, Stefano Ermon, and Ben Poole. Score-based generative modeling through stochastic differential equations. In International Conference on Learning Representations , 2021b."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib11",
+      "text": "Dhariwal & Nichol (2021) Prafulla Dhariwal and Alexander Nichol. Diffusion models beat gans on image synthesis. Advances in Neural Information Processing Systems , 34:8780–8794, 2021."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib35",
+      "text": "Ramesh et al. (2022) Aditya Ramesh, Prafulla Dhariwal, Alex Nichol, Casey Chu, and Mark Chen. Hierarchical text-conditional image generation with clip latents. arXiv preprint arXiv:2204.06125 , 2022."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib36",
+      "text": "Rombach et al. (2022) Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, and Björn Ommer. High-resolution image synthesis with latent diffusion models. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pp. 10684–10695, 2022."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib40",
+      "text": "Saharia et al. (2022b) Chitwan Saharia, William Chan, Saurabh Saxena, Lala Li, Jay Whang, Emily L Denton, Kamyar Ghasemipour, Raphael Gontijo Lopes, Burcu Karagol Ayan, Tim Salimans, et al. Photorealistic text-to-image diffusion models with deep language understanding. Advances in Neural Information Processing Systems , 35:36479–36494, 2022b."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib1",
+      "text": "Balaji et al. (2022) Yogesh Balaji, Seungjun Nah, Xun Huang, Arash Vahdat, Jiaming Song, Karsten Kreis, Miika Aittala, Timo Aila, Samuli Laine, Bryan Catanzaro, et al. ediffi: Text-to-image diffusion models with an ensemble of expert denoisers. arXiv preprint arXiv:2211.01324 , 2022."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib39",
+      "text": "Saharia et al. (2022a) Chitwan Saharia, William Chan, Huiwen Chang, Chris Lee, Jonathan Ho, Tim Salimans, David Fleet, and Mohammad Norouzi. Palette: Image-to-image diffusion models. In ACM SIGGRAPH 2022 Conference Proceedings , pp. 1–10, 2022a."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib27",
+      "text": "Liu et al. (2023) Guan-Horng Liu, Arash Vahdat, De-An Huang, Evangelos A Theodorou, Weili Nie, and Anima Anandkumar. I 2 sb: Image-to-image schrödinger bridge. arXiv preprint arXiv:2302.05872 , 2023."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib38",
+      "text": "Ruiz et al. (2022) Nataniel Ruiz, Yuanzhen Li, Varun Jampani, Yael Pritch, Michael Rubinstein, and Kfir Aberman. Dreambooth: Fine tuning text-to-image diffusion models for subject-driven generation. 2022."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib14",
+      "text": "Gal et al. (2022) Rinon Gal, Yuval Alaluf, Yuval Atzmon, Or Patashnik, Amit H. Bermano, Gal Chechik, and Daniel Cohen-Or. An image is worth one word: Personalizing text-to-image generation using textual inversion, 2022. URL https://arxiv.org/abs/2208.01618 ."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib32",
+      "text": "Nie et al. (2022) Weili Nie, Brandon Guo, Yujia Huang, Chaowei Xiao, Arash Vahdat, and Anima Anandkumar. Diffusion models for adversarial purification. In International Conference on Machine Learning (ICML) , 2022."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib6",
+      "text": "Carlini et al. (2022) Nicholas Carlini, Florian Tramer, J Zico Kolter, et al. (certified!!) adversarial robustness for free! arXiv preprint arXiv:2206.10550 , 2022."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib9",
+      "text": "Cory Stephenson (2023) Landan Seguin Cory Stephenson. Training Stable Diffusion from Scratch Costs < 160 ​ k 160k . https://github.com/mosaicml/diffusion-benchmark , 2023."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib10",
+      "text": "Devlin et al. (2018) Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. Bert: Pre-training of deep bidirectional transformers for language understanding. arXiv preprint arXiv:1810.04805 , 2018."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib17",
+      "text": "He et al. (2022) Kaiming He, Xinlei Chen, Saining Xie, Yanghao Li, Piotr Dollár, and Ross Girshick. Masked autoencoders are scalable vision learners. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pp. 16000–16009, 2022."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib26",
+      "text": "Li et al. (2022b) Yanghao Li, Haoqi Fan, Ronghang Hu, Christoph Feichtenhofer, and Kaiming He. Scaling language-image pre-training via masking. arXiv preprint arXiv:2212.00794 , 2022b."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib51",
+      "text": "Vaswani et al. (2017) Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N Gomez, Łukasz Kaiser, and Illia Polosukhin. Attention is all you need. Advances in neural information processing systems , 30, 2017."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib37",
+      "text": "Ronneberger et al. (2015) Olaf Ronneberger, Philipp Fischer, and Thomas Brox. U-net: Convolutional networks for biomedical image segmentation. In Medical Image Computing and Computer-Assisted Intervention–MICCAI 2015: 18th International Conference, Munich, Germany, October 5-9, 2015, Proceedings, Part III 18 , pp. 234–241. Springer, 2015."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib2",
+      "text": "Bao et al. (2023) Fan Bao, Shen Nie, Kaiwen Xue, Yue Cao, Chongxuan Li, Hang Su, and Jun Zhu. All are worth words: A vit backbone for diffusion models. In CVPR , 2023."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib12",
+      "text": "Dosovitskiy et al. (2020) Alexey Dosovitskiy, Lucas Beyer, Alexander Kolesnikov, Dirk Weissenborn, Xiaohua Zhai, Thomas Unterthiner, Mostafa Dehghani, Matthias Minderer, Georg Heigold, Sylvain Gelly, et al. An image is worth 16x16 words: Transformers for image recognition at scale. arXiv preprint arXiv:2010.11929 , 2020."
+    }
+  ]
+}

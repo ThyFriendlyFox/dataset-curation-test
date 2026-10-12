@@ -1,0 +1,63 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.03751",
+  "title": "Trigram-Based Persistent IDE Indices with Quick Startup",
+  "authors": "Zakhar Iakovlev, Alexey Chulkov, Nikita Golikov, Vyacheslav Lukianov, Nikita Zinoviev, Dmitry Ivanov, Vitaly Aksenov",
+  "year": "2024",
+  "categories": [
+    "cs.SE"
+  ],
+  "url": "https://arxiv.org/abs/2403.03751",
+  "html_url": "https://arxiv.org/html/2403.03751",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 658,
+  "text": "An Integrated Development Environment (IDE) is a pivotal tool for programmers, offering more than a mere text editor by incorporating numerous essential features. Among these, the text search stands out. The basic approach of searching through all project files using algorithms like the Z-function [1] tends to be slow for modern projects with extensive repositories housing multiple versions. To ensure quicker response times, IDEs rely on index data structures. This approach can be used both for backend and cloud services, and for personal usage. However, we suggest to use our approach on remote services.\n\nVarious index implementations facilitate full-text searches [2,3]. One prominent approach is the utilization of a trigram index [4] that is merely a map: from (char, char, char) to the set of files containing it. In contemporary IDEs like IntelliJ IDEA [5] indices are limited to the current working copy, encompassing files in the current project revision alongside any uncommitted in-memory changes. The main goal of this work is to create an efficient approach that can maintain the current working index and can restore the index for any version. The proposed trigram index aims to support several desired features in modern IDEs: 1) zero-time startup, 2) an enhanced code review, and 3) streamlined navigation through history, discussed individually below.\n\nIf a developer wants to work with a specific git commit, current state-of-the-art indices has to be built for this commit from scratch, a process that could take several minutes or longer depending on the project size. In contrast, our approach stores indices for all commits stored in a specific format, allowing us to build the index for any commit within seconds.\n\nThis feature is crucial for Cloud IDEs. They support just an editor for the client while the server maintains a git repository and corresponding indices. Having this feature allows the developer to just click once on a chosen commit to obtain a fully-functional IDE. Our goal is to make this as efficiently as possible, so that the change of the revision will be almost immediate for the user.\n\nCloud tools like GitHub/GitLab primarily present code review as a diff between two text files without robust navigation features. Our index structure can efficiently provide necessary navigation features for both versions in such cloud tools, enabling a more insightful code review.\n\nNavigate and search features are extremely important in contemporary IDEs for the understanding of the code. For example, the “Go-to-Class” feature allows the user to navigate to any class by typing the substring from its name. To simplify such search for the user IDEs support CamelHump search [6]. It helps to find specific code patterns, so-called symbols, i.e., the names of classes, functions, fields, etc., not only by the full name, but also by its parts, when the user does not remember the exact name or does not want to write the whole name. Our data structure supports this feature, enhancing navigation by allowing searches, for example, using the first letters of CamelCase words.\n\nA trigram search [4] is a popular method for text analysis, widely used due to its compact index size.\n\nFull-text search is often performed using string data structures, such as tries and suffix trees [2]. Although such data structures perform well when text is known in advance, and even under some moderate modifications, they fail to achieve our goal, as we need such data structure to be persistent. However, traditional persistent data structures face limitations in large repositories as they fail to fit into RAM. At the same time, hybrid RAM and on-disk approaches, e.g., [7], do not satisfy us since they do not provide zero-time startup — one need to load the nodes in RAM first. To achieve this requirement, our trigram index uses a key-value storage [8]: the current implementation uses LMDB [9].\n\nIn Section 2 we explain the design of our approach. In Section 3 we present the results of our experiments. Finally, we conclude in Section 4.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib11",
+      "text": "Gusfield (1997) Dan Gusfield. 1997. Algorithms on Strings, Trees, and Sequences: Computer Science and Computational Biology . Cambridge University Press."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib12",
+      "text": "Navarro and Mäkinen (2007) Gonzalo Navarro and Veli Mäkinen. 2007. Compressed Full-Text Indexes. ACM Comput. Surv. 39, 1 (04 2007), 2–es. https://doi.org/10.1145/1216370.1216372"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib14",
+      "text": "Vyverman et al . (2012) Michaël Vyverman, Bernard De Baets, Veerle Fack, and Peter Dawyndt. 2012. Prospects and limitations of full-text index structures in genome analysis. Nucleic Acids Research 40, 15 (05 2012), 6993–7015."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib8",
+      "text": "Adams and Meltzer (1993) Elizabeth S. Adams and Arnold C. Meltzer. 1993. Trigrams as Index Element in Full Text Retrieval: Observations and Experimental Results. In Proceedings of the 1993 ACM Conference on Computer Science . 433–439."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib6",
+      "text": "int ([n. d.]) [n. d.]. The most intelligent Java IDE. https://www.jetbrains.com/idea/ ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib4",
+      "text": "cam ([n. d.]) [n. d.]. CamelHumps in Resharper. https://www.jetbrains.com/help/resharper/Navigation_and_Search__CamelHumps.html ."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib10",
+      "text": "Chen et al . (2020) Youmin Chen, Youyou Lu, Kedong Fang, Qing Wang, and Jiwu Shu. 2020. UTree: A Persistent B+-Tree with Low Tail Latency. Proc. VLDB Endow. 13, 12 (07 2020)."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib13",
+      "text": "Seeger and Ultra-Large-Sites (2009) Marc Seeger and S Ultra-Large-Sites. 2009. Key-value stores: a practical overview. Computer Science and Media, Stuttgart (2009)."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib5",
+      "text": "LMD ([n. d.]) [n. d.]. LMDB documentation. http://www.lmdb.tech/doc/ ."
+    }
+  ]
+}

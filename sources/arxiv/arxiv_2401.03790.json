@@ -1,0 +1,221 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2401.03790",
+  "title": "Inferring Properties of Graph Neural Networks",
+  "authors": "Dat Nguyen, Hieu M. Vu, Cong-Thanh Le, Bach Le, David Lo, ThanhVu Nguyen, Corina Pasareanu",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.CR",
+    "cs.PL",
+    "cs.SE"
+  ],
+  "url": "https://arxiv.org/abs/2401.03790",
+  "html_url": "https://arxiv.org/html/2401.03790",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 992,
+  "text": "Deep neural networks (DNNs) are widely recognized as state-of-the-art in tackling a wide range of problems such as natural language processing [1,2], computer vision [3,4], and software engineering [5,6,7]. Two primary types of DNNs are (i) networks that take fixed-size input, i.e., inputs that have predefined sizes, such as feed-forward neural networks (FNNs) and convolutional neural networks (CNNs) [8,9,10] and (ii) networks that take inputs with varying sizes and structures, such as graph neural networks (GNNs) [11,12,13,14].\n\nGNNs are a powerful tool for modeling complex data structures. Problems including detecting fake users [15], fake news [16], and performing recommendations [17,18] on social media to mimicking classic combinatorial optimization [19,20] and detecting faults in software [21,22,23] can be straightforwardly modeled using graphs. In these representations, a graph can have varying numbers of nodes and edges, for example, a person in social networks can have varying numbers of friends, or a molecule can have varying numbers of atoms, etc [24]. While CNNs and FNNs are not designed for such varying data structures, GNNs can naturally handle these varying structures using the message-passing mechanism [11]. However, the complexity of the message-passing mechanism renders it difficult to debug GNNs, e.g., assessing the robustness of GNNs against adversarial attacks [25,26,27,28,29] or detecting backdoor behaviors [30,31,32]. To tackle GNNs debugging, existing explainable AI techniques provide heatmaps to help human experts manually debug GNNs [33,34,35]. To the best of our knowledge, there does not exist any technique that supports automated debugging of GNNs.\n\nThere, however, exists recent works on automated debugging of CNNs and FNNs by inferring formal properties to interpret and assess deep neural network performance [36,37,38]. These techniques take as input a DNN along with a set of fixed-size and fixed-structure input data, and then infer a set of formal properties that are logical constraints that capture the relationships between the input and output of the DNN. Despite being powerful, these techniques cannot handle inputs with varying sizes and structures such as graphs wherein the number of nodes and edges, and the connections between them can dynamically change. It is thus significantly challenging to adopt these techniques for automated debugging of GNNs.\n\nIn this work, we introduce GNN-Infer, the first automatic property inference technique for GNNs to facilitate automated debugging of GNNs. GNN-Infer tackle the challenge of dynamic input graph structures in GNN in three steps, each of which is a novel contribution. First, we select a set of representative input structures to analyze. Second, we infer GNN’s properties on each of the representative structures. Finally, we generalize these properties to varying structures that contain the representative structures. To achieve these, GNN-Infer first mines the most frequent influential structures, which appear frequently in the dataset and contribute significantly towards GNN’s prediction. These structures are more likely to capture GNN’s behavior as shown in prior works [39,40], and are thus considered representative input structures. Next, for each influential structure S as input to a GNN model \\mathcal{M}, GNN-Infer converts the pair \\langle\\mathcal{M},S\\rangle into an equivalent FNN model \\mathcal{M}_{F}. We formally prove that our conversion algorithm is both sound, i.e., \\mathcal{M}_{F} is indeed equivalent to \\langle\\mathcal{M},S\\rangle, and complete, i.e., given any \\langle\\mathcal{M},S\\rangle, there always exists an equivalent \\mathcal{M}_{F}. This enables us to leverage an existing property inference technique for FNNs, namely PROPHECY [36], to infer a set of properties \\{S_{P}\\}. These inferred properties \\{S_{P}\\} are then considered the properties of the original GNN \\mathcal{M} on the given structure S.\n\nNote that the inferred properties \\{S_{P}\\} are still specific to the frequent influential structures: each property S_{P} imposes an input condition that the input graph must have the exact structure as S. GNN-Infer then generalizes these properties to any input graph that contains the influential structures by relaxing each S_{P} into a likely property S_{LP}, in which the imposed input condition is that the input graph must contain the structure S. When the imposed input condition is relaxed, the likely property S_{LP} might lose precision. GNN-Infer improves the precision of these likely properties by training a model (either a decision tree or linear regression) that estimates the deviation of the GNN output from the inferred properties on a given full input graph. The predictions of the model help GNN-Infer obtain more precise properties that hold on the full input graph.\n\nWe evaluate GNN-Infer ’s correctness and applicability on both synthetic and popular real-world datasets. To assess GNN-Infer ’s correctness, we construct a synthetic benchmark consisting of reference GNN and corresponding ground truth properties: the constructed benchmark consists of reference and trained GNNs to mimic classic breadth-first search (BFS) and depth-first search (DFS) and Bellman-Ford (B-F) algorithms. Manual assessments show that out of 13 ground-truth properties, GNN-Infer re-discovered 8 correct properties and identified highly confident properties that approximate the remaining ground-truth properties. As an application of GNN-Infer, we use its inferred properties to detect and defend against the state-of-the-art backdoor attack technique on GNNs, namely UGBA [30]. Experiments show that GNN-Infer ’s inferred properties can be used to improve the defense against the state-of-the-art backdoor attack method UGBA [30] by up to 30 times in comparison with existing baseline defense methods [30]. In summary, we make the following contributions:\n\n- • We propose GNN-Infer which automatically infers properties of GNNs by analyzing and generalizing GNNs’ behaviors on representative structures.\n\n- • We provide an algorithm that converts a GNN with a given input structure to an equivalent FNN. We formally prove that the algorithm is both sound and complete, enabling us to use existing DNN analysis tools to infer properties of the GNN.\n\n- • We construct a set of benchmarks containing GNNs on classic traversal and shortest path algorithms to evaluate GNN-Infer and show that GNN-Infer can infer correct properties.\n\n- • Finally, we show that GNN-Infer can be used to improve the backdoor defense against state-of-the-art backdoor attack techniques on graph neural networks by up to 30 times in comparison with existing techniques, namely homophily-based pruning and isolation [30].",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib63",
+      "text": "Young et al . (2018) Tom Young, Devamanyu Hazarika, Soujanya Poria, and Erik Cambria. 2018. Recent trends in deep learning based natural language processing. IEEE Computational Intelligence Magazine 13, 3 (2018), 55–75."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib38",
+      "text": "Otter et al . (2020) Daniel W Otter, Julian R Medina, and Jugal K Kalita. 2020. A survey of the usages of deep learning for natural language processing. IEEE transactions on neural networks and learning systems 32, 2 (2020), 604–624."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib52",
+      "text": "Voulodimos et al . (2018) Athanasios Voulodimos, Nikolaos Doulamis, Anastasios Doulamis, and Eftychios Protopapadakis. 2018. Deep learning for computer vision: A brief review. Computational intelligence and neuroscience 2018 (2018)."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib28",
+      "text": "Liu et al . (2017) Weibo Liu, Zidong Wang, Xiaohui Liu, Nianyin Zeng, Yurong Liu, and Fuad E Alsaadi. 2017. A survey of deep neural network architectures and their applications. Neurocomputing 234 (2017), 11–26."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib59",
+      "text": "Yang et al . (2015) Xinli Yang, David Lo, Xin Xia, Yun Zhang, and Jianling Sun. 2015. Deep learning for just-in-time defect prediction. In 2015 IEEE International Conference on Software Quality, Reliability and Security . IEEE, 17–26."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib18",
+      "text": "Hu et al . (2018) Xing Hu, Ge Li, Xin Xia, David Lo, and Zhi Jin. 2018. Deep code comment generation. In 2018 IEEE/ACM 26th International Conference on Program Comprehension (ICPC) . IEEE, 200–20010."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib40",
+      "text": "Pradel and Chandra (2021) Michael Pradel and Satish Chandra. 2021. Neural software analysis. Commun. ACM 65, 1 (2021), 86–96."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib27",
+      "text": "Krizhevsky et al . (2012) Alex Krizhevsky, Ilya Sutskever, and Geoffrey E. Hinton. 2012. ImageNet Classification with Deep Convolutional Neural Network. Proceedings of the 25th International Conference on Neural Information Processing Systems 1 (2012), 1097–1105."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib16",
+      "text": "He et al . (2016a) Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. 2016a. Deep Residual Learning for Image Recognition. 2016 IEEE Conference on Computer Vision and Pattern Recognition (CVPR) , 770–778. https://doi.org/10.1109/CVPR.2016.90"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib17",
+      "text": "He et al . (2016b) Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. 2016b. Identity mappings in deep residual networks. Lecture Notes in Computer Science (including subseries Lecture Notes in Artificial Intelligence and Lecture Notes in Bioinformatics) 9908 LNCS (2016), 630–645."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib12",
+      "text": "Gilmer et al . (2017) Justin Gilmer, Samuel S Schoenholz, Patrick F Riley, Oriol Vinyals, and George E Dahl. 2017. Neural message passing for quantum chemistry. (2017), 1263–1272."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib66",
+      "text": "Zhou et al . (2020) Jie Zhou, Ganqu Cui, Shengding Hu, Zhengyan Zhang, Cheng Yang, Zhiyuan Liu, Lifeng Wang, Changcheng Li, and Maosong Sun. 2020. Graph neural networks: A review of methods and applications. , 57-81 pages. https://doi.org/10.1016/j.aiopen.2021.01.001"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib42",
+      "text": "Scarselli et al . (2008) Franco Scarselli, Marco Gori, Ah Chung Tsoi, Markus Hagenbuchner, and Gabriele Monfardini. 2008. The graph neural network model. IEEE transactions on neural networks 20, 1 (2008), 61–80."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib26",
+      "text": "Kipf and Welling (2016) Thomas N. Kipf and Max Welling. 2016. Semi-Supervised Classification with Graph Convolutional Networks. (9 2016)."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib48",
+      "text": "Sun et al . (2020) Yue Sun, Zhi Yang, and Yafei Dai. 2020. TrustGCN: Enabling Graph Convolutional Network for Robust Sybil Detection in OSNs. In 2020 IEEE/ACM International Conference on Advances in Social Networks Analysis and Mining (ASONAM) . 1–7. https://doi.org/10.1109/ASONAM49781.2020.9381325"
+    },
+    {
+      "n": 16,
+      "id": "bib.bib33",
+      "text": "Michail et al . (2022) Dimitrios Michail, Nikos Kanakaris, and Iraklis Varlamis. 2022. Detection of fake news campaigns using graph convolutional networks. International Journal of Information Management Data Insights 2, 2 (2022), 100104. https://doi.org/10.1016/j.jjimei.2022.100104"
+    },
+    {
+      "n": 17,
+      "id": "bib.bib60",
+      "text": "Ying et al . (2018) Rex Ying, Ruining He, Kaifeng Chen, Pong Eksombatchai, William L Hamilton, and Jure Leskovec. 2018. Graph convolutional neural networks for web-scale recommender systems. In Proceedings of the 24th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining . 974–983."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib49",
+      "text": "Tan et al . (2020) Qiaoyu Tan, Ninghao Liu, Xing Zhao, Hongxia Yang, Jingren Zhou, and Xia Hu. 2020. Learning to hash with graph neural networks for recommender systems. In Proceedings of The Web Conference 2020 . 1988–1998."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib4",
+      "text": "Cappart et al . (2021) Quentin Cappart, Didier Chételat, Elias B. Khalil, Andrea Lodi, Christopher Morris, and Petar Veličković. 2021. Combinatorial Optimization and Reasoning with Graph Neural Networks. In Proceedings of the Thirtieth International Joint Conference on Artificial Intelligence, IJCAI-21 , Zhi-Hua Zhou (Ed.). International Joint Conferences on Artificial Intelligence Organization, 4348–4355. Survey Track."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib51",
+      "text": "Veličković et al . (2019) Petar Veličković, Rex Ying, Matilde Padovano, Raia Hadsell, and Charles Blundell. 2019. Neural execution of graph algorithms. arXiv (2019)."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib67",
+      "text": "Zhou et al . (2019) Yaqin Zhou, Shangqing Liu, Jingkai Siow, Xiaoning Du, and Yang Liu. 2019. Devign: Effective vulnerability identification by learning comprehensive program semantics via graph neural networks. Advances in neural information processing systems 32 (2019)."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib3",
+      "text": "Allamanis et al . (2018) Miltiadis Allamanis, Marc Brockschmidt, and Mahmoud Khademi. 2018. Learning to Represent Programs with Graphs. In International Conference on Learning Representations ."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib37",
+      "text": "Nguyen et al . (2022b) Thanh-Dat Nguyen, Thanh Le-Cong, Duc-Minh Luong, Van-Hai Duong, Xuan-Bach D Le, David Lo, and Quyet-Thang Huynh. 2022b. FFL: Fine-grained Fault Localization for Student Programs via Syntactic and Semantic Reasoning. The 38th IEEE International Conference on Software Maintenance and Evolution (11 2022)."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib68",
+      "text": "Zhou et al . (2022) Yu Zhou, Haixia Zheng, Xin Huang, Shufeng Hao, Dengao Li, and Jumin Zhao. 2022. Graph Neural Networks: Taxonomy, Advances, and Trends. ACM Trans. Intell. Syst. Technol. 13, 1, Article 15 (jan 2022), 54 pages. https://doi.org/10.1145/3495161"
+    },
+    {
+      "n": 25,
+      "id": "bib.bib71",
+      "text": "Zügner and Günnemann (2019) Daniel Zügner and Stephan Günnemann. 2019. Adversarial Attacks on Graph Neural Networks via Meta Learning. In International Conference on Learning Representations . https://openreview.net/forum?id=Bylnx209YX"
+    },
+    {
+      "n": 26,
+      "id": "bib.bib31",
+      "text": "Ma et al . (2020) Jiaqi Ma, Shuangrui Ding, and Qiaozhu Mei. 2020. Towards more practical adversarial attacks on graph neural networks. Advances in neural information processing systems 33 (2020), 4756–4766."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib69",
+      "text": "Zhu et al . (2019) Dingyuan Zhu, Ziwei Zhang, Peng Cui, and Wenwu Zhu. 2019. Robust graph convolutional networks against adversarial attacks. In Proceedings of the 25th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining . 1399–1407."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib56",
+      "text": "Wu et al . (2019) Huijun Wu, Chen Wang, Yuriy Tyshetskiy, Andrew Docherty, Kai Lu, and Liming Zhu. 2019. Adversarial Examples for Graph Data: Deep Insights into Attack and Defense. In Proceedings of the Twenty-Eighth International Joint Conference on Artificial Intelligence, IJCAI-19 . International Joint Conferences on Artificial Intelligence Organization, 4816–4823."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib7",
+      "text": "Dai et al . (2018) Hanjun Dai, Hui Li, Tian Tian, Xin Huang, Lin Wang, Jun Zhu, and Le Song. 2018. Adversarial attack on graph structured data. In International conference on machine learning . PMLR, 1115–1124."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib6",
+      "text": "Dai et al . (2023) Enyan Dai, Minhua Lin, Xiang Zhang, and Suhang Wang. 2023. Unnoticeable Backdoor Attacks on Graph Neural Networks. In Proceedings of the ACM Web Conference 2023 . 2263–2273."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib64",
+      "text": "Zhang et al . (2021) Zaixi Zhang, Jinyuan Jia, Binghui Wang, and Neil Zhenqiang Gong. 2021. Backdoor Attacks to Graph Neural Networks. In Proceedings of the 26th ACM Symposium on Access Control Models and Technologies . ACM. https://doi.org/10.1145/3450569.3463560"
+    },
+    {
+      "n": 32,
+      "id": "bib.bib57",
+      "text": "Xi et al . (2021) Zhaohan Xi, Ren Pang, Shouling Ji, and Ting Wang. 2021. Graph Backdoor. In 30th USENIX Security Symposium (USENIX Security 21) . USENIX Association, 1523–1540. https://www.usenix.org/conference/usenixsecurity21/presentation/xi"
+    },
+    {
+      "n": 33,
+      "id": "bib.bib61",
+      "text": "Ying et al . (2019a) Zhitao Ying, Dylan Bourgeois, Jiaxuan You, Marinka Zitnik, and Jure Leskovec. 2019a. Gnnexplainer: Generating explanations for graph neural networks. Advances in neural information processing systems 32 (2019)."
+    },
+    {
+      "n": 34,
+      "id": "bib.bib29",
+      "text": "Luo et al . (2020) Dongsheng Luo, Wei Cheng, Dongkuan Xu, Wenchao Yu, Bo Zong, Haifeng Chen, and Xiang Zhang. 2020. Parameterized Explainer for Graph Neural Network. Advances in Neural Information Processing Systems 33 (2020)."
+    },
+    {
+      "n": 35,
+      "id": "bib.bib19",
+      "text": "Huang et al . (2023) Qiang Huang, Makoto Yamada, Yuan Tian, Dinesh Singh, and Yi Chang. 2023. GraphLIME: Local Interpretable Model Explanations for Graph Neural Networks. IEEE Transactions on Knowledge and Data Engineering 35, 7 (2023), 6968–6972. https://doi.org/10.1109/TKDE.2022.3187455"
+    },
+    {
+      "n": 36,
+      "id": "bib.bib14",
+      "text": "Gopinath et al . (2019) Divya Gopinath, Hayes Converse, Corina S. Pasareanu, and Ankur Taly. 2019. Property Inference For Deep Neural Networks. 2019 34th IEEE/ACM International Conference on Automated Software Engineering (ASE) (4 2019), 797–809."
+    },
+    {
+      "n": 37,
+      "id": "bib.bib45",
+      "text": "Seshia et al . (2018) Sanjit A Seshia, Ankush Desai, Tommaso Dreossi, Daniel Fremont Shromona, Ghosh Edward Kim, Sumukh Shivakumar, Marcell Vazquez-Chanlatte, Xiangyu Yue, and Daniel J Fremont Shromona. 2018. Formal Specification for Deep Neural Networks. http://www2.eecs.berkeley.edu/Pubs/TechRpts/2018/EECS-2018-25.html"
+    },
+    {
+      "n": 38,
+      "id": "bib.bib11",
+      "text": "Geng et al . (2023) Chuqin Geng, Nham Le, Xiaojie Xu, Zhaoyue Wang, Arie Gurfinkel, and Xujie Si. 2023. Towards Reliable Neural Specifications. In International Conference on Machine Learning . PMLR, 11196–11212."
+    },
+    {
+      "n": 39,
+      "id": "bib.bib62",
+      "text": "Ying et al . (2019b) Zhitao Ying, Dylan Bourgeois, Jiaxuan You, Marinka Zitnik, and Jure Leskovec. 2019b. GNNExplainer: Generating Explanations for Graph Neural Networks. In Advances in Neural Information Processing Systems , Vol. 32. Curran Associates, Inc."
+    },
+    {
+      "n": 40,
+      "id": "bib.bib30",
+      "text": "Ma et al . (2022) Jiaqi Ma, Junwei Deng, and Qiaozhu Mei. 2022. Adversarial Attack on Graph Neural Networks as An Influence Maximization Problem. In Proceedings of the Fifteenth ACM International Conference on Web Search and Data Mining (Virtual Event, AZ, USA) (WSDM ’22) . Association for Computing Machinery, New York, NY, USA, 675–685. https://doi.org/10.1145/3488560.3498497"
+    }
+  ]
+}

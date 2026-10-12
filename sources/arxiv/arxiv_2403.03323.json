@@ -1,0 +1,154 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.03323",
+  "title": "Automated Software Verification of Hyperliveness",
+  "authors": "Raven Beutner",
+  "year": "2024",
+  "categories": [
+    "cs.LO",
+    "cs.PL"
+  ],
+  "url": "https://arxiv.org/abs/2403.03323",
+  "html_url": "https://arxiv.org/html/2403.03323",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 986,
+  "text": "Relational properties (also called hyperproperties [1]) move away from a traditional specification that considers all executions of a system in isolation and, instead, relate multiple executions. Hyperproperties are becoming increasingly important and have shown up in various disciplines, perhaps most prominently in information-flow control. Assume we are given a program \\mathbb{P} with high-security input h, low-security input l, and public output o, and we want to formally prove that the output of \\mathbb{P} does not leak information about h. One way to ensure this is to verify that \\mathbb{P} behaves deterministically in the low-security input l, i.e., if the low-security input is identical across two executions, so is \\mathbb{P} ’s output.\n\nThe above property is a typical example of a 2 -safety property stating a requirement on all pairs of traces. More generally, a k -safety property requires that all k -tuples of executions, together, satisfy a given property. In the last decade, many approaches for the verification of k -safety properties have been proposed, based, e.g., on model-checking [2,3,4], abstract interpretation [5,6,7,8], symbolic execution [9], or program logics [10,11,12,13,14].\n\nHowever, for many relational properties, the implicit universal quantification found in k -safety properties is too restrictive. Consider the simple program in Figure 1 (taken from [15]), where \\star_{\\mathbb{N}} denotes the nondeterministic choice of a natural number. This program clearly violates the 2 -safety property discussed above as the nondeterminism influences the final value of o. Nevertheless, the program does not leak any information about the secret input h. To see this, assume the attacker observes some fixed low-security input-output pair (l,o), i.e., the attacker observes everything except the high-security input. The key observation is that (l,o) is possible for any possible high-security input, i.e., for every value of h, there exists some way to resolve the nondeterminism such that (l,o) is the observation made by the attacker. This information-flow policy – called generalized non-interference (GNI) [16] – requires a combination of universal and existential reasoning and thus cannot be expressed as a k -safety property.\n\nIn this paper, we study the automated verification of such (functional) \\forall^{*}\\exists^{*} properties. Concretely, we consider specifications in a form we call Forall-Exist Hoare Tuples (FEHT) (also called refinement quadruples [17] or RHLE triples [18]), which have the form\n\nwhere \\mathbb{P}_{1},\\ldots,\\mathbb{P}_{k+l} are (possibly identical) programs and \\Phi,\\Psi are first-order formulas that relate k+l different program runs. The FEHT is valid if for all k+l initial states that satisfy \\Phi, and for all possible executions of \\mathbb{P}_{1},\\ldots,\\mathbb{P}_{k} there exist executions of \\mathbb{P}_{k+1},\\ldots,\\mathbb{P}_{k+l} such that the final states satisfy \\Psi. For example, GNI can be expressed as \\boldsymbol{\\langle}l_{1}=l_{2}\\boldsymbol{\\rangle}\\mathbb{P}\\sim\\mathbb{P}\\boldsymbol{\\langle}o_{1}=o_{2}\\boldsymbol{\\rangle}, where l_{1} and o_{1} (resp. l_{2} and o_{2}) refer to the value of l and o in the first (resp. second) program copy. That is, for any two initial states \\sigma_{1},\\sigma_{2} with identical values for l (but possibly different values for h), and any final state \\sigma_{1}^{\\prime} reachable by executing \\mathbb{P} from \\sigma_{1}, there exists some final state \\sigma_{2}^{\\prime} (reachable from \\sigma_{2} by executing \\mathbb{P}) that agrees with \\sigma_{1}^{\\prime} in the value of o. The program in Figure 1 satisfies this FEHT. In the terminology of Clarkson and Schneider [1], GNI is a hyperliveness property, hence the name of our paper. Intuitively, the term hyperliveness stems from the fact that – due to the existential quantification in FEHTs – GNI reasons about the existence of a particular execution. Similar to the definition of liveness in temporal properties [19], we can, therefore, satisfy GNI by adding sufficiently many execution traces [20].\n\nFor finite -state hardware systems, many automated verification methods for hyperliveness properties (e.g., in the form of FEHTs) have been proposed [21,22,23,3,24,25,20]. In contrast, for infinite -state software, the verification of FEHTs is notoriously difficult; FEHTs mix quantification of different types, so we cannot employ purely over-approximate reasoning principles (as is possible for k -safety). Most existing approaches for software verification, therefore, require substantial user interaction, e.g., in the form of a custom Horn-clause template [26], a user-provided abstraction [15], or a deductive proof strategy [18,17]. See Section 6 for more discussion.\n\nIn this paper, we put forward an automatic algorithm for the verification of FEHTs. Our method is rooted in a novel program logic, which we call Forall-Exist Hoare Logic (FEHL) (in Section 3). Similar to many program logics for k -safety properties [11,27], our logic focuses on one of the programs involved in the verification at any given time (by, e.g., symbolically executing one step in one of the programs) and thus lends itself to automation. We show that FEHL is sound and complete (relative to a complete proof system for over- and under-approximate unary Hoare triples).\n\nOur verification algorithm – presented in Section 4 – then leverages FEHL for the analysis of FEHTs. During this analysis, the key algorithmic challenge is to find suitable instantiations for nondeterministic choices made in existentially quantified executions. Our algorithm avoids a direct instantiation and instead treats the outcome of the nondeterministic choice symbolically, allowing an instantiation at a later point in time. Formally, we define the concept of a parametric assertion. Instead of capturing a set of states, a parametric assertion defines a function that maps concrete values for a set of parameters (in our case, the nondeterministic choices in existentially quantified programs whose concrete instantiations we have postponed) to sets of states. Our algorithm then recursively computes a parametric postcondition and delegates the search for appropriate instantiations of the parameters to an SMT solver. Crucially, our algorithm only explores a restricted class of program alignments (as guided by FEHL). Therefore, the resulting constraints are ordinary (first-order) SMT formulas, which can be handled using off-the-shelf SMT solvers.\n\nWe implement our algorithm in a tool called ForEx and compare it with existing approaches for the verification of \\forall^{*}\\exists^{*} properties (in Section 5). As ForEx can resort to highly optimized off-the-shelf SMT solvers, it outperforms existing approaches (which often rely on custom solving strategies) in many benchmarks.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib21",
+      "text": "Clarkson, M.R., Schneider, F.B.: Hyperproperties. J. Comput. Secur. (2010). https://doi.org/10.3233/JCS-2009-0393"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib55",
+      "text": "Shemer, R., Gurfinkel, A., Shoham, S., Vizel, Y.: Property directed self composition. In: International Conference on Computer Aided Verification, CAV 2019 (2019). https://doi.org/10.1007/978-3-030-25540-4_9"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib33",
+      "text": "Finkbeiner, B., Rabe, M.N., Sánchez, C.: Algorithms for model checking HyperLTL and HyperCTL ∗ . In: International Conference on Computer Aided Verification, CAV 2015 (2015). https://doi.org/10.1007/978-3-319-21690-4_3"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib31",
+      "text": "Farzan, A., Vandikas, A.: Automated hypersafety verification. In: International Conference on Computer Aided Verification, CAV 2019 (2019). https://doi.org/10.1007/978-3-030-25540-4_11"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib43",
+      "text": "Mastroeni, I., Pasqua, M.: Verifying bounded subset-closed hyperproperties. In: International Symposium on Static Analysis, SAS 2018 (2018). https://doi.org/10.1007/978-3-319-99725-4_17"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib41",
+      "text": "Kovács, M., Seidl, H., Finkbeiner, B.: Relational abstract interpretation for the verification of 2-hypersafety properties. In: Conference on Computer and Communications Security, CCS 2013 (2013). https://doi.org/10.1145/2508859.2516721"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib5",
+      "text": "Assaf, M., Naumann, D.A., Signoles, J., Totel, E., Tronel, F.: Hypercollecting semantics and its application to static analysis of information flow. In: Symposium on Principles of Programming Languages, POPL 2017 (2017). https://doi.org/10.1145/3009837.3009889"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib44",
+      "text": "Mastroeni, I., Pasqua, M.: Statically analyzing information flows: an abstract interpretation-based hyperanalysis for non-interference. In: Symposium on Applied Computing, SAC 2019 (2019). https://doi.org/10.1145/3297280.3297498"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib30",
+      "text": "Farina, G.P., Chong, S., Gaboardi, M.: Relational symbolic execution. In: International Symposium on Principles and Practice of Programming Languages, PPDP 2019 (2019). https://doi.org/10.1145/3354166.3354175"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib8",
+      "text": "Benton, N.: Simple relational correctness proofs for static analyses and program transformations. In: Symposium on Principles of Programming Languages, POPL 2004 (2004). https://doi.org/10.1145/964001.964003"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib56",
+      "text": "Sousa, M., Dillig, I.: Cartesian hoare logic for verifying k-safety properties. In: Conference on Programming Language Design and Implementation, PLDI 2016 (2016). https://doi.org/10.1145/2908080.2908092"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib28",
+      "text": "D’Osualdo, E., Farzan, A., Dreyer, D.: Proving hypersafety compositionally. Proc. ACM Program. Lang. (OOPSLA) (2022). https://doi.org/10.1145/3563298"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib60",
+      "text": "Yang, H.: Relational separation logic. Theor. Comput. Sci. (2007). https://doi.org/10.1016/j.tcs.2006.12.036"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib49",
+      "text": "Nagasamudram, R., Naumann, D.A.: Alignment completeness for relational hoare logics. In: Symposium on Logic in Computer Science, LICS 2021 (2021). https://doi.org/10.1109/LICS52264.2021.9470690"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib12",
+      "text": "Beutner, R., Finkbeiner, B.: Software verification of hyperproperties beyond k-safety. In: International Conference on Computer Aided Verification, CAV 2022 (2022). https://doi.org/10.1007/978-3-031-13185-1_17"
+    },
+    {
+      "n": 16,
+      "id": "bib.bib45",
+      "text": "McCullough, D.: Noninterference and the composability of security properties. In: Symposium on Security and Privacy, SP 1988. IEEE Computer Society (1988). https://doi.org/10.1109/SECPRI.1988.8110"
+    },
+    {
+      "n": 17,
+      "id": "bib.bib6",
+      "text": "Barthe, G., Crespo, J.M., Kunz, C.: Beyond 2-safety: Asymmetric product programs for relational program verification. In: International Symposium on Logical Foundations of Computer Science, LFCS 2013 (2013). https://doi.org/10.1007/978-3-642-35722-0_3"
+    },
+    {
+      "n": 18,
+      "id": "bib.bib26",
+      "text": "Dickerson, R., Ye, Q., Zhang, M.K., Delaware, B.: RHLE: modular deductive verification of relational ∀ \\forall ∃ \\exists properties. In: Asian Symposium on Programming Languages and Systems, APLAS 2022 (2022). https://doi.org/10.1007/978-3-031-21037-2_4"
+    },
+    {
+      "n": 19,
+      "id": "bib.bib2",
+      "text": "Alpern, B., Schneider, F.B.: Defining liveness. Inf. Process. Lett. (1985). https://doi.org/10.1016/0020-0190(85)90056-0"
+    },
+    {
+      "n": 20,
+      "id": "bib.bib22",
+      "text": "Coenen, N., Finkbeiner, B., Sánchez, C., Tentrup, L.: Verifying hyperliveness. In: International Conference on Computer Aided Verification, CAV 2019 (2019). https://doi.org/10.1007/978-3-030-25540-4_7"
+    },
+    {
+      "n": 21,
+      "id": "bib.bib20",
+      "text": "Clarkson, M.R., Finkbeiner, B., Koleini, M., Micinski, K.K., Rabe, M.N., Sánchez, C.: Temporal logics for hyperproperties. In: International Conference om Principles of Security and Trust, POST 2014 (2014). https://doi.org/10.1007/978-3-642-54792-8_15"
+    },
+    {
+      "n": 22,
+      "id": "bib.bib38",
+      "text": "Hsu, T., Sánchez, C., Bonakdarpour, B.: Bounded model checking for hyperproperties. In: International Conference on Tools and Algorithms for the Construction and Analysis of Systems, TACAS 2021 (2021). https://doi.org/10.1007/978-3-030-72016-2_6"
+    },
+    {
+      "n": 23,
+      "id": "bib.bib15",
+      "text": "Beutner, R., Finkbeiner, B., Frenkel, H., Metzger, N.: Second-order hyperproperties. In: International Conference on Computer Aided Verification, CAV 2023 (2023). https://doi.org/10.1007/978-3-031-37703-7_15"
+    },
+    {
+      "n": 24,
+      "id": "bib.bib13",
+      "text": "Beutner, R., Finkbeiner, B.: AutoHyper: Explicit-state model checking for HyperLTL. In: International Conference on Tools and Algorithms for the Construction and Analysis of Systems, TACAS 2023 (2023). https://doi.org/10.1007/978-3-031-30823-9_8"
+    },
+    {
+      "n": 25,
+      "id": "bib.bib14",
+      "text": "Beutner, R., Finkbeiner, B.: Model checking omega-regular hyperproperties with AutoHyperQ. In: International Conference on Logic for Programming, Artificial Intelligence and Reasoning, LPAR 2023 (2023). https://doi.org/10.29007/1XJT"
+    },
+    {
+      "n": 26,
+      "id": "bib.bib57",
+      "text": "Unno, H., Terauchi, T., Koskinen, E.: Constraint-based relational verification. In: International Conference on Computer Aided Verification, CAV 2021 (2021). https://doi.org/10.1007/978-3-030-81685-8_35"
+    },
+    {
+      "n": 27,
+      "id": "bib.bib19",
+      "text": "Chen, J., Feng, Y., Dillig, I.: Precise detection of side-channel vulnerabilities using quantitative cartesian hoare logic. In: Conference on Computer and Communications Security, CCS 2017 (2017). https://doi.org/10.1145/3133956.3134058"
+    }
+  ]
+}

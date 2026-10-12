@@ -1,0 +1,259 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2209.13865",
+  "title": "Zero-Shot 3D Drug Design by Sketching and Generating",
+  "authors": "Siyu Long, Yi Zhou, Xinyu Dai, Hao Zhou",
+  "year": "2022",
+  "categories": [
+    "cs.CE",
+    "q-bio.BM"
+  ],
+  "url": "https://arxiv.org/abs/2209.13865",
+  "html_url": "https://arxiv.org/html/2209.13865",
+  "license": "http://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Introduction",
+  "word_count": 879,
+  "text": "Drug design is a crucial step in the drug discovery cycle, which is the inventive process of finding new drugs based on a biological target (usually a protein pocket) [1,2,3]. However, seeking appropriate drugs for a particular target is quite challenging due to the enormous space of drug candidates (almost 10^{33}). Traditional drug design approaches usually employ virtual screening [4,5,6] and molecular dynamics [7,8] to traverse in a large scaled drug library, which is time-consuming and could not produce novel drug candidates. Recently, a line of work proposes to realize drug design by generating drug molecules from scratch using deep generative models [9,2,10], which is quite promising due to the fast speed and the ability of de-novo drug design.\n\nMost of current drug generation model are developed upon 1D (SMILES) [11,12,13] or 2D (molecular graph) [14,15,16,17,18,19] molecular structures, which heavily rely on expensive experimental data for supervised training while ignoring the 3D interaction information between the drug and the pocket. In a word, they attempt to find a molecule that maximizes the score given by a bio-activity predictor trained on experimental data. They employ different optimization methods, such as Generative Adversarial Network (GAN) [20], Bayesian Optimization (BO) [21,22,9], Reinforcement Learning (RL) [23,24,20,25,26,27], Evolutionary and Genetic Algorithms (EA/GA) [28,29,30,31,32], and Markov Chain Monte Carlo (MCMC) [33,34], in the molecular space for obtaining desired drug molecule under certain constraints. However, we argue that a purely data-driven approach of drug design is practically limited, since in most cases, the quantity of experimental drug-pocket pairs hardly enables supervised training of de-novo drug design. Generally, most protein pockets lack bio-activity data, and learning on noisy and deficient data may lead to severe overfitting problems.\n\nRecently, several drug design models have been proposed to directly generate drug molecules in the 3D space, the realistic space of drug-target interaction. Generating in such space is very promising for the potential of leveraging some prior knowledge (e.g., physical knowledge) instead of entirely counting on data-driven methodology. Specifically, \\AtNextCite [35] [35] and \\AtNextCite [2] [2] propose efficient 3D generative models to learn the atom density conditioned on protein pockets, with GAN and auto-regressive models, respectively. Nevertheless experimental data are still obligatory in their models for achieving satisfactory results. Even more noteworthy is GEKO [10], which combines the ideas of 3D generation and physical simulation to obtain state-of-the-art drug design performance without the help of large-scale experimental data. Intuitively, GEKO performs geometric editing in the 3D molecule space guided by docking simulation (physical knowledge) [36,37]. However, GEKO may suffer from two concerns: a) the frequent invocation of docking is very time consuming, which significantly slows down the speed of the drug design model [38,39]. b) docking may not always be accurate enough, especially in some complex settings [40,41]. In such a case, being heavily dependent on the docking accuracy could hurt the generalization of the proposed drug design model.\n\nIn this paper, we propose the zero-shot approach Desert, namely D rug d E sign by S k E tching and gene R a T ing. Motivated by the idea of structure determines properties [42,43,44,45], Desert is built on the assumption that molecular shape determines bio-activity between drug molecules and its target pocket. In other words, we suppose that a drug candidate would have satisfactory bio-activity to a target pocket if their shapes are complementary (see Figure 2).\n\nWith such prior, as shown in Figure 2, Desert splits the whole drug design process into two stage: sketching and generating, which employs the molecular shape as the bridge of the two stages. Such splitting makes Desert enjoy two advantages: a) Desert does not heavily rely on docking simulation, which only optionally uses docking for post-process and thus avoids the aforementioned disadvantages of GEKO. b) Desert abandons the expensive experimental data. Specifically, in the sketching stage, we only need to sample some reasonable shapes complementary to the target pocket. In the generating stage, Desert proposes to employ a generative pre-trained model (from shape to concrete molecular) to fill the shape obtained in the last sketching stage. Notably, the generative pre-trained model is only trained on the ZINC database, which contains 1000M pairs of molecules and their corresponding shapes. This process does not rely on experimental data, making Desert work in a zero-shot fashion.\n\nNote that Desert is not baseless. Besides the idea that structure determines properties (an important concept of Structural Biochemistry), we also have preliminary results to verify our assumption. Figure 2 shows that after binding to a pocket, the root-mean-square deviation (RMSD) is not too shabby (1.391 Å) compared with molecular conformation generation methods such as CGCF [46] (1.248 Å) and ETKDG [47] (1.042 Å). The results suggest that the molecular shape is stable when molecules bind to proteins. We also show in Figure 2 that a ligand often attaches tight to a pocket, which means their shape is complementary.\n\nIn summary, our contributions are three-fold: (1) We propose Desert, a generative method for de-novo 3D shape-based drug design in the zero-shot setting. (2) Desert trains a pre-trained model from massive unbound molecules, eliminating the constraints of labeled data. (3) Desert achieves a new state-of-the-art result (the docking score improves 0.79\\mathrm{kcal/mol} and 2.93\\mathrm{kcal/mol} over the best supervised method on two datasets) at a fast speed (about 20 times faster than GEKO).",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bibx1",
+      "text": "Xiliang Zheng, LinFeng Gan, Erkang Wang and Jin Wang “Pocket-based drug design: exploring pocket space” In The AAPS journal 15.1 Springer, 2013, pp. 228–241"
+    },
+    {
+      "n": 2,
+      "id": "bib.bibx2",
+      "text": "Shitong Luo, Jiaqi Guan, Jianzhu Ma and Jian Peng “A 3D Generative Model for Structure-Based Drug Design” In Advances in Neural Information Processing Systems 34 , 2021"
+    },
+    {
+      "n": 3,
+      "id": "bib.bibx3",
+      "text": "Pavol Drotár et al. “Structure-aware generation of drug-like molecules” In arXiv preprint arXiv:2111.04107 , 2021"
+    },
+    {
+      "n": 4,
+      "id": "bib.bibx4",
+      "text": "Leonardo Ferreira, Ricardo Dos, Glaucius Oliva and Adriano Andricopulo “Molecular docking and structure-based drug design strategies” In Molecules 20.7 Multidisciplinary Digital Publishing Institute, 2015, pp. 13384–13421"
+    },
+    {
+      "n": 5,
+      "id": "bib.bibx5",
+      "text": "Xuan-Yu Meng, Hong-Xing Zhang, Mihaly Mezei and Meng Cui “Molecular docking: a powerful approach for structure-based drug discovery” In Current computer-aided drug design 7.2 Bentham Science Publishers, 2011, pp. 146–157"
+    },
+    {
+      "n": 6,
+      "id": "bib.bibx6",
+      "text": "Nafisa Hassan, Amr Alhossary, Yuguang Mu and Chee-Keong Kwoh “Protein-ligand blind docking using QuickVina-W with inter-process spatio-temporal integration” In Scientific reports 7.1 Nature Publishing Group, 2017, pp. 1–13"
+    },
+    {
+      "n": 7,
+      "id": "bib.bibx7",
+      "text": "Marco De, Matteo Masetti, Giovanni Bottegoni and Andrea Cavalli “Role of molecular dynamics and related methods in drug discovery” In Journal of medicinal chemistry 59.9 ACS Publications, 2016, pp. 4035–4061"
+    },
+    {
+      "n": 8,
+      "id": "bib.bibx8",
+      "text": "Jacob Durrant and J McCammon “Molecular dynamics simulations and drug discovery” In BMC biology 9.1 BioMed Central, 2011, pp. 1–9"
+    },
+    {
+      "n": 9,
+      "id": "bib.bibx9",
+      "text": "Wengong Jin, Regina Barzilay and Tommi Jaakkola “Junction tree variational autoencoder for molecular graph generation” In International conference on machine learning , 2018, pp. 2323–2332 PMLR"
+    },
+    {
+      "n": 10,
+      "id": "bib.bibx10",
+      "text": "Yuwei Yang et al. “Knowledge Guided Geometric Editing for Unsupervised Drug Design”, 2022 URL: https://openreview.net/forum?id=91muTwt1_t5"
+    },
+    {
+      "n": 11,
+      "id": "bib.bibx11",
+      "text": "Seokho Kang and Kyunghyun Cho “Conditional molecular design with deep generative models” In Journal of chemical information and modeling 59.1 ACS Publications, 2018, pp. 43–52"
+    },
+    {
+      "n": 12,
+      "id": "bib.bibx12",
+      "text": "Marwin Segler, Thierry Kogej, Christian Tyrchan and Mark Waller “Generating focused molecule libraries for drug discovery with recurrent neural networks” In ACS central science 4.1 ACS Publications, 2018, pp. 120–131"
+    },
+    {
+      "n": 13,
+      "id": "bib.bibx13",
+      "text": "Matt Kusner, Brooks Paige and José Hernández-Lobato “Grammar variational autoencoder” In International conference on machine learning , 2017, pp. 1945–1954 PMLR"
+    },
+    {
+      "n": 14,
+      "id": "bib.bibx14",
+      "text": "Qi Liu, Miltiadis Allamanis, Marc Brockschmidt and Alexander Gaunt “Constrained graph variational autoencoders for molecule design” In Advances in neural information processing systems 31 , 2018"
+    },
+    {
+      "n": 15,
+      "id": "bib.bibx15",
+      "text": "Tengfei Ma, Jie Chen and Cao Xiao “Constrained generation of semantically valid graphs via regularizing variational autoencoders” In Advances in Neural Information Processing Systems 31 , 2018"
+    },
+    {
+      "n": 16,
+      "id": "bib.bibx16",
+      "text": "Bidisha Samanta et al. “Nevae: A deep generative model for molecular graphs” In Journal of machine learning research. 2020 Apr; 21 (114): 1-33 Journal of Machine Learning Research, 2020"
+    },
+    {
+      "n": 17,
+      "id": "bib.bibx17",
+      "text": "Wengong Jin, Kevin Yang, Regina Barzilay and Tommi Jaakkola “Learning multimodal graph-to-graph translation for molecular optimization” In arXiv preprint arXiv:1812.01070 , 2018"
+    },
+    {
+      "n": 18,
+      "id": "bib.bibx18",
+      "text": "Wengong Jin, Regina Barzilay and Tommi Jaakkola “Composing molecules with multiple property constraints” In arXiv preprint arXiv:2002.03244 , 2020"
+    },
+    {
+      "n": 19,
+      "id": "bib.bibx19",
+      "text": "Ari Seff et al. “Discrete object generation with reversible inductive construction” In Advances in Neural Information Processing Systems 32 , 2019"
+    },
+    {
+      "n": 20,
+      "id": "bib.bibx20",
+      "text": "Nicola De and Thomas Kipf “MolGAN: An implicit generative model for small molecular graphs” In arXiv preprint arXiv:1805.11973 , 2018"
+    },
+    {
+      "n": 21,
+      "id": "bib.bibx21",
+      "text": "Rafael Gómez-Bombarelli et al. “Automatic chemical design using a data-driven continuous representation of molecules” In ACS central science 4.2 ACS Publications, 2018, pp. 268–276"
+    },
+    {
+      "n": 22,
+      "id": "bib.bibx22",
+      "text": "Robin Winter et al. “Efficient multi-objective molecular optimization in a continuous latent space” In Chemical science 10.34 Royal Society of Chemistry, 2019, pp. 8016–8024"
+    },
+    {
+      "n": 23,
+      "id": "bib.bibx23",
+      "text": "Wengong Jin, Regina Barzilay and Tommi Jaakkola “Multi-objective molecule generation using interpretable substructures” In International conference on machine learning , 2020, pp. 4849–4859 PMLR"
+    },
+    {
+      "n": 24,
+      "id": "bib.bibx24",
+      "text": "Mariya Popova, Olexandr Isayev and Alexander Tropsha “Deep reinforcement learning for de novo drug design” In Science advances 4.7 American Association for the Advancement of Science, 2018, pp. eaap7885"
+    },
+    {
+      "n": 25,
+      "id": "bib.bibx25",
+      "text": "Jiaxuan You et al. “Graph convolutional policy network for goal-directed molecular graph generation” In Advances in neural information processing systems 31 , 2018"
+    },
+    {
+      "n": 26,
+      "id": "bib.bibx26",
+      "text": "Chence Shi et al. “Graphaf: a flow-based autoregressive model for molecular graph generation” In arXiv preprint arXiv:2001.09382 , 2020"
+    },
+    {
+      "n": 27,
+      "id": "bib.bibx27",
+      "text": "Zhenpeng Zhou et al. “Optimization of molecules via deep reinforcement learning” In Scientific reports 9.1 Nature Publishing Group, 2019, pp. 1–10"
+    },
+    {
+      "n": 28,
+      "id": "bib.bibx28",
+      "text": "Jan Jensen “A graph-based genetic algorithm and generative model/Monte Carlo tree search for the exploration of chemical space” In Chemical science 10.12 Royal Society of Chemistry, 2019, pp. 3567–3572"
+    },
+    {
+      "n": 29,
+      "id": "bib.bibx29",
+      "text": "Sungsoo Ahn, Junsu Kim, Hankook Lee and Jinwoo Shin “Guiding deep molecular optimization with genetic exploration” In Advances in neural information processing systems 33 , 2020, pp. 12008–12021"
+    },
+    {
+      "n": 30,
+      "id": "bib.bibx30",
+      "text": "AkshatKumar Nigam, Pascal Friederich, Mario Krenn and Alán Aspuru-Guzik “Augmenting genetic algorithms with deep neural networks for exploring the chemical space” In arXiv preprint arXiv:1909.11655 , 2019"
+    },
+    {
+      "n": 31,
+      "id": "bib.bibx31",
+      "text": "R Devi, S Sathya and Mohane Coumar “Evolutionary algorithms for de novo drug design–A survey” In Applied Soft Computing 27 Elsevier, 2015, pp. 543–552"
+    },
+    {
+      "n": 32,
+      "id": "bib.bibx32",
+      "text": "Jan Jensen “A graph-based genetic algorithm and generative model/Monte Carlo tree search for the exploration of chemical space” In Chemical science 10.12 Royal Society of Chemistry, 2019, pp. 3567–3572"
+    },
+    {
+      "n": 33,
+      "id": "bib.bibx33",
+      "text": "Yutong Xie et al. “Mars: Markov molecular sampling for multi-objective drug discovery” In arXiv preprint arXiv:2103.10432 , 2021"
+    },
+    {
+      "n": 34,
+      "id": "bib.bibx34",
+      "text": "Tianfan Fu et al. “Mimosa: Multi-constraint molecule sampling for molecule optimization” In arXiv preprint arXiv:2010.02318 , 2020"
+    },
+    {
+      "n": 35,
+      "id": "bib.bibx35",
+      "text": "Tomohide Masuda, Matthew Ragoza and David Koes “Generating 3D Molecular Structures Conditional on a Receptor Binding Site with Deep Generative Models” In CoRR abs/2010.14442 , 2020 arXiv: https://arxiv.org/abs/2010.14442"
+    },
+    {
+      "n": 36,
+      "id": "bib.bibx36",
+      "text": "Oleg Trott and Arthur Olson “AutoDock Vina: improving the speed and accuracy of docking with a new scoring function, efficient optimization, and multithreading” In Journal of computational chemistry 31.2 Wiley Online Library, 2010, pp. 455–461"
+    },
+    {
+      "n": 37,
+      "id": "bib.bibx37",
+      "text": "Jerome Eberhardt, Diogo Santos-Martins, Andreas Tillack and Stefano Forli “AutoDock Vina 1.2. 0: New docking methods, expanded force field, and python bindings” In Journal of Chemical Information and Modeling 61.8 ACS Publications, 2021, pp. 3891–3898"
+    },
+    {
+      "n": 38,
+      "id": "bib.bibx38",
+      "text": "Francois Berenger, Ashutosh Kumar, Kam Zhang and Yoshihiro Yamanishi “Lean-Docking: Exploiting Ligands’ Predicted Docking Scores to Accelerate Molecular Docking” In Journal of Chemical Information and Modeling 61.5 ACS Publications, 2021, pp. 2341–2352"
+    },
+    {
+      "n": 39,
+      "id": "bib.bibx39",
+      "text": "Ondrej Vavra et al. “CaverDock: a molecular docking-based tool to analyse ligand transport through protein tunnels and channels” In Bioinformatics 35.23 Oxford University Press, 2019, pp. 4986–4993"
+    },
+    {
+      "n": 40,
+      "id": "bib.bibx40",
+      "text": "David Ramı́rez and Julio Caballero “Is it reliable to use common molecular docking methods for comparing the binding affinities of enantiomer pairs for their protein target?” In International journal of molecular sciences 17.4 Multidisciplinary Digital Publishing Institute, 2016, pp. 525"
+    },
+    {
+      "n": 41,
+      "id": "bib.bibx41",
+      "text": "Kun-Yi Hsin, Samik Ghosh and Hiroaki Kitano “Combining machine learning systems and multiple docking simulation packages to improve docking prediction reliability for network pharmacology” In PloS one 8.12 Public Library of Science San Francisco, USA, 2013, pp. e83922"
+    },
+    {
+      "n": 42,
+      "id": "bib.bibx42",
+      "text": "Alan Katritzky et al. “Computational Chemistry Approaches for Understanding how Structure Determines Properties” In Zeitschrift für Naturforschung B 64.6 Verlag der Zeitschrift für Naturforschung, 2009, pp. 773–777"
+    },
+    {
+      "n": 43,
+      "id": "bib.bibx43",
+      "text": "RM Kell and PB Stickney “How Structure Determines Properties of Plastics”, 1964"
+    },
+    {
+      "n": 44,
+      "id": "bib.bibx44",
+      "text": "Alan Katritzky and Dan Fara “How chemical structure determines physical, chemical, and technological properties: An overview illustrating the potential of quantitative structure- property relationships for fuels science” In Energy & Fuels 19.3 ACS Publications, 2005, pp. 922–935"
+    },
+    {
+      "n": 45,
+      "id": "bib.bibx45",
+      "text": "Milan Rambukwella et al. “Ligand Structure Determines Nanoparticles’ Atomic Structure, Metal-Ligand Interface and Properties” In Frontiers in chemistry Frontiers, 2018, pp. 330"
+    },
+    {
+      "n": 46,
+      "id": "bib.bibx46",
+      "text": "Minkai Xu et al. “Learning neural generative dynamics for molecular conformation generation” In arXiv preprint arXiv:2102.10240 , 2021"
+    },
+    {
+      "n": 47,
+      "id": "bib.bibx47",
+      "text": "Sereina Riniker and Gregory Landrum “Better informed distance geometry: using what we know to improve conformation generation” In Journal of chemical information and modeling 55.12 ACS Publications, 2015, pp. 2562–2574"
+    },
+    {
+      "n": 48,
+      "id": "bib.bibx48",
+      "text": "Stephan Stern, Marilyn Martinez and David Stevens “When is it important to measure unbound drug in evaluating nanomedicine pharmacokinetics?” In Drug Metabolism and Disposition 44.12 ASPET, 2016, pp. 1934–1939"
+    }
+  ]
+}

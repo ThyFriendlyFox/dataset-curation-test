@@ -1,0 +1,95 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2012.04171",
+  "title": "Sparse encoding for more-interpretable feature-selecting representations in probabilistic matrix factorization",
+  "authors": "Joshua C. Chang, Patrick Fletcher, Jungmin Han, Ted L. Chang, Shashaank Vattikuti, Bart Desmet, Ayah Zirikly, Carson C. Chow",
+  "year": "2020",
+  "categories": [
+    "cs.LG",
+    "q-bio.QM",
+    "stat.ML"
+  ],
+  "url": "https://arxiv.org/abs/2012.04171",
+  "html_url": "https://arxiv.org/html/2012.04171",
+  "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+  "section": "Introduction",
+  "word_count": 1047,
+  "text": "For many inverse problems, such as those found in healthcare, model interpretability is paramount. Building interpretable high-performing solutions is technically challenging and requires flexible frameworks. A general approach to these and other problems is to structure solutions into pipelines. By ensuring interpretability of each step in such a pipeline, one can achieve interpretability of the overall larger model.\n\nData sources for natural language processing, medical informatics, and bioinformatics are often high-dimensional count matrices. A common first step in modeling high-dimensional data sets is to use dimensionality reduction to find tractable data representations (also called factors or embeddings), that are then fed into downstream analyses. Our goal is to develop a dimension reduction scheme for count matrices such that the reduced representation has an innate interpretation in terms of the original data features.\n\n## 1.1 Interpretability versus explainability\n\nWe seek latent data representations that are not only post-hoc explainable [1,2], but also intrinsically interpretable [3]. Our definition of intrinsic interpretability requires that it is clear how the model outputs are computed from the original variables, and that the latent variables and interactions within the model are meaningful.\n\nPost-hoc explanations are based on subjective examination of a solution through the lens of subject-matter expertise. For black-box models that lack intrinsic interpretability, these explanations are produced using simpler approximating models (typically local linear regressions). In addition to the explanations being inexact, they can also be misleading [1]. Examples of black-box models that rely on approximation techniques for explainability are found throughout the deep learning literature.\n\n## 1.2 Disentangled autoencoders\n\nDisentangled variational autoencoders [4,5,6] are deep learning models that are inherently mindful of post-hoc model explainability. Like other autoencoders, these models are encoder-decoder structured (see Definitions 1 and 2), where the encoder generates dimensionally reduced representations.\n\nThe encoder transformation maps input data features to latent representations\n\nThe decoder transformation maps latent representations to predictions\n\nDisentangled autoencoders use a combination of penalties [4,7] and structural constraints [8] to encourage statistical independence in representations, facilitating explanation. These methods arose in computer vision and have demonstrated empirical utility in producing nonlinear factor models where the factors are conceptually sensible. Yet, due to the black-box nature of deep learning, explanations for how the factors are generated from the data, using local saliency maps for instance, are unreliable or imprecise [1,9,10]. In imaging applications, where the features are raw pixels, this type of interpretability is unnecessary. However, when modeling structured data problems, one often wishes to learn the effects of the individual data features.\n\n## 1.3 Probabilistic matrix factorization\n\nProbabilistic matrix factorization methods are related to autoencoders [11]. These methods are often presented in the context of recommender systems. In these cases, rows of the input matrix are attributed to users, and columns (features) are attributed to items. Probabilistic matrix factorization methods are bi-linear in item- and user-specific effects, de-convolving them in a manner similar to item response theory [12]. In applications with non-negative data, non-negative sparse matrix factorization methods further improve on interpretability by computing predictions using only additive terms [13].\n\nFor count matrices, [14] introduced hierarchical Poisson matrix factorization (HPF). Suppose \\mathbf{Y}=(y_{ui}) is a U\\times I matrix of non-negative integers, where each row corresponds to a user and each column corresponds to an item (feature). Adopting their notation, [14] formulated their model as\n\nwhere \\bm{\\Theta}=(\\theta_{uk}) is a U\\times K matrix, and \\mathbf{B}=(\\beta_{ki}) is the representation decoder matrix. Additional priors \\eta_{i}\\sim\\textrm{Gamma}(c^{\\prime},c^{\\prime}/d^{\\prime}) and \\xi_{u}\\sim\\textrm{Gamma}(a^{\\prime},a^{\\prime}/b^{\\prime}) model item and user-specific variability in the dataset, and a^{\\prime},b^{\\prime},c^{\\prime},d^{\\prime}\\in\\mathbb{R}^{+} are hyper-parameters. The row vector \\bm{\\theta}_{u}=(\\theta_{u1},\\ldots,\\theta_{uK}) constitutes a K -dimensional representation of the user, and the matrix \\mathbf{B}=(\\beta_{ki}) decodes the representation into predictions on the user’s counts.\n\nIn HPF, the gamma priors on the decoder matrix \\mathbf{B}=(\\beta_{ki}) enforce non-negativity. Because the gamma distribution can have density at zero, these priors also allow for sparsity where only a few of the entries are far from zero. Sparsity, non-negativity, and the simple bi-linear structure of the likelihood in HPF combine to yield a simple interpretation of the model: in HPF, a predictive density for each matrix element is formed using a linear combination of a subset of representation elements, where the elements of \\mathbf{B} determine the relative additive contributions of each of the elements (Fig. 1 a). However, the composition of each latent factor in terms of the original items is not explicitly determined but arises from Bayesian inference (Fig. 1 c).\n\n## 1.4 Limitations of HPF\n\nClassical non-negative matrix factorization (NMF) is often touted for having a column-clustering property [15], where data features are grouped into coherent factors. The standard HPF of Eq. 1 lacks this property. In HPF, while each prediction is a linear combination of a subset of factors, each factor is not necessarily a linear combination of a subset of features (depicted in Fig. 1 c).\n\nThe transformation matrix \\mathbf{B} defines a decoder (Def. 2) like a classic autoencoder. A corresponding encoding transformation (Def. 1) does not explicitly appear in the formulation of Eq. 1. Determining the composition of factors is not simply a matter of reading the decoding matrix row-wise. Mathematically, sparsity in decoding does not imply sparsity in encoding analogous to how pseudo-inverses of sparse matrices are not necessarily sparse.\n\nHPF is also unable to perform feature selection. By Eq. 1, predictions are formed by weighting representations using values from columns of the decoding matrix – a feature’s corresponding terms in the decoding matrix will be near zero if and only if that feature’s mean is near zero. Exclusion of a feature column from the decoding matrix yields no information on whether that feature plays a part in generating representations. Also, this deficiency can cause HPF to erroneously imply structure when none is present, as demonstrated in Fig. 3 a) on a factorization of pure Poisson noise.\n\n## 1.5 Our contributions\n\nWe propose a method to self-consistently constrain HPF so that its corresponding encoding transformation is explicit. In doing so, we improve interpretability of HPF, and give it the ability to perform feature selection. Constraining HPF in this manner also makes it more suitable to training with large datasets because the representation matrix does not need to be stored in memory. Using a medical claims case study, we demonstrate how our method facilitates reparameterization of decision rules in representation space into corresponding rules on the original data features.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib27",
+      "text": "Laugel et al. (2019) Thibault Laugel, Marie-Jeanne Lesot, Christophe Marsala, Xavier Renard, and Marcin Detyniecki. The Dangers of Post-hoc Interpretability: Unjustified Counterfactual Explanations. arXiv:1907.09294 [cs, stat] , July 2019. URL http://arxiv.org/abs/1907.09294 . arXiv: 1907.09294."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib6",
+      "text": "Caruana et al. (2020) Rich Caruana, Scott Lundberg, Marco Tulio Ribeiro, Harsha Nori, and Samuel Jenkins. Intelligible and Explainable Machine Learning: Best Practices and Practical Challenges. In Proceedings of the 26th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining , KDD ’20, pp. 3511–3512, New York, NY, USA, August 2020. Association for Computing Machinery. ISBN 978-1-4503-7998-4. doi: 10.1145/3394486.3406707 . URL https://doi.org/10.1145/3394486.3406707 ."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib36",
+      "text": "Rudin (2019) Cynthia Rudin. Stop explaining black box machine learning models for high stakes decisions and use interpretable models instead. Nature Machine Intelligence , 1(5):206–215, May 2019. ISSN 2522-5839. doi: 10.1038/s42256-019-0048-x . URL https://www.nature.com/articles/s42256-019-0048-x . Number: 5 Publisher: Nature Publishing Group."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib22",
+      "text": "Higgins et al. (2016) Irina Higgins, Loic Matthey, Arka Pal, Christopher Burgess, Xavier Glorot, Matthew Botvinick, Shakir Mohamed, and Alexander Lerchner. beta-VAE: Learning Basic Visual Concepts with a Constrained Variational Framework. November 2016. URL https://openreview.net/forum?id=Sy2fzU9gl ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib38",
+      "text": "Tomczak & Welling (2017) Jakub M. Tomczak and Max Welling. VAE with a VampPrior. arXiv:1705.07120 [cs, stat] , May 2017. URL http://arxiv.org/abs/1705.07120 . arXiv: 1705.07120."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib12",
+      "text": "Deng et al. (2017) Zhiwei Deng, Rajitha Navarathna, Peter Carr, Stephan Mandt, Yisong Yue, Iain Matthews, and Greg Mori. Factorized Variational Autoencoders for Modeling Audience Reactions to Movies. In 2017 IEEE Conference on Computer Vision and Pattern Recognition (CVPR) , pp. 6014–6023, July 2017. doi: 10.1109/CVPR.2017.637 . ISSN: 1063-6919."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib23",
+      "text": "Hoffman et al. (2017) Matt Hoffman, Carlos Riquelme, and Matthew Johnson. The Beta VAE’s Implicit Prior. 2017. URL http://bayesiandeeplearning.org/2017/papers/66.pdf ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib1",
+      "text": "Ainsworth et al. (2018) Samuel Ainsworth, Nicholas Foti, Adrian KC Lee, and Emily Fox. Interpretable VAEs for nonlinear group factor analysis. arXiv:1802.06765 [cs, stat] , February 2018. URL http://arxiv.org/abs/1802.06765 . arXiv: 1802.06765."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib37",
+      "text": "Slack et al. (2020) Dylan Slack, Sophie Hilgard, Emily Jia, Sameer Singh, and Himabindu Lakkaraju. Fooling LIME and SHAP: Adversarial Attacks on Post hoc Explanation Methods. arXiv:1911.02508 [cs, stat] , February 2020. URL http://arxiv.org/abs/1911.02508 . arXiv: 1911.02508."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib2",
+      "text": "Arun et al. (2020) Nishanth Arun, Nathan Gaw, Praveer Singh, Ken Chang, Mehak Aggarwal, Bryan Chen, Katharina Hoebel, Sharut Gupta, Jay Patel, Mishka Gidwani, Julius Adebayo, Matthew D. Li, and Jayashree Kalpathy-Cramer. Assessing the (Un)Trustworthiness of Saliency Maps for Localizing Abnormalities in Medical Imaging. arXiv:2008.02766 [cs] , August 2020. URL http://arxiv.org/abs/2008.02766 . arXiv: 2008.02766."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib31",
+      "text": "Mnih & Salakhutdinov (2008) Andriy Mnih and Russ R Salakhutdinov. Probabilistic Matrix Factorization. In J. C. Platt, D. Koller, Y. Singer, and S. T. Roweis (eds.), Advances in Neural Information Processing Systems 20 , pp. 1257–1264. Curran Associates, Inc., 2008. URL http://papers.nips.cc/paper/3208-probabilistic-matrix-factorization.pdf ."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib11",
+      "text": "Chang et al. (2019) Joshua C. Chang, Shashaank Vattikuti, and Carson C. Chow. Probabilistically-autoencoded horseshoe-disentangled multidomain item-response theory models. arXiv:1912.02351 [cs, stat] , December 2019. URL http://arxiv.org/abs/1912.02351 . arXiv: 1912.02351."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib28",
+      "text": "Lee & Seung (1999) Daniel D. Lee and H. Sebastian Seung. Learning the parts of objects by non-negative matrix factorization. Nature , 401(6755):788–791, October 1999. ISSN 1476-4687. doi: 10.1038/44565 . URL https://www.nature.com/articles/44565 . Number: 6755 Publisher: Nature Publishing Group."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib20",
+      "text": "Gopalan et al. (2014) Prem Gopalan, Jake M. Hofman, and David M. Blei. Scalable Recommendation with Poisson Factorization. arXiv:1311.1704 [cs, stat] , May 2014. URL http://arxiv.org/abs/1311.1704 . arXiv: 1311.1704."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib14",
+      "text": "Ding et al. (2005) Chris Ding, Xiaofeng He, and Horst D. Simon. On the equivalence of nonnegative matrix factorization and spectral clustering. In in SIAM International Conference on Data Mining , 2005."
+    }
+  ]
+}

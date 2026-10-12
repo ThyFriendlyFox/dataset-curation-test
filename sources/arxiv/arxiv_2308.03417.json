@@ -1,0 +1,149 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2308.03417",
+  "title": "PURL: Safe and Effective Sanitization of Link Decoration",
+  "authors": "Shaoor Munir, Patrick Lee, Umar Iqbal, Zubair Shafiq, Sandra Siby",
+  "year": "2024",
+  "categories": [
+    "cs.CR",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2308.03417",
+  "html_url": "https://arxiv.org/html/2308.03417",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 714,
+  "text": "Web browsers and browser extensions are actively cracking down on new and emerging online tracking techniques. For example, almost all mainstream web browsers now already block or will soon block third-party cookies [1,2,3] and some privacy-focused browsers even deploy countermeasures against emerging tracking techniques, such as browser fingerprinting [4,5,6]. In response, online trackers continue to evolve and devise innovative tracking techniques that can bypass existing privacy-enhancing countermeasures [7,8,9,10]. The key limitation of existing privacy-enhancing tools is that they aim to mitigate specific types of tracking (e.g., third-party cookies, first-party cookies, email addresses, canvas fingerprinting, AudioContext fingerprinting, CNAME cloaking) [11,12,8,13]. This approach works reasonably well to protect against known forms of tracking but fails against new or unknown forms of tracking, which routinely emerge from time to time [14,15,7,10].\n\nOur key insight is that trackers need to share information (e.g., user/device identifiers) from the client to the server side regardless of what type of tracking is employed. Therefore, we contend that a promising orthogonal approach to anti-tracking is to detect and block the sharing of tracking information in network requests. Trackers commonly include tracking information in “decorated” network request URLs (aka link decoration). Existing privacy-enhancing tools outright block network requests to endpoints using filter lists of known tracking services. However, a decorated link can include both tracking (e.g., user/device identifiers) and functional (e.g., CSRF tokens, identifying news/product subpages) information, which renders existing request blocking countermeasures ineffective – they risk breaking legitimate functionality as collateral damage if they block the request and risk allowing privacy-invasive tracking if they do not. This is fundamentally a granularity issue. To the best of our knowledge, there is an unmet need for a fine-grained approach that can precisely remove tracking information in decorated links.\n\nTo sanitize link decoration (i.e., precisely removing just the tracking information from a request URL), privacy-focused browsers and browser extensions such as Safari, Firefox, Brave, uBlock Origin, and AdGuard employ a manually-curated list of query parameters that are known to be abused for tracking [16,17,18,19,20], similar to the request-blocking filter lists such as EasyList and EasyPrivacy [21,22]. While the manual approach might work for a small number of tracking query parameters, it cannot keep pace with the increasing adoption of query parameters by trackers [23], a problem that has also severely impacted filter lists [24,25,26]. Thus, it is not surprising that the filter lists to sanitize link decoration conservatively target only 10-100s of query parameters.\n\nIn this paper, we propose Purl (pronounced purel-l), a machine-learning approach to distinguish between tracking and functional link decorations. Purl makes use of a cross-layer graph representation to capture the complete execution of a webpage, which includes interactions between the HTML DOM structure, JavaScript execution behavior, information stored in browser storage, and network requests issued during a webpage load. Purl then extracts distinguishing features from this rich graph representation and uses a supervised classifier to detect tracking link decorations.\n\nOur evaluation on a sample of top-million websites shows that Purl can effectively (98.87% recall) and safely (98.62% precision) sanitize link decoration. Overall Purl achieves 98.74% accuracy, significantly outperforming existing countermeasures by at least 7.71% in terms of precision, 4.83% in terms of recall, and 6.43% overall accuracy while reducing website breakage by more than 8 \\times. Our evaluation also shows that Purl is robust against common evasion attempts such as changing link decoration names and splitting/combining link decoration values.\n\nWe deploy Purl on a subset of top-million websites to measure the prevalence of link decorations for tracking. Purl detects that 73.02% of the sites abuse link decorations for tracking, with an average site using 10.75 tracking link decorations. We find that the most common abusers of link decoration include well-known advertising and tracking services, which use link decorations to share cookies, email addresses, and fingerprinting information.\n\nOur key contributions are as follows:\n\n- 1. We propose and evaluate an automated machine learning approach, called Purl, to detect tracking link decorations using features that capture interactions and flow of information across multiple layers of the web stack.\n\n- 2. We deploy Purl on top-million sites to measure the prevalence, abusers, and type of tracking information shared via link decorations.\n\n- 3. We use Purl to generate a filter list, which can and is already being used by privacy-focused browsers and browser extensions.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib113",
+      "text": "WebKit. Tracking prevention in webkit. https://webkit.org/tracking-prevention/ ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib82",
+      "text": "MDN. Storage access policy: Block cookies from trackers. https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Privacy/Storage_access_policy ."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib61",
+      "text": "Privacy Sandbox for the Web. https://privacysandbox.com/open-web/ ."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib114",
+      "text": "Tracking prevention in webkit. https://webkit.org/tracking-prevention/#anti-fingerprinting ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib51",
+      "text": "Firefox’s protection against fingerprinting. https://web.archive.org/web/20230716154817/https://support.mozilla.org/en-US/kb/firefox-protection-against-fingerprinting ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib20",
+      "text": "Brave privacy updates. https://brave.com/privacy-updates/ ."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib100",
+      "text": "Iskander Sanchez-Rola, Matteo Dell’Amico, , Davide Balzarotti, Pierre-Antoine Vervier, and Leyla Bilge. Journey to the center of the cookie ecosystem: Unraveling actors’; roles and relationships. In S&P 2021, 42nd IEEE Symposium on Security & Privacy, 23-27 May 2021, San Francisco, CA, USA , 2021."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib24",
+      "text": "Quan Chen, Panagiotis Ilia, Michalis Polychronakis, and Alexandros Kapravelos. Cookie swap party: Abusing first-party cookies for web tracking. In Proceedings of the Web Conference , 2021."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib53",
+      "text": "Imane Fouad, Cristiana Santos, Arnaud Legout, and Nataliia Bielova. My cookie is a phoenix: detection, measurement, and lawfulness of cookie respawning with browser fingerprinting. In PETS 2022-22nd Privacy Enhancing Technologies Symposium , 2022."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib88",
+      "text": "Shaoor Munir, Sandra Siby, Umar Iqbal, Steven Englehardt, Zubair Shafiq, and Carmela Troncoso. Cookiegraph: Understanding and detecting first-party tracking cookies. In ACM SIGSAC Conference on Computer and Communications Security (CCS) , 2023."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib43",
+      "text": "Steven Englehardt and Arvind Narayanan. Online tracking: A 1-million-site measurement and analysis. In Proceedings of ACM CCS 2016 , 2016."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib27",
+      "text": "Ha Dao, Johan Mazel, and Kensuke Fukuda. Cname cloaking-based tracking on the web: Characterization, detection, and protection. IEEE Transactions on Network and Service Management , 2021."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib42",
+      "text": "Steven Englehardt, Jeffrey Han, and Arvind Narayanan. I never signed up for this! privacy implications of email tracking. Proceedings on Privacy Enhancing Technologies , 2018(1):109–126, 2018."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib117",
+      "text": "John Wilander. Bounce Tracking Protection. https://github.com/privacycg/proposals/issues/6 ."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib13",
+      "text": "Pouneh Nikkhah Bahrami, Umar Iqbal, and Zubair Shafiq. Fp-radar: Longitudinal measurement and early detection of browser fingerprinting. Proceedings on Privacy Enhancing Technologies , 2:557–577, 2022."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib92",
+      "text": "Open-source tests of web browser privacy. https://web.archive.org/web/20230731221803/https://privacytests.org/ ."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib49",
+      "text": "List of query parameters removed by brave. https://web.archive.org/web/20230714022136/https://firefox.settings.services.mozilla.com/v1/buckets/main/collections/query-stripping/records ."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "Brave-Core. Brave query filter. https://web.archive.org/web/20240207231358/https://raw.githubusercontent.com/brave/brave-core/master/components/query_filter/utils.cc ."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib3",
+      "text": "Adguard url tracking filter. https://web.archive.org/web/20230415152141/https://adguard.com/en/blog/adguard-url-tracking-filter.html ."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib110",
+      "text": "List of query parameters removed by ublock origin. https://web.archive.org/web/20230321033919/https://github.com/uBlockOrigin/uAssets/blob/master/filters/filters.txt ."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib40",
+      "text": "Easylist. https://easylist.to/easylist/easylist.txt ."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib41",
+      "text": "Easyprivacy. https://easylist.to/easylist/easyprivacy.txt ."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib95",
+      "text": "Audrey Randall, Peter Snyder, Alisha Ukani, Alex C. Snoeren, Geoffrey M. Voelker, Stefan Savage, and Aaron Schulman. Measuring uid smuggling in the wild. In Proceedings of the 22nd ACM Internet Measurement Conference (IMC ’22) , pages 230–243. Association for Computing Machinery, 2022."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib9",
+      "text": "Mshabab Alrizah, Sencun Zhu, Xinyu Xing, and Gang Wang. Errors, misunderstandings, and attacks: Analyzing the crowdsourcing process of ad-blocking systems. In Proceedings of the 2019 Internet Measurement Conference (IMC) , 2019."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib105",
+      "text": "Peter Snyder, Antoine Vastel, and Benjamin Livshits. Who filters the filters: Understanding the growth, usefulness and efficiency of crowdsourced ad blocking. In ACM SIGMETRICS , 2020."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib72",
+      "text": "Umar Iqbal, Zubair Shafiq, and Zhiyun Qian. The ad wars: Retrospective measurement and analysis of anti-adblock filter lists. In IMC , 2017."
+    }
+  ]
+}

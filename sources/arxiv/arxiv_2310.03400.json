@@ -1,0 +1,118 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2310.03400",
+  "title": "Adapting Large Language Models for Content Moderation: Pitfalls in Data Engineering and Supervised Fine-tuning",
+  "authors": "Huan Ma, Changqing Zhang, Huazhu Fu, Peilin Zhao, Bingzhe Wu",
+  "year": "2024",
+  "categories": [
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2310.03400",
+  "html_url": "https://arxiv.org/html/2310.03400",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 943,
+  "text": "Content moderation is an indispensable topic in the realm of modern internet [1,2]. Over the past decade, the field of internet content moderation has undergone a profound transformation, evolving from its early stages rooted in manual rule-based strategies [3] to recent advancements characterized by deep learning-based fully automated moderation algorithms [4]. The progress in deep learning technology has significantly enhanced the efficiency and precision of content moderation. Current automated content moderation methods typically adhere to a discriminative paradigm [5,6]. This paradigm involves the manual annotation of extensive, high-quality datasets, followed by supervised training of a discriminative model for content moderation. For a recent example, OpenAI details how they construct a holistic solution for real-world content moderation scenarios based on this paradigm, covering data preparation, model training, and deployment [7]. While this paradigm has achieved significant success in various tasks such as text and multimodal moderation, and has helped businesses reduce substantial costs, it also exhibits several limitations: (1) Heavy Reliance on Data Annotation Quality, (2) Limited Robustness to Out-of-Distribution Data in Open Environments, and (3) Lack of Interpretability.\n\nThese limitations become more pronounced when dealing with emerging scenarios like chatbots [8,9]. For instance, in chatbot scenarios, there may be malicious users who attempt to manipulate the system by constructing inputs that bypass content moderation systems using techniques such as code-switching between multiple languages, using emojis, or employing variant characters. Traditional supervised discriminative approaches are clearly inadequate in addressing the dynamic and adversarial nature of these samples through data or optimization efforts alone [10]. On the other hand, recent successes of generative large language models (LLMs) in various complex reasoning and planning tasks naturally lead us to consider whether we can leverage the comprehensive grounding knowledge, strong language understanding, and logical reasoning capabilities inherent in LLMs to enhance the robustness and interpretability of content moderation model. The answer is clearly affirmative, and we have already witnessed some initial attempts and explorations. An interesting case in point is OpenAI’s use of GPT-4 to optimize existing content moderation rating systems interactively [4], aiming to achieve optimal moderation performance. We have also made our own efforts by designing prompts to enable GPT-4 to perform automatic content moderation on real-world data (As Fig. 2 shows). It is evident that GPT-4 not only produces reasonable results but can also provide a complete auditing process. However, for most companies and organizations, reliance on third-party GPT-4 models still presents significant limitations: (1) Compliance Requirements: There are regulatory and compliance requirements that may constrain the use of third-party models for content moderation, (2) Cost Considerations, and (3) Domain-Specific Knowledge Injection. Addressing these limitations and developing custom content moderation solutions that meet specific compliance, cost, and domain requirements remains an ongoing area of research and development in the field.\n\nOne viable technical approach involves constructing labeled samples with an associated moderation process (moderation reasoning chain) and then performing supervised fine-tuning (SFT) on open-source large language models to align them with the specific requirements of a given content moderation task. Over the last years, this approach has demonstrated success in various tasks beyond content moderation, such as solving mathematical problems and logical reasoning [11,12,13]. Researchers have proposed a variety of techniques to improve the ultimate performance of this approach, including but not limited to data engineering, audit chain reliability assessment, optimization objectives, and more [14,15,16]. The effectiveness of these techniques in real-world content moderation scenarios still requires validation. A relevant work in this context comes from AWS [17], where they attempt to fine-tune large models directly using label information (without the audit reasoning chain). However, in our practical experience, we find that this approach exhibits poor out-of-distribution robustness and lacks interpretable moderation process outputs.\n\nBy adapting LLMs to the content moderation, the ideal case is to build a model that is significantly more robust than previous discriminative-based generative models (as shown in Sec. 3.3) simply by applying supervised fine-tuning (SFT) to LLMs [18,19]. However, the practical implementation of such a straightforward idea is fraught with numerous design challenges. Various design choices, including data engineering and training methodologies, have a profound impact on the final model’s performance. In this paper, we aim to take the first step by conducting large-scale experiments to assess the feasibility of applying large language models to content moderation scenarios and meticulously analyze the effectiveness of various commonly used techniques throughout the entire pipeline. Specifically, at the data engineering level, we adapt a weak supervision paradigm to reduce the cost of manual annotation. This involves expert annotation of the final labels for samples, with GPT-3.5 & GPT-4 handling the more labor-intensive moderation reasoning chain. In contrast to many existing works that adapt fully unsupervised paradigms (where all data is generated by GPT-3.5 & GPT-4), our approach allows us to leverage human-generated golden labels for reflection on the reasoning chain (see the methods section for details). Additionally, we incorporate conventional optimization strategies such as data deduplication [20]. During the training process, we observe common hallucination issues in GPT models when generating the moderation reasoning chain for production. These hallucinations can lead to erroneous labels. Here, we leverage weak supervision information to correct the entire process. Applying this entire pipeline to real-world data, we have arrived at several key findings: (1) Incorporating reasoning processes during the fine-tuning can enhance the robustness of the model and effectively overcome overfitting; (2) Introducing weak supervision can effectively filter out samples with poor quality in reasoning processes, improve the quality of the fine-tuning data, and enhance the performance of the fine-tuned model. (3) Fine-tuning LLMs with reasoning processes can effectively overcome overfitting, even when the model being required directly output the classification without reasoning process during deployment.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib7",
+      "text": "Dinan et al . (2019) Emily Dinan, Samuel Humeau, Bharath Chintagunta, and Jason Weston. 2019. Build it break it fix it for dialogue safety: Robustness from adversarial human attack. arXiv preprint arXiv:1908.06083 (2019)."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib18",
+      "text": "Jahan and Oussalah (2023) Md Saroar Jahan and Mourad Oussalah. 2023. A systematic review of Hate Speech automatic detection using Natural Language Processing. Neurocomputing (2023), 126232."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib20",
+      "text": "Kebriaei et al . (2023) Emad Kebriaei, Ali Homayouni, Roghayeh Faraji, Armita Razavi, Azadeh Shakery, Heshaam Faili, and Yadollah Yaghoobzadeh. 2023. Persian offensive language detection. Machine Learning (2023), 1–21."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib25",
+      "text": "Lilian Weng (2023) Andrea Vallone Lilian Weng, Vik Goel. 2023. Using GPT-4 for content moderation. (2023)."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib6",
+      "text": "Deng et al . (2022) Jiawen Deng, Jingyan Zhou, Hao Sun, Chujie Zheng, Fei Mi, Helen Meng, and Minlie Huang. 2022. Cold: A benchmark for chinese offensive language detection. arXiv preprint arXiv:2201.06025 (2022)."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib17",
+      "text": "Husain and Uzuner (2021) Fatemah Husain and Ozlem Uzuner. 2021. A survey of offensive language detection for the Arabic language. ACM Transactions on Asian and Low-Resource Language Information Processing (TALLIP) 20, 1 (2021), 1–44."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib32",
+      "text": "Markov et al . (2023) Todor Markov, Chong Zhang, Sandhini Agarwal, Florentine Eloundou Nekoul, Theodore Lee, Steven Adler, Angela Jiang, and Lilian Weng. 2023. A holistic approach to undesired content detection in the real world. In Proceedings of the AAAI Conference on Artificial Intelligence ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib3",
+      "text": "Bhardwaj and Poria (2023) Rishabh Bhardwaj and Soujanya Poria. 2023. Red-Teaming Large Language Models using Chain of Utterances for Safety-Alignment. arXiv preprint arXiv:2308.09662 (2023)."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib44",
+      "text": "Yu et al . (2023) Jiahao Yu, Xingwei Lin, and Xinyu Xing. 2023. GPTFUZZER: Red Teaming Large Language Models with Auto-Generated Jailbreak Prompts. arXiv preprint arXiv:2309.10253 (2023)."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib30",
+      "text": "Manakul et al . (2023) Potsawee Manakul, Adian Liusie, and Mark JF Gales. 2023. Selfcheckgpt: Zero-resource black-box hallucination detection for generative large language models. arXiv preprint arXiv:2303.08896 (2023)."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib10",
+      "text": "Gao et al . (2023) Luyu Gao, Aman Madaan, Shuyan Zhou, Uri Alon, Pengfei Liu, Yiming Yang, Jamie Callan, and Graham Neubig. 2023. Pal: Program-aided language models. In International Conference on Machine Learning . PMLR, 10764–10799."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib28",
+      "text": "Luo et al . (2023a) Haipeng Luo, Qingfeng Sun, Can Xu, Pu Zhao, Jianguang Lou, Chongyang Tao, Xiubo Geng, Qingwei Lin, Shifeng Chen, and Dongmei Zhang. 2023a. WizardMath: Empowering Mathematical Reasoning for Large Language Models via Reinforced Evol-Instruct. arXiv preprint arXiv:2308.09583 (2023)."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib29",
+      "text": "Luo et al . (2023b) Ziyang Luo, Can Xu, Pu Zhao, Qingfeng Sun, Xiubo Geng, Wenxiang Hu, Chongyang Tao, Jing Ma, Qingwei Lin, and Daxin Jiang. 2023b. WizardCoder: Empowering Code Large Language Models with Evol-Instruct. arXiv preprint arXiv:2306.08568 (2023)."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib11",
+      "text": "Gerrard (2018) Ysabel Gerrard. 2018. Beyond the hashtag: Circumventing content moderation on social media. New Media & Society 20, 12 (2018), 4492–4511."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib33",
+      "text": "Morrow et al . (2022) Garrett Morrow, Briony Swire-Thompson, Jessica Montgomery Polny, Matthew Kopec, and John P Wihbey. 2022. The emerging science of content labeling: Contextualizing social media content moderation. Journal of the Association for Information Science and Technology 73, 10 (2022), 1365–1386."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib37",
+      "text": "Singhal et al . (2023) Mohit Singhal, Chen Ling, Pujan Paudel, Poojitha Thota, Nihal Kumarswamy, Gianluca Stringhini, and Shirin Nilizadeh. 2023. SoK: Content moderation in social media, from guidelines to enforcement, and research to practice. In 2023 IEEE 8th European Symposium on Security and Privacy (EuroS&P) . IEEE, 868–895."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib19",
+      "text": "James et al . (2023) Poquiz James, Man Han, and Tinaztepe Safa. 2023. AWS performs fine-tuning on a Large Language Model (LLM) to classify toxic speech for a large gaming company. https://aws.amazon.com/cn/blogs/machine-learning/ ."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib12",
+      "text": "Hajibabaee et al . (2022) Parisa Hajibabaee, Masoud Malekzadeh, Mohsen Ahmadi, Maryam Heidari, Armin Esmaeilzadeh, Reyhaneh Abdolazimi, and H James Jr. 2022. Offensive language detection on social media based on text classification. In 2022 IEEE 12th Annual Computing and Communication Workshop and Conference (CCWC) . IEEE, 0092–0098."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib36",
+      "text": "Rizwan et al . (2020) Hammad Rizwan, Muhammad Haroon Shakeel, and Asim Karim. 2020. Hate-speech and offensive language detection in roman Urdu. In Proceedings of the 2020 conference on empirical methods in natural language processing (EMNLP) . 2512–2522."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib13",
+      "text": "He et al . (2010) Qinlu He, Zhanhuai Li, and Xiao Zhang. 2010. Data deduplication techniques. In 2010 international conference on future information technology and management engineering , Vol. 1. IEEE, 430–433."
+    }
+  ]
+}

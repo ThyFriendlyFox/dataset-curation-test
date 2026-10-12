@@ -1,0 +1,95 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2402.17978",
+  "title": "Imagine, Initialize, and Explore: An Effective Exploration Method in Multi-Agent Reinforcement Learning",
+  "authors": "Zeyang Liu, Lipeng Wan, Xinrui Yang, Zhuoran Chen, Xingyu Chen, Xuguang Lan",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.AI",
+    "cs.MA"
+  ],
+  "url": "https://arxiv.org/abs/2402.17978",
+  "html_url": "https://arxiv.org/html/2402.17978",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 858,
+  "text": "Recent progress in cooperative multi-agent reinforcement learning (MARL) has shown attractive prospects for real-world applications, such as autonomous driving [1] and active voltage control on power distribution networks [2]. To utilize global information during training and maintain scalability in execution, centralized training with decentralized execution (CTDE) has become a widely adopted paradigm in MARL. Under this paradigm, value decomposition methods [3,4,5] factorize the joint Q -value as a function of individual utility functions, ensuring consistency between the centralized policy and the individual policies. Consequently, they have achieved state-of-the-art performance in challenging tasks, such as StarCraft unit micromanagement [6].\n\nDespite their success, the simple \\epsilon -greedy exploration strategy used in these methods has been found ineffective in solving coordination tasks with complex state and reward transitions [7,8,9]. To address this limitation, MAVEN [7] adopts a latent space for hierarchical control, allowing agents to condition their behavior on shared latent variables and enabling committed exploration. EITI and EDTI [8] quantify and characterize the influence of one agent’s behavior on others using mutual information and the difference of expected returns, respectively. By optimizing EITI or EDTI objectives as intrinsic rewards, agents are encouraged to coordinate their exploration and learn policies that optimize team performance. EMC [9], on the other hand, uses prediction errors of individual Q -values to capture the novelty of states and the influence from other agents for coordinated exploration. Unfortunately, these methods suffer from the exponential growth of the action-observation space with the number of agents and become inefficient in long-horizon tasks.\n\nIt is possible to decompose the complex task rather than directly conducting collective searches across the entire action-observation space. To this end, RODE [10] decomposes joint action spaces into restricted role action spaces by clustering actions based on their effects on the environment and other agents. Low-level role-based policies explore and learn within these restricted action-observation spaces, reducing execution and training complexity. However, RODE still struggles with long-term tasks as it is still unlikely to obtain a long sequence of specific actions to achieve successful states. The Go-Explore family of algorithms [11,12,13] decomposes the exploration into two phases: returning to the previous state and then starting to explore. These methods store the high-scoring trajectories in an archive and return to sampled states from this archive by running a goal-conditioned policy. However, in the multi-agent field, agents should be encouraged to teleport to the states where interactions happen and may lead to critical under-explored regions. These approaches only consider the sparse and deceptive rewards in single-agent settings, making them impractical for MARL with complex reward and transition dependencies among cooperative agents.\n\nTeleporting agents to interaction states that influence each other’s transition function can significantly increase the likelihood of discovering potentially important yet rarely visited states and reduce the exploration space. However, there often exist multiple feasible but inefficient trajectories to reach such interaction states due to the abundance of agents’ tactics and the compositional nature of their functionalities. In light of this, we propose a novel MARL exploration method named Imagine, Initialize, and Explore (IIE). It leverages the GPT architecture [14] to imagine trajectories from the initial state to interaction states, acting as a powerful “memorization engine” that can generate diverse agent behaviors. We use target timestep-to-go, return-to-go, influence value, and a one-shot demonstration as prompts to specify the “path” of the imagined trajectory. The influence value is an advantage function that compares an agent’s current action Q -value to a counterfactual baseline that marginalizes this agent. Specifically, we obtain several trajectory segments by dividing the exploration episode, where each segment starts at the initial state from the environment and ends at an interaction state with the highest influence value. Then, the GPT model learns to predict states, observations, prompts, actions, and rewards in an autoregressive manner on these segments.\n\nFig. 1 presents an overview of IIE architecture. Before the exploration phase, the agents are given a new initial state and few-shot demonstrations to construct the prompt and generate the imagined trajectory. The agents operating in partially observable environments can benefit from this imagination by utilizing it to initialize the recurrent neural network state. Then, the agents are initialized to the last state of the imagined trajectory by the simulator and interact with the environment to explore. IIE gradually provides high-influence starting points that can be viewed as auto-curricula that help agents collect crucial under-explored regions. To make the best use of the imagination, we also stitch it with the interaction sequence from exploration for policy training.\n\nThe main contributions of this paper are threefold: First, it introduces Imagine, Initialize, and Explore, which leverages the GPT architecture to imagine how the agents reach critical states before exploration. This method bridges sequence modeling and transformers with MARL instead of using GPT as a replacement for reinforcement learning algorithms [15]. Second, empirical results demonstrate significant performance improvements of IIE on partially observable MARL benchmarks, including StarCraft Multi-Agent Challenge (SMAC) with dense and sparse reward settings as well as SMACv2. And third, guided by the target timestep-to-go, return-to-go, influence value, and a one-shot demonstration, the imagination model can produce more effective curricula and outperforms behavior cloning, CVAE-GAN, and classifier-guided diffusion.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib43",
+      "text": "Zhou et al. (2021) Zhou, M.; Luo, J.; Villella, J.; Yang, Y.; Rusu, D.; Miao, J.; Zhang, W.; Alban, M.; FADAKAR, I.; Chen, Z.; et al. 2021. SMARTS: An Open-Source Scalable Multi-Agent RL Training School for Autonomous Driving. In Conference on Robot Learning , 264–285. PMLR."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib38",
+      "text": "Wang et al. (2021) Wang, J.; Xu, W.; Gu, Y.; Song, W.; and Green, T. C. 2021. Multi-agent reinforcement learning for active voltage control on power distribution networks. Advances in Neural Information Processing Systems , 34: 3271–3284."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib31",
+      "text": "Rashid et al. (2018) Rashid, T.; Samvelyan, M.; Schroeder, C.; Farquhar, G.; Foerster, J.; and Whiteson, S. 2018. Qmix: Monotonic value function factorisation for deep multi-agent reinforcement learning. In International Conference on Machine Learning , 4295–4304. PMLR."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib36",
+      "text": "Son et al. (2019) Son, K.; Kim, D.; Kang, W. J.; Hostallero, D. E.; and Yi, Y. 2019. Qtran: Learning to factorize with transformation for cooperative multi-agent reinforcement learning. In International Conference on Machine Learning , 5887–5896. PMLR."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib30",
+      "text": "Rashid et al. (2020) Rashid, T.; Farquhar, G.; Peng, B.; and Whiteson, S. 2020. Weighted qmix: Expanding monotonic value function factorisation for deep multi-agent reinforcement learning. Advances in neural information processing systems , 33: 10199–10210."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib34",
+      "text": "Samvelyan et al. (2019) Samvelyan, M.; Rashid, T.; De Witt, C. S.; Farquhar, G.; Nardelli, N.; Rudner, T. G.; Hung, C.-M.; Torr, P. H.; Foerster, J.; and Whiteson, S. 2019. The starcraft multi-agent challenge. arXiv preprint arXiv:1902.04043 ."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib22",
+      "text": "Mahajan et al. (2019) Mahajan, A.; Rashid, T.; Samvelyan, M.; and Whiteson, S. 2019. Maven: Multi-agent variational exploration. Advances in Neural Information Processing Systems , 32."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib40",
+      "text": "Wang et al. (2020c) Wang, T.; Wang, J.; Wu, Y.; and Zhang, C. 2020c. Influence-Based Multi-Agent Exploration. In International Conference on Learning Representations ."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib42",
+      "text": "Zheng et al. (2021) Zheng, L.; Chen, J.; Wang, J.; He, J.; Hu, Y.; Chen, Y.; Fan, C.; Gao, Y.; and Zhang, C. 2021. Episodic Multi-agent Reinforcement Learning with Curiosity-driven Exploration. Advances in Neural Information Processing Systems , 34."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib39",
+      "text": "Wang et al. (2020b) Wang, T.; Gupta, T.; Mahajan, A.; Peng, B.; Whiteson, S.; and Zhang, C. 2020b. Rode: Learning roles to decompose multi-agent tasks. arXiv preprint arXiv:2010.01523 ."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib6",
+      "text": "Ecoffet et al. (2019) Ecoffet, A.; Huizinga, J.; Lehman, J.; Stanley, K. O.; and Clune, J. 2019. Go-explore: a new approach for hard-exploration problems. arXiv preprint arXiv:1901.10995 ."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib11",
+      "text": "Guo et al. (2020) Guo, Y.; Choi, J.; Moczulski, M.; Feng, S.; Bengio, S.; Norouzi, M.; and Lee, H. 2020. Memory based trajectory-conditioned policies for learning from sparse rewards. Advances in Neural Information Processing Systems , 33: 4333–4345."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib7",
+      "text": "Ecoffet et al. (2021) Ecoffet, A.; Huizinga, J.; Lehman, J.; Stanley, K. O.; and Clune, J. 2021. First return, then explore. Nature , 590(7847): 580–586."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib29",
+      "text": "Radford et al. (2018) Radford, A.; Narasimhan, K.; Salimans, T.; Sutskever, I.; et al. 2018. Improving language understanding by generative pre-training. In OpenAI . OpenAI."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib4",
+      "text": "Chen et al. (2021) Chen, L.; Lu, K.; Rajeswaran, A.; Lee, K.; Grover, A.; Laskin, M.; Abbeel, P.; Srinivas, A.; and Mordatch, I. 2021. Decision transformer: Reinforcement learning via sequence modeling. Advances in neural information processing systems , 34: 15084–15097."
+    }
+  ]
+}

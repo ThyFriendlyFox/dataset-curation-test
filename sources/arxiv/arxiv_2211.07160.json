@@ -1,0 +1,145 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2211.07160",
+  "title": "FedTracker: Furnishing Ownership Verification and Traceability for Federated Learning Model",
+  "authors": "Shuo Shao, Wenyuan Yang, Hanlin Gu, Zhan Qin, Lixin Fan, Qiang Yang, Kui Ren",
+  "year": "2024",
+  "categories": [
+    "cs.CR",
+    "cs.AI",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2211.07160",
+  "html_url": "https://arxiv.org/html/2211.07160",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1203,
+  "text": "Federated Learning (FL) [1] has turned into one of the most popular frameworks for distributedly training Deep Learning (DL) models without sharing private messages. FL is nowadays widely applied in various privacy-sensitive domains, such as object detection [2,3], medical image analysis [4,5,6], recommendation systems [7,8] and so on. FL meets the privacy needs of the data owners while producing high-quality models for the community. However, collaborative training in FL makes the model publicly available to multiple participants, which may lead to the model leakage issue in FL.\n\nModel leakage in FL refers to the malicious distribution or unauthorized sale of FL models by the individual Client for personal gain. These malicious Clients are called the model leakers. Such misbehavior infringes the legitimate copyright of the entire FL group, including innocent Clients and Servers. Detecting copyright infringement and protecting intellectual property rights has become a critical issue in FL. There are two major concerns in FL copyright protection, ownership verification and traceability. Ownership verification involves verifying the ownership of the FL model when it is illegally distributed and charging the unauthorized user outside the FL group with tort. The FL model should be considered as the intellectual property of the FL group instead of any individual. Any legal use of the FL model should be made with the consent of the FL group. Traceability refers to disclosing the identity of the culprit among the FL participants who illegally distribute the model to third parties outside the FL group. It is a new requirement for protecting the copyright of the FL model, which to our best knowledge has not been addressed before.\n\nTo protect the copyright of Deep Neural Networks (DNN), the DNN watermarks [9,10], including parameter-based watermark and backdoor-based watermark, are proposed. Parameter-based watermark methods embed personal watermarks into the parameters or the distribution of the parameters of the DNN models [11,12,13,14]. It can provide multi-bit information for verification, but the extraction of parameter-based watermarks need white-box access to the model, which limits the application. On the contrary, backdoor-based watermark methods [15,16,17,18] take advantage of backdoor attack [19] to insert specific triggers to identify the ownership of the model. Although backdoor-based watermark can be verified through black-box access, it is usually zero-bit. This means the watermark can only demonstrate the presence or absence of the watermark instead of a bit string representing identity.\n\nSome recent works also explore applying DNN watermarks to FL copyright protection. WAFFLE [20] is the first watermarking scheme designed for FL, in which the Server is responsible for embedding the backdoor-based watermarks into the FL model. WAFFLE proposes to conduct a retraining step after federated aggregation to embed the watermark. Liu et al. [21,22] and Li et al. [23] propose to entitle the Clients to embed both parameter-based and backdoor-based watermarks into the global model. However, existing works only focus on ownership verification. None of them can provide traceability of the model leakers for FL models. Even if the FL group can prove the ownership of the FL model in the event of infringement, they are not capable of detecting the model leakers hidden among them.\n\nWe aim to design an FL copyright protection framework that can furnish both ownership verification and traceability for the FL model. In this paper, we present FedTracker, the first FL model protection framework that offers both. The illustration of the problem and our framework is shown in Fig. 1. Specifically, we design a bi-level protection scheme that enables ownership verification and traceability respectively. On one level, FedTracker embeds a global watermark into the aggregated global model in each iteration. While the copyright infringement occurs, the FL group can extract the watermark and verify the ownership. On the other level, before distributing the model in each iteration, the server inserts a unique local fingerprint for each Client to identify each model. The model leaker can be traced by disclosing the identification inside the model.\n\nHowever, there are two main challenges associated with implementing such a framework:\n\n- • It is challenging to preserve the utility of the model in the condition of a lack of natural data. Since the server is assumed to have no access to the training data, the server needs to embed the watermark trigger set which is out of distribution of natural data. This may significantly compromise the model’s utility.\n\n- • It is challenging to guarantee the discrimination of different models. Since we need to embed and compare multiple different fingerprints from different Clients, it puts a higher requirement on the identifiability and robustness of the Clients’ fingerprints.\n\nTo tackle the challenges mentioned above, first, we propose a watermark embedding algorithm based on Continual Learning (CL) [24] to improve the utility of the watermarked model. We regard the primitive task of FL and the watermark embedding task as learning data from different domains. The utility drop can be attributed to catastrophic forgetting [24] while learning a different task. Inspired by the Gradient Episodic Memory (GEM) [25], we design a CL-based embedding algorithm for the FL scenario and thereby, the utility can be better preserved during watermark embedding. We introduce our CL-based watermark embedding algorithm in Section IV-B.\n\nSecond, to enhance the differentiation between different models of different Clients, we conduct the fingerprint generation by minimizing the maximal distance between fingerprints. We also propose a Fingerprint Similarity Score (FSS) to measure the similarity of the extracted fingerprint and Clients’ fingerprints. Compared with traditional hamming distance whose output is discrete, FSS can provide more fine-grained measurement because the output of FSS is continuous. Thus, using FSS can better discriminate different fingerprints. Moreover, we embed the watermark and fingerprints respectively into different parts of the model to lower the mutual impact and improve the effectiveness of both mechanisms. The details are present in Section IV-C.\n\n## I-A Contributions\n\nOur main contributions can be summarized as follows:\n\n- • We propose the first FL ownership verification and traceability framework called FedTracker. In FedTracker, the bi-level protection scheme, including the global watermark mechanism and the local fingerprint mechanism, can provide ownership verification and traceability respectively. Experimental results show that FedTracker can also provide tremendous fidelity and robustness against various attacks.\n\n- • Inspired by the motivation of Continual Learning (CL), we design a CL-based watermark embedding algorithm for the FL scenario. It can maintain the utility of the FL model on both the primitive task and the watermark task while embedding the watermark.\n\n- • We propose a fingerprint generation method based on optimization and a novel metric named Fingerprint Similarity Score (FSS). The two methods can help better distinguish different fingerprints and improve the effectiveness of tracing the culprit.\n\n## I-B Roadmap\n\nThe rest of this paper is organized as follows: Section II provides an introduction to the background knowledge of FedTracker. Section III gives the formulation of the copyright protection problem in FL, including the definition of ownership verification and traceability and the threat model. Section IV proposes the procedure of FedTracker, and the solutions to the key challenges proposed above. For a detailed implementation description of FedTracker, please refer to Section V. Subsequently, in Section VI, we present the empirical experiments conducted on FedTracker’s performance evaluation, and Section VII concludes this paper.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "B. McMahan, E. Moore, D. Ramage, S. Hampson, and B. A. y Arcas, “Communication-efficient learning of deep networks from decentralized data,” in International Conference Artificial Intelligence and Statistics , 2017, pp. 1273–1282."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "Y. Liu, A. Huang, Y. Luo, H. Huang, Y. Liu, Y. Chen, L. Feng, T. Chen, H. Yu, and Q. Yang, “Fedvision: An online visual object detection platform powered by federated learning,” in AAAI Conference on Artificial Intelligence , vol. 34, no. 08, 2020, pp. 13 172–13 179."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "P. Yu and Y. Liu, “Federated object detection: Optimizing object detection model with federated learning,” in International Conference on Vision, Image and Signal Processing , 2019, pp. 1–6."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "Q. Liu, C. Chen, J. Qin, Q. Dou, and P.-A. Heng, “Feddg: Federated domain generalization on medical image segmentation via episodic learning in continuous frequency space,” in IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2021, pp. 1013–1023."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "R. Kumar, A. A. Khan, J. Kumar, A. Zakria, N. A. Golilarz, S. Zhang, Y. Ting, C. Zheng, and W. Wang, “Blockchain-federated-learning and deep learning models for covid-19 detection using CT imaging,” IEEE Sensors Journal , 2021."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "A. Xu, W. Li, P. Guo, D. Yang, H. R. Roth, A. Hatamizadeh, C. Zhao, D. Xu, H. Huang, and Z. Xu, “Closing the generalization gap of cross-silo federated medical image segmentation,” in IEEE/CVF Conference on Computer Vision and Pattern Recognition , June 2022, pp. 20 866–20 875."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "O. A. Wahab, G. Rjoub, J. Bentahar, and R. Cohen, “Federated against the cold: A trust-based federated learning approach to counter the cold start problem in recommendation systems,” Information Sciences , vol. 601, pp. 189–206, 2022."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "L. Yang, B. Tan, V. W. Zheng, K. Chen, and Q. Yang, “Federated recommendation systems,” in Federated Learning . Springer, 2020, pp. 225–239."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "M. Xue, Y. Zhang, J. Wang, and W. Liu, “Intellectual Property Protection for Deep Learning Models: Taxonomy, Methods, Attacks, and Evaluations,” IEEE Transactions on Artificial Intelligence , pp. 1–1, 2021."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "Y. Sun, T. Liu, P. Hu, Q. Liao, S. Ji, N. Yu, D. Guo, and L. Liu, “Deep intellectual property: A survey,” arXiv preprint arXiv:2304.14613 , 2023."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "Y. Uchida, Y. Nagai, S. Sakazawa, and S. Satoh, “Embedding watermarks into deep neural networks,” in ACM International Conference on Multimedia Retrieval , 2017, pp. 269–277."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "B. Darvish Rouhani, H. Chen, and F. Koushanfar, “Deepsigns: An end-to-end watermarking framework for ownership protection of deep neural networks,” in International Conference on Architectural Support for Programming Languages and Operating Systems , 2019, pp. 485–497."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "L. Fan, K. W. Ng, and C. S. Chan, “Rethinking deep neural network ownership verification: embedding passports to defeat ambiguity attacks,” in Advances in Neural Information Processing Systems , 2019, pp. 4714–4723."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "G. Li, S. Li, Z. Qian, and X. Zhang, “Encryption resistant deep neural network watermarking,” in IEEE International Conference on Acoustics, Speech and Signal Processing . IEEE, 2022, pp. 3064–3068."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "Y. Adi, C. Baum, M. Cisse, B. Pinkas, and J. Keshet, “Turning your weakness into a strength: Watermarking deep neural networks by backdooring,” in USENIX Security Symposium , 2018, pp. 1615–1631."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "A. Bansal, P.-y. Chiang, M. Curry, R. Jain, C. Wigington, V. Manjunatha, J. P. Dickerson, and T. Goldstein, “Certified Neural Network Watermarks with Randomized Smoothing,” in International Conference on Machine Learning . PMLR, Jul. 2022, pp. 1450–1465."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "Z. Li, C. Hu, Y. Zhang, and S. Guo, “How to prove your model belongs to you: A blind-watermark based framework to protect intellectual property of DNN,” in Annual Computer Security Applications Conference , 2019, pp. 126–137."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "Y. Lao, P. Yang, W. Zhao, and P. Li, “Identification for Deep Neural Network: Simply Adjusting Few Weights!” in IEEE International Conference on Data Engineering . Kuala Lumpur, Malaysia: IEEE, May 2022, pp. 1328–1341."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "T. Gu, B. Dolan-Gavitt, and S. Garg, “Badnets: Identifying vulnerabilities in the machine learning model supply chain,” arXiv preprint arXiv:1708.06733 , 2017."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "B. G. Tekgul, Y. Xia, S. Marchal, and N. Asokan, “WAFFLE: Watermarking in federated learning,” in International Symposium on Reliable Distributed Systems , 2021, pp. 310–320."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "X. Liu, S. Shao, Y. Yang, K. Wu, W. Yang, and H. Fang, “Secure Federated Learning Model Verification: A Client-side Backdoor Triggered Watermarking Scheme,” in IEEE International Conference on Systems, Man, and Cybernetics . Melbourne, Australia: IEEE, Oct. 2021, pp. 2414–2419."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib22",
+      "text": "W. Yang, S. Shao, Y. Yang, X. Liu, X. Liu, Z. Xia, G. Schaefer, and H. Fang, “Watermarking in secure federated learning: A verification framework based on client-side backdooring,” ACM Transactions on Intelligent Systems and Technology , vol. 15, no. 1, pp. 1–25, 2023."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib23",
+      "text": "B. Li, L. Fan, H. Gu, J. Li, and Q. Yang, “FedIPR: Ownership Verification for Federated Deep Neural Network Models,” IEEE Transactions on Pattern Analysis and Machine Intelligence , pp. 1–16, Mar. 2022."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib24",
+      "text": "J. Kirkpatrick, R. Pascanu, N. Rabinowitz, J. Veness, G. Desjardins, A. A. Rusu, K. Milan, J. Quan, T. Ramalho, A. Grabska-Barwinska et al. , “Overcoming catastrophic forgetting in neural networks,” Proceedings of the National Academy of Sciences , vol. 114, no. 13, pp. 3521–3526, 2017."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib25",
+      "text": "D. Lopez-Paz and M. Ranzato, “Gradient Episodic Memory for Continual Learning,” in Advances in Neural Information Processing Systems , 2017."
+    }
+  ]
+}

@@ -1,0 +1,183 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.03998",
+  "title": "OpenVPN is Open to VPN Fingerprinting",
+  "authors": "Diwen Xue, Reethika Ramesh, Arham Jain, Michalis Kallitsis, J. Alex Halderman, Jedidiah R. Crandall, Roya Ensafi",
+  "year": "2024",
+  "categories": [
+    "cs.CR"
+  ],
+  "url": "https://arxiv.org/abs/2403.03998",
+  "html_url": "https://arxiv.org/html/2403.03998",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1045,
+  "text": "ISPs, advertisers, and national governments are increasingly disrupting, manipulating, and monitoring Internet traffic [1,2,3,4,5]. As a result, virtual private network (VPN) adoption has been growing rapidly, not only among activists and journalists with heightened threat models but also among average users, who employ VPNs for reasons ranging from protecting their privacy on untrusted networks to circumventing censorship. As a recent example, with the passage of Hong Kong’s new national security law, popular VPN providers observed a 120-fold surge in downloads due to fears of escalating surveillance and censorship [6].\n\nIn response to the growing popularity of VPNs, numerous ISPs and governments are now seeking to track or block VPN traffic in order to maintain visibility and control over the traffic within their jurisdictions. Binxing Fang, the designer of the Great Firewall of China (GFW) said there is an “eternal war” between the Firewall and VPNs, and the country has ordered ISPs to report and block personal VPN usage [7,8]. More recently, Russia and India have proposed to block VPN services in their countries, both labeling VPNs a national cybersecurity threat [9,10]. Commercial ISPs are also motivated to track VPN connections. For example, in early 2021, a large ISP in South Africa, Rain, Ltd., started throttling VPN connections by over 90 percent in order to enforce quality-of-service restrictions in their data plans [11].\n\nISPs and censors are known to employ a variety of simple anti-VPN techniques, such as tracking connections based on IP reputation, blocking VPN provider (provider from hereon) websites, and enacting laws or terms of service forbidding VPN usage [12,13,8]. Yet, these methods are not robust; motivated users find ways to access VPN services in spite of them. However, even less-powerful ISPs and censors now have access to technologies such as carrier-grade deep packet inspection (DPI) with which they can implement more sophisticated modes of detection based on protocol semantics [14,15].\n\nIn this paper, we explore the implications of DPI for VPN detection and blocking by studying the fingerprintability of OpenVPN (the most popular protocol for commercial VPN services [16]) from the perspective of an adversarial ISP. We seek to answer two research questions: (1) can ISPs and governments identify traffic flows as OpenVPN connections in real time ? and (2) can they do so at-scale without incurring significant collateral damage from false positives? Answering these questions requires more than just identifying fingerprinting vulnerabilities; although challenging, we need to demonstrate practical exploits under the constraints of how ISPs and nation-state censors operate in the real world.\n\nWe build a detection framework that is inspired by the architecture of the Great Firewall [17,18,19], consisting of Filter and Prober components. A Filter performs passive filtering over passing network traffic in real time, exploiting protocol quirks we identified in OpenVPN’s handshake stage. After a flow is flagged by a Filter, the destination address is passed to a Prober that performs active probing as confirmation. By sending probes carefully designed to elicit protocol-specific behaviors, the Prober is able to identify an OpenVPN server using side channels even if the server enables OpenVPN’s optional defense against active probing. Our two-phase framework is capable of processing ISP-scale traffic at line-speed with an extremely low false positive rate.\n\nIn addition to core or “vanilla” OpenVPN, we also include commercial “obfuscated” VPN services in this study. In response to increasing interference from ISPs and censors, obfuscated VPN services have started to gain traction, especially from users in countries with heavy censorship or laws against the personal usage of VPNs. Obfuscated VPN services, whose operators often tout them as “invisible” and “unblockable” [20,21,22], typically use OpenVPN with an additional obfuscation layer to avoid detection [23,24].\n\nPartnering with Merit (a mid-size regional ISP that serves a population of 1 million users), we deploy our framework at a monitor server that observes 20 Gbps of ingress and egress traffic mirrored from a major Merit point-of-presence. (Refer to § 5 for ethical considerations.) We use PF_RING [25] in zero-copy mode for fast packet processing by parallelized Filters. In our tests, we are able to identify 1718 out of 2000 flows originating from a control client machine residing within the network, corresponding to 39 out of 40 unique “vanilla” OpenVPN configurations.\n\nMore strikingly, we also successfully identify over two-thirds of obfuscated OpenVPN flows. Eight out of the top 10 providers offer obfuscated services, yet all of them are flagged by our Filter. Despite providers’ lofty unobservability claims (such as “ \\ldots even your Internet provider can’t tell that you’re using a VPN” [21]), we find most implementations of obfuscated services resemble OpenVPN masked with the simple XOR-Patch [26], which is easily fingerprintable. Lack of random padding at the obfuscation layer and co-location with vanilla OpenVPN servers also make the obfuscated services more vulnerable to detection.\n\nIn a typical day, our single-server setup analyzes 15 TB of traffic and 2 billion flows. Over an eight-day evaluation, our framework flagged 3,638 flows as OpenVPN connections. Among these, we are able to find evidence that supports our detection results for 3,245 flows, suggesting an upper-bound false-positive rate three orders of magnitude lower than previous ML-based approaches [27,28,29].\n\nWe conclude that tracking and blocking the use of OpenVPN, even with most current obfuscation methods, is straightforward and within the reach of any ISP or network operator, as well as nation-state adversaries. Unlike circumvention tools such as Tor or Refraction Networking [30,31], which employ sophisticated strategies to avoid detection, robust obfuscation techniques have been conspicuously absent from OpenVPN and the broader VPN ecosystem. For average users, this means that they may face blocking or throttling from ISPs, but for high-profile, sensitive users, this fingerprintability may lead to follow-up attacks that aim to compromise the security of OpenVPN tunnels [32,33]. We warn users with heightened threat models not to expect that their VPN usage will be unobservable, even when connected to obfuscated services. While we propose several short-term defenses for the fingerprinting exploits described in this paper, we fear that, in the long term, a cat-and-mouse game similar to the one between the Great Firewall and Tor is imminent in the VPN ecosystem as well. We implore VPN developers and providers to develop, standardize, and adopt robust, well-validated obfuscation strategies and to adapt them as the threats posed by adversaries continue to evolve.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib69",
+      "text": "N. Weaver, C. Kreibich, and V. Paxson. Redirecting DNS for Ads and Profit. In USENIX Workshop on Free and Open Communicationson the Internet, 2011."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib22",
+      "text": "F. Li, A. A. Niaki, D. Choffnes, P. Gill, and A. Mislove. A large-scale analysis of deployed traffic differentiation practices. In Proceedings of the ACM Special Interest Group on Data Communication. SIGCOMM, 2019."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib47",
+      "text": "R. Sundara Raman, L. Evdokimov, E. Wurstrow, J. A. Halderman, and R. Ensafi. Investigating Large Scale HTTPS Interception in Kazakhstan. In Proceedings of the 2020 ACM Internet Measurement Conference."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib16",
+      "text": "T. Garrett, L. E. Setenareski, L. M. Peres, L. C. Bona, and E. P. Duarte. Monitoring network neutrality: A survey on traffic differentiation detection. IEEE Communications Surveys & Tutorials, 2018."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib27",
+      "text": "A. Molavi Kakhki, A. Razaghpanah, A. Li, H. Koo, R. Golani, D. Choffnes, P. Gill, and A. Mislove. Identifying traffic differentiation in mobile networks. In IMC’15."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib62",
+      "text": "VPN Downloads surge in response to Hong Kong Security Law. https://www.bloomberg.com/news/articles/2020-05-22/vpn-downloads-surge-in-response-to-hong-kong-security-law ."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib61",
+      "text": "China’s firewall technology upgrades virtual private network management and control tightening. https://www.rfa.org/mandarin/yataibaodao/cyl-12212012155229.html ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib60",
+      "text": "Chinese government orders ISPs to block personal VPN use. https://privateinternetaccess.com/blog/great-firewall-china-chinese-government-orders-isps-block-personal-vpn-use-february-1st/ ."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib44",
+      "text": "Attention to companies using vpn services in operation. https://rkn.gov.ru/news/rsoc/news73628.htm ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib59",
+      "text": "Indian Parliamentary Committee Wants To Ban VPN Services In India. https://www.indiatimes.com/technology/news/vpn-ban-indian-govt-vpn-services-in-india-548493.html ."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib64",
+      "text": "Rain throttles Internet speeds for customers on VPNs. https://mybroadband.co.za/news/internet/384642-rain-throttles-internet-speeds-for-customers-on-vpns.html ."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib46",
+      "text": "W. Seltzer. Infrastructures of censorship and lessons from copyright resistance. In Workshop on Free and Open Communications on the Internet (FOCI), 2011."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib53",
+      "text": "Tor In China – The Onion Router. http://www.mediafactory.org.au/2015-media6-deepweb/2015/10/01/tor-in-china/ ."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib48",
+      "text": "R. Sundara Raman, A. Stoll, J. Dalek, R. Ramesh, W. Scott, and R. Ensafi. Measuring the Deployment of Network Censorship Filters at Global Scale. In Network and Distributed System Security, 2020."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib43",
+      "text": "R. Ramesh, R. S. Raman, M. Bernhard, V. Ongkowijaya, L. Evdokimov, A. Edmundson, S. Sprecher, M. Ikram, and R. Ensafi. Decentralized Control: A Case Study of Russia. In Network and Distributed System Security, 2020."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib6",
+      "text": "E. Crist and J. Keijser. Mastering OpenVPN. Packt Publishing, 2015."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib1",
+      "text": "Alice, Bob, Carol, J. Beznazwy, and A. Houmansadr. How China Detects and Blocks Shadowsocks. In ACM Internet Measurement Conference (IMC), 2020."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib71",
+      "text": "P. Winter and S. Lindskog. How the great firewall of china is blocking tor. In 2nd USENIX Workshop on Free and Open Communications on the Internet (FOCI 12), Bellevue, WA, Aug. USENIX Association."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib11",
+      "text": "R. Ensafi, D. Fifield, P. Winter, N. Feamster, N. Weaver, and V. Paxson. Examining How the Great Firewall Discovers Hidden Circumvention Servers. In Proceedings of the 2015 Internet Measurement Conference."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib54",
+      "text": "Stealth VPN Unblock Websites, Firewalls and VPN Blocks. https://torguard.net/stealth-vpn.php ."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib49",
+      "text": "Surfshark camouflage. https://surfshark.com/features ."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib5",
+      "text": "BolehVPN Traffic Obfuscation Keeps You out of Trouble. https://www.vpnmentor.com/blog/bolehvpn-traffic-obfuscation-keeps-you-out-of-trouble/ ."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib66",
+      "text": "How Chameleon Defeats VPN Blocking. https://www.vyprvpn.com/features/chameleon ."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib2",
+      "text": "Stealth VPN - Astrill VPN. https://www.astrill.com/features/vpn-protocols/stealth-vpn ."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib38",
+      "text": "PF_RING ZC (Zero Copy). https://www.ntop.org/products/packet-capture/pf_ring/pf_ring-zc-zero-copy/ ."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib36",
+      "text": "OpenVPN_XORPatch. https://github.com/clayface/openvpn_xorpatch ."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib26",
+      "text": "S. Miller, K. Curran, and T. Lunney. Multilayer Perceptron Neural Network for Detection of Encrypted VPN Network Traffic. In 2018 International Conference On Cyber Situational Awareness, Data Analytics And Assessment (Cyber SA)."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib3",
+      "text": "S. Bagui, X. Fang, E. Kalaimannan, S. C. Bagui, and J. Sheehan. Comparison of machine-learning algorithms for classification of vpn network traffic flow using time-related features. In Journal of Cyber Security Technology, 2017."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib14",
+      "text": "P. Fu, C. Liu, Q. Yang, Z. Li, G. Gou, G. Xiong, and Z. Li. A NetFlow Sequence Attention Network for Virtual Private Network Traffic Detection. In International Conference on Web Information Systems Engineering."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib8",
+      "text": "R. Dingledine, N. Mathewson, and P. Syverson. Tor: The second-generation onion router. In 13th USENIX Security Symposium (USENIX Security 04)."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib74",
+      "text": "E. Wustrow, C. M. Swanson, and J. A. Halderman. Tapdance: End-to-middle anticensorship without flow blocking. In 23rd USENIX Security Symposium (USENIX Security 14). USENIX Association."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib51",
+      "text": "W. J. Tolley, B. Kujath, M. T. Khan, N. Vallina-Rodriguez, and J. R. Crandall. Blind In/On-Path Attacks and Applications to VPNs. In 30th USENIX Security Symposium (USENIX Security 21)."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib40",
+      "text": "Port shadows via network alchemy. https://breakpointingbad.com/2021/09/08/Port-Shadows-via-Network-Alchemy.html ."
+    }
+  ]
+}

@@ -1,0 +1,104 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.03896",
+  "title": "DART: Implicit Doppler Tomography for Radar Novel View Synthesis",
+  "authors": "Tianshu Huang, John Miller, Akarsh Prabhakara, Tao Jin, Tarana Laroia, Zico Kolter, Anthony Rowe",
+  "year": "2024",
+  "categories": [
+    "cs.CV",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2403.03896",
+  "html_url": "https://arxiv.org/html/2403.03896",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 926,
+  "text": "Driven by advances in the automotive industry, miniaturized millimeter wave (mmWave) radar chips are becoming cheaper and more ubiquitous. Boasting a high range resolution and the ability to penetrate light materials, mmWave radars have proven effective in many application domains including collision avoidance and driver assistance in automobiles [1,2,3,4,5], through-occlusion imaging in airport scanners [6,7], and vision-denied tracking and mapping [8,9,10,11,12].\n\nBecause designing, testing, and deploying new radar systems in the real world can be costly, many rapid prototyping pipelines heavily rely on simulation. Modern radar simulation tools normally require the user to manually specify the geometry and characteristics of the scene, including all material properties [13]. While other sensors (e.g. lidar) can be used to scan an environment and produce a mesh or voxel map, they cannot capture radar-specific material properties that are crucial for generating realistic radar scans. Thus, in practice, this results in greatly simplified environment models due to the difficulty of meticulously surveying a scene and generating (or annotating) a model by hand.\n\nWe envision a more intelligent, data-driven approach to scene modeling for radar simulation where a user can carry a handheld radar sensor through a static environment and automatically generate a model suitable for accurate simulation of that environment. To this end, we frame the radar simulation problem as one of novel view synthesis: using several radar measurements of a scene to simulate what a radar would see from a new pose. Such a system would not only accelerate the development and testing of new algorithms across a variety of environmental conditions, but also open the door to a myriad of new inference techniques in radar sensing such as localization, mapping, imaging, and recognition which rely on accurate forward rendering models and could greatly benefit from realistic radar models.\n\n## Novel View Synthesis\n\nNeural Radiance Fields (NeRFs) [14] have revolutionized novel view synthesis, leading to an explosion in interest in graphics and beyond. By leveraging a (neural) implicit scene representation instead of explicitly modeling scene geometry, textures, and materials, NeRFs are able to capture and reproduce visual intricacies such as specularity, translucency, reflections, and complex occlusions. This results in a 3D scene capture and rendering system that boasts an unprecedented level of photorealism.\n\nDrawing inspiration from the success of NeRFs, we formulate an analogous problem for mmWave radar imaging. Our method, Doppler-Aided Radar Tomography (DART), takes a similar approach by implicitly capturing material properties from input scans which are reproduced when the model is sampled from a novel viewpoint. Though our model is implicit, we can also generate an explicit tomographic image by sampling along a voxel grid, which we use to show that DART is not simply memorizing the input data, but is in fact learning the geometry and material properties of the scene (Fig. 1).\n\n## Key Challenges\n\nApplying NeRF’s implicit scene modeling paradigm to the radar domain presents substantial challenges. We derive a rendering model from the ground up that appropriately reflects the unique nature of radar wave propagation. In NeRF, rendering each pixel involves integrating samples along a 1D ray, following a pinhole camera model [14]. However, radar waves propagate radially from the antenna. Even after range-azimuth-elevation processing, each radar pixel corresponds to a coarse 2D region of space, as the elevation-azimuth resolution of compact mmWave radars tends to be relatively poor. One key insight is to choose a radar representation space — range-Doppler — which greatly reduces angular ambiguity in one dimension under the assumption that the scene is static and the radar is moving with a known velocity [17]. This presents additional systems challenges, as the sensor platform needs to be moving and its velocity must be measured accurately alongside its position and orientation.\n\nEven with the dimensionality reduction afforded by range-Doppler processing, rendering a single radar pixel involves integrating samples along a circle, rather than a ray (Fig. 2). However, appropriately capturing occlusion effects requires that the nearest ranges are processed first due to occlusion caused by objects closer to the radar. Additionally, the size of the integration arc grows as the distance from the radar increases, resulting in an effective decrease in sampling density for points further from the radar that needs to be accounted for. Through careful modeling of these effects and a clever sampling scheme prioritizing sample re-use, we derive a computationally efficient forward rendering function that produces realistic novel radar scans.\n\n## Contributions\n\nWe propose DART: Doppler-Aided Radar Tomography, which implicitly learns a tomographic representation of the world in order to accurately synthesize radar range-Doppler images. To summarize our contributions:\n\n- 1. We formulate the problem of radar novel view synthesis from implicit reflectance and transmittance maps using range-Doppler images.\n\n- 2. Using a NeRF-inspired technique, we explicitly formulate the forward rendering of range-Doppler radar images and implicitly invert it using gradient descent to learn a neural-implicit representation.\n\n- 3. We construct a data collection rig and collect novel radar imaging datasets with accurate position and instantaneous velocity along with reference lidar point clouds.\n\n- 4. We evaluate DART across a range of scenarios and show that it out-performs the state-of-the-art, quantitatively and qualitatively, in both its synthetic radar renderings and its implicit imaging of scenes.\n\n## Limitations\n\nSince we rely on Doppler, our method is limited to static scenes, and requires accurate velocity estimates and a constantly moving radar. While motion is intrinsic to our method, we believe that it is reasonable to require movement during scanning. Poor velocity estimates or non-static scenes can cause DART to perform poorly; we hope to relax these limitations in the future.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib64",
+      "text": "Mark E Russell, Arthur Crain, Anthony Curran, Richard A Campbell, Clifford A Drubin, and Willian F Miccioli. Millimeter-wave radar sensor for automotive intelligent cruise control (icc). IEEE Transactions on microwave theory and techniques , 45(12):2444–2453, 1997."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib57",
+      "text": "Kun Qian, Shilin Zhu, Xinyu Zhang, and Li Erran Li. Robust multimodal vehicle detection in foggy weather using complementary lidar and radar signals. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 444–453, 2021."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib36",
+      "text": "Peizhao Li, Pu Wang, Karl Berntorp, and Hongfu Liu. Exploiting temporal relations on radar perception for autonomous driving. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 17071–17080, 2022a."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib65",
+      "text": "Nicolas Scheiner, Florian Kraus, Fangyin Wei, Buu Phan, Fahim Mannan, Nils Appenrodt, Werner Ritter, Jurgen Dickmann, Klaus Dietmayer, Bernhard Sick, and Felix Heide. Seeing around street corners: Non-line-of-sight detection and tracking in-the-wild using doppler radar. In IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 2020."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib14",
+      "text": "Fangqiang Ding, Andras Palffy, Dariu M. Gavrila, and Chris Xiaoxuan Lu. Hidden gems: 4d radar scene flow learning using cross-modal supervision. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 9340–9349, 2023."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib68",
+      "text": "David M Sheen, Douglas L McMakin, and Thomas E Hall. Cylindrical millimeter-wave imaging technique for concealed weapon detection. In 26th AIPR Workshop: Exploiting New Image Sources and Sensors , pages 242–250. SPIE, 1998."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib30",
+      "text": "Mahfuza Khatun, Hani Mehrpouyan, David Matolak, and Ismail Guvenc. Millimeter wave systems for airports and short-range aviation communications: A survey of the current channel models at mmwave frequencies. In 2017 IEEE/AIAA 36th Digital Avionics Systems Conference (DASC) , pages 1–8, 2017."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib9",
+      "text": "Sarah H Cen and Paul Newman. Precise ego-motion estimation with millimeter-wave radar under diverse and challenging conditions. In 2018 IEEE International Conference on Robotics and Automation (ICRA) , pages 6045–6052. IEEE, 2018."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib43",
+      "text": "Chris Xiaoxuan Lu, Muhamad Risqi U Saputra, Peijun Zhao, Yasin Almalioglu, Pedro PB De Gusmao, Changhao Chen, Ke Sun, Niki Trigoni, and Andrew Markham. milliego: single-chip mmwave radar aided egomotion estimation via deep sensor fusion. In Proceedings of the 18th Conference on Embedded Networked Sensor Systems , pages 109–122, 2020b."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib2",
+      "text": "Yasin Almalioglu, Mehmet Turan, Chris Xiaoxuan Lu, Niki Trigoni, and Andrew Markham. Milli-rio: Ego-motion estimation with low-cost millimetre-wave radar. IEEE Sensors Journal , 21(3):3314–3323, 2020."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib37",
+      "text": "Yu-Jhe Li, Jinhyung Park, Matthew O’Toole, and Kris Kitani. Modality-agnostic learning for radar-lidar fusion in vehicle detection. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 918–927, 2022b."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib22",
+      "text": "Junfeng Guan, Sohrab Madani, Suraj Jog, Saurabh Gupta, and Haitham Hassanieh. Through fog high-resolution imaging using millimeter wave radar. In IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 2020a."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib3",
+      "text": "Stefan Auer, Richard Bamler, and Peter Reinartz. Raysar - 3d sar simulator: Now open source. 2016."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib48",
+      "text": "Ben Mildenhall, Pratul P Srinivasan, Matthew Tancik, Jonathan T Barron, Ravi Ramamoorthi, and Ren Ng. Nerf: Representing scenes as neural radiance fields for view synthesis. Communications of the ACM , 65(1):99–106, 2021."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib58",
+      "text": "Julien Rebut, Arthur Ouaknine, Waqas Malik, and Patrick Pérez. Raw high-definition radar for multi-task learning. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 17021–17030, 2022."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib76",
+      "text": "AWR1843AOP Single-chip 77- and 79-GHz FMCW mmWave Sensor Antennas-OnPackage (AOP) . Texas Instruments, 2021."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib26",
+      "text": "Franz Hlawatsch. Time-frequency analysis and synthesis of linear signal spaces: time-frequency filters, signal detection and estimation, and Range-Doppler estimation . Springer Science & Business Media, 1998."
+    }
+  ]
+}

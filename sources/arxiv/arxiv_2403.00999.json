@@ -1,0 +1,93 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.00999",
+  "title": "Distributional Dataset Distillation with Subtask Decomposition",
+  "authors": "Tian Qin, Zhiwei Deng, David Alvarez-Melis",
+  "year": "2024",
+  "categories": [
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2403.00999",
+  "html_url": "https://arxiv.org/html/2403.00999",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 975,
+  "text": "Large datasets such as ImageNet [1] can be used for a variety of purposes, ranging from image classification, single-object localization to generative tasks. If one only needs to accomplish one of those tasks, say image classification, can we synthesize only relevant information in the data and thus achieve compression? The goal of data distillation, first introduced by [2], is to answer this question: how to ‘condense’ a dataset into a smaller (synthetic) counterpart, such that training on this distilled dataset achieves performance comparable to training on the the original dataset. Since its inception, this problem has garnered significant attention due to its obvious implications for data storage efficiency, faster model training, and democratization of large-scale model training. It also holds the promise of speeding up downstream applications such as neural architecture search, approximate nearest neighbor retrieval, and knowledge distillation, all of which often require data-hungry methods [3]. Moreover, data distillation has emerged as a promising approach for continual learning [4] and differential privacy [5], often outperforming bespoke differentially-private data generators both in terms of performance and privacy, and allowing for private medical data sharing [6].\n\nMost current state-of-the-art data distillation methods produce synthetic protoypes: a small subset of learnt (input, label) pairs that capture the most ‘salient’ (in terms of their impact on classifier performance) aspects of the original dataset. These prototypes are often defined in the original input (e.g., image) space ([2,7]). Recently, some work [8,9,10] propose to distill images into a latent space, and use a decoder to map latent codes back to the input (image) space. Overall, dataset distillation methods have achieved remarkable success in producing much smaller datasets —typically measured in terms of Images (or Prototypes) Per Class (IPC)— with limited loss of downstream model performance. While early methods suffered from limited scalability, recent ones have managed to scale to large datasets like ImageNet-1K or even ImageNet-21K [11,12,13]. For example, SRe 2 L [14] achieved a \\sim\\!\\!100\\times IPC reduction on ImageNet-1K and recovered \\sim\\!\\!77\\% of the classification accuracy.\n\nAlthough encouraging, we will show that these results tell an incomplete story. When considering the total storage (e.g., disk space used to store all necessary distillation outputs) and the runtime needed to train new models on the distilled data, the efficacy of these methods is much more subdued. Beyond the prototypes, some of these methods output other artifacts that are necessary for downstream use but whose memory footprint is rarely reported. These include soft labels (often multiple per prototype) and augmentation parameters used [15,11,12]. The use of distilled labels are crucial (see Figure 7) but incur a storage cost that is not captured by IPC (Table 7, Appendix A.1). Once we take into account the storage cost of these artifacts, the true compression rate of such methods is much lower than implied by the IPC metric (Figure 1, left). On the other hand, decoding/generation/augmentation procedures often translate into additional post-distillation training time (Figure 1, right). In light of these observations, we argue that IPC as a metric of distillation is incomplete, and that the methods that have been developed to optimize it should be revisited with a more comprehensive set of evaluation metrics.\n\nIn response to the above observation, we propose a new dataset distillation method with efficient compression properties, not in terms of dataset cardinality (i.e., IPC), but directly in terms of storage size and downstream model training time. Distilling into the latent space not only allows a more compact representation of the data by sharing inter-class mutual information in decoder parameters, but also offers finer-grained control on compression than working directly with prototypes (e.g., by varying number of latent codes per class, latent dimensions and the decoder size). We challenge the conventional approach of distilling into a finite set of (latent) prototypes and propose to cast the problem into a distributional one: finding a synthetic probability distribution which can be sampled to produce training data for downstream tasks. This Distributional Dataset Distillation (D3) approach yields an efficient representation of distilled data without incurring much additional computation costs on downstream tasks.\n\nTo scale our method efficiently to large datasets such as ImageNet-1K, we propose a simple-yet-effective federated distillation scheme that parallelizes the distillation process (Figure 2). Instead of directly distilling the entire dataset, we divide the full classification tasks into subtasks, where each task only classifies a subset of all classes. Data distillation is performed on subtasks, using local experts trained on subtasks. We then aggregate the locally distilled datasets to form the distilled data for the full task. We show that data distilled on subtasks generalize well to the full task, which ensures the good performance of our federated distillation process. Using the distributional representation and federated distillation, we achieve SOTA performance on ImageNet-1K as measured by storage cost.\n\nOur contributions can be summarized as follows:\n\n- • We show that state-of-the-art prototype-based data distillation methods yield unexpectedly high storage costs and post-distillation training times, an under-reported phenomenon that is not captured by commonly-used compression metrics (e.g., IPC, the number of distilled items per class). The large storage cost and training time could hinder the usability of these methods in practice.\n\n- • We propose a novel distillation framework with smaller memory footprint that distills datasets into distributions, extending recent methods that distill into a latent space to now operate on (latent) distributions. We show this method matches or outperforms state-of-the-art distillation methods in terms of prediction accuracy on various datasets (e.g., TinyImageNet, ImageNet-1K), with smaller storage costs.\n\n- • We propose a simple-yet-effective federated distillation strategy that allows distillation training process to be parallelized, and which has general applicability beyond our specific method.\n\n- • In response to our observations above, we propose new evaluation protocols and metrics for dataset distillation methods that more accurately characterize the extent of ‘distillation’, and compare existing work and our work along these axes.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib5",
+      "text": "Deng et al. (2009) Jia Deng, Wei Dong, Richard Socher, Li-Jia Li, Kai Li, and Li Fei-Fei. Imagenet: A large-scale hierarchical image database. In 2009 IEEE Conference on Computer Vision and Pattern Recognition , pp. 248–255, 2009. doi: 10.1109/CVPR.2009.5206848 ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib24",
+      "text": "Wang et al. (2018) Tongzhou Wang, Jun-Yan Zhu, Antonio Torralba, and Alexei A Efros. Dataset distillation. November 2018. arXiv:1811.10959."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib21",
+      "text": "Sachdeva & McAuley (2023) Noveen Sachdeva and Julian McAuley. Data distillation: A survey. January 2023. arXiv:2301.04272."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib20",
+      "text": "Rosasco et al. (2021) Andrea Rosasco, Antonio Carta, Andrea Cossu, Vincenzo Lomonaco, and Davide Bacciu. Distilled replay: Overcoming forgetting through synthetic samples. March 2021. arXiv:2103.15851."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib7",
+      "text": "Dong et al. (2022) Tian Dong, Bo Zhao, and Lingjuan Lyu. Privacy for free: How does dataset condensation help privacy? June 2022. arXiv:2206.00240."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib14",
+      "text": "Li et al. (2022) Guang Li, Ren Togo, Takahiro Ogawa, and Miki Haseyama. Compressed gastric image generation based on soft-label dataset distillation for medical data sharing. Comput. Methods Programs Biomed. , 227:107189, December 2022."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib23",
+      "text": "Wang et al. (2022) Kai Wang, Bo Zhao, Xiangyu Peng, Zheng Zhu, Shuo Yang, Shuo Wang, Guan Huang, Hakan Bilen, Xinchao Wang, and Yang You. CAFE: Learning to condense dataset by aligning FEatures. pp. 12196–12205, March 2022. arXiv:2203.01531."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib6",
+      "text": "Deng & Russakovsky (2022) Zhiwei Deng and Olga Russakovsky. Remember the past: Distilling datasets into addressable memories for neural networks. pp. 34391–34404, June 2022. arXiv:2206.02916."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib29",
+      "text": "Zhao & Bilen (2022) Bo Zhao and Hakan Bilen. Synthesizing informative training samples with GAN. April 2022. arXiv:2204.07513."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib12",
+      "text": "Lee et al. (2022) Hae Beom Lee, Dong Bok Lee, and Sung Ju Hwang. Dataset condensation with latent space knowledge factorization and sharing. August 2022. arXiv:2208.10494."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib26",
+      "text": "Yin & Shen (2023) Zeyuan Yin and Zhiqiang Shen. Dataset distillation in large data era. November 2023. arXiv:2311.18838."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib27",
+      "text": "Yin et al. (2023) Zeyuan Yin, Eric Xing, and Zhiqiang Shen. Squeeze, recover and relabel: Dataset condensation at ImageNet scale from a new perspective. June 2023. arXiv:2306.13092."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib15",
+      "text": "Liu et al. (2023) Haoyang Liu, Tiancheng Xing, Luwei Li, Vibhu Dalal, Jingrui He, and Haohan Wang. Dataset distillation via the wasserstein metric. November 2023. arXiv:2311.18531."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib16",
+      "text": "Liu et al. (2022) Songhua Liu, Kai Wang, Xingyi Yang, Jingwen Ye, and Xinchao Wang. Dataset distillation via factorization. pp. 1100–1113, October 2022."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib33",
+      "text": "Zhou et al. (2022b) Yongchao Zhou, Ehsan Nezhadarya, and Jimmy Ba. Dataset distillation using neural feature regression. June 2022b. arXiv:2206.00719."
+    }
+  ]
+}

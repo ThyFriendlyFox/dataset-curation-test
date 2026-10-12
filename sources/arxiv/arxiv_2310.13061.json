@@ -1,0 +1,190 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2310.13061",
+  "title": "To grok or not to grok: Disentangling generalization and memorization on corrupted algorithmic datasets",
+  "authors": "Darshil Doshi, Aritra Das, Tianyu He, Andrey Gromov",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cond-mat.dis-nn",
+    "stat.ML"
+  ],
+  "url": "https://arxiv.org/abs/2310.13061",
+  "html_url": "https://arxiv.org/html/2310.13061",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1151,
+  "text": "The astounding progress of deep learning in the last decade has been facilitated by massive, high-quality datasets. Annotated real-world datasets inevitably contain noisy labels, due to biases of annotation schemes [1,2] or inherent ambiguity [3]. A key challenge in training large models is to prevent overfitting the noisy data and attain robust generalization performance. On the other hand, in large models, it is possible for memorization and generalization to coexist [4,5]. By and large, the tussle between memorization and generalization, especially in the presence of label corruption, remains poorly understood.\n\nIn generative language models the problem of memorization is even more nuanced. On the one hand, some factual knowledge is critical for the language models to produce accurate information. On the other hand, verbatim memorization of the training data is generally unwanted due to privacy concerns [6]. The full scope of the conditions that affect memorization in large language models (LLMs) is still under investigation [7,8]. In particular, larger models as well as repeated data [9] favor memorization.\n\nIn this work, we take an approach to disentangling generalization and memorization motivated by theoretical physics. Namely, we focus on simple, analytically tractable, (“mechanistically”) interpretable models trained on algorithmic datasets. More concretely, we study two-layer Multilayer Perceptrons (MLP) trained on modular arithmetic tasks. In this case, the network is trained to learn a rule, such as z=(m+n)\\%p\\equiv m+n\\,\\,\\textrm{mod}\\,\\,p from a number of examples. These tasks are phrased as classification problems. We then force the network to memorize \\xi\\cdot 100\\% of the examples by corrupting the labels, i.e. injecting data points where (m+n)\\%p is mapped to z^{\\prime}\\neq z. In this setting, the generalizing representations are understood qualitatively [10,11] as well as quantitatively, thanks to the availability of an analytic solution for the representations described in [12]. We empirically show that sufficiently large networks can memorize the corrupted examples while achieving nearly perfect generalization on the test set. The neurons responsible for memorization can be identified using inverse participation ratio (IPR) and pruned away, leading to perfect accuracy on the un-corrupted dataset. We further show that regularization dramatically affects the network’s ability to memorize the corrupted examples. Weight decay, Dropout and BatchNorm all prevent memorization, but in different ways: Weight decay and Dropout eliminate the memorizing neurons by converting them into generalizing ones, while BatchNorm de-amplifies the signal coming from the memorizing neurons without eliminating them.\n\n## 1.1 Preliminaries\n\n## Grokking modular arithmetic.\n\nWe consider the modular addition task (m+n)\\,\\%\\,p. It can be learned by a two-layer MLP. Explicitly, the network function takes form\n\nHere, {\\bm{e}}_{m},{\\bm{e}}_{n}\\in\\mathbb{R}^{p} are one_hot encoded numbers m,n. “ \\oplus ” denotes concatenation of vectors ({\\bm{e}}_{m}\\oplus{\\bm{e}}_{n}\\in\\mathbb{R}^{2p}). {\\bm{W}}_{in}\\in\\mathbb{R}^{N\\times 2p} and {\\bm{W}}\\in\\mathbb{R}^{p\\times N} are the first and second layer weight matrices, respectively. \\phi is the activation function. {\\bm{W}}_{in} is decomposed into two N\\times P blocks: {\\bm{U}},{\\bm{V}}\\in\\mathbb{R}^{N\\times p}. {\\bm{U}},{\\bm{V}} serve as embedding vectors for m,n respectively. {\\bm{f}}(m,n)\\in\\mathbb{R}^{p} is the network-output on one example pair (m,n). The targets are one_hot encoded answers {\\bm{e}}_{(m+n)\\,\\%\\,p}.\n\nThe dataset consists of p^{2} examples pairs; from which we randomly pick \\alpha p^{2} examples for training, and use the other (1-\\alpha)p^{2} examples as a test set. We will refer to \\alpha as the data fraction.\n\nThis setup exhibits grokking: delayed and sudden occurrence of generalization, long after memorization [13,10,11,12].\n\n## Periodic weights.\n\nChoosing quadratic activation function \\phi(x)=x^{2} makes the problem analytically solvable [12]. Upon grokking, the trained network weights are qualitatively similar to the analytical solution presented in [12]. The following analytical expression for the network weights leads to 100\\% generalization (for sufficiently large width)\n\nwhere \\sigma(k) denotes a random permutation of k in S_{N} – reflecting the permutation symmetry of the hidden neurons. The phase \\phi_{k}^{(u)} and \\phi_{k}^{(v)} are uniformly i.i.d. sampled between (-\\pi,\\pi]. We refer the reader to Appendix D for further details about the analytical solution.\n\n## Inverse participation ratio.\n\nTo characterize the generalizing representations quantitatively, we utilize a quantity familiar from the physics of localization: the inverse participation ratio (IPR). Its role is to detect periodicity in the weight matrix.\n\nLet {\\bm{U}}_{k\\cdot},{\\bm{V}}_{k\\cdot}({\\bm{W}}_{k\\cdot}) denote the k^{th} row(column) vectors of the weights {\\bm{U}},{\\bm{V}}({\\bm{W}}). Consider the discrete Fourier transforms of these vectors, denoted by \\widetilde{\\bm{U}}_{k\\cdot},\\widetilde{\\bm{V}}_{k\\cdot}(\\widetilde{\\bm{W}}_{k\\cdot}). The Fourier decompositions of the periodic rows(columns) of these weights are highly localized. We leverage this to quantify the similarity of trained weights to the analytic solution (equation 2). To that end, we define the Inverse Participation Ratio (IPR) [14,15,12] for these vectors:\n\nwhere \\lVert\\cdot\\rVert_{P} denotes the L^{P} -norm of the vector. One can readily see from equation 3 that IPR\\in[1/p,1], with higher values for periodic vectors and lower values for non-periodic ones. It is useful to quantify the periodicity of each neuron in the hidden layer of the network (indexed by k). We define per-neuron IPR by averaging over the weight-vectors connected to the neuron:\n\nSince trained networks generalize via the periodic features, a larger population of high-IPR neurons leads to better generalization. To quantify the overall similarity of the trained network to the analytical solution (equation 2) we average \\text{IPR}_{k} over all hidden neurons: \\overline{\\text{IPR}}\\coloneqq\\mathbb{E}_{k}\\left[\\text{IPR}_{k}\\right].\n\n## Label corruption.\n\nTo introduce label corruption, we choose a fraction \\xi of the training examples, and replace the true labels with random labels. The corrupted labels are generated from a uniform random distribution over all the labels. This is often called symmetric label noise in literature [16]. This type of label corruption does not introduce label asymmetry.\n\n## 1.2 Related Works\n\n## Grokking\n\nGrokking was first reported by [13] for Transformers trained on modular arithmetic datasets. [11,17] presented explanations for grokking in terms of quality of representation learning as well as weight-norms. They also found grokking-like behaviours on other datasets. [10,18] reverse-engineered grokked Transformer models and revealed the underlying learned algorithm. [19] observed grokking on the sparse-parity problem, which they attributed to the amplification of the so-called Fourier gap. [20] examined grokking in the sparse-parity setup and attributed it to the emergence of sparse subnetworks. [21] discuss solvable models for grokking in a teacher-student setup. Recently, [22] investigated the loss landscape at early training time and used it to predict the occurrence of grokking. [23] demonstrated new grokking-behaviours by investigating the critical amount of data needed for grokking.\n\n## Label Noise\n\n[4] showed that neural networks can easily fit random labels. A large body of work has been dedicated to developing techniques for robust training with label noise: explicit regularization [24,25], noise-robust loss functions [26], sample selection [27,28], noise modeling and dedicated architectures [29,30,31] etc. We refer the reader to recent reviews by [16,32] for a comprehensive overview.\n\n## Regularization and Pruning\n\n[33] investigated the interplay between label corruption and regularization in vision tasks. They showed that BatchNorm [25] and Dropout [24] have qualitatively different effects. Dropout effectively reduces the network-size but does not discourage over-reliance on a few special directions in weights space; while BatchNorm spreads the generalizing features over many dimensions. [34] found that there is a trade-off between stability and generalization when pruning trained networks.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib24",
+      "text": "Paolacci et al. (2010) Gabriele Paolacci, Jesse Chandler, and Panagiotis G. Ipeirotis. Running experiments on amazon mechanical turk. Judgment and Decision Making , 5(5):411–419, 2010. doi: 10.1017/S1930297500002205 ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib7",
+      "text": "Cothey (2004) Viv Cothey. Web-crawling reliability. Journal of the American Society for Information Science and Technology , 55(14):1228–1238, 2004. doi: https://doi.org/10.1002/asi.20078 . URL https://onlinelibrary.wiley.com/doi/abs/10.1002/asi.20078 ."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib4",
+      "text": "Beyer et al. (2020) Lucas Beyer, Olivier J. Hénaff, Alexander Kolesnikov, Xiaohua Zhai, and Aäron van den Oord. Are we done with imagenet?, 2020."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib34",
+      "text": "Zhang et al. (2017) Chiyuan Zhang, Samy Bengio, Moritz Hardt, Benjamin Recht, and Oriol Vinyals. Understanding deep learning requires rethinking generalization. In International Conference on Learning Representations , 2017. URL https://openreview.net/forum?id=Sy8gdB9xx ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib35",
+      "text": "Zhang et al. (2021) Chiyuan Zhang, Samy Bengio, Moritz Hardt, Benjamin Recht, and Oriol Vinyals. Understanding deep learning (still) requires rethinking generalization. Communications of the ACM , 64(3):107–115, 2021."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib5",
+      "text": "Carlini et al. (2021) Nicholas Carlini, Florian Tramer, Eric Wallace, Matthew Jagielski, Ariel Herbert-Voss, Katherine Lee, Adam Roberts, Tom Brown, Dawn Song, Ulfar Erlingsson, et al. Extracting training data from large language models. In 30th USENIX Security Symposium (USENIX Security 21) , pp. 2633–2650, 2021."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib6",
+      "text": "Carlini et al. (2022) Nicholas Carlini, Daphne Ippolito, Matthew Jagielski, Katherine Lee, Florian Tramer, and Chiyuan Zhang. Quantifying memorization across neural language models. arXiv preprint arXiv:2202.07646 , 2022."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib30",
+      "text": "Tirumala et al. (2022) Kushal Tirumala, Aram Markosyan, Luke Zettlemoyer, and Armen Aghajanyan. Memorization without overfitting: Analyzing the training dynamics of large language models. Advances in Neural Information Processing Systems , 35:38274–38290, 2022."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib12",
+      "text": "Hernandez et al. (2022) Danny Hernandez, Tom Brown, Tom Conerly, Nova DasSarma, Dawn Drain, Sheer El-Showk, Nelson Elhage, Zac Hatfield-Dodds, Tom Henighan, Tristan Hume, et al. Scaling laws and interpretability of learning from repeated data. arXiv preprint arXiv:2205.10487 , 2022."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib22",
+      "text": "Nanda et al. (2023) Neel Nanda, Lawrence Chan, Tom Lieberum, Jess Smith, and Jacob Steinhardt. Progress measures for grokking via mechanistic interpretability, 2023."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib18",
+      "text": "Liu et al. (2022) Ziming Liu, Ouail Kitouni, Niklas S Nolte, Eric Michaud, Max Tegmark, and Mike Williams. Towards understanding grokking: An effective theory of representation learning. In S. Koyejo, S. Mohamed, A. Agarwal, D. Belgrave, K. Cho, and A. Oh (eds.), Advances in Neural Information Processing Systems , volume 35, pp. 34651–34663. Curran Associates, Inc., 2022. URL https://proceedings.neurips.cc/paper_files/paper/2022/file/dfc310e81992d2e4cedc09ac47eff13e-Paper-Conference.pdf ."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib10",
+      "text": "Gromov (2023) Andrey Gromov. Grokking modular arithmetic, 2023. URL https://arxiv.org/abs/2301.02679 ."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib27",
+      "text": "Power et al. (2022) Alethea Power, Yuri Burda, Harri Edwards, Igor Babuschkin, and Vedant Misra. Grokking: Generalization beyond overfitting on small algorithmic datasets, 2022."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib9",
+      "text": "Girvin & Yang (2019) Steven M. Girvin and Kun Yang. Modern Condensed Matter Physics . Cambridge University Press, 2019. doi: 10.1017/9781316480649 ."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib25",
+      "text": "Pastor-Satorras & Castellano (2016) Romualdo Pastor-Satorras and Claudio Castellano. Distinct types of eigenvector localization in networks. Scientific Reports , 6(1):18847, 2016. doi: 10.1038/srep18847 . URL https://doi.org/10.1038/srep18847 ."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib28",
+      "text": "Song et al. (2022) Hwanjun Song, Minseok Kim, Dongmin Park, Yooju Shin, and Jae-Gil Lee. Learning from noisy labels with deep neural networks: A survey. IEEE Transactions on Neural Networks and Learning Systems , pp. 1–19, 2022. doi: 10.1109/TNNLS.2022.3152527 ."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib19",
+      "text": "Liu et al. (2023) Ziming Liu, Eric J Michaud, and Max Tegmark. Omnigrok: Grokking beyond algorithmic data. In The Eleventh International Conference on Learning Representations , 2023. URL https://openreview.net/forum?id=zDiHoIWa0q1 ."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib36",
+      "text": "Zhong et al. (2023) Ziqian Zhong, Ziming Liu, Max Tegmark, and Jacob Andreas. The clock and the pizza: Two stories in mechanistic explanation of neural networks, 2023."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib1",
+      "text": "Barak et al. (2022) Boaz Barak, Benjamin L. Edelman, Surbhi Goel, Sham M. Kakade, eran malach, and Cyril Zhang. Hidden progress in deep learning: SGD learns parities near the computational limit. In Alice H. Oh, Alekh Agarwal, Danielle Belgrave, and Kyunghyun Cho (eds.), Advances in Neural Information Processing Systems , 2022. URL https://openreview.net/forum?id=8XWP2ewX-im ."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "Merrill et al. (2023) William Merrill, Nikolaos Tsilivis, and Aman Shukla. A tale of two circuits: Grokking as competition of sparse and dense subnetworks, 2023."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib37",
+      "text": "Žunkovič & Ilievski (2022) Bojan Žunkovič and Enej Ilievski. Grokking phase transitions in learning local rules with gradient descent, 2022."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib23",
+      "text": "Notsawo et al. (2023) Pascal Jr. Tikeng Notsawo, Hattie Zhou, Mohammad Pezeshki, Irina Rish, and Guillaume Dumas. Predicting grokking long before it happens: A look into the loss landscape of models which grok, 2023."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib31",
+      "text": "Varma et al. (2023) Vikrant Varma, Rohin Shah, Zachary Kenton, János Kramár, and Ramana Kumar. Explaining grokking through circuit efficiency, 2023."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib13",
+      "text": "Hinton et al. (2012) Geoffrey E. Hinton, Nitish Srivastava, Alex Krizhevsky, Ilya Sutskever, and Ruslan R. Salakhutdinov. Improving neural networks by preventing co-adaptation of feature detectors, 2012."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib14",
+      "text": "Ioffe & Szegedy (2015) Sergey Ioffe and Christian Szegedy. Batch normalization: Accelerating deep network training by reducing internal covariate shift, 2015."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib8",
+      "text": "Ghosh et al. (2017) Aritra Ghosh, Himanshu Kumar, and P Shanti Sastry. Robust loss functions under label noise for deep neural networks. In Proceedings of the AAAI conference on artificial intelligence , volume 31, 2017."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib16",
+      "text": "Katharopoulos & Fleuret (2018) Angelos Katharopoulos and Francois Fleuret. Not all samples are created equal: Deep learning with importance sampling. In Proceedings of the 35th International Conference on Machine Learning , volume 80 of Proceedings of Machine Learning Research , pp. 2525–2534. PMLR, 10–15 Jul 2018."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib26",
+      "text": "Paul et al. (2021) Mansheej Paul, Surya Ganguli, and Gintare Karolina Dziugaite. Deep learning on a data diet: Finding important examples early in training. In M. Ranzato, A. Beygelzimer, Y. Dauphin, P.S. Liang, and J. Wortman Vaughan (eds.), Advances in Neural Information Processing Systems , volume 34, pp. 20596–20607. Curran Associates, Inc., 2021."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib32",
+      "text": "Xiao et al. (2015) Tong Xiao, Tian Xia, Yi Yang, Chang Huang, and Xiaogang Wang. Learning from massive noisy labeled data for image classification. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR) , June 2015."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib11",
+      "text": "Han et al. (2018) Bo Han, Jiangchao Yao, Gang Niu, Mingyuan Zhou, Ivor Tsang, Ya Zhang, and Masashi Sugiyama. Masking: A new perspective of noisy supervision. In S. Bengio, H. Wallach, H. Larochelle, K. Grauman, N. Cesa-Bianchi, and R. Garnett (eds.), Advances in Neural Information Processing Systems , volume 31, 2018."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib33",
+      "text": "Yao et al. (2019) Jiangchao Yao, Jiajie Wang, Ivor W. Tsang, Ya Zhang, Jun Sun, Chengqi Zhang, and Rui Zhang. Deep learning from noisy image labels with quality embedding. IEEE Transactions on Image Processing , 28(4):1909–1922, 2019. doi: 10.1109/TIP.2018.2877939 ."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib17",
+      "text": "Liang et al. (2022) Xuefeng Liang, Xingyu Liu, and Longshan Yao. Review–a survey of learning from noisy labels. ECS Sensors Plus , 1(2):021401, jun 2022. doi: 10.1149/2754-2726/ac75f5 . URL https://dx.doi.org/10.1149/2754-2726/ac75f5 ."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib21",
+      "text": "Morcos et al. (2018) Ari S. Morcos, David G. T. Barrett, Neil C. Rabinowitz, and Matthew Botvinick. On the importance of single directions for generalization, 2018."
+    },
+    {
+      "n": 34,
+      "id": "bib.bib3",
+      "text": "Bartoldson et al. (2020) Brian R. Bartoldson, Ari S. Morcos, Adrian Barbu, and Gordon Erlebacher. The generalization-stability tradeoff in neural network pruning, 2020."
+    }
+  ]
+}

@@ -1,0 +1,99 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2209.06356",
+  "title": "Using Forwards-Backwards Models to Approximate MDP Homomorphisms",
+  "authors": "Augustine N. Mavor-Parker, Matthew J. Sargent, Christian Pehle, Andrea Banino, Lewis D. Griffin, Caswell Barry",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.AI"
+  ],
+  "url": "https://arxiv.org/abs/2209.06356",
+  "html_url": "https://arxiv.org/html/2209.06356",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 850,
+  "text": "Reinforcement learning (RL) has achieved superhuman performance on previously unsolvable benchmarks such as Go [1] and Starcraft [2]. However, the computational expense of RL hinders its deployment in the real world. RL can demand hundreds of millions of samples to learn a policy, either within an environment model [3] or by direct interaction [4]. While sample efficiency is improving, there is a gap between the best performing agents and those that are sample efficient [5,6].\n\nHumans abstract away details about state-action pairs that do not effect their values. Consider the Atari game Asterix, where an agent collects gold while avoiding enemies in a 2D navigation task—a human gamer understands that collecting treasure when approaching from below has the same value as collecting the same treasure but approaching from the right (figure 1), which allows them to progress more quickly by generalising value predictions between equivalent state-action pairs. In this work, we identify this abstraction as a Markov decision process (MDP) homomorphism [8,9]. MDP homomorphisms collapse equivalent state-actions in an observed MDP onto a smaller abstract state-action space in an abstract MDP [9].\n\nGiven a mapping to an abstract MDP, policies can be learned efficiently in the smaller abstract space and then mapped back to the experienced MDP when interacting with the environment [8]. Previous works hard code homomorphisms into a policy [9] but developing approaches that learn homomorphic mappings online from experience is an active area of research [10,11].\n\nWe present equivalent effect abstraction, a method for constructing MDP homomorphisms from experience via a partial dynamics model of state transitions (without needing to predict rewards)—leveraging the fact that state-action pairs leading to the same next state frequently have equivalent values. We use this insight in off-policy value-based RL, which is the most sample efficient class of RL algorithms for discrete control [5]. Off-policy RL predicts separate values for different actions in a given state. We improve sample efficiency further by only requiring a value function to predict the value of a single action selected by the practitioner, which we call the hypothetical action, in a separate state called a hypothetical state. The hypothetical state is computed by first moving through a forwards dynamics model with a given state-action pair. Then, we move backwards through a model that predicts what hypothetical state would lead to the same next state as the original state-action pair, given the hypothetical action was selected.\n\nConsider again the Asterix example—moving to a given state has the same value whether your previous action was right, left, up or down. Thus, equipped with a dynamics model, we show that if the value of approaching a state from the right is known, one can also deduce the value of approaching the same state from the left, below, or above. Consequently, equivalent effect abstraction extrapolates value judgements between equivalent state-action pairs, reducing the amount of experience required to learn a policy. We make the following contributions.\n\n- 1. We develop a novel approach for learning a reduced MDP without knowledge of symmetries, and prove that, under certain assumptions, our mapping to the reduced MDP is a homomorphism.\n\n- 2. We confirm these theoretical results in an idealised tabular setting, where we show equivalent effect abstraction improves the planning efficiency of model-based RL and the sample efficiency of model-free RL.\n\n- 3. In the deep RL setting, we test our approach when the homomorphism is approximate due to imperfect learned models—we show an improvement upon standard baselines on Cartpole and Predator-Prey environments (which are MDP homomorphisms benchmarks from [9]).\n\n- 4. In the MinAtar suite [12], where the assumptions required for our theoretical results are further violated (especially relating to stochasticity), we find an almost 4x improvement over a value based baseline at 250k frames (when averaging all results over different optimizers and games).\n\nWe are not the first to exploit the equivalence of state action pairs that lead to the same next state. [13] use the concept of afterstates (states immediately before an opponents response to an action [14]) in their backgammon program. This is similar to our approach and has been scaled within MuZero to other board games [14], but in general afterstates have not found wider applicability. [15] ’s kinematic inseparability is a related but distinct abstraction that uses contrastive learning to classify whether two states will lead to the same next state for the same action. In contrast, our approach looks for state-action pairs (with different actions) that lead to the same next state, which is a broader form of abstraction. Another difference is that our equivalent effect abstraction does not require states to be discrete, which makes it readily applicable to common RL environments where it is rare to reach the same state twice. Finally [16] defines a state-action equivalence that is more comprehensive than the equivalence defined by [8], which is satisfied by various equivalent state-action pairs like those found in [8,9,15] as well as the state-action pairs satisfying the equivalent effect abstraction we present. However, they assume a tree of discrete states can be searched over for equivalences, which is challenging in deep RL.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib35",
+      "text": "Silver et al., (2016) Silver, D., Huang, A., Maddison, C. J., Guez, A., Sifre, L., Van Den Driessche, G., Schrittwieser, J., Antonoglou, I., Panneershelvam, V., Lanctot, M., et al. (2016). Mastering the game of go with deep neural networks and tree search. nature , 529(7587):484–489."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib43",
+      "text": "Vinyals et al., (2019) Vinyals, O., Babuschkin, I., Czarnecki, W. M., Mathieu, M., Dudzik, A., Chung, J., Choi, D. H., Powell, R., Ewalds, T., Georgiev, P., et al. (2019). Grandmaster level in starcraft ii using multi-agent reinforcement learning. Nature , 575(7782):350–354."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib18",
+      "text": "Hafner et al., (2020) Hafner, D., Lillicrap, T. P., Norouzi, M., and Ba, J. (2020). Mastering atari with discrete world models. In International Conference on Learning Representations ."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib5",
+      "text": "Badia et al., (2020) Badia, A. P., Piot, B., Kapturowski, S., Sprechmann, P., Vitvitskyi, A., Guo, Z. D., and Blundell, C. (2020). Agent57: Outperforming the atari human benchmark. In International Conference on Machine Learning , pages 507–517. PMLR."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib34",
+      "text": "Schwarzer et al., (2023) Schwarzer, M., Ceron, J. S. O., Courville, A., Bellemare, M. G., Agarwal, R., and Castro, P. S. (2023). Bigger, better, faster: Human-level atari with human-level efficiency. In International Conference on Machine Learning , pages 30365–30380. PMLR."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib12",
+      "text": "Fan et al., (2023) Fan, J., Zhuang, Y., Liu, Y., Hao, J., Wang, B., Zhu, J., Wang, H., and Xia, S.-T. (2023). Learnable behavior control: Breaking atari human world records via sample-efficient behavior selection. arXiv preprint arXiv:2305.05239 ."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib8",
+      "text": "Betker et al., (2023) Betker, J., Goh, G., Jing, L., Brooks, T., Wang, J., Li, L., Ouyang, L., Zhuang, J., Lee, J., Guo, Y., et al. (2023). Improving image generation with better captions. Computer Science. https://cdn. openai. com/papers/dall-e-3. pdf , 2(3):8."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib30",
+      "text": "Ravindran and Barto, (2001) Ravindran, B. and Barto, A. G. (2001). Symmetries and model minimization in markov decision processes."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib42",
+      "text": "(42) van der Pol, E., Worrall, D., van Hoof, H., Oliehoek, F., and Welling, M. (2020b). Mdp homomorphic networks: Group symmetries in reinforcement learning. Advances in Neural Information Processing Systems , 33:4199–4210."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib31",
+      "text": "Rezaei-Shoshtari et al., (2022) Rezaei-Shoshtari, S., Zhao, R., Panangaden, P., Meger, D., and Precup, D. (2022). Continuous mdp homomorphisms and homomorphic policy gradient. arXiv preprint arXiv:2209.07364 ."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib20",
+      "text": "Keurti et al., (2023) Keurti, H., Pan, H.-R., Besserve, M., Grewe, B. F., and Schölkopf, B. (2023). Homomorphism autoencoder–learning group structured representations from observed transitions. In International Conference on Machine Learning , pages 16190–16215. PMLR."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib46",
+      "text": "Young and Tian, (2019) Young, K. and Tian, T. (2019). Minatar: An atari-inspired testbed for thorough and reproducible reinforcement learning experiments. arXiv preprint arXiv:1903.03176 ."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib40",
+      "text": "Tesauro et al., (1995) Tesauro, G. et al. (1995). Temporal difference learning and td-gammon. Communications of the ACM , 38(3):58–68."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib3",
+      "text": "Antonoglou et al., (2021) Antonoglou, I., Schrittwieser, J., Ozair, S., Hubert, T. K., and Silver, D. (2021). Planning in stochastic environments with a learned model. In International Conference on Learning Representations ."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib27",
+      "text": "Misra et al., (2020) Misra, D., Henaff, M., Krishnamurthy, A., and Langford, J. (2020). Kinematic state abstraction and provably efficient rich-observation reinforcement learning. In International conference on machine learning , pages 6961–6971. PMLR."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib2",
+      "text": "Anand et al., (2015) Anand, A., Grover, A., Mausam, M., and Singla, P. (2015). Asap-uct: Abstraction of state-action pairs in uct. In Proceedings of the 24th International Conference on Artificial Intelligence , pages 1509–1515."
+    }
+  ]
+}

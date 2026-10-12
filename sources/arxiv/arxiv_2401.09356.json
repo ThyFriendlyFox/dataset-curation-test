@@ -1,0 +1,151 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2401.09356",
+  "title": "Swing: Short-cutting Rings for Higher Bandwidth Allreduce",
+  "authors": "Daniele De Sensi, Tommaso Bonato, David Saam, Torsten Hoefler",
+  "year": "2024",
+  "categories": [
+    "cs.DC",
+    "cs.LG",
+    "cs.NI",
+    "cs.PF"
+  ],
+  "url": "https://arxiv.org/abs/2401.09356",
+  "html_url": "https://arxiv.org/html/2401.09356",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction and Motivation",
+  "word_count": 994,
+  "text": "Allreduce is a collective operation used to aggregate vectors among a set of nodes and to distribute the aggregated result back to them. Allreduce is widely used to perform distributed gradient aggregation when training deep learning models [1]. Studies have shown that it can account for up to 40% of the total training time [2,3,4] and between 19% and 30% of the total core hours in MPI jobs running on production supercomputers [5].\n\nIn this work, we design a new allreduce algorithm optimized for torus-like networks. Torus networks are widely used, both on systems optimized for running machine learning (ML) workloads and on some of the top supercomputers [6,7] (e.g., Fugaku uses a 6D torus [8]). Although torus networks are characterized by a lower bisection and global bandwidth compared to other topologies (e.g., Clos), their simplicity and lower cost allow running some workloads such as ML training in a more cost-effective way, since their communication is often arranged as a 3D logical torus [9].\n\nSeen from a different perspective, torus networks trade off a lower cost for a lower bisection bandwidth, which, however, is enough to train most ML models efficiently [9]. This is the reason why many systems optimized for ML training rely on torus-like topologies. These include, for example, Google TPUs [10] (a TPU v5p pod connects \\sim$9true000$ chips on a 3D torus [11]), Amazon Trainium devices [12] (16 chip on a 2D torus), Graphcore IPU-POD [13] (connecting 64 chips on a 2D torus), Enflame [14] (2D torus).\n\nResearchers proposed several allreduce algorithms [15,16,17], and the most performing one depends on a combination of vector size, number of nodes, and physical topology [18,19]. Those algorithms perform a predefined number of steps and, at each step, each node sends and receives data to and from some predetermined nodes. Different trade-offs exist between the number of steps to perform (more critical for allreduce on small vectors) and the total number of bytes it transmits (more relevant for larger allreduce). However, a third factor that must be considered when designing a new collective algorithm is the number of hops between communicating nodes [15,20,21,18]. This is particularly relevant on networks that do not provide full bisection bandwidth such as torus, since the higher the number of hops, the higher the number of flows sharing the same links.\n\nWe show the importance of the number of hops in the allreduce through an example. In Fig. 1, we show a 16 node 1D torus (we only show a subset of the nodes since the communications are symmetric). We assume minimal (i.e., shortest path) routing and we show the communications performed by the bandwidth-optimal recursive doubling algorithm [15] (also known as Rabenseifner algorithm [22], which we describe more in detail in Sec. 2.3.3), and by the Swing algorithm (that we propose in this work).\n\nBoth algorithms perform the same number of steps (we show only the first three for simplicity). We denote with n the number of bytes of the allreduce vector. In the first step, in both algorithms, each node r sends n/2 bytes to node q=r\\text{ XOR }1 (and receives n/2 bytes from it). In the second step, however, in the recursive doubling, each node r sends n/4 bytes to node q=r\\text{ XOR }2 (two hops distant), whereas in the Swing algorithm, each node still sends n/4 bytes of data, but with the other neighbor (one hop distant).\n\nAlthough both algorithms transmit the same number of bytes, two different messages cross the same link in the recursive doubling. For example, two messages cross the link between nodes 1 and 2 and that between nodes 5 and 6. As a consequence, in the worst case all nodes transmit data at most at half the bandwidth of the link between 1 and 2, thus slowing down the entire allreduce operation. Instead, in the Swing algorithm, each node can still transmit at full bandwidth because, in this example, in the second step each link is crossed at most by one message per direction. Something similar also happens in the third step. Indeed, when using Swing at most two messages cross each link instead of the four messages crossing the link between nodes 3 and 4 in recursive doubling.\n\nIt is thus clear how even if two different algorithms transmit the same number of bytes and perform the same number of steps, they might have different performance, depending on the network characteristics and the distance between communicating nodes. In this example, we have shown an extreme case using a 1D torus. However, similar effects can happen on any topology that does not provide full bisection bandwidth.\n\nAlthough some algorithms (i.e., ring [20,15] and bucket [23,21,17]) avoid this problem by having each node communicate with its neighbors only, they perform more steps (linear in the number of nodes) and are thus not well-suited for small- and medium-sized vectors. Those are the sizes that, however, are practically used in most machine learning [24] and HPC [5] workloads. Indeed, larger allreduce are split into smaller ones to overlap better computation and communication, especially more when using 3D parallelism in machine learning training [1].\n\nThis work makes the following contributions:\n\n- • We design a new allreduce algorithm called Swing, which performs a logarithmic number of steps and transmits the minimal number of bytes while reducing the distance between communicating nodes compared to other known algorithms designed for small- and medium-sized vectors (Sec. 3 and Sec. 4).\n\n- • We evaluate Swing on different torus and torus-like topologies (e.g., HammingMesh [9] and HyperX [25,26]), by comparing it with the best state-of-the-art algorithms (Sec. 5). Our evaluation shows that Swing outperforms the other existing algorithms for allreduce on vectors ranging from 32B to 128MiB on different torus-like topologies, and regardless of their shape and size. We show that Swing outperforms the best-known algorithm up to 2.2x on square torus with 4true096 to 16true384 nodes and up to 3x on rectangular tori and HyperX with 4true096 nodes.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib10",
+      "text": "Tal Ben-Nun and Torsten Hoefler. Demystifying parallel and distributed deep learning: An in-depth concurrency analysis, 2018."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib51",
+      "text": "Weiyang Wang, Moein Khazraee, Zhizhen Zhong, Manya Ghobadi, Zhihao Jia, Dheevatsa Mudigere, Ying Zhang, and Anthony Kewitsch. TopoOpt: Co-optimizing network topology and parallelization strategy for distributed training jobs. In 20th USENIX Symposium on Networked Systems Design and Implementation (NSDI 23) , pages 739–767, Boston, MA, April 2023. USENIX Association."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib32",
+      "text": "Benjamin Klenk, Nan Jiang, Greg Thorson, and Larry Dennison. An in-network architecture for accelerating shared-memory multiprocessor collectives. In 2020 ACM/IEEE 47th Annual International Symposium on Computer Architecture (ISCA) , pages 996–1009, 2020."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib45",
+      "text": "Amedeo Sapio, Marco Canini, Chen-Yu Ho, Jacob Nelson, Panos Kalnis, Changhoon Kim, Arvind Krishnamurthy, Masoud Moshref, Dan Ports, and Peter Richtarik. Scaling distributed machine learning with In-Network aggregation. In 18th USENIX Symposium on Networked Systems Design and Implementation (NSDI 21) , pages 785–808. USENIX Association, April 2021."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib14",
+      "text": "Sudheer Chunduri, Scott Parker, Pavan Balaji, Kevin Harms, and Kalyan Kumaran. Characterization of mpi usage on a production supercomputer. In SC18: International Conference for High Performance Computing, Networking, Storage and Analysis , pages 386–400, 2018."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib2",
+      "text": "N.R. Adiga, G. Almasi, G.S. Almasi, Y. Aridor, R. Barik, D. Beece, R. Bellofatto, G. Bhanot, R. Bickford, M. Blumrich, A.A. Bright, J. Brunheroto, C. Cascaval, J. Castanos, W. Chan, L. Ceze, P. Coteus, S. Chatterjee, D. Chen, G. Chiu, T.M. Cipolla, P. Crumley, K.M. Desai, A. Deutsch, T. Domany, M.B. Dombrowa, W. Donath, M. Eleftheriou, C. Erway, J. Esch, B. Fitch, J. Gagliano, A. Gara, R. Garg, R. Germain, M.E. Giampapa, B. Gopalsamy, J. Gunnels, M. Gupta, F. Gustavson, S. Hall, R.A. Haring, D. Heidel, P. Heidelberger, L.M. Herger, D. Hoenicke, R.D. Jackson, T. Jamal-Eddine, G.V. Kopcsay, E. Krevat, M.P. Kurhekar, A.P. Lanzetta, D. Lieber, L.K. Liu, M. Lu, M. Mendell, A. Misra, Y. Moatti, L. Mok, J.E. Moreira, B.J. Nathanson, M. Newton, M. Ohmacht, A. Oliner, V. Pandit, R.B. Pudota, R. Rand, R. Regan, B. Rubin, A. Ruehli, S. Rus, R.K. Sahoo, A. Sanomiya, E. Schenfeld, M. Sharma, E. Shmueli, S. Singh, P. Song, V. Srinivasan, B.D. Steinmacher-Burow, K. Strauss, C. Surovic, R. Swetz, T. Takken, R.B. Tremaine, M. Tsao, A.R. Umamaheshwaran, P. Verma, P. Vranas, T.J.C. Ward, M. Wazlowski, W. Barrett, C. Engel, B. Drehmel, B. Hilgart, D. Hill, F. Kasemkhani, D. Krolak, C.T. Li, T. Liebsch, J. Marcella, A. Muff, A. Okomo, M. Rouse, A. Schram, M. Tubbs, G. Ulsh, C. Wait, J. Wittrup, M. Bae, K. Dockser, L. Kissel, M.K. Seager, J.S. Vetter, and K. Yates. An overview of the bluegene/l supercomputer. In SC ’02: Proceedings of the 2002 ACM/IEEE Conference on Supercomputing , pages 60–60, 2002."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib11",
+      "text": "Brett Bode, Michelle Butler, Thom Dunning, Torsten Hoefler, William Kramer, William Gropp, and Wen-mei Hwu. The Blue Waters Super-System for Super-Science , pages 339–366. 11 2017."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib4",
+      "text": "Yuichiro Ajima, Takahiro Kawashima, Takayuki Okamoto, Naoyuki Shida, Kouichi Hirai, Toshiyuki Shimizu, Shinya Hiramoto, Yoshiro Ikeda, Takahide Yoshikawa, Kenji Uchida, and Tomohiro Inoue. The tofu interconnect d. In 2018 IEEE International Conference on Cluster Computing (CLUSTER) , pages 646–654, 2018."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib26",
+      "text": "Torsten Hoefler, Tommaso Bonato, Daniele De Sensi, Salvatore Di Girolamo, Shigang Li, Marco Heddes, Jon Belk, Deepak Goel, Miguel Castro, and Steve Scott. Hammingmesh: A network topology for large-scale deep learning. In Proceedings of the International Conference on High Performance Computing, Networking, Storage and Analysis , SC ’22. IEEE Press, 2022."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib31",
+      "text": "Norman P. Jouppi, George Kurian, Sheng Li, Peter Ma, Rahul Nagarajan, Lifeng Nai, Nishant Patil, Suvinay Subramanian, Andy Swing, Brian Towles, Cliff Young, Xiang Zhou, Zongwei Zhou, and David Patterson. Tpu v4: An optically reconfigurable supercomputer for machine learning with hardware support for embeddings, 2023."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib15",
+      "text": "Google Cloud. Enabling next-generation ai workloads: Announcing tpu v5p and ai hypercomputer, 2024."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib7",
+      "text": "Amazon. AWS Trn1 Architecture. https://awsdocs-neuron.readthedocs-hosted.com/en/v2.3.0/general/arch/neuron-hardware/trn1-arch.html , 2023. Accessed: 06-Mar-2023."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib24",
+      "text": "Graphcore. Graphcore ipu-pod system, 2024."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib40",
+      "text": "The Next Platform. The ai training chip tencent has an eye on, 2021."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib50",
+      "text": "Rajeev Thakur, Rolf Rabenseifner, and William Gropp. Optimization of collective communication operations in mpich. Int. J. High Perform. Comput. Appl. , 19(1):49–66, feb 2005."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib6",
+      "text": "George Almási, Philip Heidelberger, Charles J. Archer, Xavier Martorell, C. Chris Erway, José E. Moreira, B. Steinmacher-Burow, and Yili Zheng. Optimization of mpi collective communication on bluegene/l systems. In Proceedings of the 19th Annual International Conference on Supercomputing , ICS ’05, page 253–262, New York, NY, USA, 2005. Association for Computing Machinery."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib29",
+      "text": "Nikhil Jain and Yogish Sabharwal. Optimal bucket algorithms for large mpi collectives on torus interconnects. In Proceedings of the 24th ACM International Conference on Supercomputing , ICS ’10, page 27–36, New York, NY, USA, 2010. Association for Computing Machinery."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib49",
+      "text": "Rajeev Thakur and William D. Gropp. Improving the performance of collective operations in mpich. In Jack Dongarra, Domenico Laforenza, and Salvatore Orlando, editors, Recent Advances in Parallel Virtual Machine and Message Passing Interface , pages 257–267, Berlin, Heidelberg, 2003. Springer Berlin Heidelberg."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib27",
+      "text": "Torsten Hoefler and D. Moor. Energy, Memory, and Runtime Tradeoffs for Implementing Collective Communication Operations. Journal of Supercomputing Frontiers and Innovations , 1(2):58–75, Oct. 2014."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib38",
+      "text": "Pitch Patarasuk and Xin Yuan. Bandwidth optimal all-reduce algorithms for clusters of workstations. J. Parallel Distrib. Comput. , 69(2):117–124, feb 2009."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib44",
+      "text": "Paul Sack and William Gropp. Collective algorithms for multiported torus networks. ACM Trans. Parallel Comput. , 1(2), feb 2015."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib41",
+      "text": "Rolf Rabenseifner. Optimization of collective reduction operations. In Marian Bubak, Geert Dick van Albada, Peter M. A. Sloot, and Jack Dongarra, editors, Computational Science - ICCS 2004 , pages 1–9, Berlin, Heidelberg, 2004. Springer Berlin Heidelberg."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib9",
+      "text": "M. Barnett, R. Littlefield, D.G. Payne, and R. Vandegeijn. Global combine algorithms for 2-d meshes with wormhole routing. Journal of Parallel and Distributed Computing , 24(2):191–201, 1995."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib35",
+      "text": "Shen Li, Yanli Zhao, Rohan Varma, Omkar Salpekar, Pieter Noordhuis, Teng Li, Adam Paszke, Jeff Smith, Brian Vaughan, Pritam Damania, and Soumith Chintala. Pytorch distributed: Experiences on accelerating data parallel training. Proc. VLDB Endow. , 13(12):3005–3018, aug 2020."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib3",
+      "text": "Jung Ho Ahn, Nathan Binkert, Al Davis, Moray McLaren, and Robert S. Schreiber. Hyperx: Topology, routing, and packaging of efficient large-scale networks. In Proceedings of the Conference on High Performance Computing Networking, Storage and Analysis , SC ’09, New York, NY, USA, 2009. Association for Computing Machinery."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib20",
+      "text": "Jens Domke, Satoshi Matsuoka, Ivan R. Ivanov, Yuki Tsushima, Tomoya Yuki, Akihiro Nomura, Shin’ichi Miura, Nie McDonald, Dennis L. Floyd, and Nicolas Dubé. Hyperx topology: First at-scale implementation and comparison to the fat-tree. In Proceedings of the International Conference for High Performance Computing, Networking, Storage and Analysis , SC ’19, New York, NY, USA, 2019. Association for Computing Machinery."
+    }
+  ]
+}

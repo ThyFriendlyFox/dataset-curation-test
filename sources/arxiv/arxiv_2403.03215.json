@@ -1,0 +1,223 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.03215",
+  "title": "A Safety-Critical Framework for UGVs in Complex Environments: A Data-Driven Discrepancy-Aware Approach",
+  "authors": "Skylar X. Wei, Lu Gan, Joel W. Burdick",
+  "year": "2024",
+  "categories": [
+    "cs.RO"
+  ],
+  "url": "https://arxiv.org/abs/2403.03215",
+  "html_url": "https://arxiv.org/html/2403.03215",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1111,
+  "text": "Safety is a critical requirement for autonomous exploration of complex environments by unmanned ground vehicles (UGVs) which have a wide range of applications such as agriculture [1], search and rescue [2], package delivery [3], and mining [4]. Specifically, providing collision avoidance guarantees when navigating in unknown and unstructured environments poses unique challenges, such as model mismatches induced by the complex environments [5,6] and incomplete obstacle descriptions [7,8] in the case of a priori unknown environment maps. Systematic and provable probabilistic frameworks for UGV traversal are needed to provide safety guarantees in such complex scenarios.\n\nDespite the increasing complexity of UGVs and their deployment in diverse terrains, reduced-order models are commonly employed for vehicle planning and control design [9,10,11]. However, a planning and control framework that relies on these models must be robustified against disturbances (e.g. to account for the residual difference between the reduced-order and true models) to guarantee safe and reliable traversal. This paper introduces a data-driven technique to provide these guarantees even in the presence of a simplified (still underactuated) vehicle model with matched and unmatched model uncertainties [12,13,14].\n\nOur method augments the vehicle’s controller using learned dynamic discrepancies and applies rigorous uncertainty quantification to provide provably safe operation. Example model discrepancies include wheel slipping and skidding, ignored actuation dynamics, and communication delays.\n\nThe proposed framework automatically learns an upper bound on model residuals from data and systematically calculates the corresponding collision buffers needed to provide guaranteed probabilistic safe navigation of UGV systems in unknown and cluttered environments. This feature largely eliminates the “hand tuning\" of the underlying planner and controller that is normally required for simplified models.\n\nOur framework consists of the following contributions (see Fig. 1):\n\n- 1. Data-Driven Discrepancy Identification: Using conformal prediction [15], we extract a probabilistic upper bound of matched (controllable input) discrepancies and unmatched discrepancies from training data, without any assumptions on the discrepancy distributions.\n\n- 2. Controller Augmentation: The identified upper bounds are then used to augment the vehicle’s nominal ancillary controller to ensure closed-loop stabilizability and robustness against uncertainties.\n\n- 3. Collision Buffer Construction: To ensure safety given model uncertainties, we deduce a maximum trajectory tracking deviation of the closed-loop system under the augmented controller. This collision buffer delineates the boundaries within which the system can operate safely, despite mismatches between the nominal and true vehicle models.\n\n- 4. Discrepancy-Aware Planner: A discrepancy-aware cost map is constructed from the identified collision buffer and a sensory-derived occupancy map. This cost map can be seamlessly used with Model Predictive Path Integral (MPPI) to generate optimal finite-horizon trajectories that provably adhere to a user-chosen risk tolerance.\n\nThe effectiveness of the proposed framework is demonstrated via hardware experiments on a differential-driven ground vehicle under four different vehicle and terrain configurations. Additionally, we adapted the proposed framework to provide collision avoidance for a human-in-the-loop driver assistance application.\n\n## 1.1 Related Work\n\nPrior research has studied the impact of unmodeled disturbances on vehicle planning and control using frameworks such as input-to-state safe control [16,17] and risk-aware control [18,19]. However, these methods often assume a priori model knowledge or require a minimum understanding of the disturbances’ magnitudes or distributions. Bayesian Optimization and Reinforcement Learning methods can bypass the uncertainty or model identification steps, directly learning risk-aware control policies in a model-free fashion [20,21]. These approaches still come with the assumption of a priori knowledge of the disturbances, or that they can be sampled. More recently, the union of Neural Networks with adaptive control [22] has demonstrated remarkable tracking improvements in drone control given unknown residual dynamics. However, the theoretical robustness guarantees in [22] rely on knowledge of wind disturbance upper bounds, and they do not consider obstacles.\n\nA learned control policy can be combined with an optimal path planner, as demonstrated in robust model predictive control [23,24] and chance-constrained stochastic optimal control [25,26]. Although these methods construct a deterministic problem surrogate to the original probabilistic one, they often require constraint convexification, such as sequential constraint linearization around fixed points, and optimality can only be reached in infinite sequential iterations. For instance, Monte Carlo Sample propagation [27,28] and scenario-based approaches [29] can require a very large number of samples to reach the desired obstacle avoidance probability guarantees.\n\nThe sampling-based Model Predictive Path Integral control (MPPI) method has proven versatility in off-road racing applications [11]. As a model-based strategy, MPPI may exhibit suboptimal performance in the face of modeling uncertainties and disturbances. Tube-based [10] and robust MPPI variants [30] have been proposed to address these challenges. Both of these methods integrate an ancillary controller, such as iterative Linear Quadratic Gaussian (iLQG), to improve tracking performance with measurement feedback and robustness to uncertainties. These methods’ assumptions on sequential linearization and the additive process and measurement noise being Gaussian limits their applicability to nonlinear systems with generalized additive model uncertainties.\n\nIn unknown environments, UGV navigation often relies on sensor-based occupancy grid maps [31,32], which are commonly used for global path planning [33]. Grid maps can be used for local optimization-based path planning by converting the maps into signed distance functions [34,35], which can be locally convexified to serve as the collision-avoiding state constraints. Alternatively, occupancy-based risk maps have been used for sampling-based local planners [36,37,38,7]. To alleviate the computation and convexity burden, the MPPI algorithm allows direct grid-map-based assessment for trajectory costs [38]. However, systematic parameter and cost tuning is required to avoid the algorithm making undesirable decisions [39,40]. Lastly, direct estimation of traversability from sensors is also a popular technique for robotic navigation in complex environments leveraging expert heuristics [7,9] or self-supervised learning [41]. However, it is not straightforward to extend these hardware successes to provide provable safety guarantees.\n\n## 1.2 Notation and Organization\n\nThe set of integers, positive integers, natural numbers, real numbers, positive reals, and non-negative reals are denoted as \\mathbb{Z},\\mathbb{Z}_{>0}, \\mathbb{N}, \\mathbb{R}, \\mathbb{R}_{>0}, and \\mathbb{R}_{\\geq 0}, respectively. A sequence of consecutive integers, such as \\{i,\\cdots,i+k\\}, is denoted as \\mathbb{Z}_{i}^{i+k}. A finite sequence of indexed scalars, \\{a_{1},\\cdots,a_{k}\\}, is represented as \\{a_{i}\\}_{i=1}^{k} and for vectors of \\mathbf{a} as \\{\\mathbf{a}_{i}\\}_{i=1}^{k}. Indicator functions are defined as \\mathbf{1}_{b(a)}:\\mathbb{R}\\to\\{0,1\\}, where b(a) is a Boolean proposition over argument a. If b(a) is true, the indicator function returns 1. Else it returns 0.\n\nSection 2 describes the UGV traversal problem, while Section 3 provides the mathematical preliminaries. The characterization of tracking discrepancies using conformal prediction is discussed in Section 4, while Section 5 augments the nominal ancillary controller to account for the model discrepancies, and derives theoretical bounds on the maximum tracking deviation due to the discrepancies. Section 6 outlines the construction of a discrepancy-aware cost map and the discrepancy-aware MPPI planner. Experimental results, discussions, and future works can be found in Sections 7 and 8.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "S. Bonadies, A. Lefcourt, S. A. Gadsden, A survey of unmanned ground vehicles with applications to agricultural and environmental sensing, in: Autonomous air and ground sensing systems for agricultural optimization and phenotyping, Vol. 9866, SPIE, 2016, pp. 142–155."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "K. Ebadi, Y. Chang, M. Palieri, A. Stephens, A. Hatteland, E. Heiden, A. Thakur, N. Funabiki, B. Morrell, S. Wood, L. Carlone, A.-a. Agha-mohammadi, Lamp: Large-scale autonomous mapping and positioning for exploration of perceptually-degraded subterranean environments, in: 2020 IEEE International Conference on Robotics and Automation (ICRA), 2020, pp. 80–86. doi:10.1109/ICRA40945.2020.9197082 ."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "Y. Wu, Y. Ding, S. Ding, Y. Savaria, M. Li, Autonomous last-mile delivery based on the cooperation of multiple heterogeneous unmanned ground vehicles, Mathematical Problems in Engineering 2021 (2021) 1–15."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "J. Thangavelautham, A. Chandra, E. Jensen, Autonomous robot teams for lunar mining base construction and operation, in: 2020 IEEE Aerospace Conference, 2020, pp. 1–16. doi:10.1109/AERO47225.2020.9172811 ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "P. Akella, A. Dixit, M. Ahmadi, J. W. Burdick, A. D. Ames, Sample-based bounds for coherent risk measures: Applications to policy synthesis and verification, arXiv:2204.09833 (2022)."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "M. Saveriano, Y. Yin, P. Falco, D. Lee, Data-efficient control policy search using residual dynamics learning, in: 2017 Int. Conference on Intelligent Robots and Systems (IROS), 2017, pp. 4709–4715."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "A. Dixit, D. D. Fan, K. Otsu, S. Dey, A.-A. Agha-Mohammadi, J. W. Burdick, Step: Stochastic traversability evaluation and planning for risk-aware off-road navigation; results from the darpa subterranean challenge, arXiv preprint arXiv:2303.01614 (2023)."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "A. Bouman, M. F. Ginting, N. Alatur, M. Palieri, D. D. Fan, T. Touma, T. Pailevanian, S.-K. Kim, K. Otsu, J. Burdick, A. akbar Agha-mohammadi, Autonomous spot: Long-range autonomous exploration of extreme environments with legged locomotion (2020). arXiv:2010.09259 ."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "L. Gan, J. W. Grizzle, R. M. Eustice, M. Ghaffari, Energy-based legged robots terrain traversability modeling via deep inverse reinforcement learning, IEEE Robotics and Automation Letters 7 (4) (2022) 8807–8814. doi:10.1109/LRA.2022.3188100 ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "G. Williams, B. Goldfain, P. Drews, K. Saigol, J. M. Rehg, E. A. Theodorou, Robust sampling based model predictive control with sparse objective information., in: Robotics: Science and Systems, Vol. 14, 2018, p. 2018."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "G. Williams, N. Wagener, B. Goldfain, P. Drews, J. M. Rehg, B. Boots, E. A. Theodorou, Information theoretic mpc for model-based reinforcement learning, in: 2017 IEEE International Conference on Robotics and Automation (ICRA), 2017, pp. 1714–1721. doi:10.1109/ICRA.2017.7989202 ."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "R. Sinha, J. Harrison, S. M. Richards, M. Pavone, Adaptive robust model predictive control with matched and unmatched uncertainty, in: 2022 American Control Conference (ACC), IEEE, 2022, pp. 906–913."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "W.-J. Cao, J.-X. Xu, Nonlinear integral-type sliding surface for both matched and unmatched uncertain systems, IEEE Transactions on Automatic Control 49 (8) (2004) 1355–1360. doi:10.1109/TAC.2004.832658 ."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "J. Pravitra, K. A. Ackerman, C. Cao, N. Hovakimyan, E. A. Theodorou, l 1 l_{1} -adaptive mppi architecture for robust and agile control of multirotors, in: 2020 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS), IEEE, 2020, pp. 7661–7666."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "L. Lindemann, M. Cleaveland, G. Shim, G. J. Pappas, Safe planning in dynamic environments using conformal prediction, IEEE Robotics and Automation Letters 8 (8) (2023) 5116–5123. doi:10.1109/LRA.2023.3292071 ."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "A. Alan, A. J. Taylor, C. R. He, G. Orosz, A. D. Ames, Safe controller synthesis with tunable input-to-state safe control barrier functions, IEEE Control Systems Letters 6 (2021) 908–913."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "N. Csomay-Shanklin, A. Taylor, U. Rosolia, A. Ames, Multi-rate planning and control of uncertain nonlinear systems: Model predictive control and control lyapunov functions (03 2022)."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "A. Majumdar, M. Pavone, How should a robot assess risk? towards an axiomatic theory of risk in robotics, in: Robotics Research, Springer, 2020, pp. 75–84."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "A. Dixit, M. Ahmadi, J. W. Burdick, Risk-sensitive motion planning using entropic value-at-risk, in: 2021 European Control Conference (ECC), IEEE, 2021, pp. 1726–1732."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "S. Cakmak, R. Astudillo Marban, P. Frazier, E. Zhou, Bayesian optimization of risk measures, Advances in Neural Information Processing Systems 33 (2020) 20130–20141."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "A. Makarova, I. Usmanova, I. Bogunovic, A. Krause, Risk-averse heteroscedastic bayesian optimization, Advances in Neural Information Processing Systems 34 (2021) 17235–17245."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib22",
+      "text": "M. O’Connell, G. Shi, X. Shi, K. Azizzadenesheli, A. Anandkumar, Y. Yue, S.-J. Chung, Neural-fly enables rapid learning for agile flight in strong winds, Science Robotics 7 (66) (2022)."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib23",
+      "text": "A. Bemporad, M. Morari, Robust model predictive control: A survey, in: Robustness in identification and control, Springer, 2007, pp. 207–226."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib24",
+      "text": "B. T. Lopez, J.-J. E. Slotine, J. P. How, Dynamic tube mpc for nonlinear systems, in: 2019 American Control Conference (ACC), IEEE, 2019, pp. 1655–1662."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib25",
+      "text": "Y. K. Nakka, S.-J. Chung, Trajectory optimization of chance-constrained nonlinear stochastic systems for motion planning under uncertainty, IEEE Transactions on Robotics 39 (1) (2022) 203–222."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib26",
+      "text": "H. Zhu, J. Alonso-Mora, Chance-constrained collision avoidance for mavs in dynamic environments, IEEE Robotics and Automation Letters 4 (2) (2019) 776–783. doi:10.1109/LRA.2019.2893494 ."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib27",
+      "text": "L. Blackmore, M. Ono, A. Bektassov, B. C. Williams, A probabilistic particle-control approximation of chance-constrained stochastic predictive control, IEEE Transactions on Robotics 26 (3) (2010) 502–517. doi:10.1109/TRO.2010.2044948 ."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib28",
+      "text": "L. Blackmore, M. Ono, B. C. Williams, Chance-constrained optimal path planning with obstacles, IEEE Transactions on Robotics 27 (6) (2011) 1080–1094. doi:10.1109/TRO.2011.2161160 ."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib29",
+      "text": "G. C. Calafiore, L. Fagiano, Stochastic model predictive control of lpv systems via scenario optimization, Automatica 49 (6) (2013) 1861–1866."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib30",
+      "text": "M. S. Gandhi, B. Vlahov, J. Gibson, G. Williams, E. A. Theodorou, Robust model predictive path integral control: Analysis and performance guarantees, IEEE Robotics and Automation Letters 6 (2) (2021) 1423–1430. doi:10.1109/LRA.2021.3057563 ."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib31",
+      "text": "S. Thrun, Probabilistic robotics , Commun. ACM 45 (3) (2002) 52–57. doi:10.1145/504729.504754 . URL https://doi.org/10.1145/504729.504754"
+    },
+    {
+      "n": 32,
+      "id": "bib.bib32",
+      "text": "S. Thrun, A. Bücken, Integrating grid-based and topological maps for mobile robot navigation, in: Proceedings of the national conference on artificial intelligence, 1996, pp. 944–951."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib33",
+      "text": "E. G. Tsardoulias, A. Iliakopoulou, A. Kargakos, L. Petrou, A review of global path planning methods for occupancy grid maps regardless of obstacle density, Journal of Intelligent & Robotic Systems 84 (2016) 829–858."
+    },
+    {
+      "n": 34,
+      "id": "bib.bib34",
+      "text": "H. Oleynikova, A. Millane, Z. Taylor, E. Galceran, J. I. Nieto, R. Y. Siegwart, Signed distance fields: A natural representation for both mapping and planning , 2016. URL https://api.semanticscholar.org/CorpusID:28083959"
+    },
+    {
+      "n": 35,
+      "id": "bib.bib35",
+      "text": "G. S. Camps, R. Dyro, M. Pavone, M. Schwager, Learning deep sdf maps online for robot navigation and exploration (2022). arXiv:2207.10782 ."
+    },
+    {
+      "n": 36,
+      "id": "bib.bib36",
+      "text": "D. D. Fan, A.-a. Agha-mohammadi, E. A. Theodorou, Learning risk-aware costmaps for traversability in challenging environments, IEEE Robotics and Automation Letters 7 (1) (2022) 279–286. doi:10.1109/LRA.2021.3125047 ."
+    },
+    {
+      "n": 37,
+      "id": "bib.bib37",
+      "text": "X. Cai, S. Ancha, L. Sharma, P. R. Osteen, B. Bucher, S. Phillips, J. Wang, M. Everett, N. Roy, J. P. How, Evora: Deep evidential traversability learning for risk-aware off-road autonomy (2023). arXiv:2311.06234 ."
+    },
+    {
+      "n": 38,
+      "id": "bib.bib38",
+      "text": "L. Sharma, M. Everett, D. Lee, X. Cai, P. Osteen, J. How, Ramp: A risk-aware mapping and planning pipeline for fast off-road ground robot navigation (09 2022). doi:10.48550/arXiv.2210.06605 ."
+    },
+    {
+      "n": 39,
+      "id": "bib.bib39",
+      "text": "J. Yin, C. Dawson, C. Fan, P. Tsiotras, Shield model predictive path integral: A computationally efficient robust mpc approach using control barrier functions (2023). arXiv:2302.11719 ."
+    },
+    {
+      "n": 40,
+      "id": "bib.bib40",
+      "text": "J. Clark, D. Amodei, Faulty reward functions in the wild . URL https://openai.com/research/faulty-reward-functions"
+    },
+    {
+      "n": 41,
+      "id": "bib.bib41",
+      "text": "J. Frey, M. Mattamala, N. Chebrolu, C. Cadena, M. Fallon, M. Hutter, Fast traversability estimation for wild visual navigation, arXiv preprint arXiv:2305.08510 (2023)."
+    }
+  ]
+}

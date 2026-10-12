@@ -1,0 +1,99 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.02243",
+  "title": "Better Schedules for Low Precision Training of Deep Neural Networks",
+  "authors": "Cameron R. Wolfe, Anastasios Kyrillidis",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.AI"
+  ],
+  "url": "https://arxiv.org/abs/2403.02243",
+  "html_url": "https://arxiv.org/html/2403.02243",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 621,
+  "text": "Background. DNNs have revolutionized the performance of autonomous systems. Yet, such gains come at a steep cost—DNN training is computationally burdensome and becoming more so, as the community tends towards larger-scale experiments [1]. Though many approaches exist for reducing DNN overhead [2,3], low precision training has gained recent popularity due to its ability to improve training efficiency with minimal performance impact [4,5].\n\nQuantized training approaches use lower precision representations for DNN activations, gradients, and weights during training; see Figure 1. Then, the forward and backward pass can be expedited via (faster) low precision arithmetic, which recent generations of hardware are beginning to support [6]. Though implementing quantized training is more nuanced in complex architectures (e.g., batch normalization modules require special treatment [7]), the basic approach remains the same—DNN activations, weights, and gradients are replaced with lower-precision representations during training to reduce the cost of each forward and backward pass.\n\nEarly approaches to quantized training adopted a static approach that maintained the same, low level of precision throughout training [7,8,9]. Although this work was successful in revealing that DNN training is robust to substantial reductions in precision, later work achieved further efficiency gains by dynamically adapting precision along the training trajectory [4,5]. Such work i) sets minimum (q_{\\text{min}}) and maximum (q_{\\text{max}}) bounds for precision, and ii) varies the precision between these bounds according to some (possibly cyclical) schedule throughout training. Interestingly, experiments using cyclic precision training (CPT) [5] demonstrated that precision plays a role similar to that of the learning rate in DNN training.\n\nr0.6\n\nA depiction of quantized forward/backward pass within a single DNN layer.\n\nBecause state-of-the-art results with DNNs are often achieved using curated hyperparameter schedules [10,11,12], different scheduling options for common hyperparameters (e.g., learning rate and momentum) have been explored extensively [13,14]. Despite known similarities between precision and the learning rate, however, no such study has been performed for low precision training—existing approaches to CPT simply adopt common learning rate strategies (i.e., a cyclical cosine schedule [5]) without adequate comparison to alternatives. As such, best practices for dynamically varying DNN precision along the training trajectory remain largely unknown.\n\nThis work. To close this gap, we provide an extensive empirical study of different CPT variants. First, we rigorously define the space of potential CPT schedules by deconstructing such schedules via a three-step process of i) choosing a profile, ii) choosing the number of cycles, and iii) choosing whether cycles are repeated and/or have a “triangular” form. Using this decomposition, we define a suite of ten CPT schedules—including the originally-proposed cyclical cosine schedule [5] —that are analyzed across a variety of domains, including image classification and object detection with convolutional neural networks (CNNs), language modeling with long short-term memory (LSTM) networks [15], entailment classification with pre-trained transformers [11], and graph node classification with graph neural networks (GNNs) [16]. As a byproduct of this analysis, to the best of the authors’ knowledge, we are the first to study quantized training strategies for GNNs.\n\nGoing beyond prior work, we discover new CPT variants that further improve DNN training efficiency and performance relative to prior schedules, revealing that exploring a wider variety of schedules for CPT is beneficial. More generally, we observe across all experiments that model performance tends to be correlated with the amount of compute used for training, revealing that manipulating the CPT schedule is a simple tool for controlling the tradeoff between model performance and training efficiency. Aiming to explain this relationship, we draw a connection between quantized training and critical learning periods, finding that prolonged training at low precisions can impair the training process and cause a permanent performance degradation. Finally, we leverage these empirical observations to provide best practices for choosing the correct CPT schedule in different practical scenarios.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "(1) Brown, T., Mann, B., Ryder, N., Subbiah, M., Kaplan, J.D., Dhariwal, P., Neelakantan, A., Shyam, P., Sastry, G., Askell, A., et al. : Language models are few-shot learners. Advances in neural information processing systems 33 , 1877–1901 (2020)"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "(2) Li, H., Kadav, A., Durdanovic, I., Samet, H., Graf, H.P.: Pruning filters for efficient convnets. arXiv preprint arXiv:1608.08710 (2016)"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "(3) Goyal, P., Dollár, P., Girshick, R., Noordhuis, P., Wesolowski, L., Kyrola, A., Tulloch, A., Jia, Y., He, K.: Accurate, large minibatch sgd: Training imagenet in 1 hour. arXiv preprint arXiv:1706.02677 (2017)"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "(4) Fu, Y., You, H., Zhao, Y., Wang, Y., Li, C., Gopalakrishnan, K., Wang, Z., Lin, Y.: Fractrain: Fractionally squeezing bit savings both temporally and spatially for efficient dnn training. Advances in Neural Information Processing Systems 33 , 12127–12139 (2020)"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "(5) Fu, Y., Guo, H., Li, M., Yang, X., Ding, Y., Chandra, V., Lin, Y.: Cpt: Efficient deep neural network training via cyclic precision. arXiv preprint arXiv:2101.09868 (2021)"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "(6) Micikevicius, P., Narang, S., Alben, J., Diamos, G., Elsen, E., Garcia, D., Ginsburg, B., Houston, M., Kuchaiev, O., Venkatesh, G., et al.: Mixed precision training. arXiv preprint arXiv:1710.03740 (2017)"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "(7) Banner, R., Hubara, I., Hoffer, E., Soudry, D.: Scalable methods for 8-bit training of neural networks. Advances in neural information processing systems 31 (2018)"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "(8) Zhou, S., Wu, Y., Ni, Z., Zhou, X., Wen, H., Zou, Y.: Dorefa-net: Training low bitwidth convolutional neural networks with low bitwidth gradients. arXiv preprint arXiv:1606.06160 (2016)"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "(9) Yang, Y., Deng, L., Wu, S., Yan, T., Xie, Y., Li, G.: Training high-performance and large-scale deep neural networks with full 8-bit integers. Neural Networks 125 , 70–82 (2020)"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "(10) He, K., Zhang, X., Ren, S., Sun, J.: Deep residual learning for image recognition. In: Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, pp. 770–778 (2016)"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "(11) Devlin, J., Chang, M.-W., Lee, K., Toutanova, K.: Bert: Pre-training of deep bidirectional transformers for language understanding. arXiv preprint arXiv:1810.04805 (2018)"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "(12) Smith, L.N.: A disciplined approach to neural network hyper-parameters: Part 1–learning rate, batch size, momentum, and weight decay. arXiv preprint arXiv:1803.09820 (2018)"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "(13) Chen, J., Wolfe, C., Li, Z., Kyrillidis, A.: Demon: Improved neural network training with momentum decay. In: ICASSP 2022-2022 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), pp. 3958–3962 (2022). IEEE"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "(14) Chen, J., Wolfe, C., Kyrillidis, A.: Rex: Revisiting budgeted training with an improved schedule. Proceedings of Machine Learning and Systems 4 , 64–76 (2022)"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "(15) Hochreiter, S., Schmidhuber, J.: Long short-term memory. Neural computation 9 (8), 1735–1780 (1997)"
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "(16) Kipf, T.N., Welling, M.: Semi-supervised classification with graph convolutional networks. arXiv preprint arXiv:1609.02907 (2016)"
+    }
+  ]
+}

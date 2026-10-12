@@ -1,0 +1,79 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.01050",
+  "title": "GraphMini: Accelerating Graph Pattern Matching Using Auxiliary Graphs",
+  "authors": "Juelin Liu, Sandeep Polisetty, Hui Guan, Marco Serafini",
+  "year": "2024",
+  "categories": [
+    "cs.DB",
+    "cs.PF"
+  ],
+  "url": "https://arxiv.org/abs/2403.01050",
+  "html_url": "https://arxiv.org/html/2403.01050",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 675,
+  "text": "Graph pattern matching is a fundamental problem encountered by many common graph mining tasks and real-world applications, such as analyzing social networks [1,2] and protein-protein interaction networks [3]. It is also the basic building block of several graph mining systems [4,5,6,7]. The problem is challenging because the search space and the size of intermediate data increase exponentially with the size of the data graph and query graph.\n\nGraph pattern matching involves performing a large number of set operations on the adjacency lists in the input graph. These set operations are a well-known performance bottleneck and speeding them up has been the focus of prior research [8]. State-of-the-art work reduced the number of set operations by caching intermediate results to eliminate redundant operations [5] and by using better query execution schedules [9]. Other work has proposed better implementations of the set operation [8,10,11,12].\n\nThis paper explores a different and complementary direction to speed up set operations: reducing the size of the adjacency lists that are given as input to those operations. Graph pattern matching systems usually match one query vertex or edge at a time, using nested loops. Our basic insight is that, when we match a query vertex in a loop, we can already identify some data vertices in the data graph that will never be matched in deeper loops. We can thus proactively prune these vertices from adjacency lists to make the adjacency lists shorter, accelerating the set operations involving these lists in deeper loops without changing the query results. We propose a new data structure auxiliary graph to keep track of pruned adjacency lists on the fly during query execution. We materialize the idea in GraphMini, a novel single-host graph pattern-matching system that generates query execution code to efficiently build, maintain, and reuse auxiliary graphs.\n\nGraphMini addresses several research questions. First, we establish criteria to identify which adjacency lists can be pruned and how to prune them safely, without changing the result of a query. The technique maintains multiple auxiliary graphs from pruning the same adjacency list, each auxiliary graph tailored to speed up the matching of a specific query vertex. These auxiliary graphs can be further pruned online at deeper loops as more intermediate results become available. Our experiments show that the memory overhead of storing auxiliary graphs is only a small fraction of the data graph.\n\nPruning adjacency lists preserves correctness but it does not always speed up computation. Building an auxiliary graph entails paying an upfront cost that should be amortized in deeper loops. Deciding if the gains outweigh the costs is challenging because we cannot ascertain how often an auxiliary graph will be reused in the future. Pruning always does not yield consistent speedups. We thus build a cost model that leverages runtime statistics to estimate the gains of pruning an adjacency list before it is actually pruned. We show that using the cost model outperforms simple heuristics.\n\nOur GraphMini system also implements a set of compile-time optimizations to minimize the computation costs in building, managing, and retrieving auxiliary graphs. These optimizations include removing runtime checks for retrieving the most suitable version of the pruned adjacency lists, reusing auxiliary graphs to build other auxiliary graphs, and techniques to balance load across parallel worker threads.\n\nOur evaluation shows that GraphMini outperforms state-of-the-art systems like GraphPi [9] and Dryadic [7] by up to 30.6x and 60.7x respectively. In addition, the code generation algorithm has a minimal impact on the end-to-end query execution time.\n\nTo summarize, we make the following contributions:\n\n- • We propose proactive graph pruning via a new data structure called auxiliary graph to substantially speed up graph pattern matching without changing the query results.\n\n- • We propose a cost model to estimate whether the cost of pruning an adjacency list will be amortized.\n\n- • We implement a novel single host graph pattern matching system called GraphMini, which generates query execution code tailored to maximizing the benefit of proactive pruning using several compile-time optimizations.\n\n- • We experimentally show that GraphMini is substantially faster than state-of-the-art approaches.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "W. Fan, “Graph pattern matching revised for social network analysis,” ACM International Conference Proceeding Series , 03 2012."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "T. A. B. Snijders, P. E. Pattison, G. L. Robins, and M. S. Handcock, “New specifications for exponential random graph models,” Sociological Methodology , vol. 36, no. 1, pp. 99–153, 2006. [Online]. Available: https://doi.org/10.1111/j.1467-9531.2006.00176.x"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "N. Alon, P. Dao, I. Hajirasouliha, F. Hormozdiari, and C. Sahinalp, “Biomolecular network motif counting and discovery by color coding,” Bioinformatics (Oxford, England) , vol. 24, pp. i241–9, 07 2008."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "K. Jamshidi, R. Mahadasa, and K. Vora, “Peregrine: A pattern-aware graph mining system,” in Proceedings of the Fifteenth European Conference on Computer Systems , ser. EuroSys ’20. New York, NY, USA: Association for Computing Machinery, 2020. [Online]. Available: https://doi.org/10.1145/3342195.3387548"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "D. Mawhirter and B. Wu, “Automine: Harmonizing high-level abstraction and high performance for graph mining,” in Proceedings of the 27th ACM Symposium on Operating Systems Principles , ser. SOSP ’19. New York, NY, USA: Association for Computing Machinery, 2019, p. 509–523. [Online]. Available: https://doi.org/10.1145/3341301.3359633"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "D. Mawhirter, S. Reinehr, C. Holmes, T. Liu, and B. Wu, “Graphzero: Breaking symmetry for efficient graph mining,” 2019. [Online]. Available: https://arxiv.org/abs/1911.12877"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "D. Mawhirter, S. Reinehr, W. Han, N. Fields, M. Claver, C. Holmes, J. McClurg, T. Liu, and B. Wu, “Dryadic: Flexible and fast graph pattern matching at scale,” in 30th International Conference on Parallel Architectures and Compilation Techniques, PACT 2021, Atlanta, GA, USA, September 26-29, 2021 , J. Lee and A. Cohen, Eds. IEEE, 2021, pp. 289–303. [Online]. Available: https://doi.org/10.1109/PACT52795.2021.00028"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "S. Han, L. Zou, and J. X. Yu, “Speeding up set intersections in graph algorithms using simd instructions,” in Proceedings of the 2018 International Conference on Management of Data , ser. SIGMOD ’18. New York, NY, USA: Association for Computing Machinery, 2018, p. 1587–1602. [Online]. Available: https://doi.org/10.1145/3183713.3196924"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "T. Shi, M. Zhai, Y. Xu, and J. Zhai, “Graphpi: High performance graph pattern matching through effective redundancy elimination,” in SC20: International Conference for High Performance Computing, Networking, Storage and Analysis , 2020, pp. 1–14."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "C. R. Aberger, A. Lamb, S. Tu, A. Nötzli, K. Olukotun, and C. Ré, “Emptyheaded: A relational engine for graph processing,” ACM Trans. Database Syst. , vol. 42, no. 4, oct 2017. [Online]. Available: https://doi.org/10.1145/3129246"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "X. Chen, T. Huang, S. Xu, T. Bourgeat, C. Chung, and A. Arvind, “Flexminer: A pattern-aware accelerator for graph pattern mining,” in 2021 ACM/IEEE 48th Annual International Symposium on Computer Architecture (ISCA) , 2021, pp. 581–594."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "G. Dai, Z. Zhu, T. Fu, C. Wei, B. Wang, X. Li, Y. Xie, H. Yang, and Y. Wang, “Dimmining: Pruning-efficient and parallel graph mining on near-memory-computing,” in Proceedings of the 49th Annual International Symposium on Computer Architecture , ser. ISCA ’22. New York, NY, USA: Association for Computing Machinery, 2022, p. 130–145. [Online]. Available: https://doi.org/10.1145/3470496.3527388"
+    }
+  ]
+}

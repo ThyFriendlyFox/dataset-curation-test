@@ -1,0 +1,138 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.02899",
+  "title": "Domain-Agnostic Mutual Prompting for Unsupervised Domain Adaptation",
+  "authors": "Zhekai Du, Xinyao Li, Fengling Li, Ke Lu, Lei Zhu, Jingjing Li",
+  "year": "2024",
+  "categories": [
+    "cs.AI"
+  ],
+  "url": "https://arxiv.org/abs/2403.02899",
+  "html_url": "https://arxiv.org/html/2403.02899",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 682,
+  "text": "Labeling scarcity is a perennial problem in deep learning, as collecting abundant labeled data can be expensive, time-consuming, or even infeasible [1,2]. Unsupervised Domain Adaptation (UDA) serves as a promising approach to leverage the knowledge from a well-labeled source domain to benefit the task on an unlabeled target domain, where the two domains have similar semantics but different data distributions [3,4,5].\n\nConventional UDA methods typically bridge the domain gap by minimizing the distribution discrepancy, through either moment matching [6,7,8,5,9] or adversarial learning [3,10,11,12]. However, roughly aligning two domains can result in distorted semantic structure and less class discriminability in learned feature representations [13,14]. Besides, prior works use numerical labels for training and inference, which discard rich semantics behind categories, leading to sub-optimal adaptation when handling complex categories and domain shifts.\n\nRecently, large-scale pre-trained Vision-Language Models (VLMs) have demonstrated impressive successes in various downstream tasks [16,17,18,19]. By pre-training on tremendous image-text pairs, these models learn transferable multimodal representations that align images and texts in a joint embedding space. In particular, the Contrastive Language-Image Pre-training (CLIP) model [20] encodes rich semantic knowledge about visual concepts, presenting new opportunities to address the domain gap by leveraging the pre-trained vision and language knowledge. However, few attempts have been made to leverage VLMs for UDA since two challenges stand in the way, namely, 1) how to effectively take advantage of the rich pre-trained knowledge encoded in VLMs, and 2) how to transfer the source knowledge to the target domain for better adaptation.\n\nGenerally, there are two feasible routes for adapting large-scale pre-trained VLMs. The first is to use the zero-shot prediction capacity of VLMs to obtain pseudo-labels and fine-tune the image backbone with other UDA techniques [21]. While the source knowledge can be well-encoded by fine-tuning, the pseudo-labels largely rely on manually designed textual descriptions and fine-tuning the model may ruin the pre-trained knowledge. Another way is to freeze the pre-trained model and only tune the input data (e.g., prompt) for model adaptation, which only involves a small set of learnable parameters and retains the pre-trained knowledge. For instance, DAPrompt [15] proposes to embed domain semantics into domain-specific textual prompts for each domain, which are then coupled with a domain-agnostic context for domain-specific classification in the joint CLIP space. However, we argue that a large portion of source knowledge is prone to be encoded in source-specific prompts, which cannot be transfered to the target domain. For instance, we conduct an experiment by disabling the source supervision loss in DAPrompt, and observe marginal influence on the target performance (see Fig. 1).\n\nIn this work, we aim to learn transferable (domain-agnostic) prompts to effectively leverage both pre-trained knowledge and source-knowledge for the target domain using CLIP. However, directly learning such textual prompts in UDA can be sub-optimal, as visual embeddings from different domains typically encompass distinct, domain-biased information that conforms to different distributions within the CLIP space. This is a key motivation behind domain-specific prompting in previous methods [15,22]. Inspired by the recent success of visual prompting [23], we propose also adapting the visual embeddings to elicit domain-invariant representations by prompting the vision backbone, based on the domain-agnostic textual prompt. Meanwhile, domain-invariant visual embeddings can still retain individual characteristics, e.g., object color and size. Such variations, even within the same category, necessitate instance-conditioned textual prompts for better alignment, as shown in Fig. 1. Given the interdependent nature of the two kinds of prompts, we build a mutual learning framework based on a cross-attention mechanism inspired by the Transformer decoder [24]. A semantic-consistency regularization and an instance-discrimination contrastive loss are further imposed to ensure that the learned prompts carry pure domain-agnostic and instance-conditioned information.\n\nIn summary, the key contributions of this work are three-fold: 1) We propose a novel framework termed DAMP to learn domain-agnostic prompts for transferring pre-trained knowledge and source knowledge to the target domain using CLIP. 2) DAMP mutually aligns textual and visual embeddings by prompting both modalities to learn domain-invariant representations, which are optimized with two elaborate regularizations. 3) Extensive experiments on three UDA benchmarks validate that DAMP brings consistent and notable gains over state-of-the-art approaches.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib37",
+      "text": "Sinno Jialin Pan and Qiang Yang. A survey on transfer learning. TKDE , 22(10):1345–1359, 2009."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib68",
+      "text": "Yixin Zhang, Zilei Wang, Junjie Li, Jiafan Zhuang, and Zihan Lin. Towards effective instance discrimination contrastive loss for unsupervised domain adaptation. In ICCV , pages 11388–11399, 2023b."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib11",
+      "text": "Yaroslav Ganin and Victor Lempitsky. Unsupervised domain adaptation by backpropagation. In ICML , pages 1180–1189. PMLR, 2015."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib52",
+      "text": "Eric Tzeng, Judy Hoffman, Ning Zhang, Kate Saenko, and Trevor Darrell. Deep domain confusion: Maximizing for domain invariance. arXiv preprint arXiv:1412.3474 , 2014."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib21",
+      "text": "Guoliang Kang, Lu Jiang, Yi Yang, and Alexander G Hauptmann. Contrastive adaptation network for unsupervised domain adaptation. In CVPR , pages 4893–4902, 2019."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib32",
+      "text": "Mingsheng Long, Han Zhu, Jianmin Wang, and Michael I Jordan. Deep transfer learning with joint adaptation networks. In ICML , pages 2208–2217. PMLR, 2017."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib31",
+      "text": "Mingsheng Long, Yue Cao, Jianmin Wang, and Michael Jordan. Learning transferable features with deep adaptation networks. In ICML , pages 97–105. PMLR, 2015."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib39",
+      "text": "Xingchao Peng, Qinxun Bai, Xide Xia, Zijun Huang, Kate Saenko, and Bo Wang. Moment matching for multi-source domain adaptation. In ICCV , pages 1406–1415, 2019."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib26",
+      "text": "Jingjing Li, Erpeng Chen, Zhengming Ding, Lei Zhu, Ke Lu, and Heng Tao Shen. Maximum density divergence for domain adaptation. TPAMI , 43(11):3918–3930, 2020."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib33",
+      "text": "Mingsheng Long, Zhangjie Cao, Jianmin Wang, and Michael I Jordan. Conditional adversarial domain adaptation. In NeurIPS , 2018."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib43",
+      "text": "Kuniaki Saito, Kohei Watanabe, Yoshitaka Ushiku, and Tatsuya Harada. Maximum classifier discrepancy for unsupervised domain adaptation. In CVPR , pages 3723–3732, 2018."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib7",
+      "text": "Zhekai Du, Jingjing Li, Hongzu Su, Lei Zhu, and Ke Lu. Cross-domain gradient discrepancy minimization for unsupervised domain adaptation. In CVPR , pages 3937–3946, 2021."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib49",
+      "text": "Hui Tang, Ke Chen, and Kui Jia. Unsupervised domain adaptation via structurally regularized deep clustering. In CVPR , pages 8725–8735, 2020."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib4",
+      "text": "Xinyang Chen, Sinan Wang, Mingsheng Long, and Jianmin Wang. Transferability vs. discriminability: Batch spectral penalization for adversarial domain adaptation. In ICML , pages 1081–1090. PMLR, 2019."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib12",
+      "text": "Chunjiang Ge, Rui Huang, Mixue Xie, Zihang Lai, Shiji Song, Shuang Li, and Gao Huang. Domain adaptation via prompt learning. TNNLS , pages 1–11, 2023."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib63",
+      "text": "Wenwen Yu, Yuliang Liu, Wei Hua, Deqiang Jiang, Bo Ren, and Xiang Bai. Turning a clip model into a scene text detector. In CVPR , pages 6978–6988, 2023."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib18",
+      "text": "Chao Jia, Yinfei Yang, Ye Xia, Yi-Ting Chen, Zarana Parekh, Hieu Pham, Quoc Le, Yun-Hsuan Sung, Zhen Li, and Tom Duerig. Scaling up visual and vision-language representation learning with noisy text supervision. In ICML , pages 4904–4916. PMLR, 2021."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib41",
+      "text": "Yongming Rao, Wenliang Zhao, Guangyi Chen, Yansong Tang, Zheng Zhu, Guan Huang, Jie Zhou, and Jiwen Lu. Denseclip: Language-guided dense prediction with context-aware prompting. In CVPR , pages 18082–18091, 2022."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib15",
+      "text": "Wenbin He, Suphanut Jamonnak, Liang Gou, and Liu Ren. Clip-s4: Language-guided self-supervised semantic segmentation. In CVPR , pages 11207–11216, 2023."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib40",
+      "text": "Alec Radford, Jong Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry, Amanda Askell, Pamela Mishkin, Jack Clark, et al. Learning transferable visual models from natural language supervision. In ICML , pages 8748–8763. PMLR, 2021."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib24",
+      "text": "Zhengfeng Lai, Noranart Vesdapunt, Ning Zhou, Jun Wu, Cong Phuoc Huynh, Xuelu Li, Kah Kuen Fu, and Chen-Nee Chuah. Padclip: Pseudo-labeling with adaptive debiasing in clip for unsupervised domain adaptation. In ICCV , pages 16155–16165, 2023."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib45",
+      "text": "Mainak Singha, Harsh Pal, Ankit Jha, and Biplab Banerjee. Ad-clip: Adapting domains in prompt space using clip. In ICCV , pages 4355–4364, 2023."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib19",
+      "text": "Menglin Jia, Luming Tang, Bor-Chun Chen, Claire Cardie, Serge Belongie, Bharath Hariharan, and Ser-Nam Lim. Visual prompt tuning. In ECCV , pages 709–727. Springer, 2022."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib54",
+      "text": "Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N Gomez, Łukasz Kaiser, and Illia Polosukhin. Attention is all you need. In NeurIPS , 2017."
+    }
+  ]
+}

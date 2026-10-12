@@ -1,0 +1,63 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2309.10323",
+  "title": "The Impact of Exposed Passwords on Honeyword Efficacy",
+  "authors": "Zonghao Huang, Lujo Bauer, Michael K. Reiter",
+  "year": "2024",
+  "categories": [
+    "cs.CR"
+  ],
+  "url": "https://arxiv.org/abs/2309.10323",
+  "html_url": "https://arxiv.org/html/2309.10323",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1206,
+  "text": "Credential database breaches have long been a widespread security problem and are only becoming more so. The 2022 Verizon Data Breach Investigations Report places credentials as one of the two most often breached types of confidential data, since they are so useful for attackers to masquerade as legitimate users on the system [1]. Credential database breaches are the largest source of compromised passwords used in credential stuffing campaigns [2]. In turn, credential stuffing campaigns are the cause of the vast majority of account takeovers [3]. Unfortunately, there is usually a significant delay between the breach of a credential database and its discovery. Estimates of the average delay to detect a data breach range from six to eight months in a 2022 report [4]. The resulting window of vulnerability gives attackers the opportunity to crack the passwords offline, and then sell them or leverage them directly [2,3].\n\nA strategy to accelerate the detection of credential database breaches, suggested by Juels and Rivest nearly a decade ago [5], is for a site to store decoy passwords, or honeywords, alongside real passwords in its credential database, so that if the attacker breaches the database, the correct passwords are hidden among the honeywords. The entry of a honeyword in a login attempt then alerts the site to its breach, since the legitimate user does not know the honeyword. In the time since this proposal, researchers have proposed various algorithms for generating honeywords (see Sec. 3) to meet two central criteria: (i) that it be difficult for an attacker who has breached a site’s credential database to distinguish the legitimate password for an account from that account’s honeywords, and (ii) that it be difficult for an attacker who has not breached a site’s credential database to guess honeywords for an account, since such guesses will induce false breach alarms.\n\nThe tendency of users to reuse passwords across sites (e.g., [6,7]) presents a challenge for honeywords, since an attacker can stuff an account’s breached passwords at other sites where the same user has accounts, thereby discovering the legitimate password as the one that works at another site. As such, previous advances in honeyword system designs [8] provide a mechanism by which one site can monitor for the entry of another site’s honeywords in local login attempts. Still, however, for an account for which the attacker can obtain the user’s passwords on other sites (e.g., by breaching these other sites, or by phishing their passwords), the attacker will likely need not resort to credential stuffing to differentiate the legitimate password from its honeywords. While this might seem like an unnecessarily challenging threat model, it is unfortunately realistic: A July 2020 report found more than 15 billion credentials in circulation in cybercriminal marketplaces [9], or an average of more than two for every person on the planet.\n\nIn this paper we conduct the first critical analysis of honeyword-generation algorithms in this setting, i.e., wherein the attacker knows legitimate passwords at other sites for the users represented in a database it is targeting. There is reason to suspect that this threat model would pose significant challenges to honeyword efficacy for user-chosen (versus algorithmically generated) passwords. On the one hand, if the honeyword-generation algorithm used to populate the targeted database generates honeywords that are all dissimilar from the user-chosen password, then the known password(s) for the same user might enable the attacker to distinguish the user-chosen password from its honeywords with high probability. If so, the false-negative probability (the probability that the site fails to detect the breach) would be high. On the other hand, if the honeyword-generation algorithm generates some honeywords that are similar to the user-chosen password, then this might make it easier for an attacker who has not breached the database to guess and enter honeywords in login attempts, thereby inducing a false breach alarm (false positive).\n\nThrough a systematic analysis of current honeyword-generation algorithms, we quantify this tension and, by doing so, show that there appears to be no known algorithm providing a good tradeoff for accounts with user-chosen passwords. We additionally applied two password tweaking techniques from password guessing to improve honeyword generation. While these two algorithms relieve this tension by providing slightly lower false-negative probability, they still induce a high false-positive probability. Therefore, it remains far from clear that there is any honeyword-generation algorithm that ensures low false-negative probability and provides adequate resistance to false breach alarms (i.e., a false-positive rate near 0).\n\nWe then turn our attention to accounts with algorithmically generated passwords, as might be generated by a password manager. The critical finding that we uncover in this case is that honeyword-generation algorithms that do not take into account the method by which the legitimate password was generated will yield high false-negative probability. For example, if the user employs a password manager that generates passwords to fit a user-configured specification, and if the passwords exposed for that user permit the attacker to infer this specification, then the attacker can discard any honeywords not fitting that pattern. We will quantify the ability of the adversary to do so against existing honeyword-generation algorithms, most of which do not guarantee honeywords of the same pattern as the legitimate password. We then consider the possibility that the honeyword-generation algorithm itself leverages a password manager to generate honeywords whenever the user does. However, due to the numerous generator configurations that users might adopt, doing so is not foolproof. In particular, if the attacker knows potentially more passwords for the same user’s accounts elsewhere, it can classify the user’s typical configuration better than the defender can. This advantage thus implies an increase in false negatives, which we will demonstrate in certain cases.\n\nTo summarize, our contributions are as follows:\n\n- • We formalize the false-positive and false-negative rates of honeywords in a model in which the attacker possesses passwords for the same user at other sites (obtained by, e.g., breaching those sites or phishing the user).\n\n- • Using these definitions and empirical datasets of compromised passwords, we show that existing honeyword-generation algorithms (and two honeyword-generation methods adapted from password-guessing attacks) exhibit poor tradeoffs between false negatives and false positives in this threat model. All the analyzed methods have a false-negative rate much higher than random guessing (i.e., it is often easy for false-negative attackers to distinguish the account password from honeywords) or a false-positive rate much higher than zero (i.e., it is often easy for false-positive attackers to induce false breach alarms).\n\n- • We conduct the first study of using honeywords to protect algorithmically generated passwords. Though relevant only for sites that reversibly encrypt their password databases (since password hashing, which is best practice, should render algorithmically generated passwords irrecoverable to an attacker who breaches the database), our study provides interesting findings in this setting. Using passwords gathered from popular password managers, we show that introducing honeywords without attention to the account’s password being algorithmically generated offers little protection for existing honeyword-generation algorithms. We further explore the use of automatic password generators to generate honeywords when the account password is identified as being algorithmically generated itself, but find that the myriad configurations of these generators can be a pitfall for honeyword generation.\n\nSource code for conducting our experiments is available from https://github.com/zonghaohuang007/honeywords-analysis.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib46",
+      "text": "Verizon. 2022 data breach investigations report. https://www.verizon.com/business/resources/reports/dbir/ , 2022."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib41",
+      "text": "K. Thomas, F. Li, A. Zand, J. Barrett, J. Ranieri, L. Invernizzi, Y. Markov, O. Comanescu, V. Eranti, A. Moscicki, D. Margolis, V. Paxson, and E. Bursztein. Data breaches, phishing, or malware? Understanding the risks of stolen credentials. In 24 th ACM Conference on Computer and Communications Security , 2017."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib37",
+      "text": "Shape Security. 2018 credential spill report. https://info.shapesecurity.com/rs/935-ZAM-778/images/Shape_Credential_Spill_Report_2018.pdf , 2018."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib22",
+      "text": "IBM Security. Cost of a data breach report 2022. https://www.ibm.com/security/data-breach , 2022."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib23",
+      "text": "A. Juels and R. L. Rivest. Honeywords: Making password-cracking detectable. In 20 th ACM Conference on Computer and Communications Security , November 2013."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib57",
+      "text": "R. Wash, E. Rader, R. Berman, and Z. Wellmer. Understanding password choices: How frequently entered passwords are re-used across websites. In 12 th Symposium on Usable Privacy and Security , 2016."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib33",
+      "text": "S. Pearman, J. Thomas, P. E. Naeini, H. Habib, L. Bauer, N. Christin, L. F. Cranor, S. Egelman, and A. Forget. Let’s go in for a closer look: Observing passwords in their natural habitat. In 24 th ACM Conference on Computer and Communications Security , October 2017."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib55",
+      "text": "K. C. Wang and M. K. Reiter. Using Amnesia to detect credential database breaches. In 30 th USENIX Security Symposium , August 2021."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib12",
+      "text": "Digital Shadows Photon Research Team. From exposure to takeover: The 15 billion stolen credentials allowing account takeovers. https://resources.digitalshadows.com/whitepapers-and-reports/from-exposure-to-takeover , 2020."
+    }
+  ]
+}

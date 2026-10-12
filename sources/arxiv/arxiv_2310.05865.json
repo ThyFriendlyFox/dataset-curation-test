@@ -1,0 +1,135 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2310.05865",
+  "title": "A Learning-Based Framework for Safe Human-Robot Collaboration with Multiple Backup Control Barrier Functions",
+  "authors": "Neil C. Janwani, Ersin DaÅ, Thomas Touma, Skylar X. Wei, Tamas G. Molnar, Joel W. Burdick",
+  "year": "2024",
+  "categories": [
+    "cs.RO",
+    "cs.SY",
+    "eess.SY"
+  ],
+  "url": "https://arxiv.org/abs/2310.05865",
+  "html_url": "https://arxiv.org/html/2310.05865",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 799,
+  "text": "Safety filters are useful control tools that allow a robot to remain safe while under actuation from a potentially unsafe controller, or driver. Safety filters accomplish this by minimally affecting desired control commands, and thus have become a popular add-on to robot control architectures [1,2,3] since they address real-world robot dynamics and kinodynamic constraints in a run-time fashion.\n\nControl barrier functions (CBFs) [4] are a popular method for constructing safety filters due to their ability to integrate nonlinear dynamics while providing formal safety guarantees. A CBF-based safety filter requires defining a control-invariant set that ensures safety. However, such sets can be difficult to construct with input constraints in mind [5,6,7,8,9,10,11].\n\nConsequently, the CBF framework has been extended to include actuation capability, such as torque limits, through the use of backup control barrier functions (BCBFs) [12,13,14]. BCBFs rely on the formulation of a backup controller, which is designed with input limits in mind to guarantee safety.\n\nThe backup controller typically involves a simple saving maneuver, such as coming to a stop, turning at a maximum rate, or hovering. By calculating the future backup trajectory of the system, one can analyze future safety of the robot and incorporate this information into optimization-based controllers like quadratic programs (QPs). Consequently, when constructing safety filters using the BCBF method, the system’s conservativeness is a strong function of the control engineer’s choice of backup policy.\n\nTo address this limitation, recent work examines the use of multiple backup strategies in the BCBF framework, since multiple strategies can help overcome the conservativeness of a single strategy. In [15], an algorithm is used to evaluate the BCBF method with multiple backup controllers, such that the one with the least control intervention can be chosen. However, with many backup controllers, this method could be computationally infeasible. In [16] and [17], different maneuvers are proposed to increase the reachability of a given backup controller, where a switching algorithm chooses a different maneuver if it is no longer possible to perform the current maneuver. While this method used multiple backup maneuvers with more computationally efficient ways of solving BCBFs, it is better suited to fully autonomous systems. It does not explicitly provide, in a human-robot interaction context, a way to take into account the intentions of a human vehicle driver or human companion. Nor does it account for the fact that the human operator may have better situational awareness than the autonomous controller. Even though autonomous selection may be suboptimal at times, the backup control strategy is often fixed and independent of the driver’s preferred nature of safety-critical behavior. Generally, the types of safe behavior utilized by the BCBF cannot be tuned, leading to situations where potentially preferred safe behaviors are filtered out by the BCBF framework.\n\nThere has been impressive previous work to include human preferences in safety filters. For instance in [18], preference-based learning is used to adapt tuneable parameters of a CBF to user preferences for autonomous obstacle avoidance on a quadruped. However, input bounds are not formally considered, which could potentially result in infeasibility and consequently unsafe trajectories. While there has also been work on preference based reinforcement learning (pbRL) [19], these methods must sample trajectories within the expected environment [20]. Since the drivers of teleoperated systems must provide control inputs at each timestep, trajectory sampling becomes difficult to complete due to the human-in-the-loop nature of the problem.\n\nIn order to intelligently pick backup controllers, we propose a system that utilizes a long short term memory (LSTM) and a deep neural network (DNN) component to learn a reward corresponding to each backup controller. LSTMs have been used in real-time driver intention and maneuver tracking, and have shown to be successful at regression and classification tasks with trajectory input [21,22,23]. A simple switching law is derived by using the controller with the largest reward in the BCBF framework. This system learns to estimate driver intention by training on example trajectories, labeled with the correct choice of backup controller, as provided by the driver. In our work, we show that\n\n- 1. The LSTM-DNN architecture effectively learns a switching law for the BCBF framework with multiple backup controllers–choosing the controller closest to the driver’s preference.\n\n- 2. Our approach increases the reachable sets of the driven robot while maintaining the safety guarantees of BCBFs.\n\nMoreover, we present experimental implementations of our algorithms on a tracked robot. These experiments demonstrate that switching between new and previously formulated backup controllers based on estimated driver intention can work on actual hardware systems.\n\nThis paper is organized as follows. Section II presents preliminaries on CBFs, BCBFs, and DNNs. Section III presents our contributions, including a description of system architecture. We present the implementation of our framework on hardware in Section IV and discuss experimental results in Section V. Section VI concludes the paper.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "K. L. Hobbs, M. L. Mote, M. C. Abate, S. D. Coogan, and E. M. Feron, “Runtime assurance for safety-critical systems: An introduction to safety filtering approaches for complex control systems,” IEEE Control Systems Magazine , vol. 43, no. 2, pp. 28–65, 2023."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "K.-C. Hsu, H. Hu, and J. F. Fisac, “The safety filter: A unified view of safety-critical control in autonomous systems,” arXiv preprint arXiv:2309.05837 , 2023."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "K. P. Wabersich and M. N. Zeilinger, “A predictive safety filter for learning-based control of constrained nonlinear dynamical systems,” Automatica , vol. 129, p. 109597, 2021."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "A. D. Ames, X. Xu, J. W. Grizzle, and P. Tabuada, “Control barrier function based quadratic programs for safety critical systems,” Transactions on Automatic Control , vol. 62, no. 8, pp. 3861–3876, 2017."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "Y. Chen, M. Jankovic, M. Santillo, and A. D. Ames, “Backup control barrier functions: Formulation and comparative study,” in 2021 60th IEEE Conference on Decision and Control (CDC) . IEEE, 2021, pp. 6835–6841."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "J. Breeden and D. Panagou, “Robust control barrier functions under high relative degree and input constraints for satellite trajectories,” Automatica , vol. 155, p. 111109, 2023."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "D. R. Agrawal and D. Panagou, “Safe control synthesis via input constrained control barrier functions,” in 2021 60th IEEE Conference on Decision and Control (CDC) . IEEE, 2021, pp. 6113–6118."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "W. S. Cortez and D. V. Dimarogonas, “Correct-by-design control barrier functions for Euler-Lagrange systems with input constraints,” in 2020 American Control Conference (ACC) . IEEE, 2020, pp. 950–955."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "W. Xiao, C. A. Belta, and C. G. Cassandras, “Sufficient conditions for feasibility of optimal control problems using control barrier functions,” Automatica , vol. 135, p. 109960, 2022."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "A. Wiltz, X. Tan, and D. V. Dimarogonas, “Construction of control barrier functions using predictions with finite horizon,” arXiv preprint arXiv:2305.05294 , 2023."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "C. Folkestad, Y. Chen, A. D. Ames, and J. W. Burdick, “Data-driven safety-critical control: Synthesizing control barrier functions with Koopman operators,” IEEE Control Systems Letters , vol. 5, no. 6, pp. 2012–2017, 2020."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "T. Gurriet, M. Mote, A. Singletary, P. Nilsson, E. Feron, and A. D. Ames, “A scalable safety critical control framework for nonlinear systems,” IEEE Access , vol. 8, pp. 187 249–187 275, 2020."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "T. G. Molnar and A. D. Ames, “Safety-critical control with bounded inputs via reduced order models,” in 2023 American Control Conference (ACC) . IEEE, 2023, pp. 1414–1421."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "R. K. Cosner, A. W. Singletary, A. J. Taylor, T. G. Molnar, K. L. Bouman, and A. D. Ames, “Measurement-robust control barrier functions: Certainty in safety with uncertainty in state,” in 2021 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS) . IEEE, 2021, pp. 6286–6291."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "Y. Chen, A. Singletary, and A. D. Ames, “Guaranteed obstacle avoidance for multi-robot operations with limited actuation: A control barrier function approach,” IEEE Control Systems Letters , vol. 5, no. 1, pp. 127–132, 2021."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "A. Singletary, A. Swann, I. D. J. Rodriguez, and A. D. Ames, “Safe drone flight with time-varying backup controllers,” in 2022 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS) . IEEE, 2022, pp. 4577–4584."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "A. Singletary, A. Swann, Y. Chen, and A. D. Ames, “Onboard safety guarantees for racing drones: High-speed geofencing with control barrier functions,” IEEE Robotics and Automation Letters , vol. 7, no. 2, pp. 2897–2904, 2022."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "R. Cosner, M. Tucker, A. Taylor, K. Li, T. Molnar, W. Ubelacker, A. Alan, G. Orosz, Y. Yue, and A. Ames, “Safety-aware preference-based learning for safety-critical control,” in Learning for Dynamics and Control Conference . PMLR, 2022, pp. 1020–1033."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "E. R. Novoseller, Y. Wei, Y. Sui, Y. Yue, and J. W. Burdick1, “Dueling posterior sampling for preference-based reinforcement learning,” in Conference on Uncertainty in Artificial Intelligence , 2020, pp. 1029–1038."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "C. Wirth, R. Akrour, G. Neumann, and J. Fürnkranz, “A survey of preference-based reinforcement learning methods,” Journal of Machine Learning Research , vol. 18, no. 136, pp. 1–46, 2017. [Online]. Available: http://jmlr.org/papers/v18/16-634.html"
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "N. Khairdoost, M. Shirpour, M. A. Bauer, and S. S. Beauchemin, “Real-time driver maneuver prediction using lstm,” IEEE Transactions on Intelligent Vehicles , vol. 5, no. 4, pp. 714–724, 2020."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib22",
+      "text": "S. Wang, X. Zhao, Q. Yu, and T. Yuan, “Identification of driver braking intention based on long short-term memory (lstm) network,” IEEE Access , vol. 8, pp. 180 422–180 432, 2020."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib23",
+      "text": "A. Zyner, S. Worrall, J. Ward, and E. Nebot, “Long short term memory for driver intent prediction,” in 2017 IEEE Intelligent Vehicles Symposium (IV) , 2017, pp. 1484–1489."
+    }
+  ]
+}

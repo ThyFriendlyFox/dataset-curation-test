@@ -1,0 +1,64 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.00745",
+  "title": "AtP*: An efficient and scalable method for localizing LLM behaviour to components",
+  "authors": "JÃ¡nos KramÃ¡r, Tom Lieberum, Rohin Shah, Neel Nanda",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.CL"
+  ],
+  "url": "https://arxiv.org/abs/2403.00745",
+  "html_url": "https://arxiv.org/html/2403.00745",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 654,
+  "text": "As LLMs become ubiquitous and integrated into numerous digital applications, it’s an increasingly pressing research problem to understand the internal mechanisms that underlie their behaviour – this is the problem of mechanistic interpretability. A fundamental subproblem is to causally attribute particular behaviours to individual parts of the transformer forward pass, corresponding to specific components (such as attention heads, neurons, layer contributions, or residual streams), often at specific positions in the input token sequence. This is important because in numerous case studies of complex behaviours, they are found to be driven by sparse subgraphs within the model [1,2,3].\n\nA classic form of causal attribution uses zero-ablation, or knock-out, where a component is deleted and we see if this negatively affects a model’s output – a negative effect implies the component was causally important. More recent work has generalised this to replacing a component’s activations with samples from some baseline distribution (with zero-ablation being a special case where activations are resampled to be zero). We focus on the popular and widely used method of Activation Patching (also known as causal mediation analysis) [4,3,5] where the baseline distribution is a component’s activations on some corrupted input, such as an alternate string with a different answer [6,7].\n\nGiven a causal attribution method, it is common to sweep across all model components, directly evaluating the effect of intervening on each of them via resampling [3]. However, when working with SoTA models it can be expensive to attribute behaviour especially to small components (e.g. heads or neurons) – each intervention requires a separate forward pass, and so the number of forward passes can easily climb into the millions or billions. For example, on a prompt of length 1024, there are 2.7\\cdot 10^{9} neuron nodes in Chinchilla 70B [8].\n\nWe propose to accelerate this process by using Attribution Patching (AtP) [9], a faster, approximate, causal attribution method, as a prefiltering step: after running AtP, we iterate through the nodes in decreasing order of absolute value of the AtP estimate, then use Activation Patching to more reliably evaluate these nodes and filter out false positives – we call this verification. We typically care about a small set of top contributing nodes, so verification is far cheaper than iterating over all nodes.\n\n- • We investigate the performance of AtP, finding two classes of failure modes which produce false negatives. We propose a variant of AtP called AtP ∗, with two changes to address these failure modes while retaining scalability: – When patching queries and keys, recomputing the attention softmax and using a gradient based approximation from then on, as gradients are a poor approximation to saturated attention. – Using dropout on the backwards pass to fix brittle false negatives, where significant positive and negative effects cancel out.\n\n- – When patching queries and keys, recomputing the attention softmax and using a gradient based approximation from then on, as gradients are a poor approximation to saturated attention.\n\n- – Using dropout on the backwards pass to fix brittle false negatives, where significant positive and negative effects cancel out.\n\n- • We introduce several alternative methods to approximate Activation Patching as baselines to AtP which outperform brute force Activation Patching.\n\n- • We present the first systematic study of AtP and these alternatives and show that AtP significantly outperforms all other investigated methods, with AtP ∗ providing further significant improvement.\n\n- • To estimate the residual error of AtP ∗ and statistically bound the sizes of any remaining false negatives we provide a diagnostic method, based on using AtP to filter out high impact nodes, and then patching random subsets of the remainder. Good diagnostics mean that practitioners may still gauge whether AtP is reliable in relevant domains without the costs of exhaustive verification.\n\nFinally, we provide some guidance in Section 5.4 on how to successfully perform causal attribution in practice and what attribution methods are likely to be useful and under what circumstances.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib39",
+      "text": "Olsson et al. (2022) C. Olsson, N. Elhage, N. Nanda, N. Joseph, N. DasSarma, T. Henighan, B. Mann, A. Askell, Y. Bai, A. Chen, T. Conerly, D. Drain, D. Ganguli, Z. Hatfield-Dodds, D. Hernandez, S. Johnston, A. Jones, J. Kernion, L. Lovitt, K. Ndousse, D. Amodei, T. Brown, J. Clark, J. Kaplan, S. McCandlish, and C. Olah. In-context learning and induction heads. Transformer Circuits Thread , 2022. https://transformer-circuits.pub/2022/in-context-learning-and-induction-heads/index.html."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib54",
+      "text": "Wang et al. (2022) K. Wang, A. Variengien, A. Conmy, B. Shlegeris, and J. Steinhardt. Interpretability in the wild: a circuit for indirect object identification in gpt-2 small, 2022."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib32",
+      "text": "Meng et al. (2023) K. Meng, D. Bau, A. Andonian, and Y. Belinkov. Locating and editing factual associations in gpt, 2023."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib15",
+      "text": "Geiger et al. (2022) A. Geiger, Z. Wu, H. Lu, J. Rozner, E. Kreiss, T. Icard, N. D. Goodman, and C. Potts. Inducing causal structure for interpretable neural networks, 2022."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib6",
+      "text": "Chan et al. (2022) L. Chan, A. Garriga-Alonso, N. Goldwosky-Dill, R. Greenblatt, J. Nitishinskaya, A. Radhakrishnan, B. Shlegeris, and N. Thomas. Causal scrubbing, a method for rigorously testing interpretability hypotheses. AI Alignment Forum , 2022. https://www.alignmentforum.org/posts/JvZhhzycHu2Yd57RN/causal-scrubbing-a-method-for-rigorously-testing ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib41",
+      "text": "Pearl (2001) J. Pearl. Direct and indirect effects, 2001."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib44",
+      "text": "Robins and Greenland (1992) J. M. Robins and S. Greenland. Identifiability and exchangeability for direct and indirect effects. Epidemiology , 3:143–155, 1992. URL https://api.semanticscholar.org/CorpusID:10757981 ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib23",
+      "text": "Hoffmann et al. (2022) J. Hoffmann, S. Borgeaud, A. Mensch, E. Buchatskaya, T. Cai, E. Rutherford, D. de Las Casas, L. A. Hendricks, J. Welbl, A. Clark, T. Hennigan, E. Noland, K. Millican, G. van den Driessche, B. Damoc, A. Guy, S. Osindero, K. Simonyan, E. Elsen, O. Vinyals, J. Rae, and L. Sifre. An empirical analysis of compute-optimal large language model training. In S. Koyejo, S. Mohamed, A. Agarwal, D. Belgrave, K. Cho, and A. Oh, editors, Advances in Neural Information Processing Systems , volume 35, pages 30016–30030. Curran Associates, Inc., 2022. URL https://proceedings.neurips.cc/paper_files/paper/2022/file/c1e2faff6f588870935f114ebe04a3e5-Paper-Conference.pdf ."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib36",
+      "text": "Nanda (2022) N. Nanda. Attribution patching: Activation patching at industrial scale. 2022. URL https://www.neelnanda.io/mechanistic-interpretability/attribution-patching ."
+    }
+  ]
+}

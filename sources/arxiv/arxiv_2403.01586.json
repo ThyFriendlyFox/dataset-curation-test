@@ -1,0 +1,89 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.01586",
+  "title": "IoT Device Labeling Using Large Language Models",
+  "authors": "Bar Meyuhas, Anat Bremler-Barr, Tal Shapira",
+  "year": "2024",
+  "categories": [
+    "cs.CR",
+    "cs.NI"
+  ],
+  "url": "https://arxiv.org/abs/2403.01586",
+  "html_url": "https://arxiv.org/html/2403.01586",
+  "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+  "section": "Introduction",
+  "word_count": 975,
+  "text": "The rapid proliferation of Internet of Things (IoT) technology in various sectors has created new security and management challenges. Correctly identifying an IoT device plays a crucial role in IoT security and observability solutions [1,2,3]. Extensive research in both industry and academia has been dedicated to IoT identification algorithms [4,5,6,7,8], which are crucial for many IoT security and observability solutions. These algorithms predominantly rely on labeled IoT datasets for the real-time identification of already seen devices. However, given the sheer diversity of IoT devices, collecting labeled data is a formidable challenge.\n\nThis paper introduces a method that passively monitors network traffic to automatically label unseen IoT devices by identifying their vendor and function. To the best of our knowledge, this is the first paper to address the IoT labeling problem. The motivation to address this issue was born out of discussions with IoT security companies who are having difficulty identifying IoT devices in the wild. In the IoT realm, maintaining a lab with all known IoT devices simply isn’t feasible. Moreover, the increasing number of cybersecurity attacks and new regulations make IoT vulnerability management important to various organizations nowadays. IoT security considers a vulnerability to be potential when it applies to a specific device type and vendor/model. Therefore, the first stage in any vulnerability management program is to identify and construct an inventory of assets, particularly IoT devices owned by the organization [9].\n\nLabeling IoT devices with their vendor and function provides crucial visibility, ensuring administrators can effectively oversee their network. Our solution also introduces the potential for tailored security policies that can be formulated based on precise device functions, such as ones that give a device labeled ’smart doorbell’ limited external communication but grant one labeled ’smart TV’ broader access.\n\nTo the best of our knowledge, the high-tech industry currently relies on a single solution for IoT device labeling, with Fing [10] standing out as the leading product used by IT teams to label devices in their networks. Our solution has surpassed Fing’s performance in achieving accurate results. Their approach to the labeling challenge is through crowd-sourcing. Their solution allows users, such as network owners or administrators, to label devices that the monitoring app couldn’t accurately identify. However, this solution needs extensive network coverage to work optimally, and a recent study indicated its limitations in accuracy [11].\n\nIn this study, we demonstrate how recent advancements in Large Language Models (LLMs) can address the challenging task of IoT device labeling. Our algorithm uses a catalog of known vendors and the various IoT functions they produce to identify known devices. However, by harnessing the power of LLMs, it can automatically update this catalog when a new device type appears.\n\nThe algorithm starts by extracting textual strings from the network’s traffic log. Specifically, it extracts the following features: domains to which the devices connect, hostnames, TLS issuers, OUI (after the MAC lookup [12]), and user-agents. Note that different amounts of textual values can be associated with each feature type. For instance, a single IoT device can connect to multiple domains and may have different TLS issuers for each domain.\n\nThe algorithm then takes the text features and feeds them into a search engine so the search results’ descriptions can be used to enrich the data. Because these results typically include pages from IoT manufacturers, online shopping websites selling the device, and security blogs discussing the device’s features, such searches often yield references to the vendors and functions of the IoT devices. Figure 1 shows an example of the enriched features, and how they reveal the vendor and function. The enriched features give us a large text dataset in which we use string matching to find the vendor of the device and LLMs to determine the function of the device. Note, however, that different enriched features can result in different labels, as seen in our example. Choosing the most accurate label among several possible ones is one of the challenges addressed by our solution. It was vital that our algorithm determine how to weigh the answers from different enriched feature values, according to the feature type. To address this challenge, we employed a machine-learning approach.\n\nOur labeling algorithm consists of two steps: using string matching to identify the vendor and using LLMs with zero-shot classification to label the function. In the first step, we identify the vendor by performing string matching of the text results in our dataset against a catalog of vendors and create labels based on the most common ones. In our dataset, which comprises 97 unique IoT devices from 55 distinct vendors, the algorithm achieves a high accuracy rate: 86% for HIT1 and 89% for HIT2. Although there is a misconception that the OUI information can reveal the vendor, we observed that it achieves only a 64% accuracy. This is primarily because in IoT, the OUI often identifies the NIC vendor rather than the actual device vendor.\n\nIn the second step, the algorithm receives the catalog of potential functions for the vendor identified in the first step. Here, we leverage the fact that most IoT vendors specialize in producing a limited range of device functions. We employ large language models (LLMs) and use zero-shot classification [13] to map each feature value to its relevant functions. Specifically, we used Roberta [14] to classify each feature into possible functions and gathered the confidence scores of these classifications. Our method then aggregates these scores to establish an overall confidence level for each label. The label with the highest confidence level is then assigned as the device’s function. In our dataset, which includes 21 functions, the algorithm achieves an accuracy of 70% for HIT1 and 77% for HIT2. Since our algorithm works on textual features, it can provide explanations to humans who wish to verify its result, by outputting the set of features upon which its decision was based.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib31",
+      "text": "Palo Alto Networks. Introduction to iot security. https://docs.paloaltonetworks.com/iot/iot-security-admin/iot-security-overview/introduction-to-iot-security#id235c0535-8183-48ce-b591-9f4f512fa914 . Accessed: 2023-05-19."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib25",
+      "text": "Check Point Software Technologies Ltd. Quantum iot protect, 2023. Accessed: 2023-05-22."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib16",
+      "text": "2023 FIREDOME. Iot endpoint protection platform, 2023. Accessed: 2023-07-28."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib23",
+      "text": "Franck Le, Jorge Ortiz, Dinesh Verma, and Dilip Kandlur. Policy-based identification of iot devices’ vendor and type by dns traffic analysis. In Policy-Based Autonomic Data Governance , pages 180–201. Springer, 2019."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib18",
+      "text": "Hang Guo and John Heidemann. Ip-based iot device detection. In Proceedings of the 2018 workshop on IoT security and privacy , pages 36–42, 2018."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib19",
+      "text": "Ibbad Hafeez, Markku Antikainen, Aaron Yi Ding, and Sasu Tarkoma. Iot-keeper: Detecting malicious iot network activity using online traffic analysis at the edge. IEEE Transactions on Network and Service Management , 17(1):45–59, 2020."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib27",
+      "text": "Samuel Marchal, Markus Miettinen, Thien Duc Nguyen, Ahmad-Reza Sadeghi, and N Asokan. Audi: Toward autonomous iot device-type identification using periodic communication. IEEE Journal on Selected Areas in Communications , 37(6):1402–1412, 2019."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib2",
+      "text": "Sandhya Aneja, Nagender Aneja, and Md Shohidul Islam. Iot device fingerprint using deep learning. In 2018 IEEE international conference on internet of things and intelligence system (IOTAIS) , pages 174–179. IEEE, 2018."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib34",
+      "text": "Inc. Palo Alto Networks. Palalto: Iot security administrator’s guide."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib15",
+      "text": "Fing. Device recognition user guide. https://www.fing.com/images/uploads/general/Device_Recognition_User_Guide.pdf , 2018."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib26",
+      "text": "A. Mandalari, H. Haddadi, D. J. Dubois, and D. Choffnes. Protected or porous: A comparative analysis of threat detection capability of iot safeguards. In 2023 IEEE Symposium on Security and Privacy (SP) , pages 3061–3078, may 2023."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib22",
+      "text": "Deniel Laurent. Wireshark manufacturer database."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib12",
+      "text": "Hugging Face. What is Zero-Shot Classification? https://huggingface.co/tasks/zero-shot-classification , Aug 2020. Accessed: 2023-Aug-02."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib13",
+      "text": "Hugging Face. xlm-roberta-large-xnli model and fine-tunes it on a combination. https://huggingface.co/joeddav/xlm-roberta-large-xnli , June 2020. Accessed: 2022-Feb-02."
+    }
+  ]
+}

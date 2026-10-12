@@ -1,0 +1,85 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2402.16073",
+  "title": "Pfeed: Generating near real-time personalized feeds using precomputed embedding similarities",
+  "authors": "Binyam Gebre, Karoliina Ranta, Stef van den Elzen, Ernst Kuiper, Thijs Baars, Tom Heskes",
+  "year": "2024",
+  "categories": [
+    "cs.IR",
+    "cs.AI",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2402.16073",
+  "html_url": "https://arxiv.org/html/2402.16073",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1057,
+  "text": "Bol, like many other e-commerce platforms, faces the challenge of providing customers with an easy and efficient way to navigate their vast catalog and find products that match their customers’ interests. The traditional approach of relying on customer controlled text-based search engines or browsing through categories is often limited and cumbersome, particularly during the customer’s discovery phase. To overcome these limitations and enhance customers’ overall discovery experience, Bol has launched personalized feeds called Top deals for you, Top picks for you, and New for you.\n\nThese personalized feed systems utilize a combination of the customer’s historical and recent behavior to display the best recommendations on the customer’s home page across both app and desktop platforms. In this paper, we present the methodology behind these feeds. We begin by presenting the challenges inherent to creating personalized feed systems. Subsequently, we delve into the prevailing industry approach (related work) that tackles these challenges, concluding with the presentation of our proposed solution and the evaluation outcomes.\n\n## 1.1. Four Challenges in Personalized Feed Systems\n\nPersonalized feed systems can be viewed as search engines, where customers are the search queries and items in the catalog are the search results. In this view, there are four challenges that need to be overcome to provide customers with a personalized set of items that align with their interests and preferences: customer, item, candidate retrieval and ranking challenges.\n\n## 1.1.1. Customer representation challenge\n\nCustomers show complex behaviors while shopping on e-commerce sites before making a purchase, e.g., searching for items, viewing items, reading reviews, and making item comparisons. The challenge is distilling these interactions into a concise customer representation. In addition to their dynamic interactions, the representation may also need to incorporate static attributes of customers, such as customer ID, gender, and clothing-size.\n\n## 1.1.2. Item representation challenge\n\nItems have rich structured information such as item ID, title, description, specifications, and other metadata. Items also have historical customer interactions: views, clicks, customer ratings, reviews, etc. The item representation challenge is identifying the most relevant data for representing various items, a task complicated by two factors. The first is the diversity of item attributes. For instance, author and title are key attributes for books, whereas size and gender are more critical for fashion items. The second factor is the cold-start problem associated with new products; these have no historical interactions.\n\n## 1.1.3. Candidate retrieval challenge\n\nCandidate retrieval entails determining which items best match a given customer’s preferences. Here, the challenges are of two varieties: 1) training customer and item representations in the same embedding space and 2) the inference challenge, which aims to efficiently retrieve the best matches from a corpus containing millions to billions of items.\n\n## 1.1.4. Ranking challenge\n\nThe candidate retrieval stage is followed by a ranking stage, where the retrieved candidates are re-ranked using a more complex model and more complex features of both the retrieved candidates and queries. The goal of this stage is to select and rank the top K items per customer (for example, the top 100 items) using learning-to-rank algorithms [1,2,3,4].\n\nIn this paper, we focus on addressing the first three challenges: the customer representation, item representation, and candidate retrieval challenges.\n\n## 1.2. Our Contributions\n\nThe most dominant approach to tackling the aforementioned challenges relies on a user-item framework (see figure 1). Two neural networks, called dual encoders, are each trained to generate embeddings for user and item data [5,6,7,8,9]. The user embedding model receives input in the form of a sequence or bag of interactions on items, along with context and user data [9]. On the other hand, the item embedding model utilizes various item metadata types including item IDs [7,5,10] or output embeddings from pre-trained models [11,5,6].\n\nHowever, despite its widespread use, the user encoding model in this framework has two significant drawbacks: the single vector representation bottleneck and the high infrastructure and maintenance costs.\n\n## 1.2.1. Single vector representation bottleneck\n\nUsing a single vector to represent users introduces challenges due to the diversity and complexity of their interests, compromising both the capacity to accurately represent users and the interpretability of the representation by obscuring which interests are represented and which are not. While attempts to use multiple embeddings have been made to overcome these limitations, the exact number of vectors needed and the method for obtaining them remain topics of research [12,6].\n\n## 1.2.2. High infrastructure and maintenance costs\n\nGenerating and maintaining up-to-date user embeddings requires substantial investment in terms of infrastructure and maintenance (see, for example, the SOAP platform from Meta [13]). Each new user action necessitates executing the user encoder to generate fresh embeddings and recommendations. Furthermore, the user encoder must be large in order to effectively model a sequence of interactions, leading to expensive training and inference requirements.\n\nOur approach overcomes these drawbacks by modelling item-to-item relationships, as illustrated in figure 2. Here, the first item represents the query context (an item that has been bought or viewed), while the second item is the target (the item that is subsequently bought). We utilize dual encoders to effectively capture relationships between viewed and bought items, as well as between items bought together. Specifically, our contributions include:\n\n- (1) We demonstrate how a transformer-based two-tower architecture, also known as dual encoders, can be utilized to generate multiple embeddings per item in one model run. Generating multiple embeddings is effective for capturing the various roles of items, and generating them with one model run provides inference efficiency.\n\n- (2) We show how we represent customers with multiple queries, where each query corresponds to a product that the customer has interacted with, either through a view or a buy. This approach of representing customers by a set of queries allows us to precompute query embeddings and their respective similarities, facilitating the generation of personalized feeds in near real-time (updates occurring every 2 minutes). This approach offers the benefits of efficiency, as queries are shared, and interpretability, as each recommendation is associated with a specific query.\n\n- (3) We showcase real-world applications of our approach in deployed systems at Bol, namely, Top deals for you, Top picks for you, and New for you. By indexing products that are on sale, new or popular and matching them with selected customer query representations, we generate the Top deals for you, New for you, and Top picks for you recommendations.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib4",
+      "text": "Cheng et al . (2016) Heng-Tze Cheng, Levent Koc, Jeremiah Harmsen, Tal Shaked, Tushar Chandra, Hrishi Aradhye, Glen Anderson, Greg Corrado, Wei Chai, Mustafa Ispir, Rohan Anil, Zakaria Haque, Lichan Hong, Vihan Jain, Xiaobing Liu, and Hemal Shah. 2016. Wide & Deep Learning for Recommender Systems. In Proceedings of the 1st Workshop on Deep Learning for Recommender Systems (Boston, MA, USA) (DLRS 2016) . Association for Computing Machinery, New York, NY, USA, 7–10. https://doi.org/10.1145/2988450.2988454"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib33",
+      "text": "Zhou et al . (2018) Guorui Zhou, Xiaoqiang Zhu, Chenru Song, Ying Fan, Han Zhu, Xiao Ma, Yanghui Yan, Junqi Jin, Han Li, and Kun Gai. 2018. Deep Interest Network for Click-Through Rate Prediction. In Proceedings of the 24th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining (London, United Kingdom) (KDD ’18) . Association for Computing Machinery, New York, NY, USA, 1059–1068. https://doi.org/10.1145/3219819.3219823"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib7",
+      "text": "Guo et al . (2017) Huifeng Guo, Ruiming Tang, Yunming Ye, Zhenguo Li, and Xiuqiang He. 2017. DeepFM: A Factorization-Machine Based Neural Network for CTR Prediction. In Proceedings of the 26th International Joint Conference on Artificial Intelligence (Melbourne, Australia) (IJCAI’17) . AAAI Press, 1725–1731."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib24",
+      "text": "Wang et al . (2021b) Ruoxi Wang, Rakesh Shivanna, Derek Cheng, Sagar Jain, Dong Lin, Lichan Hong, and Ed Chi. 2021b. DCN V2: Improved Deep & Cross Network and Practical Lessons for Web-Scale Learning to Rank Systems. In Proceedings of the Web Conference 2021 (Ljubljana, Slovenia) (WWW ’21) . Association for Computing Machinery, New York, NY, USA, 1785–1797. https://doi.org/10.1145/3442381.3450078"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib20",
+      "text": "Pancha et al . (2022) Nikil Pancha, Andrew Zhai, Jure Leskovec, and Charles Rosenberg. 2022. PinnerFormer: Sequence Modeling for User Representation at Pinterest. In Proceedings of the 28th ACM SIGKDD Conference on Knowledge Discovery and Data Mining (Washington DC, USA) (KDD ’22) . Association for Computing Machinery, New York, NY, USA, 3702–3712. https://doi.org/10.1145/3534678.3539156"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib19",
+      "text": "Pal et al . (2020) Aditya Pal, Chantat Eksombatchai, Yitong Zhou, Bo Zhao, Charles Rosenberg, and Jure Leskovec. 2020. PinnerSage: Multi-Modal User Embedding Framework for Recommendations at Pinterest. In Proceedings of the 26th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining (Virtual Event, CA, USA) (KDD ’20) . Association for Computing Machinery, New York, NY, USA, 2311–2320. https://doi.org/10.1145/3394486.3403280"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib5",
+      "text": "Covington et al . (2016) Paul Covington, Jay Adams, and Emre Sargin. 2016. Deep neural networks for youtube recommendations. In Proceedings of the 10th ACM conference on recommender systems . 191–198."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib28",
+      "text": "Yi et al . (2019) Xinyang Yi, Ji Yang, Lichan Hong, Derek Zhiyuan Cheng, Lukasz Heldt, Aditee Kumthekar, Zhe Zhao, Li Wei, and Ed Chi. 2019. Sampling-Bias-Corrected Neural Modeling for Large Corpus Item Recommendations (RecSys ’19) . Association for Computing Machinery, New York, NY, USA, 269–277. https://doi.org/10.1145/3298689.3346996"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib25",
+      "text": "Wang et al . (2021a) Tian Wang, Yuri M Brovman, and Sriganesh Madhvanath. 2021a. Personalized embedding-based e-commerce recommendations at ebay. arXiv preprint arXiv:2102.06156 (2021)."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib3",
+      "text": "Cen et al . (2020) Yukuo Cen, Jianwei Zhang, Xu Zou, Chang Zhou, Hongxia Yang, and Jie Tang. 2020. Controllable Multi-Interest Framework for Recommendation. In Proceedings of the 26th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining (Virtual Event, CA, USA) (KDD ’20) . Association for Computing Machinery, New York, NY, USA, 2942–2951. https://doi.org/10.1145/3394486.3403344"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib29",
+      "text": "Ying et al . (2018) Rex Ying, Ruining He, Kaifeng Chen, Pong Eksombatchai, William L. Hamilton, and Jure Leskovec. 2018. Graph Convolutional Neural Networks for Web-Scale Recommender Systems. In Proceedings of the 24th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining (London, United Kingdom) (KDD ’18) . Association for Computing Machinery, New York, NY, USA, 974–983. https://doi.org/10.1145/3219819.3219890"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib17",
+      "text": "Li et al . (2019) Chao Li, Zhiyuan Liu, Mengmeng Wu, Yuchi Xu, Huan Zhao, Pipei Huang, Guoliang Kang, Qiwei Chen, Wei Li, and Dik Lun Lee. 2019. Multi-Interest Network with Dynamic Routing for Recommendation at Tmall. In Proceedings of the 28th ACM International Conference on Information and Knowledge Management (Beijing, China) (CIKM ’19) . Association for Computing Machinery, New York, NY, USA, 2615–2623. https://doi.org/10.1145/3357384.3357814"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib32",
+      "text": "Zhang et al . (2023) Wei Zhang, Dai Li, Chen Liang, Fang Zhou, Zhongke Zhang, Xuewei Wang, Ru Li, Yi Zhou, Yaning Huang, Dong Liang, et al . 2023. Scaling User Modeling: Large-scale Online User Representations for Ads Personalization in Meta. arXiv preprint arXiv:2311.09544 (2023)."
+    }
+  ]
+}

@@ -1,0 +1,115 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.02665",
+  "title": "DGAP: Efficient Dynamic Graph Analysis on Persistent Memory",
+  "authors": "Abdullah Al Raqibul Islam, Dong Dai",
+  "year": "2024",
+  "categories": [
+    "cs.DS",
+    "cs.DC",
+    "cs.PF"
+  ],
+  "url": "https://arxiv.org/abs/2403.02665",
+  "html_url": "https://arxiv.org/html/2403.02665",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 830,
+  "text": "The ability to ingest new graph data continuously and analyze the latest graphs efficiently is crucial for many real-world applications today. For instance, cellular network operators need to address traffic hotspots in their networks as they are generated and identified [1]. A dynamic graph framework that can both persistently store new graph updates and perform complex graph analysis on the latest graph is essential for supporting such applications. However, constructing such a framework is fundamentally challenging. Existing storage devices like SSDs, hard disks, or DRAM either lack persistence (as in volatile DRAM) or offer low performance on graph analysis (as in SSDs or hard disks). To handle both operations, graph frameworks must manage various storage devices, design unique data structures for each, and find a balance between them, leading to intricate systems. For example, GraphOne persists the graphs updates on SSD in Edge List (EL), conducts graph analysis on DRAM using Adjacency List (AL), and continuously synchronizes data between the two [2].\n\nRecently, a new set of non-volatile or persistent memory devices (PMs) have emerged, such as Intel Optane DC Persistent Memory [3]. These devices can be accessed in bytes via the memory bus with data persistence guarantees. Compared to DRAM, PMs offer data persistence and greater density (e.g., Optane’s 512GB/dimm vs. DRAM’s 64GB/dimm). Compared to block-based devices, PMs allow byte-level access using load and store instructions with significantly lower latency (e.g., \\sim 300 ns vs. \\sim 100 ms) and higher IOPS (e.g., \\sim 10M vs. \\sim 500K for random writes) [4,5,6,7]. These characteristics suggest a promising alternative for building dynamic graph frameworks: employ PMs to serve both graph updates and graph analysis for persistence, speed, and capacity. This approach further avoids the cost of data movements and reduces the complexity of coordinating multiple data structures on different storage devices. Although Intel has discontinued Optane PMs due to business reasons, millions of these devices remain available, and various new non-volatile memory solutions continue to emerge. We contend that designing high-performance storage systems on persistent memory devices remains both economically practical and beneficial, as evidenced by recent studies [8,9].\n\nHowever, directly porting existing graph frameworks to PMs can be sub-optimal. Existing dynamic graph frameworks, such as LLAMA [10] or GraphOne [2], utilize block I/O interfaces, whose software overheads are not acceptable for byte-addressable PMs [11]. The data structures are not tailored for PMs either, leading to potential performance issues [12,13]. Moreover, although PMs are persistent devices, writing data persistently is complicated due to the existence of volatile CPU caches. Extra flushing and fencing operations, though necessary, become costly without the right optimizations [12,13]. Unexpected crashes further necessitates expensive transactions to avoid partial writes, significantly impacting the performance [14,15].\n\nOn the other hand, existing PM-specific dynamic graph frameworks, such as NVGRAPH [16] and, more recently, XPGraph [8], continue to follow the traditional approach of coordinating separate persistence-friendly and analysis-friendly data structures (i.e., edge list or adjacency list) on DRAM or PMs. This approach still leads to overly complicated data synchronization between data structures and creates unnecessary conversions or movements.\n\nIn this study, we introduce a novel approach to design a unified graph data structure, serving both graph persistence and analysis directly from persistent memory. To this end, we propose DGAP, a D ynamic G raph A nalysis framework specifically designed for P ersistent memory. DGAP is built upon a recently proposed mutable Compressed Sparse Row (CSR) graph structure [17,18], which leverages Packed Memory Array (PMA) [19] for efficient graph updates and analysis. Instead of naively porting mutable CSR to PMs, DGAP introduces a series of new designs to enhance its performance on PMs. Firstly, DGAP introduces a new per-section edge log data structure to mitigate the write amplification issues associated with mutable CSR. Secondly, DGAP integrates new per-thread undo logs to support high-performance crash-consistent rebalancing operations, which are frequent and costly operations in mutable CSR. Thirdly, DGAP strategically caches various mutable CSR components in DRAM according to the workloads. Through these designs, DGAP is able to deliver exceptional performance on both graph updates and graph analysis by maximally utilizing PMs.\n\nWe implemented DGAP in around 2,000 lines of C++ code and compared its performance to that of state-of-the-art graph frameworks on PMs, using multiple graph analysis algorithms on different real-world graphs. Our results show that DGAP achieves up to 3.2\\times improved graph update performance and 3.77\\times enhanced graph analysis performance compared to leading graph frameworks, such as XPGraph, LLAMA, and GraphOne.\n\nThe remainder of this paper is organized as follows: In § 2 we discuss the background and motivation of this study. We introduce persistent memory device, existing graph storage formats including PMA-based mutable CSR, and most importantly, why directly porting PMA-based mutable CSR to PMs does not work. In § 3, we present the key components of DGAP and its operations in details. We present the extensive experimental results in § 4. We compare with related work in § 5, conclude this paper and discuss the future work in § 6.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib28",
+      "text": "Iyer et al . (2015) Anand Iyer, Li Erran Li, and Ion Stoica. 2015. CellIQ : Real-Time Cellular Network Analytics at Scale. In 12th USENIX Symposium on Networked Systems Design and Implementation (NSDI’15) ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib34",
+      "text": "Kumar and Huang (2019) Pradeep Kumar and H Howie Huang. 2019. Graphone: A data store for real-time analytics on evolving graphs. In 17th USENIX Conference on File and Storage Technologies (FAST’19) ."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib47",
+      "text": "Optane (2019) Optane. 2019. Intel Optane Persistent Memory. https://www.intel.com/content/www/us/en/products/docs/memory-storage/optane-persistent-memory/optane-dc-persistent-memory-brief.html."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib62",
+      "text": "Suzuki and Swanson (2015) Kosuke Suzuki and Steven Swanson. 2015. A survey of trends in non-volatile memory technologies: 2000-2014. In Proceedings of the IEEE International Memory Workshop (IMW’15) ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib52",
+      "text": "Qureshi et al . (2009a) Moinuddin K Qureshi, John Karidis, Michele Franceschini, Vijayalakshmi Srinivasan, Luis Lastras, and Bulent Abali. 2009a. Enhancing lifetime and security of PCM-based main memory with start-gap wear leveling. In Proceedings of the 42nd Annual IEEE/ACM International Symposium on Microarchitecture (MICRO’09) ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib74",
+      "text": "Yang et al . (2013) J Joshua Yang, Dmitri B Strukov, and Duncan R Stewart. 2013. Memristive devices for computing. Nature nanotechnology 8, 1 (2013), 13."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib53",
+      "text": "Qureshi et al . (2009b) Moinuddin K Qureshi, Vijayalakshmi Srinivasan, and Jude A Rivers. 2009b. Scalable high performance main memory system using phase-change memory technology. In Proceedings of the 36th annual international symposium on Computer architecture (ISCA’09) ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib66",
+      "text": "Wang et al . (2022) Rui Wang, Shuibing He, Weixu Zong, Yongkun Li, and Yinlong Xu. 2022. XPGraph: XPline-Friendly Persistent Memory Graph Stores for Large-Scale Evolving Graphs. In Proceedings of the 55th IEEE/ACM International Symposium on Microarchitecture (MICRO’22) ."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib61",
+      "text": "Song et al . (2023) Yongju Song, Wook-Hee Kim, Sumit Kumar Monga, Changwoo Min, and Young Ik Eom. 2023. Prism: Optimizing Key-Value Store for Modern Heterogeneous Storage Devices. In Proceedings of the 28th ACM International Conference on Architectural Support for Programming Languages and Operating Systems, Volume 2 (ASPLOS’23) ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib43",
+      "text": "Macko et al . (2015) Peter Macko, Virendra J Marathe, Daniel W Margo, and Margo I Seltzer. 2015. Llama: Efficient graph analytics using large multiversioned arrays. In IEEE 31st International Conference on Data Engineering (ICDE’15) ."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib70",
+      "text": "Wu et al . (2020) Yinjun Wu, Kwanghyun Park, Rathijit Sen, Brian Kroth, and Jaeyoung Do. 2020. Lessons Learned from the Early Performance Evaluation of Intel Optane DC Persistent Memory in DBMS. In Proceedings of the 16th International Workshop on Data Management on New Hardware (DaMoN’20) ."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib26",
+      "text": "Islam et al . (2020) Abdullah Al Raqibul Islam, Dong Dai, Anirudh Narayanan, and Christopher York. 2020. A Performance Study of Optane Persistent Memory: From Indexing Data Structures’ Perspective. In 36th International Conference on Massive Storage Systems and Technology (MSST’20) ."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib27",
+      "text": "Islam et al . (2022b) Abdullah Al Raqibul Islam, Christopher York, and Dong Dai. 2022b. A performance study of optane persistent memory: from storage data structures’ perspective. CCF Transactions on High Performance Computing (24 Sep 2022)."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib22",
+      "text": "Haria et al . (2020) Swapnil Haria, Mark D Hill, and Michael M Swift. 2020. MOD: Minimally ordered durable datastructures for persistent memory. In Proceedings of the Twenty-Fifth International Conference on Architectural Support for Programming Languages and Operating Systems (ASPLOS’20) ."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib69",
+      "text": "Wu et al . (2021) Kai Wu, Jie Ren, Ivy Peng, and Dong Li. 2021. ArchTM: Architecture-Aware, High Performance Transaction for Persistent Memory. In 19th USENIX Conference on File and Storage Technologies (USENIX FAST’21) ."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib41",
+      "text": "Lim et al . (2019) Soklong Lim, Zaixin Lu, Bin Ren, and Xuechen Zhang. 2019. Enforcing crash consistency of evolving network analytics in non-volatile main memory systems. In 2019 28th International Conference on Parallel Architectures and Compilation Techniques (PACT’19) ."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib68",
+      "text": "Wheatman and Xu (2021) Brian Wheatman and Helen Xu. 2021. A Parallel Packed Memory Array to Store Dynamic Graphs. In Proceedings of the Symposium on Algorithm Engineering and Experiments (ALENEX’21) ."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib25",
+      "text": "Islam et al . (2022a) Abdullah Al Raqibul Islam, Dong Dai, and Dazhao Cheng. 2022a. VCSR: Mutable CSR Graph Format Using Vertex-Centric Packed Memory Array. In 2022 22nd IEEE International Symposium on Cluster, Cloud and Internet Computing (CCGrid’22) ."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib6",
+      "text": "Bender and Hu (2007) Michael A Bender and Haodong Hu. 2007. An adaptive packed-memory array. ACM Transactions on Database Systems (TODS’07) 32 (2007)."
+    }
+  ]
+}

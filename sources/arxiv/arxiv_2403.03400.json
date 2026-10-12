@@ -1,0 +1,168 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.03400",
+  "title": "Contrastive Learning of Person-independent Representations for Facial Action Unit Detection",
+  "authors": "Yong Li, Shiguang Shan",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2403.03400",
+  "html_url": "https://arxiv.org/html/2403.03400",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1034,
+  "text": "Facial Action Coding System (FACS) [1] is a systematic approach to describe what a face looks like when facial muscle movements have occurred. It describes the presence and intensity of various facial movements. In FACS, each facial action unit (AU) is hypothesized to correspond to the contraction of a distinct facial muscle or a distinct grouping of muscles that are visible as a specific facial movement [2]. For example, the raising of the inner corners of the eyebrows corresponds to AU1. Lowering the inner corners of the brows means the activation of AU4. With FACS, each facial expression can be expressed via a combination of multiple AUs. Therefore, a reliable AU detection system is of great importance for the analysis of facial expressions. Furthermore, AU detection technology also holds promise to an abundance of practical applications, such as affect analysis [3], automatic pain estimation [4], and human-computer interaction [5].\n\nIn recent years, the development of AU detection has gained considerable improvements based on the progress in deep learning techniques [6,7,8,9,10,11,12]. To learn the AU-specific representation and improve the AU detection performance, many of the prior works typically adopt the facial landmarks to localize or crop the AU-related facial regions. Despite the improvements, people have realized that such deep learning-based supervised methods are data starved. In fact, existing AU datasets like BP4D [13] and DISFA [14] only comprise limited subjects as well as the facial images. As a consequence, the AU detection models trained on these datasets usually overfit on person-specific features and can be poorly generalized [15,16]. However, the acquisition of AU annotations is intellectually expensive, error-prone, and cumbersome [16]. Human coders need to be trained for many weeks to reliably identify if a specific AU is activated or not. It has been verified that an AU expert needs to take almost half an hour to manually annotate one AU for a one-minute video [16,17].\n\nTo alleviate the demand for a large amount and accurate AU annotations, a number of literatures propose to exploit the semi-/weakly-supervised methods to learn more generalizable AU representations. Among them, the former [16] incorporates both the labelled and unlabelled AU data by assuming the faces to be clustered by AUs. The latter seeks to leverage the facial images with incomplete or noisy AU annotations [18,19]. Different with them, we challenge the AU data scarcity issue via learning the discriminative AU representations from the practically infinite amount of unlabelled facial videos in a self-supervised contrastive learning paradigm. Intuitively, the frame sequences within a video naturally offer the temporal evolution and consistency characteristics for the video objects, which have been extensively utilized as self-supervisory signals [20,21,22,23,24]. However, the recent pervasive video-based contrastive learning methods usually learn video-level representation [20,22,21] or frame correspondence [25,23], while AU representation should be frame-wisely discriminative within a video clip [26,27] and consistent across identities that show analogous AUs [28,29].\n\nTo effectively learn the discriminative AU representations, we propose to C ontrastively L earn the P erson-independent (CLP) representations for facial AU detection. Fig. 1 illustrates the main idea of the proposed CLP. We sample a consecutive frame sequence from a video clip where the AUs show temporally coherence and evolution naturally. To perceive the frame-wisely distinctiveness of the consecutive faces, CLP is tasked to learn their feature similarity and distinctiveness via temporally contrastive learning. As shown in the first frame sequence in Fig. 1, given an anchor frame in a video sequence, the subsequent frames naturally contain abundant positive and negative samples that can be used to construct triplets according to their temporal distance to the anchor frame. To make use of this nature, we introduce a temporally contrastive learning method that carefully takes the temporal coherence and evolution dynamics into consideration, which will be carefully described in Sec. III-A.\n\nIn order to facilitate learning consistent AU representations across identities that illustrate analogous AUs, we generalize the contrastive learning with positive image pairs across different facial videos. For an arbitrary facial frame sampled from a subject, CLP reconstructs its AU representation via re-weighing the representations of the training samples from other identities. We hypothesize this inter-subject invariance learning paradigm can potentially perceive the high-level AU semantics beyond the undesired subject-dependent nuisances. As shown in Fig. 1, the cross-identity facial frames with consistent AUs will be pulled close in the latent embedding space. Concretely, given a facial frame q randomly sampled from a video, we firstly generate a copy of q as k via artificial pixel-level augmentation, then approximate q by composing frames sampled from other identities that illustrate similar AUs with q. Finally, we compare the composed frame \\hat{q} with k for cross-identity reconstruction (CIR). However, CIR may not be achievable due to limited video sequences within a training batch. To obtain a dictionary that consists of a large amount of AU representations from different identities, we build a large and consistent dictionary as a queue, with the sequences in the current mini-batch enqueued and the oldest mini-batch dequeued, decoupling it from the mini-batch size [30]. We present the details of how we learn person-independent facial AU representations in Sec. III-B. Compared with the vanilla weakly-/semi-supervised methods, the proposed CLP can learn discriminative AU features without AU labels and is regardless of the assumptions on label distribution.\n\nIn summary, the contributions of this paper can be concluded as follows:\n\n- • We formulate a contrastive self-supervised learning method for encoding the discriminative AU representations from the practically infinite amount of unlabelled facial videos. Given a common observation that a facial video usually comes from only a single subject, the desired AU representations should be discriminative within a video clip and consistent across different identities that show analogous facial AUs.\n\n- • We propose to contrastively encode the intra-video distinctiveness of the AU representations via deriving the self-supervised pseudo signals from the temporal characteristics within a short video clip. Furthermore, the representations are optimized to be person-independent with CIR. To the best of our knowledge, our proposed CLP is the first work that uses the self-supervised CIR for AU representation learning.\n\n- • Experimental results show CLP outperforms other self-supervised contrastive learning methods and significantly closes the performance gap between the self-supervised and supervised AU detection approaches.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "P. Ekman and W. V. Friesen, Manual for the facial action coding system . Consulting Psychologists Press, 1978."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "B. Martinez, M. F. Valstar, B. Jiang, and M. Pantic, “Automatic analysis of facial actions: A survey,” IEEE transactions on affective computing , vol. 10, no. 3, pp. 325–347, 2017."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "I. Kotsia, S. Zafeiriou, and I. Pitas, “Texture and shape information fusion for facial expression and facial action unit recognition,” Pattern Recognition , vol. 41, no. 3, pp. 833–851, 2008."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "Z. Zafar and N. A. Khan, “Pain intensity evaluation through facial action units,” in 2014 22nd International Conference on Pattern Recognition . IEEE, 2014, pp. 4696–4701."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "M. S. Bartlett, G. Littlewort, I. Fasel, and J. R. Movellan, “Real time face detection and facial expression recognition: development and applications to human computer interaction.” in 2003 Conference on computer vision and pattern recognition workshop , vol. 5. IEEE, 2003, pp. 53–53."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "K. Zhao, W.-S. Chu, and H. Zhang, “Deep region and multi-label learning for facial action unit detection,” in CVPR , 2016, pp. 3391–3399."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "W. Li, F. Abtahi, Z. Zhu, and L. Yin, “Eac-net: A region-based deep enhancing and cropping approach for facial action unit detection,” in 2017 12th IEEE International Conference on Automatic Face & Gesture Recognition (FG 2017) . IEEE, 2017, pp. 103–110."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "C. Corneanu, M. Madadi, and S. Escalera, “Deep structure inference network for facial action unit recognition,” in Proceedings of the European Conference on Computer Vision (ECCV) , 2018, pp. 298–313."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "Z. Shao, Z. Liu, J. Cai, and L. Ma, “Deep adaptive attention for joint facial action unit detection and face alignment,” in Proceedings of the European conference on computer vision (ECCV) , 2018, pp. 705–720."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "G. Li, X. Zhu, Y. Zeng, Q. Wang, and L. Lin, “Semantic relationships guided representation learning for facial action unit recognition,” in Proceedings of the AAAI Conference on Artificial Intelligence , vol. 33, no. 01, 2019, pp. 8594–8601."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "H. Yang, L. Yin, Y. Zhou, and J. Gu, “Exploiting semantic embedding and visual feature for facial action unit detection,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2021, pp. 10 482–10 491."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "T. Song, Z. Cui, W. Zheng, and Q. Ji, “Hybrid message passing with performance-driven structures for facial action unit detection,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2021, pp. 6267–6276."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "X. Zhang, L. Yin, J. F. Cohn, S. Canavan, M. Reale, A. Horowitz, and P. Liu, “A high-resolution spontaneous 3d dynamic facial expression database,” in FG . IEEE, 2013."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "S. M. Mavadati, M. H. Mahoor, K. Bartlett, P. Trinh, and J. F. Cohn, “Disfa: A spontaneous facial action intensity database,” IEEE Transactions on Affective Computing , vol. 4, no. 2, pp. 151–160, 2013."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "J. M. Girard, J. F. Cohn, L. A. Jeni, S. Lucey, and F. De la Torre, “How much training data for facial action unit detection?” in 2015 11th IEEE International Conference and Workshops on Automatic Face and Gesture Recognition (FG) , vol. 1. IEEE, 2015, pp. 1–8."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "K. Zhao, W.-S. Chu, and A. M. Martinez, “Learning facial action units from web images with scalable weakly supervised clustering,” in CVPR , 2018, pp. 2090–2099."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "X. Sun, J. Zeng, and S. Shan, “Emotion-aware contrastive learning for facial action unit detection,” in 2021 16th IEEE International Conference on Automatic Face and Gesture Recognition (FG 2021) . IEEE, 2021, pp. 01–08."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "Y. Zhang, W. Dong, B.-G. Hu, and Q. Ji, “Weakly-supervised deep convolutional neural network learning for facial action unit intensity estimation,” in Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition , 2018, pp. 2314–2323."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "G. Peng and S. Wang, “Weakly supervised facial action unit recognition through adversarial training,” in CVPR , 2018, pp. 2188–2196."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "Q. Kong, W. Wei, Z. Deng, T. Yoshinaga, and T. Murakami, “Cycle-contrast for self-supervised video representation learning,” Advances in Neural Information Processing Systems , vol. 33, pp. 8089–8100, 2020."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "A. Miech, J.-B. Alayrac, L. Smaira, I. Laptev, J. Sivic, and A. Zisserman, “End-to-end learning of visual representations from uncurated instructional videos,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , June 2020."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib22",
+      "text": "Y. Li and G. Zhao, “Intra-and inter-contrastive learning for micro-expression action unit detection,” in Proceedings of the 2021 International Conference on Multimodal Interaction , 2021, pp. 702–706."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib23",
+      "text": "H. Wu and X. Wang, “Contrastive learning of image representations with cross-video cycle-consistency,” in Proceedings of the IEEE/CVF International Conference on Computer Vision , 2021, pp. 10 149–10 159."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib24",
+      "text": "R. Qian, T. Meng, B. Gong, M.-H. Yang, H. Wang, S. Belongie, and Y. Cui, “Spatiotemporal contrastive video representation learning,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , June 2021, pp. 6964–6974."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib25",
+      "text": "X. Wang, A. Jabri, and A. A. Efros, “Learning correspondence from the cycle-consistency of time,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2019, pp. 2566–2576."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib26",
+      "text": "L. Yang, I. O. Ertugrul, J. F. Cohn, Z. Hammal, D. Jiang, and H. Sahli, “Facs3d-net: 3d convolution based spatiotemporal representation for action unit detection,” in 2019 8th International Conference on Affective Computing and Intelligent Interaction (ACII) . IEEE, 2019, pp. 538–544."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib27",
+      "text": "M. K. Tellamekala and M. Valstar, “Temporally coherent visual representations for dimensional affect recognition,” in 2019 8th International Conference on Affective Computing and Intelligent Interaction (ACII) . IEEE, 2019, pp. 1–7."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib28",
+      "text": "T. Almaev, B. Martinez, and M. Valstar, “Learning to transfer: transferring latent task structures and its application to person-specific facial action unit detection,” in Proceedings of the IEEE International Conference on Computer Vision , 2015, pp. 3774–3782."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib29",
+      "text": "S. Song, S. Jaiswal, E. Sanchez, G. Tzimiropoulos, L. Shen, and M. Valstar, “Self-supervised learning of person-specific facial dynamics for automatic personality recognition,” IEEE Transactions on Affective Computing , 2021."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib30",
+      "text": "K. He, H. Fan, Y. Wu, S. Xie, and R. Girshick, “Momentum contrast for unsupervised visual representation learning,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2020, pp. 9729–9738."
+    }
+  ]
+}

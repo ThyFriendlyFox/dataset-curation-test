@@ -1,0 +1,172 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.03552",
+  "title": "Population-aware Online Mirror Descent for Mean-Field Games by Deep Reinforcement Learning",
+  "authors": "Zida Wu, Mathieu Lauriere, Samuel Jia Cong Chua, Matthieu Geist, Olivier Pietquin, Ankur Mehta",
+  "year": "2024",
+  "categories": [
+    "cs.GT",
+    "cs.LG",
+    "cs.MA",
+    "cs.SY",
+    "eess.SY"
+  ],
+  "url": "https://arxiv.org/abs/2403.03552",
+  "html_url": "https://arxiv.org/html/2403.03552",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 897,
+  "text": "Multi-agent systems (MAS) [1] are prevalent in real-life scenarios involving a large number of players, such as flocking [2,3], traffic flow [4], and swarm robotics [5], among others. The study of MAS has garnered significant attention throughout history. Although many models are pure dynamical systems, some try to incorporate elements of rationality using the framework of game theory. As the number of players increases in these multi-agent systems, scalability becomes a challenge [6,7]. However, under symmetry and homogeneity assumptions, mean field approximations offer an effective approach for modeling population behaviors and learning decentralized policies which do not suffer from issues of the curse of dimensionality and non-stationarity.\n\nMean field games (MFGs) [8,9,10,11] provide a framework for large-population games where agents are identical in their behaviors (policy) and only interact through the distribution of all agents. This implies that, as the number of agents grows, the influence of an individual agent becomes negligible, reducing the interactions among agents to that between a representative individual and the population distribution. The main solution concept in MFGs corresponds to a Nash equilibrium, which represents the situation where no player has an incentive to unilaterally deviate from its current policy. Recently, several learning methods have been proposed to solve MFGs; see e.g. [12] for a survey. The most basic one relies on fixed point iterations, which amounts to iteratively updating the policy of a player and the mean field. However, convergence of Banach-Picard fixed point iterations relies on a strict contraction condition [13,14]. This condition necessitates Lipschitz continuity with sufficiently small Lipschitz constants, which often fails to hold [15,16].\n\nTo address this limitation, several approaches have been proposed, usually based on some form of smoothing. A popular method is Fictitious Play (FP). FP was originally introduced for finite player games [17,18,19] and has been extended to the MFG setting [20,21,22] (see Algo. 2 in Appendix). In essence, FP smoothens the mean field updates by averaging historical distributions from past iterations. Notably, convergence of FP can be proved without relying on strict contraction properties, using instead a structural assumption called Lasry-Lions monotonicity. However, FP faces some computational challenges. In particular, it requires averaging policies, which is not a trivial task when these are represented by non-linear approximators such as deep neural networks. Although this difficulty has been successfully tackled in [23] by introducing a variant of FP, fundamental issues remain for FP-based algorithms. First, these algorithms require computing at each iteration the best response against the distribution of the remaining population, which is costly for complex problems. Second, the mean field is updated by averaging uniformly over all past mean fields, which means that the update rate decays with the iteration number and hence progress is very slow after even a moderately large number of iterations.\n\nThese two issues are avoided by the Online Mirror Descent (OMD) method, which was designed for optimization problems, see e.g. [24], and has been extended to the MFG framework in [25,26,27] (see Algo. 3 in Appendix). Compared with fixed-point based algorithms, OMD aims to stabilize the learning process by using past iterations. But in contrast with FP, it aggregates past Q-functions instead of past policies. Here again, convergence can be proved under monotonicity assumption without using a strict contraction. The two major differences with FP-based methods are that: (1) at each iteration, OMD simply requires evaluating a policy (instead of computing an optimal one) and (2) the update rate remains constant. Summing Q-functions is not easy when these are approximated using deep networks, but [23] proposed an adaptation to a deep RL setting by implicitly learning the sum of Q-functions with the so-called Munchausen trick [28].\n\nThe aforementioned works – and, in fact, most of the MFG literature – compute the Nash equilibrium for a single population distribution (or distribution sequence for time-dependent problems). In such cases, it is sufficient to consider policies that are myopic to the population distribution and depend only on the individual state. While this is fine in specific scenarios, this assumption restricts the applicability of the MFG theory. Indeed, in general, one would like to know the value function and the equilibrium policy of the players for any mean field, i.e., as functions of the population distribution. The Master equation has been introduced by Lions to characterize the mean-field dependent value function, see [29]. The closely related notion of master policy, which is a population-dependent policy, has been introduced in [30] to enable the attainment of Nash equilibrium from any initial distribution. The authors have proposed a method for learning this policy using a deep RL extension of FP for population-dependent policies. While efficient in small scale problems, this method suffers from the aforementioned intrinsic limitations of FP-type algorithms: necessity to compute a best response at every iteration and decaying learning rate.\n\nIn this paper, we propose an algorithm to tackle both aspects: it is designed to learn master policies, and it is more efficient than FP. The algorithm is a deep RL extension of OMD to MFG with population-dependent policies. In Section 2 we introduce the main elements of background. In Section 3, we present the algorithm and explain how we overcome the main technical challenges. In Section 4, we present numerical experiments on popular examples from the MFG literature, including comparisons of our method with four baselines. Last, we discuss our findings in Section 5 and conclude in Section 6.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib15",
+      "text": "A. Dorri, S. S. Kanhere, and R. Jurdak. Multi-agent systems: A survey. Ieee Access , 6:28573–28593, 2018."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib31",
+      "text": "R. Olfati-Saber. Flocking for multi-agent dynamic systems: Algorithms and theory. IEEE Transactions on automatic control , 51(3):401–420, 2006."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib13",
+      "text": "F. Cucker and S. Smale. Emergent behavior in flocks. IEEE Transactions on automatic control , 52(5):852–862, 2007."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib7",
+      "text": "B. Burmeister, A. Haddadi, and G. Matylis. Application of multi-agent systems in traffic and transportation. IEE Proceedings-Software , 144(1):51–60, 1997."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib12",
+      "text": "S.-J. Chung, A. A. Paranjape, P. Dames, S. Shen, and V. Kumar. A survey on aerial swarm robotics. IEEE Transactions on Robotics , 34(4):837–855, 2018."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib29",
+      "text": "R. Lowe, Y. I. Wu, A. Tamar, J. Harb, O. Pieter Abbeel, and I. Mordatch. Multi-agent actor-critic for mixed cooperative-competitive environments. Advances in neural information processing systems , 30, 2017."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib37",
+      "text": "T. Rashid, M. Samvelyan, C. S. De Witt, G. Farquhar, J. Foerster, and S. Whiteson. Monotonic value function factorisation for deep multi-agent reinforcement learning. The Journal of Machine Learning Research , 21(1):7234–7284, 2020."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib24",
+      "text": "J.-M. Lasry and P.-L. Lions. Mean field games. Japanese journal of mathematics , 2(1):229–260, 2007."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib22",
+      "text": "M. Huang, P. E. Caines, and R. P. Malhamé. Large-population cost-coupled lqg problems with nonuniform agents: individual-mass behavior and decentralized ε \\varepsilon -nash equilibria. IEEE transactions on automatic control , 52(9):1560–1571, 2007."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "R. Carmona and F. Delarue. Probabilistic theory of mean field games with applications I-II . Springer, 2018."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib3",
+      "text": "A. Bensoussan, J. Frehse, and P. Yam. Mean field games and mean field type control theory , volume 101. Springer, 2013."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib25",
+      "text": "M. Laurière, S. Perrin, M. Geist, and O. Pietquin. Learning mean field games: A survey. arXiv preprint arXiv:2205.12944 , 2022a."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib27",
+      "text": "M. Li, Z. Qin, Y. Jiao, Y. Yang, J. Wang, C. Wang, G. Wu, and J. Ye. Efficient ridesharing order dispatching with mean field multi-agent reinforcement learning. In The world wide web conference , pages 983–994, 2019."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib18",
+      "text": "X. Guo, A. Hu, R. Xu, and J. Zhang. Learning mean-field games. Advances in Neural Information Processing Systems , 32, 2019."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib14",
+      "text": "K. Cui and H. Koeppl. Approximately solving mean field games via entropy-regularized deep reinforcement learning. In International Conference on Artificial Intelligence and Statistics , pages 1909–1917. PMLR, 2021."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib2",
+      "text": "B. Anahtarci, C. D. Kariksiz, and N. Saldi. Q-learning in regularized mean-field games. Dynamic Games and Applications , 13(1):89–117, 2023."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib6",
+      "text": "G. W. Brown. Iterative solution of games by fictitious play. Act. Anal. Prod Allocation , 13(1):374, 1951."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib38",
+      "text": "J. Robinson. An iterative method of solving a game. Annals of mathematics , pages 296–301, 1951."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib5",
+      "text": "U. Berger. Brown’s original fictitious play. Journal of Economic Theory , 135(1):572–578, 2007."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib8",
+      "text": "P. Cardaliaguet and S. Hadikhanloo. Learning in mean field games: the fictitious play. ESAIM: Control, Optimisation and Calculus of Variations , 23(2):569–591, 2017."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "S. Hadikhanloo and F. J. Silva. Finite mean field games: fictitious play and convergence to a first order continuous mean field game. Journal de Mathématiques Pures et Appliquées , 132:369–397, 2019."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib35",
+      "text": "S. Perrin, J. Pérolat, M. Laurière, M. Geist, R. Elie, and O. Pietquin. Fictitious play for mean field games: Continuous time analysis and applications. Advances in Neural Information Processing Systems , 33:13199–13213, 2020."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib26",
+      "text": "M. Laurière, S. Perrin, S. Girgin, P. Muller, A. Jain, T. Cabannes, G. Piliouras, J. Pérolat, R. Élie, and O. Pietquin. Scalable deep reinforcement learning algorithms for mean field games. In International Conference on Machine Learning , pages 12078–12095. PMLR, 2022b."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib40",
+      "text": "S. Shalev-Shwartz. Online learning and online convex optimization. Foundations and Trends® in Machine Learning , 4(2):107–194, 2012."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib19",
+      "text": "S. Hadikhanloo. Learning in anonymous nonatomic games with applications to first-order mean field games. arXiv preprint arXiv:1704.00378 , 2017."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib20",
+      "text": "S. Hadikhanloo. Learning in mean field games . PhD thesis, Université Paris sciences et lettres, 2018."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib34",
+      "text": "J. Perolat, S. Perrin, R. Elie, M. Laurière, G. Piliouras, M. Geist, K. Tuyls, and O. Pietquin. Scaling mean field games by online mirror descent. Proceedings of the 21st International Conference on Autonomous Agents and Multiagent Systems , pages 1028–1037, 2022."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib43",
+      "text": "N. Vieillard, O. Pietquin, and M. Geist. Munchausen reinforcement learning. Advances in Neural Information Processing Systems , 33:4235–4246, 2020b."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib9",
+      "text": "P. Cardaliaguet, F. Delarue, J.-M. Lasry, and P.-L. Lions. The master equation and the convergence problem in mean field games:(ams-201) . Princeton University Press, 2019."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib36",
+      "text": "S. Perrin, M. Laurière, J. Pérolat, R. Élie, M. Geist, and O. Pietquin. Generalization in mean field games by learning master policies. In Proceedings of the AAAI Conference on Artificial Intelligence , volume 36, pages 9413–9421, 2022."
+    }
+  ]
+}

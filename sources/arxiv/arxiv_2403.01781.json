@@ -1,0 +1,174 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.01781",
+  "title": "Integrating Efficient Optimal Transport and Functional Maps For Unsupervised Shape Correspondence Learning",
+  "authors": "Tung Le, Khai Nguyen, Shanlin Sun, Nhat Ho, Xiaohui Xie",
+  "year": "2024",
+  "categories": [
+    "cs.CV",
+    "cs.AI"
+  ],
+  "url": "https://arxiv.org/abs/2403.01781",
+  "html_url": "https://arxiv.org/html/2403.01781",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 813,
+  "text": "Establishing precise correspondences between geometric 3D shapes is a core challenge in various domains of computer vision and graphics, including but not limited to, object tracking, registration, reconstruction, deformation, texture transfer, and statistical shape analysis [1,2,3,4,5,6]. To facilitate the mapping between non-rigid shapes, early approaches [7,8,9] concentrated on the development of hand-crafted features, leveraging geometric invariance as a key principle. In the latter approaches [10,11,12,13], there has been a shift towards the utilization of data-driven methods for feature learning, which has resulted in marked enhancements in terms of accuracy, efficiency, and robustness.\n\nRecently, an increasing body of work has exploited the use of spectral methods [14,15,16,17,18], especially the functional map (FM) representation [19]. Specifically, the FM methods succinctly encode correspondences through compact matrices, utilizing a truncated spectral basis. With recent developments in deep learning, deep FM (DFM) is quickly employed in numerous settings [20,13,21,22] by incorporating feature learning as geometric descriptors for FM frameworks. Most DFM works focus on learning features that optimize FM priors to express desirable map priors, e.g. area preservation, isometry, and bijectivity, which achieves remarkable results even without supervision [15,16,23,12,21]. On the other hand, less attention is paid to the problem of explicitly aligning features outputted from the feature extractor network, due to the lack of smoothness and consistency of linear assignment problems.\n\nIn this work, we focus on jointly learning features via the functional map, and explicit features, i.e. directly from the feature extractor to establish correct correspondence. Nonetheless, learning to map explicit features is not easy since the geometric objects might potentially undergo arbitrary deformations. Therefore, we propose to employ optimal transport (OT), which is a well-known approach for linear assignment problems, to cast the feature alignment from 3D shapes as a probability measures matching problem.\n\nThe Wasserstein distance [24,25] is widely acknowledged as an effective OT metric for comparing two probability measures, particularly when their supports are disjoint. However, it comes with the drawback of high computational complexity. Specifically, for discrete probability measures with at most m supports, the time and memory complexities are \\mathcal{O}(m^{3}\\log m) and \\mathcal{O}(m^{2}), respectively. This computational burden is exacerbated in 3D shape applications where each shape, represented as mesh, is treated as a distinct probability measure. To ameliorate the computational demands, entropic regularization coupled with the Sinkhorn algorithm [26] can yield an \\epsilon -approximation of the Wasserstein distance with a time complexity of \\mathcal{O}(m^{2}/\\epsilon^{2}) [27,28,29,30]. Nonetheless, this method does not alleviate the \\mathcal{O}(m^{2}) memory complexity due to the necessity of storing the cost matrix. Additionally, the entropic regularization fails to produce a valid metric between probability measures as it does not satisfy the triangle inequality. An alternative, more efficient method is the sliced Wasserstein distance (SWD) [31], which calculates the expectation of the Wasserstein distance between random one-dimensional push-forward measures derived from the original measures. SWD offers a time complexity of \\mathcal{O}(m\\log m) and a linear memory complexity of \\mathcal{O}(m).\n\nMotivated by the above discussion, we introduce a novel differentiable unsupervised OT-based loss derived from efficient sliced Wasserstein distance, which accounts for associating two extracted extrinsic features to align two meshes combined with functional map regularizers. Our proposed approach leverages a valid efficient OT metric to obtain highly discriminative local feature matching. Additionally, the integration of functional map regularizers promotes smoothness in the mapping process, allowing our method to achieve both precise and smooth correspondence.\n\nFurthermore, we introduce an adaptive refinement process tailored for each pair of shapes, utilizing entropy regularized OT to enhance matching performance. The differentiable nature of entropic regularization in OT enables our refinement strategy to leverage the Sinkhorn algorithm. This approach yields a soft point-wise map, which is instrumental in calculating FM regularizers. These regularizers are then used to iteratively update features, thereby facilitating the retrieval of precise point-to-point correspondences.\n\nFinally, we demonstrate our proposed approach on a diverse and extensive selection of datasets. Our contributions are as follows:\n\n- • We propose an unsupervised learning framework that employs efficient optimal transport to jointly learn with functional map in shape matching paradigm. Subsequently, we derive two novel unsupervised loss functions based on sliced Wasserstein distance, which is a valid fast optimal transport metric, to effectively align mesh features by interpreting them as probability measures, potentially offering a promising avenue for advancements in shape matching through efficient optimal transport.\n\n- • To enhance the quality of point mapping, we propose an adaptive refinement module that iteratively refines the optimal transport similarity matrix estimated via entropy regularization optimal transport.\n\n- • We outperform previous state-of-the-art works in various settings of non-rigid shape matching including near-isometric and non-isometric shape matching. Additionally, when applied to a downstream task such as segmentation transfer, our approach continues to outperform contemporary state-of-the-art methods in non-rigid shape matching. This success not only demonstrates the efficacy of our method in specific applications but also underlines its strong generalization capabilities across various use cases in shape matching.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib63",
+      "text": "Qian-Yi Zhou, Jaesik Park, and Vladlen Koltun. Fast global registration. In Computer Vision–ECCV 2016: 14th European Conference, Amsterdam, The Netherlands, October 11-14, 2016, Proceedings, Part II 14 , pages 766–782. Springer, 2016."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib14",
+      "text": "Huong Quynh Dinh, Anthony Yezzi, and Greg Turk. Texture transfer during shape transformation. ACM Transactions on Graphics (ToG) , 24(2):289–310, 2005."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib7",
+      "text": "Federica Bogo, Javier Romero, Matthew Loper, and Michael J Black. Faust: Dataset and evaluation for 3d mesh registration. In CVPR , 2014."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib53",
+      "text": "Robert W Sumner and Jovan Popović. Deformation transfer for triangle meshes. ACM Transactions on Graphics (ToG) , 23(3):399–405, 2004."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib56",
+      "text": "Shanlin Sun, Thanh-Tung Le, Chenyu You, Hao Tang, Kun Han, Haoyu Ma, Deying Kong, Xiangyi Yan, and Xiaohui Xie. Hybrid-csr: Coupling explicit and implicit shape representation for cortical surface reconstruction. arXiv preprint arXiv:2307.12299 , 2023b."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib22",
+      "text": "Kun Han, Shanlin Sun, Thanh-Tung Le, Xiangyi Yan, Haoyu Ma, Chenyu You, and Xiaohui Xie. Hybrid neural diffeomorphic flow for shape representation and generation via triplane. In Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision , pages 7707–7717, 2024."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib9",
+      "text": "Michael M Bronstein and Iasonas Kokkinos. Scale-invariant heat kernel signatures for non-rigid shape recognition. In CVPR , 2010."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib49",
+      "text": "Samuele Salti, Federico Tombari, and Luigi Di Stefano. Shot: Unique signatures of histograms for surface and texture description. Computer Vision and Image Understanding , 125:251–264, 2014."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib6",
+      "text": "Mathieu Aubry, Ulrich Schlickewei, and Daniel Cremers. The wave kernel signature: A quantum mechanical approach to shape analysis. In ICCV , 2011."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib4",
+      "text": "Souhaib Attaiki and Maks Ovsjanikov. Ncp: Neural correspondence prior for effective unsupervised shape matching. In NeurIPS , 2022."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib16",
+      "text": "Nicolas Donati, Etienne Corman, and Maks Ovsjanikov. Deep orientation-aware functional maps: Tackling symmetry issues in shape matching. In CVPR , 2022."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib10",
+      "text": "Dongliang Cao and Florian Bernard. Unsupervised deep multi-shape matching. In ECCV , 2022."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib28",
+      "text": "Lei Li, Nicolas Donati, and Maks Ovsjanikov. Learning multi-resolution functional maps with spectral attention for robust shape matching. NIPS , 2022."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib33",
+      "text": "Or Litany, Tal Remez, Emanuele Rodola, Alex Bronstein, and Michael Bronstein. Deep functional maps: Structured prediction for dense shape correspondence. In ICCV , 2017."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib21",
+      "text": "Oshri Halimi, Or Litany, Emanuele Rodola, Alex M Bronstein, and Ron Kimmel. Unsupervised learning of dense shape correspondence. In CVPR , 2019."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib47",
+      "text": "Jean-Michel Roufosse, Abhishek Sharma, and Maks Ovsjanikov. Unsupervised deep learning for structured shape matching. In ICCV , 2019."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib5",
+      "text": "Souhaib Attaiki, Gautam Pai, and Maks Ovsjanikov. Dpfm: Deep partial functional maps. In International Conference on 3D Vision (3DV) , 2021."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "Marvin Eisenberger, Aysim Toker, Laura Leal-Taixé, and Daniel Cremers. Deep shells: Unsupervised shape correspondence with optimal transport. NIPS , 2020b."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib40",
+      "text": "Maks Ovsjanikov, Mirela Ben-Chen, Justin Solomon, Adrian Butscher, and Leonidas Guibas. Functional maps: a flexible representation of maps between shapes. ACM Transactions on Graphics (ToG) , 31(4):1–11, 2012."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib55",
+      "text": "Mingze Sun, Shiwei Mao, Puhua Jiang, Maks Ovsjanikov, and Ruqi Huang. Spatially and spectrally consistent deep functional maps. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 14497–14507, 2023a."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib12",
+      "text": "Dongliang Cao, Paul Roetzer, and Florian Bernard. Unsupervised learning of robust spectral shape matching. arXiv preprint arXiv:2304.14419 , 2023."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib11",
+      "text": "Dongliang Cao and Florian Bernard. Self-supervised learning for multimodal non-rigid 3d shape matching. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 17735–17744, 2023."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib20",
+      "text": "Dvir Ginzburg and Dan Raviv. Cyclic functional mapping: Self-supervised correspondence between non-isometric deformable shapes. In Computer Vision–ECCV 2020: 16th European Conference, Glasgow, UK, August 23–28, 2020, Proceedings, Part V 16 , pages 36–52. Springer, 2020."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib42",
+      "text": "Gabriel Peyré, Marco Cuturi, et al. Computational optimal transport: With applications to data science. Foundations and Trends® in Machine Learning , 11(5-6):355–607, 2019."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib61",
+      "text": "Cédric Villani et al. Optimal transport: old and new . Springer, 2009."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib13",
+      "text": "Marco Cuturi. Sinkhorn distances: Lightspeed computation of optimal transport. Advances in neural information processing systems , 26, 2013."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib2",
+      "text": "Jason Altschuler, Jonathan Niles-Weed, and Philippe Rigollet. Near-linear time approximation algorithms for optimal transport via Sinkhorn iteration. In Advances in Neural Information Processing Systems , pages 1964–1974, 2017."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib30",
+      "text": "Tianyi Lin, Nhat Ho, and Michael Jordan. On efficient optimal transport: An analysis of greedy and accelerated mirror descent algorithms. In International Conference on Machine Learning , pages 3982–3991, 2019."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib32",
+      "text": "Tianyi Lin, Nhat Ho, and Michael I. Jordan. On the efficiency of entropic regularized algorithms for optimal transport. Journal of Machine Learning Research (JMLR) , 23:1–42, 2022."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib31",
+      "text": "Tianyi Lin, Nhat Ho, Xi Chen, Marco Cuturi, and Michael I. Jordan. Fixed-support Wasserstein barycenters: Computational hardness and fast algorithm. In NeurIPS , pages 5368–5380, 2020."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib8",
+      "text": "Nicolas Bonneel, Julien Rabin, Gabriel Peyré, and Hanspeter Pfister. Sliced and radon wasserstein barycenters of measures. Journal of Mathematical Imaging and Vision , 51:22–45, 2015."
+    }
+  ]
+}

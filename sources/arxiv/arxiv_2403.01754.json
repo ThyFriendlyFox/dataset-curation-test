@@ -1,0 +1,113 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.01754",
+  "title": "Derivative-Free Optimization for Low-Rank Adaptation in Large Language Models",
+  "authors": "Feihu Jin, Yin Liu, Ying Tan",
+  "year": "2024",
+  "categories": [
+    "cs.CL"
+  ],
+  "url": "https://arxiv.org/abs/2403.01754",
+  "html_url": "https://arxiv.org/html/2403.01754",
+  "license": "http://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Introduction",
+  "word_count": 563,
+  "text": "In recent years, there has been a rapid development in large language models (LLMs) [1,2,3,4],\n\nwhich have showcased impressive capabilities across various natural language processing tasks. However, the sheer number of parameters of large models leads to a linear increase in tuning cost and poses challenges for fine-tuning on common hardware. To this end, parameter-efficient tuning methods [5,6,7,8] have emerged as a solution that could achieve comparable performance to full fine-tuning while only tuning a small portion of the parameters in large language models. Although these methods can reduce GPU memory requirements by approximately 30% [9], tuning a small subset of parameters still involves the computation of gradients and back-propagation, which presents challenges for utilizing and deploying large language models. Currently, the prevailing approach to harness the power of large language models is through in-context learning, treating the model as a service [2]. The approach only involves forward computation and requires designing appropriate prompts or demonstrations without updating model parameters. However, in-context learning demands a meticulous selection of prompts and demonstrations, and the model’s performance relies entirely on the chosen prompts and demonstrations [10].\n\nRecently, much effort has been devoted to black-box tuning methods [11,12,13,14,15], which utilizes the derivative-free optimization method to optimize the introduced continuous prompts. Black-box tuning methods achieve comparable performance to parameter-efficient tuning methods and full fine-tuning in a few-shot setting without needing gradient computation and back-propagation through the entire LLM. However, it is acknowledged that training the prompt vectors in few-shot settings is prone to instability and exhibits slow convergence [16,17,18], making it challenging to generalize to large language models.\n\nIn this paper, we propose a derivative-free optimization approach to address the challenges associated with the introduced low-rank modules in large language models that eschews the computation of gradients and showcases an augmented level of robustness in few-shot settings. Our method eliminates the need for gradient computation and back-propagation, resulting in improved stability and faster convergence compared to previous baselines. We prepend low-rank modules into each self-attention layer of the language model and initialize these modules by computing the mean and variance of hidden states for each layer. To optimize the parameters of the low-rank modules, we employ two derivative-free optimization methods. Recognizing that directly optimizing all low-rank modules of each layer using derivative-free methods in a high-dimensional space may slow down convergence, we adopt a divide-and-conquer strategy. The strategy entails optimizing the low-rank modules of each layer separately. To enable the optimization of the low-rank modules through derivative-free methods, we introduce a linear mapping matrix. The matrix maps the parameters obtained after derivative-free optimization to the desired low-rank modules at each layer. We initialize the linear mapping matrix based on normal distributions, with standard deviations related to the hidden states of each layer.\n\nWe conduct comprehensive experiments on RoBERTa-large [19], GPT2-large, and GPT2-XL [1] to assess the effectiveness of our method. The results demonstrate that our proposed method has a significant improvement on average across seven natural language understanding tasks in a few-shot setting. As shown in the Figure 1, our proposed approach achieves substantial improvement compared to existing gradient-based parameter-efficient methods (e.g., Adapter tuning, LoRA, P-Tuning v2, and BitFit) and derivative-free optimization methods (e.g., BBT, GAP3, and BBTv2) on RoBERTa-large. Additionally, our proposed method demonstrates superior performance, clear advantages regarding GPU memory usage, and faster model convergence speed compared to existing derivative-free optimization methods in larger models.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib36",
+      "text": "Radford et al. (2019) Alec Radford, Jeffrey Wu, Rewon Child, David Luan, Dario Amodei, Ilya Sutskever, et al. 2019. Language models are unsupervised multitask learners. OpenAI blog , 1(8)."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib5",
+      "text": "Brown et al. (2020) Tom Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared D Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, Sandhini Agarwal, Ariel Herbert-Voss, Gretchen Krueger, Tom Henighan, Rewon Child, Aditya Ramesh, Daniel Ziegler, Jeffrey Wu, Clemens Winter, Chris Hesse, Mark Chen, Eric Sigler, Mateusz Litwin, Scott Gray, Benjamin Chess, Jack Clark, Christopher Berner, Sam McCandlish, Alec Radford, Ilya Sutskever, and Dario Amodei. 2020. Language models are few-shot learners . In NeurIPS ."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib31",
+      "text": "OpenAI (2023) OpenAI. 2023. Gpt-4 technical report. ArXiv , abs/2303.08774."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib46",
+      "text": "Touvron et al. (2023) Hugo Touvron, Thibaut Lavril, Gautier Izacard, Xavier Martinet, Marie-Anne Lachaux, Timothée Lacroix, Baptiste Rozière, Naman Goyal, Eric Hambro, Faisal Azhar, Aurélien Rodriguez, Armand Joulin, Edouard Grave, and Guillaume Lample. 2023. Llama: Open and efficient foundation language models . CoRR , abs/2302.13971."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib17",
+      "text": "He et al. (2022) Junxian He, Chunting Zhou, Xuezhe Ma, Taylor Berg-Kirkpatrick, and Graham Neubig. 2022. Towards a unified view of parameter-efficient transfer learning . In International Conference on Learning Representations ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib18",
+      "text": "Houlsby et al. (2019) Neil Houlsby, Andrei Giurgiu, Stanislaw Jastrzebski, Bruna Morrone, Quentin de Laroussilhe, Andrea Gesmundo, Mona Attariyan, and Sylvain Gelly. 2019. Parameter-efficient transfer learning for nlp. In ICML ."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib8",
+      "text": "Chen et al. (2022b) Yifan Chen, Devamanyu Hazarika, Mahdi Namazifar, Yang Liu, Di Jin, and Dilek Hakkani-Tur. 2022b. Inducer-tuning: Connecting prefix-tuning and adapter-tuning . In Proceedings of the 2022 Conference on Empirical Methods in Natural Language Processing , pages 793–808, Abu Dhabi, United Arab Emirates. Association for Computational Linguistics."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib7",
+      "text": "Chen et al. (2022a) Yifan Chen, Devamanyu Hazarika, Mahdi Namazifar, Yang Liu, Di Jin, and Dilek Hakkani-Tur. 2022a. Empowering parameter-efficient transfer learning by recognizing the kernel structure in self-attention . In Findings of the Association for Computational Linguistics: NAACL 2022 , pages 1375–1388, Seattle, United States. Association for Computational Linguistics."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib45",
+      "text": "Sung et al. (2022) Yi-Lin Sung, Jaemin Cho, and Mohit Bansal. 2022. LST: Ladder side-tuning for parameter and memory efficient transfer learning . In Advances in Neural Information Processing Systems ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib12",
+      "text": "Gao et al. (2021) Tianyu Gao, Adam Fisch, and Danqi Chen. 2021. Making pre-trained language models better few-shot learners . In ACL ."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib44",
+      "text": "Sun et al. (2022b) Tianxiang Sun, Yunfan Shao, Hong Qian, Xuanjing Huang, and Xipeng Qiu. 2022b. Black-box tuning for language-model-as-a-service. In Proceedings of ICML ."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib43",
+      "text": "Sun et al. (2022a) Tianxiang Sun, Zhengfu He, Hong Qian, Yunhua Zhou, Xuanjing Huang, and Xipeng Qiu. 2022a. BBTv2: Towards a gradient-free future with large language models. In Proceedings of the 2022 Conference on Empirical Methods in Natural Language Processing , pages 3916–3930, Abu Dhabi, United Arab Emirates. Association for Computational Linguistics."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib56",
+      "text": "Zhao et al. (2023) Jiangjiang Zhao, Zhuoran Wang, and Fangchun Yang. 2023. Genetic prompt search via exploiting language model probabilities . In Proceedings of the Thirty-Second International Joint Conference on Artificial Intelligence, IJCAI 2023, 19th-25th August 2023, Macao, SAR, China , pages 5296–5305. ijcai.org."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib52",
+      "text": "Xu et al. (2023) Can Xu, Qingfeng Sun, Kai Zheng, Xiubo Geng, Pu Zhao, Jiazhan Feng, Chongyang Tao, and Daxin Jiang. 2023. Wizardlm: Empowering large language models to follow complex instructions . ArXiv , abs/2304.12244."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib30",
+      "text": "Oh et al. (2023) Changdae Oh, Hyeji Hwang, Hee young Lee, Yongtaek Lim, Geunyoung Jung, Jiyoung Jung, Hosik Choi, and Kyungwoo Song. 2023. Blackvip: Black-box visual prompting for robust transfer learning . 2023 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 24224–24235."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib22",
+      "text": "Lester et al. (2021) Brian Lester, Rami Al-Rfou, and Noah Constant. 2021. The power of scale for parameter-efficient prompt tuning . In EMNLP ."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib25",
+      "text": "Li and Liang (2021) Xiang Lisa Li and Percy Liang. 2021. Prefix-tuning: Optimizing continuous prompts for generation . In ACL ."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib28",
+      "text": "Liu et al. (2021b) Xiao Liu, Yanan Zheng, Zhengxiao Du, Ming Ding, Yujie Qian, Zhilin Yang, and Jie Tang. 2021b. Gpt understands, too. ArXiv , abs/2103.10385."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib9",
+      "text": "Delobelle et al. (2020) Pieter Delobelle, Thomas Winters, and Bettina Berendt. 2020. RobBERT: a Dutch RoBERTa-based Language Model . In Findings of EMNLP ."
+    }
+  ]
+}

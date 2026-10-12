@@ -1,0 +1,154 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.02571",
+  "title": "DPAdapter: Improving Differentially Private Deep Learning through Noise Tolerance Pre-training",
+  "authors": "Zihao Wang, Rui Zhu, Dongruo Zhou, Zhikun Zhang, John Mitchell, Haixu Tang, XiaoFeng Wang",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2403.02571",
+  "html_url": "https://arxiv.org/html/2403.02571",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1079,
+  "text": "Recent years have witnessed an exponential growth in applications of deep neural networks (DNNs) to various domains [1,2,3]. However, DNN models trained with standard pipelines can be attacked by an adversary that seeks to reveal the data on which the model was trained. For example, Carlini et al. [4] show that adversaries can generate and detect text sequences from the training set of a large transformer language model, while Balle et al. [5] demonstrate that powerful adversaries can reconstruct images from the training set of a classifier. Alongside other results [6,7,8], these studies indicate that models trained on sensitive datasets present a significant privacy risk. Differential privacy (DP) [9] has been the golden standard for effective control of the risks of exposing training examples, and has already been adopted by various machine learning tasks [10,11,12,13] for protection. A differentially private algorithm is a randomized algorithm providing a formal guarantee that any single example in the training set only has a limited impact on the output distributions of the algorithm. The privacy guarantee, denoted (\\epsilon, \\delta)-DP, is defined by two parameters (\\epsilon, \\delta), which we refer to as the privacy budget. The smaller these two parameters are, the closer the output distributions between the training sets that differ by a single example, and therefore the more difficult it becomes for an adversary to infer whether any single data point is included during training.\n\nChallenges in Private Deep Learning. Differentially private stochastic gradient descent (DP-SGD) [14] stands out as a prevalent DPML technique. DP-SGD modifies the conventional mini-batch gradient calculation used in SGD by incorporating a privatized version, whereby the gradient of each training sample is clipped to a maximum norm. Subsequently, Gaussian noise, proportional to the clipping norm, is introduced to the sum of the clipped gradients, masking the influence of any individual example on the sum. However, the incorporation of the DP noise often comes with a notable degradation in the performance of trained models [14,15]. In response, efforts to mitigate the adverse impact of DP on model utility have been made, either through formulating new algorithms [16,15,17,18] or by relaxing the definition of DP to align with particular contexts [19,20,21]. Nonetheless, the detriment imposed by DP noise on differentially private models remains significant.\n\nOur Solution. To mitigate the adverse impact of DP on model utility, prior research has underscored that transfer learning [22] from public data markedly enhances the model performance of DPML algorithms [23]. In our research, we went a step further. Specifically, we observed that the deep learning training process is highly sensitive to noise, with even a small amount of noise leading to a substantial impact on performance. However, this issue can be mitigated by the model pre-trained to minimize parameter sensitivity to noise, which we call parameter robustness, so as to control DP’s performance impact. Therefore, we designed a new technique that pre-trains a model with its parameters robust to noise to enhance the performance of the downstream model fine-turned with DPML on private data.\n\nA technique that could serve this purpose is sharpness-aware minimization (SAM), which augments parameter robustness [24,25,26] for the purpose of enhancing a model’s generality. This technique, however, turns out to be less effective in controlling the performance impact of DPML, since it is not designed for maximizing parameter robustness. Concretely, SAM adds the worst-case perturbation to parameters before computing gradients and later removes the perturbation after each round of parameter updates. For this purpose, it calculates both the perturbation and gradients on a small batch of training samples. A problem is that although a small batch could be enough for improving a model’s generality, it is inadequate for making an accurate estimate of the worst-case perturbation, thereby rendering the model parameters less robust than they could be. To address this issue, we enhanced SAM for our purpose with a new technique called DPAdapter, which utilizes two batches of training instances, a large one for a more accurate estimate of the perturbation and a small one for effective gradient descent to ensure convergence. We further theoretically analyzed why this approach improves parameter robustness against noise, thereby reducing DPML’s performance impact on the downstream model fine-tuning.\n\nEmpiricaly Results. We implemented DPAdapter and evaluated its performance using a model pre-trained on CIFAR-100, which was then fine-tuned for classification tasks on CIFAR-10, SVHN, and STL-10 datasets. In these experiments, we utilized DPAdapter as the pre-training method and the CIFAR-100 dataset as the public dataset for the pre-training. The downstream tasks involve fine-tuning the pre-trained model with DPML. Our experimental results consistently show a stable improvement in the accuracy achieved by the downstream tasks, compared with those fine-tuned from the models without robustness enhancement. For instance, when the privacy budget is set to \\epsilon=4 and DPML configured to DP-SGD (a popular setting), DPAdapter elevates the average accuracy across three downstream tasks to 77.09%. By comparison, when utilizing the pre-trained models without DPAdapter, the accuracy is 72.92%, over 4% below that of our approach. Note that all existing DPML enhancements could only achieve a performance gain no more than 3% [27] when the privacy budget is set to \\epsilon=4. Also, many of them cannot work together, since they all focus on the downstream fine-tuning step. Our approach, however, is designed for more generic protection, independent of tasks, and compatible with these existing solutions, given its focus on the pre-training step.\n\nContributions. Our key contributions are outlined below:\n\n\\bullet New technique. We developed DPAdapter, a new technique for enhancing parameter robustness, which leads to a general solution significantly outperforming yet compatible with existing techniques for controlling DPML’s negative impacts.\n\n\\bullet Theoretical understandings. We theoretically analyzed our solution to justify its effectiveness, unveiling intrinsic relations among parameter robustness, transferability, and DPML’s performance impacts. Our analysis leads to new insights about how a pre-trained model can be designed to maximize the benefits of DPML.\n\n\\bullet Extensive empirical studies. We conducted comprehensive empirical studies of DPAdapter on various downstream tasks and DPML algorithms under different privacy budgets. Our results show that our approach effectively enhances the performance of the downstream tasks fine-tuned by DPML.\n\nRoadmap. The rest of the paper is organized as follows. Section 2 presents the background of our research; Section 3 presents our key observations; Section 4 elaborates our method and theoretic analysis; Section 5 reports the evaluation of our techniques; Section 6 discusses the limitations of our study and potential future work; Section 7 reviews the related prior studies and Section 8 concludes the paper.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib29",
+      "text": "Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. Deep residual learning for image recognition. In 2016 IEEE Conference on Computer Vision and Pattern Recognition, CVPR 2016, Las Vegas, NV, USA, June 27-30, 2016 , pages 770–778, 2016."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib51",
+      "text": "Shaoqing Ren, Kaiming He, Ross B. Girshick, and Jian Sun. Faster R-CNN: towards real-time object detection with region proposal networks. In Advances in Neural Information Processing Systems 28: Annual Conference on Neural Information Processing Systems 2015, December 7-12, 2015, Montreal, Quebec, Canada , pages 91–99, 2015."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib14",
+      "text": "Ronan Collobert, Jason Weston, Léon Bottou, Michael Karlen, Koray Kavukcuoglu, and Pavel P. Kuksa. Natural language processing (almost) from scratch. J. Mach. Learn. Res. , 12:2493–2537, 2011."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib8",
+      "text": "Nicholas Carlini, Florian Tramèr, Eric Wallace, Matthew Jagielski, Ariel Herbert-Voss, Katherine Lee, Adam Roberts, Tom B. Brown, Dawn Song, Úlfar Erlingsson, Alina Oprea, and Colin Raffel. Extracting training data from large language models. In 30th USENIX Security Symposium, USENIX Security 2021, August 11-13, 2021 , pages 2633–2650, 2021."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "Borja Balle, Giovanni Cherubin, and Jamie Hayes. Reconstructing training data with informed adversaries. In 43rd IEEE Symposium on Security and Privacy, SP 2022, San Francisco, CA, USA, May 22-26, 2022 , pages 1138–1156, 2022."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib39",
+      "text": "Yugeng Liu, Rui Wen, Xinlei He, Ahmed Salem, Zhikun Zhang, Michael Backes, Emiliano De Cristofaro, Mario Fritz, and Yang Zhang. Ml-doctor: Holistic risk assessment of inference attacks against machine learning models. In 31st USENIX Security Symposium, USENIX Security 2022, Boston, MA, USA, August 10-12, 2022 , pages 4525–4542, 2022."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "Nicholas Carlini, Steve Chien, Milad Nasr, Shuang Song, Andreas Terzis, and Florian Tramèr. Membership inference attacks from first principles. In 43rd IEEE Symposium on Security and Privacy, SP 2022, San Francisco, CA, USA, May 22-26, 2022 , pages 1897–1914, 2022."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib37",
+      "text": "Zheng Li and Yang Zhang. Membership leakage in label-only exposures. In CCS ’21: 2021 ACM SIGSAC Conference on Computer and Communications Security, Virtual Event, Republic of Korea, November 15 - 19, 2021 , pages 880–895, 2021."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib21",
+      "text": "Cynthia Dwork, Frank McSherry, Kobbi Nissim, and Adam D. Smith. Calibrating noise to sensitivity in private data analysis. In Theory of Cryptography, Third Theory of Cryptography Conference, TCC 2006, New York, NY, USA, March 4-7, 2006, Proceedings , pages 265–284, 2006."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib62",
+      "text": "Da Yu, Saurabh Naik, Arturs Backurs, Sivakanth Gopi, Huseyin A. Inan, Gautam Kamath, Janardhan Kulkarni, Yin Tat Lee, Andre Manoel, Lukas Wutschitz, Sergey Yekhanin, and Huishuai Zhang. Differentially private fine-tuning of language models. In The Tenth International Conference on Learning Representations, ICLR 2022, Virtual Event, April 25-29, 2022 , 2022."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib43",
+      "text": "Harsh Mehta, Abhradeep Thakurta, Alexey Kurakin, and Ashok Cutkosky. Large scale transfer learning for differentially private image classification. CoRR , abs/2205.02973, 2022."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib36",
+      "text": "Xuechen Li, Florian Tramèr, Percy Liang, and Tatsunori Hashimoto. Large language models can be strong differentially private learners. In The Tenth International Conference on Learning Representations, ICLR 2022, Virtual Event, April 25-29, 2022 , 2022."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib15",
+      "text": "Soham De, Leonard Berrada, Jamie Hayes, Samuel L. Smith, and Borja Balle. Unlocking high-accuracy differentially private image classification through scale. CoRR , abs/2204.13650, 2022."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib1",
+      "text": "Martín Abadi, Andy Chu, Ian J. Goodfellow, H. Brendan McMahan, Ilya Mironov, Kunal Talwar, and Li Zhang. Deep learning with differential privacy. In Proceedings of the 2016 ACM SIGSAC Conference on Computer and Communications Security, Vienna, Austria, October 24-28, 2016 , pages 308–318, 2016."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib54",
+      "text": "Florian Tramèr and Dan Boneh. Differentially private learning needs better features (or much more data). In 9th International Conference on Learning Representations, ICLR 2021, Virtual Event, Austria, May 3-7, 2021 , 2021."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib47",
+      "text": "Nicolas Papernot, Martín Abadi, Úlfar Erlingsson, Ian J. Goodfellow, and Kunal Talwar. Semi-supervised knowledge transfer for deep learning from private training data. In 5th International Conference on Learning Representations, ICLR 2017, Toulon, France, April 24-26, 2017, Conference Track Proceedings , 2017."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib63",
+      "text": "Da Yu, Huishuai Zhang, Wei Chen, and Tie-Yan Liu. Do not let privacy overbill utility: Gradient embedding perturbation for private learning. In 9th International Conference on Learning Representations, ICLR 2021, Virtual Event, Austria, May 3-7, 2021 , 2021."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib71",
+      "text": "Yuqing Zhu, Xiang Yu, Manmohan Chandraker, and Yu-Xiang Wang. Private-knn: Practical differential privacy for computer vision. In 2020 IEEE/CVF Conference on Computer Vision and Pattern Recognition, CVPR 2020, Seattle, WA, USA, June 13-19, 2020 , pages 11851–11859, 2020."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib40",
+      "text": "Ashwin Machanavajjhala, Daniel Kifer, John M. Abowd, Johannes Gehrke, and Lars Vilhuber. Privacy: Theory meets practice on the map. In Proceedings of the 24th International Conference on Data Engineering, ICDE 2008, April 7-12, 2008, Cancún, Mexico , pages 277–286, 2008."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "Cynthia Dwork. Differential privacy in new settings. In Proceedings of the Twenty-First Annual ACM-SIAM Symposium on Discrete Algorithms, SODA 2010, Austin, Texas, USA, January 17-19, 2010 , pages 174–183, 2010."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib24",
+      "text": "Badih Ghazi, Noah Golowich, Ravi Kumar, Pasin Manurangsi, and Chiyuan Zhang. Deep learning with label differential privacy. In Advances in Neural Information Processing Systems 34: Annual Conference on Neural Information Processing Systems 2021, NeurIPS 2021, December 6-14, 2021, virtual , pages 27131–27145, 2021."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib46",
+      "text": "Sinno Jialin Pan and Qiang Yang. A survey on transfer learning. IEEE Trans. Knowl. Data Eng. , 22(10):1345–1359, 2010."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib34",
+      "text": "Alexey Kurakin, Steve Chien, Shuang Song, Roxana Geambasu, Andreas Terzis, and Abhradeep Thakurta. Toward training at imagenet scale with differential privacy. CoRR , abs/2201.12328, 2022."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib23",
+      "text": "Pierre Foret, Ariel Kleiner, Hossein Mobahi, and Behnam Neyshabur. Sharpness-aware minimization for efficiently improving generalization. arXiv preprint arXiv:2010.01412 , 2020."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib59",
+      "text": "Dongxian Wu, Shu-Tao Xia, and Yisen Wang. Adversarial weight perturbation helps robust generalization. In Advances in Neural Information Processing Systems 33: Annual Conference on Neural Information Processing Systems 2020, NeurIPS 2020, December 6-12, 2020, virtual , 2020."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib70",
+      "text": "Yaowei Zheng, Richong Zhang, and Yongyi Mao. Regularizing neural networks via adversarial model perturbation. In IEEE Conference on Computer Vision and Pattern Recognition, CVPR 2021, virtual, June 19-25, 2021 , pages 8156–8165, 2021."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib58",
+      "text": "Chengkun Wei, Minghu Zhao, Zhikun Zhang, Min Chen, Wenlong Meng, Bo Liu, Yuan Fan, and Wenzhi Chen. Dpmlbench: Holistic evaluation of differentially private machine learning. CoRR , abs/2305.05900, 2023."
+    }
+  ]
+}

@@ -1,0 +1,123 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2311.14479",
+  "title": "Controlled Text Generation via Language Model Arithmetic",
+  "authors": "Jasper Dekoninck, Marc Fischer, Luca Beurer-Kellner, Martin Vechev",
+  "year": "2024",
+  "categories": [
+    "cs.CL"
+  ],
+  "url": "https://arxiv.org/abs/2311.14479",
+  "html_url": "https://arxiv.org/html/2311.14479",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 911,
+  "text": "In recent years, Large Language Models (LLMs) [1,2,3] have been increasingly recognized for their capabilities in handling a wide range of tasks [4,5]. In many applications, such as chatbots interacting with diverse audiences like children, students, or customers, precise control and customization of attributes such as the employed vocabulary, linguistic style, and emotional expression are crucial.\n\n## Controlling Language Models\n\nA common technique for this is prompting with natural language [5]. While prompting is simple and makes it easy to condition the LLM to a broad attribute, the ambiguity of natural language makes it challenging to express how present that attribute should be in the generated text. Further, prompting also lacks the ability to effectively steer the model away from a certain attribute in a reliable manner, as mentioning a specific topic in the prompt can inadvertently increase the likelihood of the model generating text about it [6], e.g. \"do not mention cats\" may increase the likelihood of the model referring to cats. One alternative is fine-tuning the model, but this requires highly specific training data for the desired attribute, which also has to implicitly encode the strength of the conditioning. Controlled Text Generation (CTG) techniques aim to solve this problem by steering the model during inference instead [7,8,9]: The model is conditioned on a particular attribute a in a smoothly controllable way, by biasing the model’s token distribution. Many CTG methods are inspired by Bayes rule P(\\text{text}|a)\\propto P(a|\\text{text})P(\\text{text}), and utilize an auxiliary model, i.e. P(a|\\text{text}), to condition the LLM, i.e., P(\\text{text}), towards a.\n\n## Key Challenge: Lack of Expressive and Efficient Control for Text Generation\n\nThese techniques, however, suffer from several drawbacks, including a lack of expressiveness, efficiency, and interpretability. First, to control the strength of the applied conditioning, a parameter \\lambda is introduced in an ad-hoc manner, i.e., as an exponential weight P(a|\\text{text})^{\\lambda}. However, introducing the strength in this way, while possible, quickly becomes unintuitive as it can no longer be interpreted in a Bayesian manner, e.g., when biasing away from attributes. Moreover, neither prompting nor CTG methods allow for the natural and controlled combination of multiple attributes or instructions with relative strength. This is due to the inherent ambiguity of natural language in prompting [10,11], and the absence of a theoretical foundation and intuitive semantics for the biasing strength \\lambda with CTG methods. Lastly, both CTG techniques and fine-tuning often require custom and highly specific training data for the desired attribute [9,12,13,14] and can be resource-intensive [15,16] as multiple models are evaluated at inference time.\n\n## Fine-Grained Control via Model Arithmetic\n\nIn this work, we address these challenges and introduce model arithmetic, a principled and intuitive method to combine multiple models. Our method is orthogonal to prompting, fine-tuning, and simple CTG concepts, like the use of classifiers, and can naturally incorporate them. Model arithmetic enables us to blend multiple LLMs and attributes into a single precisely controlled, formula-based composite model. To illustrate our method, consider the simple example in Fig. 1, where we aim to write a magical, child-like fairy tale. We employ multiple models M_{a}, with different attributes a. On the top right, we see a prompted model \\bm{{M_{\\text{child}}}} that already generates a child-appropriate story. However, the resulting text is not child-like and we therefore subtract an adult-conditioned model, \\bm{{M_{\\text{adult}}}}, with a weight of 0.6 to generate a less adult-sounding story. Now, to again increase formality, we additionally bias with classifier \\bm{{C_{\\text{formal}}}}. Lastly, we use a special \\unionop operator to obtain a model that emphasizes both magical and child-like language and use it to further bias generation and obtain our final result. This simple example cannot be precisely expressed with prior CTG approaches and showcases the flexibility of model arithmetic. That is, it allows us to compose models in a natural way, while precisely controlling the impact of each component. Further, we can naturally incorporate paradigms such as prompting or fine-tuning (for the individual M and C) and even implement many prior CTG techniques (discussed in Section 3) as simple formulas.\n\n## Efficient Model Arithmetic via Generalized Speculative Sampling\n\nCTG methods, including model arithmetic, can lead to increased inference times as multiple models need to be evaluated in order to generate text. To counteract this, we generalize speculative sampling [17] to model arithmetic. Speculative sampling is usually employed to reduce the latency of a single LLM by augmenting it with a smaller model that proposes tokens, which are then validated by the LLM. In contrast, we extend it in a way where we postpone the evaluation of more expensive model calls within model arithmetic formulas. This allows us to execute model formulas comprised of multiple models with only marginal overhead over a single model and reduces model calls by up to 64\\%. The resulting inference speedup naturally extends to prior CTG techniques that can be expressed in model arithmetic [18,19,20,21].\n\n## Key Contributions\n\nOur core contributions include:\n\n- • Model Arithmetic: A principled framework for fine-grained CTG, enabling precise control over multiple attributes. Our framework can express many prior CTG approaches (Section 3).\n\n- • An extension of speculative sampling to model arithmetic, counteracting the overhead of CTG and enabling efficient inference, which naturally benefits CTG techniques expressible in model arithmetic (Section 4).\n\n- • An extensive qualitative and quantitative evaluation of model arithmetic (Section 5). We show that it is more expressive than prior CTG work and outperforms them in toxicity reduction. We demonstrate that our extended speculative sampling reduces model calls by up to 64\\%.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib5",
+      "text": "Brown et al. (2020) Tom B. Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, Sandhini Agarwal, Ariel Herbert-Voss, Gretchen Krueger, Tom Henighan, Rewon Child, Aditya Ramesh, Daniel M. Ziegler, Jeffrey Wu, Clemens Winter, Christopher Hesse, Mark Chen, Eric Sigler, Mateusz Litwin, Scott Gray, Benjamin Chess, Jack Clark, Christopher Berner, Sam McCandlish, Alec Radford, Ilya Sutskever, and Dario Amodei. Language models are few-shot learners. In Hugo Larochelle, Marc’Aurelio Ranzato, Raia Hadsell, Maria-Florina Balcan, and Hsuan-Tien Lin, editors, Advances in Neural Information Processing Systems 33: Annual Conference on Neural Information Processing Systems 2020, NeurIPS 2020, December 6-12, 2020, virtual , 2020. URL https://proceedings.neurips.cc/paper/2020/hash/1457c0d6bfcb4967418bfb8ac142f64a-Abstract.html ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib9",
+      "text": "Chowdhery et al. (2022) Aakanksha Chowdhery, Sharan Narang, Jacob Devlin, Maarten Bosma, Gaurav Mishra, Adam Roberts, Paul Barham, Hyung Won Chung, Charles Sutton, Sebastian Gehrmann, Parker Schuh, Kensen Shi, Sasha Tsvyashchenko, Joshua Maynez, Abhishek Rao, Parker Barnes, Yi Tay, Noam Shazeer, Vinodkumar Prabhakaran, Emily Reif, Nan Du, Ben Hutchinson, Reiner Pope, James Bradbury, Jacob Austin, Michael Isard, Guy Gur-Ari, Pengcheng Yin, Toju Duke, Anselm Levskaya, Sanjay Ghemawat, Sunipa Dev, Henryk Michalewski, Xavier Garcia, Vedant Misra, Kevin Robinson, Liam Fedus, Denny Zhou, Daphne Ippolito, David Luan, Hyeontaek Lim, Barret Zoph, Alexander Spiridonov, Ryan Sepassi, David Dohan, Shivani Agrawal, Mark Omernick, Andrew M. Dai, Thanumalayan Sankaranarayana Pillai, Marie Pellat, Aitor Lewkowycz, Erica Moreira, Rewon Child, Oleksandr Polozov, Katherine Lee, Zongwei Zhou, Xuezhi Wang, Brennan Saeta, Mark Diaz, Orhan Firat, Michele Catasta, Jason Wei, Kathy Meier-Hellstern, Douglas Eck, Jeff Dean, Slav Petrov, and Noah Fiedel. Palm: Scaling language modeling with pathways. CoRR , abs/2204.02311, 2022. doi: 10.48550/arXiv.2204.02311 . URL https://doi.org/10.48550/arXiv.2204.02311 ."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib37",
+      "text": "Touvron et al. (2023) Hugo Touvron, Louis Martin, Kevin Stone, Peter Albert, Amjad Almahairi, Yasmine Babaei, Nikolay Bashlykov, Soumya Batra, Prajjwal Bhargava, Shruti Bhosale, Dan Bikel, Lukas Blecher, Cristian Canton-Ferrer, Moya Chen, Guillem Cucurull, David Esiobu, Jude Fernandes, Jeremy Fu, Wenyin Fu, Brian Fuller, Cynthia Gao, Vedanuj Goswami, Naman Goyal, Anthony Hartshorn, Saghar Hosseini, Rui Hou, Hakan Inan, Marcin Kardas, Viktor Kerkez, Madian Khabsa, Isabel Kloumann, Artem Korenev, Punit Singh Koura, Marie-Anne Lachaux, Thibaut Lavril, Jenya Lee, Diana Liskovich, Yinghai Lu, Yuning Mao, Xavier Martinet, Todor Mihaylov, Pushkar Mishra, Igor Molybog, Yixin Nie, Andrew Poulton, Jeremy Reizenstein, Rashi Rungta, Kalyan Saladi, Alan Schelten, Ruan Silva, Eric Michael Smith, Ranjan Subramanian, Xiaoqing Ellen Tan, Binh Tang, Ross Taylor, Adina Williams, Jian Xiang Kuan, Puxin Xu, Zheng Yan, Iliyan Zarov, Yuchen Zhang, Angela Fan, Melanie Kambadur, Sharan Narang, Aurélien Rodriguez, Robert Stojnic, Sergey Edunov, and Thomas Scialom. Llama 2: Open foundation and fine-tuned chat models. CoRR , abs/2307.09288, 2023. doi: 10.48550/arXiv.2307.09288 . URL https://doi.org/10.48550/arXiv.2307.09288 ."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib27",
+      "text": "Rozière et al. (2023) Baptiste Rozière, Jonas Gehring, Fabian Gloeckle, Sten Sootla, Itai Gat, Xiaoqing Ellen Tan, Yossi Adi, Jingyu Liu, Tal Remez, Jérémy Rapin, Artyom Kozhevnikov, Ivan Evtimov, Joanna Bitton, Manish Bhatt, Cristian Canton-Ferrer, Aaron Grattafiori, Wenhan Xiong, Alexandre Défossez, Jade Copet, Faisal Azhar, Hugo Touvron, Louis Martin, Nicolas Usunier, Thomas Scialom, and Gabriel Synnaeve. Code llama: Open foundation models for code. CoRR , abs/2308.12950, 2023. doi: 10.48550/arXiv.2308.12950 . URL https://doi.org/10.48550/arXiv.2308.12950 ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib23",
+      "text": "Ouyang et al. (2022) Long Ouyang, Jeffrey Wu, Xu Jiang, Diogo Almeida, Carroll L. Wainwright, Pamela Mishkin, Chong Zhang, Sandhini Agarwal, Katarina Slama, Alex Ray, John Schulman, Jacob Hilton, Fraser Kelton, Luke Miller, Maddie Simens, Amanda Askell, Peter Welinder, Paul F. Christiano, Jan Leike, and Ryan Lowe. Training language models to follow instructions with human feedback. In NeurIPS , 2022. URL http://papers.nips.cc/paper_files/paper/2022/hash/b1efde53be364a73914f58805a001731-Abstract-Conference.html ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib13",
+      "text": "Jang et al. (2022) Joel Jang, Seonghyeon Ye, and Minjoon Seo. Can large language models truly understand prompts? A case study with negated prompts. In Alon Albalak, Chunting Zhou, Colin Raffel, Deepak Ramachandran, Sebastian Ruder, and Xuezhe Ma, editors, Transfer Learning for Natural Language Processing Workshop, 03 December 2022, New Orleans, Louisiana, USA , volume 203 of Proceedings of Machine Learning Research , pages 52–62. PMLR, 2022. URL https://proceedings.mlr.press/v203/jang23a.html ."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib17",
+      "text": "Liu et al. (2021) Alisa Liu, Maarten Sap, Ximing Lu, Swabha Swayamdipta, Chandra Bhagavatula, Noah A. Smith, and Yejin Choi. Dexperts: Decoding-time controlled text generation with experts and anti-experts. In Chengqing Zong, Fei Xia, Wenjie Li, and Roberto Navigli, editors, Proceedings of the 59th Annual Meeting of the Association for Computational Linguistics and the 11th International Joint Conference on Natural Language Processing, ACL/IJCNLP 2021, (Volume 1: Long Papers), Virtual Event, August 1-6, 2021 , pages 6691–6706. Association for Computational Linguistics, 2021. doi: 10.18653/v1/2021.acl-long.522 . URL https://doi.org/10.18653/v1/2021.acl-long.522 ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib11",
+      "text": "Dathathri et al. (2020) Sumanth Dathathri, Andrea Madotto, Janice Lan, Jane Hung, Eric Frank, Piero Molino, Jason Yosinski, and Rosanne Liu. Plug and play language models: A simple approach to controlled text generation. In 8th International Conference on Learning Representations, ICLR 2020, Addis Ababa, Ethiopia, April 26-30, 2020 . OpenReview.net, 2020. URL https://openreview.net/forum?id=H1edEyBKDS ."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib40",
+      "text": "Yang and Klein (2021) Kevin Yang and Dan Klein. FUDGE: controlled text generation with future discriminators. In Kristina Toutanova, Anna Rumshisky, Luke Zettlemoyer, Dilek Hakkani-Tür, Iz Beltagy, Steven Bethard, Ryan Cotterell, Tanmoy Chakraborty, and Yichao Zhou, editors, Proceedings of the 2021 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, NAACL-HLT 2021, Online, June 6-11, 2021 , pages 3511–3535. Association for Computational Linguistics, 2021. doi: 10.18653/v1/2021.naacl-main.276 . URL https://doi.org/10.18653/v1/2021.naacl-main.276 ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib2",
+      "text": "Arora et al. (2023) Simran Arora, Avanika Narayan, Mayee F. Chen, Laurel J. Orr, Neel Guha, Kush Bhatia, Ines Chami, and Christopher Ré. Ask me anything: A simple strategy for prompting language models. In The Eleventh International Conference on Learning Representations, ICLR 2023, Kigali, Rwanda, May 1-5, 2023 . OpenReview.net, 2023. URL https://openreview.net/pdf?id=bhUPJnS2g0X ."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib42",
+      "text": "Zhao et al. (2021) Zihao Zhao, Eric Wallace, Shi Feng, Dan Klein, and Sameer Singh. Calibrate before use: Improving few-shot performance of language models. In Marina Meila and Tong Zhang, editors, Proceedings of the 38th International Conference on Machine Learning, ICML 2021, 18-24 July 2021, Virtual Event , volume 139 of Proceedings of Machine Learning Research , pages 12697–12706. PMLR, 2021. URL http://proceedings.mlr.press/v139/zhao21c.html ."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib30",
+      "text": "Sansone and Manhaeve (2022) Emanuele Sansone and Robin Manhaeve. GEDI: generative and discriminative training for self-supervised learning. CoRR , abs/2212.13425, 2022. doi: 10.48550/arXiv.2212.13425 . URL https://doi.org/10.48550/arXiv.2212.13425 ."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib28",
+      "text": "Saha et al. (2022) Punyajoy Saha, Kanishk Singh, Adarsh Kumar, Binny Mathew, and Animesh Mukherjee. Countergedi: A controllable approach to generate polite, detoxified and emotional counterspeech. In Luc De Raedt, editor, Proceedings of the Thirty-First International Joint Conference on Artificial Intelligence, IJCAI 2022, Vienna, Austria, 23-29 July 2022 , pages 5157–5163. ijcai.org, 2022. doi: 10.24963/ijcai.2022/716 . URL https://doi.org/10.24963/ijcai.2022/716 ."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "Kim et al. (2023) Minbeom Kim, Hwanhee Lee, Kang Min Yoo, Joonsuk Park, Hwaran Lee, and Kyomin Jung. Critic-guided decoding for controlled text generation. In Anna Rogers, Jordan L. Boyd-Graber, and Naoaki Okazaki, editors, Findings of the Association for Computational Linguistics: ACL 2023, Toronto, Canada, July 9-14, 2023 , pages 4598–4612. Association for Computational Linguistics, 2023. doi: 10.18653/v1/2023.findings-acl.281 . URL https://doi.org/10.18653/v1/2023.findings-acl.281 ."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib16",
+      "text": "Kumar et al. (2022) Sachin Kumar, Biswajit Paria, and Yulia Tsvetkov. Gradient-based constrained sampling from language models. In Yoav Goldberg, Zornitsa Kozareva, and Yue Zhang, editors, Proceedings of the 2022 Conference on Empirical Methods in Natural Language Processing, EMNLP 2022, Abu Dhabi, United Arab Emirates, December 7-11, 2022 , pages 2251–2277. Association for Computational Linguistics, 2022. doi: 10.18653/v1/2022.emnlp-main.144 . URL https://doi.org/10.18653/v1/2022.emnlp-main.144 ."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib15",
+      "text": "Kumar et al. (2021) Sachin Kumar, Eric Malmi, Aliaksei Severyn, and Yulia Tsvetkov. Controlled text generation as continuous optimization with multiple constraints. In Marc’Aurelio Ranzato, Alina Beygelzimer, Yann N. Dauphin, Percy Liang, and Jennifer Wortman Vaughan, editors, Advances in Neural Information Processing Systems 34: Annual Conference on Neural Information Processing Systems 2021, NeurIPS 2021, December 6-14, 2021, virtual , pages 14542–14554, 2021. URL https://proceedings.neurips.cc/paper/2021/hash/79ec2a4246feb2126ecf43c4a4418002-Abstract.html ."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib7",
+      "text": "Chen et al. (2023) Charlie Chen, Sebastian Borgeaud, Geoffrey Irving, Jean-Baptiste Lespiau, Laurent Sifre, and John Jumper. Accelerating large language model decoding with speculative sampling. CoRR , abs/2302.01318, 2023. doi: 10.48550/arXiv.2302.01318 . URL https://doi.org/10.48550/arXiv.2302.01318 ."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib25",
+      "text": "Pei et al. (2023) Jonathan Pei, Kevin Yang, and Dan Klein. PREADD: prefix-adaptive decoding for controlled text generation. In Anna Rogers, Jordan L. Boyd-Graber, and Naoaki Okazaki, editors, Findings of the Association for Computational Linguistics: ACL 2023, Toronto, Canada, July 9-14, 2023 , pages 10018–10037. Association for Computational Linguistics, 2023. doi: 10.18653/v1/2023.findings-acl.636 . URL https://doi.org/10.18653/v1/2023.findings-acl.636 ."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib29",
+      "text": "Sanchez et al. (2023) Guillaume Sanchez, Honglu Fan, Alexander Spangher, Elad Levi, Pawan Sasanka Ammanamanchi, and Stella Biderman. Stay on topic with classifier-free guidance. CoRR , abs/2306.17806, 2023. doi: 10.48550/arXiv.2306.17806 . URL https://doi.org/10.48550/arXiv.2306.17806 ."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib8",
+      "text": "Chen et al. (2022) Howard Chen, Huihan Li, Danqi Chen, and Karthik Narasimhan. Controllable text generation with language constraints. CoRR , abs/2212.10466, 2022. doi: 10.48550/arXiv.2212.10466 . URL https://doi.org/10.48550/arXiv.2212.10466 ."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib31",
+      "text": "Schick et al. (2021) Timo Schick, Sahana Udupa, and Hinrich Schütze. Self-diagnosis and self-debiasing: A proposal for reducing corpus-based bias in NLP. Trans. Assoc. Comput. Linguistics , 9:1408–1424, 2021. doi: 10.1162/tacl\\_a\\_00434 . URL https://doi.org/10.1162/tacl_a_00434 ."
+    }
+  ]
+}

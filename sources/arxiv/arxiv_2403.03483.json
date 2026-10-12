@@ -1,0 +1,183 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.03483",
+  "title": "A Teacher-Free Graph Knowledge Distillation Framework with Dual Self-Distillation",
+  "authors": "Lirong Wu, Haitao Lin, Zhangyang Gao, Guojiang Zhao, Stan Z. Li",
+  "year": "2024",
+  "categories": [
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2403.03483",
+  "html_url": "https://arxiv.org/html/2403.03483",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 608,
+  "text": "Recently, Graph Neural Networks (GNNs) [1,2,3,4,5] have demonstrated their powerful capability to handle graph-structured data in a variety of applications, including meteorology [6,7], life sciences [8,9], and transportation [10,11]. Despite their great academic success, practical deployments of GNNs in the industry are still less popular. One reason for their gaps is the neighborhood-fetching inference latency incurred by data dependency in GNNs [12]. Most existing GNNs [13,14,15] rely on message passing to aggregate neighborhood features for capturing data dependency between nodes within a local subgraph. As a result, neighborhood fetching caused by data dependency is one of the major sources of GNN latency during inference. For example, to infer a single node with a L -layer GNN on a graph with average node degree R, it requires fetching and aggregating \\mathcal{O}(R^{L}) fetched nodes. However, R can be large for real-world graphs, e.g., 19 for the Amazon-com dataset, and L is getting deeper for the latest GNN architectures, e.g., L =1001 layers for RevGNN-Deep [16]. Compared with GNNs, MLPs do not suffer from the data dependency problem and infer much faster than GNNs. However, due to the lack of modeling data dependencies, MLPs may fail to take full advantage of the graph topological information, which limits their performance on various downstream tasks.\n\nTo connect the two worlds of topology-aware GNNs and inference-efficient MLPs, graph knowledge distillation [17,18,19,20,21] is proposed to distill knowledge from large teacher GNNs to small student GNNs or MLPs, yielding two branches, namely GNN-to-GNN [22,23,24] and GNN-to-MLP [25,26,27,28,29], as shown in Fig. 1(a). Different from the standard teacher-student KD, there is a similar technique called GNN Self-Distillation [30,31], which regularizes a GNN model by distilling its own knowledge within GNNs (e.g., across different layers or nodes) without other teacher models. Similarly, MLP Self-Distillation [32,33] is proposed to implicitly self-distill knowledge from structural information, but it does not involve any teachers or GNNs and is purely based on MLPs.\n\nConsidering both inference accuracy and inference time, the above four types of graph knowledge distillation methods are two completely different worlds. As shown in Fig. 1(b), GNN-to-GNN KD and GNN Self-Distillation directly deploy well-distilled GNNs for inference, which helps to improve the inference accuracy but does not help much in inference acceleration with the data dependency in GNNs unresolved. On the other hand, GNN-to-MLP KD and MLP Self-Distillation require only MLPs for inference, which greatly improves their inference speed, but brings limited performance improvement. In particular, MLP Self-Distillation completely removes GNNs, which disables it from being topology-aware, making its inference fastest, but at the cost of undesired performance drops.\n\nIn this paper, we found that neither teachers nor GNNs are necessary to achieve high-accuracy and high-efficiency inference on graphs. Therefore, we propose a simple T eacher-Free G raph S elf-Distillation (TGS) framework that does not require any teacher model or GNNs during both training and inference. The proposed TGS framework is purely based on MLPs, where structural information is only implicitly used to guide dual knowledge self-distillation between the target node and its neighborhood, substituting the explicit information propagation as in GNNs. As a result, the resulting model enjoys the benefits of graph topology-awareness in training but reduces time overhead in inference. Moreover, we propose an edge sampling strategy for batch-style self-distillation instead of feeding the entire graph into memory to reduce memory usage when scaling to large-scale graphs. Extensive experiments show that TGS infers as fast as MLPs, but its inference accuracy is comparable to or even better than state-of-the-art GKD algorithms. We believe that this work will inspire researchers to rethink the necessity of teachers and GNNs for graph knowledge distillation. Codes will be public at https://github.com/LirongWu/TGS.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "Z. Wu, S. Pan, F. Chen, G. Long, C. Zhang, and S. Y. Philip, “A comprehensive survey on graph neural networks,” IEEE transactions on neural networks and learning systems , 2020."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "J. Zhou, G. Cui, S. Hu, Z. Zhang, C. Yang, Z. Liu, L. Wang, C. Li, and M. Sun, “Graph neural networks: A review of methods and applications,” AI Open , vol. 1, pp. 57–81, 2020."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "L. Wu, H. Lin, Z. Liu, Z. Liu, Y. Huang, and S. Z. Li, “Homophily-enhanced self-supervision for graph structure learning: Insights and directions,” IEEE Transactions on Neural Networks and Learning Systems , 2023."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "L. Wu, J. Xia, Z. Gao, H. Lin, C. Tan, and S. Z. Li, “Graphmixup: Improving class-imbalanced node classification by reinforcement mixup and self-supervised context prediction,” in Joint European Conference on Machine Learning and Knowledge Discovery in Databases . Springer, 2022, pp. 519–535."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "L. Wu, H. Lin, B. Hu, C. Tan, Z. Gao, Z. Liu, and S. Z. Li, “Beyond homophily and homogeneity assumption: Relation-based frequency adaptive graph neural networks,” IEEE Transactions on Neural Networks and Learning Systems , 2023."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "H. Lin, Z. Gao, Y. Xu, L. Wu, L. Li, and S. Z. Li, “Conditional local convolution for spatio-temporal meteorological forecasting,” in Proceedings of the AAAI Conference on Artificial Intelligence , vol. 36, no. 7, 2022, pp. 7470–7478."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "M. Ma, P. Xie, F. Teng, B. Wang, S. Ji, J. Zhang, and T. Li, “Histgnn: Hierarchical spatio-temporal graph neural network for weather forecasting,” Information Sciences , vol. 648, p. 119580, 2023."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "L. Wu, Y. Tian, Y. Huang, S. Li, H. Lin, N. V. Chawla, and S. Li, “MAPE-PPI: Towards effective and efficient protein-protein interaction prediction via microenvironment-aware protein embedding,” in The Twelfth International Conference on Learning Representations , 2024. [Online]. Available: https://openreview.net/forum?id=itGkF993gz"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "L. Wu, Y. Huang, C. Tan, Z. Gao, H. Lin, B. Hu, Z. Liu, and S. Z. Li, “Psc-cpi: Multi-scale protein sequence-structure contrasting for efficient and generalizable compound-protein interaction prediction,” in Proceedings of the AAAI Conference on Artificial Intelligence , 2024."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "F. Zhou, Q. Yang, T. Zhong, D. Chen, and N. Zhang, “Variational graph neural networks for road traffic prediction in intelligent transportation systems,” IEEE Transactions on Industrial Informatics , vol. 17, no. 4, pp. 2802–2812, 2020."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "W. Jiang and J. Luo, “Graph neural network for traffic forecasting: A survey,” Expert Systems with Applications , vol. 207, p. 117921, 2022."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "Z. Jia, S. Lin, R. Ying, J. You, J. Leskovec, and A. Aiken, “Redundancy-free computation for graph neural networks,” in Proceedings of the 26th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining , 2020, pp. 997–1005."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "T. N. Kipf and M. Welling, “Variational graph auto-encoders,” arXiv preprint arXiv:1611.07308 , 2016."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "P. Veličković, G. Cucurull, A. Casanova, A. Romero, P. Lio, and Y. Bengio, “Graph attention networks,” arXiv preprint arXiv:1710.10903 , 2017."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "W. Hamilton, Z. Ying, and J. Leskovec, “Inductive representation learning on large graphs,” in Advances in neural information processing systems , 2017, pp. 1024–1034."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "G. Li, M. Müller, B. Ghanem, and V. Koltun, “Training graph neural networks with 1000 layers,” arXiv preprint arXiv:2106.07476 , 2021."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "B. Yan, C. Wang, G. Guo, and Y. Lou, “Tinygnn: Learning efficient graph neural networks,” in Proceedings of the 26th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining , 2020, pp. 1848–1856."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "H. He, J. Wang, Z. Zhang, and F. Wu, “Compressing deep graph neural networks via adversarial knowledge distillation,” in Proceedings of the 28th ACM SIGKDD Conference on Knowledge Discovery and Data Mining , 2022, pp. 534–544."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "H. Zhang, S. Lin, W. Liu, P. Zhou, J. Tang, X. Liang, and E. P. Xing, “Iterative graph self-distillation,” IEEE Transactions on Knowledge and Data Engineering , 2023."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "F. M. Nardini, C. Rulli, S. Trani, and R. Venturini, “Distilled neural networks for efficient learning to rank,” IEEE Transactions on Knowledge and Data Engineering , vol. 35, no. 5, pp. 4695–4712, 2022."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "W. Liu, D. Gong, M. Tan, J. Q. Shi, Y. Yang, and A. G. Hauptmann, “Learning distilled graph for large-scale social network data clustering,” IEEE Transactions on Knowledge and Data Engineering , vol. 32, no. 7, pp. 1393–1404, 2019."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib22",
+      "text": "Y. Yang, J. Qiu, M. Song, D. Tao, and X. Wang, “Distilling knowledge from graph convolutional networks,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2020, pp. 7074–7083."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib23",
+      "text": "Y. Ren, J. Ji, L. Niu, and M. Lei, “Multi-task self-distillation for graph-based semi-supervised learning,” arXiv preprint arXiv:2112.01174 , 2021."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib24",
+      "text": "L. Wu, H. Lin, Y. Huang, and S. Z. Li, “Knowledge distillation improves graph structure augmentation for graph neural networks,” in Advances in Neural Information Processing Systems , 2022."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib25",
+      "text": "S. Zhang, Y. Liu, Y. Sun, and N. Shah, “Graph-less neural networks: Teaching old mlps new tricks via distillation,” arXiv preprint arXiv:2110.08727 , 2021."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib26",
+      "text": "C. Yang, J. Liu, and C. Shi, “Extract the knowledge of graph neural networks and go beyond it: An effective knowledge distillation framework,” in Proceedings of the Web Conference 2021 , 2021, pp. 1227–1237."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib27",
+      "text": "L. Wu, H. Lin, Y. Huang, T. Fan, and S. Z. Li, “Extracting low-/high- frequency knowledge from graph neural networks and injecting it into mlps: An effective gnn-to-mlp distillation framework,” in Proceedings of the AAAI Conference on Artificial Intelligence , 2023."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib28",
+      "text": "Anonymous, “Double wins: Boosting accuracy and efficiency of graph neural networks by reliable knowledge distillation,” in Submitted to The Eleventh International Conference on Learning Representations , 2023, under review. [Online]. Available: https://openreview.net/forum?id=NGIFt6BNvLe"
+    },
+    {
+      "n": 29,
+      "id": "bib.bib29",
+      "text": "L. Wu, H. Lin, Y. Huang, and S. Z. Li, “Quantifying the knowledge in gnns for reliable distillation into mlps,” arXiv preprint arXiv:2306.05628 , 2023."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib30",
+      "text": "Y. Chen, Y. Bian, X. Xiao, Y. Rong, T. Xu, and J. Huang, “On self-distilling graph neural network,” arXiv preprint arXiv:2011.02255 , 2020."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib31",
+      "text": "W. Zhang, X. Miao, Y. Shao, J. Jiang, L. Chen, O. Ruas, and B. Cui, “Reliable data distillation on graph convolutional network,” in Proceedings of the 2020 ACM SIGMOD International Conference on Management of Data , 2020, pp. 1399–1414."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib32",
+      "text": "Y. Hu, H. You, Z. Wang, Z. Wang, E. Zhou, and Y. Gao, “Graph-mlp: Node classification without message passing in graph,” arXiv preprint arXiv:2106.04051 , 2021."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib33",
+      "text": "Y. Luo, A. Chen, K. Yan, and L. Tian, “Distilling self-knowledge from contrastive links to classify graph nodes without passing messages,” arXiv preprint arXiv:2106.08541 , 2021."
+    }
+  ]
+}

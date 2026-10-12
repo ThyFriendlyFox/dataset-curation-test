@@ -1,0 +1,190 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2306.12059",
+  "title": "EquiformerV2: Improved Equivariant Transformer for Scaling to Higher-Degree Representations",
+  "authors": "Yi-Lun Liao, Brandon Wood, Abhishek Das, Tess Smidt",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.AI",
+    "physics.comp-ph"
+  ],
+  "url": "https://arxiv.org/abs/2306.12059",
+  "html_url": "https://arxiv.org/html/2306.12059",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 551,
+  "text": "In recent years, machine learning (ML) models have shown promising results in accelerating and scaling high-accuracy but compute-intensive quantum mechanical calculations by effectively accounting for key features of atomic systems, such as the discrete nature of atoms, and Euclidean and permutation symmetries [1,2,3,4,5,6,7,8,9,10]. By bringing down computational costs from hours or days to fractions of seconds, these methods enable new insights in many applications such as molecular simulations, material design and drug discovery. A promising class of ML models that have enabled this progress is equivariant graph neural networks (GNNs) [11,12,13,14,5,15,16,17,18].\n\nEquivariant GNNs treat 3D atomistic systems as graphs, and incorporate inductive biases such that their internal representations and predictions are equivariant to 3D translations, rotations and optionally inversions. Specifically, they build up equivariant features of each node as vector spaces of irreducible representations (or irreps) and have interactions or message passing between nodes based on equivariant operations such as tensor products. Recent works on equivariant Transformers, specifically Equiformer [17], have shown the efficacy of applying Transformers [19], which have previously enjoyed widespread success in computer vision [20,21,22], language [23,24], and graphs [25,26,27,28], to this domain of 3D atomistic systems.\n\nA bottleneck in scaling Equiformer as well as other equivariant GNNs is the computational complexity of tensor products, especially when we increase the maximum degree of irreps L_{max}. This limits these models to use small values of L_{max} (e.g., L_{max}\\leq 3), which consequently limits their performance. Higher degrees can better capture angular resolution and directional information, which is critical to accurate prediction of atomic energies and forces [5,29,18]. To this end, eSCN [18] recently proposes efficient convolutions to reduce SO(3) tensor products to SO(2) linear operations, bringing down the computational cost from \\mathcal{O}(L_{max}^{6}) to \\mathcal{O}(L_{max}^{3}) and enabling scaling to larger values of L_{max} (e.g., L_{max} up to 8). However, except using efficient convolutions for higher L_{max}, eSCN still follows SEGNN-like message passing network [15] design, and Equiformer has been shown to improve upon SEGNN. More importantly, this ability to use higher L_{max} challenges whether the previous design of equivariant Transformers can scale well to higher-degree representations.\n\nIn this paper, we are interested in adapting eSCN convolutions for higher-degree representations to equivariant Transformers. We start with Equiformer [17] and replace SO(3) convolutions with eSCN convolutions. We find that naively incorporating eSCN convolutions does not result in better performance than the original eSCN model. Therefore, to better leverage the power of higher degrees, we propose three architectural improvements – attention re-normalization, separable S^{2} activation and separable layer normalization. Putting these all together, we propose EquiformerV2, which is developed on large and diverse OC20 dataset [30]. Experiments on OC20 show that EquiformerV2 outperforms previous state-of-the-art methods with improvements of up to 9\\% on forces and 4\\% on energies, and offers better speed-accuracy trade-offs compared to existing invariant and equivariant GNNs. Additionally, when used in the AdsorbML algorithm [10] for performing adsorption energy calculations, EquiformerV2 achieves the highest success rate and 2\\times reduction in DFT calculations to achieve comparable adsorption energy accuracies as previous methods. Furthermore, EquiformerV2 trained on only OC22 [31] dataset outperforms GemNet-OC [32] trained on both OC20 and OC22 datasets, achieving much better data efficiency. Finally, we compare EquiformerV2 with Equiformer on QM9 dataset [33,34] and OC20 S2EF-2M dataset to better understand the performance gain of higher degrees and the improved architecture.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib21",
+      "text": "Gilmer et al. (2017) Justin Gilmer, Samuel S. Schoenholz, Patrick F. Riley, Oriol Vinyals, and George E. Dahl. Neural message passing for quantum chemistry. In International Conference on Machine Learning (ICML) , 2017."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib69",
+      "text": "Zhang et al. (2018) Linfeng Zhang, Jiequn Han, Han Wang, Roberto Car, and Weinan E. Deep potential molecular dynamics: A scalable model with the accuracy of quantum mechanics. Phys. Rev. Lett. , 120:143001, Apr 2018. doi: 10.1103/PhysRevLett.120.143001 . URL https://link.aps.org/doi/10.1103/PhysRevLett.120.143001 ."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib25",
+      "text": "Jia et al. (2020) Weile Jia, Han Wang, Mohan Chen, Denghui Lu, Lin Lin, Roberto Car, Weinan E, and Linfeng Zhang. Pushing the limit of molecular dynamics with ab initio accuracy to 100 million atoms with machine learning. In Proceedings of the International Conference for High Performance Computing, Networking, Storage and Analysis , SC ’20. IEEE Press, 2020."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib17",
+      "text": "Gasteiger et al. (2020a) Johannes Gasteiger, Shankari Giri, Johannes T. Margraf, and Stephan Günnemann. Fast and uncertainty-aware directional message passing for non-equilibrium molecules. In Machine Learning for Molecules Workshop, NeurIPS , 2020a."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib3",
+      "text": "Batzner et al. (2022) Simon Batzner, Albert Musaelian, Lixin Sun, Mario Geiger, Jonathan P. Mailoa, Mordechai Kornbluth, Nicola Molinari, Tess E. Smidt, and Boris Kozinsky. E(3)-equivariant graph neural networks for data-efficient and accurate interatomic potentials. Nature Communications , 13(1), May 2022. doi: 10.1038/s41467-022-29939-5 . URL https://doi.org/10.1038/s41467-022-29939-5 ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib35",
+      "text": "Lu et al. (2021) Denghui Lu, Han Wang, Mohan Chen, Lin Lin, Roberto Car, Weinan E, Weile Jia, and Linfeng Zhang. 86 pflops deep potential molecular dynamics simulation of 100 million atoms with ab initio accuracy. Computer Physics Communications , 259:107624, 2021. ISSN 0010-4655. doi: https://doi.org/10.1016/j.cpc.2020.107624 . URL https://www.sciencedirect.com/science/article/pii/S001046552030299X ."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib60",
+      "text": "Unke et al. (2021) Oliver Thorsten Unke, Mihail Bogojeski, Michael Gastegger, Mario Geiger, Tess Smidt, and Klaus Robert Muller. SE(3)-equivariant prediction of molecular wavefunctions and electronic densities. In A. Beygelzimer, Y. Dauphin, P. Liang, and J. Wortman Vaughan (eds.), Advances in Neural Information Processing Systems (NeurIPS) , 2021. URL https://openreview.net/forum?id=auGY2UQfhSu ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib52",
+      "text": "Sriram et al. (2022) Anuroop Sriram, Abhishek Das, Brandon M Wood, and C. Lawrence Zitnick. Towards training billion parameter graph neural networks for atomic simulations. In International Conference on Learning Representations (ICLR) , 2022."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib41",
+      "text": "Rackers et al. (2023) Joshua A Rackers, Lucas Tecot, Mario Geiger, and Tess E Smidt. A recipe for cracking the quantum scaling limit with machine learned electron densities. Machine Learning: Science and Technology , 4(1):015027, feb 2023. doi: 10.1088/2632-2153/acb314 . URL https://dx.doi.org/10.1088/2632-2153/acb314 ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib30",
+      "text": "Lan et al. (2022) Janice Lan, Aini Palizhati, Muhammed Shuaibi, Brandon M Wood, Brook Wander, Abhishek Das, Matt Uyttendaele, C Lawrence Zitnick, and Zachary W Ulissi. AdsorbML: Accelerating adsorption energy calculations with machine learning. arXiv preprint arXiv:2211.16486 , 2022."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib55",
+      "text": "Thomas et al. (2018) Nathaniel Thomas, Tess E. Smidt, Steven Kearnes, Lusann Yang, Li Li, Kai Kohlhoff, and Patrick Riley. Tensor field networks: Rotation- and translation-equivariant neural networks for 3d point clouds. arxiv preprint arXiv:1802.08219 , 2018."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib63",
+      "text": "Weiler et al. (2018) Maurice Weiler, Mario Geiger, Max Welling, Wouter Boomsma, and Taco Cohen. 3D Steerable CNNs: Learning Rotationally Equivariant Features in Volumetric Data. In Advances in Neural Information Processing Systems 32 , pp. 10402–10413, 2018."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib28",
+      "text": "Kondor et al. (2018) Risi Kondor, Zhen Lin, and Shubhendu Trivedi. Clebsch–gordan nets: a fully fourier space spherical convolutional neural network. In Advances in Neural Information Processing Systems 32 , pp. 10117–10126, 2018."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib16",
+      "text": "Fuchs et al. (2020) Fabian Fuchs, Daniel E. Worrall, Volker Fischer, and Max Welling. Se(3)-transformers: 3d roto-translation equivariant attention networks. In Advances in Neural Information Processing Systems (NeurIPS) , 2020."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib4",
+      "text": "Brandstetter et al. (2022) Johannes Brandstetter, Rob Hesselink, Elise van der Pol, Erik J Bekkers, and Max Welling. Geometric and physical quantities improve e(3) equivariant message passing. In International Conference on Learning Representations (ICLR) , 2022. URL https://openreview.net/forum?id=_xwr8gOBeV1 ."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib37",
+      "text": "Musaelian et al. (2022) Albert Musaelian, Simon Batzner, Anders Johansson, Lixin Sun, Cameron J. Owen, Mordechai Kornbluth, and Boris Kozinsky. Learning local equivariant representations for large-scale atomistic dynamics. arxiv preprint arxiv:2204.05249 , 2022."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib33",
+      "text": "Liao & Smidt (2023) Yi-Lun Liao and Tess Smidt. Equiformer: Equivariant graph attention transformer for 3d atomistic graphs. In International Conference on Learning Representations (ICLR) , 2023. URL https://openreview.net/forum?id=KwmPfARgOTD ."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib39",
+      "text": "Passaro & Zitnick (2023) Saro Passaro and C Lawrence Zitnick. Reducing SO(3) Convolutions to SO(2) for Efficient Equivariant GNNs. In International Conference on Machine Learning (ICML) , 2023."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib61",
+      "text": "Vaswani et al. (2017) Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Lukasz Kaiser, and Illia Polosukhin. Attention is all you need. In Advances in Neural Information Processing Systems (NeurIPS) , 2017."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib6",
+      "text": "Carion et al. (2020) Nicolas Carion, Francisco Massa, Gabriel Synnaeve, Nicolas Usunier, Alexander Kirillov, and Sergey Zagoruyko. End-to-end object detection with transformers. In European Conference on Computer Vision (ECCV) , 2020."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib11",
+      "text": "Dosovitskiy et al. (2021) Alexey Dosovitskiy, Lucas Beyer, Alexander Kolesnikov, Dirk Weissenborn, Xiaohua Zhai, Thomas Unterthiner, Mostafa Dehghani, Matthias Minderer, Georg Heigold, Sylvain Gelly, Jakob Uszkoreit, and Neil Houlsby. An image is worth 16x16 words: Transformers for image recognition at scale. In International Conference on Learning Representations (ICLR) , 2021. URL https://openreview.net/forum?id=YicbFdNTTy ."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib56",
+      "text": "Touvron et al. (2020) Hugo Touvron, Matthieu Cord, Matthijs Douze, Francisco Massa, Alexandre Sablayrolles, and Hervé Jégou. Training data-efficient image transformers & distillation through attention. arXiv preprint arXiv:2012.12877 , 2020."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib10",
+      "text": "Devlin et al. (2019) Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. BERT: Pre-training of deep bidirectional transformers for language understanding. arxiv preprint arxiv:1810.04805 , 2019."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib5",
+      "text": "Brown et al. (2020) Tom Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared D Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, Sandhini Agarwal, Ariel Herbert-Voss, Gretchen Krueger, Tom Henighan, Rewon Child, Aditya Ramesh, Daniel Ziegler, Jeffrey Wu, Clemens Winter, Chris Hesse, Mark Chen, Eric Sigler, Mateusz Litwin, Scott Gray, Benjamin Chess, Jack Clark, Christopher Berner, Sam McCandlish, Alec Radford, Ilya Sutskever, and Dario Amodei. Language models are few-shot learners. In Advances in Neural Information Processing Systems (NeurIPS) , 2020."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib13",
+      "text": "Dwivedi & Bresson (2020) Vijay Prakash Dwivedi and Xavier Bresson. A generalization of transformer networks to graphs. arxiv preprint arxiv:2012.09699 , 2020."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib29",
+      "text": "Kreuzer et al. (2021) Devin Kreuzer, Dominique Beaini, William L. Hamilton, Vincent Létourneau, and Prudencio Tossou. Rethinking graph transformers with spectral attention. In Advances in Neural Information Processing Systems (NeurIPS) , 2021. URL https://openreview.net/forum?id=huAdB-Tj4yG ."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib66",
+      "text": "Ying et al. (2021) Chengxuan Ying, Tianle Cai, Shengjie Luo, Shuxin Zheng, Guolin Ke, Di He, Yanming Shen, and Tie-Yan Liu. Do transformers really perform badly for graph representation? In Advances in Neural Information Processing Systems (NeurIPS) , 2021. URL https://openreview.net/forum?id=OeWooOxFwDa ."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib50",
+      "text": "Shi et al. (2022) Yu Shi, Shuxin Zheng, Guolin Ke, Yifei Shen, Jiacheng You, Jiyan He, Shengjie Luo, Chang Liu, Di He, and Tie-Yan Liu. Benchmarking graphormer on large-scale molecular modeling datasets. arxiv preprint arxiv:2203.04810 , 2022."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib70",
+      "text": "Zitnick et al. (2022) Larry Zitnick, Abhishek Das, Adeesh Kolluru, Janice Lan, Muhammed Shuaibi, Anuroop Sriram, Zachary Ulissi, and Brandon Wood. Spherical channels for modeling atomic interactions. In Advances in Neural Information Processing Systems (NeurIPS) , 2022."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib7",
+      "text": "Chanussot* et al. (2021) Lowik Chanussot*, Abhishek Das*, Siddharth Goyal*, Thibaut Lavril*, Muhammed Shuaibi*, Morgane Riviere, Kevin Tran, Javier Heras-Domingo, Caleb Ho, Weihua Hu, Aini Palizhati, Anuroop Sriram, Brandon Wood, Junwoong Yoon, Devi Parikh, C. Lawrence Zitnick, and Zachary Ulissi. Open catalyst 2020 (oc20) dataset and community challenges. ACS Catalysis , 2021. doi: 10.1021/acscatal.0c04525 ."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib58",
+      "text": "Tran* et al. (2022) Richard Tran*, Janice Lan*, Muhammed Shuaibi*, Brandon Wood*, Siddharth Goyal*, Abhishek Das, Javier Heras-Domingo, Adeesh Kolluru, Ammar Rizvi, Nima Shoghi, Anuroop Sriram, Zachary Ulissi, and C. Lawrence Zitnick. The open catalyst 2022 (oc22) dataset and challenges for oxide electrocatalysis. arXiv preprint arXiv:2206.08917 , 2022."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib19",
+      "text": "Gasteiger et al. (2022) Johannes Gasteiger, Muhammed Shuaibi, Anuroop Sriram, Stephan Günnemann, Zachary Ulissi, C Lawrence Zitnick, and Abhishek Das. GemNet-OC: Developing Graph Neural Networks for Large and Diverse Molecular Simulation Datasets. Transactions on Machine Learning Research (TMLR) , 2022."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib43",
+      "text": "Ramakrishnan et al. (2014) Raghunathan Ramakrishnan, Pavlo O Dral, Matthias Rupp, and O Anatole von Lilienfeld. Quantum chemistry structures and properties of 134 kilo molecules. Scientific Data , 1, 2014."
+    },
+    {
+      "n": 34,
+      "id": "bib.bib45",
+      "text": "Ruddigkeit et al. (2012) Lars Ruddigkeit, Ruud van Deursen, Lorenz C. Blum, and Jean-Louis Reymond. Enumeration of 166 billion organic small molecules in the chemical universe database gdb-17. Journal of Chemical Information and Modeling , 52(11):2864–2875, 2012. doi: 10.1021/ci300415d . URL https://doi.org/10.1021/ci300415d . PMID: 23088335."
+    }
+  ]
+}

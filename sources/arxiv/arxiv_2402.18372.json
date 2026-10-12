@@ -1,0 +1,85 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2402.18372",
+  "title": "FedUV: Uniformity and Variance for Heterogeneous Federated Learning",
+  "authors": "Ha Min Son, Moon-Hyun Kim, Tai-Myoung Chung, Chao Huang, Xin Liu",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.AI",
+    "cs.DC"
+  ],
+  "url": "https://arxiv.org/abs/2402.18372",
+  "html_url": "https://arxiv.org/html/2402.18372",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 887,
+  "text": "Federated Learning (FL) [1] is a distributed learning framework that allows the training of deep neural networks with data in decentralized locations. FL is especially appealing because it achieves similar performance to centralized training in specific settings while also negating the cost of collecting data into a centralized location and allowing effective parallelization across devices [2]. However, because devices participating in FL use locally collected data for training, it is realistic to expect that the collective data across all devices are not independent and identically distributed (non-IID). This severely degrades overall performance. Local devices optimize their copy of the model towards local optima. In non-IID settings, however, it is likely that local optima across devices are in disagreement with the true optimum of the IID setting. Thus, the direction of the gradient causes dissonance and degraded performance. This phenomena is referred to as client drift in the FL literature.\n\nTo combat client drift, a number of work [3,4,5] introduced the idea of using the global model as a basis for regularization. More recently, some work showed it may be effective to focus on certain layers which are more prone to bias. In particular, [6] found that the final layer, referred to as the classifier, is the most biased in non-IID settings. They introduce a method to calibrate the classifier to offset this bias. Other work [7] used augmentation techniques [8] to regularize the classifier, while another work [9] randomly initialized and froze the weights of the classifier. Since random vectors in high dimension space are likely to be orthogonal, the output of the penultimate layer, referred to as the representations or activations of the encoder, are trained to fit these orthogonal classifiers, thus offsetting bias.\n\nHowever, we note previous work have approached the non-IID problem by regularizing local models to be less biased, rather than directly regularizing local models to emulate the IID setting. In addition, many work have not been tested in a feature-shift setting, often only using the Dirichlet distribution to simulate a label-shift setting. Furthermore, while providing important insight for FL, these work generally do not take into account efficiency and scalability. State-of-the-art methods such as FedProx [3], SCAFFOLD [10], and FedDyn [4] require distances calculations of weights between all layers of multiple models at every batch. MOON [5] and FedAlign [7] require extra forward passes at every batch. Computation and memory constraints certainly become issues as the size of models and datasets grow.\n\nMotivation. In most classification problems, it is standard to minimize a Cross-Entropy loss function [11] to fit a neural network’s probability distribution to the sampled probability distribution. When the sampled class distribution is imbalanced, such as in a non-IID environment, the classifier becomes biased towards some subspace regardless of the features extracted by the encoder. Motivated by the success of freezing the classifier as orthogonal vectors [9], we use the singular value decomposition to gain insight into the training dynamics of the classifier. We train a Resnet-18 [12] on CIFAR-100 [13] and take the singular value decomposition of the weight matrix (\\mathbf{W}=\\mathbf{U}\\mathbf{\\Sigma}\\mathbf{V^{\\top}}, \\mathbf{\\Sigma}=diag(\\mathbf{\\sigma_{1},...,\\sigma_{n}})) as shown in Fig. 1. The singular values of the classifier decrease in a non-IID setting, showing there is a difference in the training dynamic between IID and non-IID settings.\n\nIn light of this, we propose an approach to the non-IID problem in which we directly promote the emulation of an IID setting. There is a nuanced difference from previous work which regularize to decrease bias. Previous work use the global model as a source of regularization under the intuition that the global model is less biased than any single local model. However, this may not be optimal in every setting as the aggregate of biased local model may still be biased. We instead focus on regularizing local models to emulate the IID setting without the use of the global model. Namely, we present FedUV, a method that promotes IID emulation by inducing representation hyperspherical U niformity and classifier V araiance during local training. FedUV penalizes classifier probability distributions that are biased towards a subset of classes, thus promoting probability distributions in non-IID settings to match IID settings. This promotes local classifiers to be unbiased in their predictions rather than becoming biased towards local labels. Furthermore, we penalize representations that are not thoroughly spread across the hypersphere. There are two reasons for this. First, this encourages the encoder to not become biased towards local features. Second, expanding the feature space allows the classifier to expand its variance in more directions. We show both regularizations are essential for improved performance. FedUV achieves state-of-the-art performance on various standard label-shift benchmark in addition to various feature-shift benchmarks while being extremely simple, efficient, and scalable.\n\nOur contributions are summarized as follows. First, we verify that singular values of the classifier decreases as a consequence of non-IID environments in FL (Fig. 1). Second, we present two regularization terms, representation hyperspherical uniformity and classifier variance, to prevent this degradation. These regularization terms are simple yet effective. Third, we show that FedUV achieves state-of-the-art performance not only on label shift non-IID settings but also on feature shift non-IID settings. Unlike previous work, FedUV does not use the global model as a source of regularization, which requires extra forward-pass, requires extra memory, or requires matrix comparison between weights of each layer, thus being more efficient.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib31",
+      "text": "Brendan McMahan, Eider Moore, Daniel Ramage, Seth Hampson, and Blaise Aguera y Arcas. Communication-efficient learning of deep networks from decentralized data. In Artificial intelligence and statistics , pages 1273–1282. PMLR, 2017."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib42",
+      "text": "Joost Verbraeken, Matthijs Wolting, Jonathan Katzy, Jeroen Kloppenburg, Tim Verbelen, and Jan S. Rellermeyer. A survey on distributed machine learning, 2019."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib20",
+      "text": "Tian Li, Anit Kumar Sahu, Manzil Zaheer, Maziar Sanjabi, Ameet Talwalkar, and Virginia Smith. Federated optimization in heterogeneous networks. Proceedings of Machine Learning and Systems , 2:429–450, 2020."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib1",
+      "text": "Durmus Alp Emre Acar, Yue Zhao, Ramon Matas Navarro, Matthew Mattina, Paul N Whatmough, and Venkatesh Saligrama. Federated learning based on dynamic regularization. arXiv preprint arXiv:2111.04263 , 2021."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib19",
+      "text": "Qinbin Li, Bingsheng He, and Dawn Song. Model-contrastive federated learning. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 10713–10722, 2021a."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib29",
+      "text": "Mi Luo, Fei Chen, Dapeng Hu, Yifan Zhang, Jian Liang, and Jiashi Feng. No fear of heterogeneity: Classifier calibration for federated learning with non-iid data. Advances in Neural Information Processing Systems , 34:5972–5984, 2021."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib32",
+      "text": "Matias Mendieta, Taojiannan Yang, Pu Wang, Minwoo Lee, Zhengming Ding, and Chen Chen. Local learning matters: Rethinking data heterogeneity in federated learning. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 8397–8406, 2022."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib49",
+      "text": "Taojiannan Yang, Sijie Zhu, and Chen Chen. Gradaug: A new regularization method for deep neural networks. Advances in Neural Information Processing Systems , 33:14207–14218, 2020."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib34",
+      "text": "Jaehoon Oh, Sangmook Kim, and Se-Young Yun. Fedbabu: Towards enhanced representation for federated image classification. arXiv preprint arXiv:2106.06042 , 2021."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib15",
+      "text": "Sai Praneeth Karimireddy, Satyen Kale, Mehryar Mohri, Sashank Reddi, Sebastian Stich, and Ananda Theertha Suresh. Scaffold: Stochastic controlled averaging for federated learning. In International Conference on Machine Learning , pages 5132–5143. PMLR, 2020b."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib9",
+      "text": "Irving John Good. Rational decisions. In Breakthroughs in statistics , pages 365–377. Springer, 1992."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib10",
+      "text": "Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. Deep residual learning for image recognition. In Proceedings of the IEEE conference on computer vision and pattern recognition , pages 770–778, 2016."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib16",
+      "text": "Alex Krizhevsky. Learning multiple layers of features from tiny images, 2009."
+    }
+  ]
+}

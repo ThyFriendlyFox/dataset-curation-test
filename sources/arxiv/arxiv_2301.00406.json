@@ -1,0 +1,244 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2301.00406",
+  "title": "Curvature regularization for Non-line-of-sight Imaging from Under-sampled Data",
+  "authors": "Rui Ding, Juntian Ye, Qifeng Gao, Feihu Xu, Yuping Duan",
+  "year": "2024",
+  "categories": [
+    "cs.CV",
+    "eess.IV"
+  ],
+  "url": "https://arxiv.org/abs/2301.00406",
+  "html_url": "https://arxiv.org/html/2301.00406",
+  "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+  "section": "Introduction",
+  "word_count": 892,
+  "text": "Non-line-of-sight (NLOS) imaging uses time-resolved measurements to recover the 3D shape and visual appearance of hidden objects beyond the direct line of sight of sensors [1,2], which has various applications such as autonomous driving [3], 3D human pose estimation [4], sensor system [5,6], and many other domains. Recent advances in single-photon detector technology and computational algorithms for solving large-scale inverse problems make NLOS imaging feasible in different conditions. For instance, NLOS imaging and real-time tracking of hidden objects have been demonstrated over a distance of 1.43 km [7] and at a resolution of 0.6 mm at a distance of 0.55 m [8,9], respectively.\n\nThe inverse problem of reconstructing the 3D shape and appearance of the hidden object is also very challenging [10,11]. Roughly speaking the NLOS imaging reconstruction methods can be divided into three categories, i.e., direct reconstruction methods, iterative reconstruction methods, and deep learning-based reconstruction methods. The filtered back-projection algorithm is a kind of fast direct method by filtering the data and performing the back-projection operation, where the data is painted back in the image along the direction it is being measured [12,13,14]. Other direct reconstruction methods also contain the phasor field [15], frequency-domain method [16], Fermat flow method [17], etc, which are proposed by modeling the physical process of imaging. These direct reconstruction methods are fast and efficient but are sensitive to noises and measurement distortions. The iterative reconstruction methods have been used by introducing priors to regularize the NLOS reconstruction problem and improve the image quality [18,19,20,21,22]. Although iterative reconstruction methods can provide high-quality reconstruction images, they also consume much more computational time than direct methods. Due to the development of deep learning, convolutional neural network models have been developed for solving the NLOS reconstruction problem [23,24,25,26,27]. However, deep learning methods are highly dependent on the training datasets, which makes it possible to lose their impact on real measurement data and spatial/temporal degradation data [23].\n\nIndeed, the dense raster scanning used in the aforementioned methods is detrimental to high-speed NLOS applications. Thus, different strategies have been employed to reduce the acquisition time. One strategy is to use the multi-pixel time-of-flight NLOS system. Nam et al. [28] used the specifically designed single photon avalanche diode (SPAD) array detectors to realize a multi-pixel NLOS imaging method together with a fast reconstruction algorithm that can capture and reconstruct live low-latency videos of NLOS scenes. Pei et al. [29] used the SPAD array and an optimization-based computational method to achieve NLOS reconstruction of 20 frames per second. Another strategy is to use fewer scanning points to reconstruct the scene. Isogawa et al. [30] proposed a circular and confocal non-line-of-sight scan, for which the scanning involves sampling points forming a circle on a visible wall to reduce the dimension of transient measurements. Ye et al. [21] explored compressed sensing in active NLOS imaging to reduce the required number of scanning points for fast implementation. Zhang et al. [31] proposed an Archimedean spiral scanning method based on confocal non-line-of-sight imaging, which greatly reduces the data acquisition time.\n\nAs illustrated in previous works [30,21], NLOS reconstruction can be realized by under-sampled measurements to facilitate high-speed acquisition. However, sparse measurements may lead to the degradation of reconstructed images. Effective regularization methods have been used for various shape and image processing tasks, such as sparse regularization [32], surface area regularization [33], and curvature regularization [34,35,36], etc. Among them, curvature regularization is well-known for its ability to model the continuities of edges and surfaces. Initially, curvature regularization was applied to the problem of image inpainting to restore satisfactory results meeting human perception [37,38,39]. Due to its superiority in recovering missing data, curvature regularity has also been used for surface reconstruction [40,41], sparse image reconstruction [42,43]. Since the curvature regularization is capable of capturing the tiny but elongated structures in images, it has also been used for image segmentation [44], tubular structure tracking [45], etc. Curvature regularization is a good choice for under-sampled NLOS imaging problems to obtain smooth and satisfied reconstructed surfaces.\n\nIn this paper, we study the curvature regularization reconstruction model for under-sampled NLOS imaging problems, called curvNLOS, which can reconstruct surfaces with good quality through as few measurements as possible. We also develop an effective numerical algorithm based on the alternating direction methods of multipliers (ADMM), which can be solved by GPU computation. Comprehensive experiments are conducted on both synthetic and real data. The numerical results demonstrate that curvature regularization can effectively guarantee the smoothness of the object and estimated signals. The main contribution of this work can be summarized as follows:\n\n- • We propose novel curvature regularization models for solving the NLOS imaging problem, where the curvature regularization is used to restore the smooth surface of hidden objects and fill in the sparse measured signals.\n\n- • We present fast iterative optimization algorithms for solving the curvature minimization problems, where the high-order curvature is regarded as the adaptive weight for total variation, and the linearization technique is used to obtain the GPU-friendly iterative algorithms.\n\n- • We develop a GPU-based NLOS reconstruction package by utilizing the parallel computation ability of GPUs, which is desirable for high-speed NLOS applications.\n\n- • By comparing with the state-of-the-art NLOS methods, our curvature regularization models can robustly restore estimated signals and the three-dimensional scene points on both confocal and non-confocal settings, especially when the measurements are under-sampled measured data.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "D. Faccio, A. Velten, and G. Wetzstein, “Non-line-of-sight imaging,” Nature Reviews Physics , vol. 2, no. 6, pp. 318–327, 2020."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "R. Geng, Y. Hu, Y. Chen et al. , “Recent advances on non-line-of-sight imaging: Conventional physical models, deep learning, and new scenes,” APSIPA Transactions on Signal and Information Processing , vol. 11, no. 1, 2021."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "N. Scheiner, F. Kraus, F. Wei, B. Phan, F. Mannan, N. Appenrodt, W. Ritter, J. Dickmann, K. Dietmayer, B. Sick et al. , “Seeing around street corners: Non-line-of-sight detection and tracking in-the-wild using doppler radar,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2020, pp. 2068–2077."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "M. Isogawa, Y. Yuan, M. O’Toole, and K. M. Kitani, “Optical non-line-of-sight physics-based 3d human pose estimation,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2020, pp. 7013–7022."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "W. Chen, F. Wei, K. N. Kutulakos, S. Rusinkiewicz, and F. Heide, “Learned feature embeddings for non-line-of-sight imaging and recognition,” ACM Transactions on Graphics (ToG) , vol. 39, no. 6, pp. 1–18, 2020."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "S. Zhu, Y. M. Sua, P. Rehain, and Y.-P. Huang, “Single photon imaging and sensing of highly obscured objects around the corner,” Optics Express , vol. 29, no. 25, pp. 40 865–40 877, 2021."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "C. Wu, J. Liu, X. Huang, Z.-P. Li, C. Yu, J.-T. Ye, J. Zhang, Q. Zhang, X. Dou, V. K. Goyal et al. , “Non–line-of-sight imaging over 1.43 km,” Proceedings of the National Academy of Sciences , vol. 118, no. 10, p. e2024468118, 2021."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "R. Cao, F. de Goumoens, B. Blochet, J. Xu, and C. Yang, “High-resolution non-line-of-sight imaging employing active focusing,” Nature Photonics , pp. 1–7, 2022."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "B. Wang, M.-Y. Zheng, J.-J. Han, X. Huang, X.-P. Xie, F. Xu, Q. Zhang, and J.-W. Pan, “Non-line-of-sight imaging with picosecond temporal resolution,” Physical Review Letters , vol. 127, no. 6, p. 053602, 2021."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "M. O’Toole, D. B. Lindell, and G. Wetzstein, “Confocal non-line-of-sight imaging based on the light-cone transform,” Nature , vol. 555, no. 7696, pp. 338–341, 2018."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "D. B. Lindell and G. Wetzstein, “Three-dimensional imaging through scattering media based on confocal diffuse tomography,” Nature Communications , vol. 11, no. 1, pp. 1–8, 2020."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "O. Gupta, T. Willwacher, A. Velten, A. Veeraraghavan, and R. Raskar, “Reconstruction of hidden 3d shapes using diffuse reflections,” Optics Express , vol. 20, no. 17, pp. 19 096–19 108, 2012."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "M. La Manna, F. Kine, E. Breitbach, J. Jackson, T. Sultan, and A. Velten, “Error backprojection algorithms for non-line-of-sight imaging,” IEEE Transactions on Pattern Analysis and Machine Intelligence , vol. 41, no. 7, pp. 1615–1626, 2018."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "V. Arellano, D. Gutierrez, and A. Jarabo, “Fast back-projection for non-line of sight reconstruction,” Optics express , vol. 25, no. 10, pp. 11 574–11 583, 2017."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "X. Liu, I. Guillén, M. La Manna, J. H. Nam, S. A. Reza, T. Huu Le, A. Jarabo, D. Gutierrez, and A. Velten, “Non-line-of-sight imaging using phasor-field virtual wave optics,” Nature , vol. 572, no. 7771, pp. 620–623, 2019."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "D. B. Lindell, G. Wetzstein, and M. O’Toole, “Wave-based non-line-of-sight imaging using fast fk migration,” ACM Transactions on Graphics (ToG) , vol. 38, no. 4, pp. 1–13, 2019."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "S. Xin, S. Nousias, K. N. Kutulakos, A. C. Sankaranarayanan, S. G. Narasimhan, and I. Gkioulekas, “A theory of fermat paths for non-line-of-sight shape reconstruction,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2019, pp. 6800–6809."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "F. Heide, L. Xiao, W. Heidrich, and M. B. Hullin, “Diffuse mirrors: 3d reconstruction from diffuse indirect illumination using inexpensive time-of-flight sensors,” in IEEE Conference on Computer Vision and Pattern Recognition , 2014, pp. 3222–3229."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "B. Ahn, A. Dave, A. Veeraraghavan, I. Gkioulekas, and A. C. Sankaranarayanan, “Convolutional approximations to the general non-line-of-sight imaging operator,” in IEEE/CVF International Conference on Computer Vision . IEEE, 2019, pp. 7888–7898."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "X. Liu, J. Wang, Z. Li, Z. Shi, X. Fu, and L. Qiu, “Non-line-of-sight reconstruction with signal–object collaborative regularization,” Light: Science & Applications , vol. 10, no. 1, pp. 1–20, 2021."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "J.-T. Ye, X. Huang, Z.-P. Li, and F. Xu, “Compressed sensing for active non-line-of-sight imaging,” Optics Express , vol. 29, no. 2, pp. 1749–1763, 2021."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib22",
+      "text": "J. Liu, Y. Zhou, X. Huang, Z. Li, and F. Xu, “Photon-efficient non-line-of-sight imaging,” IEEE Transactions on Computational Imaging , vol. 8, pp. 639–650, 2022."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib23",
+      "text": "J. G. Chopite, M. B. Hullin, M. Wand, and J. Iseringhausen, “Deep non-line-of-sight reconstruction,” in IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2020, pp. 957–966."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib24",
+      "text": "W. Chen, F. Wei, K. N. Kutulakos, S. Rusinkiewicz, and F. Heide, “Learned feature embeddings for non-line-of-sight imaging and recognition,” ACM Transactions on Graphics , vol. 39, no. 6, pp. 230:1–230:18, 2020."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib25",
+      "text": "M. Isogawa, Y. Yuan, M. O’Toole, and K. M. Kitani, “Optical non-line-of-sight physics-based 3d human pose estimation,” in 2020 IEEE/CVF Conference on Computer Vision and Pattern Recognition, CVPR 2020, Seattle, WA, USA, June 13-19, 2020 , 2020, pp. 7011–7020."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib26",
+      "text": "S. Shen, Z. Wang, P. Liu, Z. Pan, R. Li, T. Gao, S. Li, and J. Yu, “Non-line-of-sight imaging via neural transient fields,” IEEE Transactions on Pattern Analysis and Machine Intelligence , vol. 43, no. 7, pp. 2257–2268, 2021."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib27",
+      "text": "S. Zhu, Y. M. Sua, T. Bu, and Y.-P. Huang, “Compressive non-line-of-sight imaging with deep learning,” Physical Review Applied , vol. 19, no. 3, p. 034090, 2023."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib28",
+      "text": "J. H. Nam, E. Brandt, S. Bauer, X. Liu, M. Renna, A. Tosi, E. Sifakis, and A. Velten, “Low-latency time-of-flight non-line-of-sight imaging at 5 frames per second,” Nature Communications , vol. 12, no. 1, pp. 1–10, 2021."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib29",
+      "text": "C. Pei, A. Zhang, Y. Deng, F. Xu, J. Wu, U. David, L. Li, H. Qiao, L. Fang, and Q. Dai, “Dynamic non-line-of-sight imaging system based on the optimization of point spread functions,” Optics Express , vol. 29, no. 20, pp. 32 349–32 364, 2021."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib30",
+      "text": "M. Isogawa, D. Chan, Y. Yuan, K. Kitani, and M. O’Toole, “Efficient non-line-of-sight imaging from transient sinograms,” in European Conference on Computer Vision . Springer, 2020, pp. 193–208."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib31",
+      "text": "M. Zhang, Y. Shi, W. Sheng, J. Liu, J. Li, Y. Wei, B. Wang, D. Zhang, and Y. Liu, “Non-line-of-sight imaging based on archimedean spiral scanning,” Optics Communications , vol. 537, p. 129450, 2023."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib32",
+      "text": "J. Liu, R. W. Liu, J. Sun, and T. Zeng, “Rank-one prior: Real-time scene recovery,” IEEE Transactions on Pattern Analysis and Machine Intelligence , vol. 45, no. 7, pp. 8845 – 8860, 2023."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib33",
+      "text": "J. Liu, M. Yan, and T. Zeng, “Surface-aware blind image deblurring,” IEEE Transactions on Pattern Analysis and Machine Intelligence , vol. 43, no. 3, pp. 1041–1055, 2019."
+    },
+    {
+      "n": 34,
+      "id": "bib.bib34",
+      "text": "A. Chambolle and T. Pock, “Total roto-translational variation,” Numerische Mathematik , vol. 142, no. 3, pp. 611–666, 2019."
+    },
+    {
+      "n": 35,
+      "id": "bib.bib35",
+      "text": "B. Dong, H. Ju, Y. Lu, and Z. Shi, “CURE: curvature regularization for missing data recovery,” SIAM Journal on Imaging Sciences , vol. 13, no. 4, pp. 2169–2188, 2020."
+    },
+    {
+      "n": 36,
+      "id": "bib.bib36",
+      "text": "Q. Zhong, K. Yin, and Y. Duan, “Image reconstruction by minimizing curvatures on image surface,” Journal of Mathematical Imaging Vision , vol. 63, no. 1, pp. 30–55, 2021."
+    },
+    {
+      "n": 37,
+      "id": "bib.bib37",
+      "text": "S. Masnou and J. Morel, “Level lines based disocclusion,” in Proceedings of the 1998 IEEE International Conference on Image Processing, Chicago, Illinois, USA, October 4-7, 1998 , pp. 259–263."
+    },
+    {
+      "n": 38,
+      "id": "bib.bib38",
+      "text": "Q. Zhong, Y. Li, Y. Yang, and Y. Duan, “Minimizing discrete total curvature for image processing,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2020, pp. 9474–9482."
+    },
+    {
+      "n": 39,
+      "id": "bib.bib39",
+      "text": "K. Schrader, T. Alt, J. Weickert, and M. Ertel, “Cnn-based euler’s elastica inpainting with deep energy and deep image prior,” in 10th European Workshop on Visual Information Processing . IEEE, 2022, pp. 1–6."
+    },
+    {
+      "n": 40,
+      "id": "bib.bib40",
+      "text": "D. Lefloch, M. Kluge, H. Sarbolandi, T. Weyrich, and A. Kolb, “Comprehensive use of curvature for robust and accurate online surface reconstruction,” IEEE Transactions on Pattern Analysis and Machine Intelligence , vol. 39, no. 12, pp. 2349–2365, 2017."
+    },
+    {
+      "n": 41,
+      "id": "bib.bib41",
+      "text": "Y. He, S. H. Kang, and H. Liu, “Curvature regularized surface reconstruction from point clouds,” SIAM Journal on Imaging Sciences , vol. 13, no. 4, pp. 1834–1859, 2020."
+    },
+    {
+      "n": 42,
+      "id": "bib.bib42",
+      "text": "Z. Zheng, Y. Hu, A. Cai, W. Zhang, J. Li, B. Yan, and G. Hu, “Few-view computed tomography image reconstruction using mean curvature model with curvature smoothing and surface fitting,” IEEE Transactions on Nuclear Science , vol. 66, no. 2, pp. 585–596, 2018."
+    },
+    {
+      "n": 43,
+      "id": "bib.bib43",
+      "text": "M. Yan and Y. Duan, “Nonlocal elastica model for sparse reconstruction,” Journal of Mathematical Imaging Vision , vol. 62, no. 4, pp. 532–548, 2020."
+    },
+    {
+      "n": 44,
+      "id": "bib.bib44",
+      "text": "W. Zhu, X. Tai, and T. F. Chan, “Image segmentation using euler’s elastica as the regularization,” Journal of Scientific Computing , vol. 57, no. 2, pp. 414–438, 2013."
+    },
+    {
+      "n": 45,
+      "id": "bib.bib45",
+      "text": "L. Liu, D. Chen, M. Shu, B. Li, H. Shu, M. Pâques, and L. D. Cohen, “Trajectory grouping with curvature regularization for tubular structure tracking,” IEEE Transactions on Image Processing , vol. 31, pp. 405–418, 2022."
+    }
+  ]
+}
