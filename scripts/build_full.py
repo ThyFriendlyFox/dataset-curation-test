@@ -8,6 +8,7 @@ Pools (no document is used by two approaches):
   A-type  every reconstruction in sources/reconstructed/ that passes validate_reconstruction
   B-type  sources/wiki_history/*.json (trial) + sources/wiki_history_full/*.json.gz
   C       sources/github_history/*.json (trial) + sources/github_history_full/*.json.gz
+Wikipedia articles marked off-topic (topic_filter.py) are excluded from every pool.
 D takes a disjoint share: ~25% of the B-type pool and 7 A-type rows for every 3 B-type rows, so D is
 ~70/30 like the trial. Trial rows keep their trial assignment. Assignment and splits are stable hashes.
 B/C histories with too few distinct versions for a variant are left out of that variant, never padded.
@@ -40,14 +41,29 @@ def stem(path):
     return b[:-8] if b.endswith(".json.gz") else b[:-5]
 
 
+def off_topic():
+    """Slugs of Wikipedia articles marked off-topic by topic_filter.py (products, people, orgs...)."""
+    path = S("wiki_cs_articles.json")
+    if not os.path.exists(path):
+        return set()
+    import re
+    return {re.sub(r"[^A-Za-z0-9_]", "", r["title"].replace(" ", "_"))
+            for r in json.load(open(path)) if r.get("topic_ok") is False}
+
+
 def pools():
+    bad = off_topic()
     a = {}
     for p in sorted(glob.glob(S("reconstructed", "*.json"))):
+        n = stem(p)
+        if n.startswith("wiki_") and n[5:] in bad:
+            continue
         if not validate(p):
-            a[stem(p)] = p
+            a[n] = p
     b = {stem(p): p for p in sorted(glob.glob(S("wiki_history", "*.json")))}
     for p in sorted(glob.glob(S("wiki_history_full", "*.json.gz"))):
-        b.setdefault(stem(p), p)  # trial copy wins when both exist
+        if stem(p) not in bad:
+            b.setdefault(stem(p), p)  # trial copy wins when both exist
     c = {stem(p): p for p in sorted(glob.glob(S("github_history_full", "*.json.gz")))}
     for p in sorted(glob.glob(S("github_history", "*.json"))):
         c.setdefault(stem(p), p)
