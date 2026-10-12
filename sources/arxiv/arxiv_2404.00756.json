@@ -1,0 +1,136 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2404.00756",
+  "title": "Recover: A Neuro-Symbolic Framework for Failure Detection and Recovery",
+  "authors": "Cristina Cornelio, Mohammed Diab",
+  "year": "2024",
+  "categories": [
+    "cs.AI",
+    "cs.LG",
+    "cs.LO",
+    "cs.RO"
+  ],
+  "url": "https://arxiv.org/abs/2404.00756",
+  "html_url": "https://arxiv.org/html/2404.00756",
+  "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+  "section": "Introduction",
+  "word_count": 1234,
+  "text": "With the increasing use of robots in tasks involving humans in the perception-action loop, understanding the reasons behind failures in both planning and execution is a significant challenge for enhancing the reliability, adaptability, and safety of autonomous systems. Robots need to comprehend why and when failures occur and devise appropriate solutions based on the current situation. To achieve this, robots should be equipped with robust planning, perception, and reasoning capabilities enabling them to analyze failures and propose recovery strategies in real time.\n\nThe standard approaches to autonomous robots are typically model-based or policy-based [1]. Model-based approaches can involve offline planning, where the robot considers the current state and utilizes its model to predict the next state and potential rewards, enabling it to plan a sequence of actions expected to maximize reward. In online model-based planning instead, the robot continuously re-plans based on the current state, adjusting its actions in response to changes in the environment. Policy-based approaches usually entail either open-loop policy, where the robot predicts a sequence of actions based on the initial state and goal, or closed-loop policy, where the robot predicts individual actions at each moment based on the current state and goal. These policies guide the robot’s decision-making process, facilitating adaptive behavior in dynamic environments. In our approach, we integrate elements from both methodologies mentioned above: we emply an ontology and a set of rules to represent the environment, and utilize these representations to refine a policy determined by a large language model (LLM) acting as a planner. This combined strategy enables the model to guide the policy, especially in scenarios where limited data availability restricts the policy’s exposure to relevant instances.\n\nIn this paper we introduce an innovative use of ontological knowledge bases and LLMs for failure recognition and recovery within robotic systems, thereby enhancing the overall reliability and efficiency of robotic task execution. Our framework, named Recover, leverages the available symbolic knowledge about an environment (e.g., the set of available objects and their properties) to efficiently detect failures when they occur, in an online fashion during the task execution. The symbolic representation, embedded within an ontology, enables the robot to map multi-modal data (e.g., video, images, and audio) to the same representation, allowing simultaneous reasoning across all data types. When a failure has been identified, an LLM is employed as a re-planner, producing a set of steps to perform to recover from the failure and complete the task.\n\nEmploying LLMs for planning is not novel and has been recently proposed in various contexts [2,3,4,5,6]. However, LLMs come with several limitations, including a tendency to “hallucinate” [7,8]. By incorporating symbolic information, we can steer the LLM-planner towards generating fewer hallucinations, thereby ensuring that the system operates within the confines of available objects and actions.\n\nCurrent approaches utilizing LLMs for failure recovery and re-planning typically function in an offline manner: initially, a plan is executed in full to solve a task; if a failure is detected, a revised plan is generated and the task execution restarts from the initial state. This necessitates resetting the scene before executing the revised plan. Performing this method iteratively enables the refinement of the plan until one that successfully leads to task completion is generated [9]. However, this approach is impractical in real-world scenarios where, for instance, the environment undergoes changes during task execution (such as an object being broken or moved), or when, as often happens in robotics, even a correct plan may result in failure during execution (such as when a robot struggles to perform a feasible action). In such scenarios, the ability to act in real-time is crucial. Our framework detects failures during task execution and generates a new plan based on the environment conditions at the moment of failure, without needing to observe the effects of the failure throughout the entire plan.\n\nUtilizing symbolic knowledge alongside natural language also confers explainability features to the framework, enabling transparent and understandable reasoning behind the robot’s actions and responses to failures. This attribute not only enhances trust and transparency but also helps in debugging and optimizing the system.\n\nFurthermore, the use of ontologies for storing the environmental description and reasoning enables the integration of specialized knowledge and personalization, thereby adapting the system’s capabilities to particular tasks or environments, enhancing its effectiveness and versatility. As a contribution of our work, we extend established taxonomies [10] of failure categories in a human-robot interaction context, incorporating preferences such as allergies and dietary restrictions. We release an ontology named OntoThor, specifically designed for the AI2Thor simulator, which we utilize in our experiments. OntoThor describes kitchen environments and includes personalized features.\n\nThis kind of ontologies are particularly useful when interacting with human agents who may possess diverse preferences or requirements, or in scenarios involving technical and specialized equipment. Examples of such use cases are healthcare support (e.g., surgical robots or assistant bots), automated transportation (including spacecraft, planes, or cars), and household assistance (e.g., kitchen robots or cooking assistants).\n\n## 1.1 State of the Art\n\nRecent studies have investigated the utilization of pre-trained LLMs for planning and executing actions in interactive environments, by using the priors of the LLM for plan generation [5,11]. Usually, this involves converting multi-modal observations into natural language, utilizing an LLM to generate domain-specific actions or plans, and then employing an agent for execution. However, these approaches are susceptible to hallucination and lack deep understanding and reasoning capabilities [3].\n\nReasoning, especially when grounded on concrete actions, is one of the most desired capability of LLMs, as it offers explainability and enables the generation of more meaningful solutions [2,12]. However, despite substantial progress in the reasoning abilities of LLMs [13], the requirement to detect and correct errors in the reasoning process remains an open problem.\n\nSome progress has been made in this regards: ReAct [14] is a prompting refinement technique that leverages the reasoning and planning capabilities of LLMs to iteratively refine a plan to solve a task. Although it introduces innovative features like iterative action-environment observations and LLM-policy refinement, it may face challenges in complex or real-world environments. Reflexion [15] offers a unique approach to reinforcing LLMs-based agents through verbal reflection on task feedback. By maintaining reflective text in an episodic long-term and short-term memory, it enhances decision-making in subsequent trials across diverse tasks. As an extension of Reflexion, ExpeL [16], SALAM [9], and SAMA [17] enhance their capabilities by analyzing patterns in failures and successes to extract valuable insights. These insights are then integrated into prompts, thereby improving decision-making and adaptive behavior. RetroFormer [18] introduces a framework to bolster LLMs-based agents by refining prompts based on environment feedback. Through policy gradient techniques, the system adjusts prompts iteratively, learning from rewards across various tasks and environments. This process enhances the LLM’s performance by summarizing past failures and suggesting action plans for improvement.\n\nThe increasing use and advancements of LLMs in recent years have led to their widespread application across various research fields in AI, including robotics [19,20,21,22]. Most relevant to our work is REFLECT [23] a framework that, similarly to Reflexion, utilizes LLMs in the context of robot failures to explain them and propose corrective plans. REFLECT demonstrates great promise in addressing robot failures and proposing corrective plans, however, it is currently unable to accommodate human preferences and personalization. Moreover, the necessity to observe the entire plan, reset the scene, and the cost of the extensive use of LLMs (both computational and monetary) are strong limitations.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib3",
+      "text": "Konstantinos Chatzilygeroudis, Vassilis Vassiliades, Freek Stulp, Sylvain Calinon, and Jean-Baptiste Mouret. A survey on policy search algorithms for learning robot controllers in a handful of trials. IEEE Transactions on Robotics , 36(2):328–347, 2019."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib24",
+      "text": "Jason Wei, Xuezhi Wang, Dale Schuurmans, Maarten Bosma, Ed H. Chi, Quoc Le, and Denny Zhou. Chain of thought prompting elicits reasoning in large language models. CoRR , abs/2201.11903, 2022."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib2",
+      "text": "Michael Ahn, Anthony Brohan, Noah Brown, Yevgen Chebotar, Omar Cortes, Byron David, Chelsea Finn, Chuyuan Fu, Keerthana Gopalakrishnan, Karol Hausman, et al. Do as i can, not as i say: Grounding language in robotic affordances. arXiv preprint arXiv:2204.01691 , 2022."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib26",
+      "text": "Shunyu Yao, Rohan Rao, Matthew Hausknecht, and Karthik Narasimhan. Keep calm and explore: Language models for action generation in text-based games. In Empirical Methods in Natural Language Processing (EMNLP) , 2020."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib8",
+      "text": "Wenlong Huang, Pieter Abbeel, Deepak Pathak, and Igor Mordatch. Language models as zero-shot planners: Extracting actionable knowledge for embodied agents. In International Conference on Machine Learning , pages 9118–9147. PMLR, 2022."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib18",
+      "text": "Timo Schick, Jane Dwivedi-Yu, Roberto Dessi, Roberta Raileanu, Maria Lomeli, Eric Hambro, Luke Zettlemoyer, Nicola Cancedda, and Thomas Scialom. Toolformer: Language models can teach themselves to use tools. In Thirty-seventh Conference on Neural Information Processing Systems , 2023."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib6",
+      "text": "Olga Golovneva, Moya Peng Chen, Spencer Poff, Martin Corredor, Luke Zettlemoyer, Maryam Fazel-Zarandi, and Asli Celikyilmaz. Roscoe: A suite of metrics for scoring step-by-step reasoning. In The Eleventh International Conference on Learning Representations , 2022."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib16",
+      "text": "Shirui Pan, Linhao Luo, Yufei Wang, Chen Chen, Jiapu Wang, and Xindong Wu. Unifying large language models and knowledge graphs: A roadmap. IEEE Transactions on Knowledge & Data Engineering , (01):1–20, 2024."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib21",
+      "text": "Danqing Wang and Lei Li. Learning from mistakes via cooperative study assistant for large language models. In The 2023 Conference on Empirical Methods in Natural Language Processing , 2023."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib5",
+      "text": "Mohammed Diab, Mihai Pomarlan, Daniel Beßler, Aliakbar Akbari, Jan Rosell, John Bateman, and Michael Beetz. An ontology for failure interpretation in automated planning and execution. In Iberian Robotics conference , pages 381–390. Springer, 2019."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib25",
+      "text": "Jimmy Wu, Rika Antonova, Adam Kan, Marion Lepert, Andy Zeng, Shuran Song, Jeannette Bohg, Szymon Rusinkiewicz, and Thomas Funkhouser. Tidybot: Personalized robot assistance with large language models. Autonomous Robots , 2023."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib22",
+      "text": "Xuezhi Wang, Jason Wei, Dale Schuurmans, Quoc V Le, Ed H. Chi, Sharan Narang, Aakanksha Chowdhery, and Denny Zhou. Self-consistency improves chain of thought reasoning in language models. In The Eleventh International Conference on Learning Representations , 2023."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib23",
+      "text": "Jason Wei, Yi Tay, Rishi Bommasani, Colin Raffel, Barret Zoph, Sebastian Borgeaud, Dani Yogatama, Maarten Bosma, Denny Zhou, Donald Metzler, Ed H. Chi, Tatsunori Hashimoto, Oriol Vinyals, Percy Liang, Jeff Dean, and William Fedus. Emergent abilities of large language models. Transactions on Machine Learning Research , 2022."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib27",
+      "text": "Shunyu Yao, Jeffrey Zhao, Dian Yu, Nan Du, Izhak Shafran, Karthik R Narasimhan, and Yuan Cao. React: Synergizing reasoning and acting in language models. In The Eleventh International Conference on Learning Representations , 2023."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib19",
+      "text": "Noah Shinn, Federico Cassano, Edward Berman, Ashwin Gopinath, Karthik Narasimhan, and Shunyu Yao. Reflexion: Language agents with verbal reinforcement learning. In arXiv/2303.11366 , 2023."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib29",
+      "text": "Andrew Zhao, Daniel Huang, Quentin Xu, Matthieu Lin, Yong-Jin Liu, and Gao Huang. Expel: Llm agents are experiential learners. In arXiv/2308.10144 , 2023."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib13",
+      "text": "Wenhao Li, Dan Qiao, Baoxiang Wang, Xiangfeng Wang, Bo Jin, and Hongyuan Zha. Semantically aligned task decomposition in multi-agent reinforcement learning. arXiv preprint arXiv:2305.10865 , 2023."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib28",
+      "text": "Weiran Yao, Shelby Heinecke, Juan Carlos Niebles, Zhiwei Liu, Yihao Feng, Le Xue, Rithesh R N, Zeyuan Chen, Jianguo Zhang, Devansh Arpit, Ran Xu, Phil L Mui, Huan Wang, Caiming Xiong, and Silvio Savarese. Retroformer: Retrospective large language agents with policy gradient optimization. In The Twelfth International Conference on Learning Representations , 2024."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib17",
+      "text": "Allen Z Ren, Anushri Dixit, Alexandra Bodrova, Sumeet Singh, Stephen Tu, Noah Brown, Peng Xu, Leila Takayama, Fei Xia, Jake Varley, et al. Robots that ask for help: Uncertainty alignment for large language model planners. In 7th Annual Conference on Robot Learning , 2023."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib4",
+      "text": "Devleena Das and Sonia Chernova. Semantic-based explainable ai: Leveraging semantic scene graphs and pairwise ranking to explain robot failures. In 2021 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS) , pages 3034–3041. IEEE, 2021."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib9",
+      "text": "Yixiang Jin, Dingzhe Li, A Yong, Jun Shi, Peng Hao, Fuchun Sun, Jianwei Zhang, and Bin Fang. Robotgpt: Robot manipulation learning from chatgpt. IEEE Robotics and Automation Letters , 2024."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib20",
+      "text": "Sai Vemprala, Rogerio Bonatti, Arthur Bucker, and Ashish Kapoor. Chatgpt for robotics: Design principles and model abilities. arXiv preprint arXiv:2306.17582 , 2023."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib14",
+      "text": "Zeyi Liu, Arpit Bahety, and Shuran Song. REFLECT: Summarizing robot experiences for failure explanation and correction. In 7th Annual Conference on Robot Learning , 2023."
+    }
+  ]
+}

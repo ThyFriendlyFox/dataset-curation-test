@@ -1,0 +1,54 @@
+{
+  "source_type": "encyclopedia_article",
+  "source_id": "enwiki:Cooley–Tukey FFT algorithm#rev1373740970",
+  "title": "Cooley–Tukey FFT algorithm",
+  "authors": "Wikipedia contributors",
+  "year": "2026",
+  "url": "https://en.wikipedia.org/w/index.php?title=Cooley%E2%80%93Tukey_FFT_algorithm&oldid=1373740970",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Variations",
+  "word_count": 640,
+  "text": "There are many other variations on the Cooley–Tukey algorithm.\n\nMixed-radix implementations handle composite sizes with a variety of (typically small) factors in addition to two, usually (but not always) employing the O(N2) algorithm for the prime base cases of the recursion (it is also possible to employ an N log N algorithm for the prime base cases, such as Rader's or Bluestein's algorithm).\n\nSplit radix merges radices 2 and 4, exploiting the fact that the first transform of radix 2 requires no twiddle factor, in order to achieve what was long the lowest known arithmetic operation count for power-of-two sizes,[1] although recent variations achieve an even lower count.[2,3] (On present-day computers, performance is determined more by cache and CPU pipeline considerations than by strict operation counts; well-optimized FFT implementations often employ larger radices and/or hard-coded base-case transforms of significant size.)[4]\n\nAnother way of looking at the Cooley–Tukey algorithm is that it re-expresses a size N one-dimensional DFT as an N1 by N2 two-dimensional DFT (plus twiddles), where the output matrix is transposed. The net result of all of these transpositions, for a radix-2 algorithm, corresponds to a bit reversal of the input (DIF) or output (DIT) indices. If, instead of using a small radix, one employs a radix of roughly and explicit input/output matrix transpositions, it is called a four-step FFT algorithm (or six-step, depending on the number of transpositions), initially proposed to improve memory locality,[5,6] e.g. for cache optimization or out-of-core operation, and was later shown to be an optimal cache-oblivious algorithm.[7]\n\nThe general Cooley–Tukey factorization rewrites the indices k and n as k = N_2 k_1 + k_2 and n = N_1 n_2 + n_1 , respectively, where the indices ka and na run from 0..Na-1 (for a of 1 or 2). That is, it re-indexes the input (n) and output (k) as N1 by N2 two-dimensional arrays in column-major and row-major order, respectively; the difference between these indexings is a transposition, as mentioned above. When this re-indexing is substituted into the DFT formula for nk, the N_1 n_2 N_2 k_1 cross term vanishes (its exponential is unity), and the remaining terms give\n\nX_{N_2 k_1 + k_2} =\n\n\\sum_{n_1=0}^{N_1-1} \\sum_{n_2=0}^{N_2-1}\n\nx_{N_1 n_2 + n_1}\n\ne^{-\\frac{2\\pi i}{N_1 N_2} \\cdot (N_1 n_2 + n_1) \\cdot (N_2 k_1 + k_2) }\n\n\\sum_{n_1=0}^{N_1-1}\n\n\\left[ e^{-\\frac{2\\pi i}{N_1N_2} n_1 k_2 } \\right]\n\n\\left( \\sum_{n_2=0}^{N_2-1} x_{N_1 n_2 + n_1}\n\ne^{-\\frac{2\\pi i}{N_2} n_2 k_2 } \\right)\n\ne^{-\\frac{2\\pi i}{N_1} n_1 k_1 }\n\n\\sum_{n_1=0}^{N_1-1}\n\n\\left( \\sum_{n_2=0}^{N_2-1} x_{N_1 n_2 + n_1}\n\ne^{-\\frac{2\\pi i}{N_2} n_2 k_2 } \\right)\n\ne^{-\\frac{2\\pi i}{N_1N_2} n_1(N_2k_1+k_2) } .\n\nwhere each inner sum is a DFT of size N2, each outer sum is a DFT of size N1, and the [...] bracketed term is the twiddle factor.\n\nAn arbitrary radix r (as well as mixed radices) can be employed, as was shown by both Cooley and Tukey[8] as well as Gauss (who gave examples of radix-3 and radix-6 steps).[9] Cooley and Tukey originally assumed that the radix butterfly required O(r2) work and hence reckoned the complexity for a radix r to be O(r2 N/r logrN) = O(N log2(N) r/log2r); from calculation of values of r/log2r for integer values of r from 2 to 12 the optimal radix is found to be 3 (the closest integer to e, which minimizes r/log2r).[8,10] This analysis was erroneous, however: the radix-butterfly is also a DFT and can be performed via an FFT algorithm in O(r log r) operations, hence the radix r actually cancels in the complexity O(r log(r) N/r logrN), and the optimal r is determined by more complicated considerations. In practice, quite large r (32 or 64) are important in order to effectively exploit e.g. the large number of processor registers on modern processors,[4] and even an unbounded radix r= also achieves O(N log N) complexity and has theoretical and practical advantages for large N as mentioned above.[5,6,7]",
+  "references": [
+    {
+      "n": 1,
+      "text": "Duhamel, P., and M. Vetterli, \"Fast Fourier transforms: a tutorial review and a state of the art,\" Signal Processing 19, 259–299 (1990)"
+    },
+    {
+      "n": 2,
+      "text": "Lundy, T., and J. Van Buskirk, \"A new matrix approach to real FFTs and convolutions of length 2k,\" Computing 80, 23–45 (2007)."
+    },
+    {
+      "n": 3,
+      "text": "Johnson, S. G., and M. Frigo, \"A modified split-radix FFT with fewer arithmetic operations,\" IEEE Trans. Signal Process. 55 (1), 111–119 (2007)."
+    },
+    {
+      "n": 4,
+      "text": "Frigo, M.. (2005). The Design and Implementation of FFTW3. Proceedings of the IEEE. doi:10.1109/JPROC.2004.840301"
+    },
+    {
+      "n": 5,
+      "text": "Gentleman W. M., and G. Sande, \"Fast Fourier transforms—for fun and profit,\" Proc. AFIPS 29, 563–578 (1966)."
+    },
+    {
+      "n": 6,
+      "text": "Bailey, David H., \"FFTs in external or hierarchical memory,\" J. Supercomputing 4 (1), 23–35 (1990)"
+    },
+    {
+      "n": 7,
+      "text": "M. Frigo, C. E. Leiserson, H. Prokop, and S. Ramachandran. Cache-oblivious algorithms. In Proceedings of the 40th IEEE Symposium on Foundations of Computer Science (FOCS 99), p.285-297. 1999. Extended abstract at IEEE, at Citeseer."
+    },
+    {
+      "n": 8,
+      "text": "Cooley, James W.. (1965). An algorithm for the machine calculation of complex Fourier series. Math. Comput.. doi:10.2307/2003354"
+    },
+    {
+      "n": 9,
+      "text": "Heideman, M. T., D. H. Johnson, and C. S. Burrus, \"Gauss and the history of the fast Fourier transform,\" IEEE ASSP Magazine, 1, (4), 14–21 (1984)"
+    },
+    {
+      "n": 10,
+      "text": "Cooley, J. W., P. Lewis and P. Welch, \"The Fast Fourier Transform and its Applications\", IEEE Trans on Education 12, 1, 28–34 (1969)"
+    }
+  ]
+}

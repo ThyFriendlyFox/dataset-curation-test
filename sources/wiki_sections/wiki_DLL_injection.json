@@ -1,0 +1,158 @@
+{
+  "source_type": "encyclopedia_article",
+  "source_id": "enwiki:DLL injection#rev1364152225",
+  "title": "DLL injection",
+  "authors": "Wikipedia contributors",
+  "year": "2026",
+  "url": "https://en.wikipedia.org/w/index.php?title=DLL_injection&oldid=1364152225",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Approaches on Microsoft Windows",
+  "word_count": 540,
+  "text": "There are multiple ways on Microsoft Windows to force a process to load and execute code in a DLL that the authors did not intend:\n\nDLLs listed in the registry entry HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Windows\\AppInit_DLLs are loaded into every process that loads User32.dll during the initial call of that DLL.[1,2,3] Beginning with Windows Vista, AppInit_DLLs are disabled by default.[4] Beginning with Windows 7, the AppInit_DLL infrastructure supports code signing. Starting with Windows 8, the entire AppInit_DLL functionality is disabled when Secure Boot is enabled, regardless of code signing or registry settings.[5]\n\nDLLs listed under the registry key HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\AppCertDLLs are loaded into every process that calls the Win32 API functions CreateProcess, CreateProcessAsUser, CreateProcessWithLogonW, CreateProcessWithTokenW and WinExec. That is the right way to use legal DLL injection on current version of Windows - Windows 10. DLL must be signed by a valid certificate.\n\nProcess manipulation functions such as CreateRemoteThread or code injection techniques such as AtomBombing,[6] can be used to inject a DLL into a program after it has started.[7,8,9,10,11,12]\n\nOpen a handle to the target process. This can be done by spawning the process[13,14] or by keying off something created by that process that is known to exist – for instance, a window with a predictable title,[15] or by obtaining a list of running processes[16] and scanning for the target executable's filename.[17]\n\nAllocate some memory in the target process,[18] and the name of the DLL to be injected is written to it.[9,19]\n\nThis step can be skipped if a suitable DLL name is already available in the target process. For example, if a process links to User32.dll, GDI32.dll, Kernel32.dll or any other library whose name ends in 32.dll, it would be possible to load a library named 32.dll[20]. This technique has in the past been demonstrated to be effective against a method of guarding processes against DLL injection.[21]\n\nCreate a new thread in the target process[22] with the thread's start address set to be the address of LoadLibrary and the argument set to the address of the string just uploaded into the target.[9,23]\n\nInstead of writing the name of a DLL-to-load to the target and starting the new thread at LoadLibrary, one can write the code-to-be-executed to the target and start the thread at that code.[8]\n\nThe operating system then calls the initialization routine of the injected DLL.[9,24]\n\nNote that without precautions, this approach can be detected by the target process due to the DLL_THREAD_ATTACH notifications sent to every loaded module as a thread starts.[24]\n\nWindows hooking calls such as SetWindowsHookEx.[25,7,8,26,27,28]\n\nUse the SuspendThread or NtSuspendThread function to suspend all threads, and then use SetThreadContext or NtSetContextThread function to modify an existing thread's context in the application to execute injected code, that in turn could load a DLL.[29,30,31]\n\nExploit design limitations in Windows and applications that call the LoadLibrary or LoadLibraryEx function without specifying a full-qualified path to the DLL being loaded.[32,33,34]\n\nOperating system-level shims.\n\nSubstituting an application-specific DLL with a rogue replacement that implements the same function exports as the original.[35]\n\nReflective DLLs or DLLs that are able to load themselves. The reflective DLL is copied into memory space of the target process and execution is passed to the entry point of the DLL which then loads itself from memory. [36]",
+  "references": [
+    {
+      "n": 1,
+      "text": "(November 21, 2006). Working with the AppInit_DLLs registry value. Microsoft Help and Support. https://support.microsoft.com/en-us/kb/197571"
+    },
+    {
+      "n": 2,
+      "text": "Raymond Chen. (December 13, 2007). AppInit_DLLs should be renamed Deadlock_Or_Crash_Randomly_DLLs. The Old New Thing. https://devblogs.microsoft.com/oldnewthing/20071213-00/?p=24183"
+    },
+    {
+      "n": 3,
+      "text": "(July 8, 2008). dllmain.c. ReactOS. http://svn.reactos.org/svn/reactos/trunk/reactos/dll/win32/user32/misc/dllmain.c?view=markup"
+    },
+    {
+      "n": 4,
+      "text": "AppInit_DLLs in Windows 7 and Windows Server 2008 R2"
+    },
+    {
+      "n": 5,
+      "text": "AppInit DLLs and Secure Boot. MSDN. https://msdn.microsoft.com/en-us/library/dn280412.aspx"
+    },
+    {
+      "n": 6,
+      "text": "'AtomBombing' Microsoft Windows Via Code Injection. Dark Reading. http://www.darkreading.com/vulnerabilities---threats/atombombing-microsoft-windows-via-code-injection/d/d-id/1327320"
+    },
+    {
+      "n": 7,
+      "text": "Ivo Ivanov. (December 2, 2002). API hooking revealed. CodeProject. http://www.codeproject.com/KB/system/hooksys.aspx"
+    },
+    {
+      "n": 8,
+      "text": "Robert Kuster. (August 20, 2003). Three Ways to Inject Your Code into Another Process. CodeProject. http://www.codeproject.com/KB/threads/winspy.aspx"
+    },
+    {
+      "n": 9,
+      "text": "Trent Waddington. InjectDLL. http://www.quantumg.net/injectdll.php"
+    },
+    {
+      "n": 10,
+      "text": "(May 4, 2006). Dll Injection. DreamInCode.net. http://www.dreamincode.net/code/snippet407.htm"
+    },
+    {
+      "n": 11,
+      "text": "Greg Jenkins. (November 2007). DLL Injection Framework. Ring3 Circus. http://www.ring3circus.com/downloads/dll-injection-framework/"
+    },
+    {
+      "n": 12,
+      "text": "Drew Benton. (August 17, 2007). A More Complete DLL Injection Solution Using CreateRemoteThread. CodeProject. http://www.codeproject.com/Articles/20084/A-More-Complete-DLL-Injection-Solution-Using-Creat"
+    },
+    {
+      "n": 13,
+      "text": "CreateProcess. Platform SDK for Windows XP SP2. https://msdn.microsoft.com/en-us/library/ms682425.aspx"
+    },
+    {
+      "n": 14,
+      "text": "PROCESS_INFORMATION. Platform SDK for Windows XP SP2. https://msdn.microsoft.com/en-us/library/ms684873.aspx"
+    },
+    {
+      "n": 15,
+      "text": "GetWindowThreadProcessId Function. Platform SDK for Windows XP SP2. https://msdn.microsoft.com/en-us/library/ms633522.aspx"
+    },
+    {
+      "n": 16,
+      "text": "EnumProcesses. Platform SDK for Windows XP SP2. https://msdn.microsoft.com/en-us/library/ms682629.aspx"
+    },
+    {
+      "n": 17,
+      "text": "GetModuleBaseName. Platform SDK for Windows XP SP2. https://msdn.microsoft.com/en-us/library/ms683196.aspx"
+    },
+    {
+      "n": 18,
+      "text": "VirtualAllocEx. Platform SDK for Windows XP SP2. https://msdn.microsoft.com/en-us/library/aa366890.aspx"
+    },
+    {
+      "n": 19,
+      "text": "WriteProcessMemory. Platform SDK for Windows XP SP2. https://msdn.microsoft.com/en-us/library/ms681674.aspx"
+    },
+    {
+      "n": 20,
+      "text": "DLL Injection with CreateRemoteThread. Stack Overflow. https://stackoverflow.com/questions/22750112/dll-injection-with-createremotethread"
+    },
+    {
+      "n": 21,
+      "text": "(December 1, 2006). Outpost Bypassing Self-Protection via Advanced DLL injection with handle stealing Vulnerability. Matousec. http://www.matousec.com/info/advisories/Outpost-Bypassing-Self-Protection-via-Advanced-DLL-injection-with-handle-stealing.php"
+    },
+    {
+      "n": 22,
+      "text": "CreateRemoteThread. Platform SDK for Windows XP SP2. https://msdn.microsoft.com/en-us/library/ms682437.aspx"
+    },
+    {
+      "n": 23,
+      "text": "LoadLibrary. Platform SDK for Windows XP SP2. https://msdn.microsoft.com/en-us/library/ms684175.aspx"
+    },
+    {
+      "n": 24,
+      "text": "DllMain. Platform SDK for Windows XP SP2. https://msdn.microsoft.com/en-us/library/ms682583.aspx"
+    },
+    {
+      "n": 25,
+      "text": "Iczelion. (August 2002). Tutorial 24: Windows Hooks. Iczelion's Win32 Assembly Homepage. http://win32assembly.online.fr/tut24.html"
+    },
+    {
+      "n": 26,
+      "text": "SetWindowsHookEx Function. Platform SDK for Windows XP SP2. https://msdn.microsoft.com/en-us/library/ms644990.aspx"
+    },
+    {
+      "n": 27,
+      "text": "(March 1, 2005). AppInit_DLLs Registry Value and Windows 95. Microsoft Help and Support. https://support.microsoft.com/en-us/kb/134655"
+    },
+    {
+      "n": 28,
+      "text": "(April 3, 2008). Dll Injection using SetWindowsHookEx() Method. Game Reversal. http://www.gamereversal.com/index.php?option=com_content&view=article&id=56%3Adll-injection-using-setwindowshookex-method&catid=39%3Ac--c-core-concepts&Itemid=1"
+    },
+    {
+      "n": 29,
+      "text": "Nasser R. Rowhani. (October 23, 2003). DLL Injection and function interception tutorial. CodeProject. https://www.codeproject.com/Articles/5178/DLL-Injection-and-function-interception-tutorial"
+    },
+    {
+      "n": 30,
+      "text": "(January 16, 2007). SetThreadContext DLL Injection. http://nerd.egloos.com/2940083"
+    },
+    {
+      "n": 31,
+      "text": "Ben Botto. (September 6, 2008). DLL Injector. http://busybin.com/busybin/C++/dll_injector/"
+    },
+    {
+      "n": 32,
+      "text": "(10 June 2011). Insecure Library Loading Could Allow Remote Code Execution. Microsoft. https://technet.microsoft.com/en-us/library/2269637.aspx"
+    },
+    {
+      "n": 33,
+      "text": "(10 June 2011). Secure loading of libraries to prevent DLL preloading attacks. Microsoft. https://support.microsoft.com/en-us/kb/2389418"
+    },
+    {
+      "n": 34,
+      "text": "(10 June 2011). Microsoft Security Advisory: Insecure library loading could allow remote code execution. Microsoft. https://support.microsoft.com/en-us/kb/2533623"
+    },
+    {
+      "n": 35,
+      "text": "Nicolas Falliere. (26 September 2010). Stuxnet Infection of Step 7 Projects. Symantec. https://community.broadcom.com/symantecenterprise/communities/community-home/librarydocuments/viewdocument?DocumentKey=0c21cbc7-0c40-44e7-8539-8d682b80103c&CommunityKey=1ecf5f55-9545-44d6-b0f4-4e4a7f5f5e68&tab=librarydocuments"
+    },
+    {
+      "n": 36,
+      "text": "Team, Microsoft Defender Security Research. (2017-11-13). Detecting reflective DLL loading with Windows Defender ATP. Microsoft Security Blog. https://www.microsoft.com/en-us/security/blog/2017/11/13/detecting-reflective-dll-loading-with-windows-defender-atp/"
+    }
+  ]
+}

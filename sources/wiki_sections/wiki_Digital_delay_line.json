@@ -1,0 +1,38 @@
+{
+  "source_type": "encyclopedia_article",
+  "source_id": "enwiki:Digital delay line#rev1362367326",
+  "title": "Digital delay line",
+  "authors": "Wikipedia contributors",
+  "year": "2026",
+  "url": "https://en.wikipedia.org/w/index.php?title=Digital_delay_line&oldid=1362367326",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Filter design solutions",
+  "word_count": 734,
+  "text": "### Naive solution\n\nThe conceptually easiest solution is obtained by sampling the continuous-time domain solution, which is trivial for any delay value. Given a continuous-time signal x delayed by D \\in \\mathbb{R} samples, or \\tau = DT_s seconds[1]: y(t) = x(t-D) \\xrightarrow[]{\\mathcal{F} } Y(\\omega) = \\overbrace{ e^{-j\\omega D} }^{H_{ideal}(\\omega)} X(\\omega).\n\nIn this case, e^{-j\\omega D} = H_{ideal}(\\omega) is the continuous-time domain fractional delay filter with:\n\n\\begin{cases} |\\centerdot| = 1 = 0dB, & \\text{zero dB gain} \\\\ \\measuredangle = -\\omega D, & \\text{linear phase} \\\\ \\tau_{gr} = -{d\\measuredangle \\over{d\\omega}} = D, & \\text{constant group delay} \\\\ \\tau_{ph} = -{ \\measuredangle \\over{\\omega}} = -D, &\n\n\\text{constant phase delay.} \\end{cases}\n\nThe naive solution for the sampled filter h_{ideal}[n] is the sampled inverse Fourier transform of H_{ideal}(\\omega) , which produces a non-causal IIR filter shaped as a Cardinal Sine sinc() shifted by D [1]: h_{ideal}[n] = \\mathcal{F}^{-1} [H_{ideal}(\\omega)] =\n\n{1\\over{2\\pi}} \\int\\limits_{-\\pi}^{+\\pi} e^{j\\omega D} e^{j\\omega n} d\\omega =\n\nsinc(n- D) =\n\n{sin(\\pi (n-D))\\over{\\pi (n-D)}} The continuous-time domain sinc is shifted by the fractional delay while the sampling is always aligned to the cartesian plane, therefore:\n\nwhen the delay is an integer number of samples D \\in \\mathbb{N} , the sampled shifted sinc degenerates to a shifted impulse just like in the theoretical solution.\n\nwhen the delay is a fractional number of samples D \\in \\mathbb{R} , the sampled shifted sinc produces a non-causal IIR filter, which is not implementable in practice.\n\n### Truncated causal FIR solution\n\nThe conceptually easiest implementable solution is the causal truncation of the naive solution above.[2] h_{\\tau}[n] = \\begin{cases} sinc(n-D) & \\text{for } 0\\leq n\\leq N\\\\ 0 & \\text{otherwise} \\end{cases} \\;\\;\\;\\;\\; \\text{where}\\;\\;\\;\\;\\; {N-1\\over{2}} < D < {N+1\\over{2}}\\;\\;\\;\\;\\;\\text{and}\\;\\;\\;\\;\\;N\\;\\text{is the order of the filter.} Truncating the impulse response might however cause instability, which can be mitigated in a few ways:\n\nWindowing the truncated impulse response, therefore smoothing it. Note that in this case we have to add a further shift L in order to align the window and the sinc() and provide symmetric filtering[2,3]. h_{\\tau}[n] = \\begin{cases} w(n-D)sinc(n-D) & \\text{for } L\\leq n\\leq L + N\\\\ 0 & \\text{otherwise} \\end{cases} \\;\\;\\;\\;\\; \\text{where}\\;\\;\\;\\;\\; L = \\begin{cases} round(D)- {N \\over{2}} & \\text{for even } N\\\\ \\lfloor D \\rfloor - {N-1 \\over{2}} & \\text{for odd } N \\end{cases}\n\nGeneral Least Square (GLS) Method:[4] iteratively adjusts the frequency response by windowing a Least Square Integral Error design, which minimises the square integral error between ideal and truncated frequency responses of the filter, defined as:\n\nE_{LS} = {1\\over{2\\pi}} \\int\\limits_{-\\alpha\\pi}^{\\alpha\\pi} w(\\omega)\n\n|H^{truncated}_D(e^{j\\omega})- H^{id}_D(e^{j\\omega})|^2 d\\omega\n\n\\;\\;\\;\\;\\;\\text{where } 0<\\alpha \\leq 1 \\text{ is the passband width parameter}\n\nLagrange Interpolator (Maximally Flat Fractional Delay Filter):[5] adds \"flatness\" constraints to the first N derivatives of the Least Square Integral Error. This method is of particular interest because it has a closed form solution:\n\nh_{D}[n] = \\prod_{k=0 ,\\; k\\neq n}^N {D-k\\over{n-k}} \\;\\;\\;\\;\\;\\text{where}\\;\\;\\;\\;\\;0\\leq n \\leq N What follows is an expansion of the formula above displaying the resulting filters of order up to N=3 :\n\n### All-pass IIR phase-approximated solution\n\nAnother approach is designing an IIR filter of order N with a Z-transform structure that forces it to be an all-pass while still approximating a D delay[2]: H_D(z) = {z^{-N} A(z) \\over{A(z^{-1})}} =\n\n{a_N+a_{N-1}z^{-1}+...+a_1z^{-(N-1)}+z^{-N}\\over{1+a_1z^{-1}+...+a_{N-1}z^{-(N-1)}+a_Nz^{-N}}}\n\n\\;\\;\\;\\;\\; \\text{which has} \\;\\;\\;\\;\\;\n\n\\begin{cases} |\\centerdot| = 1 = 0dB & 0dB \\text{ gain} \\\\ \\measuredangle_{H_D(z)} = -N\\omega + 2\\measuredangle_{A(z)} = -D\\omega & \\text{desired value for delay } D \\end{cases} The reciprocally placed zeros and poles of A(z) \\text{ and } A(z^{-1}) respectively flatten the frequency |\\centerdot| response, while the phase is function of the phase of A(z) . Therefore, the problem becomes designing the FIR filter A(z) , that is finding its coefficients a_k as a function of D (note that a_0=1 always), so that the phase approximates best the desired value \\measuredangle_{H_D(z)} = -D\\omega .[2]\n\nThe main solutions are:\n\nIterative minimization of Least Square Phase Error,[4] which is defined as:\n\nE_{LS} = {1\\over{2\\pi}} \\int\\limits_{-\\pi}^{\\pi} w(\\omega)\n\n|\\underbrace{ \\underbrace{-D\\omega}_{\\measuredangle_{ID}} - \\underbrace{(-N\\omega+2\\measuredangle_{A(z)})}_{\\measuredangle_{H}} }_{\\Delta\\measuredangle_{ H_D }}|^2d\\omega\n\nIterative minimization of Least Square Phase Delay Error,[4] which is defined as:\n\nE_{LS} = {1\\over{2\\pi}} \\int\\limits_{-\\pi}^{\\pi} w(\\omega)\n\n| {{ \\Delta\\measuredangle_{ H_D } }\\over{\\omega}} |^2\n\nThiran All-Pole Low-Pass Filter with Maximally Flat Group Delay.[6] This yields a closed solution for finding the coefficients a_k for positive delay D>0 :\n\na_k = (-1)^k\\binom{N}{k}\\prod_{l=0}^N {D+l \\over{D+k+l}}\n\n\\;\\;\\;\\;\\; \\text{where} \\;\\;\\;\\;\\;\n\n\\binom{n}{k} = {N! \\over{k! (N-k)! }}\n\nWhat follows is an expansion of the formula above displaying the resulting coefficients of order up to N=3 :",
+  "references": [
+    {
+      "n": 1,
+      "text": "Ideal Bandlimited (Sinc) Interpolation. ccrma.stanford.edu. https://ccrma.stanford.edu/~jos/Interpolation/Ideal_Bandlimited_Sinc_Interpolation.html"
+    },
+    {
+      "n": 2,
+      "text": "Välimäki, Vesa. (1998). Discrete Time Modeling of Acoustic Tubes Using Fractional Delay Filters. http://users.spa.aalto.fi/vpv/publications/vesan_vaitos/"
+    },
+    {
+      "n": 3,
+      "text": "Harris, F.J.. (1978). On the use of windows for harmonic analysis with the discrete Fourier transform. Proceedings of the IEEE. doi:10.1109/proc.1978.10837"
+    },
+    {
+      "n": 4,
+      "text": "Laakso, Timo I.. (January 1996). Splitting the unit delay [FIR/all pass filters design]. doi:10.1109/79.482137"
+    },
+    {
+      "n": 5,
+      "text": "Hermanowicz, E.. (1992). formulas for weighting coefficients of maximally flat tunable FIR delays. Electronics Letters. doi:10.1049/el:19921239"
+    },
+    {
+      "n": 6,
+      "text": "Thiran, J.-P.. (1971). Recursive digital filters with maximally flat group delay. IEEE Transactions on Circuit Theory. doi:10.1109/TCT.1971.1083363"
+    }
+  ]
+}

@@ -1,0 +1,74 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2312.00968",
+  "title": "Omni-SMoLA: Boosting Generalist Multimodal Models with Soft Mixture of Low-rank Experts",
+  "authors": "Jialin Wu, Xia Hu, Yaqing Wang, Bo Pang, Radu Soricut",
+  "year": "2024",
+  "categories": [
+    "cs.CV",
+    "cs.CL"
+  ],
+  "url": "https://arxiv.org/abs/2312.00968",
+  "html_url": "https://arxiv.org/html/2312.00968",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 678,
+  "text": "Large multimodal models (LMMs) [1,2,3,4,5,6] demonstrate remarkable performance on a variety of tasks including visual question answering, image captioning, visual document understanding, etc. To date, the best performance on most of these tasks is achieved by so-called specialist LMMs, but their large scale makes it impractical to deploy a multitude of such specialists at once. As a result, so-called generalist LMMs emerge as an obvious choice, where such a model is trained and deployed to handle a wide range of tasks using the same set of model parameters.\n\nBuilding a single generalist model to solve multiple tasks remains challenging. A straightforward approach is to fine-tune the model parameters with supervised data representing multiple tasks. However, recent research suggests that it causes non-negligible performance degradation compared to the performance of a single-task specialist [3]. It is likely that, even though these tasks share the same configuration of modalities (e.g., image + text as input, text as output), what the model needs to solve for is significantly diverse – for instance, some tasks require recognizing the fine-grained identity of visual content, others may rely on world-knowledge outside of the visual scene, while others require reading and understanding texts from images.\n\nRecent work [7] show that Mixture-of-Experts (MoE) models stand to benefit more from instruction tuning compared to dense models, and serve as good candidate architectures for building generalist large language models. Intuitively, this should work well because different expert modules can specialize and handle different tasks. However, there is an obvious issue with applying the MoE design on Transformer blocks for large-scale models: the different transformer blocks result in replicating the model parameters using high-rank experts. This creates a situation in which the scale of each expert model block compared to their dense-model counterparts is much more limited.\n\nIn this work, we address the aforementioned limitations by introducing Omni-SMoLA, an architecture that efficiently mixes many multi-modal low rank experts. Using this architecture, we demonstrate strong capabilities for adapting pretrained models to tackle specialized tasks. The core intuition is that a large pretrained (or instruction-tuned) model provides a foundational backbone of capabilities (we denote this model by \\theta^{*}), while different lightweight experts learn additional specializations (which can be knowledge, style, or capabilities). In particular, for the modalities considered in this paper (text & vision), the Omni-SMoLA architecture consists of three sets of experts, focusing on text tokens, visual tokens and multimodal tokens, respectively, in order to satisfy different needs from various tasks.\n\nIn general, the SMoLA design has several important proprieties. First, due to its adoption of the low rank expert design [8] and unlike conventional MoE transformer models [9,10,11,7], the total parameter count is not proportional to the product of expert counts and the parameter counts in each expert as the backbone still contains majority of the parameters. This allows it to bypass the limitation on the number of experts used, which helps achieve better generalist performance. Second, this design is potentially compatible with any large model architecture, either dense or MoE. And, last but not least, it allows for the freedom to potentially adopt different model architectures between the pretraining stage and multi-task learning (or instruction tuning) stage.\n\nWe evaluate the Omni-SMoLA approach on a variety of settings, starting from PaLI-3 [4] (a 5B LMM) and PaLI-X [3] (a 55B LMM), models that have current state-of-the-art (SOTA) performance across a wide range of vision-language benchmarks. The settings include various image captioning tasks and visual question answering tasks, and we experiment with possible combinations in terms of model specialization. We find that: (1) Omni-SMoLA achieves better average performance compared to full-model fine-tuning baselines for both PaLI-3 and PaLI-X; our experiments show that it achieves new SoTA results on multiple vision-language benchmarks, both under generalist settings and under specialist settings; (2) the performance improves with the introduction of the Omni experts, and also increases with the number of experts; (3) in spite of the added modules and a large number of experts per module, the inference speed is only slightly slower compared the base models, indicating the efficiency of this design.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib53",
+      "text": "Maria Tsimpoukelli, Jacob L Menick, Serkan Cabi, SM Eslami, Oriol Vinyals, and Felix Hill. Multimodal few-shot learning with frozen language models. Advances in Neural Information Processing Systems , 34:200–212, 2021."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib9",
+      "text": "Xi Chen, Xiao Wang, Soravit Changpinyo, AJ Piergiovanni, Piotr Padlewski, Daniel Salz, Sebastian Goodman, Adam Grycner, Basil Mustafa, Lucas Beyer, Alexander Kolesnikov, Joan Puigcerver, Nan Ding, Keran Rong, Hassan Akbari, Gaurav Mishra, Linting Xue, Ashish V Thapliyal, James Bradbury, Weicheng Kuo, Mojtaba Seyedhosseini, Chao Jia, Burcu Karagol Ayan, Carlos Riquelme Ruiz, Andreas Peter Steiner, Anelia Angelova, Xiaohua Zhai, Neil Houlsby, and Radu Soricut. PaLI: A jointly-scaled multilingual language-image model. In The Eleventh International Conference on Learning Representations , 2023c."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib7",
+      "text": "Xi Chen, Josip Djolonga, Piotr Padlewski, Basil Mustafa, Soravit Changpinyo, Jialin Wu, Carlos Riquelme Ruiz, Sebastian Goodman, Xiao Wang, Yi Tay, Siamak Shakeri, Mostafa Dehghani, Daniel Salz, Mario Lucic, Michael Tschannen, Arsha Nagrani, Hexiang Hu, Mandar Joshi, Bo Pang, Ceslee Montgomery, Paulina Pietrzyk, Marvin Ritter, AJ Piergiovanni, Matthias Minderer, Filip Pavetic, Austin Waters, Gang Li, Ibrahim Alabdulmohsin, Lucas Beyer, Julien Amelot, Kenton Lee, Andreas Peter Steiner, Yang Li, Daniel Keysers, Anurag Arnab, Yuanzhong Xu, Keran Rong, Alexander Kolesnikov, Mojtaba Seyedhosseini, Anelia Angelova, Xiaohua Zhai, Neil Houlsby, and Radu Soricut. PaLI-X: On scaling up a multilingual vision and language model, 2023a."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib8",
+      "text": "Xi Chen, Xiao Wang, Lucas Beyer, Alexander Kolesnikov, Jialin Wu, Paul Voigtlaender, Basil Mustafa, Sebastian Goodman, Ibrahim Alabdulmohsin, Piotr Padlewski, Daniel Salz, Xi Xiong, Daniel Vlasic, Filip Pavetic, Keran Rong, Tianli Yu, Daniel Keysers, Xiaohua Zhai, and Radu Soricut. PaLI-3 vision language models: Smaller, faster, stronger, 2023b."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib33",
+      "text": "Junnan Li, Dongxu Li, Silvio Savarese, and Steven Hoi. Blip-2: Bootstrapping language-image pre-training with frozen image encoders and large language models, 2023."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib14",
+      "text": "Danny Driess, F. Xia, Mehdi S. M. Sajjadi, Corey Lynch, Aakanksha Chowdhery, Brian Ichter, Ayzaan Wahid, Jonathan Tompson, Quan Ho Vuong, Tianhe Yu, Wenlong Huang, Yevgen Chebotar, Pierre Sermanet, Daniel Duckworth, Sergey Levine, Vincent Vanhoucke, Karol Hausman, Marc Toussaint, Klaus Greff, Andy Zeng, Igor Mordatch, and Peter R. Florence. Palm-e: An embodied multimodal language model. In International Conference on Machine Learning , 2023."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib48",
+      "text": "Sheng Shen, Le Hou, Yanqi Zhou, Nan Du, Shayne Longpre, Jason Wei, Hyung Won Chung, Barret Zoph, William Fedus, Xinyun Chen, Tu Vu, Yuexin Wu, Wuyang Chen, Albert Webson, Yunxuan Li, Vincent Zhao, Hongkun Yu, Kurt Keutzer, Trevor Darrell, and Denny Zhou. Mixture-of-experts meets instruction tuning:a winning combination for large language models, 2023."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib43",
+      "text": "Joan Puigcerver, Carlos Riquelme, Basil Mustafa, and Neil Houlsby. From sparse to soft mixtures of experts. arXiv preprint arXiv:2308.00951 , 2023."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib30",
+      "text": "Dmitry Lepikhin, HyoukJoong Lee, Yuanzhong Xu, Dehao Chen, Orhan Firat, Yanping Huang, Maxim Krikun, Noam M. Shazeer, and Z. Chen. Gshard: Scaling giant models with conditional computation and automatic sharding. ArXiv , abs/2006.16668, 2020b."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib18",
+      "text": "William Fedus, Barret Zoph, and Noam M. Shazeer. Switch transformers: Scaling to trillion parameter models with simple and efficient sparsity. J. Mach. Learn. Res. , 23:120:1–120:39, 2021b."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib15",
+      "text": "Nan Du, Yanping Huang, Andrew M Dai, Simon Tong, Dmitry Lepikhin, Yuanzhong Xu, Maxim Krikun, Yanqi Zhou, Adams Wei Yu, Orhan Firat, et al. Glam: Efficient scaling of language models with mixture-of-experts. In International Conference on Machine Learning , pages 5547–5569. PMLR, 2022."
+    }
+  ]
+}

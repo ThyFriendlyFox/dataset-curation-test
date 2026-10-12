@@ -1,0 +1,95 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2111.11229",
+  "title": "Off-Policy Correction For Multi-Agent Reinforcement Learning",
+  "authors": "MichaÅ Zawalski, BÅaÅ¼ej OsiÅski, Henryk Michalewski, Piotr MiÅoÅ",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.AI",
+    "cs.MA"
+  ],
+  "url": "https://arxiv.org/abs/2111.11229",
+  "html_url": "https://arxiv.org/html/2111.11229",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 516,
+  "text": "Reinforcement learning has witnessed impressive development in recent years. Famously, superhuman performance has been achieved in games Go [1], StarCraft II [2], Dota 2 [3] and other applications. These successes are the result of rapid algorithmic development. Research in directions like trust-region optimization [4], principle of maximum entropy [5], importance sampling [6], distributional RL [7] or bridging the sim-to-real gap [8] are among these which brought significant progress. Multi-agent reinforcement learning (MARL), a framework for problems involving multiple interacting agents, is similar to the standard, single-agent setting. However, it is inherently harder. The challenges are both theoretical (e.g., partial observability and lack of the Markov property) and practical (MARL algorithms often suffer from inferior stability and scalability).\n\nIn this work, we take a step towards amending this situation. We propose MA-Trace, a new on-policy actor-critic algorithm, which adheres to the centralized training and decentralized execution paradigm [9,10,11]. The key component of MA-Trace is the usage of importance sampling. This mechanism, based on V-Trace [6], provides off-policy correction for training data. As we demonstrate empirically, it allows distributing the computations efficiently in a multi-worker setup. Another advantage of MA-Trace is the fact that it is theoretically grounded. We provide a fixed-point theorem that guarantees convergence.\n\nThe on-policy algorithms directly optimize the objective; thus, they tend to be more stable and robust to hyperparameter choices than off-policy methods [12,13,14]. However, it is often impractical to train an on-policy algorithm in the distributed setting. When data collection is performed using many workers, the communication latency, asynchronicity, and other factors make the behavioral policies lag behind the target one. This results in a shift of the collected data towards off-policy distribution, which hurts the training quality. V-Trace reduces this shift by utilizing importance weights, thus permitting highly scalable training. Following that scheme, MA-Trace can be distributed to many workers to vastly reduce the wall-time of training with no negative impact on the results.\n\nWe evaluate MA-Trace on StarCraft Multi-Agent Challenge [15] – a standard benchmark for multi-agent algorithms. Our approach achieves competitive performance on all tasks and exceeds state-of-the-art results on some of them. Additionally, we provide a comprehensive set of ablations to quantify the influence of each component on the final results. We confirm that importance sampling is a key factor for MA-Trace’s performance and show that our algorithm scales favorably with the number of actor workers. Additionally, we provide a few quite surprising findings, e.g. that an observation-based critic network performs better than a state-based.\n\nFor the description of key ideas and videos, visit our webpage: https://sites.google.com/view/ma-trace/main-page. The code used for our experiments is available at https://github.com/awarelab/seed_rl.\n\nOur main contributions are the following:\n\n- (1) We introduce MA-Trace – a simple, scalable and effective multi-agent reinforcement learning algorithm with theoretical guarantees.\n\n- (2) We confirm that the training of MA-Trace can be easily distributed on multiple workers with nearly perfect speed-up and no negative impact on the quality.\n\n- (3) We provide extensive experimental validation of the MA-Trace algorithm in StarCraft Multi-Agent Challenge, including ablations with regard to importance sampling, centralization of learning, scaling and sharing of parameters.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib31",
+      "text": "Silver et al . (2016) David Silver, Aja Huang, Christopher Maddison, Arthur Guez, Laurent Sifre, George Driessche, Julian Schrittwieser, Ioannis Antonoglou, Veda Panneershelvam, Marc Lanctot, Sander Dieleman, Dominik Grewe, John Nham, Nal Kalchbrenner, Ilya Sutskever, Timothy Lillicrap, Madeleine Leach, Koray Kavukcuoglu, Thore Graepel, and Demis Hassabis. 2016. Mastering the game of Go with deep neural networks and tree search. Nature 529 (01 2016), 484–489. https://doi.org/10.1038/nature16961"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib37",
+      "text": "Vinyals et al . (2019b) Oriol Vinyals, I. Babuschkin, Wojciech Czarnecki, Michaël Mathieu, Andrew Dudzik, J. Chung, D. Choi, Richard Powell, Timo Ewalds, P. Georgiev, Junhyuk Oh, Dan Horgan, M. Kroiss, Ivo Danihelka, Aja Huang, L. Sifre, Trevor Cai, J. Agapiou, Max Jaderberg, A. Vezhnevets, Rémi Leblond, Tobias Pohlen, Valentin Dalibard, D. Budden, Yury Sulsky, James Molloy, T. Paine, Caglar Gulcehre, Ziyu Wang, T. Pfaff, Yuhuai Wu, Roman Ring, Dani Yogatama, Dario Wünsch, Katrina McKinney, Oliver Smith, Tom Schaul, T. Lillicrap, K. Kavukcuoglu, D. Hassabis, C. Apps, and D. Silver. 2019b. Grandmaster level in StarCraft II using multi-agent reinforcement learning. Nature (2019), 1–5."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib5",
+      "text": "Berner et al . (2019) Christopher Berner, Greg Brockman, Brooke Chan, Vicki Cheung, Przemyslaw Debiak, Christy Dennison, David Farhi, Quirin Fischer, Shariq Hashme, Christopher Hesse, Rafal Józefowicz, Scott Gray, Catherine Olsson, Jakub Pachocki, Michael Petrov, Henrique Pondé de Oliveira Pinto, Jonathan Raiman, Tim Salimans, Jeremy Schlatter, Jonas Schneider, Szymon Sidor, Ilya Sutskever, Jie Tang, Filip Wolski, and Susan Zhang. 2019. Dota 2 with Large Scale Deep Reinforcement Learning. CoRR abs/1912.06680 (2019). arXiv:1912.06680 http://arxiv.org/abs/1912.06680"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib30",
+      "text": "Schulman et al . (2017) John Schulman, Filip Wolski, Prafulla Dhariwal, Alec Radford, and Oleg Klimov. 2017. Proximal Policy Optimization Algorithms. CoRR abs/1707.06347 (2017). arXiv:1707.06347 http://arxiv.org/abs/1707.06347"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib14",
+      "text": "Haarnoja et al . (2018a) Tuomas Haarnoja, Aurick Zhou, Pieter Abbeel, and Sergey Levine. 2018a. Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor. In Proceedings of the 35th International Conference on Machine Learning, ICML 2018, Stockholmsmässan, Stockholm, Sweden, July 10-15, 2018 (Proceedings of Machine Learning Research) , Jennifer G. Dy and Andreas Krause (Eds.), Vol. 80. PMLR, 1856–1865. http://proceedings.mlr.press/v80/haarnoja18b.html"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib9",
+      "text": "Espeholt et al . (2018) Lasse Espeholt, Hubert Soyer, Rémi Munos, Karen Simonyan, Volodymyr Mnih, Tom Ward, Yotam Doron, Vlad Firoiu, Tim Harley, Iain Dunning, Shane Legg, and Koray Kavukcuoglu. 2018. IMPALA: Scalable Distributed Deep-RL with Importance Weighted Actor-Learner Architectures. In Proceedings of the 35th International Conference on Machine Learning, ICML 2018, Stockholmsmässan, Stockholm, Sweden, July 10-15, 2018 (Proceedings of Machine Learning Research) , Jennifer G. Dy and Andreas Krause (Eds.), Vol. 80. PMLR, 1406–1415. http://proceedings.mlr.press/v80/espeholt18a.html"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib4",
+      "text": "Bellemare et al . (2017) Marc G. Bellemare, Will Dabney, and Rémi Munos. 2017. A Distributional Perspective on Reinforcement Learning. In Proceedings of the 34th International Conference on Machine Learning, ICML 2017, Sydney, NSW, Australia, 6-11 August 2017 (Proceedings of Machine Learning Research) , Doina Precup and Yee Whye Teh (Eds.), Vol. 70. PMLR, 449–458. http://proceedings.mlr.press/v70/bellemare17a.html"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib3",
+      "text": "Andrychowicz et al . (2020) Marcin Andrychowicz, Bowen Baker, Maciek Chociej, Rafal Józefowicz, Bob McGrew, Jakub W. Pachocki, Arthur Petron, Matthias Plappert, Glenn Powell, Alex Ray, Jonas Schneider, Szymon Sidor, Josh Tobin, Peter Welinder, Lilian Weng, and Wojciech Zaremba. 2020. Learning dexterous in-hand manipulation. Int. J. Robotics Res. 39, 1 (2020). https://doi.org/10.1177/0278364919887447"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib20",
+      "text": "Lowe et al . (2017) Ryan Lowe, Yi Wu, Aviv Tamar, Jean Harb, Pieter Abbeel, and Igor Mordatch. 2017. Multi-Agent Actor-Critic for Mixed Cooperative-Competitive Environments. In Advances in Neural Information Processing Systems 30: Annual Conference on Neural Information Processing Systems 2017, December 4-9, 2017, Long Beach, CA, USA , Isabelle Guyon, Ulrike von Luxburg, Samy Bengio, Hanna M. Wallach, Rob Fergus, S. V. N. Vishwanathan, and Roman Garnett (Eds.). 6379–6390. https://proceedings.neurips.cc/paper/2017/hash/68a9750337a418a86fe06c1991a1d64c-Abstract.html"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib11",
+      "text": "Foerster et al . (2018) Jakob N. Foerster, Gregory Farquhar, Triantafyllos Afouras, Nantas Nardelli, and Shimon Whiteson. 2018. Counterfactual Multi-Agent Policy Gradients. In Proceedings of the Thirty-Second AAAI Conference on Artificial Intelligence, (AAAI-18), the 30th innovative Applications of Artificial Intelligence (IAAI-18), and the 8th AAAI Symposium on Educational Advances in Artificial Intelligence (EAAI-18), New Orleans, Louisiana, USA, February 2-7, 2018 , Sheila A. McIlraith and Kilian Q. Weinberger (Eds.). AAAI Press, 2974–2982. https://www.aaai.org/ocs/index.php/AAAI/AAAI18/paper/view/17193"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib26",
+      "text": "Rashid et al . (2018) Tabish Rashid, Mikayel Samvelyan, Christian Schröder de Witt, Gregory Farquhar, Jakob N. Foerster, and Shimon Whiteson. 2018. QMIX: Monotonic Value Function Factorisation for Deep Multi-Agent Reinforcement Learning. In Proceedings of the 35th International Conference on Machine Learning, ICML 2018, Stockholmsmässan, Stockholm, Sweden, July 10-15, 2018 (Proceedings of Machine Learning Research) , Jennifer G. Dy and Andreas Krause (Eds.), Vol. 80. PMLR, 4292–4301. http://proceedings.mlr.press/v80/rashid18a.html"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib2",
+      "text": "Achiam (2018) Josh Achiam. 2018. Spinning Up in Deep RL. https://spinningup.openai.com ."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib36",
+      "text": "Tsitsiklis and Roy (1997) John N. Tsitsiklis and Benjamin Van Roy. 1997. An analysis of temporal-difference learning with function approximation. IEEE Trans. Autom. Control. 42, 5 (1997), 674–690. https://doi.org/10.1109/9.580874"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib34",
+      "text": "Sutton and Barto (2018) Richard S Sutton and Andrew G Barto. 2018. Reinforcement learning: An introduction . MIT press."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib28",
+      "text": "Samvelyan et al . (2019a) Mikayel Samvelyan, Tabish Rashid, Christian Schröder de Witt, Gregory Farquhar, Nantas Nardelli, Tim G. J. Rudner, Chia-Man Hung, Philip H. S. Torr, Jakob N. Foerster, and Shimon Whiteson. 2019a. The StarCraft Multi-Agent Challenge. In Proceedings of the 18th International Conference on Autonomous Agents and MultiAgent Systems, AAMAS ’19, Montreal, QC, Canada, May 13-17, 2019 , Edith Elkind, Manuela Veloso, Noa Agmon, and Matthew E. Taylor (Eds.). International Foundation for Autonomous Agents and Multiagent Systems, 2186–2188. http://dl.acm.org/citation.cfm?id=3332052"
+    }
+  ]
+}

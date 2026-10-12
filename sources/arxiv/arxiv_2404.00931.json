@@ -1,0 +1,138 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2404.00931",
+  "title": "GOV-NeSF: Generalizable Open-Vocabulary Neural Semantic Fields",
+  "authors": "Yunsong Wang, Hanlin Chen, Gim Hee Lee",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2404.00931",
+  "html_url": "https://arxiv.org/html/2404.00931",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 649,
+  "text": "Semantic segmentation for 2D [1,2,3,4] and 3D [5,6,7,8] is a fundamental problem in computer vision with broad applications in fields such as autonomous driving [9,10], robotic navigation [11], medical imaging analysis [12], etc. Given the input 2D images or 3D data such as point cloud, the model is trained to predict dense semantic labels that are assigned to each pixel or point, respectively. Conventional approaches for semantic segmentation are limited by a predefined set of classes that can potentially be assigned to a pixel/point, which hinders the generalizability of the models across datasets and label sets, resulting in dataset-specific models that heavily rely on labels.\n\nRecently, Vision-Language Models (VLMs) [13,14,15,16] propose to learn vision-language correlations from web-scale image-text pairs, showing impressive generalizability in zero-shot vision recognition tasks across different datasets. Attempts like MaskCLIP [17] and PointCLIP [18] have explored transferring knowledge from 2D VLMs to 3D encoders, benefiting from the robustness and generalizability inherent in 2D VLMs. Despite their advantages, these methods typically require pairs of images and point clouds during training, which is largely constrained by the limited availability of 3D data. Additionally, when this knowledge is directly distilled from 2D to 3D contexts, the limited 3D dataset sizes for training may compromise the generalizability of the models, which is the key strength of VLMs.\n\nOpenScene [19] has achieved notable success in zero-shot and open-vocabulary 3D semantic segmentation by averaging multi-view open-vocabulary features and distilling them into a 3D encoder. Despite these achievements, there are several issues with this approach: 1) Averaging multi-view open-vocabulary features can result in sub-optimal performance (cf. Table 2); 2) The direct distillation of open-vocabulary features from 2D to 3D can impair the generalizability (cf. Table 2); 3) The performance of OpenScene-2D significantly deteriorates during inference without depth maps (cf. Table 2, Figure 5). To address these limitations, we leverage Neural Radiance Field (NeRF) to simultaneously encode 3D scene representations and open-vocabulary semantics, where we train the model to learn the blending weights of multi-view open-vocabulary features using the supervision from novel views. While previous works like LERF [20], VL-Fields [21], and Open-NeRF [22] have explored using neural implicit fields to learn open-vocabulary semantics, they still require per-scene optimization and cannot generalize to unseen scenes.\n\nIn this paper, we propose G eneralizable O pen- V ocabulary Ne ural S emantic F ields (GOV-NeSF), the overall pipeline of which is shown in Figure 1. GOV-NeSF is trained using only 2D data without the need for point clouds, ground truth semantic labels or depth maps, and can generalize to unseen scenes for open-vocabulary semantic segmentation. Our model is capable of 2D semantic segmentation from novel views and 3D semantic segmentation of the entire 3D scene. Our approach begins with the construction of a cost volume through back-projection of image features, which is then processed by a 3D U-Net [23,24] to extract geometry-aware features of the 3D scene. Subsequently, during volume rendering, we predict the color and semantic of the sampled 3D points through proposing a Multi-view Joint Fusion Module, which is trained to blend both the color and open-vocabulary values from multi-view projections. Additionally, a Cross-View Attention module is introduced to effectively aggregate multi-view image features before the prediction of blending weights. Extensive experiments validate our state-of-the-art performance on both 2D and 3D open-vocabulary semantic segmentation. Our contributions can be summarized as:\n\n- 1. To the best of our knowledge, we are the first to explore Generalizable Open-Vocabulary Neural Semantic Fields. Its robust design allows for direct inference in unseen scenes and seamless adaptation across datasets.\n\n- 2. The Multi-view Joint Fusion module, a key innovation of our model, blends colors and open-vocabulary features from multi-view inputs. It employs implicit scene representation to predict geometry-aware blending weights and integrates a cross-view attention module for enhanced multi-view feature aggregation.\n\n- 3. Extensive experiments demonstrate our state-of-the-art open-vocabulary semantic segmentation results with remarkable generalizability across scenes and datasets.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib34",
+      "text": "Karen Simonyan and Andrew Zisserman. Very deep convolutional networks for large-scale image recognition. arXiv preprint arXiv:1409.1556 , 2014."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib13",
+      "text": "Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. Deep residual learning for image recognition. In Proceedings of the IEEE conference on computer vision and pattern recognition , pages 770–778, 2016."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib45",
+      "text": "Saining Xie, Ross Girshick, Piotr Dollár, Zhuowen Tu, and Kaiming He. Aggregated residual transformations for deep neural networks. In Proceedings of the IEEE conference on computer vision and pattern recognition , pages 1492–1500, 2017."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib25",
+      "text": "Sachin Mehta, Mohammad Rastegari, Anat Caspi, Linda Shapiro, and Hannaneh Hajishirzi. Espnet: Efficient spatial pyramid of dilated convolutions for semantic segmentation. In Proceedings of the european conference on computer vision (ECCV) , pages 552–568, 2018."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib30",
+      "text": "Charles R Qi, Hao Su, Kaichun Mo, and Leonidas J Guibas. Pointnet: Deep learning on point sets for 3d classification and segmentation. In Proceedings of the IEEE conference on computer vision and pattern recognition , pages 652–660, 2017a."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib31",
+      "text": "Charles Ruizhongtai Qi, Li Yi, Hao Su, and Leonidas J Guibas. Pointnet++: Deep hierarchical feature learning on point sets in a metric space. Advances in neural information processing systems , 30, 2017b."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib4",
+      "text": "Christopher Choy, JunYoung Gwak, and Silvio Savarese. 4d spatio-temporal convnets: Minkowski convolutional neural networks. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 3075–3084, 2019."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib29",
+      "text": "Quang-Hieu Pham, Binh-Son Hua, Thanh Nguyen, and Sai-Kit Yeung. Real-time progressive 3d semantic segmentation for indoor scenes. In 2019 IEEE Winter Conference on Applications of Computer Vision (WACV) , pages 1089–1098. IEEE, 2019."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib20",
+      "text": "Baojun Li, Shun Liu, Weichao Xu, and Wei Qiu. Real-time object detection and semantic segmentation for autonomous driving. In MIPPR 2017: Automatic Target Recognition and Navigation , pages 167–174. SPIE, 2018."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib39",
+      "text": "Yu-Ho Tseng and Shau-Shiun Jan. Combination of computer vision detection and segmentation for autonomous driving. In 2018 IEEE/ION Position, Location and Navigation Symposium (PLANS) , pages 1047–1052. IEEE, 2018."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib54",
+      "text": "Yuxiao Zhang, Haiqiang Chen, Yiran He, Mao Ye, Xi Cai, and Dan Zhang. Road segmentation for all-day outdoor robot navigation. Neurocomputing , 314:316–325, 2018b."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib15",
+      "text": "Feng Jiang, Aleksei Grigorev, Seungmin Rho, Zhihong Tian, YunSheng Fu, Worku Jifara, Khan Adil, and Shaohui Liu. Medical image semantic segmentation based on deep learning. Neural Computing and Applications , 29:1257–1265, 2018."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib32",
+      "text": "Alec Radford, Jong Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry, Amanda Askell, Pamela Mishkin, Jack Clark, et al. Learning transferable visual models from natural language supervision. In International conference on machine learning , pages 8748–8763. PMLR, 2021."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib49",
+      "text": "Lewei Yao, Runhui Huang, Lu Hou, Guansong Lu, Minzhe Niu, Hang Xu, Xiaodan Liang, Zhenguo Li, Xin Jiang, and Chunjing Xu. Filip: Fine-grained interactive language-image pre-training. arXiv preprint arXiv:2111.07783 , 2021."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib51",
+      "text": "Jiahui Yu, Zirui Wang, Vijay Vasudevan, Legg Yeung, Mojtaba Seyedhosseini, and Yonghui Wu. Coca: Contrastive captioners are image-text foundation models. arXiv preprint arXiv:2205.01917 , 2022."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib33",
+      "text": "Christoph Schuhmann, Romain Beaumont, Richard Vencu, Cade Gordon, Ross Wightman, Mehdi Cherti, Theo Coombes, Aarush Katta, Clayton Mullis, Mitchell Wortsman, et al. Laion-5b: An open large-scale dataset for training next generation image-text models. Advances in Neural Information Processing Systems , 35:25278–25294, 2022."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib56",
+      "text": "Chong Zhou, Chen Change Loy, and Bo Dai. Extract free dense labels from clip. In European Conference on Computer Vision , pages 696–712. Springer, 2022."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib57",
+      "text": "Xiangyang Zhu, Renrui Zhang, Bowei He, Ziyao Zeng, Shanghang Zhang, and Peng Gao. Pointclip v2: Adapting clip for powerful 3d open-world learning. arXiv preprint arXiv:2211.11682 , 2022."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib28",
+      "text": "Songyou Peng, Kyle Genova, Chiyu Jiang, Andrea Tagliasacchi, Marc Pollefeys, Thomas Funkhouser, et al. Openscene: 3d scene understanding with open vocabularies. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 815–824, 2023."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib16",
+      "text": "Justin Kerr, Chung Min Kim, Ken Goldberg, Angjoo Kanazawa, and Matthew Tancik. Lerf: Language embedded radiance fields. In International Conference on Computer Vision (ICCV) , 2023."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib37",
+      "text": "Nikolaos Tsagkas, Oisin Mac Aodha, and Chris Xiaoxuan Lu. Vl-fields: Towards language-grounded neural implicit spatial representations. arXiv preprint arXiv:2305.12427 , 2023."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib52",
+      "text": "Hao Zhang, Fang Li, and Narendra Ahuja. Open-nerf: Towards open vocabulary nerf decomposition. arXiv preprint arXiv:2310.16383 , 2023."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib5",
+      "text": "Özgün Çiçek, Ahmed Abdulkadir, Soeren S Lienkamp, Thomas Brox, and Olaf Ronneberger. 3d u-net: learning dense volumetric segmentation from sparse annotation. In Medical Image Computing and Computer-Assisted Intervention–MICCAI 2016: 19th International Conference, Athens, Greece, October 17-21, 2016, Proceedings, Part II 19 , pages 424–432. Springer, 2016."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib19",
+      "text": "Kisuk Lee, Jonathan Zung, Peter Li, Viren Jain, and H Sebastian Seung. Superhuman accuracy on the snemi3d connectomics challenge. arXiv preprint arXiv:1706.00120 , 2017."
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2404.00857",
+  "title": "Meta Episodic learning with Dynamic Task Sampling for CLIP-based Point Cloud Classification",
+  "authors": "Shuvozit Ghose, Yang Wang",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2404.00857",
+  "html_url": "https://arxiv.org/html/2404.00857",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1067,
+  "text": "Point cloud classification refers to the process of assigning semantic labels or categories to individual points within a point cloud data structure. A point cloud is a collection of 3D points that represent the surface of an object or a scene, typically acquired through techniques like LiDAR or structured light scanning and the objective of point cloud classification is to extract meaningful information from 3D point cloud data. Point cloud classification has numerous real-world applications, including stereo reconstruction, indoor navigation, autonomous driving, augmented reality, and robotics perception. Compared to 2D image classification, point cloud classification presents additional challenges. While 2D images consist of dense and regular pixel arrays, 3D point clouds are sparse and unordered, lacking the rich texture and information found in 2D images. While early deep learning point cloud classification methods focused on designing advanced architectures for point cloud classification, such as PointNet [1], PointNet++ [2], RSCNN [3], DGCNN [4], CurveNet [5], the introduction of Contrastive Language-Image Pre-training (CLIP) has opened up a new direction in computer vision research. CLIP [6], which is trained using unlabeled image-caption supervision, can be adapted to specific downstream tasks with minimal additional training. Inspired by CLIP’s [6] success, recent works have explored the extension of pre-trained CLIP to 3D recognition. In this direction, CLIP-based point cloud models like PointCLIP [7], CLIP2Point [8] etc have become state-of-the-art methods in the few-shot setup. In general, the pipeline for 3D recognition using pre-trained CLIP involves projecting the point cloud as depth maps, processing the depth maps using the pre-trained CLIP visual encoder, and adding a small adapter network that is fine-tuned for the specific task.\n\nAlthough these methods show promising performance for some classes like airplanes, desks, guitars, etc, the performance for some classes like the cup, flower pot, sink, nightstand, etc is still far from satisfactory as depicted by Fig (b). This is due to the fact that the adapter of CLIP-based models is trained using randomly sampled N-way K-shot data in the standard supervised learning setup. But, for some classes point cloud instances differ drastically in terms of shape and structure as depicted in Fig. 1. In the CLIP-based point cloud classification few-shot setup, the adapter tries to learn these various shape and structure variations through only k-shot data but often falls short, thus overfitting on the training set and generalizing poorly on evaluation because it is not possible for a single adapter model to perform well on every class-specific point cloud instance. However, another naive approach can be fine-tuning the adapter to the unseen class-specific point cloud instances. But it requires thousands of backpropagation gradients updates, thus requiring considerable time and computation to get the desired result. Moreover, although fine-tuning can solve the unseen class-specific point cloud adaptation problem to some extent, it is not possible to fine-tune the adapter with every unseen class-specific point cloud instance.\n\nTo solve this issue, one potential solution can be the introduction of a meta-learning formulation for CLIP-based point cloud classification. Unlike supervised learning, meta-learning learns novel tasks with only a few examples, in a similar way to human beings. Just like humans learn by seeing some examples and then using domain-specific knowledge in practical scenarios, meta-learning adapts to a specific task by observing a few examples. The motivation of meta-learning is to absorb information from one task and generalize that information to unseen tasks proficiently by quickly adapting to the new tasks from a small set of training examples given during the testing phase. Especially, Model Agnostic Meta-learning (MAML) [9] has shown great impact. MAML [9] tries to find a good initialization across shared knowledge, so that small updates with task-specific data can adapt the model to that task, thus boosting performance.\n\nHowever, the standard MAML [9] has several problems in this context. Firstly, the standard meta-learning paradigm is used to learn good initialization for the base model which has increased model capacity, enhanced feature extractor, and a large receptive field. In the case of CLIP based model, the adapter is a small model with a smaller receptive field. In the standard MAML [9], the base model learns the generalized knowledge from the randomly sampled task, whereas for CLIP-based models, some visual knowledge has already been captured by the CLIP Visual encoder as depicted by the Fig. 3 (a). Finally and most importantly, the standard meta-learning gives equal importance to all the classes and samples the N-way K-shot data accordingly. However, in the CLIP-based models, some visual information has already been learned by the CLIP visual encoder (e.g. airplanes, desks, guitars, etc), and the main target of our meta-training is to encode unknown generalized class information (e.g. cup, flower pot, sink, nightstand, etc) to the adapter. Thus, a natural question arises, how can we encode unknown generalized class information to the adapter so that it can achieve satisfactory results?\n\nFor this purpose, we propose a novel meta-episodic learning framework with dynamic task sampling for CLIP-based point cloud classification. While meta-episodic learning combines these two concepts by employing episodic training within a meta-learning framework, dynamic task sampling ensures the sampling of unknown classes in the related task within an episodic. For sampling dynamic tasks within an episode, we propose a novel performance memory. The performance memory keeps track of the class-wise performance within an episode and samples the task according. In our approach, the CLIP-based model is trained on episodes of related tasks, where each episode contains a set of related examples mostly sampled from unknown classes. By learning from these episodes, the adapter acquires a generalization ability that enables it to quickly adapt and learn from new tasks.\n\nIn summary, the contribution of this paper is as follows: 1) we, to the best of our knowledge for the first time, propose a novel meta-episodic learning framework for CLIP-based point cloud classification, addressing the challenges of limited training examples and sampling unknown classes. 2) we propose a novel dynamic task sampling technique within the episode based on performance memory. This sampling strategy effectively addresses the challenge of sampling unknown classes, ensuring that the model learns from a diverse range of classes and promotes the exploration of underrepresented categories. By dynamically updating the performance memory, we adaptively prioritize the sampling of classes based on their performance, enhancing the model’s ability to handle challenging and real-world scenarios. 3) We confirm that our framework consistently improves upon even the most recent state-of-the-art CLIP-based point cloud models.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "C. R. Qi, H. Su, K. Mo, and L. J. Guibas, “Pointnet: Deep learning on point sets for 3d classification and segmentation,” in CVPR , 2017."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "C. R. Qi, L. Yi, H. Su, and L. J. Guibas, “Pointnet++: Deep hierarchical feature learning on point sets in a metric space,” NeurIPS , 2017."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "Y. Liu, B. Fan, S. Xiang, and C. Pan, “Relation-shape convolutional neural network for point cloud analysis,” in CVPR , 2019."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "Y. Wang, Y. Sun, Z. Liu, S. E. Sarma, M. M. Bronstein, and J. M. Solomon, “Dynamic graph cnn for learning on point clouds,” TOG , 2019."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "T. Xiang, C. Zhang, Y. Song, J. Yu, and W. Cai, “Walk in the cloud: Learning curves for point clouds shape analysis,” in CVPR , 2021."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "A. Radford, J. W. Kim, C. Hallacy, A. Ramesh, G. Goh, S. Agarwal, G. Sastry, A. Askell, P. Mishkin, J. Clark et al. , “Learning transferable visual models from natural language supervision,” in ICML , 2021."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "R. Zhang, Z. Guo, W. Zhang, K. Li, X. Miao, B. Cui, Y. Qiao, P. Gao, and H. Li, “Pointclip: Point cloud understanding by clip,” in CVPR , 2022."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "T. Huang, B. Dong, Y. Yang, X. Huang, R. W. Lau, W. Ouyang, and W. Zuo, “Clip2point: Transfer clip to point cloud classification with image-depth pre-training,” arXiv , 2022."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "C. Finn, P. Abbeel, and S. Levine, “Model-agnostic meta-learning for fast adaptation of deep networks,” ICML , 2017."
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2401.09329",
+  "title": "Calibrate-Extrapolate: Rethinking Prevalence Estimation with Black Box Classifiers",
+  "authors": "Siqi Wu, Paul Resnick",
+  "year": "2024",
+  "categories": [
+    "cs.SI"
+  ],
+  "url": "https://arxiv.org/abs/2401.09329",
+  "html_url": "https://arxiv.org/html/2401.09329",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 867,
+  "text": "Measuring the frequency of certain labels within a data sample is a common task in many disciplines. This problem, generally called “prevalence estimation” or “quantification”, has a wide range of real world applications, from quantifying the number of infected COVID-19 patients in a country [1], to automated accounts in a social platform [2], and to anti-social posts in an online community [3]. It would be ideal to manually examine every individual in the dataset. This approach is called “census”. However, census is often prohibitively expensive.\n\nIn computational social science (CSS), it is common to make use of an imperfect pre-trained classifier that assigns a label, or label probability, to each item [2,4,5,6]. The prevalence estimation techniques then somehow account for the imperfections of the classifier. Alternative approaches are possible, such as a model trained with prevalence estimation evaluation metrics rather than individual classification accuracy as the objective function [7]. However, the classifier-aided approaches are especially attractive when the dataset is on a large scale, ground truth labels are difficult or expensive to obtain, and a high quality pre-trained classifier such as ChatGPT or Jigsaw’s Perspective API [8] is available for use.\n\nExtant literature on prevalence estimation with black box classifiers is plentiful and there are two useful survey articles [9,10]. In this paper, we do not propose any new estimation techniques. Instead, our contribution is a conceptual framework called “Calibrate-Extrapolate”. It rethinks the prevalence estimation process not as merely estimating the percentage of ground truth labels but as estimating the complete joint distribution between the classifier outputs and ground truth. A calibration phase gathers ground truth labels for a small data sample that is purposefully selected from a base dataset, and then estimates the joint distribution for the full base dataset. An extrapolation phase assumes that some properties of the base joint distribution are stable and infers other properties from the observed classifier output distribution of a target dataset. In both phases, the prevalence for label of interest can be read off from the inferred joint distribution of classifier outputs and ground truth labels.\n\nThe Calibrate-Extrapolate framework is broadly applicable to many real world settings. It is also flexible because researchers can still customize design elements in some steps. We identify four such elements: which black box classifier to apply, which data to sample for ground truth labels, which stability assumption to make, and which prevalence estimation technique to employ.\n\nIn a real world setting, it may be unclear which stability assumptions are reasonable to make. Thinking about prevalence estimation techniques in the Calibrate-Extrapolate framework makes it clear what assumptions each technique requires about the stable properties (or lack thereof) between training, base, and target datasets; and how violations of those assumptions can lead to errors in the final prevalence estimate. For example, assuming only stable calibration curve between base and target datasets limits the range of possible final estimates and attenuates any observed change in the density of classifier outputs. On the other hand, assuming only class-conditional densities amplifies any observed change in the density of classifier outputs and can lead to estimates clipped at 0 or 100%. In addition, thinking about prevalence estimation in this framework clarifies the value of a more accurate classifier. While a weak classifier can still yield correct prevalence estimates if repeated many times [11], those estimates will be less certain and less robust to incorrect stability assumptions between base and target datasets.\n\nWe demonstrate the impacts of alternative design elements using simulated data, where large-scale base and target datasets are generated from known joint distributions of classifier outputs with ground truth labels. We experimented with two kinds of data generating processes (intrinsic and extrinsic), two classifiers (strong and weak), two stability assumptions (stable class-conditional densities and stable calibration curve), and two prevalence estimation techniques (mixture model and probabilistic estimator). These yield an instructive set of comparisons that highlight both the strengths and limitations of each estimation technique.\n\nWe apply the Calibrate-Extrapolate framework to estimating the weekly prevalence of toxic comments on news topics on Reddit, Twitter/X, and YouTube in 2022. We selected Jigsaw’s Perspective API as our black box classifier and sent all collected comments to it for obtaining a classifier score for each. We used comments from August 2021 as the base dataset, asked crowdworkers to annotate it, and used the annotations to calibrate the Perspective API outputs. We then extrapolated the learned base joint distribution to make an inference for target datasets in later weeks. The alternative prevalence estimation techniques yield a range of estimates for each platform for each week. We estimated consistently higher prevalence of toxic comments on YouTube (12.93%) than on Twitter/X (9.39%), than on Reddit (7.75%).\n\nIn sum, the contributions of this work include:\n\n- • a framework that rethinks the prevalence estimation process as modeling the joint distribution between classifier outputs and ground truth labels in a dataset;\n\n- • experiments and arguments about how different design elements of the prevalence estimation process impact the accuracy of estimates, including guidance about avoiding clear missteps and ways to think about robustness to incorrect stability assumptions;\n\n- • repeated empirical prevalence estimates, over time, of toxic comments on news topics on Reddit, Twitter/X, and YouTube.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib24",
+      "text": "Sempos and Tian (2021) Sempos, C. T.; and Tian, L. 2021. Adjusting Coronavirus Prevalence Estimates for Laboratory Test Kit Error. American Journal of Epidemiology ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib29",
+      "text": "Yang et al. (2020) Yang, K.-C.; Varol, O.; Hui, P.-M.; and Menczer, F. 2020. Scalable and generalizable social bot detection through data selection. In AAAI ."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib18",
+      "text": "Park, Seering, and Bernstein (2022) Park, J. S.; Seering, J.; and Bernstein, M. S. 2022. Measuring the Prevalence of Anti-Social Behavior in Online Communities. Proceedings of the ACM on Human-Computer Interaction , 6(CSCW2)."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib21",
+      "text": "Rajadesingan, Budak, and Resnick (2021) Rajadesingan, A.; Budak, C.; and Resnick, P. 2021. Political Discussion Is Abundant in Non-political Subreddits (And Less Toxic). In ICWSM ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib22",
+      "text": "Saha et al. (2023) Saha, P.; Garimella, K.; Kalyan, N. K.; Pandey, S. K.; Meher, P. M.; Mathew, B.; and Mukherjee, A. 2023. On the Rise of Fear Speech in Online Social Media. PNAS ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib19",
+      "text": "Pfeffer et al. (2023) Pfeffer, J.; Matter, D.; Jaidka, K.; Varol, O.; Mashhadi, A.; Lasser, J.; Assenmacher, D.; Wu, S.; Yang, D.; Brantner, C.; et al. 2023. Just Another Day on Twitter: A Complete 24 Hours of Twitter Data. In ICWSM ."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "Esuli and Sebastiani (2015) Esuli, A.; and Sebastiani, F. 2015. Optimizing Text Quantifiers for Multivariate Loss Functions. ACM Transactions on Knowledge Discovery from Data ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib28",
+      "text": "Wulczyn, Thain, and Dixon (2017) Wulczyn, E.; Thain, N.; and Dixon, L. 2017. Ex Machina: Personal Attacks Seen at Scale. In TheWebConf ."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "Forman (2008) Forman, G. 2008. Quantifying Counts and Costs via Classification. Data Mining and Knowledge Discovery ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "González et al. (2017) González, P.; Castaño, A.; Chawla, N. V.; and Coz, J. J. D. 2017. A Review on Quantification Learning. ACM Computing Surveys ."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib26",
+      "text": "TeBlunthuis, Hase, and Chan (2024) TeBlunthuis, N.; Hase, V.; and Chan, C.-H. 2024. Misclassification in Automated Content Analysis Causes Bias in Regression. Can We Fix It? Yes We Can! Communication Methods and Measures ."
+    }
+  ]
+}

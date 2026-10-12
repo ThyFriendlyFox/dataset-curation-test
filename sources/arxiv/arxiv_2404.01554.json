@@ -1,0 +1,83 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2404.01554",
+  "title": "FT2Ra: A Fine-Tuning-Inspired Approach to Retrieval-Augmented Code Completion",
+  "authors": "Qi Guo, Xiaohong Li, Xiaofei Xie, Shangqing Liu, Ze Tang, Ruitao Feng, Junjie Wang, Jidong Ge, Lei Bu",
+  "year": "2024",
+  "categories": [
+    "cs.SE"
+  ],
+  "url": "https://arxiv.org/abs/2404.01554",
+  "html_url": "https://arxiv.org/html/2404.01554",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1065,
+  "text": "In the realm of software engineering, code pre-trained models (CPMs) specialized for code generation and completion are becoming increasingly prevalent. Recently, a series of code completion plugins such as GitHub Copilot [1], and Visual Studio IntelliCode [2] have significantly alleviated the burden on software developers and enhanced their development efficiency.\n\nCode-centric pre-trained models are generally trained using vast amounts of source code data harvested from open repositories. In the inference phase, CPMs typically map the code prefixes to fixed-sized representations and use the representations to predict the next code token. However, despite the extensive training data, CPMs still struggle to capture rare or specialized patterns. On one hand, the rarity of certain patterns in the training data makes it difficult for the model to learn them adequately. On the other hand, the complex inter-dependencies between different data samples could include conflicting coding styles or logic that the model fails to reconcile. Furthermore, these CPMs may not excel in specific domains where task-oriented or project-specific knowledge is essential, such as project-specific API invocations. For example, the recent study [3] disclosed that these general-purpose pre-trained models are inferior in repository-level code completion where the interrelated dependencies among files within a repository are missed for these general models. Therefore, the post-training enhancement of these models becomes a crucial task.\n\nTo tackle the outlined challenges, a straightforward approach is to fine-tune the pre-trained models using specialized data, such as missing patterns or project-specific information. However, fine-tuning comes with its own set of limitations, particularly concerning the computational resources required and the quality of data necessary for effective adjustment. Fine-tuning the entire model necessitates storing and updating a colossal parameter set, an operation that becomes increasingly costly and often infeasible as model size escalates into billions of parameters. Furthermore, the success of this strategy hinges on the availability of high-quality, task-specific data. While parameter-efficient fine-tuning techniques have been proposed [4,5,6], they still demand considerable computational resources for fine-tuning.\n\nRecent research [3,7,8] proposes an alternative route through the use of retrieval-augmented language models (RaLMs). These models supplement the capabilities of pre-trained models by incorporating retrieval mechanisms that source information (e.g., rare patterns) from an external database, thereby bypassing the need for additional fine-tuning. This method enables the model to explicitly store and retrieve rare patterns, as opposed to implicitly integrating them into the model’s parameters [7]. This paradigm aligns well with human learning behavior, where sparse examples are leveraged to generalize effectively to new situations. Empirical results demonstrate that RaLMs can significantly enhance the performance of CPMs, particularly in the prediction of rare patterns.\n\nFor retrieval-augmented language models, two main challenges exist the identification of similar samples from an external database and the effective utilization of this retrieved information for making predictions. Typically, the former is addressed by retrieving nearest neighbors based on distance metrics in a pre-trained embedding space. For the latter, existing methods adopt different methods such as employing frequency analysis [9] and empirical probabilities [10] to integrate the retrieved information. For example, kNN-LM [7] retrieves the neighbors and computes a distribution over neighbors based on a softmax of their negative distances, which are used to augment the original predictions. The most recent work kNM-LM [8] retrieves the code tokens that the language model fails to predict and normalize into a distribution, which is merged with the predictions of the language model. While these heuristic approaches have yielded promising results, they largely depend on empirical settings, leaving theoretical gaps in terms of what information should be retrieved and how this information can be better exploited.\n\nIn this paper, to better understand the optimal use of retrieved knowledge, we first conduct a theoretical analysis of the fine-tuning process in CPMs. Our theoretical analysis and derivation reveal insights for designing a strategy that more closely approximates the effects of fine-tuning. While our theoretical derivation does incorporate certain approximations, the evaluation results still demonstrate the effectiveness of the retrieval mechanism. Specifically, our analysis indicates that the logits discrepancy between the predicted and actual values associated with neighbors (i.e., \\Delta logits) serves as crucial information for augmenting CPM predictions. Based on the analysis, we develop a novel retrieval-augmentation technique, denoted as FT2Ra, for code completion tasks. CPMs can recalibrate and improve its predictions by adding the \\Delta logits to its logit output. Furthermore, akin to the iterative nature of the fine-tuning process, FT2Ra is designed to operate through an iterative retrieval cycle, progressively updating the external database to refine the quality of retrieved information, thereby continuously improving prediction accuracy.\n\nTo showcase the effectiveness of FT2Ra, we selected four state-of-the-art retrieval-based methods: kNN-LM [7], kNM-LM [8], ReACC [11], and BM25 [12]. Our evaluation encompassed both token-level and line-level code completion. The experimental results demonstrate that, guided by our theoretical analysis, FT2Ra significantly outperforms the baseline methods and achieves competitive performance similar to actual fine-tuned models. For instance, in the context of token-level completion, FT2Ra obtains an average accuracy of 74.22% (4.29%+) on UniXcoder, whereas UniXcoder and the top-performing baseline, kNM-LM, achieve accuracy of 54.07% and 69.93%, respectively. In the more challenging line-level completion task, FT2Ra achieves an average Exact Match (EM) score of 26.32 (\\sim 2 \\times+) on UniXcoder. In contrast, UniXcoder and kNM-LM only manage scores of 1.63 and 13.93, respectively. We also observed that, in line-level completion using UniXcoder, FT2Ra achieves performance better than that of the fine-tuned UniXcoder model after 10 epochs, even when operating without fine-tuning. These results not only demonstrate the effectiveness of FT2Ra but also highlight its significant potential to achieve competitive results comparable to those of fine-tuned models. Furthermore, our additional evaluations reveal that the iterative retrieval mechanism designed within FT2Ra significantly contributes to its performance.\n\nIn summary, this paper makes the following contributions:\n\n- • Theoretical Analysis: We perform a theoretical analysis of the model fine-tuning process. This analysis provides valuable insights into how to effectively exploit retrieval information in retrieval augmentation mechanisms.\n\n- • Methodology: Building upon the insights derived from our theoretical analysis, we introduce a novel method called FT2Ra. This innovative approach emulates real fine-tuning through an iterative retrieval process, enhancing its effectiveness.\n\n- • Comprehensive Evaluation: We conduct an extensive evaluation to evaluate the effectiveness of FT2Ra in both token-level and line-level code completion tasks. The results highlight substantial improvements achieved by FT2Ra.\n\n- • Open-Source Resources: We have made the pertinent data, detailed experimental findings, and the tools publicly available [13].",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib2",
+      "text": "git (2022) 2022. GitHub Copilot. https://github.com/features/copilot ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib3",
+      "text": "int (2022) 2022. intellicode. https://visualstudio.microsoft.com/services/intellicode ."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib55",
+      "text": "Zhang et al . (2023) Fengji Zhang, Bei Chen, Yue Zhang, Jin Liu, Daoguang Zan, Yi Mao, Jian-Guang Lou, and Weizhu Chen. 2023. Repocoder: Repository-level code completion through iterative retrieval and generation. arXiv preprint arXiv:2303.12570 (2023)."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib19",
+      "text": "Hu et al . (2021) Edward J Hu, Yelong Shen, Phillip Wallis, Zeyuan Allen-Zhu, Yuanzhi Li, Shean Wang, Lu Wang, and Weizhu Chen. 2021. Lora: Low-rank adaptation of large language models. arXiv preprint arXiv:2106.09685 (2021)."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib36",
+      "text": "Liu et al . (2023b) Xiao Liu, Yanan Zheng, Zhengxiao Du, Ming Ding, Yujie Qian, Zhilin Yang, and Jie Tang. 2023b. GPT understands, too. AI Open (2023)."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib27",
+      "text": "Lester et al . (2021) Brian Lester, Rami Al-Rfou, and Noah Constant. 2021. The power of scale for parameter-efficient prompt tuning. arXiv preprint arXiv:2104.08691 (2021)."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib25",
+      "text": "Khandelwal et al . (2020) Urvashi Khandelwal, Omer Levy, Dan Jurafsky, Luke Zettlemoyer, and Mike Lewis. 2020. Generalization through Memorization: Nearest Neighbor Language Models. In International Conference on Learning Representations . https://openreview.net/forum?id=HklBjCEKvH"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib48",
+      "text": "Tang et al . (2023) Ze Tang, Jidong Ge, Shangqing Liu, Tingwei Zhu, Tongtong Xu, Liguo Huang, and Bin Luo. 2023. Domain Adaptive Code Completion via Language Models and Decoupled Domain Databases. arXiv preprint arXiv:2308.09313 (2023)."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib52",
+      "text": "Wikipedia (2023b) Wikipedia. 2023b. Frequency (statistics). https://en.wikipedia.org/wiki/Frequency_(statistics) ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib51",
+      "text": "Wikipedia (2023a) Wikipedia. 2023a. Empirical Probability. https://en.wikipedia.org/wiki/Empirical_probability ."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib37",
+      "text": "Lu et al . (2022) Shuai Lu, Nan Duan, Hojae Han, Daya Guo, Seung-won Hwang, and Alexey Svyatkovskiy. 2022. Reacc: A retrieval-augmented code completion framework. arXiv preprint arXiv:2203.07722 (2022)."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib45",
+      "text": "Robertson et al . (2009) Stephen Robertson, Hugo Zaragoza, et al . 2009. The probabilistic relevance framework: BM25 and beyond. Foundations and Trends® in Information Retrieval 3, 4 (2009), 333–389."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib4",
+      "text": "ft2 (2023) 2023. ft2ra website. https://sites.google.com/view/ft2ra/home ."
+    }
+  ]
+}

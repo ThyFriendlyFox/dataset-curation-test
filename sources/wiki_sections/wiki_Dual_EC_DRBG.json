@@ -1,0 +1,66 @@
+{
+  "source_type": "encyclopedia_article",
+  "source_id": "enwiki:Dual EC DRBG#rev1374935540",
+  "title": "Dual EC DRBG",
+  "authors": "Wikipedia contributors",
+  "year": "2026",
+  "url": "https://en.wikipedia.org/w/index.php?title=Dual_EC_DRBG&oldid=1374935540",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Security",
+  "word_count": 647,
+  "text": "The stated purpose of including the Dual_EC_DRBG in NIST SP 800-90A is that its security is based on computational hardness assumptions from number theory. A mathematical security reduction proof can then prove that as long as the number theoretical problems are hard, the random number generator itself is secure. However, the makers of Dual_EC_DRBG did not publish a security reduction for Dual_EC_DRBG, and it was shown soon after the NIST draft was published that Dual_EC_DRBG was indeed not secure, because it output too many bits per round.[1,2,3] The output of too many bits (along with carefully chosen elliptic curve points P and Q) is what makes the NSA backdoor possible, because it enables the attacker to revert the truncation by brute force guessing. The output of too many bits was not corrected in the final published standard, leaving Dual_EC_DRBG both insecure and backdoored.[4]\n\nIn many other standards, constants that are meant to be arbitrary are chosen by the nothing up my sleeve number principle, where they are derived from pi or similar mathematical constants in a way that leaves little room for adjustment. However, Dual_EC_DRBG did not specify how the default P and Q constants were chosen, possibly because they were constructed by NSA to be backdoored. Because the standard committee were aware of the potential for a backdoor, a way for an implementer to choose their own secure P and Q was included.[5,6] But the exact formulation in the standard was written such that use of the alleged backdoored P and Q was required for FIPS 140-2 validation, so the OpenSSL project chose to implement the backdoored P and Q, even though they were aware of the potential backdoor and would have preferred generating their own secure P and Q.[7] New York Times would later write that NSA had worked during the standardization process to eventually become the sole editor of the standard.[8]\n\nA security proof was later published for Dual_EC_DRBG by Daniel R.L. Brown and Kristian Gjøsteen, showing that the generated elliptic curve points would be indistinguishable from uniformly random elliptic curve points, and that if fewer bits were output in the final output truncation, and if the two elliptic curve points P and Q were independent, then Dual_EC_DRBG is secure. The proof relied on the assumption that three problems were hard: the decisional Diffie–Hellman assumption (which is generally accepted to be hard), and two newer less-known problems which are not generally accepted to be hard: the truncated point problem, and the x-logarithm problem.[2,3] Dual_EC_DRBG was quite slow compared to many alternative CSPRNGs (which don't have security reductions[9]), but Daniel R.L. Brown argues that the security reduction makes the slow Dual_EC_DRBG a valid alternative (assuming implementors disable the obvious backdoor).[9] Note that Daniel R.L. Brown works for Certicom, the main owner of elliptic curve cryptography patents, so there may be a conflict of interest in promoting an EC CSPRNG.\n\nThe alleged NSA backdoor would allow the attacker to determine the internal state of the random number generator from looking at the output from a single round (32 bytes); all future output of the random number generator can then easily be calculated, until the CSPRNG is reseeded with an external source of randomness. This makes for example SSL/TLS vulnerable, since the setup of a TLS connection includes the sending of a randomly generated cryptographic nonce in the clear.[4] NSA's alleged backdoor would depend on their knowing of the single e such that eQ=P . This is a hard problem if P and Q are set ahead of time, but it's easier if P and Q are chosen.[10] e is a secret key presumably known only by NSA, and the alleged backdoor is a kleptographic asymmetric hidden backdoor.[11] Matthew Green's blog post The Many Flaws of Dual_EC_DRBG[12] has a simplified explanation of how the alleged NSA backdoor works by employing the discrete-log kleptogram introduced in Crypto 1997.[13]",
+  "references": [
+    {
+      "n": 1,
+      "text": "Schoenmakers, Berry. (29 May 2006). Cryptanalysis of the Dual Elliptic Curve Pseudorandom Generator. Cryptology ePrint Archive. http://eprint.iacr.org/2006/190"
+    },
+    {
+      "n": 2,
+      "text": "Kristian Gjøsteen. Comments on Dual-EC-DRBG/NIST SP 800-90"
+    },
+    {
+      "n": 3,
+      "text": "Brown, Daniel R. L.. (2007-08-19). Advances in Cryptology - CRYPTO 2007. Springer, Berlin, Heidelberg. doi:10.1007/978-3-540-74143-5_26"
+    },
+    {
+      "n": 4,
+      "text": "Green, Matthew. (2013-09-18). The Many Flaws of Dual_EC_DRBG. http://blog.cryptographyengineering.com/2013/09/the-many-flaws-of-dualecdrbg.html"
+    },
+    {
+      "n": 5,
+      "text": "Green, Matthew. (2013-12-28). A Few Thoughts on Cryptographic Engineering: A few more notes on NSA random number generators. Blog.cryptographyengineering.com. http://blog.cryptographyengineering.com/2013/12/a-few-more-notes-on-nsa-random-number.html"
+    },
+    {
+      "n": 6,
+      "text": "Kelsey, John. (May 2014). Dual EC in X9.82 and SP 800-90. http://csrc.nist.gov/groups/ST/crypto-review/documents/dualec_in_X982_and_sp800-90.pdf"
+    },
+    {
+      "n": 7,
+      "text": "Steve Marquess. Flaw in Dual EC DRBG (no, not that one). OpenSSL project. http://marc.info/?l=openssl-announce&m=138747119822324"
+    },
+    {
+      "n": 8,
+      "text": "Ball, James. (2013-09-06). Revealed: how US and UK spy agencies defeat internet privacy and security. https://www.theguardian.com/world/2013/sep/05/nsa-gchq-encryption-codes-security"
+    },
+    {
+      "n": 9,
+      "text": "(2013-12-27). [Cfrg] Dual_EC_DRBG ... [was RE: Requesting removal of CFRG co-chair]. Ietf.org. http://www.ietf.org/mail-archive/web/cfrg/current/msg03651.html"
+    },
+    {
+      "n": 10,
+      "text": "Shumow, Dan. On the Possibility of a Back Door in the NIST SP800-90 Dual Ec PRNG. Microsoft. http://rump2007.cr.yp.to/15-shumow.pdf"
+    },
+    {
+      "n": 11,
+      "text": "(31 December 2013). Aris ADAMANTIADIS: \"Dual_Ec_Drbg backdoor: a proof of concept\" 31 Dec 2013. http://blog.0xbadc0de.be/archives/155"
+    },
+    {
+      "n": 12,
+      "text": "(18 September 2013). The Many Flaws of Dual_EC_DRBG. https://blog.cryptographyengineering.com/2013/09/18/the-many-flaws-of-dualecdrbg/"
+    },
+    {
+      "n": 13,
+      "text": "Young, Adam. (1997-08-17). Advances in Cryptology — CRYPTO '97. Springer, Berlin, Heidelberg. doi:10.1007/bfb0052241"
+    }
+  ]
+}

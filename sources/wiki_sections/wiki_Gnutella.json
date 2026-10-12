@@ -1,0 +1,54 @@
+{
+  "source_type": "encyclopedia_article",
+  "source_id": "enwiki:Gnutella#rev1368420048",
+  "title": "Gnutella",
+  "authors": "Wikipedia contributors",
+  "year": "2026",
+  "url": "https://en.wikipedia.org/w/index.php?title=Gnutella&oldid=1368420048",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Design",
+  "word_count": 1137,
+  "text": "To envision how Gnutella originally worked, imagine a large circle of users (called nodes), each of whom has Gnutella client software. On initial startup, the client software must bootstrap and find at least one other node. Various methods have been used for this, including a pre-existing address list of possibly working nodes shipped with the software, using updated web caches of known nodes (called Gnutella Web Caches), UDP host caches and, rarely, even IRC. Once connected, the client requests a list of working addresses. The client tries to connect to the nodes it was shipped with, as well as nodes it receives from other clients until it reaches a certain quota. It connects to only that many nodes, locally caching the addresses which it has not yet tried and discarding the addresses which it tried and found to be invalid.[1]\n\nWhen the user wants to do a search, the client sends the request to each actively connected node. In version 0.4 of the protocol, the number of actively connected nodes for a client was quite small (around 5). In that version of the protocol, each node forwards the request to all its actively connected nodes, who, in turn, forward the request. This continues until the packet has reached a predetermined number of hops from the sender (maximum 7).[2]\n\nSince version 0.6 (2002[3]), Gnutella is a composite network made of leaf nodes and ultra nodes (also called ultrapeers). The leaf nodes are connected to a small number of ultrapeers (typically 3) while each ultrapeer is connected to more than 32 other ultrapeers. With this higher outdegree, the maximum number of hops a query can travel was lowered to 4.\n\nLeaves and ultrapeers use the Query Routing Protocol to exchange a Query Routing Table (QRT), a table of 64 Ki-slots and up to 2 Mi-slots consisting of hashed keywords. A leaf node sends its QRT to each of the ultrapeers to which it is connected, and ultrapeers merge the QRT of all their leaves (downsized to 128 Ki-slots) plus their own QRT (if they share files) and exchange that with their own neighbors. Query routing is then done by hashing the words of the query and seeing whether all of them match in the QRT. Ultrapeers do that check before forwarding a query to a leaf node, and also before forwarding the query to a peer ultra node provided this is the last hop the query can travel.\n\nIf a search request turns up a result, the node that has the result contacts the searcher. In the classic Gnutella protocol, response messages were sent back along the route taken by the query, as the query itself did not contain identifying information for the node. This scheme was later revised, to deliver search results over UDP, directly to the node that initiated the search, usually an ultrapeer of the node. Thus, in the current protocol, the queries carry the IP address and port number of either node. This lowers the amount of traffic routed through the Gnutella network, making it significantly more scalable.[4]\n\nIf the user decides to download the file, they negotiate the file transfer. If the node which has the requested file is not firewalled, the querying node can connect to it directly. However, if the node is firewalled, stopping the source node from receiving incoming connections, the client wanting to download a file sends it a so-called push request to the server for the remote client to initiate the connection instead (to push the file). At first, these push requests were routed along the original chain it used to send the query. This was rather unreliable because routes would often break and routed packets are always subject to flow control. push proxies were introduced to address this problem. These are usually the ultrapeers of a leaf node and they are announced in search results. The client connects to one of these push proxies using an HTTP request and the proxy sends a push request to a leaf on behalf of the client. Normally, it is also possible to send a push request over UDP to the push proxy, which is more efficient than using TCP. Push proxies have two advantages: First, ultrapeer-leaf connections are more stable than routes. This makes push requests much more reliable. Second, it reduces the amount of traffic routed through the Gnutella network.[5]\n\nFinally, when a user disconnects, the client software saves a list of known nodes.\n\nThis contains the nodes to which the client was connected and the nodes learned from pong packets.\n\nThe client uses that as its seed list, when it next starts, thus becoming independent of bootstrap services.[6]\n\nIn practice, this method of searching on the Gnutella network was often unreliable. Each node is a regular computer user; as such, they are constantly connecting and disconnecting, so the network is never completely stable. Also, the bandwidth cost of searching on Gnutella grew exponentially to the number of connected users,[7] often saturating connections and rendering slower nodes useless. Therefore, search requests would often be dropped, and most queries reached only a very small part of the network. This observation identified the Gnutella network as an unscalable distributed system, and inspired the development of distributed hash tables, which are much more scalable but support only exact-match, rather than keyword, search.[8]\n\nTo address the problems of bottlenecks, Gnutella developers implemented a tiered system of ultrapeers and leaves. Instead of all nodes being considered equal, nodes entering the network were kept at the 'edge' of the network, as a leaf. Leaves don't provide routing. Nodes which are capable of routing messages are promoted to ultrapeers. Ultrapeers accept leaf connections and route searches and network maintenance messages. This allows searches to propagate further through the network and allows for numerous alterations in topology. This greatly improved efficiency and scalability.\n\nAdditionally, gnutella adopted a number of other techniques to reduce traffic overhead and make searches more efficient. Most notable are Query Routing Protocol (QRP) and Dynamic Querying (DQ). With QRP, a search reaches only those clients which are likely to have the files, so searches for rare files become far more efficient. With DQ, the search stops as soon as the program has acquired enough search results. This vastly reduces the amount of traffic caused by popular searches.[9]\n\nOne of the benefits of having Gnutella so decentralized is to make it very difficult to shut the network down and to make it a network in which the users are the only ones who can decide which content will be available. Unlike Napster, where the entire network relied on the central server, Gnutella cannot be shut down by shutting down any one node. A decentralized network prevents bad actors from taking control of the contents of the network and/or manipulating data by controlling the central server.[10]",
+  "references": [
+    {
+      "n": 1,
+      "text": "How Auto Discovery Works - Amazon ElastiCache. docs.aws.amazon.com. https://docs.aws.amazon.com/AmazonElastiCache/latest/mem-ug/AutoDiscovery.HowAutoDiscoveryWorks.html"
+    },
+    {
+      "n": 2,
+      "text": "Moon, Jongbae. (2011). Computational Science and Its Applications - ICCSA 2011 Proceedings. Springer."
+    },
+    {
+      "n": 3,
+      "text": "Gnutella Protocol Development. rfc-gnutella.sourceforge.net. https://rfc-gnutella.sourceforge.net/src/rfc-0_6-draft.html"
+    },
+    {
+      "n": 4,
+      "text": "Ripeanu, Matei. Topology of Gnutella Network: Discovery and Analysis. https://www.academia.edu/2893724"
+    },
+    {
+      "n": 5,
+      "text": "(2022-05-09). Gnutella clients that still work. apreasnisuf1984's Ownd. https://questhalo.amebaownd.com/posts/34235509"
+    },
+    {
+      "n": 6,
+      "text": "Franzoni, Federico. (2022). SoK: Network-Level Attacks on the Bitcoin P2P Network. IEEE Access. doi:10.1109/ACCESS.2022.3204387"
+    },
+    {
+      "n": 7,
+      "text": "Why Gnutella Can't Scale. No, Really. February 2001."
+    },
+    {
+      "n": 8,
+      "text": "Bischofs, Ludger. (September 2004). A Hierarchical Super Peer Network for Distributed Software Development. Austrian Computer Society. https://oceanrep.geomar.de/id/eprint/14574/"
+    },
+    {
+      "n": 9,
+      "text": "DQ in Arabic - English-Arabic Dictionary Glosbe. glosbe.com. https://glosbe.com/en/ar/DQ"
+    },
+    {
+      "n": 10,
+      "text": "Berkes, Jem. (April 9, 2003). Decentralized Peer-to-Peer Network Architecture: Gnutella and Freenet. berkes.ca. https://www.berkes.ca/archive/berkes_gnutella_freenet.pdf"
+    }
+  ]
+}

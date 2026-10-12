@@ -1,0 +1,64 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.00939",
+  "title": "G3DR: Generative 3D Reconstruction in ImageNet",
+  "authors": "Pradyumna Reddy, Ismail Elezi, Jiankang Deng",
+  "year": "2024",
+  "categories": [
+    "cs.CV",
+    "cs.GR"
+  ],
+  "url": "https://arxiv.org/abs/2403.00939",
+  "html_url": "https://arxiv.org/html/2403.00939",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 630,
+  "text": "Generating 3D assets is becoming increasingly vital for applications such as VR/AR, film production, and video games. Traditionally, 3D modeling is done by devoted artists and content creators, however, nowadays it is desirable to use machine learning solutions to automate the process. The seminal work of NeRF [1] made a large step in 3D novel view synthesis, by posing the problem as learning an implicit radiance field solely from calibrated images. However, the method requires many different views of the same object/scene with known camera transformations to perform an accurate reconstruction. Furthermore, NeRF can only reconstruct a scene but not generate plausible similar-looking scenes.\n\nSeveral methods [2,3,4] modified NeRF to have generative capabilities. While these methods show impressive 3D generative capabilities, they primarily cater to well-curated and aligned datasets featuring similar object categories and structures, necessitating domain-specific 3D knowledge of the category at hand. This knowledge enables the inference of underlying 3D key points, camera transformation, object scale, and precise cropping. However, this knowledge required for alignment becomes impractical for extensive multi-category datasets such as ImageNet.\n\nIn this work, we propose a novel Generative 3D Reconstruction (G3DR) method that learns from a diverse unaligned 2D dataset such as ImageNet [5]. We combine a latent diffusion model along with a conditional triplane generator to generate highly detailed 3D scenes. Training a triplane generator to reconstruct the scene in the input view is a trivial task, and can be done by simply enforcing a reconstruction loss between it and the ground truth. However, training the model to generate plausible novel views is much more challenging since the ImageNet dataset contains only a single image for each scene. We tackle this by employing a pre-trained language-vision model [6] to give the necessary supervision for the novel views.\n\nThe framework mentioned so far only considers the visual quality of the images and does not ensure plausible geometry. We use a generic off-the-shelf monocular depth estimation model [7] to estimate the depth map of images in the dataset. These depth maps are used to supervise the geometry of the input view. We do so using a depth reconstruction loss that acts as a surrogate loss for the geometry. While this loss gives some concept of geometry, in the absence of multi-view data or alignment, optimizing the triplane generator is an overparametrized problem and, thus prone to many solutions, most of which do not ensure good novel views or plausible geometry. We ensure that the geometry is faithful to the supervision depth map, we propose a novel depth regularization method. This depth regularization method scales the gradients of density and color variables of NeRF volumetric rendering using a kernel. The kernel takes into account the proximity of 3D points that correspond to the density and color value from the camera and the surface’s distance from the camera and scales the gradients to encourage high-density values close to the surface. We further improve the quality of the textures of generated 3D scenes using a multi-resolution triplane sampling strategy. Our multi-resolution sampling strategy helps in improving the model performance without increasing the number of model weights.\n\nIn summary, we make the following contributions:\n\n- • We design a framework for 3D content generation from a single view. Our method can be coupled with generative diffusion models for unconditional, class-conditional, and text-conditional 3D generation.\n\n- • We propose a new gradient regularization method in order to preserve the geometry of the objects.\n\n- • We propose an efficient multi-resolution sampling strategy to enhance the quality of generated images.\n\n- • We improve the state-of-the-art on Imagenet by 22\\% in quality and 90\\% in geometry while lowering the computing by 48\\%. We further validate our method on three other datasets: SDIP Dogs [8], SDIP Elephants [8] and LSUN Horses [9].",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib27",
+      "text": "Ben Mildenhall, Pratul P. Srinivasan, Matthew Tancik, Jonathan T. Barron, Ravi Ramamoorthi, and Ren Ng. Nerf: Representing scenes as neural radiance fields for view synthesis. In ECCV , 2020."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib6",
+      "text": "Eric R. Chan, Marco Monteiro, Petr Kellnhofer, Jiajun Wu, and Gordon Wetzstein. Pi-gan: Periodic implicit generative adversarial networks for 3d-aware image synthesis. In CVPR , 2021."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib44",
+      "text": "Katja Schwarz, Yiyi Liao, Michael Niemeyer, and Andreas Geiger. GRAF: generative radiance fields for 3d-aware image synthesis. In NeurIPS , 2020."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib32",
+      "text": "Michael Niemeyer and Andreas Geiger. GIRAFFE: representing scenes as compositional generative neural feature fields. In CVPR , 2021."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib7",
+      "text": "Jia Deng, Wei Dong, Richard Socher, Li-Jia Li, Kai Li, and Li Fei-Fei. Imagenet: A large-scale hierarchical image database. In CVPR , 2009."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib36",
+      "text": "Alec Radford, Jong Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry, Amanda Askell, Pamela Mishkin, Jack Clark, Gretchen Krueger, and Ilya Sutskever. Learning transferable visual models from natural language supervision. In ICML , 2021."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib26",
+      "text": "S Mahdi H Miangoleh, Sebastian Dille, Long Mai, Sylvain Paris, and Yagiz Aksoy. Boosting monocular depth estimation models to high-resolution via content-adaptive multi-resolution merging. In CVPR , 2021."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib28",
+      "text": "Ron Mokady, Omer Tov, Michal Yarom, Oran Lang, Inbar Mosseri, Tali Dekel, Daniel Cohen-Or, and Michal Irani. Self-distilled stylegan: Towards generation from internet photos. In ACM SIGGRAPH 2022 Conference Proceedings , pages 1–9, 2022."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib60",
+      "text": "Fisher Yu, Ari Seff, Yinda Zhang, Shuran Song, Thomas Funkhouser, and Jianxiong Xiao. Lsun: Construction of a large-scale image dataset using deep learning with humans in the loop. arXiv preprint arXiv:1506.03365 , 2015."
+    }
+  ]
+}

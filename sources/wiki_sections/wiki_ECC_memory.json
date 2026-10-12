@@ -1,0 +1,90 @@
+{
+  "source_type": "encyclopedia_article",
+  "source_id": "enwiki:ECC memory#rev1378474638",
+  "title": "ECC memory",
+  "authors": "Wikipedia contributors",
+  "year": "2026",
+  "url": "https://en.wikipedia.org/w/index.php?title=ECC_memory&oldid=1378474638",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Implementations",
+  "word_count": 973,
+  "text": "### Standard server memory: side-band SECDED\n\nStandard server memory are designed for a single-error correction and double-error detection (SECDED) Hamming code, which allows a single-bit error to be corrected and double-bit errors to be detected per word (the unit of bus transfer). Since DDR SDRAM, the standard bus width (word size) as far as memory is concerned is 64 bits. As a result, the typical setup between DDR and DDR4 is a 72-bit word with 64 data bits and 8 checking bits. DDR5 SDRAM splits the bus into two somewhat independent 32-bit subchannels, so ECC memory uses 80 bits of width in total, split between two 40-bit (32 data, 8 checking) channels.[1] ECC is also used with smaller and larger sizes.\n\nAn ECC-capable memory controller uses the additional bits to store the SECDED code; the memory is only responsible for holding the extra bits. Since the late 1990s, the memory controller also communicates to the BIOS and maintains a count of errors detected and corrected, in part to help identify failing memory modules before the problem becomes catastrophic. Reading the counter is supported on many systems thanks to the SMBIOS standard, being available on Linux, BSD, and Windows (Windows 2000 and later).[2]\n\n### Layout of bits\n\nError detection and correction depends on an expectation of the kinds of errors that occur. Implicitly, it is assumed that the failure of each bit in a word of memory is independent, resulting in improbability of two simultaneous errors. This used to be the case when memory chips were one-bit wide, what was typical in the first half of the 1980s; later developments moved many bits into the same chip.\n\nThis weakness is addressed by various technologies, including IBM's Chipkill, Sun Microsystems' Extended ECC, Hewlett-Packard's Chipspare, and Intel's Single Device Data Correction (SDDC), all of which make sure that the failure of one memory chip would only affect one bit per ECC word. This is achieved by scattering the bits of ECC words across chips, a form of interleaving. To make sure each chip only gets one bit per word, it may be necessary to interleave across multiple memory modules (sticks).\n\nInterleaving in general is a useful technique to defend against correlated multi-bit failures. A cosmic ray, for example, may upset multiple physically neighboring bits across multiple words by associating neighboring bits to different words. As long as a single-event upset (SEU) does not exceed the error threshold (e.g., a single error) in any particular word between accesses, it can be corrected (e.g., by a single-bit error-correcting code), and an effectively error-free memory system may be maintained.[3]\n\n### By memory chip itself\n\nSome DRAM chips include internal \"on-chip\" or \"on-die\" error-correction circuits, which allow systems with non-ECC memory controllers to still gain most of the benefits of ECC memory.[4,5] In some systems, a similar effect may be achieved by using EOS memory modules.\n\nAs mentioned above, on-die ECC is mandatory on DDR5 and LPDDR6. However, its lack of reporting means that very little is known about the true state of the memory chip until the errors exceed the ability for the on-die algorithm to perform correction; no information on how much \"margin\" there is conveyed. Sophisticated algorithms have been built to infer the existence of corrected errors based on non-corrected errors.[6]\n\n### Location of correction\n\nMany ECC memory systems use an \"external\" EDAC circuit between the CPU and the memory. A few systems with ECC memory use both internal and external EDAC systems; the external EDAC system should be designed to correct certain errors that the internal EDAC system is unable to correct.[4] Modern desktop and server CPUs integrate the EDAC circuit into the CPU,[7] even before the shift toward CPU-integrated memory controllers, which are related to the NUMA architecture. CPU integration enables a zero-penalty EDAC system during error-free operation.\n\n### Correction algorithms\n\nAs of 2009, the most-common error-correction codes use Hamming or Hsiao codes that provide single-bit error correction and double-bit error detection (SEC-DED). Other error-correction codes have been proposed for protecting memory double-bit error correcting and triple-bit error detecting (DEC-TED) codes, single-nibble error correcting and double-nibble error detecting (SNC-DND) codes, Reed–Solomon error correction codes, etc. However, in practice, multi-bit correction is usually implemented by interleaving multiple SEC-DED codes.[8,9]\n\nEarly research attempted to minimize the area and delay overheads of ECC circuits. Hamming first demonstrated that SEC-DED codes were possible with one particular check matrix. Hsiao showed that an alternative matrix with odd-weight columns provides SEC-DED capability with less hardware area and shorter delay than traditional Hamming SEC-DED codes.[10] More recent research also attempts to minimize power in addition to minimizing area and delay.[11,12]\n\n### Redundancy instead of ECC\n\nError-correcting memory controllers traditionally use space-optimal error-correction codes such as Hamming and Hsiao. If cost and space is not a concern but speed is, a triple modular redundancy (TMR) may be used due for its faster hardware implementation.[3] Space satellite systems often use TMR,[13,14,15] although satellite RAM usually uses Hamming error correction.[16]\n\n### Personal computers\n\nSeymour Cray famously said \"parity is for farmers\" when asked why he left this out of the CDC 6600.[17] Later, he included parity in the CDC 7600, which caused pundits to remark that \"apparently a lot of farmers buy computers\". The original IBM PC and all PCs until the early 1990s used parity checking.[18] Later ones mostly did not.\n\nMost data paths on a 2020s personal computer, including PCIe, SATA, chip-to-chip interconnection, and on-disk storage, have some form of ECC protection. The lack of ECC on main memory is in comparison unusual, especially given the size and higher likelihood of corruption. Linus Torvalds wrote a long post in a forum in 2021 attacking Intel's choice to forgo ECC support on desktop platforms, when contemporary AMD desktop platforms could use (but not necessary enable the ECC feature on) registered DIMMs with ECC support.[19]",
+  "references": [
+    {
+      "n": 1,
+      "text": "DDR5 Memory Standard: An introduction to the next generation of DRAM module technology - Kingston Technology. Kingston Technology Company. https://www.kingston.com/en/blog/pc-performance/ddr5-overview#:~:text=Dual%2032%2Dbit%20Subchannels,feature%20four%2032%2Dbit%20subchannels."
+    },
+    {
+      "n": 2,
+      "text": "DOMARS. !mca. Microsoft Learn. https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/-mca"
+    },
+    {
+      "n": 3,
+      "text": "Using StrongArm SA-1110 in the On-Board Computer of Nanosatellite. Tsinghua Space Center, Tsinghua University, Beijing. http://www.apmcsta.org/File/doc/Conferences/6th%20meeting/Chen%20Zhenyu.doc"
+    },
+    {
+      "n": 4,
+      "text": "A. H. Johnston. \"Space Radiation Effects in Advanced Flash Memories\". . NASA Electronic Parts and Packaging Program (NEPP). 2001."
+    },
+    {
+      "n": 5,
+      "text": "ECC DRAM. Intelligent Memory. http://www.intelligentmemory.com/ECC-DRAM/"
+    },
+    {
+      "n": 6,
+      "text": "Patel, Minesh. (June 2019). 2019 49th Annual IEEE/IFIP International Conference on Dependable Systems and Networks (DSN). IEEE. doi:10.1109/DSN.2019.00017"
+    },
+    {
+      "n": 7,
+      "text": "AMD-762™ System Controller Software/BIOS Design Guide, p. 179. http://support.amd.com/us/ChipsetMotherboard_TechDocs/24462.pdf"
+    },
+    {
+      "n": 8,
+      "text": "Doe Hyun Yoon; Mattan Erez. \"Memory Mapped ECC: Low-Cost Error Protection for Last Level Caches\". 2009. p. 3."
+    },
+    {
+      "n": 9,
+      "text": "Daniele Rossi; Nicola Timoncini; Michael Spica; Cecilia Metra. \"Error Correcting Code Analysis for Cache Memory High Reliability and Performance\". ."
+    },
+    {
+      "n": 10,
+      "text": "M. Y. Hsiao. \"A Class of Optimal Minimum Odd-weight-column SEC-DED Codes\". 1970."
+    },
+    {
+      "n": 11,
+      "text": "Shalini Ghosh; Sugato Basu; and Nur A. Touba. \"Selecting Error Correcting Codes to Minimize Power in Memory Checker Circuits\". . P. 2, 4."
+    },
+    {
+      "n": 12,
+      "text": "Chris Wilkerson; Alaa R. Alameldeen; Zeshan Chishti; Wei Wu; Dinesh Somasekhar; Shih-lien Lu. \"Reducing cache power with low-cost, multi-bit error-correcting codes\". ."
+    },
+    {
+      "n": 13,
+      "text": "Actel engineers use triple-module redundancy in new rad-hard FPGA. Military & Aerospace Electronics. http://mae.pennnet.com/Articles/Article_Display.cfm?ARTICLE_ID=111934"
+    },
+    {
+      "n": 14,
+      "text": "(2010-02-03). SEU Hardening of Field Programmable Gate Arrays (FPGAs) For Space Applications and Device Characterization. Klabs.org. http://klabs.org/richcontent/Papers/Synopses/nsrec94.htm"
+    },
+    {
+      "n": 15,
+      "text": "Morris, Kevin. (2015-04-14). FPGAs in Space. eejournal.com. https://www.eejournal.com/article/20150414-space/"
+    },
+    {
+      "n": 16,
+      "text": "Commercial Microelectronics Technologies for Applications in the Satellite Radiation Environment. Radhome.gsfc.nasa.gov. http://radhome.gsfc.nasa.gov/radhome/papers/aspen.htm"
+    },
+    {
+      "n": 17,
+      "text": "CDC 6600. Microsoft Research. http://research.microsoft.com/~GBell/craytalk/sld047.htm"
+    },
+    {
+      "n": 18,
+      "text": "Kozierok, Charles M.. (2001-04-17). Parity Checking. The PC Guide. http://www.pcguide.com/ref/ram/errChecking-c.html"
+    },
+    {
+      "n": 19,
+      "text": "(3 January 2021). Linus Torvalds On The Importance Of ECC RAM, Calls Out Intel's \"Bad Policies\" Over ECC. www.phoronix.com. https://www.phoronix.com/news/Linus-Torvalds-ECC"
+    }
+  ]
+}

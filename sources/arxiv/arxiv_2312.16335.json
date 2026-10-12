@@ -1,0 +1,154 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2312.16335",
+  "title": "LeanVec: Searching vectors faster by making them fit",
+  "authors": "Mariano Tepper, Ishwar Singh Bhati, Cecilia Aguerrebere, Mark Hildebrand, Ted Willke",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.DB"
+  ],
+  "url": "https://arxiv.org/abs/2312.16335",
+  "html_url": "https://arxiv.org/html/2312.16335",
+  "license": "http://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "INTRODUCTION",
+  "word_count": 934,
+  "text": "High-dimensional embedding vectors, stemming from deep learning models, have become the quintessential data representation for unstructured data, e.g., for images, audio, video, text, genomics, and computer code [1,2,3,4,5]. The power of these representations comes from translating semantic affinities into spatial similarities between the corresponding vectors. Thus, searching over massive collections of vectors for the nearest neighbors to a given query vector yields semantically relevant results, enabling a wide range of applications [6,7,8,9,10].\n\nAmong other similarity search approaches, graph-based methods [11,12,13] stand out with their high accuracy and performance for high-dimensional data [14]. Here, the index consists of a directed graph, where each vertex corresponds to a dataset vector and edges represent neighbor-relationships between vectors so that the graph can be efficiently traversed to find the nearest neighbors in sub-linear time [15].\n\n[16] have recently shown that, when properly implemented, graph search is bottlenecked by the memory bandwidth of the system, which is mainly consumed by fetching database vectors from memory in a random access pattern (due to the complexity in globally ordering high-dimensional vectors and to the way any graph traversal works, i.e., hoping from one node to the other). Mainstream state-of-the-art vector quantization techniques are either specifically designed for a sequential access pattern [17,18], rendering them not suitable for graph search, or incur more expensive similarity calculations by increasing the number of memory accesses [19] (more details in Section 4). To reduce these access times, [16] introduce a lightweight method, Locally-adaptive Vector Quantization (LVQ), that greatly accelerates the search and leads to state-of-the-art performance. Although LVQ removes the memory bottleneck in vectors of moderate dimensionality (D\\approx 128), we observe increased memory bandwidth and computational pressure for higher dimensional (e.g., D=512,768) deep learning embedding vectors. Higher memory utilization drastically increases the memory latency [20] to access each vector and results in suboptimal search performance. Even masterful placement of prefetching instructions in the software cannot hide the increased latency. These difficulties extend to the time-consuming procedure of constructing a graph-based index as construction speed is proportional to search speed. In a world where both academic and industrial deployments of similarity search overwhelmingly use deep learning embedding vectors, it is paramount to address this performance gap.\n\nAn additional difficulty with modern applications of similarity search is cross-modal querying, i.e., where a user uses a query from one modality to fetch similar elements from a different modality [2,21,22]. For instance, in text2image applications, text queries are used to retrieve semantically similar images. Alternatively, sometimes queries and database vectors are produced by different models, e.g., in question-answering applications [8]. In these cases, queries come from a statistical distribution different from the one underlying the database vectors, which makes applying vector compression techniques learned from the data itself a more challenging problem [23].\n\nIn this work, we introduce LeanVec, a framework that combines linear dimensionality reduction with Locally-adaptive Vector Quantization (LVQ) to accelerate similarity search for high-dimensional vectors, making it suitable for applications with deep learning embedding vectors. LeanVec is inscribed in the standard search-and-rerank paradigm popular in similarity search. We present LeanVec variants for the two main cases: in-distribution (ID) and out-of-distribution (OOD) queries. LeanVec’s compression lowers the required memory bandwidth and provides a proportional increase in search throughput. On the rqa-768-1M dataset (refer to for details), LeanVec compresses vectors by 9.6x (4.8x from the dimensionality reduction and 2x from LVQ) over the baseline of FP16 vectors and provides a 8.5x performance gain while consuming much less memory bandwidth (see Figure 1a). The performance gain increases even further as the dimensionality increases. For instance, in the standard gist-960-1M dataset, LeanVec shows ~12x improvement over the uncompressed FP16 vectors (see Figure 12 in the appendix). We present the following contributions:\n\n- • We show that linear dimensionality reduction can be effectively used on-the-fly to increase the performance of graph-based similarity search, with no degradation in quality, and leads to state of the art results for high-dimensional vectors, including those produced by deep learning models.\n\n- • We show that LeanVec can be used to build high-quality graph indices in a fraction of the time required for the original vectors, yielding up to a 8.6x runtime improvement.\n\n- • For the ID case, LeanVec-ID improves upon previous work using principal component analysis (PCA) [24,25,26,27] by combining it with LVQ, bringing search speedups of up to 3.6x over the state of the art. LeanVec-ID does not make any assumptions about the statistical distribution of the query vectors.\n\n- • For the OOD case, we present a new linear dimensionality reduction technique, LeanVec-OOD, that finds the optimal projection subspaces for the dataset and a representative query set to reduce the errors in the similarity computations. We present two lightweight and fast optimization algorithms for LeanVec-OOD. We present a detailed convergence analysis for one of these variants (based on a non-convex Frank-Wolfe algorithm). We show that LeanVec-OOD performs as good as LeanVec-ID in the ID case and is vastly superior in the OOD case.\n\n- • For reproducibility, we will contribute the LeanVec implementation to Scalable Vector Search, an open source library for high-performance similarity search. We also introduce and will open-source two new datasets with different types of OOD characteristics.\n\nThe remainder of this work is organized as follows. We introduce LeanVec in Section 2, covering the overall framework and the novel techniques for OOD dimensionality reduction. We then present in Section 3 extensive experimental results comparing LeanVec to its alternatives and showing its superiority across all relevant metrics. In Section 4 we review the existing literature and its relation to our work. We provide a few concluding remarks in Section 5.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib22",
+      "text": "Devlin et al. (2019) Devlin, J., Chang, M.-W., Lee, K. & Toutanova, K. (2019), BERT: pre-training of deep bidirectional transformers for language understanding, in ‘Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies’, pp. 4171–4186."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib58",
+      "text": "Radford et al. (2021) Radford, A., Kim, J. W., Hallacy, C., Ramesh, A., Goh, G., Agarwal, S., Sastry, G., Askell, A., Mishkin, P., Clark, J. et al. (2021), Learning transferable visual models from natural language supervision, in ‘International Conference on Machine Learning’, pp. 8748–8763."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib62",
+      "text": "Shvetsova et al. (2022) Shvetsova, N., Chen, B., Rouditchenko, A., Thomas, S., Kingsbury, B., Feris, R. S., Harwath, D., Glass, J. & Kuehne, H. (2022), Everything at once-multi-modal fusion transformer for video retrieval, in ‘IEEE/CVF Conference on Computer Vision and Pattern Recognition’, pp. 20020–20029."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib40",
+      "text": "Ji et al. (2021) Ji, Y., Zhou, Z., Liu, H. & Davuluri, R. V. (2021), ‘DNABERT: pre-trained bidirectional encoder representations from transformers model for DNA-language in genome’, Bioinformatics 37 (15), 2112–2120."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib50",
+      "text": "Li et al. (2022) Li, Y., Choi, D., Chung, J., Kushman, N., Schrittwieser, J., Leblond, R., Eccles, T., Keeling, J., Gimeno, F., Dal Lago, A. et al. (2022), ‘Competition-level code generation with AlphaCode’, Science 378 (6624), 1092–1097."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib16",
+      "text": "Blattmann et al. (2022) Blattmann, A., Rombach, R., Oktay, K., Müller, J. & Ommer, B. (2022), ‘Retrieval-augmented diffusion models’, Advances in Neural Information Processing Systems 35 , 15309–15324."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib17",
+      "text": "Borgeaud et al. (2022) Borgeaud, S., Mensch, A., Hoffmann, J., Cai, T., Rutherford, E., Millican, K., Van Den Driessche, G. B., Lespiau, J.-B., Damoc, B., Clark, A. et al. (2022), Improving language models by retrieving from trillions of tokens, in ‘International Conference on Machine Learning’, pp. 2206–2240."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib43",
+      "text": "Karpukhin et al. (2020) Karpukhin, V., Oguz, B., Min, S., Lewis, P., Wu, L., Edunov, S., Chen, D. & Yih, W.-t. (2020), Dense passage retrieval for open-domain question answering, in ‘Conference on Empirical Methods in Natural Language Processing’, pp. 6769–6781."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib51",
+      "text": "Lian et al. (2020) Lian, D., Wang, H., Liu, Z., Lian, J., Chen, E. & Xie, X. (2020), LightRec: A memory and search-efficient recommender system, in ‘The Web Conference’, pp. 695–705."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib29",
+      "text": "Grbovic et al. (2016) Grbovic, M., Djuric, N., Radosavljevic, V., Silvestri, F., Baeza-Yates, R., Feng, A., Ordentlich, E., Yang, L. & Owens, G. (2016), Scalable semantic matching of queries to ads in sponsored search advertising, in ‘International ACM SIGIR conference on Research and Development in Information Retrieval’, pp. 375–384."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib8",
+      "text": "Arya & Mount (1993) Arya, S. & Mount, D. M. (1993), Approximate nearest neighbor queries in fixed dimensions, in ‘ACM-SIAM Symposium on Discrete algorithms’, Vol. 93, pp. 271–280."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib53",
+      "text": "Malkov & Yashunin (2018) Malkov, Y. A. & Yashunin, D. A. (2018), ‘Efficient and robust approximate nearest neighbor search using hierarchical navigable small world graphs’, IEEE Transactions on Pattern Analysis and Machine Intelligence 42 (4), 824–836."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib38",
+      "text": "Jayaram Subramanya et al. (2019) Jayaram Subramanya, S., Devvrit, F., Simhadri, H. V., Krishnawamy, R. & Kadekodi, R. (2019), ‘DiskANN: Fast accurate billion-point nearest neighbor search on a single node’, Advances in Neural Information Processing Systems 32 ."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib67",
+      "text": "Wang et al. (2021) Wang, M., Xu, X., Yue, Q. & Wang, Y. (2021), ‘A comprehensive survey and experimental comparison of graph-based approximate nearest neighbor search’, Proceedings of the VLDB Endowment 14 (11), 1964–1978."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib25",
+      "text": "Fu et al. (2019) Fu, C., Xiang, C., Wang, C. & Cai, D. (2019), ‘Fast approximate nearest neighbor search with the navigating spreading-out graph’, Proceedings of the VLDB Endowment 12 (5), 461–474."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib3",
+      "text": "Aguerrebere et al. (2023) Aguerrebere, C., Bhati, I., Hildebrand, M., Tepper, M. & Willke, T. (2023), ‘Similarity search in the blink of an eye with compressed indices’, Proceedings of the VLDB Endowment 16 (11), 3433–3446."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib6",
+      "text": "André et al. (2021) André, F., Kermarrec, A.-M. & Scouarnec, N. L. (2021), ‘Quicker ADC : Unlocking the hidden potential of product quantization with SIMD’, IEEE Transactions on Pattern Analysis and Machine Intelligence 43 (5), 1666–1677."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib30",
+      "text": "Guo et al. (2020) Guo, R., Sun, P., Lindgren, E., Geng, Q., Simcha, D., Chern, F. & Kumar, S. (2020), Accelerating large-scale inference with anisotropic vector quantization, in ‘International Conference on Machine Learning’, pp. 3887–3896."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib42",
+      "text": "Jégou et al. (2011) Jégou, H., Douze, M. & Schmid, C. (2011), ‘Product quantization for nearest neighbor search’, IEEE Transactions on Pattern Analysis and Machine Intelligence 33 (1), 117–128."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib64",
+      "text": "Srinivasan et al. (2009) Srinivasan, S., Zhao, L., Ganesh, B., Jacob, B., Espig, M. & Iyer, R. (2009), CMP memory modeling: How much does accuracy matter?, in ‘Workshop on Modeling, Benchmarking and Simulation’."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib70",
+      "text": "Yu et al. (2022) Yu, J., Wang, Z., Vasudevan, V., Yeung, L., Seyedhosseini, M. & Wu, Y. (2022), ‘CoCa: Contrastive captioners are image-text foundation models’, preprint arXiv:2205.01917 ."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib49",
+      "text": "Li et al. (2023) Li, J., Li, D., Savarese, S. & Hoi, S. (2023), ‘Blip-2: Bootstrapping language-image pre-training with frozen image encoders and large language models’, preprint arXiv:2301.12597 ."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib37",
+      "text": "Jaiswal et al. (2022) Jaiswal, S., Krishnaswamy, R., Garg, A., Simhadri, H. V. & Agrawal, S. (2022), ‘OOD-DiskANN: Efficient and scalable graph anns for out-of-distribution queries’, preprint arXiv:2211.12850 ."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib39",
+      "text": "Jegou et al. (2010) Jegou, H., Douze, M., Schmid, C. & Perez, P. (2010), Aggregating local descriptors into a compact image representation, in ‘IEEE Conference on Computer Vision and Pattern Recognition’, IEEE, pp. 3304–3311."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib28",
+      "text": "Gong et al. (2012) Gong, Y., Lazebnik, S., Gordo, A. & Perronnin, F. (2012), ‘Iterative quantization: A procrustean approach to learning binary codes for large-scale image retrieval’, IEEE transactions on pattern analysis and machine intelligence 35 (12), 2916–2929."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib12",
+      "text": "Babenko & Lempitsky (2014b) Babenko, A. & Lempitsky, V. (2014 b ), ‘The inverted multi-index’, IEEE transactions on pattern analysis and machine intelligence 37 (6), 1247–1260."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib69",
+      "text": "Wei et al. (2014) Wei, B., Guan, T. & Yu, J. (2014), ‘Projected residual vector quantization for ANN search’, IEEE MultiMedia 21 (3), 41–51."
+    }
+  ]
+}

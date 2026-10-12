@@ -1,0 +1,138 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2402.18490",
+  "title": "TAMM: TriAdapter Multi-Modal Learning for 3D Shape Understanding",
+  "authors": "Zhihao Zhang, Shengcao Cao, Yu-Xiong Wang",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2402.18490",
+  "html_url": "https://arxiv.org/html/2402.18490",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 825,
+  "text": "Despite the recent success of 3D shape understanding [1,2,3,4,5,6,7], the limited scale of existing 3D shape datasets hinders the learning of more robust and generalizable 3D representations. Due to the significant human labor and expertise required in collecting and annotating 3D shape data, building large-scale 3D shape datasets is a prohibitive endeavor [8,9,10].\n\nTo mitigate the challenge of the limited data scale, recent research in 3D shape representation learning shows a promising direction of multi-modal learning [11,12]. By establishing connections among data of 3D shapes, 2D images, and text, it becomes possible to pre-train 3D shape representations by distilling learned knowledge from image and language modalities. There exists a comprehensive body of literature of massive datasets [13], high-quality models pre-trained via self-supervised learning for 2D image [14,15,16] and language [17,18,19] modalities, and furthermore, cross-modal vision-language models [20,21]. For instance, ULIP [12] creates triplets of 3D point clouds, 2D images, and text by rendering images from 3D shapes and generating text descriptions from their metadata. Then, ULIP adopts contrastive learning to align the 3D shape features with both the image features and text features extracted by CLIP [20].\n\nWhile the image and language modalities are pre-aligned by CLIP pre-training and share the same feature space, we observe that directly aligning 3D features with image features leads to considerably worse representation quality as compared with aligning 3D features with text features, as shown in Figure -left. This phenomenon suggests that existing methods (e.g., ULIP [12] and OpenShape [11]) are not optimally leveraging the 2D image modality in 3D representation pre-training.\n\nThere are two reasons for this counter-intuitive observation: 1) The 2D images in the generated triplets follow a data distribution different from natural images, on which CLIP is pre-trained. The images are rendered or projected from 3D to 2D, usually lacking a realistic background and texture. Since the image domain is shifted, the image features are no longer well-aligned with the text features, as exemplified in Figure -middle. 2) Intuitively, the image features represent more visual attributes including the shape, texture, or color, while the text features have a focus on semantics such as the function of the object. As shown in Figure -right, if the 3D features are specifically aligned with one single modality of images or text, they pay attention to different aspects of the 3D shape. Therefore, enforcing the 3D shape to simultaneously align with two modalities that convey subtly distinct information could be challenging. Such an approach may not fully leverage the potential of multi-modal learning signals.\n\nAiming at addressing these two issues hindering multi-modal pre-training for 3D shape understanding, we propose T ri A dapter M ulti- M odal Learning (TAMM), a two-stage pre-training approach based on three synergistic adapters. In the first stage, to mitigate the domain gap between the 2D images rendered from 3D shapes and the natural images on which CLIP is pre-trained, we adapt the visual representations of CLIP based on the synthetic image-text pairs. More specifically, we fine-tune a lightweight CLIP Image Adapter on top of CLIP visual encoder through contrastive learning and re-align the adapted image features with the text features in the new domain. This CLIP Image Adapter allows us to establish more accurate relations between 3D shapes, 2D images, and language in an updated feature space, and avoids learning 3D representations from mismatched image features and text features.\n\nIn the following second stage, to prevent the vision-semantic feature disparity from impairing our 3D representation pre-training, we choose to embrace this disparity and decouple the 3D representations into two sub-spaces. To comprehensively encode a 3D shape, the 3D encoder needs to capture both the visual and semantic aspects of its representation, which are centric to the corresponding image and text features, respectively. Therefore, we decouple the 3D feature space for the two focuses on visual and semantic representations. In particular, we attach two independent feature adapters to the 3D backbone and transform the 3D features into two sub-spaces. One sub-space focuses more on the visual representations, and is aligned with the 2D image feature space; the other sub-space focuses more on the semantic representations, and is aligned with the language feature space. This approach of decoupled feature spaces makes the learned 3D representations more comprehensive and expressive.\n\nTo summarize, our main contribution includes:\n\n- • We identify the under-utilization of the 2D image modality in existing multi-modal methods. The image domain gap and feature disparity in image-text pairs hinder representation learning in 3D shape understanding.\n\n- • We propose a novel multi-modal learning framework with two learning stages and three unified adapter modules. Our proposed TAMM better exploits both image and language modalities and improves 3D shape representations.\n\n- • Our TAMM consistently enhances 3D representations for a variety of 3D encoder architectures (e.g., Point-BERT [1], SparseConv [22]), pre-training datasets (e.g., ShapeNet [8], an ensembled dataset [11]), and downstream tasks (e.g., zero-shot and linear probing shape classification on Objaverse-LVIS [10], ModelNet40 [23], and ScanObjectNN [24]).",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib54",
+      "text": "Xumin Yu, Lulu Tang, Yongming Rao, Tiejun Huang, Jie Zhou, and Jiwen Lu. Point-BERT: Pre-training 3D point cloud transformers with masked point modeling. In CVPR , 2022."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib29",
+      "text": "Xu Ma, Can Qin, Haoxuan You, Haoxi Ran, and Yun Fu. Rethinking network design and local geometry in point cloud: A simple residual MLP framework. In ICLR , 2022."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib49",
+      "text": "Xiaoyang Wu, Yixing Lao, Li Jiang, Xihui Liu, and Hengshuang Zhao. Point Transformer V2: Grouped vector attention and partition-based pooling. In NeurIPS , 2022."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib58",
+      "text": "Renrui Zhang, Ziyu Guo, Wei Zhang, Kunchang Li, Xupeng Miao, Bin Cui, Yu Qiao, Peng Gao, and Hongsheng Li. PointCLIP: Point cloud understanding by CLIP. In CVPR , 2022b."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib63",
+      "text": "Xiangyang Zhu, Renrui Zhang, Bowei He, Ziyu Guo, Ziyao Zeng, Zipeng Qin, Shanghang Zhang, and Peng Gao. PointCLIP V2: Prompting CLIP and GPT for powerful 3D open-world learning. In ICCV , 2023."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib22",
+      "text": "Tianyu Huang, Bowen Dong, Yunhan Yang, Xiaoshui Huang, Rynson WH Lau, Wanli Ouyang, and Wangmeng Zuo. CLIP2Point: Transfer CLIP to point cloud classification with image-depth pre-training. In ICCV , 2023."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib18",
+      "text": "Deepti Hegde, Jeya Maria Jose Valanarasu, and Vishal Patel. CLIP goes 3D: Leveraging prompt tuning for language grounded 3D recognition. In ICCV , 2023."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib4",
+      "text": "Angel X. Chang, Thomas A. Funkhouser, Leonidas J. Guibas, Pat Hanrahan, Qi-Xing Huang, Zimo Li, Silvio Savarese, Manolis Savva, Shuran Song, Hao Su, Jianxiong Xiao, Li Yi, and Fisher Yu. ShapeNet: An information-rich 3D model repository. arXiv preprint arXiv:1512.03012 , 2015."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib31",
+      "text": "Kaichun Mo, Shilin Zhu, Angel X Chang, Li Yi, Subarna Tripathi, Leonidas J Guibas, and Hao Su. PartNet: A large-scale benchmark for fine-grained and hierarchical part-level 3D object understanding. In CVPR , 2019."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "Matt Deitke, Dustin Schwenk, Jordi Salvador, Luca Weihs, Oscar Michel, Eli VanderBilt, Ludwig Schmidt, Kiana Ehsani, Aniruddha Kembhavi, and Ali Farhadi. Objaverse: A universe of annotated 3D objects. In CVPR , 2023."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib27",
+      "text": "Minghua Liu, Ruoxi Shi, Kaiming Kuang, Yinhao Zhu, Xuanlin Li, Shizhong Han, Hong Cai, Fatih Porikli, and Hao Su. OpenShape: Scaling up 3D shape representation towards open-world understanding. In NeurIPS , 2023."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib52",
+      "text": "Le Xue, Mingfei Gao, Chen Xing, Roberto Martín-Martín, Jiajun Wu, Caiming Xiong, Ran Xu, Juan Carlos Niebles, and Silvio Savarese. ULIP: Learning a unified representation of language, images, and point clouds for 3D understanding. In CVPR , 2023."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib42",
+      "text": "Christoph Schuhmann, Romain Beaumont, Richard Vencu, Cade W Gordon, Ross Wightman, Mehdi Cherti, Theo Coombes, Aarush Katta, Clayton Mullis, Mitchell Wortsman, Patrick Schramowski, Srivatsa R Kundurthy, Katherine Crowson, Ludwig Schmidt, Robert Kaczmarczyk, and Jenia Jitsev. LAION-5B: An open large-scale dataset for training next generation image-text models. In NeurIPS Datasets and Benchmarks Track , 2022."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib5",
+      "text": "Ting Chen, Simon Kornblith, Mohammad Norouzi, and Geoffrey Hinton. A simple framework for contrastive learning of visual representations. In ICML , 2020."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib17",
+      "text": "Kaiming He, Haoqi Fan, Yuxin Wu, Saining Xie, and Ross Girshick. Momentum contrast for unsupervised visual representation learning. In CVPR , 2020."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib3",
+      "text": "Mathilde Caron, Hugo Touvron, Ishan Misra, Hervé Jégou, Julien Mairal, Piotr Bojanowski, and Armand Joulin. Emerging properties in self-supervised vision transformers. In ICCV , 2021."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib11",
+      "text": "Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. BERT: Pre-training of deep bidirectional transformers for language understanding. In NAACL , 2019."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib2",
+      "text": "Tom B. Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, Sandhini Agarwal, Ariel Herbert-Voss, Gretchen Krueger, Tom Henighan, Rewon Child, Aditya Ramesh, Daniel M. Ziegler, Jeffrey Wu, Clemens Winter, Christopher Hesse, Mark Chen, Eric Sigler, Mateusz Litwin, Scott Gray, Benjamin Chess, Jack Clark, Christopher Berner, Sam McCandlish, Alec Radford, Ilya Sutskever, and Dario Amodei. Language models are few-shot learners. In NeurIPS , 2020."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib45",
+      "text": "Hugo Touvron, Thibaut Lavril, Gautier Izacard, Xavier Martinet, Marie-Anne Lachaux, Timothée Lacroix, Baptiste Rozière, Naman Goyal, Eric Hambro, Faisal Azhar, Aurelien Rodriguez, Armand Joulin, Edouard Grave, and Guillaume Lample. LLaMA: Open and efficient foundation language models. arXiv preprint arXiv:2302.13971 , 2023."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib39",
+      "text": "Alec Radford, Jong Wook Kim, Chris Hallacy, A. Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry, Amanda Askell, Pamela Mishkin, Jack Clark, Gretchen Krueger, and Ilya Sutskever. Learning transferable visual models from natural language supervision. In ICML , 2021."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib6",
+      "text": "Mehdi Cherti, Romain Beaumont, Ross Wightman, Mitchell Wortsman, Gabriel Ilharco, Cade Gordon, Christoph Schuhmann, Ludwig Schmidt, and Jenia Jitsev. Reproducible scaling laws for contrastive language-image learning. In CVPR , 2023."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib7",
+      "text": "Christopher Choy, JunYoung Gwak, and Silvio Savarese. 4D spatio-temporal ConvNets: Minkowski convolutional neural networks. In CVPR , 2019."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib50",
+      "text": "Zhirong Wu, Shuran Song, Aditya Khosla, Fisher Yu, Linguang Zhang, Xiaoou Tang, and Jianxiong Xiao. 3D ShapeNets: A deep representation for volumetric shapes. In CVPR , 2015."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib46",
+      "text": "Mikaela Angelina Uy, Quang-Hieu Pham, Binh-Son Hua, Thanh Nguyen, and Sai-Kit Yeung. Revisiting point cloud classification: A new benchmark dataset and classification model on real-world data. In ICCV , 2019."
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "source_type": "encyclopedia_article",
+  "source_id": "enwiki:File locking#rev1362915290",
+  "title": "File locking",
+  "authors": "Wikipedia contributors",
+  "year": "2026",
+  "url": "https://en.wikipedia.org/w/index.php?title=File_locking&oldid=1362915290",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "In Microsoft Windows",
+  "word_count": 724,
+  "text": "Microsoft Windows uses three distinct mechanisms to manage access to shared files:\n\nusing share-access controls that allow applications to specify whole-file access-sharing for read, write, or delete[1]\n\nusing byte-range locks to arbitrate read and write access to regions within a single file[2]\n\nby Windows file systems disallowing executing files from being opened for write or delete access\n\nWindows inherits the semantics of share-access controls from the MS-DOS system, where sharing was introduced in MS-DOS 3.3 . Thus, an application must explicitly allow sharing when it opens a file; otherwise it has exclusive read, write, and delete access to the file until closed (other types of access, such as those to retrieve the attributes of a file are allowed.)\n\nFor a file opened with shared access, applications may then use byte-range locking to control access to specific regions of the file. Such byte-range locks specify a region of the file (offset and length) and the type of lock (shared or exclusive). Note that the region of the file being locked is not required to have data within the file, and applications sometimes exploit this ability to implement their functionality.\n\nFor applications that use the file read/write APIs in Windows, byte-range locks are enforced (also referred to as mandatory locks) by the file systems that execute within Windows. For applications that use the file mapping APIs in Windows, byte-range locks are not enforced (also referred to as advisory locks.) Byte-range locking may also have other side-effects on the Windows system. For example, the Windows file-sharing mechanism will typically disable client side caching of a file for all clients when byte-range locks are used by any client. The client will observe slower access because read and write operations must be sent to the server where the file is stored.\n\nImproper error-handling in an application program can lead to a scenario where a file is locked (either using \"share\" access or with byte-range file locking) and cannot be accessed by other applications. If so, the user may be able to restore file access by manually terminating the malfunctioning program. This is typically done through the Task Manager utility.\n\nThe sharing mode (dwShareMode) parameter of the CreateFile[1] function (used to open files) determines file-sharing. The sharing mode can be specified to allow sharing the file for read, write, or delete access, or any combination of these. Subsequent attempts to open the file must be compatible with all previously granted sharing-access to the file. When the file is closed, sharing-access restrictions are adjusted to remove the restrictions imposed by that specific file open.\n\nByte-range locking type is determined by the dwFlags parameter in the LockFileEx[3] function used to lock a region of a file. The Windows API function LockFile[4] can also be used and acquires an exclusive lock on the region of the file.\n\nAny file containing an executable program file that is currently running on the computer system as a program (e.g. an EXE, COM, DLL, CPL or other binary program file format) is normally locked by the operating system itself, preventing any application from modifying or deleting it. Any attempt to do so will be denied with a sharing violation error, despite the fact that the program file is not opened by any application. However, some access is still allowed. For example, a running application file can be renamed or copied (read) even when executing.\n\nFiles are accessed by applications in Windows by using file handles. These file handles can be explored with the Process Explorer utility. This utility can also be used to force-close handles without needing to terminate the application holding them. This can cause an undefined behavior, since the program will receive an unexpected error when using the force-closed handle and may even operate on an unexpected file since the handle number may be recycled.\n\nMicrosoft Windows XP and Server 2003 editions have introduced volume snapshot (VSS) capability to NTFS, allowing open files to be accessed by backup software despite any exclusive locks. However, unless software is rewritten to specifically support this feature, the snapshot will be crash consistent only, while properly supported applications can assist the operating system in creating \"transactionally consistent\" snapshots. Other commercial software for accessing locked files under Windows include File Access Manager and Open File Manager. These work by installing their own drivers to access the files in kernel mode.",
+  "references": [
+    {
+      "n": 1,
+      "text": "CreateFileW function. Microsoft Docs. https://docs.microsoft.com/en-us/windows/desktop/api/fileapi/nf-fileapi-createfilew#parameters"
+    },
+    {
+      "n": 2,
+      "text": "LockFileEx function. Microsoft Docs. https://docs.microsoft.com/en-us/windows/desktop/api/fileapi/nf-fileapi-lockfileex"
+    },
+    {
+      "n": 3,
+      "text": "LockFileEx function. Microsoft Docs. https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-lockfileex#parameters"
+    },
+    {
+      "n": 4,
+      "text": "LockFile function. Microsoft Docs. https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-lockfile"
+    }
+  ]
+}

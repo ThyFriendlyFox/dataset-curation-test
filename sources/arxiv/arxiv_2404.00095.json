@@ -1,0 +1,128 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2404.00095",
+  "title": "GDA: Generalized Diffusion for Robust Test-time Adaptation",
+  "authors": "Yun-Yun Tsai, Fu-Chen Chen, Albert Y. C. Chen, Junfeng Yang, Che-Chun Su, Min Sun, Cheng-Hao Kuo",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2404.00095",
+  "html_url": "https://arxiv.org/html/2404.00095",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 713,
+  "text": "Deep networks have achieved unprecedented performance in many machine learning applications, yet unexpected corruptions and natural shifts at test time [1,2,3,4,5] still degrade their performance severely. This vulnerability hinders the deployment of machine learning models in the real world, especially in safety-critical, high-stake applications [6].\n\nTest-time adaptation (TTA) [7,8] emerges as a new branch to improve out-of-distribution robustness by adjusting either the model weights or the input data. The former assumes that the weights are not frozen, and can be modified iteratively during test time [7,8,9]. It thus requires edit access to the model and complicates model maintenance because all adapted model versions need to be tracked. The latter modifies the input with random noise vectors or structural visual prompts [10,11,12,13] optimized for pre-defined objectives. The visual prompt design is, however, prone to overfitting due to the high dimensionality of the prompts.\n\nTherefore, we focus on a new branch of test-time adaptation, diffusion-based adaptation, that does not need to modify model weights and provides more structured guidance. Prior work [14,15] shows that diffusion is powerful for transferring style and countering natural corruptions by adding simple structural guidance, a latent refinement step conditioned on the input of the reverse process (e.g., a sequence of up-scaling and down-scaling processes). However, the key performance gain of prior work [14] is shown only in specific corruption types, such as the Gaussian noise or Impulse noise. The results imply two challenges that limit the generalizability of diffusion for adaptation: (1) The structural guidance in prior work can handle only high-frequency corruption and does not generalize well to other types of corruption. (2) The diffusion model is fully trained on the source domain data, which potentially causes learning biases and can fail to restore the distribution shift in OOD data.\n\nTo address these challenges and improve the generalizability of diffusion models, we propose Generalized Diffusion Adaptation (GDA), an efficient diffusion-based adaptation method robust against diverse OOD shifts at test time, including style changes and multiple corruptions. Our key idea is a new structural guidance for unconditional diffusion models, consisting of three components: style transfer, content preservation, and model output consistency. We show sample OOD data adapted by GDA in Fig. 1 and demonstrate the schematic in Fig. 2. To let the corrupted sample shift back to the source domain, GDA incorporates the structural guidance into the reverse process, which has three components: (1) The style loss utilizes CLIP model to transfer the image style; (2) The patch-wise contrastive loss calculated from samples’ features aims to preserve the content information; (3) The marginal entropy loss calculated on samples and its augmenting version for ensuring the consistency of output behavior on the downstream task. During the reverse process, GDA iteratively updates the generated samples for every time step by calculating the gradient from three objectives.\n\nThe trade-off between style transfer and content preservation in the diffusion model has been studied by [16]. However, the output behavior of the downstream classifier on the generated samples is still unexplored in the diffusion-driven adaptation, which is crucial to the robustness. Our key insights are: (1) Marginal entropy can measure the ambiguity of the unlabeled data with respect to the target classifier [17,8]. (2) The marginal entropy calculated from a sample without corruption (clean sample) and its augmented versions is usually lower than a corrupted sample; clean samples are typically less ambiguous to the target classifier. (3) The diffusion guided with marginal entropy will move the sample away from the decision boundary.\n\nOur main contributions are as follows.\n\n- • We propose Generalized Diffusion Adaptation (GDA), a new diffusion-based adaptation method that generalizes to multiple local-texture and style-shifting OOD benchmarks, including ImageNet-C, Rendition, Sketch, and Stylized-ImageNet.\n\n- • Our key innovation is a new structural guidance towards minimizing marginal entropy, style, and content preservation loss. We demonstrate that our guidance is both effective and efficient as GDA reaches higher or on-par accuracy with fewer reverse sampling steps.\n\n- • GDA outperforms state-of-the-art TTA methods, including DDA [14] and Diffpure [18] on four datasets with respect to target classifiers of different network backbones (ResNet50 [19], ConvNext [20], Swin [21], CLIP [22]).\n\n- • Ablation studies show that GDA indeed minimizes the entropy loss, enhances the corrupted samples, and recovers the correct attention of the target classifier.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib9",
+      "text": "Dan Hendrycks and Thomas Dietterich. Benchmarking neural network robustness to common corruptions and perturbations. arXiv preprint arXiv:1903.12261 , 2019a."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib11",
+      "text": "Dan Hendrycks, Mantas Mazeika, Saurav Kadavath, and Dawn Song. Using self-supervised learning can improve model robustness and uncertainty. Advances in Neural Information Processing Systems , 32, 2019."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib10",
+      "text": "Dan Hendrycks and Thomas Dietterich. Benchmarking neural network robustness to common corruptions and perturbations. Proceedings of the International Conference on Learning Representations , 2019b."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib14",
+      "text": "Dan Hendrycks, Steven Basart, Norman Mu, Saurav Kadavath, Frank Wang, Evan Dorundo, Rahul Desai, Tyler Zhu, Samyak Parajuli, Mike Guo, et al. The many faces of robustness: A critical analysis of out-of-distribution generalization. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 8340–8349, 2021b."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib27",
+      "text": "Chengzhi Mao, Kevin Xia, James Wang, Hao Wang, Junfeng Yang, Elias Bareinboim, and Carl Vondrick. Causal transportability for visual recognition. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 7521–7531, 2022."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib32",
+      "text": "Kexin Pei, Yinzhi Cao, Junfeng Yang, and Suman Jana. Deepxplore: Automated whitebox testing of deep learning systems. In proceedings of the 26th Symposium on Operating Systems Principles , pages 1–18, 2017."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib44",
+      "text": "Dequan Wang, Evan Shelhamer, Shaoteng Liu, Bruno Olshausen, and Trevor Darrell. Tent: Fully test-time adaptation by entropy minimization, 2020."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib50",
+      "text": "M. Zhang, S. Levine, and C. Finn. MEMO: Test time robustness via adaptation and augmentation. 2021."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib40",
+      "text": "Yu Sun, Xiaolong Wang, Zhuang Liu, John Miller, Alexei A. Efros, and Moritz Hardt. Test-time training with self-supervision for generalization under distribution shifts, 2019."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib25",
+      "text": "Chengzhi Mao, Mia Chiquier, Hao Wang, Junfeng Yang, and Carl Vondrick. Adversarial attacks are reversible with natural supervision. arXiv preprint arXiv:2103.14222 , 2021b."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib42",
+      "text": "Yun-Yun Tsai, Chengzhi Mao, Yow-Kuan Lin, and Junfeng Yang. Self-supervised convolutional visual prompts. arXiv preprint arXiv:2303.00198 , 2023."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib41",
+      "text": "Yun-Yun Tsai, Pin-Yu Chen, and Tsung-Yi Ho. Transfer learning without knowing: Reprogramming black-box machine learning models with scarce data and limited resources. In International Conference on Machine Learning , pages 9614–9624. PMLR, 2020."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib43",
+      "text": "Hsi-Ai Tsao, Lei Hsiung, Pin-Yu Chen, Sijia Liu, and Tsung-Yi Ho. AutoVP: An automated visual prompting framework and benchmark. In The Twelfth International Conference on Learning Representations , 2024."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib5",
+      "text": "Jin Gao, Jialing Zhang, Xihui Liu, Trevor Darrell, Evan Shelhamer, and Dequan Wang. Back to the source: Diffusion-driven test-time adaptation. arXiv preprint arXiv:2207.03442 , 2022."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib2",
+      "text": "Jooyoung Choi, Sungwon Kim, Yonghyun Jeong, Youngjune Gwon, and Sungroh Yoon. Ilvr: Conditioning method for denoising diffusion probabilistic models, 2021."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib48",
+      "text": "Serin Yang, Hyunmin Hwang, and Jong Chul Ye. Zero-shot contrastive loss for text-guided diffusion image style transfer, 2023."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib7",
+      "text": "Yves Grandvalet and Yoshua Bengio. Semi-supervised learning by entropy minimization. Advances in neural information processing systems , 17, 2004."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib30",
+      "text": "Weili Nie, Brandon Guo, Yujia Huang, Chaowei Xiao, Arash Vahdat, and Anima Anandkumar. Diffusion models for adversarial purification. In International Conference on Machine Learning (ICML) , 2022."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib8",
+      "text": "Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. Deep residual learning for image recognition. In Proceedings of the IEEE conference on computer vision and pattern recognition , pages 770–778, 2016."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib23",
+      "text": "Zhuang Liu, Hanzi Mao, Chao-Yuan Wu, Christoph Feichtenhofer, Trevor Darrell, and Saining Xie. A convnet for the 2020s. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 11976–11986, 2022."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib22",
+      "text": "Ze Liu, Yutong Lin, Yue Cao, Han Hu, Yixuan Wei, Zheng Zhang, Stephen Lin, and Baining Guo. Swin transformer: Hierarchical vision transformer using shifted windows. In Proceedings of the IEEE/CVF international conference on computer vision , pages 10012–10022, 2021."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib34",
+      "text": "Alec Radford, Jong Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry, Amanda Askell, Pamela Mishkin, Jack Clark, et al. Learning transferable visual models from natural language supervision. In International Conference on Machine Learning , pages 8748–8763. PMLR, 2021."
+    }
+  ]
+}

@@ -1,0 +1,153 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2404.00766",
+  "title": "SoK: The Faults in our Graph Benchmarks",
+  "authors": "Puneet Mehrotra, Vaastav Anand, Daniel Margo, Milad Rezaei Hajidehi, Margo Seltzer",
+  "year": "2024",
+  "categories": [
+    "cs.DB"
+  ],
+  "url": "https://arxiv.org/abs/2404.00766",
+  "html_url": "https://arxiv.org/html/2404.00766",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 865,
+  "text": "Graph structured data are used to express complex relationships in social networks [1], protein interactions [2,3], transportation networks [4], and many other domains. Graphs with billions of nodes and edges are common today [5], and large-scale industrial applications often require running analytics on trillion-edge datasets [6]. The research community has produced a constant stream of novel graph processing systems over the past decade to address these challenges.\n\nThese systems can be designed to distribute their data across a compute cluster [7,8,9] or to run on a single compute node by optimizing the data access patterns - be it from memory [10,11] or disk-resident shards [12,13,14]. Together these decisions produce a vast design space with different graph processing systems representing just a single point in this design space. Application developers thus face the problem of selecting a graph processing system appropriate for their task.\n\nThis challenging task of selecting the appropriate graph system is further exacerbated by the fact that comparing graph processing systems is difficult for several reasons.\n\nFirst, there is a lack of robust standardization of benchmarking practices such as which metrics are important, how to measure and report them, and how to do so in a reproducible manner. There have been several attempts at standardization in the High-Performance Computation (HPC) community through the Graph500 [15] and GraphChallenge [16] benchmark definitions. However, these benchmarks are not representative of the diversity of use cases of graph processing and neither do they take into account the immense diversity of datasets that exist in the real world. The LDBC Graphalytics [17] benchmark provides a richer set of datasets and benchmark kernels but remains underutilized in practice.\n\nSecond, most graph processing systems provide their own implementation of popular benchmark kernels. These different implementations mean that when comparing the performance of two systems, it is difficult, if not impossible, to attribute performance differences to the underlying system itself, the algorithm used for a particular kernel, or the quality of the kernel’s implementation. For example, Galois [18] implements four different variations of PageRank [19], each with different runtime performance. Additionally, there are many time-based metrics to compare PageRank: time per iteration, time to run a fixed number of iterations, or time to convergence; different systems use different metrics in their published results. We found that there is no single reference implementation of triangle counting on directed graphs resulting in different graph processing systems reporting different numbers of triangles for the same dataset (§3.1.2).\n\nThird, there are few large representative graph datasets available for benchmarking, which limits the quality of results being reported. For example, a distributed graph processing system that claims to be scalable should be evaluated using datasets that are large enough to warrant distribution. However, we show that this is not true in practice; most systems demonstrate scalability by using popular datasets from the SNAP and KONECT [20,21] dataset libraries. Twitter2010 [22,23] is one of the largest, most frequently used datasets, yet in its uncompressed state is only 26GB - smaller than the available RAM on a high-end laptop or a modest server. The dearth of publicly available large datasets poses a significant problem that is frequently addressed via synthetic graph generators. The RMAT [24] and Kronecker graph generators [25,26] remain the most popular. However, these generators do not produce graphs that are representative of real world graph datasets, which distorts performance [27].\n\nFourth, statistical properties of datasets produce hidden, uncontrolled effects at various steps of the graph processing pipeline that drastically affects the performance on the systems. We demonstrate the effect of two such properties inherent in the graph structure of datasets - vertex ID assignments (§3.1) and the presence of zero-degree vertices (§3.2), each of which can introduce changes in key performance metrics such as runtime and cache behavior. Changing the vertex ID assignment of a dataset can cause a performance difference of as much as 38% for the PageRank benchmark on several popular graph processing systems; the presence of isolated vertices can cause a 10x performance boost for benchmarks such as BFS. Failure to identify these issues produces results that reflect idiosyncrasies of the experimental setup rather than the fundamental behavior of the systems under evaluation.\n\nTogether, these challenges render system comparisons obscure, at best, and meaningless at worst. In addition to these challenges, different developers might have different goals for their application: minimizing runtime, running within a memory or cost budget, rapidly ingesting a stream of updates to the graph, etc. How can we, as researchers, help developers make wise choices?\n\nTo help developers make wise choices about using, building, and benchmarking graph processing systems, we present a systemization of knowledge surrounding the benchmarking of graph processing systems. Specifically, we present the three following contributions. First, we provide a study of 12 years of published literature on graph processing systems and algorithms that establishes the current status quo for benchmarking these systems. Second, we present empirical data that illustrates the significance the properties of datasets can have on runtime, using four graph processing systems, the most popular benchmarks, and the most widely used datasets identified in the literature survey. Finally, we provide a set of principles (§4) to guide evaluation of graph processing systems.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "Alan Mislove, Massimiliano Marcon, Krishna P Gummadi, Peter Druschel, and Bobby Bhattacharjee. Measurement and analysis of online social networks. In Proceedings of the 7th ACM SIGCOMM conference on Internet measurement , pages 29–42. ACM, 2007."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "Alexander Roth, Andrea Franceschini, Damian Szklarczyk, Jean Muller, Manuel Stark, Michael Kuhn, Milan Simonovic, Pablo Minguez, Tobias Doerks, Christian von Mering, Lars J. Jensen, and Peer Bork. The string database in 2011: functional interaction networks of proteins, globally integrated and scored. Nucleic Acids Research , 39:D561–D568, 11 2010."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "Oliver Mason and Mark Verwoerd. Graph theory and networks in biology. IET systems biology , 1(2):89–119, 2007."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "Hannah Bast, Daniel Delling, Andrew Goldberg, Matthias Müller-Hannemann, Thomas Pajor, Peter Sanders, Dorothea Wagner, and Renato F Werneck. Route planning in transportation networks. In Algorithm engineering , pages 19–80. Springer, 2016."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "Siddhartha Sahu, Amine Mhedhbi, Semih Salihoglu, Jimmy Lin, and M. Tamer Özsu. The ubiquity of large graphs and surprising challenges of graph processing. Proc. VLDB Endow. , 11(4):420–431, oct 2018."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "Avery Ching, Sergey Edunov, Maja Kabiljo, Dionysios Logothetis, and Sambavi Muthukrishnan. One trillion edges: Graph processing at facebook-scale. Proceedings of the VLDB Endowment , 8(12):1804–1815, 2015."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "Joseph E Gonzalez, Reynold S Xin, Ankur Dave, Daniel Crankshaw, Michael J Franklin, and Ion Stoica. Graphx: Graph processing in a distributed dataflow framework. In OSDI , volume 14, pages 599–613, 2014."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "Joseph E Gonzalez, Yucheng Low, Haijie Gu, Danny Bickson, and Carlos Guestrin. Powergraph: Distributed graph-parallel computation on natural graphs. In Presented as part of the 10th { \\{ USENIX } \\} Symposium on Operating Systems Design and Implementation ( { \\{ OSDI } \\} 12) , pages 17–30, 2012."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "Yucheng Low, Danny Bickson, Joseph Gonzalez, Carlos Guestrin, Aapo Kyrola, and Joseph M Hellerstein. Distributed graphlab: a framework for machine learning and data mining in the cloud. Proceedings of the VLDB Endowment , 5(8):716–727, 2012."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "Julian Shun and Guy E Blelloch. Ligra: a lightweight graph processing framework for shared memory. In ACM Sigplan Notices , volume 48, pages 135–146. ACM, 2013."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "Xiaowei Zhu, Wenguang Chen, Weimin Zheng, and Xiaosong Ma. Gemini: A computation-centric distributed graph processing system. In 12th { \\{ USENIX } \\} Symposium on Operating Systems Design and Implementation ( { \\{ OSDI } \\} 16) , pages 301–316, 2016."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "Aapo Kyrola, Guy E Blelloch, and Carlos Guestrin. Graphchi: Large-scale graph computation on just a pc. USENIX, 2012."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "Juno Kim and Steven Swanson. Blaze: fast graph processing on fast ssds. In 2022 SC22: International Conference for High Performance Computing, Networking, Storage and Analysis (SC) , pages 617–631. IEEE Computer Society, 2022."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "Xiaowei Zhu, Wentao Han, and Wenguang Chen. { \\{ GridGraph } \\} : { \\{ Large-Scale } \\} graph processing on a single machine using 2-level hierarchical partitioning. In 2015 USENIX Annual Technical Conference (USENIX ATC 15) , pages 375–386, 2015."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "Graph500 benchmarks. https://graph500.org/ ."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "Siddharth Samsi, Vijay Gadepally, Michael Hurley, Michael Jones, Edward Kao, Sanjeev Mohindra, Paul Monticciolo, Albert Reuther, Steven Smith, William Song, Diane Staheli, and Jeremy Kepner. Graphchallenge.org: Raising the bar on graph analytic performance. In 2018 IEEE High Performance extreme Computing Conference (HPEC) , pages 1–7, 2018."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "Mihai Capotă, Tim Hegeman, Alexandru Iosup, Arnau Prat-Pérez, Orri Erling, and Peter Boncz. Graphalytics: A big data benchmark for graph-processing platforms. In Proceedings of the GRADES’15 , page 7. ACM, 2015."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "Donald Nguyen, Andrew Lenharth, and Keshav Pingali. A lightweight infrastructure for graph analytics. In Proceedings of the Twenty-Fourth ACM Symposium on Operating Systems Principles , pages 456–471. ACM, 2013."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "Lawrence Page, Sergey Brin, Rajeev Motwani, and Terry Winograd. The pagerank citation ranking: Bringing order to the web. Technical report, Stanford InfoLab, 1999."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "Jure Leskovec and Andrej Krevl. SNAP Datasets: Stanford large network dataset collection. http://snap.stanford.edu/data , June 2014."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "Jérôme Kunegis. Konect: the koblenz network collection. In Proceedings of the 22nd International Conference on World Wide Web , pages 1343–1350. ACM, 2013."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib22",
+      "text": "Haewoon Kwak, Changhyun Lee, Hosung Park, and Sue Moon. What is twitter, a social network or a news media? In Proceedings of the 19th international conference on World wide web , pages 591–600. AcM, 2010."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib23",
+      "text": "Twitter Dataset from SNAP, SHA256: a8ea26e01be2d7d3bff29e4b80e3fac11deb83bb7c6 91552896e48e9f13098b1. 41.65M Vertices, 1.46B Edges. https://snap.stanford.edu/data/twitter-2010.html ."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib24",
+      "text": "Deepayan Chakrabarti, Yiping Zhan, and Christos Faloutsos. R-mat: A recursive model for graph mining. In Proceedings of the 2004 SIAM International Conference on Data Mining , pages 442–446. SIAM, 2004."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib25",
+      "text": "Jurij Leskovec, Deepayan Chakrabarti, Jon Kleinberg, and Christos Faloutsos. Realistic, mathematically tractable graph generation and evolution, using kronecker multiplication. In European conference on principles of data mining and knowledge discovery , pages 133–145. Springer, 2005."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib26",
+      "text": "Jure Leskovec, Deepayan Chakrabarti, Jon Kleinberg, Christos Faloutsos, and Zoubin Ghahramani. Kronecker graphs: An approach to modeling networks. Journal of Machine Learning Research , 11(Feb):985–1042, 2010."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib27",
+      "text": "Vaastav Anand, Puneet Mehrotra, Daniel Margo, and Margo Seltzer. Smooth kronecker: Solving the combing problem in kronecker graphs. In Proceedings of the 3rd Joint International Workshop on Graph Data Management Experiences & Systems (GRADES) and Network Data Analytics (NDA) , pages 1–10, 2020."
+    }
+  ]
+}

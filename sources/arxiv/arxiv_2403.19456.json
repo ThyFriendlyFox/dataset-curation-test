@@ -1,0 +1,105 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.19456",
+  "title": "Break-for-Make: Modular Low-Rank Adaptations for Composable Content-Style Customization",
+  "authors": "Yu Xu, Fan Tang, Juan Cao, Yuxin Zhang, Oliver Deussen, Weiming Dong, Jintao Li, Tong-Yee Lee",
+  "year": "2024",
+  "categories": [
+    "cs.CV",
+    "cs.GR",
+    "cs.MM"
+  ],
+  "url": "https://arxiv.org/abs/2403.19456",
+  "html_url": "https://arxiv.org/html/2403.19456",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 738,
+  "text": "Text-to-image (T2I) models based on diffusion technology [1,2,3] have demonstrated remarkable proficiency in generating high-quality images, expanding the imaginative capabilities of humans through textual descriptions. Represented by Stable Diffusion [4] and Midjourney [5], various diffusion models and platforms have been widely applied in the field of creativity design or digital content generation. Despite the outstanding generalization ability of T2I models, it is challenging for users to generate specific visual concepts using only textual descriptions.\n\nCustomized generation approaches have thus been proposed for subject-driven generation by techniques such as tuning the base model with regularization [6], learning additional parameters as pseudo words [7,8,9] or low-rank adaptations [10]. Most of these approaches, however, only support generating images depicting a single concept (e.g., objects, textures, materials, art style, etc.), leaving the customized generation of multi-concept (e.g. specific content with a specific style) a challenging task. For example, designers may wish to render specific objects with different textures or materials to examine various effects. Similarly, artists may want to render specific objects in their own distinctive styles.\n\nMulti-concept generation approaches [11,12] are first proposed to learn and generate different contents by manipulating or constraining cross-attentions mechanisms. Different objects would be distinguished on the cross-attention maps using corresponding textual descriptions [13]. However, the intricate nature of visual style, which is often entangled with content, poses challenges in effectively decoupling content and style concepts due to the shared parameter space and the lack of disentanglement strategies employed by these methods. As a result, previous approaches cannot be well applied to jointly learn content and style concepts.\n\nTo address the content-style customization problem, [14] recently propose a step-wise pseudo words generation pipeline, which supports combining content and style concepts. However, relying on step-wise diffusion priors limits ProSpect’s generability across different types of visual styles. More intuitively, ZipLoRA [15] merges two independently fine-tuned content and style adaptations using a loss function based on cosine similarity to alleviate the entanglement between content and style. Nevertheless, the merging process often leads to interference between the parameters of different adapters [16]. This oversight in failing to optimally align the integrated parameters can result in a notable performance degradation of the merged model, leading to ineffective preservation of the distinct qualities of both content and style [17]. Therefore, a method that decouples the learning of content and style, and recombines them in the generation process without interference, is necessary.\n\nIn this work, we introduce a two-stage learning approach for customized content-style generation, namely “break-for-make”. In the first stage, we propose “partly learnable projection” (PLP) matrices to train content and style in separated sub-parameter spaces of low-rank adapters. Specifically, we freeze certain parameters in both the “up projection” and “down projection” matrices, allowing separate training of content and style within their respective trainable parameter subsets. To avoid interference between content and style after matrix multiplication by frozen parameters, we initialize the frozen rows and columns within the projection matrices to approximate orthogonal bases. To maintain the generalization of the learned content/style PLPs, we utilize a “multi-correspondence projection” (MCP) learning strategy to learn unbiased content and style parameter spaces. Specifically, we train customized content in “up projection” matrices with diverse reference styles in “down projection” matrices and vice versa. This approach avoids one-to-one binding between content and style, thereby mitigating the overfitting of content/style PLPs when composing with other corresponding PLPs. In the second stage, we reconstruct the unified parameter space using the content and style PLP matrices trained in the first stage, then fine-tune the combined adapter to obtain content-style customized results. As the specific content and style are learned separately and in a generalized manner during the first stage, fine-tuning (approximately a few dozen steps) is required for the combined adapter to generate images that better align with the content and style references, as shown in Fig. 1 (a) and (b).\n\nOur contributions can be summarized as follows:\n\n- • We separate the parameter space of low-rank adapters for disentangling the content and style representations and introduce a content-style customization learning pipeline.\n\n- • We propose a Partly Learnable Projection (PLP) with an orthogonal frozen parameters strategy that enables the disentanglement of content and style. During training, a Multi-Corresp-ondence Projection (MCP) mechanism is proposed to maintain generalization.\n\n- • Extensive qualitative and quantitative experiments validate the superior effectiveness of our approach over current baseline methods, particularly in the realms of content and style disentanglement and the preservation of content-style fidelity.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib19",
+      "text": "Ho et al . (2020) Jonathan Ho, Ajay Jain, and Pieter Abbeel. 2020. Denoising diffusion probabilistic models. Advances in neural information processing systems 33 (2020), 6840–6851."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib44",
+      "text": "Song et al . (2020) Jiaming Song, Chenlin Meng, and Stefano Ermon. 2020. Denoising diffusion implicit models. arXiv preprint arXiv:2010.02502 (2020)."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib20",
+      "text": "Ho and Salimans (2022) Jonathan Ho and Tim Salimans. 2022. Classifier-free diffusion guidance. arXiv preprint arXiv:2207.12598 (2022)."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib38",
+      "text": "Rombach et al . (2022) Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, and Björn Ommer. 2022. High-resolution image synthesis with latent diffusion models. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition . 10684–10695."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib28",
+      "text": "Midjourney (2023) Midjourney. 2023. Midjourney. https://www.midjourney.com/ ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib39",
+      "text": "Ruiz et al . (2023) Nataniel Ruiz, Yuanzhen Li, Varun Jampani, Yael Pritch, Michael Rubinstein, and Kfir Aberman. 2023. Dreambooth: Fine tuning text-to-image diffusion models for subject-driven generation. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition . 22500–22510."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib15",
+      "text": "Gal et al . (2022) Rinon Gal, Yuval Alaluf, Yuval Atzmon, Or Patashnik, Amit H Bermano, Gal Chechik, and Daniel Cohen-Or. 2022. An image is worth one word: Personalizing text-to-image generation using textual inversion. arXiv preprint arXiv:2208.01618 (2022)."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib48",
+      "text": "Voynov et al . (2023) Andrey Voynov, Qinghao Chu, Daniel Cohen-Or, and Kfir Aberman. 2023. P + P+ : Extended Textual Conditioning in Text-to-Image Generation. arXiv preprint arXiv:2303.09522 (2023)."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib2",
+      "text": "Alaluf et al . (2023) Yuval Alaluf, Elad Richardson, Gal Metzer, and Daniel Cohen-Or. 2023. A Neural Space-Time Representation for Text-to-Image Personalization. ACM Transactions on Graphics (TOG) 42, 6 (2023), 1–10."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib21",
+      "text": "Hu et al . (2021) Edward J Hu, Yelong Shen, Phillip Wallis, Zeyuan Allen-Zhu, Yuanzhi Li, Shean Wang, Lu Wang, and Weizhu Chen. 2021. Lora: Low-rank adaptation of large language models. arXiv preprint arXiv:2106.09685 (2021)."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib26",
+      "text": "Kumari et al . (2023) Nupur Kumari, Bingliang Zhang, Richard Zhang, Eli Shechtman, and Jun-Yan Zhu. 2023. Multi-concept customization of text-to-image diffusion. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition . 1931–1941."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib3",
+      "text": "Avrahami et al . (2023a) Omri Avrahami, Kfir Aberman, Ohad Fried, Daniel Cohen-Or, and Dani Lischinski. 2023a. Break-A-Scene: Extracting Multiple Concepts from a Single Image. In SIGGRAPH Asia 2023 Conference Papers (, Sydney, NSW, Australia,) (SA ’23) . Association for Computing Machinery, New York, NY, USA, Article 96, 12 pages. https://doi.org/10.1145/3610548.3618154"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib18",
+      "text": "Hertz et al . (2022) Amir Hertz, Ron Mokady, Jay Tenenbaum, Kfir Aberman, Yael Pritch, and Daniel Cohen-Or. 2022. Prompt-to-prompt image editing with cross attention control. arXiv preprint arXiv:2208.01626 (2022)."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib52",
+      "text": "Zhang et al . (2023b) Yuxin Zhang, Weiming Dong, Fan Tang, Nisha Huang, Haibin Huang, Chongyang Ma, Tong-Yee Lee, Oliver Deussen, and Changsheng Xu. 2023b. ProSpect: Expanded Conditioning for the Personalization of Attribute-aware Image Generation. arXiv preprint arXiv:2305.16225 (2023)."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib41",
+      "text": "Shah et al . (2023) Viraj Shah, Nataniel Ruiz, Forrester Cole, Erika Lu, Svetlana Lazebnik, Yuanzhen Li, and Varun Jampani. 2023. ZipLoRA: Any Subject in Any Style by Effectively Merging LoRAs. arXiv preprint arXiv:2311.13600 (2023)."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib32",
+      "text": "Ortiz-Jimenez et al . (2023) Guillermo Ortiz-Jimenez, Alessandro Favero, and Pascal Frossard. 2023. Task Arithmetic in the Tangent Space: Improved Editing of Pre-Trained Models. (May 2023)."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib50",
+      "text": "Yadav et al . (2023) Prateek Yadav, Derek Tam, Leshem Choshen, Colin Raffel, and Mohit Bansal. 2023. Resolving Interference When Merging Models. arXiv preprint arXiv:2306.01708 (2023)."
+    }
+  ]
+}

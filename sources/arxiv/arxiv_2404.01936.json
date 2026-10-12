@@ -1,0 +1,84 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2404.01936",
+  "title": "Settling Time vs. Accuracy Tradeoffs for Clustering Big Data",
+  "authors": "Andrew Draganov, David Saulpic, Chris Schwiegelshohn",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.DS"
+  ],
+  "url": "https://arxiv.org/abs/2404.01936",
+  "html_url": "https://arxiv.org/html/2404.01936",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 957,
+  "text": "The modern data analyst has no shortage of clustering algorithms to choose from but, given the ever-increasing size of relevant datasets, many are often too slow to be practically useful. This is particularly relevant for big-data pipelines, where clustering algorithms are commonly used for compression. The goal is to replace a very large dataset by a smaller, more manageable one for downstream tasks, with the hope it represents the original input well. Lloyd’s algorithm [1] was introduced for precisely this reason and minimizes the quantization error – the sum of square distance from each input point to its representative in the compressed dataset. Arguably the most popular clustering algorithm, Lloyd’s runs for multiple iterations until convergence with every iteration requiring O(ndk) time, where n is the number of points, d is the number of features and k is the number of clusters – or the size of the targeted compression. For such applications, the number of points can easily be hundreds of millions and, since the quality of compression increases with k, standard objectives can have k in the thousands [2,3]. In such settings, any O(ndk) algorithm is prohibitively slow.\n\nExamples like these have prompted the rise of big data algorithms that provide both theoretical and practical runtime improvements. The perspectives of theoretical soundness and practical efficacy are, however, often at odds with one another. On the one hand, theoretical guarantees provide assurance that the algorithm will work regardless of whatever unlucky inputs it receives. On the other hand, it may be difficult to convince oneself to implement the theoretically optimal algorithm when there are cruder methods that are faster to get running and perform well in practice.\n\nSince datasets can be large in the number of points n and/or the number of features d, big-data methods must mitigate the effects of both. With respect to the feature space, the question is effectively closed as random projections are fast (running in effectively linear time), practical to implement [4], and provide tight guarantees on the embedding’s size and quality. The outlook is less clear when reducing the number of points n, and there are two separate paradigms that each provide distinct advantages. On the one hand, we have uniform sampling, which runs in sublinear time but may miss important subsets of the data and therefore can only guarantee accuracy under certain strong assumptions on the data [5]. On the other hand, the most accurate sampling strategies provide the strong coreset guarantee, wherein the cost of any solution on the compressed data is within an \\varepsilon -factor of that solution’s cost on the original dataset [6].\n\n## Our contributions\n\nWe study both paradigms (uniform sampling and strong coresets) with respect to a classic problem – compression for the k -means and k -median objectives. Whereas uniform sampling provides optimal speed but no worst-case accuracy guarantee, all available coreset constructions have a running time of at least \\tilde{\\Omega}(nd+nk) when yielding tight bounds on the minimum number of samples required for accurate compression.\n\nIt is easy to show that any algorithm that achieves a compression guarantee must read the entire dataset. Thus a clear open question is what guarantees are achievable in linear or nearly-linear time. Indeed, currently available fast sampling algorithms for clustering [7,8] cannot achieve strong coreset guarantees. Recently, [9] proposed a method for strong coresets that runs in time \\tilde{O}(nd+nk) and conjectured this to be optimal for k -median and k -means.\n\nWhile this bound is effectively optimal for small values of k, there are many applications such as computer vision [10] or algorithmic fairness [11] where the number of clusters can be larger than the number of features by several orders of magnitude. In such settings, the question of time-optimal coresets remains open. Since the issue of determining a coreset of optimal size has recently been closed [6,12,13], this is arguably the main open problem in coreset research for center-based clustering. We resolve this by showing that there exists an easy-to-implement algorithm that constructs coresets in \\tilde{O}(nd) time – only logarithmic factors away from the time it takes to read in the dataset.\n\nNonetheless, this does not fully illuminate the landscape among sampling algorithms for clustering in practice. Although our algorithm achieves both an optimal runtime and an optimal compression, it is certainly possible that other, cruder methods may be just as viable for all practical purposes. We state this formally in the following question: When are optimal k -means and k -median coresets necessary and what is the practical tradeoff between coreset speed and accuracy?\n\nTo answer this, we perform a thorough comparison across the full span of sampling algorithms that are faster than our proposed method. Through this we verify that, while these faster methods are sufficiently accurate on many real-world datasets, there exist data distributions that cause catastrophic failure for each of them. Indeed, these cases can only be avoided with a strong-coreset method. Thus, while many practical settings do not require the full coreset guarantee, one cannot cut corners if one wants to be confident in their compression. We verify that this extends to the streaming paradigm and applies to downstream clustering approaches.\n\nIn summary, our contributions are as follows:\n\n- • We show that one can obtain strong coresets for k -means and k -median in \\tilde{O}(nd) time. This resolves a conjecture on the necessary runtime for k -means coresets [9] and is theoretically optimal up to log-factors.\n\n- • Through a comprehensive analysis across datasets, tasks, and streaming/non-streaming paradigms, we verify that there is a necessary tradeoff between speed and accuracy among the linear- and sublinear-time sampling methods. This gives the clustering practitioner a blueprint on when to use each compression algorithm for effective clustering results in the fastest possible time.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib49",
+      "text": "Stuart P. Lloyd. Least squares quantization in PCM. IEEE Trans. Inf. Theory , 28(2):129–136, 1982. doi: 10.1109/TIT.1982.1056489 . URL https://doi.org/10.1109/TIT.1982.1056489 ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib41",
+      "text": "Qinghao Hu, Jiaxiang Wu, Lu Bai, Yifan Zhang, and Jian Cheng. Fast k-means for large scale clustering. In Proceedings of the 2017 ACM on Conference on Information and Knowledge Management , pages 2099–2102, 2017. doi: 10.1145/3132847.3133091 ."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib4",
+      "text": "Olivier Bachem, Mario Lucic, Hamed Hassani, and Andreas Krause. Fast and provably good seedings for k-means. Advances in neural information processing systems , 29, 2016a."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib50",
+      "text": "Konstantin Makarychev, Yury Makarychev, and Ilya P. Razenshteyn. Performance of johnson-lindenstrauss transform for k -means and k -medians clustering. In Proceedings of the 51st Annual ACM SIGACT Symposium on Theory of Computing, STOC 2019, Phoenix, AZ, USA, June 23-26, 2019 , pages 1027–1038, 2019. doi: 10.1145/3313276.3316350 . URL https://doi.org/10.1145/3313276.3316350 ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib45",
+      "text": "Lingxiao Huang, Shaofeng H.-C. Jiang, and Jianing Lou. The power of uniform sampling for k-median. In Andreas Krause, Emma Brunskill, Kyunghyun Cho, Barbara Engelhardt, Sivan Sabato, and Jonathan Scarlett, editors, International Conference on Machine Learning, ICML 2023, 23-29 July 2023, Honolulu, Hawaii, USA , volume 202 of Proceedings of Machine Learning Research , pages 13933–13956. PMLR, 2023. URL https://proceedings.mlr.press/v202/huang23j.html ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib25",
+      "text": "Vincent Cohen-Addad, David Saulpic, and Chris Schwiegelshohn. A new coreset framework for clustering. In Samir Khuller and Virginia Vassilevska Williams, editors, STOC ’21: 53rd Annual ACM SIGACT Symposium on Theory of Computing, Virtual Event, Italy, June 21-25, 2021 . ACM, 2021b. doi: 10.1145/3406325.3451022 . URL https://doi.org/10.1145/3406325.3451022 ."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib6",
+      "text": "Olivier Bachem, Mario Lucic, and Andreas Krause. Scalable k-means clustering via lightweight coresets. In Yike Guo and Faisal Farooq, editors, Proceedings of the 24th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining, KDD 2018, London, UK, August 19-23, 2018 , pages 1119–1127. ACM, 2018. doi: 10.1145/3219819.3219973 . URL https://doi.org/10.1145/3219819.3219973 ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib5",
+      "text": "Olivier Bachem, Mario Lucic, S. Hamed Hassani, and Andreas Krause. Approximate k-means++ in sublinear time. In Dale Schuurmans and Michael P. Wellman, editors, Proceedings of the Thirtieth AAAI Conference on Artificial Intelligence, February 12-17, 2016, Phoenix, Arizona, USA , pages 1459–1467. AAAI Press, 2016b. doi: 10.1609/AAAI.V30I1.10259 . URL https://doi.org/10.1609/aaai.v30i1.10259 ."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib31",
+      "text": "Yichuan Deng, Zhao Song, Yitan Wang, and Yuanyuan Yang. A nearly optimal size coreset algorithm with nearly linear time. CoRR , abs/2210.08361, 2022. doi: 10.48550/arXiv.2210.08361 . URL https://doi.org/10.48550/arXiv.2210.08361 ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib34",
+      "text": "Georgios Exarchakis, Omar Oubari, and Gregor Lenz. A sampling-based approach for efficient clustering in large datasets. In IEEE/CVF Conference on Computer Vision and Pattern Recognition, CVPR 2022, New Orleans, LA, USA, June 18-24, 2022 , pages 12393–12402. IEEE, 2022. doi: 10.1109/CVPR52688.2022.01208 . URL https://doi.org/10.1109/CVPR52688.2022.01208 ."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib18",
+      "text": "Flavio Chierichetti, Ravi Kumar, Silvio Lattanzi, and Sergei Vassilvitskii. Fair clustering through fairlets. In Isabelle Guyon, Ulrike von Luxburg, Samy Bengio, Hanna M. Wallach, Rob Fergus, S. V. N. Vishwanathan, and Roman Garnett, editors, Advances in Neural Information Processing Systems 30: Annual Conference on Neural Information Processing Systems 2017, December 4-9, 2017, Long Beach, CA, USA , pages 5029–5037, 2017. URL https://proceedings.neurips.cc/paper/2017/hash/978fce5bcc4eccc88ad48ce3914124a2-Abstract.html ."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib28",
+      "text": "Vincent Cohen-Addad, Kasper Green Larsen, David Saulpic, Chris Schwiegelshohn, and Omar Ali Sheikh-Omar. Improved coresets for euclidean k-means. In NeurIPS , 2022b. URL http://papers.nips.cc/paper_files/paper/2022/hash/120c9ab5c58ba0fa9dd3a22ace1de245-Abstract-Conference.html ."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib44",
+      "text": "Lingxiao Huang, Jian Li, and Xuan Wu. Towards optimal coreset construction for (k, z)-clustering: Breaking the quadratic dependency on k. CoRR , abs/2211.11923, 2022. doi: 10.48550/arXiv.2211.11923 . URL https://doi.org/10.48550/arXiv.2211.11923 ."
+    }
+  ]
+}

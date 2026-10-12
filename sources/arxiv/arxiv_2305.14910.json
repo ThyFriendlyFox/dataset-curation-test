@@ -1,0 +1,166 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2305.14910",
+  "title": "From Shortcuts to Triggers: Backdoor Defense with Denoised PoE",
+  "authors": "Qin Liu, Fei Wang, Chaowei Xiao, Muhao Chen",
+  "year": "2024",
+  "categories": [
+    "cs.CL",
+    "cs.AI",
+    "cs.CR",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2305.14910",
+  "html_url": "https://arxiv.org/html/2305.14910",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 798,
+  "text": "Similar to all other DNN models [1,2,3,4,5], the language models nowadays are also exposed to the risk of backdoors [6,7,8,9,10,11], where attackers exploit vulnerabilities in NLP systems by inserting specific triggers into the training data. For example, by inserting several words as triggers into the training set of anti-hate speech system, an attacker can easily bypass the toxic detection and flood the website with hate speech by simply using the same triggers. Notably, the consequences of backdoor attacks were exemplified by Microsoft’s chatbot Tay, which was trained on user interactions and quickly turned into a platform for spreading offensive and hate-filled messages due to manipulated inputs [12]. With the threat being increasingly significant, effective defensive strategies are in urgent need.\n\nTo mitigate the adverse effects of backdoors on language models, various defense methods have been proposed. Existing methods of such either detect and remove triggers during inference time [6,13,14,15] or filter out trigger-embedded samples during training [16], assuming that backdoor triggers are visible and detectable or that only a single type of trigger is inserted. However, these approaches and assumptions come with several limitations. First, backdoor triggers can be implicit or invisible. Instead of inserting any surface-level backdoors, attackers may use syntactic [8] or stylistic [17] backdoors that are hard to notice. For example, instead of inserting tangible triggers like “[cf, mn, bb, tq, mb]” [6] which are suspicious and can be easily eyeballed or recognized by existing defenders, a syntactic attack [8] rephrases benign text with a selected syntactic structure, such as S(SBAR)(,)(NP)(VP)(.), as a trigger that is more stealthy and imperceptible. Second, adversaries might, under the more challenging condition, choose a combination of diverse types of triggers to attack a model (Figure 1). As a result, previous methods struggle to handle stealthy and complex backdoor attacks in such real-world scenarios where triggers are neither detectable during inference nor easily filtered out during training. Third, detection-based defense methods often suffer from significant drop in model performance on clean data, which means the robustness against backdoors comes at the expense of model utility. What’s more, some existing methods [18,19] assume that a supplementary clean dataset is available to train and verify the trigger discriminator, which may not be practical in real-world scenarios.\n\nTaking both explicit and implicit backdoor triggers into consideration, the inserted backdoors are indeed deliberately crafted shortcuts, or spurious correlations [20,21,22,23,24], between the predesigned triggers and the target label predefined by the attacker. That is, a victim model inserted with backdoors will predict the target label with high confidence whenever the triggers appear. Thus, inspired by the line of works on shortcut mitigation [25,26,27,28], we tailor the Product-of-Experts (PoE) approach [29] for backdoor mitigation, which differs from model debiasing in two aspects. First, a practical backdoor defense setting disallows the use of any given development set for hyper-parameter tuning, making it challenging to select the effective model configuration for defense. Second, the poisoned training set especially suffers from noisy labels since the attackers change the ground truth labels into the target label after inserting triggers, which makes these samples to be noisy instances with incorrect labels (Figure 3). Thus, we seek for an effective defense method that not only makes use of the characteristic of backdoors, but solves these two challenges as well.\n\nIn this paper, we propose D enoised P roduct of E xperts (DPoE), an end-to-end defense method that mitigates the backdoor shortcuts and reduces the impact of noisy labels. As an ensemble-based defense method, DPoE uses a shallow model (dubbed as trigger-only model) to capture spurious backdoor shortcuts and trains the ensemble of this trigger-only model and a main model to prevent the main model from learning the backdoor shortcuts (Section 3.2). Further, to deal with the problem of noisy labels, DPoE incorporates a denoising design on top of PoE framework(Section 3.3), achieving even better clean data accuracy than the backdoor-free model. We also propose a pseudo development set construction scheme (Section 3.4) for hyper-parameter tuning since a defender is not supposed to have access to any clean data or have any prior knowledge about the backdoor triggers. Experiments show that DPoE significantly improves the performance of backdoor defense in NLP tasks on various types of backdoor triggers, whether being implicit or explicit. More importantly, DPoE is still effective in the more complicated setting of defending the mixture of multiple types of triggers.\n\nOur contributions are three-fold. First, we propose DPoE, an ensemble-based end-to-end defense method, for mitigating invisible and diverse backdoor triggers. Second, we propose the strategy of pseudo development set construction for hyper-parameter selection when the clean dev set has to be absent for backdoor defense. Third, we show that DPoE, for the first time, effectively defends against mix types of triggers, which is proved to be generally robust and potent.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib6",
+      "text": "Chen et al. (2017) Xinyun Chen, Chang Liu, Bo Li, Kimberly Lu, and Dawn Song. 2017. Targeted backdoor attacks on deep learning systems using data poisoning. arXiv preprint arXiv:1712.05526 ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib18",
+      "text": "Gu et al. (2019) Tianyu Gu, Kang Liu, Brendan Dolan-Gavitt, and Siddharth Garg. 2019. Badnets: Evaluating backdooring attacks on deep neural networks. IEEE Access , 7:47230–47244."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib57",
+      "text": "Turner et al. (2019) Alexander Turner, Dimitris Tsipras, and Aleksander Madry. 2019. Label-consistent backdoor attacks. arXiv preprint arXiv:1912.02771 ."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib40",
+      "text": "Nguyen and Tran (2021) Tuan Anh Nguyen and Anh Tuan Tran. 2021. Wanet - imperceptible warping-based backdoor attack . In International Conference on Learning Representations ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib50",
+      "text": "Saha et al. (2022) Aniruddha Saha, Ajinkya Tejankar, Soroush Abbasi Koohpayegani, and Hamed Pirsiavash. 2022. Backdoor attacks on self-supervised learning. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 13337–13346."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib26",
+      "text": "Kurita et al. (2020) Keita Kurita, Paul Michel, and Graham Neubig. 2020. Weight poisoning attacks on pretrained models . In Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics , pages 2793–2806, Online. Association for Computational Linguistics."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib5",
+      "text": "Chen et al. (2021b) Xiaoyi Chen, Ahmed Salem, Dingfan Chen, Michael Backes, Shiqing Ma, Qingni Shen, Zhonghai Wu, and Yang Zhang. 2021b. Badnl: Backdoor attacks against nlp models with semantic-preserving improvements. In Annual Computer Security Applications Conference , pages 554–569."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib45",
+      "text": "Qi et al. (2021c) Fanchao Qi, Mukai Li, Yangyi Chen, Zhengyan Zhang, Zhiyuan Liu, Yasheng Wang, and Maosong Sun. 2021c. Hidden killer: Invisible textual backdoor attacks with syntactic trigger . In Proceedings of the 59th Annual Meeting of the Association for Computational Linguistics and the 11th International Joint Conference on Natural Language Processing (Volume 1: Long Papers) , pages 443–453, Online. Association for Computational Linguistics."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib46",
+      "text": "Qi et al. (2021d) Fanchao Qi, Yuan Yao, Sophia Xu, Zhiyuan Liu, and Maosong Sun. 2021d. Turn the combination lock: Learnable textual backdoor attacks via word substitution . In Proceedings of the 59th Annual Meeting of the Association for Computational Linguistics and the 11th International Joint Conference on Natural Language Processing (Volume 1: Long Papers) , pages 4873–4883, Online. Association for Computational Linguistics."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib13",
+      "text": "Gan et al. (2022) Leilei Gan, Jiwei Li, Tianwei Zhang, Xiaoya Li, Yuxian Meng, Fei Wu, Yi Yang, Shangwei Guo, and Chun Fan. 2022. Triggerless backdoor attack for NLP tasks with clean labels . In Proceedings of the 2022 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies , pages 2942–2952, Seattle, United States. Association for Computational Linguistics."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib68",
+      "text": "Yan et al. (2023) Jun Yan, Vansh Gupta, and Xiang Ren. 2023. BITE: Textual backdoor attacks with iterative trigger injection . In Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) , pages 12951–12968, Toronto, Canada. Association for Computational Linguistics."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib64",
+      "text": "Wolf et al. (2017) M. J. Wolf, K. Miller, and F. S. Grodzinsky. 2017. Why we should have seen that coming: Comments on microsoft’s tay \"experiment,\" and wider implications . SIGCAS Comput. Soc. , 47(3):54–64."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib3",
+      "text": "Chen and Dai (2021) Chuanshuai Chen and Jiazhu Dai. 2021. Mitigating backdoor attacks in LSTM-based text classification systems by backdoor keyword identification. Neurocomputing , 452:253–262."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib43",
+      "text": "Qi et al. (2021a) Fanchao Qi, Yangyi Chen, Mukai Li, Yuan Yao, Zhiyuan Liu, and Maosong Sun. 2021a. ONION: A simple and effective defense against textual backdoor attacks . In Proceedings of the 2021 Conference on Empirical Methods in Natural Language Processing , pages 9558–9566, Online and Punta Cana, Dominican Republic. Association for Computational Linguistics."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib33",
+      "text": "Li et al. (2021d) Zichao Li, Dheeraj Mekala, Chengyu Dong, and Jingbo Shang. 2021d. BFClass: A backdoor-free text classification framework . In Findings of the Association for Computational Linguistics: EMNLP 2021 , pages 444–453, Punta Cana, Dominican Republic. Association for Computational Linguistics."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib24",
+      "text": "Jin et al. (2022) Lesheng Jin, Zihan Wang, and Jingbo Shang. 2022. Wedef: Weakly supervised backdoor defense for text classification. arXiv preprint arXiv:2205.11803 ."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib44",
+      "text": "Qi et al. (2021b) Fanchao Qi, Yangyi Chen, Xurui Zhang, Mukai Li, Zhiyuan Liu, and Maosong Sun. 2021b. Mind the style of text! adversarial and backdoor attacks based on text style transfer . In Proceedings of the 2021 Conference on Empirical Methods in Natural Language Processing , pages 4569–4580, Online and Punta Cana, Dominican Republic. Association for Computational Linguistics."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib41",
+      "text": "Pang et al. (2022) Lu Pang, Tao Sun, Haibin Ling, and Chao Chen. 2022. Backdoor cleansing with unlabeled data. arXiv preprint arXiv:2211.12044 ."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib52",
+      "text": "Sha et al. (2022) Zeyang Sha, Xinlei He, Pascal Berrang, Mathias Humbert, and Yang Zhang. 2022. Fine-tuning is all you need to mitigate backdoor attacks. arXiv preprint arXiv:2212.09067 ."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib23",
+      "text": "Jia and Liang (2017) Robin Jia and Percy Liang. 2017. Adversarial examples for evaluating reading comprehension systems . In Proceedings of the 2017 Conference on Empirical Methods in Natural Language Processing , pages 2021–2031, Copenhagen, Denmark. Association for Computational Linguistics."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib19",
+      "text": "Gururangan et al. (2018) Suchin Gururangan, Swabha Swayamdipta, Omer Levy, Roy Schwartz, Samuel Bowman, and Noah A. Smith. 2018. Annotation artifacts in natural language inference data . In Proceedings of the 2018 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 2 (Short Papers) , pages 107–112, New Orleans, Louisiana. Association for Computational Linguistics."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib42",
+      "text": "Poliak et al. (2018) Adam Poliak, Jason Naradowsky, Aparajita Haldar, Rachel Rudinger, and Benjamin Van Durme. 2018. Hypothesis only baselines in natural language inference . In Proceedings of the Seventh Joint Conference on Lexical and Computational Semantics , pages 180–191, New Orleans, Louisiana. Association for Computational Linguistics."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib62",
+      "text": "Wang and Culotta (2020) Zhao Wang and Aron Culotta. 2020. Identifying spurious correlations for robust text classification . In Findings of the Association for Computational Linguistics: EMNLP 2020 , pages 3431–3440, Online. Association for Computational Linguistics."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib15",
+      "text": "Gardner et al. (2021) Matt Gardner, William Merrill, Jesse Dodge, Matthew Peters, Alexis Ross, Sameer Singh, and Noah A. Smith. 2021. Competency problems: On finding and removing artifacts in language data . In Proceedings of the 2021 Conference on Empirical Methods in Natural Language Processing , pages 1801–1813, Online and Punta Cana, Dominican Republic. Association for Computational Linguistics."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib7",
+      "text": "Clark et al. (2019) Christopher Clark, Mark Yatskar, and Luke Zettlemoyer. 2019. Don’t take the easy way out: Ensemble based methods for avoiding known dataset biases . In Proceedings of the 2019 Conference on Empirical Methods in Natural Language Processing and the 9th International Joint Conference on Natural Language Processing (EMNLP-IJCNLP) , pages 4069–4082, Hong Kong, China. Association for Computational Linguistics."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib58",
+      "text": "Utama et al. (2020) Prasetya Ajie Utama, Nafise Sadat Moosavi, and Iryna Gurevych. 2020. Towards debiasing NLU models from unknown biases . In Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing (EMNLP) , pages 7597–7610, Online. Association for Computational Linguistics."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib25",
+      "text": "Karimi Mahabadi et al. (2020) Rabeeh Karimi Mahabadi, Yonatan Belinkov, and James Henderson. 2020. End-to-end bias mitigation by modelling biases in corpora . In Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics , pages 8706–8716, Online. Association for Computational Linguistics."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib60",
+      "text": "Wang et al. (2023) Fei Wang, James Y. Huang, Tianyi Yan, Wenxuan Zhou, and Muhao Chen. 2023. Robust natural language understanding with residual attention debiasing. In Findings of the Association for Computational Linguistics: ACL-IJCNLP 2023 ."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib22",
+      "text": "Hinton (2002) Geoffrey E Hinton. 2002. Training products of experts by minimizing contrastive divergence. Neural computation , 14(8):1771–1800."
+    }
+  ]
+}

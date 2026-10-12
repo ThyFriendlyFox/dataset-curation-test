@@ -1,0 +1,129 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2404.00807",
+  "title": "GAMA-IR: Global Additive Multidimensional Averaging for Fast Image Restoration",
+  "authors": "Youssef Mansour, Reinhard Heckel",
+  "year": "2024",
+  "categories": [
+    "cs.CV",
+    "eess.IV"
+  ],
+  "url": "https://arxiv.org/abs/2404.00807",
+  "html_url": "https://arxiv.org/html/2404.00807",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 757,
+  "text": "Deep learning gives state-of-the-art performance for a variety of image restoration tasks like denoising, deblurring, and deraining. Image restoration is often formulated as an image-to-image regression problem, i.e., to map a noisy image or a coarse reconstruction of an image to a clean image [1,2].\n\nThe network architectures that map the noisy or coarse reconstruction to the clean images play a pivotal role for performance. For many years, the prominent UNet [3] has been the go-to network for different reconstruction tasks, since it performs well and has low computational requirements. The UNet is therefore a common choice for image reconstruction problems where speed is a concern, and it is also frequently used as a building block in more complicated reconstruction approaches. For example, recent self-supervised denoising methods [4,5,6,7,8] as well as the Variational Network [9], a state-of-the art network for accelerated MRI, all utilize the UNet as a building block.\n\nIn the recent years, several deep networks that use a self attention [10] mechanism or variants of it have been proposed for image reconstruction, in particular SwinIR [11], Restormer [12], and MAXIM [13]. Those networks provide better reconstructions than the UNet at the cost of significantly higher compute, due to their depth, and the computational cost of the attention or attention-like mechanisms used in those networks.\n\nThere is large demand for efficient and simple network architectures that enable fast inference times, consume little memory, while maintaining state-of-the-art image restoration performance. We focus on latency and memory at inference instead of MACs (multiply-accumulate operations) or number of parameters, since in many practical applications, speed and memory consumption are the metrics of interest.\n\nIn this paper, we propose a network with state-of-the-art performance but with low latency and memory consumption. The network is shallow and only uses convolutions, non-linearities, skip connections [14], and LayerNorm [15]. A key component of the network is a simple global additive multidimensional averaging (GAMA) block that efficiently captures non-local information and enables a large receptive field even when used in shallow networks. We integrate this block into a relatively standard convolutional neural network architecture, and the resulting network is called GAMA-IR (IR for image restoration). GAMA-IR can compete with state-of-the-art models at higher speed as seen in Figure 1.\n\nState-of-the-art networks like Restormer [12] and NAFNet [16] are usually deep. The network’s depth enables good performance, but causes the network to be slow, since computations must be performed sequentially across multiple layers. Therefore, the challenge in designing a fast network lies in enabling a shallow network to perform well, which our proposed GAMA block achieves.\n\nUp to our knowledge, the only recent image restoration network to focus on minimizing the latency instead of the MACs is MalleNet [17]. MalleNet is a lightweight network that utilizes an efficient variant of dynamic convolutions [18] to create a fast network. Although MalleNet reaches impressive speed, its performance is notably below the state of the art.\n\nRecently, several other efficient networks have been proposed that focus on minimizing the number of parameters or FLOPs (floating point operations). However, the number of parameters and FLOPs are not necessarily well correlated with a network’s latency [19,20,21] and/or with a network’s memory footprint as shown in Figure 2. That is because metrics like parameter count and FLOPs do not consider the memory access cost and degree of parallelism, which can significantly affect a network’s speed and memory expenditure [22].\n\nFor instance, sharing a model’s weights decreases the model’s number of parameters, but does not change the latency. Moreover, adding skip connections [14] does not change the parameter count and has a negligible effect on the FLOPs, but requires significantly more memory. This weak correlation between the metrics has been manifested by SwinIR [11], which is very parameter-efficient. However, the network is slow and consumes a lot of memory in comparison with other baseline networks as seen in Figure 2.\n\nContrary to the previous restoration works, our work is the first to directly target the compute metrics of interest on a GPU: Memory and speed. The main contribution of our work, illustrated in Figure 1, is:\n\n- • We optimise the network’s latency and memory expenditure instead of the number of trainable parameters or FLOPs as in previous restoration works.\n\n- • We propose a global additive multidimensional averaging block that efficiently captures global dependencies, and enables a shallow network to have a large receptive field.\n\n- • We design a simple yet effective image restoration network, that performs similar to the state of the art models, but at much higher speed.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bibx72",
+      "text": "[Zha+17] K. Zhang, W. Zuo, Y. Chen, D. Meng and L. Zhang “Beyond a Gaussian Denoiser: Residual Learning of Deep CNN for Image Denoising” In IEEE Transactions on Image Processing , 2017"
+    },
+    {
+      "n": 2,
+      "id": "bib.bibx6",
+      "text": "[Bro+19] Tim Brooks, Ben Mildenhall, Tianfan Xue, Jiawen Chen, Dillon Sharlet and Jonathan. Barron “Unprocessing Images for Learned Raw Denoising” In IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 2019"
+    },
+    {
+      "n": 3,
+      "id": "bib.bibx48",
+      "text": "[RFB15] Olaf Ronneberger, Philipp Fischer and Thomas Brox “U-Net: Convolutional Networks for Biomedical Image Segmentation” In Medical Image Computing and Computer-Assisted Intervention (MICCAI) , 2015"
+    },
+    {
+      "n": 4,
+      "id": "bib.bibx32",
+      "text": "[Leh+18] Jaakko Lehtinen, Jacob Munkberg, Jon Hasselgren, Samuli Laine, Tero Karras, Miika Aittala and Timo Aila “Noise2Noise: Learning Image Restoration without Clean Data” In International Conference on Machine Learning (ICML) , 2018"
+    },
+    {
+      "n": 5,
+      "id": "bib.bibx30",
+      "text": "[KBJ19] Alexander Krull, Tim-Oliver Buchholz and Florian Jug “Noise2Void - Learning Denoising From Single Noisy Images” In IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 2019"
+    },
+    {
+      "n": 6,
+      "id": "bib.bibx44",
+      "text": "[Mor+20] Nick Moran, Dan Schmidt, Yu Zhong and Patrick Coady “Noisier2Noise: Learning to Denoise From Unpaired Noisy Data” In IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 2020"
+    },
+    {
+      "n": 7,
+      "id": "bib.bibx28",
+      "text": "[Hua+21] Tao Huang, Songjiang Li, Xu Jia, Huchuan Lu and Jianzhuang Liu “Neighbor2Neighbor: Self-Supervised Denoising from Single Noisy Images” In IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 2021"
+    },
+    {
+      "n": 8,
+      "id": "bib.bibx62",
+      "text": "[Wan+22] Zejin Wang, Jiazheng Liu, Guoqing Li and Hua Han “Blind2Unblind: Self-Supervised Image Denoising With Visible Blind Spots” In IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 2022"
+    },
+    {
+      "n": 9,
+      "id": "bib.bibx52",
+      "text": "[Sri+20] Anuroop Sriram, Jure Zbontar, Tullie Murrell, Aaron Defazio, C. Zitnick, Nafissa Yakubova, Florian Knoll and Patricia Johnson “End-to-End Variational Networks for Accelerated MRI Reconstruction” In arXiv preprint , 2020 arXiv: 2004.06688"
+    },
+    {
+      "n": 10,
+      "id": "bib.bibx59",
+      "text": "[Vas+17] Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan. Gomez, Lukasz Kaiser and Illia Polosukhin “Attention is All you Need” In Neural Information Processing Systems (NeurIPS) , 2017"
+    },
+    {
+      "n": 11,
+      "id": "bib.bibx35",
+      "text": "[Lia+21] Jingyun Liang, Jiezhang Cao, Guolei Sun, Kai Zhang, Luc Van and Radu Timofte “SwinIR: Image Restoration Using Swin Transformer” In IEEE/CVF International Conference on Computer Vision Workshops (ICCVW) , 2021"
+    },
+    {
+      "n": 12,
+      "id": "bib.bibx67",
+      "text": "[Zam+22] Syed Zamir, Aditya Arora, Salman Khan, Munawar Hayat, Fahad Khan and Ming-Hsuan Yang “Restormer: Efficient Transformer for High-Resolution Image Restoration” In IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 2022"
+    },
+    {
+      "n": 13,
+      "id": "bib.bibx56",
+      "text": "[Tu+22] Zhengzhong Tu, Hossein Talebi, Han Zhang, Feng Yang, Peyman Milanfar, Alan Bovik and Yinxiao Li “MAXIM: Multi-Axis MLP for Image Processing” In IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 2022"
+    },
+    {
+      "n": 14,
+      "id": "bib.bibx23",
+      "text": "[He+16] Kaiming He, Xiangyu Zhang, Shaoqing Ren and Jian Sun “Deep Residual Learning for Image Recognition” In IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 2016"
+    },
+    {
+      "n": 15,
+      "id": "bib.bibx5",
+      "text": "[BKH16] Jimmy Ba, Jamie Kiros and Geoffrey. Hinton “Layer Normalization” In arXiv preprint , 2016 arXiv: 1607.06450"
+    },
+    {
+      "n": 16,
+      "id": "bib.bibx9",
+      "text": "[Che+22] Liangyu Chen, Xiaojie Chu, Xiangyu Zhang and Jian Sun “Simple Baselines for Image Restoration” In European Conference on Computer Vision (ECCV) , 2022"
+    },
+    {
+      "n": 17,
+      "id": "bib.bibx29",
+      "text": "[Jia+22] Yifan Jiang, Bartlomiej Wronski, Ben Mildenhall, Jonathan. Barron, Zhangyang Wang and Tianfan Xue “Fast and High-Quality Image Denoising via Malleable Convolutions” In European Conference on Computer Vision (ECCV) , 2022"
+    },
+    {
+      "n": 18,
+      "id": "bib.bibx11",
+      "text": "[Che+20] Yinpeng Chen, Xiyang Dai, Mengchen Liu, Dongdong Chen, Lu Yuan and Zicheng Liu “Dynamic Convolution: Attention Over Convolution Kernels” In IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 2020"
+    },
+    {
+      "n": 19,
+      "id": "bib.bibx17",
+      "text": "[Din+21] Xiaohan Ding, Xiangyu Zhang, Ningning Ma, Jungong Han, Guiguang Ding and Jian Sun “RepVGG: Making VGG-style ConvNets Great Again” In IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 2021"
+    },
+    {
+      "n": 20,
+      "id": "bib.bibx16",
+      "text": "[Deh+22] Mostafa Dehghani, Anurag Arnab, Lucas Beyer, Ashish Vaswani and Yi Tay “The Efficiency Misnomer” In International Conference on Learning Representations (ICLR) , 2022"
+    },
+    {
+      "n": 21,
+      "id": "bib.bibx58",
+      "text": "[Vas+23] Pavan Kumar Vasu, James Gabriel, Jeff Zhu, Oncel Tuzel and Anurag Ranjan “MobileOne: An Improved One Millisecond Mobile Backbone” In IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 2023"
+    },
+    {
+      "n": 22,
+      "id": "bib.bibx41",
+      "text": "[Ma+18] Ningning Ma, Xiangyu Zhang, Hai-Tao Zheng and Jian Sun “ShuffleNet V2: Practical Guidelines for Efficient CNN Architecture Design” In European Conference on Computer Vision (ECCV) , 2018"
+    }
+  ]
+}

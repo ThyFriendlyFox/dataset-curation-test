@@ -1,0 +1,62 @@
+{
+  "source_type": "encyclopedia_article",
+  "source_id": "enwiki:Device driver synthesis and verification#rev1376468051",
+  "title": "Device driver synthesis and verification",
+  "authors": "Wikipedia contributors",
+  "year": "2026",
+  "url": "https://en.wikipedia.org/w/index.php?title=Device_driver_synthesis_and_verification&oldid=1376468051",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Verification of device drivers",
+  "word_count": 989,
+  "text": "There are two challenges that limit testing the device drivers.\n\nIt is very hard to determine the exact operation or time when there is a fault in the interaction between driver and the kernel. The system could go into some inconsistent state and the crash is reported after a long time, blurring the real cause of the crash.\n\nThe drivers which work properly in normal circumstances can go wrong in rare and exceptional cases and the traditional testing techniques may not help in detecting the corner case behavior of the drivers.\n\nThe wave of verification of device drivers was initiated by Microsoft through their SLAM project as early as the year 2000. The motivation for the project was that 500,000 crashes reported a day were found to be caused by one video driver, leading to concern about the great vulnerability in using complex device drivers. More details can be found here, in the speech delivered by Bill Gates. A large number of static and runtime techniques have since been proposed for bug detection and isolation.\n\n### Static analysis\n\nStatic analysis means analyzing the program to check whether it complies with the safety-critical properties specified. For example, the system software should conform to rules such as \"check user permissions before writing to kernel data structures\", \"don't reference null pointer without check\", \"prohibit overflowing buffer size\" etc. Such checks can be made without actually executing the code being checked. Using the traditional testing process (dynamic execution) requires writing many test cases to exercise these paths and drive the system into error states. This process can take a long time and effort and is not a practical solution. Another theoretically possible approach is manual inspection, but this is impractical in modern systems in which millions of lines of code are involved, making the logic too complex to be analyzed by humans.\n\n### Compiler techniques\n\nThe rules that have a straightforward mapping to source code can be checked using a compiler. Rule violations can be found by checking if the source operation does not make sense. For example, rules like \"enabling an interrupt after being disabled\" can be checked by looking at the order of function calls. But if the source code type system cannot specify the rules in its semantics, then the compilers cannot catch errors of that kind. Many type-safe languages allow memory safety violations resulting from unsafe type casting to be detected by compiler.\n\nAnother approach is to use meta-level compilation (MC).[1] Metacompilers constructed for this purpose may extend the compilers with lightweight, system specific checkers and optimizers. These extensions need to be written by system implementers in a high level language and dynamically linked to the compilers to do strict static analysis.\n\n### Software model checking\n\nSoftware model checking is the algorithmic analysis of programs to prove properties of their executions.[2] This automates the reasoning about the program behavior with respect to the given correct specifications. Model checking and symbolic execution are used to verify the safety-critical properties of device drivers. The input to the model checker is the program and the temporal safety properties. The output is the proof that the program is correct or a demonstration that there exists a violation of the specification by means of a counterexample in the form of a specific execution path.\n\nThe tool SDV (Static Driver Verifier)[3] from Microsoft uses static analysis for windows device drivers. The back end analysis engine SLAM used model checking and symbolic execution for compile time static verification. The rules that are to be observed by the drivers for each API are specified in a C like language SLIC (Specification Language for Interface Checking). The analysis engine finds all paths which can lead to violations of the API usage rules and are presented as source level error paths through the driver source code. Internally, it abstracts the C code into a boolean program and a set of predicates which are rules that are to be observed on this program. Then it uses the symbolic model checking[4] to validate the predicates on the boolean program.\n\nThe model checker BLAST (Berkeley Lazy Abstraction Software verification Tool)[5] is used to find memory safety and incorrect locking errors in Linux kernel code. It uses an abstraction algorithm called lazy abstraction[6] to build the model from the driver C code. It has been successful in verifying temporal safety properties of C programs with up to 50K lines of code. It is also used to determine if a change in the source code affects the proof of property in the previous version and is demonstrated on a Windows device driver.\n\nAvinux[7] is another tool that facilitates the automatic analysis of Linux device drives and is built on top of bounded model checker CBMC.[8] There exist fault localization methods to find the bug location as these model checking tools return a long counter example trace and it is hard to find the exact faulty location.[9]\n\n### Run-time analysis\n\nDynamic program analysis is performed by running the program with sufficient test inputs to produce interesting behaviors. Safe Drive[10] is a low overhead system for detecting and recovering from type safety violations in device drivers. With only 4% changes to the source code of Linux network drivers they were able to implement SafeDrive and give better protection and recovery to Linux kernel. A similar project using hardware to isolate the device drivers from the main kernel is Nook.[11] They place device drivers in separate hardware protection domain called \"nooks\" and they have separate permission setting for each pages making sure that a driver does not modify pages which are not in its domain but can read all kernel data since they share the same address space.\n\nAnother similar work in this area is on automatic recovery of operating systems due to driver faults. Minix 3[12] is an operating system which can isolate major faults, defects are detected and failing components are replaced on the fly.",
+  "references": [
+    {
+      "n": 1,
+      "text": "Engler, Dawson and Chelf, Benjamin and Chou, Andy and Hallem, Seth. \"Checking system rules using system-specific, programmer-written compiler extensions\". In Proceedings of the 4th conference on Symposium on Operating System Design and Implementation, 2000"
+    },
+    {
+      "n": 2,
+      "text": "Jhala, Ranjit and Majumdar, Rupak. \"Software model checking\". In ACM Computation Survey. 2009"
+    },
+    {
+      "n": 3,
+      "text": "Thomas Ball, Ella Bounimova, Byron Cook, Vladimir Levin, Jakob Lichtenberg, Con McGarvey, Bohus Ondrusek, Sriram Rajamani. and Abdullah Ustuner. \"Thorough static analysis of device drivers\", In SIGOPS Oper. Syst. Rev, Vol. 40, 2006."
+    },
+    {
+      "n": 4,
+      "text": "McMillan, Kenneth L. \"Symbolic Model Checking\". Kluwer Academic Publishers, 1993."
+    },
+    {
+      "n": 5,
+      "text": "Thomas A. Henzinger, Ranjit Jhala, Rupak Majumdar and Gregoire Sutre. \"Software Verification with BLAST\". In SPIN, 2003."
+    },
+    {
+      "n": 6,
+      "text": "Thomas A. Henzinger, Ranjit Jhala, Rupak Majumdar and Gregoire Sutre. \"Lazy Abstraction\", In ACM SIGPLAN-SIGACT Conference on Principles of Programming Languages, 2002."
+    },
+    {
+      "n": 7,
+      "text": "H. Post, W. Küchlin. \"Integration of static analysis for linux device driver verification\". In The 6th Intl. Conf. on Integrated Formal Methods, 2007."
+    },
+    {
+      "n": 8,
+      "text": "Edmund Clarke, Daniel Kroening and Flavio Lerda. \"A Tool for checking ANSI-C Programs\". In TACAS, 2004"
+    },
+    {
+      "n": 9,
+      "text": "Thomas Ball, Mayur Naik, and Sriram K. Rajamani. \"From symptom to cause: localizing errors in counterexample traces\". ACM SIGPLAN Notices, 2003."
+    },
+    {
+      "n": 10,
+      "text": "Feng Zhou, Jeremy Condit, Zachary Anderson, Ilya Bagrak, Rob Ennals, Matthew Harren, George Necula and Eric Brewer. \"SafeDrive: Safe and Recoverable Extensions Using Language-Based Techniques\". In 7th OSDI, 2006."
+    },
+    {
+      "n": 11,
+      "text": "Michael M. Swift, Steven Martin, Henry M. Levy, and Susan J. Eggers. \"Nooks: an architecture for reliable device drivers \". In 10th ACM SIGOPS, 2002."
+    },
+    {
+      "n": 12,
+      "text": "Jorrit N. Herder, Herbert Bos, Ben Gras, Philip Homburg, and Andrew S. Tanenbaum. \"MINIX 3: a highly reliable, self-repairing operating system\". In SIGOPS Oper. Syst. Rev. 40, 2006."
+    }
+  ]
+}

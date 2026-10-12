@@ -1,0 +1,123 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2404.00464",
+  "title": "Leveraging Pre-trained and Transformer-derived Embeddings from EHRs to Characterize Heterogeneity Across Alzheimer's Disease and Related Dementias",
+  "authors": "Matthew West, Colin Magdamo, Lily Cheng, Yingnan He, Sudeshna Das",
+  "year": "2024",
+  "categories": [
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2404.00464",
+  "html_url": "https://arxiv.org/html/2404.00464",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1248,
+  "text": "Alzheimer’s disease (AD) is a degenerative neurological condition which affects around 50 million people globally, and is the 6th leading cause of death in the US [1]. Despite its substantial public health burden, AD remains poorly understood and there are relatively few interventions or treatment options available. AD is a type of dementia, a syndrome that emerges following neurodegeneration, and typically affects memory, cognition and behaviour. Alzheimer’s disease and related dementias (ADRD) is an umbrella term that refers to AD and a number of associated common dementias, including frontotemporal dementia (FTD), Lewy body dementia (LBD), and vascular dementia. AD is the most common among the ADRD pathologies, and constitutes around 60-80% of all dementias, being distinguished from other dementias by exerting more significant impact on memory [1].\n\nPathophysiologically, AD is characterised by the build-up of amyloid- \\beta plaques and neurofibrillary tangles constituted by hyperphosphorylated tau proteins. The so-called ‘amyloid hypothesis’ has prevailed as the leading explanation of disease etiology, where it is held that amyloid- \\beta toxicity leads to synaptic dysfunction and neurodegeneration [2]. However, while most treatments in development have aimed to target this amyloid hypothesis, existing treatments exhibit borderline efficacy or only show benefit limited to small subpopulations. This motivates an approach to disease characterisation where potential subtypes of disease could be elucidated, thereby informing different disease etiologies, trial designs, and ultimately the development of effective treatments.\n\nPrevious approaches to subtyping Alzheimer’s disease have focused on molecular subtyping on the basis of RNA expression, as well as subtyping and staging on the basis of brain imaging and cognitive assessments. Neff et al. [3] use RNA-seq signatures from the brain to identify five molecular subtypes of AD in three major classes, characterised by different combinations of multiple dysregulated pathways. These broadly pertain to tau-mediated neurodegeneration, amyloid- \\beta neuroinflammation, synaptic signaling, immune activity, mitochondria organization, and myelination.\n\nUsing imaging data from patients with FTD and AD, the SuStaIn (Subtype and Stage Inference) algorithm is able to extract disease stage and subtype by training a probabilistic generative model of disease progression on time-series of MRI images [4]. From this, three distinct trajectories of AD were identified, characterised anatomically by the rate and sequence of atrophy in different brain regions. The SuStaIn algorithm was later applied to a multi-site cohort of positron emission tomography (PET) scans, revealing distinct trajectories of tau deposition in AD [5].\n\nThere has also been prior work characterising subtypes of disease based on neuropsychological profiles assessed from cognitive tests. These broadly group patients on the basis of memory, visuospatial and linguistic capabilities, and executive function [6,7,8]. Aside from molecular, imaging, and cognitive data, some prior work clustering AD has utilised electronic health records (EHRs) as a modality. EHRs offer easy access to large observational datasets for clinical research, but are subject to their own inherent biases due to not being designed for research purposes. Unsupervised learning on EHR datasets has been leveraged successfully to reveal latent structure in other neurological and neurodevelopmental conditions, such as autism [9,10], as well as Parkinson’s disease [11].\n\nIn the context of Alzheimer’s disease, these EHR-based approaches have been applied with some success, with varying results dependent on methodology and population. Xu et al. [12] train an AD risk-prediction model on an EHR-derived cohort, using structured features like diseases and medications to predict EHR-derived AD status. They then cluster representations for AD patients derived from predictive features in the risk-prediction task, identifying subtypes by prevalence of comorbidities and medications. These subtypes broadly correspond to patients with cardiovascular disease, those with mental illness, those with older age of onset, and finally those taking medications for dementia and with sensory problems.\n\nAlexander et al. [13] use a large EHR system to characterise the clinical heterogeneity of AD, using diagnoses, symptoms, and demographic data from a literature-informed feature set to characterize patients. They provide a comparative analysis of four different clustering methods and assess the stability and reproducibility of the phenotypic clusters that are identified. They reliably identify a subpopulation of early-onset AD patients characterised by a faster rate of progression and being predominantly female. The approach in Landi et al. [14] utilises unsupervised deep learning to derive representations of EHRs from an entire hospital system, without restriction to any one disease cohort. To derive these representations, they explicitly encode each EHR in a temporal sequence, constituted by diagnoses, medications, labs, and procedures along with pre-trained word embeddings to characterise medical concepts extracted from notes. These representations are passed through a convolutional autoencoder, and latent representations are retained to cluster patients. Following training, they cluster on patient representations to try and identify separation between 8 disease groups, before attempting to characterize heterogeneity within disease group. One of these disease groups is AD, where they identify three distinct clusters: patients with early-onset disease, patients with later-onset disease and mild neuropsychiatric and cerebrovascular comorbidities, and finally patients with typical onset and mild-to-moderate dementia symptoms.\n\nMore recently, He et al. [15] performed a spectral clustering on a cohort of patients EHRs, using features derived in a 3-year window prior to AD onset. They specifically encode diagnoses prior to AD onset in discrete 6-month intervals, and identify four clusters that differ significantly in terms of demographics, mortality, and prescription medications. Tang et al. [16] perform a deep clinical phenotyping on the basis of comorbidities in patient EHRs from two independent cohorts, and identify a number of clusters that appear to exhibit dependence on sex. For example, after sex stratification there is an enrichment for vascular and musculoskeletal disorders in females with AD vs female controls, and enrichment for behavioural/neurological disorders in males with AD vs male controls. They also characterise network interactions between comorbidities in AD patients, which compared to controls exhibit greater numbers of edges and higher rates of comorbid conditions.\n\nBuilding on these studies, the methodology contained in this work offers the following contributions:\n\n- • We make use of pre-trained embeddings from a medical context to encode ICD codes prior to clustering.\n\n- • In contrast to prior work, we make direct use of clinical free-text without prior rule-based extraction of medical concepts.\n\n- • We demonstrate the use of transformers adapted to a clinical domain to encode representations of clinical text, and that these representations are able to characterise heterogeneity in AD following clustering.\n\nIn this work, we both utilise both pre-trained embeddings for ICD code diagnostic data and transformer-derived embeddings to characterise clinical notes, clustering patient representations for each of these modalities independently. Transformers are a recent development in deep learning that have exhibited state-of-the-art performance in language modelling tasks, and are broadly characterised by their reliance on the concept of attention [17]. Attention, so-called because it mimics cognitive attention, allows contextual information to be shared between word representations without explicitly encoding word sequence, by providing attention weights to bias important parts of prior representations in the network’s forward pass. The transformer used in this work is a version of the BERT architecture fine-tuned on a biomedical corpus [18]. BERT allows for improved contextual representations over the original transformer architecture, with its base architecture having 12 attention heads in each of its 12 layers, allowing for more detailed contextual word embeddings. This architecture provides an encoder which can be fine-tuned on downstream applications and domains, as done in BioBERT, which fine-tunes the BERT-base architecture on PubMed abstracts and PMC full-text articles [19]. Specifically, we use Clinical BERT, a publicly-released model which further fine-tunes BioBERT on notes from the critical care database MIMIC [20,21].",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "Irma Mebane-Sims. 2009 alzheimer’s disease facts and figures. Alzheimer’s & Dementia: The Journal of the Alzheimer’s Association , 2009."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "John Hardy and Dennis J Selkoe. The amyloid hypothesis of alzheimer’s disease: progress and problems on the road to therapeutics. science , 297(5580):353–356, 2002."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "Ryan A Neff, Minghui Wang, Sezen Vatansever, Lei Guo, Chen Ming, Qian Wang, Erming Wang, Emrin Horgusluoglu-Moloch, Won-min Song, Aiqun Li, et al. Molecular subtyping of alzheimer’s disease using rna sequencing data reveals novel mechanisms and targets. Science Advances , 7(2):eabb5398, 2021."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "Alexandra L Young, Razvan V Marinescu, Neil P Oxtoby, Martina Bocchetta, Keir Yong, Nicholas C Firth, David M Cash, David L Thomas, Katrina M Dick, Jorge Cardoso, et al. Uncovering the heterogeneity and temporal complexity of neurodegenerative diseases with subtype and stage inference. Nature communications , 9(1):1–16, 2018."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "Jacob W Vogel, Alexandra L Young, Neil P Oxtoby, Ruben Smith, Rik Ossenkoppele, Olof T Strandberg, Renaud La Joie, Leon M Aksman, Michel J Grothe, Yasser Iturria-Medina, et al. Four distinct trajectories of tau deposition identified in alzheimer’s disease. Nature Medicine , 27(5):871–881, 2021."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "David J Libon, Deborah AG Drabick, Tania Giovannetti, Catherine C Price, Mark W Bondi, Joel Eppig, Kathryn Devlin, Christine Nieves, Melissa Lamar, Lisa Delano-Wood, et al. Neuropsychological syndromes associated with alzheimer’s/vascular dementia: a latent class analysis. Journal of Alzheimer’s disease , 42(3):999–1014, 2014."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "Nienke ME Scheltens, Francisca Galindo-Garre, Yolande AL Pijnenburg, Annelies E van der Vlies, Lieke L Smits, Teddy Koene, Charlotte E Teunissen, Frederik Barkhof, Mike P Wattjes, Philip Scheltens, et al. The identification of cognitive subtypes in alzheimer’s disease dementia using latent class analysis. Journal of Neurology, Neurosurgery & Psychiatry , 87(3):235–243, 2016."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "Nienke ME Scheltens, Betty M Tijms, Teddy Koene, Frederik Barkhof, Charlotte E Teunissen, Steffen Wolfsgruber, Michael Wagner, Johannes Kornhuber, Oliver Peters, Brendan I Cohn-Sheehy, et al. Cognitive subtypes of probable alzheimer’s disease robustly identified in four cohorts. Alzheimer’s & Dementia , 13(11):1226–1236, 2017."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "Finale Doshi-Velez, Yaorong Ge, and Isaac Kohane. Comorbidity clusters in autism spectrum disorders: an electronic health record time-series analysis. Pediatrics , 133(1):e54–e63, 2014."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "Yuan Luo, Alal Eran, Nathan Palmer, Paul Avillach, Ami Levy-Moonshine, Peter Szolovits, and Isaac S Kohane. A multidimensional precision medicine approach identifies an autism subtype characterized by dyslipidemia. Nature Medicine , 26(9):1375–1379, 2020."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "Xi Zhang, Jingyuan Chou, Jian Liang, Cao Xiao, Yize Zhao, Harini Sarva, Claire Henchcliffe, and Fei Wang. Data-driven subtyping of parkinson’s disease using longitudinal clinical records: a cohort study. Scientific reports , 9(1):1–12, 2019."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "Jie Xu, Fei Wang, Zhenxing Xu, Prakash Adekkanattu, Pascal Brandt, Guoqian Jiang, Richard C Kiefer, Yuan Luo, Chengsheng Mao, Jennifer A Pacheco, et al. Data-driven discovery of probable alzheimer’s disease and related dementia subphenotypes using electronic health records. Learning Health Systems , 4(4):e10246, 2020."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "Nonie Alexander, Daniel C Alexander, Frederik Barkhof, and Spiros Denaxas. Using unsupervised learning to identify clinical subtypes of alzheimer’s disease in electronic health records. Studies in health technology and informatics , 270:499–503, 2020."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "Isotta Landi, Benjamin S Glicksberg, Hao-Chih Lee, Sarah Cherng, Giulia Landi, Matteo Danieletto, Joel T Dudley, Cesare Furlanello, and Riccardo Miotto. Deep representation learning of electronic health records to unlock patient stratification at scale. NPJ digital medicine , 3(1):1–11, 2020."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "Zhe He, Shubo Tian, Arslan Erdengasileng, Neil Charness, and Jiang Bian. Temporal subtyping of alzheimer’s disease using medical conditions preceding alzheimer’s disease onset in electronic health records. arXiv preprint arXiv:2202.10991 , 2022."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "Alice S Tang, Tomiko Oskotsky, Shreyas Havaldar, William G Mantyh, Mesude Bicak, Caroline Warly Solsberg, Sarah Woldemariam, Billy Zeng, Zicheng Hu, Boris Oskotsky, et al. Deep phenotyping of alzheimer’s disease leveraging electronic medical records identifies sex-specific clinical associations. Nature communications , 13(1):1–15, 2022."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N Gomez, Łukasz Kaiser, and Illia Polosukhin. Attention is all you need. In Advances in neural information processing systems , pages 5998–6008, 2017."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. Bert: Pre-training of deep bidirectional transformers for language understanding. arXiv preprint arXiv:1810.04805 , 2018."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "Jinhyuk Lee, Wonjin Yoon, Sungdong Kim, Donghyeon Kim, Sunkyu Kim, Chan Ho So, and Jaewoo Kang. Biobert: a pre-trained biomedical language representation model for biomedical text mining. Bioinformatics , 36(4):1234–1240, 2020."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "Emily Alsentzer, John R Murphy, Willie Boag, Wei-Hung Weng, Di Jin, Tristan Naumann, and Matthew McDermott. Publicly available clinical bert embeddings. arXiv preprint arXiv:1904.03323 , 2019."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "Alistair EW Johnson, Tom J Pollard, Lu Shen, H Lehman Li-Wei, Mengling Feng, Mohammad Ghassemi, Benjamin Moody, Peter Szolovits, Leo Anthony Celi, and Roger G Mark. Mimic-iii, a freely accessible critical care database. Scientific data , 3(1):1–9, 2016."
+    }
+  ]
+}

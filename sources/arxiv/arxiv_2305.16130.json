@@ -1,0 +1,84 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2305.16130",
+  "title": "Language Models Implement Simple Word2Vec-style Vector Arithmetic",
+  "authors": "Jack Merullo, Carsten Eickhoff, Ellie Pavlick",
+  "year": "2024",
+  "categories": [
+    "cs.CL",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2305.16130",
+  "html_url": "https://arxiv.org/html/2305.16130",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 512,
+  "text": "The growing capabilities of large language models (LLMs) have led to an equally growing interest in understanding how such models work under the hood. Such understanding is critical for ensuring that LLMs are reliable and trustworthy once deployed. Recent work in interpretability has contributed to this understanding by reverse-engineering the data structures and algorithms that are implicitly encoded in the model’s weights, e.g., by identifying detailed circuits [1,2,3] or by identifying mechanisms for factual storage and retrieval which support intervention and editing [4,5,6,7,8].\n\nHere, we contribute to this growing body of work by analyzing how LLMs recall information during in-context learning. Modern LLMs are based on a complex transformer architecture [9] which produces contextualized word embeddings [10,11] connected via multiple non-linearities. Despite this, we find that LLMs implement a basic vector-addition mechanism qualitatively similar to relational information encoded in their static word embeddings predecessors [12]. We also find that for non-injective relations that static embeddings typically fail to encode [13], LMs do not use the identified mechanism (Appendix G).\n\nWe study this phenomenon across nine tasks, but focus on three in the main paper: recalling capital cities, uppercasing tokens, and past-tensing verbs. Our key findings are:\n\n- • We find evidence of a distinct processing signature in the forward pass which characterizes argument-function processing (§ 3). That is, if models need to perform the get_capital(x) function, which takes an argument x and yields an answer y, they first surface the argument x in earlier layers which enables them to apply the function and yield y as the final output (Figure 2). This signature generalizes across models and tasks, but appears to become sharper as models increase in size.\n\n- • We take a closer look at GPT2-Medium, and find that the vector arithmetic mechanism is often implemented by mid-to-late layer feedforward networks (FFNs) in a way that is modular and supports intervention (§ 4). E.g., an FFN outputs a content-independent update which produces Warsaw given Poland and can be patched into an unrelated context to produce Beijing given China. We don’t find this evidence of this mechanism being used for tasks in which word embedding vector arithmetic classically fails (Appendix G).\n\n- • We demonstrate that this mechanism is specific to recalling information from pretraining memory (§ 5). For settings in which the correct answer can be retrieved from the prompt, this mechanism does not appear to play any role, and FFNs can be ablated entirely with relatively minimal performance degradation. Thus, we present new evidence supporting the claim that FFNs and attention specialize for different roles, with FFNs supporting factual recall and attention copying and pasting from local context.\n\nTaken together, our results offer new insights about one component of the complex algorithms that underlie in-context learning. The mechanism’s simplicity raises the possibility that other apparently complicated behaviors may be supported by a sequence of simple operations under the hood. Moreover, our results suggest a distinct processing signature and hint at a method for intervention. These ideas could support future work on detecting and preventing unwanted behavior by LLMs at runtime.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib39",
+      "text": "Wang et al. (2022) Kevin Wang, Alexandre Variengien, Arthur Conmy, Buck Shlegeris, and Jacob Steinhardt. 2022. Interpretability in the Wild: a Circuit for Indirect Object Identification in GPT-2 small . ArXiv:2211.00593 [cs]."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib10",
+      "text": "Elhage et al. (2021) N Elhage, N Nanda, C Olsson, T Henighan, N Joseph, B Mann, A Askell, Y Bai, A Chen, T Conerly, et al. 2021. A mathematical framework for transformer circuits. Transformer Circuits Thread ."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib29",
+      "text": "Olsson et al. (2022) Catherine Olsson, Nelson Elhage, Neel Nanda, Nicholas Joseph, Nova DasSarma, Tom Henighan, Ben Mann, Amanda Askell, Yuntao Bai, Anna Chen, Tom Conerly, Dawn Drain, Deep Ganguli, Zac Hatfield-Dodds, Danny Hernandez, Scott Johnston, Andy Jones, Jackson Kernion, Liane Lovitt, Kamal Ndousse, Dario Amodei, Tom Brown, Jack Clark, Jared Kaplan, Sam McCandlish, and Chris Olah. 2022. In-context learning and induction heads. Transformer Circuits Thread . Https://transformer-circuits.pub/2022/in-context-learning-and-induction-heads/index.html."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib14",
+      "text": "Geva et al. (2021a) Mor Geva, Roei Schuster, Jonathan Berant, and Omer Levy. 2021a. Transformer Feed-Forward Layers Are Key-Value Memories . In Proceedings of the 2021 Conference on Empirical Methods in Natural Language Processing , pages 5484–5495, Online and Punta Cana, Dominican Republic. Association for Computational Linguistics."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib22",
+      "text": "Li et al. (2022) Kenneth Li, Aspen K Hopkins, David Bau, Fernanda Viégas, Hanspeter Pfister, and Martin Wattenberg. 2022. Emergent world representations: Exploring a sequence model trained on a synthetic task. arXiv preprint arXiv:2210.13382 ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib23",
+      "text": "Meng et al. (2022a) Kevin Meng, David Bau, Alex Andonian, and Yonatan Belinkov. 2022a. Locating and Editing Factual Associations in GPT . ArXiv:2202.05262 [cs] version: 4."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib25",
+      "text": "Meng et al. (2022c) Kevin Meng, Arnab Sen Sharma, Alex Andonian, Yonatan Belinkov, and David Bau. 2022c. Mass editing memory in a transformer. arXiv preprint arXiv:2210.07229 ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib6",
+      "text": "Dai et al. (2022) Damai Dai, Li Dong, Yaru Hao, Zhifang Sui, Baobao Chang, and Furu Wei. 2022. Knowledge neurons in pretrained transformers. In Proceedings of the 60th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) , pages 8493–8502."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib36",
+      "text": "Vaswani et al. (2017) Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N Gomez, Łukasz Kaiser, and Illia Polosukhin. 2017. Attention is all you need. Advances in neural information processing systems , 30."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib30",
+      "text": "Peters et al. (2018) Matthew E. Peters, Mark Neumann, Mohit Iyyer, Matt Gardner, Christopher Clark, Kenton Lee, and Luke Zettlemoyer. 2018. Deep contextualized word representations . In Proceedings of the 2018 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long Papers) , pages 2227–2237, New Orleans, Louisiana. Association for Computational Linguistics."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib8",
+      "text": "Devlin et al. (2019) Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. 2019. BERT: Pre-training of deep bidirectional transformers for language understanding . In Proceedings of the 2019 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long and Short Papers) , pages 4171–4186, Minneapolis, Minnesota. Association for Computational Linguistics."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib27",
+      "text": "Mikolov et al. (2013) Tomáš Mikolov, Wen-tau Yih, and Geoffrey Zweig. 2013. Linguistic regularities in continuous space word representations. In Proceedings of the 2013 conference of the north american chapter of the association for computational linguistics: Human language technologies , pages 746–751."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib16",
+      "text": "Gladkova et al. (2016) Anna Gladkova, Aleksandr Drozd, and Satoshi Matsuoka. 2016. Analogy-based detection of morphological and semantic relations with word embeddings: what works and what doesn’t. In Proceedings of the NAACL Student Research Workshop , pages 8–15, San Diego, California. Association for Computational Linguistics."
+    }
+  ]
+}

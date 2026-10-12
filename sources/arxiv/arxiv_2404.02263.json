@@ -1,0 +1,70 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2404.02263",
+  "title": "OFMPNet: Deep End-to-End Model for Occupancy and Flow Prediction in Urban Environment",
+  "authors": "Youshaa Murhij, Dmitry Yudin",
+  "year": "2024",
+  "categories": [
+    "cs.CV",
+    "cs.AI",
+    "cs.RO"
+  ],
+  "url": "https://arxiv.org/abs/2404.02263",
+  "html_url": "https://arxiv.org/html/2404.02263",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 798,
+  "text": "Currently, the autonomous driving task is divided into multiple subtasks, including: perception, motion prediction and planning. The motion prediction subtask allows estimating the future positions of the surrounding moving objects by the perception module. This can ensure the safe movement of the ego-vehicle in such a dynamically changing environment. Motion prediction has been studied extensively due to the growing interest in autonomous driving. It typically takes road map and agent history states as input. To encode such scene context, early works typically rasterize them into an image so as to be processed with convolutional neural networks (CNNs) [1].\n\nRecently, the large-scale Waymo Open Motion Dataset (WOMD) [2] is proposed for long-term motion prediction. To address this challenge, DenseTNT [3] adopts a goal-based strategy to classify endpoint of trajectory from dense goal points. Other works directly predict the future trajectories based on the encoded agent features or latent anchor embedding [1]. Transformer has been widely applied in natural language processing and computer vision [4]. DETR [5] and its follow-up works, especially DAB-DETR [6], consider the object query as the positional embedding of a spatial anchor box [7].MTR adopts a novel Transformer encoder-decoder structures with iterative motion refinement for predicting multimodal future motion [8].\n\nThe main modern approach to solving the problem of predicting the movement of vehicles on the road scene is deep neural network methods. They provide the best quality metrics at various leading competitions held using NuScenes [9], Argoverse [10], Waymo [2] open datasets.\n\nIn this work, we investigate a neural network-based simultaneous solution for three connected tasks for the motion prediction problem presented in [2] (see Figure 1):\n\n- 1. future occupancy prediction of currently-observed vehicles,\n\n- 2. future occupancy prediction of all vehicles that are not present at the current time step,\n\n- 3. future motion flow of all vehicles.\n\nWe decided to explore the potential of common neural architectures and their modifications in this specific task. Specifically, the ones that include UNet-like backbone, LSTM and SWIN transformer. Additionally, we introduce our improvements and modifications to these models to properly match the task in hand. Our approach introduces the integration of the SWIN transformer for feature selection with LSTM and sparse operations for feature refinement benefiting from our proposed time-based weight for flow loss.\n\nThe first task is the future occupancy prediction of currently-observed vehicles. See Figure 1 (a). Given histories of all agents over T_{h} input time steps t-T_{h},t-(T_{h}-1),...,t, we need to predict the future occupancy grid as bird’s-eye-view (BEV) of all vehicles that are present at the current time step t, for N seconds into the future. More specifically, the predictions are N occupancy grids, capturing future occupancy of all currently-visible vehicles at N different waypoints. Each occupancy grid is a mxmx1 array containing values in the range [0,1] indicating the probability that some part of some currently-observed vehicle will occupy that grid cell.\n\nIn the second task, see Figure 1 (b), we are given histories of all agents over T_{h} input time steps t-T_{h},t-(T_{h}-1),...,t, and we need to predict future occupancy of all vehicles that are not present at the current time step t, for N seconds into the future. The predictions are N occupancy grids, capturing future occupancy of all currently-occluded vehicles at N different waypoints. Each occupancy grid is a mxmx1 array containing values in the range [0,1] indicating the probability that some part of some currently-occluded vehicle will occupy that grid cell.\n\nIn the third task, see Figure 1 (c), we are given histories of all agents over T_{h} input time steps t-T_{h},t-(T_{h}-1),...,t, and we need to predict future motion flow of all vehicles (currently observed or occluded), for N seconds into the future. The predictions are N flow fields, capturing future flow of all vehicles at N different waypoints. Each flow field is a mxmx2 array containing (dx,dy) values indicating the displacement over 1 second of the vehicle part that occupies that grid cell.\n\nIn our article, we focused on building end-to-end neural network models to solve these three tasks and experimenting with their training on the most relevant and up-to-date Waymo Open Motion Dataset [2].\n\nOur main contributions are listed below:\n\n- 1. We present a new deep encoder-decoder model called OFMPNet for occupancy and flow prediction problem. As one of the model options, we proposed a novel architecture with an attention-based, transformer and LSTM units to extract features from historical occupancy/flow grids.\n\n- 2. We introduce a time weighted loss as a part of a combination of occupancy-flow losses for multi-task learning. This has demonstrated its effectiveness for the motion flow prediction task.\n\n- 3. We train, validate and test our approach on Waymo Open Motion dataset, achieving competing performance in comparison with current state-of-the-art methods.\n\nCode of the proposed approach is publicly available at: https://github.com/YoushaaMurhij/OFMPNet",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "S. Paravarzar, B. Mohammad, Motion Prediction on Self-driving Cars: A Review, arXiv e-prints (2020) arXiv:2011.03635 arXiv:2011.03635 , doi:10.48550/arXiv.2011.03635 ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "S. Ettinger, S. Cheng, B. Caine, C. Liu, H. Zhao, S. Pradhan, Y. Chai, B. Sapp, C. Qi, Y. Zhou, Z. Yang, A. Chouard, P. Sun, J. Ngiam, V. Vasudevan, A. McCauley, J. Shlens, D. Anguelov, Large scale interactive motion forecasting for autonomous driving : The waymo open motion dataset, in: 2021 IEEE/CVF International Conference on Computer Vision (ICCV), 2021, pp. 9690–9699. doi:10.1109/ICCV48922.2021.00957 ."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "J. Gu, C. Sun, H. Zhao, Densetnt: End-to-end trajectory prediction from dense goal sets, in: 2021 IEEE/CVF International Conference on Computer Vision (ICCV), 2021, pp. 15283–15292. doi:10.1109/ICCV48922.2021.01502 ."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "S. Konev, K. Brodt, A. Sanakoyeu, MotionCNN: A Strong Baseline for Motion Prediction in Autonomous Driving, arXiv e-prints (2022) arXiv:2206.02163 arXiv:2206.02163 , doi:10.48550/arXiv.2206.02163 ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "N. Carion, F. Massa, G. Synnaeve, N. Usunier, A. Kirillov, S. Zagoruyko, End-to-End Object Detection with Transformers, arXiv e-prints (2020) arXiv:2005.12872 arXiv:2005.12872 , doi:10.48550/arXiv.2005.12872 ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "S. Liu, F. Li, H. Zhang, X. Yang, X. Qi, H. Su, J. Zhu, L. Zhang, DAB-DETR: Dynamic Anchor Boxes are Better Queries for DETR, arXiv e-prints (2022) arXiv:2201.12329 arXiv:2201.12329 , doi:10.48550/arXiv.2201.12329 ."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "P. Karle, M. Geisslinger, J. Betz, M. Lienkamp, Scenario understanding and motion prediction for autonomous vehicles—review and comparison, IEEE Transactions on Intelligent Transportation Systems 23 (10) (2022) 16962–16982. doi:10.1109/TITS.2022.3156011 ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "S. Shi, L. Jiang, D. Dai, B. Schiele, Motion transformer with global intention localization and local movement refinement, arXiv preprint arXiv:2209.13508."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "H. Caesar, V. Bankiti, A. H. Lang, S. Vora, V. E. Liong, Q. Xu, A. Krishnan, Y. Pan, G. Baldan, O. Beijbom, nuScenes: A multimodal dataset for autonomous driving, arXiv e-prints (2019) arXiv:1903.11027 arXiv:1903.11027 , doi:10.48550/arXiv.1903.11027 ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "B. Wilson, W. Qi, T. Agarwal, J. Lambert, J. Singh, S. Khandelwal, B. Pan, R. Kumar, A. Hartnett, J. Kaesemodel Pontes, D. Ramanan, P. Carr, J. Hays, Argoverse 2: Next Generation Datasets for Self-Driving Perception and Forecasting, arXiv e-prints (2023) arXiv:2301.00493 arXiv:2301.00493 , doi:10.48550/arXiv.2301.00493 ."
+    }
+  ]
+}

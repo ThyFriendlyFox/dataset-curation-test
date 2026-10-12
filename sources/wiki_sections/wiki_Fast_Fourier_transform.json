@@ -1,0 +1,90 @@
+{
+  "source_type": "encyclopedia_article",
+  "source_id": "enwiki:Fast Fourier transform#rev1379393988",
+  "title": "Fast Fourier transform",
+  "authors": "Wikipedia contributors",
+  "year": "2026",
+  "url": "https://en.wikipedia.org/w/index.php?title=Fast_Fourier_transform&oldid=1379393988",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Computational issues",
+  "word_count": 1094,
+  "text": "### Bounds on complexity and operation counts\n\nA fundamental question of longstanding theoretical interest is to prove lower bounds on the complexity and exact operation counts of fast Fourier transforms, and many open problems remain. It is not rigorously proved whether DFTs truly require \\Omega(n \\log n) (i.e., order n \\log n or greater) operations, even for the simple case of power of two sizes, although no algorithms with lower complexity are known. In particular, the count of arithmetic operations is usually the focus of such questions, although actual performance on modern-day computers is determined by many other factors such as cache or CPU pipeline optimization.\n\nFollowing work by Shmuel Winograd (1978),[1] a tight \\Theta(n) lower bound is known for the number of real multiplications required by an FFT. It can be shown that only 4n - 2\\log_2^2(n) - 2\\log_2(n) - 4 irrational real multiplications are required to compute a DFT of power-of-two length n = 2^m . Moreover, explicit algorithms that achieve this count are known (Heideman & Burrus, 1986;[2] Duhamel, 1990[3]). However, these algorithms require too many additions to be practical, at least on modern computers with hardware multipliers (Duhamel, 1990;[3] Frigo & Johnson, 2005).[4]\n\nA tight lower bound is not known on the number of required additions, although lower bounds have been proved under some restrictive assumptions on the algorithms. In 1973, Morgenstern[5] proved an \\Omega(n \\log n) lower bound on the addition count for algorithms where the multiplicative constants have bounded magnitudes (which is true for most but not all FFT algorithms). Pan (1986)[6] proved an \\Omega(n \\log n) lower bound assuming a bound on a measure of the FFT algorithm's asynchronicity, but the generality of this assumption is unclear. For the case of power-of-two n, Papadimitriou (1979)[7] argued that the number n \\log_2 n of complex-number additions achieved by Cooley–Tukey algorithms is optimal under certain assumptions on the graph of the algorithm (his assumptions imply, among other things, that no additive identities in the roots of unity are exploited). (This argument would imply that at least 2N \\log_2 N real additions are required, although this is not a tight bound because extra additions are required as part of complex-number multiplications.) Thus far, no published FFT algorithm has achieved fewer than n \\log_2 n complex-number additions (or their equivalent) for power-of-two n.\n\nA third problem is to minimize the total number of real multiplications and additions, sometimes called the arithmetic complexity (although in this context it is the exact count and not the asymptotic complexity that is being considered). Again, no tight lower bound has been proven. Since 1968, however, the lowest published count for power-of-two n was long achieved by the split-radix FFT algorithm, which requires 4n\\log_2(n) - 6n + 8 real multiplications and additions for n > 1. This was further reduced to \\sim \\frac{34}{9} n \\log_2 n (Johnson and Frigo, 2007;[8] Lundy and Van Buskirk, 2007[9]). A slightly larger count (but still better than split radix for n ≥ 256) was shown to be provably optimal for n ≤ 512 under additional restrictions on the possible algorithms (split-radix-like flowgraphs with unit-modulus multiplicative factors), by reduction to a satisfiability modulo theories problem solvable by brute force (Haynal & Haynal, 2011).[10]\n\nMost of the attempts to lower or prove the complexity of FFT algorithms have focused on the ordinary complex-data case, because it is the simplest. However, complex-data FFTs are so closely related to algorithms for related problems, such as real-data FFTs, discrete cosine transforms, discrete Hartley transforms, and so on, that any improvement in one of these would immediately lead to improvements in the others (Duhamel & Vetterli, 1990).[11]\n\n### Approximations\n\nAll of the FFT algorithms discussed above compute the DFT exactly (i.e., neglecting floating-point errors). A few FFT algorithms have been proposed, however, that compute the DFT approximately, with an error that can be made arbitrarily small at the expense of increased computations. Such algorithms trade the approximation error for increased speed or other properties. For example, an approximate FFT algorithm by Edelman et al. (1999)[12] achieves lower communication requirements for parallel computing with the help of a fast multipole method. A wavelet-based approximate FFT by Guo and Burrus (1996)[13] takes sparse inputs/outputs (time/frequency localization) into account more efficiently than is possible with an exact FFT. Another algorithm for approximate computation of a subset of the DFT outputs is due to Shentov et al. (1995).[14] The Edelman algorithm works equally well for sparse and non-sparse data, since it is based on the compressibility (rank deficiency) of the Fourier matrix itself rather than the compressibility (sparsity) of the data. Conversely, if the data are sparse—that is, if only k out of n Fourier coefficients are nonzero—then the complexity can be reduced to O(k \\log n \\log n/k) , and this has been demonstrated to lead to practical speedups compared to an ordinary FFT for n/k > 32 in a large-n example (n 2) using a probabilistic approximate algorithm (which estimates the largest k coefficients to several decimal places).[15]\n\n### Accuracy\n\nFFT algorithms have errors when finite-precision floating-point arithmetic is used, but these errors are typically quite small; most FFT algorithms, e.g., Cooley–Tukey, have excellent numerical properties as a consequence of the pairwise summation structure of the algorithms. The upper bound on the relative error for the Cooley–Tukey algorithm is O(\\varepsilon \\log n) , compared to O(\\varepsilon n^{3/2}) for the naïve DFT formula,[16] where is the machine floating-point relative precision. In fact, the root mean square (rms) errors are much better than these upper bounds, being only O(\\varepsilon \\sqrt{\\log n}) for Cooley–Tukey and O(\\varepsilon \\sqrt{n}) for the naïve DFT (Schatzman, 1996).[17] These results, however, are very sensitive to the accuracy of the twiddle factors used in the FFT (i.e. the trigonometric function values), and it is not unusual for incautious FFT implementations to have much worse accuracy, e.g., if they use inaccurate trigonometric recurrence formulas. Some FFTs other than Cooley–Tukey, such as the Rader–Brenner algorithm, are intrinsically less stable.\n\nIn fixed-point arithmetic, the finite-precision errors accumulated by FFT algorithms are worse, with rms errors growing as O(\\sqrt{n}) for the Cooley–Tukey algorithm (Welch, 1969).[18] Achieving this accuracy requires careful attention to scaling to minimize loss of precision, and fixed-point FFT algorithms involve rescaling at each intermediate stage of decompositions like Cooley–Tukey.\n\nTo verify the correctness of an FFT implementation, rigorous guarantees can be obtained in O(n \\log n) time by a simple procedure checking the linearity, impulse-response, and time-shift properties of the transform on random inputs (Ergün, 1995).[19]\n\nThe values for intermediate frequencies may be obtained by various averaging methods.",
+  "references": [
+    {
+      "n": 1,
+      "text": "(1978). On computing the discrete Fourier transform. Mathematics of Computation. doi:10.1090/S0025-5718-1978-0468306-4"
+    },
+    {
+      "n": 2,
+      "text": "(1986). On the number of multiplications necessary to compute a length-2n DFT. IEEE Transactions on Acoustics, Speech, and Signal Processing. doi:10.1109/TASSP.1986.1164785"
+    },
+    {
+      "n": 3,
+      "text": "(1990). Algorithms meeting the lower bounds on the multiplicative complexity of length-2n DFTs and their connection with practical algorithms. IEEE Transactions on Acoustics, Speech, and Signal Processing. doi:10.1109/29.60070"
+    },
+    {
+      "n": 4,
+      "text": "(2005). The Design and Implementation of FFTW3. Proceedings of the IEEE. doi:10.1109/jproc.2004.840301"
+    },
+    {
+      "n": 5,
+      "text": "(1973). Note on a lower bound of the linear complexity of the fast Fourier transform. Journal of the ACM. doi:10.1145/321752.321761"
+    },
+    {
+      "n": 6,
+      "text": "(1986-01-02). The trade-off between the additive complexity and the asynchronicity of linear and bilinear algorithms. Information Processing Letters. doi:10.1016/0020-0190(86)90035-9"
+    },
+    {
+      "n": 7,
+      "text": "(1979). Optimality of the fast Fourier transform. Journal of the ACM. doi:10.1145/322108.322118"
+    },
+    {
+      "n": 8,
+      "text": "(January 2007). A Modified Split-Radix FFT With Fewer Arithmetic Operations. IEEE Transactions on Signal Processing. doi:10.1109/tsp.2006.882087"
+    },
+    {
+      "n": 9,
+      "text": "(2007). A new matrix approach to real FFTs and convolutions of length 2k. Computing. doi:10.1007/s00607-007-0222-6"
+    },
+    {
+      "n": 10,
+      "text": "(2011). Generating and Searching Families of FFT Algorithms. Journal on Satisfiability, Boolean Modeling and Computation. doi:10.3233/SAT190084"
+    },
+    {
+      "n": 11,
+      "text": "(1990). Fast Fourier transforms: a tutorial review and a state of the art. Signal Processing. doi:10.1016/0165-1684(90)90158-U"
+    },
+    {
+      "n": 12,
+      "text": "(1999). The Future Fast Fourier Transform?. SIAM Journal on Scientific Computing. doi:10.1137/S1064827597316266"
+    },
+    {
+      "n": 13,
+      "text": "(1996). Wavelet Applications in Signal and Image Processing IV. doi:10.1117/12.255236"
+    },
+    {
+      "n": 14,
+      "text": "(1995). Subband DFT. I. Definition, interpretations and extensions. Signal Processing. doi:10.1016/0165-1684(94)00103-7"
+    },
+    {
+      "n": 15,
+      "text": "(January 2012). Simple and Practical Algorithm for Sparse Fourier Transform. ACM-SIAM Symposium on Discrete Algorithms. https://www.mit.edu/~ecprice/papers/sparse-fft-soda.pdf"
+    },
+    {
+      "n": 16,
+      "text": "(1966). Fast Fourier transforms—for fun and profit. Proceedings of the AFIPS. doi:10.1145/1464291.1464352"
+    },
+    {
+      "n": 17,
+      "text": "(1996). Accuracy of the discrete Fourier transform and the fast Fourier transform. SIAM Journal on Scientific Computing. doi:10.1137/s1064827593247023"
+    },
+    {
+      "n": 18,
+      "text": "(1969). A fixed-point fast Fourier transform error analysis. IEEE Transactions on Audio and Electroacoustics. doi:10.1109/TAU.1969.1162035"
+    },
+    {
+      "n": 19,
+      "text": "(1995). Proceedings of the twenty-seventh annual ACM symposium on Theory of computing - STOC '95. doi:10.1145/225058.225167"
+    }
+  ]
+}

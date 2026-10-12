@@ -1,0 +1,102 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2312.09056",
+  "title": "ReCoRe: Regularized Contrastive Representation Learning of World Model",
+  "authors": "Rudra P. K. Poudel, Harit Pandya, Stephan Liwicki, Roberto Cipolla",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.AI",
+    "cs.CV",
+    "cs.RO",
+    "stat.ML"
+  ],
+  "url": "https://arxiv.org/abs/2312.09056",
+  "html_url": "https://arxiv.org/html/2312.09056",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 678,
+  "text": "In recent years, deep RL algorithms have been successfully employed for designing optimal strategies for games [1,2] and shown a promise for controlling robots [3,4]. Model-free RL approaches learn the policy along with the visual encoder in an end-to-end fashion from raw observations. As a result, they require a large number of training samples, which makes it difficult to deploy them on real robots where obtaining a large amount of training data is resource intensive, especially for safety-critical tasks such as autonomous navigation [5]. On the contrary, in model-based RL, an explicit predictive model of the world is learned called world model, enabling the agent to plan by thinking ahead [6,2,7,8]. The world model is learned separately from the policy, therefore, the policy can use the world model as a surrogate for the real world. Consequently, model-based methods have higher sample efficiency [7,8] making them more suitable in real environments since they can be trained with a small amount of data.\n\nNevertheless, even current model-based RL struggles with generalization, as model-based approaches have to learn the world model purely from experience, which poses several challenges: The central issue is the training bias, which can be exploited by an agent, and leads to poor performance when deployed [7]. Another issue is that the latent representation is learned from a reconstruction loss, such as the state abstraction of variational autoencoders (VAE) [9], which is not sufficient to separate the task-relevant states from irrelevant ones. Hence, the RL policy may still overfit to environment-specific characteristics [10]. Thus, the aim of this paper is invariant feature abstraction, which is essential for learning a robust RL policy.\n\nSpecifically, we propose to use contrastive learning for invariant state abstraction since the contrastive learning objective implicitly ensures that the feature embeddings are invariant to the intervention, i.e. data augmentation. However, feature collapse is possible if a naïve implementation is used as can be seen in our evaluation (Table 1), where the naïve implementation of contrastive loss (ReCoRe-D) completely fails (< 1% success rate) for model-based RL. Mitrovic et al. [11] proposed a regularizer based on KL-divergence that matches the distributions among the augmentations, which stabilizes contrastive learning under model-free RL settings and slightly improved the performance over CURL [12]. On the contrary, we propose a regularizer in the form of an auxiliary task to explicitly enforce the invariant feature learning. For example in the navigation task, we utilize depth predictions to extract the geometric features needed for navigation as they do not depend on textures as shown in Figure 1. We emphasize that depth is only required for training but not for deployment since it works as a regulariser. Furthermore, in cases where depth is not available other auxiliary tasks such as image denoising, segmentation or optical flow prediction can be utilized for regularization, enabling a wider applicability of the proposed model. Importantly, our setup allows us to employ contrastive learning in model-based RL settings, which improves the sample efficiency and helps with Out-of-Distribution (OoD) generalization.\n\nIn summary, we propose a Regularized Contrastive Representation learning (ReCoRe) approach to the world model. The proposed variant of the world model can extract and predict robust invariant features (Figure 2). ReCoRe is verified on the point goal navigation task from Gibson [13] and iGibson 1.0 [14] as well as on the DeepMind Control suite (DMControl) [15]. Thus, our main contributions are:\n\n- 1. We show that contrastive unsupervised representation learning can significantly improve OoD generalization of world model based reinforcement learning (Table 1, ReCoRe vs. DreamerV2).\n\n- 2. We propose an intervention-invariant regularizer that learns the invariant features (Section 3.1.1) and is shown to be crucial in preventing feature collapse of contrastive learning (Table 1, ReCoRe vs. ReCoRe-D).\n\n- 3. Through extensive experiments, we showcase that our approach outperforms state-of-the-art RL models (including language guided foundation model Grounding DINO [16]) on out-of-distribution generalization (Table 1) and sim-to-real transfer of learned features (Table 2). We further show that even for in-distribution evaluation our approach outperforms model-free reinforcement learning approaches (Table 3) which is difficult for other model-based learning approaches.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib25",
+      "text": "Volodymyr Mnih, Koray Kavukcuoglu, David Silver, Alex Graves, Ioannis Antonoglou, Daan Wierstra, and Martin Riedmiller. Playing atari with deep reinforcement learning. arXiv preprint arXiv:1312.5602 , 2013."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib31",
+      "text": "David Silver, Thomas Hubert, Julian Schrittwieser, Ioannis Antonoglou, Matthew Lai, Arthur Guez, Marc Lanctot, Laurent Sifre, Dharshan Kumaran, Thore Graepel, Timothy Lillicrap, Karen Simonyan, and Demis Hassabis. A general reinforcement learning algorithm that masters chess, shogi, and Go through self-play. Science , 362(6419):1140–1144, 2018."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib21",
+      "text": "Sergey Levine, Chelsea Finn, Trevor Darrell, and Pieter Abbeel. End-to-end training of deep visuomotor policies. The Journal of Machine Learning Research , 17(1):1334–1373, 2016."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib35",
+      "text": "Erik Wijmans, Abhishek Kadian, Ari Morcos, Stefan Lee, Irfan Essa, Devi Parikh, Manolis Savva, and Dhruv Batra. Dd-ppo: Learning near-perfect pointgoal navigators from 2.5 billion frames. arXiv preprint arXiv:1911.00357 , 2019."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib9",
+      "text": "Nico Gürtler, Sebastian Blaes, Pavel Kolev, Felix Widmaier, Manuel Wüthrich, Stefan Bauer, Bernhard Schölkopf, and Georg Martius. Benchmarking offline reinforcement learning on real-robot hardware. arXiv preprint arXiv:2307.15690 , 2023."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "Marc Deisenroth and Carl E Rasmussen. Pilco: A model-based and data-efficient approach to policy search. In Proceedings of the 28th International Conference on machine learning (ICML) , pages 465–472, 2011."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib10",
+      "text": "David Ha and Jürgen Schmidhuber. Recurrent world models facilitate policy evolution. In Advances in Neural Information Processing Systems , 2018."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib13",
+      "text": "Danijar Hafner, Timothy P Lillicrap, Mohammad Norouzi, and Jimmy Ba. Mastering atari with discrete world models. In International Conference on Learning Representations , 2021."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib18",
+      "text": "Diederik P Kingma and Max Welling. Auto-encoding variational bayes, 2014."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib40",
+      "text": "Amy Zhang, Clare Lyle, Shagun Sodhani, Angelos Filos, Marta Kwiatkowska, Joelle Pineau, Yarin Gal, and Doina Precup. Invariant causal prediction for block MDPs. In Proceedings of the 37th International Conference on Machine Learning , 2020."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib24",
+      "text": "Jovana Mitrovic, Brian McWilliams, Jacob C Walker, Lars Holger Buesing, and Charles Blundell. Representation learning via invariant causal mechanisms. In International Conference on Learning Representations , 2021."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib20",
+      "text": "Michael Laskin, Aravind Srinivas, and Pieter Abbeel. Curl: Contrastive unsupervised representations for reinforcement learning. Proceedings of the 37th International Conference on Machine Learning, Vienna, Austria, PMLR 119 , 2020b. arXiv:2004.04136."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib37",
+      "text": "Fei Xia, Amir R. Zamir, Zhi-Yang He, Alexander Sax, Jitendra Malik, and Silvio Savarese. Gibson env: real-world perception for embodied agents. In IEEE Conference on Computer Vision and Pattern Recognition (CVPR) . IEEE, 2018."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib30",
+      "text": "Bokui Shen, Fei Xia, Chengshu Li, Roberto Martín-Martín, Linxi Fan, Guanzhi Wang, Claudia Pérez-D’Arpino, Shyamal Buch, Sanjana Srivastava, Lyne Tchapmi, Micael Tchapmi, Kent Vainio, Josiah Wong, Li Fei-Fei, and Silvio Savarese. igibson 1.0: A simulation environment for interactive tasks in large realistic scenes. In IEEE International Conference on Intelligent Robots and Systems (IROS) , 2021."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib33",
+      "text": "Saran Tunyasuvunakool, Alistair Muldal, Yotam Doron, Siqi Liu, Steven Bohez, Josh Merel, Tom Erez, Timothy Lillicrap, Nicolas Heess, and Yuval Tassa. dm_control: Software and tasks for continuous control. Software Impacts , 6, 2020."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib23",
+      "text": "Shilong Liu, Zhaoyang Zeng, Tianhe Ren, Feng Li, Hao Zhang, Jie Yang, Chunyuan Li, Jianwei Yang, Hang Su, Jun Zhu, et al. Grounding dino: Marrying dino with grounded pre-training for open-set object detection. arXiv preprint arXiv:2303.05499 , 2023."
+    }
+  ]
+}

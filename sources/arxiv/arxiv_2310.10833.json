@@ -1,0 +1,79 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2310.10833",
+  "title": "Proper Laplacian Representation Learning",
+  "authors": "Diego Gomez, Michael Bowling, Marlos C. Machado",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.AI"
+  ],
+  "url": "https://arxiv.org/abs/2310.10833",
+  "html_url": "https://arxiv.org/html/2310.10833",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 804,
+  "text": "Reinforcement learning (RL) is a framework for decision-making where an agent continually takes actions in its environment and, in doing so, controls its future states. After each action, given the current state and the action itself, the agent receives a reward and a next state from the environment. The objective of the agent is to maximize the sum of these rewards. In principle, the agent has to visit all states and try all possible actions a reasonable number of times to determine the optimal behavior. However, in complex environments, e.g., when the number of states is large or the environment changes with time, this is not a plausible strategy. Instead, the agent needs the ability to learn representations of the state that facilitate exploration, generalization, and transfer.\n\nThe Laplacian framework [1,2] proposes one such representation. This representation is based on the graph Laplacian, which, in the tabular case, is a matrix that encodes the topology of the state space based on both the policy the agent uses to select actions and the environment dynamics. Specifically, the d- dimensional Laplacian representation is a map from states to vectors whose entries correspond to d eigenvectors of the Laplacian.\n\nAmong other properties, the Laplacian representation induces a metric space where the Euclidean distance of two representations correlates to the temporal distance of their corresponding states; moreover, its entries correspond to directions that maximally preserve state value information [3]. Correspondingly, it has been used for reward shaping [4,5], as a state representation for value approximation [2,6,7,8], as a set of intrinsic rewards for exploration via temporally-extended actions [9], zero-shot learning [10], and to achieve state-of-the-art performance in sparse reward environments [11].\n\nWhen the number of states, |\\mathcal{S}|, is small, the graph Laplacian can be represented as a matrix and one can use standard matrix eigendecomposition techniques to obtain its eigensystem and the corresponding Laplacian representation. In practice, however, |\\mathcal{S}| is large, or even uncountable. Thus, at some point it becomes infeasible to directly compute the eigenvectors of the Laplacian. In this context, [4] proposed a scalable optimization procedure to obtain the Laplacian representation in state spaces with uncountably many states. Such an approach is based on a general definition of the graph Laplacian as a linear operator, also introduced by [4]. Importantly, this definition allows us to model the Laplacian representation as a neural network and to learn it by minimizing an unconstrained optimization objective, the graph drawing objective (GDO).\n\nA shortcoming of GDO, however, is that arbitrary rotations of the eigenvectors of the Laplacian minimize the graph drawing objective [12]. This is, in general, undesirable since rotating the eigenvectors affect the properties that make them useful as intrinsic rewards (see Appendix C for more details). As a solution, [12] proposed the generalized graph drawing objective (GGDO), which breaks the symmetry of the optimization problem by introducing a sequence of decreasing hyperparameters to GDO. The true eigenvectors are the only solution to this new objective. Despite this, when minimizing this objective with stochastic gradient descent, the rotations of the smallest eigenvectors are still equilibrium points of the generalized objective. Consequently, there is variability in the eigenvectors one actually finds when minimizing such an objective, depending, for example, on the initialization of the network and on the hyperparameters chosen.\n\nThese issues are particularly problematic because it is impossible to tune the hyperparameters of GGDO without already having access to the problem solution: previous results, when sweeping hyperparameters, used the cosine similarity between the true eigenvectors and the approximated solution as a performance metric. To make matters worse, the best hyperparameters are environment dependent, as shown in Figure 1. Thus, when relying on GDO, or GGDO, it is impossible to guarantee an accurate estimate of the eigenvectors of the Laplacian in environments where one does not know these eigenvectors in advance, which obviously defeats the whole purpose. Finally, the existing objectives are unable to approximate the eigenvalues of the Laplacian, and existing heuristics heavily depend on the accuracy of the estimated eigenvectors [5].\n\nIn this work, we introduce a theoretically sound max-min objective and a corresponding optimization procedure for approximating the Laplacian representation that addresses all the aforementioned issues. Our approach naturally recovers both the true eigenvectors and eigenvalues while eliminating the hyperparameter dependence of previous approximations. Our objective, which we call the Augmented Lagrangian Laplacian Objective (ALLO), corresponds to a Lagrangian version of GDO augmented with stop-gradient operators. These operators break the symmetry between the rotations of the Laplacian eigenvectors, turning the eigenvectors and eigenvalues into the unique stable equilibrium point of min-max ALLO under gradient ascent-descent dynamics, independently of the original hyperparameters of GGDO. Besides theoretical guarantees, we empirically demonstrate that our proposed approach is robust across different environments with different topologies and that it is able to accurately recover the eigenvalues of the graph Laplacian as well.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib11",
+      "text": "Mahadevan (2005) Sridhar Mahadevan. Proto-value Functions: Developmental Reinforcement Learning. In International Conference on Machine Learning (ICML) , 2005."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib12",
+      "text": "Mahadevan & Maggioni (2007) Sridhar Mahadevan and Mauro Maggioni. Proto-value Functions: A Laplacian Framework for Learning Representation and Control in Markov Decision Processes. Journal of Machine Learning Research , 8(10):2169–2231, 2007."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib15",
+      "text": "Petrik (2007) Marek Petrik. An Analysis of Laplacian Methods for Value Function Approximation in MDPs. In International Joint Conference on Artificial Intelligence (IJCAI) , 2007."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib23",
+      "text": "Wu et al. (2019) Yifan Wu, George Tucker, and Ofir Nachum. The Laplacian in RL: Learning Representations with Efficient Approximations. In International Conference on Learning Representations (ICLR) , 2019."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib22",
+      "text": "Wang et al. (2023) Kaixin Wang, Kuangqi Zhou, Jiashi Feng, Bryan Hooi, and Xinchao Wang. Reachability-Aware Laplacian Representation in Reinforcement Learning. In International Conference on Machine Learning (ICML) , 2023."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib7",
+      "text": "Lan et al. (2022) Charline Le Lan, Stephen Tu, Adam Oberman, Rishabh Agarwal, and Marc G. Bellemare. On the Generalization of Representations in Reinforcement Learning. In International Conference on Artificial Intelligence and Statistics (AISTATS) , 2022."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib20",
+      "text": "Wang et al. (2022) Han Wang, Archit Sakhadeo, Adam M. White, James Bell, Vincent Liu, Xutong Zhao, Puer Liu, Tadashi Kozuno, Alona Fyshe, and Martha White. No More Pesky Hyperparameters: Offline Hyperparameter Tuning for RL. Transactions on Machine Learning Research , 2022, 2022."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib3",
+      "text": "Farebrother et al. (2023) Jesse Farebrother, Joshua Greaves, Rishabh Agarwal, Charline Le Lan, Ross Goroshin, Pablo Samuel Castro, and Marc G. Bellemare. Proto-Value Networks: Scaling Representation Learning with Auxiliary Tasks. In International Conference on Learning Representations (ICLR) , 2023."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib10",
+      "text": "Machado et al. (2023) Marlos C. Machado, Andre Barreto, Doina Precup, and Michael Bowling. Temporal Abstraction in Reinforcement Learning with the Successor Representation. Journal of Machine Learning Research , 24(80):1–69, 2023."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib19",
+      "text": "Touati et al. (2023) Ahmed Touati, Jérémy Rapin, and Yann Ollivier. Does Zero-Shot Reinforcement Learning Exist? In International Conference on Learning Representations (ICLR) , 2023."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib5",
+      "text": "Klissarov & Machado (2023) Martin Klissarov and Marlos C. Machado. Deep Laplacian-based Options for Temporally-Extended Exploration. In International Conference on Machine Learning (ICML) , 2023."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib21",
+      "text": "Wang et al. (2021) Kaixin Wang, Kuangqi Zhou, Qixin Zhang, Jie Shao, Bryan Hooi, and Jiashi Feng. Towards Better Laplacian Representation in Reinforcement Learning with Generalized Graph Drawing. In International Conference on Machine Learning (ICML) , 2021."
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "source_type": "encyclopedia_article",
+  "source_id": "enwiki:Fuzzing#rev1378511824",
+  "title": "Fuzzing",
+  "authors": "Wikipedia contributors",
+  "year": "2026",
+  "url": "https://en.wikipedia.org/w/index.php?title=Fuzzing&oldid=1378511824",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Types",
+  "word_count": 1154,
+  "text": "A fuzzer can be categorized in several ways:[1,2]\n\nA fuzzer can be generation-based or mutation-based depending on whether inputs are generated from scratch or by modifying existing inputs.\n\nA fuzzer can be dumb (unstructured) or smart (structured) depending on whether it is aware of input structure.\n\nA fuzzer can be white-, grey-, or black-box, depending on whether it is aware of program structure.\n\n### Reuse of existing input seeds\n\nA mutation-based fuzzer leverages an existing corpus of seed inputs during fuzzing. It generates inputs by modifying (or rather mutating) the provided seeds.[3] For example, when fuzzing the image library libpng, the user would provide a set of valid PNG image files as seeds while a mutation-based fuzzer would modify these seeds to produce semi-valid variants of each seed. The corpus of seed files may contain thousands of potentially similar inputs. Automated seed selection (or test suite reduction) allows users to pick the best seeds in order to maximize the total number of bugs found during a fuzz campaign.[4]\n\nA generation-based fuzzer generates inputs from scratch. For instance, a smart generation-based fuzzer[5] takes the input model that was provided by the user to generate new inputs. Unlike mutation-based fuzzers, a generation-based fuzzer does not depend on the existence or quality of a corpus of seed inputs.\n\nSome fuzzers have the capability to do both, to generate inputs from scratch and to generate inputs by mutation of existing seeds.[6]\n\n### Aware of input structure\n\nTypically, fuzzers are used to generate inputs for programs that take structured inputs, such as a file, a sequence of keyboard or mouse events, or a sequence of messages. This structure distinguishes valid input that is accepted and processed by the program from invalid input that is quickly rejected by the program. What constitutes a valid input may be explicitly specified in an input model. Examples of input models are formal grammars, file formats, GUI-models, and network protocols. Even items not normally considered as input can be fuzzed, such as the contents of databases, shared memory, environment variables or the precise interleaving of threads. An effective fuzzer generates semi-valid inputs that are \"valid enough\" so that they are not directly rejected by the parser and \"invalid enough\" so that they might stress corner cases and exercise interesting program behaviours.\n\nA smart (model-based,[6] grammar-based,[5,7] or protocol-based[8]) fuzzer leverages the input model to generate a greater proportion of valid inputs. For instance, if the input can be modelled as an abstract syntax tree, then a smart mutation-based fuzzer[7] would employ random transformations to move complete subtrees from one node to another. If the input can be modelled by a formal grammar, a smart generation-based fuzzer[5] would instantiate the production rules to generate inputs that are valid with respect to the grammar. However, generally the input model must be explicitly provided, which is difficult to do when the model is proprietary, unknown, or very complex. If a large corpus of valid and invalid inputs is available, a grammar induction technique, such as Angluin's L* algorithm, would be able to generate an input model.[9,10]\n\nA dumb fuzzer[11,12] does not require the input model and can thus be employed to fuzz a wider variety of programs. For instance, AFL is a dumb mutation-based fuzzer that modifies a seed file by flipping random bits, by substituting random bytes with \"interesting\" values, and by moving or deleting blocks of data. However, a dumb fuzzer might generate a lower proportion of valid inputs and stress the parser code rather than the main components of a program. The disadvantage of dumb fuzzers can be illustrated by means of the construction of a valid checksum for a cyclic redundancy check (CRC). A CRC is an error-detecting code that ensures that the integrity of the data contained in the input file is preserved during transmission. A checksum is computed over the input data and recorded in the file. When the program processes the received file and the recorded checksum does not match the re-computed checksum, then the file is rejected as invalid. Now, a fuzzer that is unaware of the CRC is unlikely to generate the correct checksum. However, there are attempts to identify and re-compute a potential checksum in the mutated input, once a dumb mutation-based fuzzer has modified the protected data.[13]\n\n### Aware of program structure\n\nTypically, a fuzzer is considered more effective if it achieves a higher degree of code coverage. The rationale is that if a fuzzer does not exercise certain structural elements in the program, then it is also not able to reveal bugs that are hiding in these elements. Some program elements are considered more critical than others. For instance, a division operator might cause a division by zero error, or a system call may crash the program.\n\nA black-box fuzzer[11,7] treats the program as a black box and is unaware of internal program structure. For instance, a random testing tool that generates inputs at random is considered a blackbox fuzzer. Hence, a blackbox fuzzer can execute several hundred inputs per second, can be easily parallelized, and can scale to programs of arbitrary size. However, blackbox fuzzers may only scratch the surface and expose \"shallow\" bugs. Hence, there are attempts to develop blackbox fuzzers that can incrementally learn about the internal structure (and behavior) of a program during fuzzing by observing the program's output given an input. For instance, LearnLib employs active learning to generate an automaton that represents the behavior of a web application.\n\nA white-box fuzzer[12,6] leverages program analysis to systematically increase code coverage or to reach certain critical program locations. For instance, SAGE[14] leverages symbolic execution to systematically explore different paths in the program (a technique known as concolic execution).\n\nIf the program's specification is available, a whitebox fuzzer might leverage techniques from model-based testing to generate inputs and check the program outputs against the program specification.\n\nA whitebox fuzzer can be very effective at exposing bugs that hide deep in the program. However, the time used for analysis (of the program or its specification) can become prohibitive. If the whitebox fuzzer takes relatively too long to generate an input, a blackbox fuzzer will be more efficient.[15] Hence, there are attempts to combine the efficiency of blackbox fuzzers and the effectiveness of whitebox fuzzers.[16]\n\nA gray-box fuzzer leverages instrumentation rather than program analysis to glean information about the program. For instance, AFL and libFuzzer utilize lightweight instrumentation to trace basic block transitions exercised by an input. This leads to a reasonable performance overhead but informs the fuzzer about the increase in code coverage during fuzzing, which makes gray-box fuzzers extremely efficient vulnerability detection tools.[17]\n\nA common form of gray-box fuzzing is coverage-guided fuzzing, where the fuzzer uses coverage information from previous executions to guide the generation of new inputs. Inputs that result in previously unseen behavior can then be retained in the corpus, and mutated further in an attempt to discover additional execution paths.[18]",
+  "references": [
+    {
+      "n": 1,
+      "text": "(2007). Fuzzing: Brute Force Vulnerability Discovery. Addison-Wesley."
+    },
+    {
+      "n": 2,
+      "text": "John Neystadt. (February 2008). Automated Penetration Testing with White-Box Fuzzing. Microsoft. http://msdn.microsoft.com/en-us/library/cc162782.aspx"
+    },
+    {
+      "n": 3,
+      "text": "Offutt, Jeff. (2004). Generating test cases for web services using data perturbation. ACM SIGSOFT Software Engineering Notes. doi:10.1145/1022494.1022529"
+    },
+    {
+      "n": 4,
+      "text": "Rebert, Alexandre. (2014). Optimizing Seed Selection for Fuzzing. Proceedings of the 23rd USENIX Conference on Security Symposium. https://www.usenix.org/system/files/conference/usenixsecurity14/sec14-paper-rebert.pdf"
+    },
+    {
+      "n": 5,
+      "text": "Grammar-based Whitebox Fuzzing. Microsoft Research. http://people.csail.mit.edu/akiezun/pldi-kiezun.pdf"
+    },
+    {
+      "n": 6,
+      "text": "(2016-09-07). Proceedings of the 31st IEEE/ACM International Conference on Automated Software Engineering - ASE 2016. Proceedings of Automated Software Engineering (ASE'16). doi:10.1145/2970276.2970316"
+    },
+    {
+      "n": 7,
+      "text": "Peach Fuzzer. https://www.peachfuzzer.com"
+    },
+    {
+      "n": 8,
+      "text": "SNOOZE: Toward a Stateful NetwOrk prOtocol fuzZEr. Proceedings of the Information Security Conference (ISC'06). http://dl.acm.org/citation.cfm?id=2079962"
+    },
+    {
+      "n": 9,
+      "text": "(June 2017). Synthesizing Program Input Grammars. Proceedings of the ACM SIGPLAN Conference on Programming Language Design and Implementation (PLDI 2017)."
+    },
+    {
+      "n": 10,
+      "text": "VDA Labs - Evolutionary Fuzzing System. http://www.vdalabs.com/tools/efs_gpf.html"
+    },
+    {
+      "n": 11,
+      "text": "(31 January 2018). Fuzzing for Software Security Testing and Quality Assurance, Second Edition. Artech House. https://books.google.com/books?id=tKN5DwAAQBAJ&q=%22I+settled+on+the+term+fuzz%22&pg=PR15"
+    },
+    {
+      "n": 12,
+      "text": "Ganesh, Vijay. (2009). 2009 IEEE 31st International Conference on Software Engineering. doi:10.1109/ICSE.2009.5070546"
+    },
+    {
+      "n": 13,
+      "text": "Wang, T.. (May 2010). 2010 IEEE Symposium on Security and Privacy. doi:10.1109/SP.2010.37"
+    },
+    {
+      "n": 14,
+      "text": "(2008-02-08). Automated Whitebox Fuzz Testing. Proceedings of Network and Distributed Systems Symposium (NDSS'08). http://www.isoc.org/isoc/conferences/ndss/08/papers/10_automated_whitebox_fuzz.pdf"
+    },
+    {
+      "n": 15,
+      "text": "(2015-10-05). A Probabilistic Analysis of the Efficiency of Automated Software Testing. IEEE Transactions on Software Engineering. doi:10.1109/TSE.2015.2487274"
+    },
+    {
+      "n": 16,
+      "text": "(2016-02-24). Driller: Augmenting. Fuzzing Through Selective Symbolic Execution. Proceedings of Network and Distributed Systems Symposium (NDSS'16). https://www.internetsociety.org/sites/default/files/blogs-media/driller-augmenting-fuzzing-through-selective-symbolic-execution.pdf"
+    },
+    {
+      "n": 17,
+      "text": "(2016-10-28). Proceedings of the 2016 ACM SIGSAC Conference on Computer and Communications Security. Proceedings of the ACM Conference on Computer and Communications Security (CCS'16). doi:10.1145/2976749.2978428"
+    },
+    {
+      "n": 18,
+      "text": "libFuzzer – a library for coverage-guided fuzz testing. LLVM. https://llvm.org/docs/LibFuzzer.html"
+    }
+  ]
+}

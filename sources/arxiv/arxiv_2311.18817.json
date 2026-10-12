@@ -1,0 +1,89 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2311.18817",
+  "title": "Dichotomy of Early and Late Phase Implicit Biases Can Provably Induce Grokking",
+  "authors": "Kaifeng Lyu, Jikai Jin, Zhiyuan Li, Simon S. Du, Jason D. Lee, Wei Hu",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.AI"
+  ],
+  "url": "https://arxiv.org/abs/2311.18817",
+  "html_url": "https://arxiv.org/html/2311.18817",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 792,
+  "text": "The generalization behavior of modern over-parameterized neural nets has been puzzling: these nets have the capacity to overfit the training set, and yet they frequently exhibit a small gap between training and test performance when trained by popular gradient-based optimizers. A common view now is that the network architectures and training pipelines can automatically induce regularization effects to avoid or mitigate overfitting throughout the training trajectory.\n\nRecently, [1] discovered an even more perplexing generalization phenomenon called grokking: when training a neural net to learn modular arithmetic operations, it first “memorizes” the training set with zero training error and near-random test error, and then training for much longer leads to a sharp transition from no generalization to perfect generalization. See Section 2 for our reproduction of this phenomenon. Beyond modular arithmetic, grokking has been reported in learning group operations [2], learning sparse parity [3,4], learning greatest common divisor [5], and image classification [6,7].\n\nDifferent viewpoints on the mechanism of grokking have been proposed, including the slingshot mechanism (cyclic phase transitions) [8], random walk among minimizers [9], slow formulation of good representations [10], the scale of initialization [6], and the simplicity of the generalizable solution [11,12]. However, existing studies failed to address two crucial aspects for gaining a comprehensive understanding of grokking:\n\n- 1. No prior work has rigorously proved grokking in a neural network setting.\n\n- 2. No prior work has provided a quantitative explanation as to why the transition from memorization to generalization is often sharp, instead of gradual.\n\nIn this work, we address these limitations by identifying simple yet insightful theoretical setups where grokking with sharp transition can be rigorously proved and its mechanism can be intuitively understood. Our main intuition is that optimizers may implicitly induce different biases in early and late phases; grokking happens if the early phase bias implies an overfitting solution and late phase bias implies a generalizable solution.\n\nMore specifically, we focus on neural nets with large initialization and small weight decay. This is inspired by a recent work [6] showing that training with these two tricks can induce grokking on many tasks, even beyond learning modular arithmetic. Our theoretical analysis attributes this to the following dichotomy of early and late phase implicit biases: the large initialization induces a very strong early phase implicit bias towards kernel predictors, but over time, it decays and competes with a late phase implicit bias towards min-norm/max-margin predictors induced by the small weight decay, resulting in a transition that turns out to be provably sharp in between.\n\nThis implicit bias result holds for homogeneous neural nets, a broad class of neural nets that include commonly used MLPs and CNNs with homogeneous activation. We further exemplify this dichotomy in sparse linear classification with diagonal linear nets and low-rank matrix completion with over-parameterized models, where we provide theory and experiments showing that the kernel predictor does not generalize well but the min-norm/max-margin predictors do, hence grokking happens (see Figures 1 and 3).\n\nBased on these theoretical insights, we are able to construct examples where the early phase implicit bias leads to a generalizable solution, and the late phase bias leads to overfitting. This gives rise to a new phenomenon which we call “ misgrokking ”: a neural net first achieves perfect training and test accuracies, but training for a longer time leads to a sudden big drop in test accuracy. See Figure 1.\n\nOur proof of the kernel regime in the early phase is related to the Neural Tangent Kernel (NTK) regime studied in the literature [13,14]. However, our result is qualitatively different from existing NTK analyses in that in our setting, the weight norm changes significantly (due to weight decay), while in the usual NTK regime, the weight changes only by a small amount, and so does its norm. Our proof relies on a careful analysis of the norm and direction of the weight, which enables us to obtain a tight bound on the time spent in the kernel regime. This novel result of a kernel regime in homogeneous neural nets under weight decay may be of independent interest. We further analyze the late phase using a gradient convergence argument, and it turns out that a slightly longer time suffices for convergence to the max-margin/min-norm predictor, thus exhibiting a sharp transition between the two phases.\n\nConcretely, our contributions can be summarized as follows:\n\n- 1. For training homogeneous neural nets with large initialization and small weight decay on classification and regression tasks, we prove a very sharp transition from optimal solutions of kernel SVM/regression to KKT solutions of global max-margin/min-norm problems associated with the neural net.\n\n- 2. For classification and regression tasks respectively, we provide concrete examples with diagonal linear nets and overparameterized matrix completion, showing either grokking or misgrokking.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib55",
+      "text": "Power et al. [2022] Alethea Power, Yuri Burda, Harri Edwards, Igor Babuschkin, and Vedant Misra. Grokking: Generalization beyond overfitting on small algorithmic datasets. arXiv preprint arXiv:2201.02177 , 2022."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib14",
+      "text": "Chughtai et al. [2023] Bilal Chughtai, Lawrence Chan, and Neel Nanda. A toy model of universality: Reverse engineering how networks learn group operations. In Andreas Krause, Emma Brunskill, Kyunghyun Cho, Barbara Engelhardt, Sivan Sabato, and Jonathan Scarlett, editors, Proceedings of the 40th International Conference on Machine Learning , volume 202 of Proceedings of Machine Learning Research , pages 6243–6267. PMLR, 23–29 Jul 2023. URL https://proceedings.mlr.press/v202/chughtai23a.html ."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib6",
+      "text": "Barak et al. [2022] Boaz Barak, Benjamin Edelman, Surbhi Goel, Sham Kakade, Eran Malach, and Cyril Zhang. Hidden progress in deep learning: SGD learns parities near the computational limit. In S. Koyejo, S. Mohamed, A. Agarwal, D. Belgrave, K. Cho, and A. Oh, editors, Advances in Neural Information Processing Systems , volume 35, pages 21750–21764. Curran Associates, Inc., 2022. URL https://proceedings.neurips.cc/paper_files/paper/2022/file/884baf65392170763b27c914087bde01-Paper-Conference.pdf ."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib7",
+      "text": "Bhattamishra et al. [2023] Satwik Bhattamishra, Arkil Patel, Varun Kanade, and Phil Blunsom. Simplicity bias in transformers and their ability to learn sparse boolean functions. In Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) , pages 5767–5791, 2023."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib11",
+      "text": "Charton [2024] Francois Charton. Learning the greatest common divisor: explaining transformer predictions. In The Twelfth International Conference on Learning Representations , 2024. URL https://openreview.net/forum?id=cmcD05NPKa ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib43",
+      "text": "Liu et al. [2023] Ziming Liu, Eric J Michaud, and Max Tegmark. Omnigrok: Grokking beyond algorithmic data. In The Eleventh International Conference on Learning Representations , 2023. URL https://openreview.net/forum?id=zDiHoIWa0q1 ."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib56",
+      "text": "Radhakrishnan et al. [2022] Adityanarayanan Radhakrishnan, Daniel Beaglehole, Parthe Pandit, and Mikhail Belkin. Mechanism of feature learning in deep fully connected networks and kernel machines that recursively learn features. arXiv preprint arXiv:2212.13881 , 2022."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib60",
+      "text": "Thilak et al. [2022] Vimal Thilak, Etai Littwin, Shuangfei Zhai, Omid Saremi, Roni Paiss, and Joshua Susskind. The slingshot mechanism: An empirical study of adaptive optimizers and the grokking phenomenon. arXiv preprint arXiv:2206.04817 , 2022."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib47",
+      "text": "Millidge [2022] Beren Millidge. Grokking. 2022. URL https://www.beren.io/2022-01-11-Grokking-Grokking/ ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib42",
+      "text": "Liu et al. [2022] Ziming Liu, Ouail Kitouni, Niklas S Nolte, Eric Michaud, Max Tegmark, and Mike Williams. Towards understanding grokking: An effective theory of representation learning. In S. Koyejo, S. Mohamed, A. Agarwal, D. Belgrave, K. Cho, and A. Oh, editors, Advances in Neural Information Processing Systems , volume 35, pages 34651–34663. Curran Associates, Inc., 2022. URL https://proceedings.neurips.cc/paper_files/paper/2022/file/dfc310e81992d2e4cedc09ac47eff13e-Paper-Conference.pdf ."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib53",
+      "text": "Nanda et al. [2023] Neel Nanda, Lawrence Chan, Tom Lieberum, Jess Smith, and Jacob Steinhardt. Progress measures for grokking via mechanistic interpretability. In The Eleventh International Conference on Learning Representations , 2023. URL https://openreview.net/forum?id=9XFSbDPmdW ."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib61",
+      "text": "Varma et al. [2023] Vikrant Varma, Rohin Shah, Zachary Kenton, János Kramár, and Ramana Kumar. Explaining grokking through circuit efficiency. arXiv preprint arXiv:2309.02390 , 2023."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib32",
+      "text": "Jacot et al. [2018] Arthur Jacot, Franck Gabriel, and Clement Hongler. Neural tangent kernel: Convergence and generalization in neural networks. In S. Bengio, H. Wallach, H. Larochelle, K. Grauman, N. Cesa-Bianchi, and R. Garnett, editors, Advances in Neural Information Processing Systems , volume 31. Curran Associates, Inc., 2018. URL https://proceedings.neurips.cc/paper_files/paper/2018/file/5a4be1fa34e62bb8a6ec6b91d2462f5a-Paper.pdf ."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib13",
+      "text": "Chizat et al. [2019] Lénaïc Chizat, Edouard Oyallon, and Francis Bach. On lazy training in differentiable programming. In H. Wallach, H. Larochelle, A. Beygelzimer, F. d'Alché-Buc, E. Fox, and R. Garnett, editors, Advances in Neural Information Processing Systems , volume 32. Curran Associates, Inc., 2019. URL https://proceedings.neurips.cc/paper_files/paper/2019/file/ae614c557843b1df326cb29c57225459-Paper.pdf ."
+    }
+  ]
+}

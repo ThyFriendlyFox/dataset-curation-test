@@ -1,0 +1,38 @@
+{
+  "source_type": "encyclopedia_article",
+  "source_id": "enwiki:Estimation of distribution algorithm#rev1378530991",
+  "title": "Estimation of distribution algorithm",
+  "authors": "Wikipedia contributors",
+  "year": "2026",
+  "url": "https://en.wikipedia.org/w/index.php?title=Estimation_of_distribution_algorithm&oldid=1378530991",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Multivariate factorizations",
+  "word_count": 837,
+  "text": "The next stage of EDAs development was the use of multivariate factorizations. In this case, the joint probability distribution is usually factorized in a number of components of limited size |\\pi_i| \\leq K,~\\forall i\\in 1,2,\\dots,N .\n\np(X_1,\\dots,X_N) = \\prod_{i=1}^{N} p(X_i|\\pi_i)\n\nThe learning of PGMs encoding multivariate distributions is a computationally expensive task, therefore, it is usual for EDAs to estimate multivariate statistics from bivariate statistics. Such relaxation allows PGM to be built in polynomial time in N ; however, it also limits the generality of such EDAs.\n\n### Extended compact genetic algorithm (eCGA)\n\nThe ECGA[1] was one of the first EDA to employ multivariate factorizations, in which high-order dependencies among decision variables can be modeled. Its approach factorizes the joint probability distribution in the product of multivariate marginal distributions. Assume T_\\text{eCGA}=\\{\\tau_1,\\dots,\\tau_\\Psi\\} is a set of subsets, in which every \\tau\\in T_\\text{eCGA} is a linkage set, containing |\\tau|\\leq K variables. The factorized joint probability distribution is represented as follows\n\np(X_1,\\dots,X_N) = \\prod_{\\tau\\in T_\\text{eCGA}} p(\\tau).\n\nThe ECGA popularized the term \"linkage-learning\" as denoting procedures that identify linkage sets. Its linkage-learning procedure relies on two measures: (1) the Model Complexity (MC) and (2) the Compressed Population Complexity (CPC). The MC quantifies the model representation size in terms of number of bits required to store all the marginal probabilities\n\nMC = \\log_2 (\\lambda+1) \\sum_{\\tau\\in T_\\text{eCGA}} (2^{|\\tau|-1}),\n\nThe CPC, on the other hand, quantifies the data compression in terms of entropy of the marginal distribution over all partitions, where \\lambda is the selected population size, |\\tau| is the number of decision variables in the linkage set \\tau and H(\\tau) is the joint entropy of the variables in \\tau\n\nCPC = \\lambda \\sum_{\\tau\\in T_\\text{eCGA}} H(\\tau).\n\nThe linkage-learning in ECGA works as follows: (1) Insert each variable in a cluster, (2) compute CCC = MC + CPC of the current linkage sets, (3) verify the increase on CCC provided by joining pairs of clusters, (4) effectively joins those clusters with highest CCC improvement. This procedure is repeated until no CCC improvements are possible and produces a linkage model T_\\text{eCGA} . The ECGA works with concrete populations, therefore, using the factorized distribution modeled by ECGA, it can be described as\n\nP(t+1) = \\beta_\\mu \\circ \\alpha_\\text{eCGA} \\circ S(P(t))\n\n### Bayesian optimization algorithm (BOA)\n\nThe BOA[2,3,4] uses Bayesian networks to model and sample promising solutions. Bayesian networks are directed acyclic graphs, with nodes representing variables and edges representing conditional probabilities between pair of variables. The value of a variable x_i can be conditioned on a maximum of K other variables, defined in \\pi_i . BOA builds a PGM encoding a factorized joint distribution, in which the parameters of the network, i.e. the conditional probabilities, are estimated from the selected population using the maximum likelihood estimator.\n\np(X_1,X_2,\\dots,X_N)=\\prod_{i=1}^{N}p(X_i|\\pi_{i}).\n\nThe Bayesian network structure, on the other hand, must be built iteratively (linkage-learning). It starts with a network without edges and, at each step, adds the edge which better improves some scoring metric (e.g. Bayesian information criterion (BIC) or Bayesian-Dirichlet metric with likelihood equivalence (BDe)).[5] The scoring metric evaluates the network structure according to its accuracy in modeling the selected population. From the built network, BOA samples new promising solutions as follows: (1) it computes the ancestral ordering for each variable, each node being preceded by its parents; (2) each variable is sampled conditionally to its parents. Given such scenario, every BOA step can be defined as\n\nP(t+1) = \\beta_\\mu \\circ \\alpha_\\text{BOA} \\circ S(P(t))\n\n### Linkage-tree Genetic Algorithm (LTGA)\n\nThe LTGA[6] differs from most EDA in the sense it does not explicitly model a probability distribution but only a linkage model, called linkage-tree. A linkage T is a set of linkage sets with no probability distribution associated, therefore, there is no way to sample new solutions directly from T . The linkage model is a linkage-tree produced stored as a Family of sets (FOS).\n\nT_\\text{LT} = \\{ \\{x_1\\}, \\{x_2\\},\\{x_3\\},\\{x_4\\},\\{x_1,x_2\\},\\{x_3,x_4\\} \\}.\n\nThe linkage-tree learning procedure is a hierarchical clustering algorithm, which work as follows. At each step the two closest clusters i and j are merged, this procedure repeats until only one cluster remains, each subtree is stored as a subset \\tau\\in T_\\text{LT} .\n\nThe LTGA uses T_\\text{LT} to guide an \"optimal mixing\" procedure which resembles a recombination operator but only accepts improving moves. We denote it as R_\\text{LTGA} , where the notation x[\\tau]\\gets y[\\tau] indicates the transfer of the genetic material indexed by \\tau from y to x .\n\nInput: A family of subsets T_\\text{LT} and a population P(t)\n\nOutput: A population P(t+1) .\n\nfor each x_i in P(t) do\n\nfor each \\tau in T_\\text{LT} do\n\nchoose a random x_j\\in P(t) : x_i\\neq x_j\n\nf_{x_i} := f(x_i)\n\nx_i[\\tau] := x_j[\\tau]\n\nif f(x_i) \\leq f_{x_i} then\n\nx_i[\\tau]:= x_j[\\tau]\n\nreturn P(t)\n\nThe LTGA does not implement typical selection operators, instead, selection is performed during recombination. Similar ideas have been usually applied into local-search heuristics and, in this sense, the LTGA can be seen as an hybrid method. In summary, one step of the LTGA is defined as\n\nP(t+1) = R_{\\text{LTGA}}(P(t)) \\circ \\alpha_\\text{LTGA} (P(t))",
+  "references": [
+    {
+      "n": 1,
+      "text": "Harik, Georges Raif. (1997). Learning Gene Linkage to Efficiently Solve Problems of Bounded Difficulty Using Genetic Algorithms. University of Michigan. http://dl.acm.org/citation.cfm?id=269517"
+    },
+    {
+      "n": 2,
+      "text": "Pelikan, Martin. (1 January 1999). BOA: The Bayesian Optimization Algorithm. Morgan Kaufmann."
+    },
+    {
+      "n": 3,
+      "text": "Pelikan, Martin. (2005). Hierarchical Bayesian optimization algorithm: toward a new generation of evolutionary algorithms. Springer."
+    },
+    {
+      "n": 4,
+      "text": "Wolpert, David H.. (1 January 2013). Using Machine Learning to Improve Stochastic Optimization. Proceedings of the 17th AAAI Conference on Late-Breaking Developments in the Field of Artificial Intelligence. http://dl.acm.org/citation.cfm?id=2908286.2908335"
+    },
+    {
+      "n": 5,
+      "text": "Larrañaga, Pedro. (21 August 2012). A review on probabilistic graphical models in evolutionary computation. Journal of Heuristics. doi:10.1007/s10732-012-9208-4"
+    },
+    {
+      "n": 6,
+      "text": "Thierens, Dirk. (11 September 2010). Parallel Problem Solving from Nature, PPSN XI. doi:10.1007/978-3-642-15844-5_27"
+    }
+  ]
+}

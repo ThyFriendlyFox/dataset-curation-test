@@ -1,0 +1,53 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2402.13043",
+  "title": "Effective and Efficient Conversation Retrieval for Dialogue State Tracking with Implicit Text Summaries",
+  "authors": "Seanie Lee, Jianpeng Cheng, Joris Driesen, Alexandru Coca, Anders Johannsen",
+  "year": "2024",
+  "categories": [
+    "cs.CL"
+  ],
+  "url": "https://arxiv.org/abs/2402.13043",
+  "html_url": "https://arxiv.org/html/2402.13043",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 709,
+  "text": "Dialogue state tracking (DST) is one of the most crucial components in task-oriented dialogue systems. The goal of DST is to track users’ intents, slots and values at every turn of a dialogue based on a predefined schema [1]. The challenge of training a supervised DST model lies in the cost of dialogue state annotations, which is not scalable to new schemas, domains or annotation languages. To address these challenges, recent works [2,3] adopt in-context learning with pre-trained large language models (LLM) for few-shot DST. In the few-shot setting, similar dialogue exemplars are retrieved based on the test sample and then these exemplars are added to the LLM prompt for target generation. This approach is attractive since no domain-specific fine-tuning is required for the LLM but it can still generalize to unseen domains.\n\nOne challenge in few-shot DST is how to retrieve salient conversation exemplars (e.g., in a set of 3 to 5) from the support set, which serves as demonstrations for the LLM. Ideally, a retrieved exemplar should carry both the same dialogue history and state change as the test sample. However, in a practical few-shot setting (e.g., with at most 100 annotated support examples), it is likely that no exemplar in the support set satisfies the above requirement. Consider a test example with two user turns:\n\nIt is possible that the closest exemplar we can get from the support set is:\n\nwhich neither matches the test dialogue state nor the state change. Nevertheless, we hope that LLM can generalize by learning from such exemplars with an identical user intent. The retrieval task gets harder when the conversation becomes lengthy with only partial history related to the current user input. For example, in another test dialog:\n\nthe user’s current intent is identical to the earlier test sample, but it involves unrelated history. Still we want to match the test sample to a similar exemplar, which reflects the user’s intent up to the current point of conversation. This retrieval cannot be easily accomplished with pre-trained dense retrieval models based on word or sentence similarity. To optimize retrieval performance, previous works [2,3] fine-tune a dense retriever with “structurally similar” dialogue examples identified from dialogue state annotations with heuristics. [2] additionally report that including dialogue state information in the retrieval key is helpful. However, the approach is not scalable to a practical few-shot setting (with fewer than 100 annotated support examples), as fine-tuning easily leads to overfitting and catastrophic forgetting [4,5]. It is also impractical to expect every domain owner to create their own fine-tuning data with well-engineered rules.\n\nIn this work, we propose a new solution for conversation retrieval starting with the introduction of a LLM-based conversation summarizer. For each exemplar to be indexed and also each test dialog, the summarizer produces a text summarizing what the user wants at this point of the conversation. In Section 2, we provide a discussion of this specific summarization choice and how it compares to dialogue state. The summaries are then used as condensed search keys and queries applicable to pre-trained dense retrievers with standard nearest neighbor search. We empirically show that in the few-shot setting, using summaries as retrieval keys and queries is more effective than using raw dialogues.\n\nNotably the conversation summarization task described above can be easily handled by state-of-the-art LLMs via prompt learning, as we will show in an ablation study. However, the deployment of such a retrieval system also introduces extra model parameters and inference cost. Unlike search keys, which can be pre-built offline, a search query needs to be auto-regressively decoded for each test dialogue right during inference. To improve the efficiency of this conversation retriever, our second contribution in this work focuses on distilling a light-weight conversation encoder which embeds a raw dialogue directly into a vector space similar to the embedding of its summary. The light-weight conversation encoder enables efficient conversation search over a vector database without explicit query generation. When evaluated on the MultiWOZ dataset with GPT-Neo-2.7B [6], LLaMA-7B, and LLaMA-30B [7] for few-shot DST, we find that the distilled conversation encoder is not only more efficient, but also more effective than a cascaded conversation retriever with explicit query generation. Our approach also significantly outperforms relevant baselines, which use annotated dialogues for retriever fine-tuning.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib2",
+      "text": "Budzianowski et al. (2018) Paweł Budzianowski, Tsung-Hsien Wen, Bo-Hsiang Tseng, Iñigo Casanueva, Stefan Ultes, Osman Ramadan, and Milica Gasic. 2018. MultiWOZ-A large-scale multi-domain wizard-of-oz dataset for task-oriented dialogue modelling. In Proceedings of the 2018 Conference on Empirical Methods in Natural Language Processing , pages 5016–5026."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib16",
+      "text": "Hu et al. (2022) Yushi Hu, Chia-Hsuan Lee, Tianbao Xie, Tao Yu, Noah A Smith, and Mari Ostendorf. 2022. In-context learning for few-shot dialogue state tracking. In Findings of the Association for Computational Linguistics: EMNLP 2022 , pages 2627–2643."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib4",
+      "text": "Chen et al. (2023) Derek Chen, Kun Qian, and Zhou Yu. 2023. Stabilized in-context learning with pre-trained language models for few shot dialogue state tracking. In Findings of the Association for Computational Linguistics: EACL 2023 , pages 1506–1519."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib31",
+      "text": "McCloskey and Cohen (1989) Michael McCloskey and Neal J Cohen. 1989. Catastrophic interference in connectionist networks: The sequential learning problem. In Psychology of learning and motivation , volume 24, pages 109–165. Elsevier."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib24",
+      "text": "Lee et al. (2022) Seanie Lee, Hae Beom Lee, Juho Lee, and Sung Ju Hwang. 2022. Sequential reptile: Inter-task gradient alignment for multilingual learning. In International Conference on Learning Representations ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib1",
+      "text": "Black et al. (2022) Sidney Black, Stella Biderman, Eric Hallahan, Quentin Anthony, Leo Gao, Laurence Golding, Horace He, Connor Leahy, Kyle McDonell, Jason Phang, et al. 2022. GPT-NeoX-20B: An open-source autoregressive language model. In Proceedings of BigScience Episode# 5–Workshop on Challenges & Perspectives in Creating Large Language Models , pages 95–136."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib45",
+      "text": "Touvron et al. (2023) Hugo Touvron, Thibaut Lavril, Gautier Izacard, Xavier Martinet, Marie-Anne Lachaux, Timothée Lacroix, Baptiste Rozière, Naman Goyal, Eric Hambro, Faisal Azhar, et al. 2023. LLaMA: Open and efficient foundation language models. arXiv preprint arXiv:2302.13971 ."
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2404.02258",
+  "title": "Mixture-of-Depths: Dynamically allocating compute in transformer-based language models",
+  "authors": "David Raposo, Sam Ritter, Blake Richards, Timothy Lillicrap, Peter Conway Humphreys, Adam Santoro",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.CL"
+  ],
+  "url": "https://arxiv.org/abs/2404.02258",
+  "html_url": "https://arxiv.org/html/2404.02258",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 527,
+  "text": "Not all problems require the same amount of time or effort to solve. Analogously, in language modeling not all tokens and sequences require the same time or effort to accurately make a prediction. And yet, transformer models expend the same amount of compute per token in a forward pass. Ideally, transformers would use smaller total compute budgets by not spending compute unnecessarily.\n\nConditional computation is a technique that tries to reduce total compute by expending it only when needed [1,2,3]. Various algorithms offer solutions to when and how much compute should be used [4,5,6]. However, general formulations of this challenging problem may not work well with existing hardware constraints since they tend to introduce dynamic computation graphs [7,8]. The most promising conditional computation methods may instead be those that are harmonious with our current hardware stack, which prioritizes static computation graphs, and known tensor sizes that are selected to maximize hardware utilization.\n\nHere we consider the problem of language modeling using a static compute budget that can be made less than that used by a vanilla transformer. The network must learn how to dynamically allocate the available compute by making decisions per-token, in each layer, about where to spend compute from the available budget. In our implementation total compute is user defined and unchanging prior to training, rather than being a function of the network’s on-the-fly decisions. Thus, hardware efficiency gains—such as reduced memory footprint, or reduced FLOPs per forward pass—can be anticipated and exploited ahead of time. As we will show, these gains can be had without sacrificing overall performance.\n\nWe leverage an approach akin to Mixture of Experts (MoE) transformers, in which dynamic token-level routing decisions are made across the network depth. Departing from MoE, we choose to either apply a computation to a token (as would be the case for a standard transformer), or pass it through a residual connection (remaining unchanged and saving compute). Also in contrast to MoE, we apply this routing to both forward MLPs and multi-head attention. Since this therefore also impacts the keys and queries we process, the routing makes decisions not only about which tokens to update, but also which tokens are made available to attend to. We refer to this strategy as Mixture-of-Depths (MoD) to emphasize how individual tokens pass through different numbers of layers, or blocks, through the depth of the transformer (see figure 1).\n\nThe MoD technique also allows one to trade-off performance with speed. On the one hand, one can train an MoD transformer that improves upon vanilla transformers by as much as 1.5\\% on the final log probability training objective for equivalent training FLOPs (isoFLOP), and while taking an equivalent amount of wall-clock time to train. On the other hand, one can train an MoD transformer that achieves training loss parity with an isoFLOP optimal vanilla transformer, but which uses a fraction of the FLOPs (upwards of 50%) per forward pass, and hence is faster to step. Together, these results imply that MoD transformers learn to route intelligently (i.e., skipping computations that are unnecessary) since they can achieve equal or better log probabilities per sequence despite a smaller FLOP footprint per forward pass.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib4",
+      "text": "Bengio (2013) Y. Bengio. Deep learning of representations: Looking forward, 2013."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib5",
+      "text": "Bengio et al. (2013) Y. Bengio, N. Léonard, and A. Courville. Estimating or propagating gradients through stochastic neurons for conditional computation, 2013."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "Bengio et al. (2016) E. Bengio, P.-L. Bacon, J. Pineau, and D. Precup. Conditional computation in neural networks for faster models, 2016."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib1",
+      "text": "Ainslie et al. (2023) J. Ainslie, T. Lei, M. de Jong, S. Ontañón, S. Brahma, Y. Zemlyanskiy, D. Uthus, M. Guo, J. Lee-Thorp, Y. Tay, Y.-H. Sung, and S. Sanghai. Colt5: Faster long-range transformers with conditional computation, 2023."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib10",
+      "text": "Fedus et al. (2022) W. Fedus, B. Zoph, and N. Shazeer. Switch transformers: Scaling to trillion parameter models with simple and efficient sparsity, 2022."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib2",
+      "text": "Bapna et al. (2020) A. Bapna, N. Arivazhagan, and O. Firat. Controlling computation versus quality for neural sequence models. CoRR , abs/2002.07106, 2020. URL https://arxiv.org/abs/2002.07106 ."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib11",
+      "text": "Graves (2016) A. Graves. Adaptive computation time for recurrent neural networks. CoRR , abs/1603.08983, 2016. URL http://arxiv.org/abs/1603.08983 ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "Dehghani et al. (2018) M. Dehghani, S. Gouws, O. Vinyals, J. Uszkoreit, and Ł. Kaiser. Universal transformers. arXiv preprint arXiv:1807.03819 , 2018."
+    }
+  ]
+}

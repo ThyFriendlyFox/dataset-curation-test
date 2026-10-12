@@ -1,0 +1,110 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2404.01409",
+  "title": "OVFoodSeg: Elevating Open-Vocabulary Food Image Segmentation via Image-Informed Textual Representation",
+  "authors": "Xiongwei Wu, Sicheng Yu, Ee-Peng Lim, Chong-Wah Ngo",
+  "year": "2024",
+  "categories": [
+    "cs.CV",
+    "cs.AI",
+    "cs.MM"
+  ],
+  "url": "https://arxiv.org/abs/2404.01409",
+  "html_url": "https://arxiv.org/html/2404.01409",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 961,
+  "text": "Food computing has garnered significant attention as a research focus due to its widespread application [1,2,3,4]: it integrates computer science with the analysis of food and dietary patterns that have a direct impact on people’s healthy eating habits [5]. At the core of food computing is the task of food image segmentation [6,7,8]. It aims to identify the ingredients in a food image and locate them with pixel-level masks. This task can be easily found in many practical applications, e.g., analysis of caloric and nutritional content of food intake [9,10], hence, making it very important in food computing research.\n\nThe standard food image segmentation follows a pipeline [6] that begins with the annotation of a large image dataset with pixel-wise masks followed by the training of image segmentation models [12,13]. However, the pixel mask annotation of images is not only time consuming but also complex. The complexity is further exacerbated in the domain of food as the ingredients can look very small in food images, and they may interact with one another to form obscuring boundaries. While publicly available annotated image datasets for semantic segmentation exist [8,3], there is only one ingredient-level food segmentation dataset [6] that provides the human annotated masks of 103 ingredient labels across 7,000 images. Even such a small dataset took one year to construct. The set of 103 ingredient labels is also too small to cover all the ingredients that are used in today’s food. To tackle the limited ingredient coverage among annotated food image datasets, we propose to address food image segmentation in the open-vocabulary setting. Under this setting, our goal is to learn a segmentation model that adapts to novel ingredients which are not found in the training data without compromising much accuracy performance.\n\nVision-language models (VLMs) which aligns both vision and language modalities demonstrate remarkable capabilities as a feature extractor in zero-shot classification [14] and open-vocabulary detection tasks [15,16,17]. One such example VLMs is CLIP [14] which learns to encode both image and text embeddings via contrastive loss. For image segmentation, CLIP first generates the text embeddings from the ingredient text describing the food image (top of Figure 1 (a)) and then contrast with the corresponding image representation. While such methods achieve success with general domain images, it fails to produce similar gains due to intra-class variance of food ingredients: the same ingredient with different cooking methods may look very different visually, e.g., the “egg” class shows considerable variations in appearance between boiled egg and scrambled egg (see Figure 1 (b)). The intra-class variance is further exacerbated by unseen classes, where the model lacks prior exposure to these ingredients and the many ways they are prepared and cooked.\n\nTo address the aforementioned challenges, we introduce an Open-Vocabulary Food Segmentation framework, named OVFoodSeg. The framework effectively integrates the capabilities of CLIP with the image-to-text FoodLearner, and replaces CLIP’s original fixed text encoder with the proposed Image-Informed Text Encoder (see bottom of Figure 1 (a)). By harnessing cross-modality capabilities of CLIP, OVFoodSeg effectively transfers knowledge from seen ingredients to novel ingredients. FoodLearner is proposed to mitigate the high intra-class variance for ingredients. Specifically, FoodLearner is a BERT-style text-to-image learner motivated by BLIP2 [18], which is designed to automatically extract visual knowledge from the food images. The extracted visual knowledge is subsequently fed into the Image-Informed Text Encoder, enhancing CLIP’s static text representation with image-specific information. This process enables tailored adjustments to the text embeddings, effectively dealing with ingredient classes that exhibit diverse visual appearances. Figure 1 (b) showcases an example of classifying egg prepared in different ways using both the conventional static text embedding and the proposed image-informed text embedding. In more common scenarios (such as boiled egg), both models yield reliably accurate predictions. However, in more ambiguous cases (like scrambled egg), the performance of the conventional static text embedding is poor, while the image-informed text embedding still achieves impressive results.\n\nThe training process of OVFoodSeg comprises two stages: the FoodLearner Pre-training stage and the Segmentation Learning stage. In the first stage, the FoodLearner module is trained to align visual information with textual representations. This training utilizes a large-scale dataset of food-related image-text pairs, intended to introduce the FoodLearner to a broad range of food items. Following this, the Segmentation Learning stage involves fine-tuning the FoodLearner for the open-vocabulary food image segmentation task using a specialized segmentation dataset. This stage further hones the model’s ability to accurately segment food items in diverse scenarios.\n\nTo validate the effectiveness of OVFoodSeg, we conduct experiments under open-vocabulary setting based on the existing publicly available food image segmentation dataset, FoodSeg103 [6]. We specifically design two open-vocabulary scenarios for the experiments: (i) a random splitting of FoodSeg103, allocating 80% of the ingredient classes as base classes for training and the remaining as novel classes for inference, and (ii) the expansion of FoodSeg103 by introducing 92 new classes to create FoodSeg195, followed by a similar random split. The results of these experiments indicate that our OVFoodSeg outperforms the state-of-the-art open-vocabulary segmentation method, i.e., SAN [11], by 4.9% in mean Intersection over Union (mIoU) on novel classes in FoodSeg103 and by 3.5% in FoodSeg195. Here is a summary of our contributions:\n\n- • We introduced OVFoodSeg, an innovative framework specifically designed for open-vocabulary food image segmentation. Our OVFoodSeg employs a two-stage training and is the first to address the challenge of segmenting food ingredients at an open-vocabulary level.\n\n- • To tackle the issue of large intra-class variance in the visual representation of food ingredients, OVFoodSeg integrates an image-to-text learning module, FoodLearner, along with the Image-Informed Text Encoder. This integration enriches textual representations with visual knowledge derived from food images.\n\n- • OVFoodSeg achieves state-of-the-art performance in two open-vocabulary benchmarks for food image segmentation, demonstrating its effectiveness and advancement over existing methods.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib5",
+      "text": "Tilman David and Clark Michael. Global diets link environmental sustainability and human health. Nature , 2014."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib1",
+      "text": "Rebecca G Boswell, Wendy Sun, Shosuke Suzuki, and Hedy Kober. Training in cognitive strategies reduces eating and improves food choice. PNAS , 2018."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib20",
+      "text": "Austin Meyers, Nick Johnston, Vivek Rathod, Anoop Korattikara, Alex Gorban, Nathan Silberman, Sergio Guadarrama, George Papandreou, Jonathan Huang, and Kevin P Murphy. Im2Calories: towards an automated mobile vision food diary. In ICCV , 2015."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib28",
+      "text": "Quin Thames, Arjun Karpur, Wade Norris, Fangting Xia, Liviu Panait, Tobias Weyand, and Jack Sim. Nutrition5k: Towards automatic nutritional understanding of generic food. In CVPR , 2021."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib21",
+      "text": "Weiqing Min, Shuqiang Jiang, Linhu Liu, Yong Rui, and Ramesh Jain. A survey on food computing. ACM Computing Surveys , 2019."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib31",
+      "text": "Xiongwei Wu, Xin Fu, Ying Liu, Ee-Peng Lim, Steven CH Hoi, and Qianru Sun. A large-scale benchmark for food image segmentation. In ACMMM , 2021."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib24",
+      "text": "Kaimu Okamoto and Keiji Yanai. UEC-FoodPIX Complete: A large-scale food image segmentation dataset. In ICPRW , 2020."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "Takumi Ege and Keiji Yanai. A new large-scale food image segmentation dataset and its application to food calorie estimation based on grains of rice. In MADiMa , 2019."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib22",
+      "text": "Weiqing Min, Zhiling Wang, Yuxin Liu, Mengjiang Luo, Liping Kang, Xiaoming Wei, Xiaolin Wei, and Shuqiang Jiang. Large scale visual food recognition. arXiv preprint arXiv:2103.16107 , 2021."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib23",
+      "text": "Weiqing Min, Chunlin Liu, Leyi Xu, and Shuqiang Jiang. Applications of knowledge graphs for food science and industry. Patterns , 2022."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib34",
+      "text": "Mengde Xu, Zheng Zhang, Fangyun Wei, Han Hu Hu, and Xiang Bai. Side adapter network for open-vocabulary semantic segmentation. In CVPR , 2023."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib35",
+      "text": "Sixiao Zheng, Jiachen Lu, Hengshuang Zhao, Xiatian Zhu, Zekun Luo, Yabiao Wang, Yanwei Fu, Jianfeng Feng, Tao Xiang, Philip HS Torr, et al. Rethinking semantic segmentation from a sequence-to-sequence perspective with transformers. In CVPR , 2021."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib3",
+      "text": "Liang-Chieh Chen, George Papandreou, Iasonas Kokkinos, Kevin Murphy, and Alan L Yuille. Deeplab: Semantic image segmentation with deep convolutional nets, atrous convolution, and fully connected crfs. TPAMI , 2017."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib26",
+      "text": "Alec Radford, Jong Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry, Amanda Askell, Pamela Mishkin, Jack Clark, et al. Learning transferable visual models from natural language supervision. In ICML , 2021."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib10",
+      "text": "Xiuye Gu, Tsung-Yi Lin, Weicheng Kuo, and Yin Cui. Open-vocabulary object detection via vision and language knowledge distillation. In ICLR , 2022."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib15",
+      "text": "Weicheng Kuo, Yin Cui, Xiuye Gu, AJ Piergiovanni, and Anelia Angelova. Open-vocabulary object detection upon frozen vision and language models. In ICLR , 2023."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib7",
+      "text": "Yu Du, Fangyun Wei, Zihe Zhang, Miaojing Shi, Yue Gao, and Guoqi Li. Learning to prompt for open-vocabulary object detection with vision-language model. In CVPR , 2022."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib17",
+      "text": "Junnan Li, Dongxu Li, Silvio Savarese, and Steven Hoi. Blip-2: Bootstrapping language-image pre-training with frozen image encoders and large language models. In ICML , 2023."
+    }
+  ]
+}

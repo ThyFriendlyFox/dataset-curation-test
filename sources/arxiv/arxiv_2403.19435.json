@@ -1,0 +1,83 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.19435",
+  "title": "BAMM: Bidirectional Autoregressive Motion Model",
+  "authors": "Ekkasit Pinyoanuntapong, Muhammad Usama Saleem, Pu Wang, Minwoo Lee, Srijan Das, Chen Chen",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2403.19435",
+  "html_url": "https://arxiv.org/html/2403.19435",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 869,
+  "text": "Text-to-motion generation is a promising interdisciplinary field that uses natural language to generate 3D human movements. This emerging field holds vast potential to transform animation, gaming, filming, and VR/AR/MR domains by enabling easy and intuitive creation of 3D assets through user-friendly textual inputs. However, bridging the semantic gap between textual descriptions and intricate motion sequences presents a significant challenge. To address this challenge, recent efforts have been focusing on two methods: (1) conditional denoising motion model and (2) conditional autoregressive motion model. Both methods can greatly improve motion generation quality by learning the probabilistic distribution of motion sequences, conditioned on the textural descriptors. However, both methods face fundamental limitations.\n\nConditional denoising motion models are trained to restore corrupted motion sequences to their original state, guided by textual prompts. These models operate through two primary mechanisms: diffusion and generative masking. Diffusion models apply structured Gaussian noise to the original motion data for corruption [1,2,3,4], whereas generative masked models [5,6] corrupt motion sequence by substituting selected motion tokens with [MASK] tokens. The denoising process, followed by motion corruption procedure, considers motion tokens from both directions, effectively capturing the intricate dependencies among tokens. This leads to enhanced motion generation quality. Furthermore, these models inherently ease the motion editing tasks. By selectively corrupting and recovering motion tokens in areas needing modifications, they ensure seamless transitions between edited and unedited segments.\n\nWhile denoising motion models excel in generation quality and editability, a significant limitation of these models is their usability because these models depend on prior knowledge of motion length for each text prompt, a requirement that proves impractical in real-world scenarios. Utilizing incorrect motion lengths can result in a significant decline in generation quality. To address this fundamental limitation, conditional motion autoregressive models emerge as a solution, capable of simultaneously predicting the sequence length and content of generated motions. Inspired by large language models like GPT [7], motion autoregressive models sequentially predict one motion token at a time from left to right until the [END] token is predicted, guided by the textual description [8,9,10]. As a result, the generated motions are not only well aligned with the text inputs but also appropriately scaled in duration. However, the sequential token decoding of autoregressive models cannot fully capture the dependencies between the motion tokens, potentially compromising generation quality, and complicating the editing process, because edited parts need to be conditioned on the unedited parts from both directions to ensure overall continuity and coherence.\n\nAs previously highlighted, existing text-driven motion generation models encounter a comprise among usability, quality of generation, and editability. To address this challenge, we propose Bidirectional Autoregressive Motion Model (BAMM), a novel text-to-motion generation framework. It consists of two pivotal components: a motion tokenizer and a conditional masked self-attention transformer. In a two-stage training paradigm, the motion tokenizer performs initial training based on Vector Quantized Variational Autoencoders (VQ-VAE) [11]. This tokenizer encodes the raw motion sequence into discrete motion tokens within the latent space leveraging learned codebooks. In the subsequent phase, motion tokens are randomly masked out. A conditional masked self-attention transformer is then trained to autoregressively predict these masked tokens, adopting the causal attention masking strategy. This strategy is largely departing from the traditional [MASK] token replacement approach in generative masked models. In particular, it does not substitute the input motion tokens with [MASK] tokens. Instead, it adjusts the attention score matrix according to both unidirectional and bidirectional causal masks. The unidirectional causal mask enables adaptive prediction of [END] token based on text prompts, while bidirectional causal mask forces the model to predict the next motion token not only based on past tokens but also conditioned on future unmasked tokens. This facilitates bidirectional autoregressive training for enhanced predictive capabilities.\n\nBy unifying masked and autoregressive prediction during training, BAMM captures rich and bidirectional dependencies among motion tokens, while learning a direct probabilistic mapping from textual inputs to motion outputs with dynamically-adjusted motion sequence length. Leveraging such unique feature, we propose cascaded motion generation during inference, where BAMM first leverages unidirectional autoregressive decoding to implicitly predict motion sequence length and generate coarse-grained motion sequence. Such motion sequence is then refined by masking and regenerating a portion of motion tokens in a bidirectional autoregressive fashion. This feature allows BAMM to achieve high-quality motion generation with high usability. Moreover, BAMM naturally supports zero-shot motion editing without specially being trained for such task. By treating the masked motion tokens as the contents that need editing, BAMM can predict the masked tokens based on the surrounding context and the text description. Our main contributions can be summarized as follows.\n\n- • We introduce the bidirectional autoregressive motion model, which is a novel text-to-motion generation framework. It effectively harnesses the complementary benefits of denoising and autoregressive models, thus simultaneously achieving high-quality motion generation with enhanced usability and innate motion editability, as showcased in Fig. 1 and Table 1.\n\n- • We demonstrate that our model outperforms current state-of-the-art methods qualitatively and quantitatively on two standard text-to-motion generation datasets, HumanML3D [12] and KIT-ML [13].\n\n- • We showcase that our model supports a variety of motion editing tasks in the zero-shot manner without specially training for these tasks, including motion inpainting, outpainting, prefix prediction, suffix completion, and long sequence generation.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib37",
+      "text": "Tevet, G., Raab, S., Gordon, B., Shafir, Y., Cohen-Or, D., Bermano, A.H.: Human motion diffusion model. ArXiv abs/2209.14916 (2022), https://api.semanticscholar.org/CorpusID:252595883"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib46",
+      "text": "Zhang, M., Cai, Z., Pan, L., Hong, F., Guo, X., Yang, L., Liu, Z.: Motiondiffuse: Text-driven human motion generation with diffusion model. ArXiv abs/2208.15001 (2022), https://api.semanticscholar.org/CorpusID:251953565"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib22",
+      "text": "Kim, J., Kim, J., Choi, S.: Flame: Free-form language-based motion synthesis & editing. In: AAAI Conference on Artificial Intelligence (2022), https://api.semanticscholar.org/CorpusID:251979380"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib41",
+      "text": "Wang, Y., Leng, Z., Li, F.W.B., Wu, S.C., Liang, X.: Fg-t2m: Fine-grained text-driven human motion generation via diffusion model. ArXiv abs/2309.06284 (2023), https://api.semanticscholar.org/CorpusID:261697123"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib29",
+      "text": "Pinyoanuntapong, E., Wang, P., Lee, M., Chen, C.: Mmm: Generative masked motion model. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) (2024)"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib14",
+      "text": "Guo, C., Mu, Y., Javed, M.G., Wang, S., Cheng, L.: Momask: Generative masked modeling of 3d human motions (2023)"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib5",
+      "text": "Brown, T.B., Mann, B., Ryder, N., Subbiah, M., Kaplan, J., Dhariwal, P., Neelakantan, A., Shyam, P., Sastry, G., Askell, A., Agarwal, S., Herbert-Voss, A., Krueger, G., Henighan, T.J., Child, R., Ramesh, A., Ziegler, D.M., Wu, J., Winter, C., Hesse, C., Chen, M., Sigler, E., Litwin, M., Gray, S., Chess, B., Clark, J., Berner, C., McCandlish, S., Radford, A., Sutskever, I., Amodei, D.: Language models are few-shot learners. ArXiv abs/2005.14165 (2020), https://api.semanticscholar.org/CorpusID:218971783"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib45",
+      "text": "Zhang, J., Zhang, Y., Cun, X., Huang, S., Zhang, Y., Zhao, H., Lu, H., Shen, X.: Generating human motion from textual descriptions with discrete representations. 2023 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) pp. 14730–14740 (2023), https://api.semanticscholar.org/CorpusID:255942203"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib49",
+      "text": "Zhong, C., Hu, L., Zhang, Z., Xia, S.: Attt2m: Text-driven human motion generation with multi-perspective attention mechanism. ArXiv abs/2309.00796 (2023), https://api.semanticscholar.org/CorpusID:261530775"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib21",
+      "text": "Jiang, B., Chen, X., Liu, W., Yu, J., Yu, G., Chen, T.: Motiongpt: Human motion as a foreign language. ArXiv abs/2306.14795 (2023), https://api.semanticscholar.org/CorpusID:259262201"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib26",
+      "text": "van den Oord, A., Vinyals, O., Kavukcuoglu, K.: Neural discrete representation learning. ArXiv abs/1711.00937 (2017), https://api.semanticscholar.org/CorpusID:20282961"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib16",
+      "text": "Guo, C., Zou, S., Zuo, X., Wang, S., Ji, W., Li, X., Cheng, L.: Generating diverse and natural 3d human motions from text. In: 2022 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR). pp. 5142–5151 (2022). https://doi.org/10.1109/CVPR52688.2022.00509"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib30",
+      "text": "Plappert, M., Mandery, C., Asfour, T.: The KIT motion-language dataset. Big Data 4 (4), 236–252 (dec 2016). https://doi.org/10.1089/big.2016.0028, http://dx.doi.org/10.1089/big.2016.0028"
+    }
+  ]
+}

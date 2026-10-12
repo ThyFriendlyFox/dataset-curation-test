@@ -1,0 +1,198 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2404.00679",
+  "title": "Weak-to-Strong 3D Object Detection with X-Ray Distillation",
+  "authors": "Alexander Gambashidze, Aleksandr Dadukin, Maksim Golyadkin, Maria Razzhivina, Ilya Makarov",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2404.00679",
+  "html_url": "https://arxiv.org/html/2404.00679",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 880,
+  "text": "3D object detection is a fundamental task in the field of computer vision and autonomous systems, playing a key role in the advancement of self-driving technology [1] and contributing significantly to the robotics industry [2,3]. Currently, LiDAR-based 3D object detection [4,5,6] demonstrates superior performance compared to camera-based [7,8,9,10] and radar-based [11,12,13,14] approaches. Furthermore, LiDAR point clouds are the key ingredient of multimodal fusion-based approaches [15,16,17], so LiDAR-based 3D detection continues to be a strong focus of the research community.\n\nThe point cloud-based 3D object detection challenges the following issues: sparsity, occlusions, and the complexity of 3D data annotation. Sparsity: large point clouds are sparse due to the LiDAR sensing process’s inherent characteristics that leads to an imprecise representation of the captured scene. Additionally, there is an imbalance in point density. In particular, the point cloud is sparser in the far range and contains less spatial information affecting feature representation and box prediction. Occlusions: another problem arises from the frequent occurrence of partial occlusion in LiDAR frames. This primarily happens due to the fact that the frames are acquired from a single fixed point of view, making them essentially 2.5D. To detect and accurately locate a highly occluded object, a detector must recognize the hidden shapes of the object even when a significant portion of its parts is missing. Since the absence of certain shapes inevitably affects object perception, this becomes a critical detection challenge. Our previous approaches focused on depth completion [18], depth inpainting [19] or self-supervised depth pretraining [20,21] could not address occlusion problems. Data annotation: finally, data annotation is a formidable challenge in 3D object detection due to the complexity of annotating objects in three-dimensional space. For example, a skilled annotator can spend weeks annotating just one hour of LiDAR data [22,23]. This problem is partially addressed by semi-supervised learning approaches in a teacher-student framework [24,25,26,27]. However, the quality of pseudo labels and the performance of these methods are limited due to the aforementioned sparsity and occlusion problems. Therefore, overcoming these inherent challenges is essential to improve the accuracy and reliability of 3D detection systems.\n\nThe challenges posed by sparsity and occlusion have led to the formulation of several methodologies. Some of them [28] are aimed at improving the computational efficiency of processing sparse data without improving the quality of the predictions. Others, including our work, focus on improving detection performance on sparse occluded data [29,30,31,32]. Li et al. [32] enforce shape constraints to improve object localization with explicit shape priors obtained from a database of CAD models. Najibi et al. [29] and Li et al. [30] do the same by implicitly introducing priors with novel modules pretrained for point cloud completion and SDF approximation. Xu et al. [31] propose a Shape Occupancy Probability estimation module to refine predicted bounding boxes for occluded objects. However, all of these mentioned approaches utilize new modules and adapt the model architecture to take advantage of them. As a result, these methods have limited applicability to new architectures that will emerge as the field evolves.\n\nIn this work, we address all three major challenges in 3D object detection with our novel framework called X-Ray Distillation with Object-Complete Frames that is easily plugged in existing approaches and new architectures. It is designed for universal application to any LiDAR-based detector, improving performance on sparse and occluded objects. Our approach exploits the properties of existing large-scale autonomous driving datasets, which consist of sequences of LiDAR frames. Such property makes it possible to reconstruct complete shapes for occluded objects using other occurrences of these objects in the sequence, ensuring that all objects are equipped with points from all available viewpoints in a scene. We then use this completed data in the Teacher-Student framework for both semi-supervised learning and knowledge distillation in a supervised setting. We train our Teacher on extremely informative Object-Complete frames thus making it a weaker model [33]. Then, we use it to extract features from such simple Object-Complete frames and distills this knowledge to a stronger Student, which operates with the original data, to guide him on how to extract rich features from occluded objects. To generate Object-Complete frames, we leverage ground truth object tracking labels. Since there are no labels for the majority of data in the semi-supervised setting, we propose an Objects Temporal Fusion block to detect, track, and use point cloud registration techniques to construct Object-Complete frames.\n\nWe validate the proposed X-Ray Teacher framework on nuScenes [34] and Waymo Open Dataset [35] 3D object detection benchmarks for SECOND [28], CenterPoint [36], and DSVT [6] models in a supervised learning paradigm. Experiments show a steady improvement by 1-2 mAP with minimal or no impact on time and computational resources during the inference stage. For semi-supervised performance evaluation, we use ONCE [23] benchmark.\n\nApplying these novel ideas for 3D object detection, we provide the following contributions:\n\n- 1. We propose the X-Ray Teacher framework for semi-supervised learning, which achieves state-of-the-art performance on the ONCE benchmark.\n\n- 2. We show that our approach improves the quality of four supervised learning models, including the current state-of-the-art model, and demonstrates the potential to improve the performance of any supervised model trained on sequential data.\n\n- 3. We suggest the Objects Temporal Fusion block to generate Object-Complete frames for data that lacks ground truth tracking labels.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "Mayank Bansal, Alex Krizhevsky, and Abhijit S. Ogale. Chauffeurnet: Learning to drive by imitating the best and synthesizing the worst. arXiv preprint arXiv:1812.03079 , 2018."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib51",
+      "text": "Yuke Zhu, Roozbeh Mottaghi, Eric Kolve, Joseph J. Lim, Abhinav Gupta, Li Fei-Fei, and Ali Farhadi. Target-driven visual navigation in indoor scenes using deep reinforcement learning. In 2017 IEEE International Conference on Robotics and Automation (ICRA) , pages 3357–3364, 2017."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib38",
+      "text": "Haiyang Wang, Wenguan Wang, Xizhou Zhu, Jifeng Dai, and Liwei Wang. Collaborative visual navigation. arXiv preprint arXiv:2107.01151 , 2021."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib6",
+      "text": "Yilun Chen, Zhiding Yu, Yukang Chen, Shiyi Lan, Anima Anandkumar, Jiaya Jia, and Jose M. Alvarez. Focalformer3d: Focusing on hard instance for 3d object detection. In Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV) , pages 8394–8405, October 2023."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib17",
+      "text": "Junho Koh, Junhyung Lee, Youngwoo Lee, Jaekyum Kim, and Jun Won Choi. Mgtanet: Encoding sequential lidar points using long short-term motion-guided temporal attention for 3d object detection. Proceedings of the AAAI Conference on Artificial Intelligence , 37(1):1179–1187, Jun. 2023."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib36",
+      "text": "Haiyang Wang, Chen Shi, Shaoshuai Shi, Meng Lei, Sen Wang, Di He, Bernt Schiele, and Liwei Wang. Dsvt: Dynamic sparse voxel transformer with rotated sets. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 13520–13529, June 2023."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib40",
+      "text": "Xinshuo Weng and Kris Kitani. Monocular 3d object detection with pseudo-lidar point cloud. In Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV) Workshops , Oct 2019."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib19",
+      "text": "Peiliang Li, Xiaozhi Chen, and Shaojie Shen. Stereo r-cnn based 3d object detection for autonomous driving. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , June 2019."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib45",
+      "text": "Lehan Yang and Kele Xu. Cross modality knowledge distillation for multi-modal aerial view object classification. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) Workshops , pages 382–387, June 2021."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib39",
+      "text": "Yan Wang, Bin Yang, Rui Hu, Ming Liang, and Raquel Urtasun. Plumenet: Efficient 3d object detection from stereo images. In 2021 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS) , pages 3383–3390, 2021."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib22",
+      "text": "Bence Major, Daniel Fontijne, Amin Ansari, Ravi Teja Sukhavasi, Radhika Gowaikar, Michael Hamilton, Sean Lee, Slawomir Grzechnik, and Sundar Subramanian. Vehicle detection with automotive radar using deep learning on range-azimuth-doppler tensors. In 2019 IEEE/CVF International Conference on Computer Vision Workshop (ICCVW) , pages 924–932, 2019."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib3",
+      "text": "Daniel Brodeski, Igal Bilik, and Raja Giryes. Deep radar detector. In 2019 IEEE Radar Conference (RadarConf) , pages 1–6, 2019."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib8",
+      "text": "Xu Dong, Pengluo Wang, Pengyue Zhang, and Langechuan Liu. Probabilistic oriented object detection in automotive radar. In 2020 IEEE/CVF Conference on Computer Vision and Pattern Recognition Workshops (CVPRW) , pages 458–467, 2020."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib25",
+      "text": "Michael Meyer, Georg Kuschk, and Sven Tomforde. Graph convolutional networks for 3d object detection on radar data. In 2021 IEEE/CVF International Conference on Computer Vision Workshops (ICCVW) , pages 3053–3062, 2021."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib14",
+      "text": "Haotian Hu, Fanyi Wang, Jingwen Su, Yaonong Wang, Laifeng Hu, Weiye Fang, Jingwei Xu, and Zhiwang Zhang. Ea-lss: Edge-aware lift-splat-shot framework for 3d bev object detection. arXiv preprint arXiv:2303.17895 , 2023."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib21",
+      "text": "Zhijian Liu, Haotian Tang, Alexander Amini, Xinyu Yang, Huizi Mao, Daniela L. Rus, and Song Han. Bevfusion: Multi-task multi-sensor fusion with unified bird’s-eye view representation. In 2023 IEEE International Conference on Robotics and Automation (ICRA) , pages 2774–2781, 2023."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib37",
+      "text": "Haiyang Wang, Hao Tang, Shaoshuai Shi, Aoxue Li, Zhenguo Li, Bernt Schiele, and Liwei Wang. Unitr: A unified and efficient multi-modal transformer for bird’s-eye-view representation. In ICCV , 2023."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib23",
+      "text": "Ilya Makarov, Vladimir Aliev, and Olga Gerasimova. Semi-dense depth interpolation using deep convolutional neural networks. In Proceedings of the 25th ACM International Conference on Multimedia , MM ’17, page 1407–1415, New York, NY, USA, 2017. Association for Computing Machinery."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib30",
+      "text": "Ilia Semenkov, Aleksei Karpov, Andrey V Savchenko, and Ilya Makarov. Inpainting semantic and depth features to improve visual place recognition in the wild. IEEE Access , 2024."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib16",
+      "text": "Aleksei Karpov and Ilya Makarov. Exploring efficiency of vision transformers for self-supervised monocular depth estimation. In 2022 IEEE International Symposium on Mixed and Augmented Reality (ISMAR) , pages 711–719, 2022."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib15",
+      "text": "Ilia Indyk and Ilya Makarov. Monovan: Visual attention for self-supervised monocular depth estimation. In 2023 IEEE International Symposium on Mixed and Augmented Reality (ISMAR) , pages 1211–1220. IEEE, 2023."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib9",
+      "text": "J. Fang, D. Zhou, F. Yan, T. Zhao, F. Zhang, Y. Ma, L. Wang, and R. Yang. Augmented lidar simulator for autonomous driving. In IEEE Robotics and Automation , 2020."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib24",
+      "text": "Jiageng Mao, Minzhe Niu, Chenhan Jiang, Hanxue Liang, Jingheng Chen, Xiaodan Liang, Yamin Li, Chaoqiang Ye, Wei Zhang, Zhenguo Li, et al. One million scenes for autonomous driving: Once dataset. arXiv preprint arXiv:2106.11037 , 2021."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib33",
+      "text": "Antti Tarvainen and Harri Valpola. Mean teachers are better role models: Weight-averaged consistency targets improve semi-supervised deep learning results. In I. Guyon, U. Von Luxburg, S. Bengio, H. Wallach, R. Fergus, S. Vishwanathan, and R. Garnett, editors, Advances in Neural Information Processing Systems , volume 30. Curran Associates, Inc., 2017."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib35",
+      "text": "He Wang, Yezhen Cong, Or Litany, Yue Gao, and Leonidas J. Guibas. 3dioumatch: Leveraging iou prediction for semi-supervised 3d object detection. In CVPR , 2020."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib46",
+      "text": "Junbo Yin, Jin Fang, Dingfu Zhou, Liangjun Zhang, Cheng-Zhong Xu, Jianbing Shen, and Wenguan Wang. Semi-supervised 3d object detection with proficient teachers. In European Conference on Computer Vision , pages 727–743. Springer, 2022."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib48",
+      "text": "Na Zhao, Tat-Seng Chua, and Gim Hee Lee. Sess: Self-ensembling semi-supervised 3d object detection. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 11079–11087, 2020."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib42",
+      "text": "Yan Yan, Yuxing Mao, and Bo Li. Second: Sparsely embedded convolutional detection. Sensors , 18(10):3337, 2018."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib26",
+      "text": "Mahyar Najibi, Guangda Lai, Abhijit Kundu, Zhichao Lu, Vivek Rathod, Thomas Funkhouser, Caroline Pantofaru, David Ross, Larry S. Davis, and Alireza Fathi. Dops: Learning to detect 3d objects and predict their 3d shapes. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , June 2020."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib20",
+      "text": "Ziyu Li, Yuncong Yao, Zhibin Quan, Jin Xie, and Wankou Yang. Spatial information enhancement network for 3d object detection from point cloud. Pattern Recognition , page 108684, 2022."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib41",
+      "text": "Qiangeng Xu, Yiqi Zhong, and Ulrich Neumann. Behind the curtain: Learning occluded shapes for 3d object detection. In Proceedings of the AAAI Conference on Artificial Intelligence , volume 36, pages 2893–2901, 2022."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib18",
+      "text": "Haoang Li, Jinhu Dong, Binghui Wen, Ming Gao, Tianyu Huang, Yun-Hui Liu, and Daniel Cremers. Ddit: Semantic scene completion via deformable deep implicit templates. In Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV) , pages 21894–21904, October 2023."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib4",
+      "text": "Collin Burns et al. Weak-to-strong generalization: Eliciting strong capabilities with weak supervision. arXiv preprint arXiv:2312.09390 , 2023."
+    },
+    {
+      "n": 34,
+      "id": "bib.bib5",
+      "text": "Holger Caesar, Varun Bankiti, Alex H. Lang, Sourabh Vora, Venice Erin Liong, Qiang Xu, Anush Krishnan, Yu Pan, Giancarlo Baldan, and Oscar Beijbom. nuscenes: A multimodal dataset for autonomous driving. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , June 2020."
+    },
+    {
+      "n": 35,
+      "id": "bib.bib32",
+      "text": "Pei Sun, Henrik Kretzschmar, Xerxes Dotiwalla, Aurelien Chouard, Vijaysai Patnaik, Paul Tsui, James Guo, Yin Zhou, Yuning Chai, Benjamin Caine, Vijay Vasudevan, Wei Han, Jiquan Ngiam, Hang Zhao, Aleksei Timofeev, Scott Ettinger, Maxim Krivokon, Amy Gao, Aditya Joshi, Yu Zhang, Jonathon Shlens, Zhifeng Chen, and Dragomir Anguelov. Scalability in perception for autonomous driving: Waymo open dataset. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , June 2020."
+    },
+    {
+      "n": 36,
+      "id": "bib.bib47",
+      "text": "Tianwei Yin, Xingyi Zhou, and Philipp Krahenbuhl. Center-based 3d object detection and tracking. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 11784–11793, 2021."
+    }
+  ]
+}

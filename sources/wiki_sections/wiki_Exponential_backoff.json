@@ -1,0 +1,50 @@
+{
+  "source_type": "encyclopedia_article",
+  "source_id": "enwiki:Exponential backoff#rev1378714044",
+  "title": "Exponential backoff",
+  "authors": "Wikipedia contributors",
+  "year": "2026",
+  "url": "https://en.wikipedia.org/w/index.php?title=Exponential_backoff&oldid=1378714044",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "History and theory",
+  "word_count": 1137,
+  "text": "In a seminal paper published in AFIPS 1970,[1] Norman Abramson presented the idea of multiple users, on different islands, sharing a single radio channel (i.e., a single frequency) to access the main computer at the University of Hawaii. Packet collisions are detected as errors at the receiver of the main computer and are not acknowledged. Each sender not receiving a positive acknowledgement from the main computer would retransmit its lost packet. Abramson assumed that the sequence of packets transmitted into the shared channel is a Poisson process at rate G, which is the sum of the rate S of new packet arrivals to senders and the rate of retransmitted packets into the channel. Assuming steady state, he showed that the channel throughput rate is S = Ge^{-2G} with a maximum value of 1/{2e} \\approx 0.184 .\n\nLarry Roberts considered a time-slotted ALOHA channel with each time slot long enough for a packet transmission time. (A satellite channel using the TDMA protocol is time slotted.) Using the same Poisson process and steady-state assumptions as Abramson, Larry Roberts showed that the theoretical maximum throughput rate is 1/e \\approx 0.368 .[2] Roberts was the program manager of the ARPANET research project. Inspired by the slotted ALOHA idea, Roberts initiated a new ARPANET Satellite System (ASS) project to include satellite links in the ARPANET.\n\nSimulation results by Abramson, his colleagues, and others showed that an ALOHA channel, slotted or not, is unstable and would sometimes go into congestive collapse. The time until collapse depended on the arrival rate of new packets as well as other unknown factors. In 1971, Roberts asked Professor Leonard Kleinrock and his Ph.D. student, Simon Lam, at UCLA to join ASS. Simon Lam would work on the stability, performance evaluation, and adaptive control of slotted ALOHA for his Ph.D. dissertation research. The first paper he co-authored with Kleinrock was ASS Note 12 disseminated to the ASS group in August 1972.[3] In this paper, a slot chosen randomly over an interval of K slots was used for retransmission. A new result from the model was that increasing K increases channel throughput, which converges to 1/e as K increases to infinity. This model retained the assumptions of Poisson arrivals and steady state and was not intended for understanding statistical behaviour and congestive collapse.\n\n### Stability and adaptive backoff\n\nTo understand stability, Lam created a discrete-time Markov chain model for analyzing the statistical behaviour of slotted ALOHA in chapter 5 of his dissertation.[4] The model has three parameters: N, s, and p. N is the total number of users. At any time, each user may be idle or blocked. Each user has at most one packet to transmit in the next time slot. An idle user generates a new packet with probability s and transmits it in the next time slot immediately. A blocked user transmits its backlogged packet with probability p, where 1/p = (K+1)/2 to keep the average retransmission interval the same. The throughput-delay results of the two retransmission methods were compared by extensive simulations and found to be essentially the same.[5]\n\nLam’s model provides mathematically rigorous answers to the stability questions of slotted ALOHA, as well as an efficient algorithm for computing the throughput-delay performance for any stable system. There are 3 key results, shown below, from Lam’s Markov chain model in Chapter 5 of his dissertation (also published jointly with Professor Len Kleinrock, in IEEE Transactions on Communications).[6])\n\nSlotted ALOHA with Poisson arrivals (i.e., infinite N) is inherently unstable, because a stationary probability distribution does not exist. (Reaching steady state was a key assumption used in the models of Abramson and Roberts.)\n\nFor slotted ALOHA with a finite N and a finite K, the Markov chain model can be used to determine whether the system is stable or unstable for a given input rate (N×s) and, if it is stable, compute its average packet delay and channel throughput rate.\n\nIncreasing K increases the maximum number of users that can be accommodated by a stable slotted ALOHA channel.[7]\n\n### Corollary\n\nFor a finite (Ns), an unstable channel for the current K value can be made stable by increasing K to a sufficiently large value, to be referred to as its K(N,s).[8]\n\n### Heuristic control for adaptive backoff\n\nLam used Markov decision theory and developed optimal control policies for slotted ALOHA, but these policies require all blocked users to know the current state (number of blocked users) of the Markov chain. In 1973, Lam decided that instead of using a complex protocol for users to estimate the system state, he would create a simple algorithm for each user to use its own local information, i.e., the number of collisions its backlogged packet has encountered. Applying the above Corollary, Lam invented a class of adaptive backoff algorithms he called (Heuristic RCP).paper[9]\n\nA Heuristic RCP algorithm consists of the following steps: (1) Let m denote the number of previous collisions incurred by a packet at a user as the feedback information in its control loop. For a new packet, K(0) is initialized to 1. (2) The packet’s retransmission interval K(m) increases as m increases (until the channel becomes stable, as implied by the above Corollary). For implementation, with K(0)=1, as m increases, K(m) can be increased by multiplication (or by addition).\n\n### Observation\n\nBinary Exponential Backoff (BEB) used in Ethernet several years later is a special case of Heuristic RCP with K(m) = 2^m .\n\nBEB is very easy to implement. It is, however, not optimal for many applications because BEB uses 2 as the only multiplier, which provides no flexibility for optimization. In particular, for a system with a large number of users, BEB increases K(m) too slowly. On the other hand, for a system with a small number of users, a fairly small K is sufficient for the system to be stable, and backoff would not be necessary.\n\nTo illustrate an example of a multiplicative RCP that uses several multipliers, see the bottom row in Table 6.3 on page 214 in Chapter 6 of Lam’s dissertation, or the bottom row in Table III on page 902 in the Lam-Kleinrock paper. In this example:\n\nA new packet is transmitted immediately, m=0, K(0)=1\n\nFor a packet with 1 previous collision, K(1) = K(0)10 = 10 (The multiplier jumps up directly to K = 10 which was found to be the optimum K value at steady state for this particular system (slotted ALOHA for a satellite channel).\n\nFor a packet with 2 previous collisions, K(2) = K(1)10 = 100 (one more collision, K jumps up 10 times).\n\nK(3) = K(2) × 2 = 200\n\nK(m)=K(m−1) for m≥4\n\nFor this example, K=200 is sufficient for a stable slotted ALOHA system with N equal to about 400, which follows from result 3 above Corollary. There is no need to increase K any further.",
+  "references": [
+    {
+      "n": 1,
+      "text": "Abramson, Norman. (1970). The ALOHA System - Another Alternative for Computer Communications. AFIPS Press. https://www.clear.rice.edu/comp551/papers/Abramson-Aloha.pdf"
+    },
+    {
+      "n": 2,
+      "text": "Roberts, Lawrence G.. (April 1975). ALOHA Packet System With and Without Slots and Capture. ACM SIGCOMM Computer Communication Review. doi:10.1145/1024916.1024920"
+    },
+    {
+      "n": 3,
+      "text": "Kleinrock, Leonard. (August 1972). Analytic Results for the ARPANET Satellite System Model Including the Effects of the Retransmission Delay Distribution. https://www.cs.utexas.edu/users/lam/Vita/Bpapers/ASS_note_12.pdf"
+    },
+    {
+      "n": 4,
+      "text": "Lam, Simon S.. (March 1974). Packet Switching in a Multi-Access Broadcast Channel with Application to Satellite Communication in a Computer Network, Ph.D. dissertation, 306 pages. https://www.cs.utexas.edu/users/lam/Vita/UCLA/"
+    },
+    {
+      "n": 5,
+      "text": "Fig. 5-1 on page 100, Chapter 5, in Lam’s dissertation"
+    },
+    {
+      "n": 6,
+      "text": "Kleinrock, Leonard. (April 1975). Packet-Switching in a Multi-Access Broadcast Channel: Performance Evaluation. IEEE Transactions on Communications. doi:10.1109/TCOM.1975.1092814"
+    },
+    {
+      "n": 7,
+      "text": "Fig. 5-9 on page 114 in Chapter 5 of Lam's dissertation, or Fig. 10 on page 418 in the 1975 Kleinrock-Lam paper."
+    },
+    {
+      "n": 8,
+      "text": "Fig 5-10 on page 116 in Chapter 5 of Lam’s dissertation, or Figure 11 on page 418 in the 1975 Kleinrock-Lam paper."
+    },
+    {
+      "n": 9,
+      "text": "Lam, Simon S.. (September 1975). Packet-Switching in a Multi-Access Broadcast Channel: Dynamic Control Procedures. IEEE Transactions on Communications. doi:10.1109/TCOM.1975.1092917"
+    }
+  ]
+}

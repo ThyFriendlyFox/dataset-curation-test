@@ -1,0 +1,30 @@
+{
+  "source_type": "encyclopedia_article",
+  "source_id": "enwiki:Hazard pointer#rev1374755172",
+  "title": "Hazard pointer",
+  "authors": "Wikipedia contributors",
+  "year": "2026",
+  "url": "https://en.wikipedia.org/w/index.php?title=Hazard_pointer&oldid=1374755172",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Lead",
+  "word_count": 488,
+  "text": "Hazard pointers, in a multithreaded computing environment, are one approach to solving the problems posed by dynamic memory management of the nodes in a lock-free data structure. These problems generally arise only in environments that don't have automatic garbage collection.[1] Although they are a pointer type, they are not smart pointers.\n\nAny lock-free data structure that uses the compare-and-swap primitive must deal with the ABA problem. For example, in a lock-free stack represented as an intrusively linked list, one thread may be attempting to pop an item from the front of the stack (A → B → C). It remembers the second-from-top value B, and then performs . Unfortunately, in the middle of this operation, another thread may have done two pops and then pushed A back on top, resulting in the stack (A → C). The compare-and-swap succeeds in swapping head with B, and the result is that the stack now contains garbage (a pointer to the freed element B).\n\nFurthermore, any lock-free algorithm containing code of the form\n\nsuffers from another major problem, in the absence of automatic garbage collection. In between those two lines, it is possible that another thread may pop the node pointed to by x.head() and deallocate it, meaning that the memory access through current on the second line reads deallocated memory (which may in fact already be in use by some other thread for a completely different purpose).\n\nHazard pointers can be used to address both of these problems. In a hazard-pointer system, each thread keeps a list of hazard pointers indicating which nodes the thread is currently accessing. (In many systems this \"list\" may be probably limited to only one[1,2] or two elements.) Nodes on the hazard pointer list must not be modified or deallocated by any other thread.\n\nWhen a thread wishes to remove a node, it places it on a list of nodes \"to be freed later\", but does not actually deallocate the node's memory until no other thread's hazard list contains the pointer. This manual garbage collection can be done by a dedicated garbage-collection thread (if the list \"to be freed later\" is shared by all the threads); alternatively, cleaning up the \"to be freed\" list can be done by each worker thread as part of an operation such as \"pop\" (in which case each worker thread can be responsible for its own \"to be freed\" list).\n\nIn 2002, Maged Michael of IBM filed an application for a U.S. patent on the hazard pointer technique,[3] but the application was abandoned in 2010.\n\nAlternatives to hazard pointers include reference counting.[1]\n\nHazard pointers were added to C++26 as std::hazard_pointer which is a single-writer multi-reader pointer that can be owned by at most one thread at any point of time, in header <hazard_pointer>, for C++ Standard Library threading support. To be hazard-protectable, a class must extend a class called std::hazard_ptr_obj_base<T, Del> (where the template parameter Del is by default std::default_delete<T>).[4]",
+  "references": [
+    {
+      "n": 1,
+      "text": "Williams, Anthony. (2012). C++ Concurrency in Action: Practical Multithreading. Manning."
+    },
+    {
+      "n": 2,
+      "text": "Alexandrescu, Andrei. (2004). Lock-Free Data Structures with Hazard Pointers. Dr. Dobb's. http://www.drdobbs.com/lock-free-data-structures-with-hazard-po/184401890"
+    },
+    {
+      "n": 3,
+      "text": "Method for efficient implementation of dynamic lock-free data structures with safe memory reclamation."
+    },
+    {
+      "n": 4,
+      "text": "Standard library header <hazard_pointer> (C++26). cppreference. https://en.cppreference.com/w/cpp/header/hazard_pointer.html"
+    }
+  ]
+}

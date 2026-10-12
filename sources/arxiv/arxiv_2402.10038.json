@@ -1,0 +1,106 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2402.10038",
+  "title": "RS-DPO: A Hybrid Rejection Sampling and Direct Preference Optimization Method for Alignment of Large Language Models",
+  "authors": "Saeed Khaki, JinJin Li, Lan Ma, Liu Yang, Prathap Ramachandra",
+  "year": "2024",
+  "categories": [
+    "cs.CL",
+    "cs.AI",
+    "cs.CV",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2402.10038",
+  "html_url": "https://arxiv.org/html/2402.10038",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 718,
+  "text": "State-of-the-art (SOTA) LLMs such as GPT-4 [1], LLaMa [2] etc., are trained with several stages. With pre-training and supervised instruction tuning, LLMs learns to follow specific instructions to complete various tasks with zero-shot or few-shot prompts [3]. To further improve the LLMs’ intelligence as close as to human and ensure a more helpful and harmless model, alignment is important as the last-mile LLM training procedure [4,5,6,7]. Reinforcement learning with human feedback (RLHF) [8] is the most adopted approach for alignment training and it usually involves training a reward model with human preference datasets which optimizes a reward function based on the human-annotated preference. Then LLMs are fine-tuned to learn to maximize the reward of their responses using reinforcement learning algorithms, including proximal policy optimization (PPO) [9], REINFORCE [10], and similar variants. While PPO is used by SOTA LLMs due to its ease of use and good performance, training with PPO has few limitations, including complexity of training multiple LLMs, and sampling from policy model in training loop, high GPU memory requirement with hosting multiple LLMs during training, and sensitivity to training data and reward models.\n\nTo make RLHF training more efficient, there are methods proposed from different perspective. In order to reduce the preference data effort by human annotation, [11] and [12] proposed to train the LLM to align to the LLM’s preference rating in order to save human effort. [13] proposed a combined strategy to merge SFT and reward models as well as in PPO with LoRA selection in order to reduce latency and memory footprint. [14,15] used reward model to select ranked high-reward good samples to supervise fine-tune the models and iteratively repeating this process yield good results. To reduce the memory and save training resources, [16] proposed the direct preference optimization (DPO) to remove the need of training reward model, and directly optimize the policy model using a simple classification to maximize the difference between likelihood of human preference pairs. This method proves equivalent performance by implicitly maximize the reward. However, it is mainly trained on human preference data to learn the alignment, instead of sampling the policy model’s response for optimization. LLaMa2 [2] adopts several rounds of rejection sampling to select the best samples from k model-generated samples for fine-tuning before PPO in order to boost the model performance. But rejection sampling only selects the best samples instead of preference pairs, with low data usage efficiency. RSO [17] proposes to generate preference data from the target optimal policy using rejection sampling, enabling a more accurate estimation of the optimal policy. Compared to RSO, our proposed method (RS-DPO) directly employs a point-wise reward model for response ranking and optimization, utilizing logistic loss exclusively during policy optimization. Unlike RSO’s approach of statistical rejection sampling and tournament ranking for response generation and selection, RS-DPO generates a fixed number of responses per prompt and relies on computing reward gaps between responses for preference data generation, resulting in reduced computational expense. Additionally, while RSO lacks evaluation on standard alignment benchmarks and comparison against PPO, RS-DPO demonstrates its effectiveness against other RLHF methods on such benchmarks.\n\nIn this work, we propose RS-DPO method for RLHF training that combines the advantages of existing efficient methods, including offline preference data generation using rejection sampling, and using DPO in order to reduce the training GPU memory consumption. Specifically, RS-DPO generates responses from the large language model directly, and leverages rejection sampling (RS) to sample synthetic preference pairs based on the reward distribution of LLMs responses. Then, it uses the generated preference pairs for alignment with DPO. The main contributions of our proposed RLHF training method can be summarized as follows: (1) RS-DPO demonstrates stability and robustness against variations in the reward model quality, consistently outperforming existing methods like DPO, PPO and RS. (2) In contrast to the rejection sampling approach that focuses solely on the best response among k generated responses for alignment, RS-DPO selects pairs of contrastive samples based the reward distribution, thereby enhancing overall performance. (3) RS-DPO samples contrastive data directly from the SFT model, distinguishing itself from DPO which often relies on responses from alternative language models or human annotations. This approach contributes to the superior performance of RS-DPO. (4) Our proposed method is efficient, being less resource-intensive compared to PPO, making it practical for applications in limited resource environments.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib18",
+      "text": "OpenAI (2023) OpenAI. 2023. Gpt-4 technical report . ArXiv , abs/2303.08774."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib28",
+      "text": "Touvron et al. (2023) Hugo Touvron, Louis Martin, Kevin Stone, Peter Albert, Amjad Almahairi, Yasmine Babaei, Nikolay Bashlykov, Soumya Batra, Prajjwal Bhargava, Shruti Bhosale, et al. 2023. Llama 2: Open foundation and fine-tuned chat models. arXiv preprint arXiv:2307.09288 ."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib4",
+      "text": "Chowdhery et al. (2022) Aakanksha Chowdhery, Sharan Narang, Jacob Devlin, Maarten Bosma, Gaurav Mishra, Adam Roberts, Paul Barham, Hyung Won Chung, Charles Sutton, Sebastian Gehrmann, et al. 2022. Palm: Scaling language modeling with pathways. arXiv preprint arXiv:2204.02311 ."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib37",
+      "text": "Ziegler et al. (2019) Daniel M Ziegler, Nisan Stiennon, Jeffrey Wu, Tom B Brown, Alec Radford, Dario Amodei, Paul Christiano, and Geoffrey Irving. 2019. Fine-tuning language models from human preferences. arXiv preprint arXiv:1909.08593 ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib27",
+      "text": "Stiennon et al. (2020b) Nisan Stiennon, Long Ouyang, Jeffrey Wu, Daniel Ziegler, Ryan Lowe, Chelsea Voss, Alec Radford, Dario Amodei, and Paul F Christiano. 2020b. Learning to summarize with human feedback. Advances in Neural Information Processing Systems , 33:3008–3021."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib1",
+      "text": "Bai et al. (2022) Yuntao Bai, Andy Jones, Kamal Ndousse, Amanda Askell, Anna Chen, Nova DasSarma, Dawn Drain, Stanislav Fort, Deep Ganguli, Tom Henighan, et al. 2022. Training a helpful and harmless assistant with reinforcement learning from human feedback. arXiv preprint arXiv:2204.05862 ."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib20",
+      "text": "Ouyang et al. (2022) Long Ouyang, Jeffrey Wu, Xu Jiang, Diogo Almeida, Carroll Wainwright, Pamela Mishkin, Chong Zhang, Sandhini Agarwal, Katarina Slama, Alex Ray, et al. 2022. Training language models to follow instructions with human feedback. Advances in Neural Information Processing Systems , 35:27730–27744."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib5",
+      "text": "Christiano et al. (2017) Paul F Christiano, Jan Leike, Tom Brown, Miljan Martic, Shane Legg, and Dario Amodei. 2017. Deep reinforcement learning from human preferences. Advances in neural information processing systems , 30."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib24",
+      "text": "Schulman et al. (2017) John Schulman, Filip Wolski, Prafulla Dhariwal, Alec Radford, and Oleg Klimov. 2017. Proximal policy optimization algorithms. arXiv preprint arXiv:1707.06347 ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib34",
+      "text": "Williams (2004) Ronald J. Williams. 2004. Simple statistical gradient-following algorithms for connectionist reinforcement learning . Machine Learning , 8:229–256."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib14",
+      "text": "Lee et al. (2023) Harrison Lee, Samrat Phatale, Hassan Mansoor, Kellie Lu, Thomas Mesnard, Colton Bishop, Victor Carbune, and Abhinav Rastogi. 2023. Rlaif: Scaling reinforcement learning from human feedback with ai feedback. arXiv preprint arXiv:2309.00267 ."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib29",
+      "text": "Tunstall et al. (2023) Lewis Tunstall, Edward Beeching, Nathan Lambert, Nazneen Rajani, Kashif Rasul, Younes Belkada, Shengyi Huang, Leandro von Werra, Clémentine Fourrier, Nathan Habib, et al. 2023. Zephyr: Direct distillation of lm alignment. arXiv preprint arXiv:2310.16944 ."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib23",
+      "text": "Santacroce et al. (2023) Michael Santacroce, Yadong Lu, Han Yu, Yuanzhi Li, and Yelong Shen. 2023. Efficient rlhf: Reducing the memory usage of ppo. arXiv preprint arXiv:2309.00754 ."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib8",
+      "text": "Dong et al. (2023) Hanze Dong, Wei Xiong, Deepanshu Goyal, Rui Pan, Shizhe Diao, Jipeng Zhang, Kashun Shum, and Tong Zhang. 2023. Raft: Reward ranked finetuning for generative foundation model alignment. arXiv preprint arXiv:2304.06767 ."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib11",
+      "text": "Gulcehre et al. (2023) Caglar Gulcehre, Tom Le Paine, Srivatsan Srinivasan, Ksenia Konyushkova, Lotte Weerts, Abhishek Sharma, Aditya Siddhant, Alex Ahern, Miaosen Wang, Chenjie Gu, et al. 2023. Reinforced self-training (rest) for language modeling. arXiv preprint arXiv:2308.08998 ."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib21",
+      "text": "Rafailov et al. (2023) Rafael Rafailov, Archit Sharma, Eric Mitchell, Stefano Ermon, Christopher D Manning, and Chelsea Finn. 2023. Direct preference optimization: Your language model is secretly a reward model. arXiv preprint arXiv:2305.18290 ."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib16",
+      "text": "Liu et al. (2023) Tianqi Liu, Yao Zhao, Rishabh Joshi, Misha Khalman, Mohammad Saleh, Peter J Liu, and Jialu Liu. 2023. Statistical rejection sampling improves preference optimization. arXiv preprint arXiv:2309.06657 ."
+    }
+  ]
+}

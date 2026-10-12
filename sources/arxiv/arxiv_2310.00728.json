@@ -1,0 +1,107 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2310.00728",
+  "title": "Physics-Informed Graph Neural Network for Dynamic Reconfiguration of Power Systems",
+  "authors": "Jules Authier, Rabab Haider, Anuradha Annaswamy, Florian Dorfler",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.SY",
+    "eess.SY",
+    "math.OC",
+    "stat.ML"
+  ],
+  "url": "https://arxiv.org/abs/2310.00728",
+  "html_url": "https://arxiv.org/html/2310.00728",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 972,
+  "text": "The global energy landscape is rapidly evolving with the transition towards renewable energy generation. This transition brings numerous benefits for the climate, but also presents challenges in effectively controlling and optimizing power systems with high penetration of intermittent renewable generation such as solar and wind. New operating schemes are needed to ensure efficient and reliable grid operations in the presence of intermittent generation. Significant research efforts focus on optimizing resource dispatch and load flexibility towards reducing costs and increasing grid efficiency; however there remains efficiency gains to be had when co-optimizing grid topology. To this end, we propose Dynamic Reconfiguration (DyR) in a distribution grid to increase operating efficiency by co-optimizing grid topology and resource dispatch.\n\nThe distribution grid reconfiguration problem involves the selection of switch states (open/closed) to meet demand with available generation, while satisfying voltage and operating constraints. Grid reconfiguration can re-route power flows to reduce power losses [1], increase utilization of renewable generation [2,3], and re-energize grids after contingencies. Presently, DyR is deployed for loss reduction in the EU [2], and for fault conditions in the US using rule-based control schemes. The widespread growth of distributed generation, storage, and electric vehicles creates the opportunity for DyR for loss reduction, whereby topology and dispatch decisions are made fast and frequently in response to faster resource timescales; as solar generation varies, the topology is adapted to supply loads in close proximity to generation, thus reducing losses and improving voltage profiles across the grid.\n\nThe DyR problem is a mixed integer program (MIP) due to the discrete nature of switch decisions. It is well known that MIPs are NP-hard (i.e. cannot be solved in polynomial time) and thus may be computationally intractable for large-scale problems. A distribution substation may have 10 feeders each with 5 switches, resulting in over 10^{15} possible topologies. If operating constraints and load conditions result in only 1\\% of these topologies, the search space remains prohibitively large for traditional approaches. One option is to restrict the optimization to a single feeder, however optimizing topology over all feeders permits load transfer and generation exports.\n\nMachine learning (ML) offers an alternative by shifting the computational burden to offline training, thereby making dynamic decision making via the online application of ML algorithms computationally feasible. Recent works propose ML for solving MIPs and combinatorial optimization (CO) [4], either in an end-to-end fashion or to accelerate traditional solvers. Graphs play a central role in formulating many CO problems [5], representing paths between entities in routing problems, or interactions between variables and constraints in a general CO [6,7]. The use of Graph Neural Networks (GNNs) is also being explored to leverage the underlying graph structure during training and identify common patterns in problem instances. The traveling salesman problem (TSP) is a fundamental problem in CO and a standard benchmark which has been extensively studied with traditional optimization techniques. Recently, GNNs have been used to solve the TSP with good performance and generalizability [8,9,10]. In this work we leverage GNNs to learn the power flow representation for reconfiguration.\n\nGrid reconfiguration for distribution grids has been studied with varying solution methodologies including knowledge-based algorithms and single loop optimization [1,11], heuristic methods [12,13], and reformulation as a convex optimization problem using big- \\mathcal{M} constraints [14,15,16]. However, these methods are not computationally tractable for large-scale optimization in close to real-time applications, and may be limited to passive grids (i.e. no local generation). Machine learning approaches for DyR have also been proposed [17,3]. In [17] the DyR problem is formulated as a Markov decision process and solved using reinforcement learning. In [3] a light-weight physics-informed neural network is proposed as an end-to-end learning to optimize framework with guarantee certified satisfiability of the power physics. A physics-informed rounding layer explicitly embeds the discrete decisions within the neural framework. These approaches show potential, but both are limited to a given grid topology and switch locations. Our approach is similar to that of [3] wherein we embed discrete decisions directly within an ML framework.\n\nThe main contribution of this paper is GraPhyR, a graph neural network (Gra) framework employing physics-informed rounding [3] (PhyR) for DyR in distribution grids. GraPhyR is an end-to-end framework that learns to optimize the reconfiguration task, enabled by four key architectural components:\n\n(1) A message passing layer that models switches as gates: The gates are implemented as a value between zero and one to model switches over a continuous operating range. Gates control the flow of information through switches in the GNN, modeling the control of physical power flow between nodes.\n\n(2) A scalable local prediction method: We make power flow predictions locally at every node in the grid using local features. The predictors are scale-free and so can generalize to grids of any topology and size.\n\n(3) A physics-informed rounding layer: We embed the discrete open/closed decisions of switches directly within the neural framework. PhyR selects a grid topology for each training instance upon which GraPhyR predicts a feasible power flow and learns to optimize a given objective function.\n\n(4) A GNN that takes the electrical grid topology as input: We treat the grid topology and switch locations as an input which permits GraPhyR to learn the power flow representation across multiple possible distribution grid topologies within and across grids. Thus GraPhyR can optimize topology and generator dispatch: (a) on multiple grid topologies seen during training, and (b) under varying grid conditions such as (un)planned maintenance of the grid.\n\nWe demonstrate the performance of GraPhyR in predicting near-optimal and feasible solutions. We also show the effectiveness of GraPhyR in adapting to unforeseen grid conditions.\n\nThe remainder of this paper is organized as follows. Section II presents DyR as an optimization problem. Section III presents the GraPhyR method and details the four key architectural components. Section IV presents the simulation results, and conclusions are drawn in Section V.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "M. Baran and F. Wu, “Network reconfiguration in distribution systems for loss reduction and load balancing,” IEEE Transactions on Power Delivery , vol. 4, no. 2, pp. 1401–1407, 1989."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "C. Lueken, P. M. Carvalho, and J. Apt, “Distribution grid reconfiguration reduces power losses and helps integrate renewables,” Energy Policy , vol. 48, pp. 260–273, 2012, special Section: Frontiers of Sustainability. [Online]. Available: https://www.sciencedirect.com/science/article/pii/S0301421512004351"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "R. Haider and A. M. Annaswamy, “Grid-siphyr: An end-to-end learning to optimize framework for combinatorial problems in power systems,” 2023, arXiv:2206.06789v3 [eess.SY]."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "V. Nair, S. Bartunov, F. Gimeno, I. von Glehn, P. Lichocki, I. Lobov, B. O’Donoghue, N. Sonnerat, C. Tjandraatmadja, P. Wang, R. Addanki, T. Hapuarachchi, T. Keck, J. Keeling, P. Kohli, I. Ktena, Y. Li, O. Vinyals, and Y. Zwols, “Solving Mixed Integer Programs Using Neural Networks,” 12 2020. [Online]. Available: http://arxiv.org/abs/2012.13349"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "Q. Cappart, D. Chételat, E. Khalil, A. Lodi, C. Morris, and P. Veličković, “Combinatorial optimization and reasoning with graph neural networks,” Journal of Machine Learning Research , 2 2023."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "J. Zhang, C. Liu, X. Li, H.-L. Zhen, M. Yuan, Y. Li, and J. Yan, “A survey for solving mixed integer programming via machine learning,” Neurocomputing , vol. 519, pp. 205–217, 2023."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "P. Gupta, M. Gasse, E. B. Khalil, P. K. Mudigonda, A. Lodi, and Y. Bengio, “Hybrid models for learning to branch,” in Advances in Neural Information Processing Systems 33: Annual Conference on Neural Information Processing Systems 2020, NeurIPS 2020, December 6-12, 2020, virtual , 2020."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "C. K. Joshi, T. Laurent, and X. Bresson, “An Efficient Graph Convolutional Network Technique for the Travelling Salesman Problem,” 6 2019. [Online]. Available: http://arxiv.org/abs/1906.01227"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "C. K. Joshi, Q. Cappart, L.-M. Rousseau, and T. Laurent, “Learning the Travelling Salesperson Problem Requires Rethinking Generalization,” 6 2020. [Online]. Available: http://arxiv.org/abs/2006.07054 http://dx.doi.org/10.4230/LIPIcs.CP.2021.33"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "M. Prates, P. H. C. Avelar, H. Lemos, L. C. Lamb, and M. Y. Vardi, “Learning to solve np-complete problems: a graph neural network for decision tsp,” in Proceedings of the Thirty-Third AAAI Conference on Artificial Intelligence and Thirty-First Innovative Applications of Artificial Intelligence Conference and Ninth AAAI Symposium on Educational Advances in Artificial Intelligence , ser. AAAI’19/IAAI’19/EAAI’19. AAAI Press, 2019. [Online]. Available: https://doi.org/10.1609/aaai.v33i01.33014731"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "J.-Y. Fan, L. Zhang, and J. McDonald, “Distribution network reconfiguration: single loop optimization,” IEEE Transactions on Power Systems , vol. 11, no. 3, pp. 1643–1647, 1996."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "H. J. Wang, J. S. Pan, T. T. Nguyen, and S. Weng, “Distribution network reconfiguration with distributed generation based on parallel slime mould algorithm,” Energy , vol. 244, 4 2022."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "J. Mendoza, R. Lopez, D. Morales, E. Lopez, P. Dessante, and R. Moraga, “Minimal loss reconfiguration using genetic algorithms with restricted population and addressed operators: real application,” IEEE Transactions on Power Systems , vol. 21, no. 2, pp. 948–954, 2006."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "J. A. Taylor and F. S. Hover, “Convex models of distribution system reconfiguration,” IEEE Transactions on Power Systems , vol. 27, no. 3, pp. 1407–1413, 2012."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "N. V. Kovački, P. M. Vidović, and A. T. Sarić, “Scalable algorithm for the dynamic reconfiguration of the distribution network using the Lagrange relaxation approach,” International Journal of Electrical Power and Energy Systems , vol. 94, pp. 188–202, 1 2018."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "Z. N. Popović and N. V. Kovački, “Multi-period reconfiguration planning considering distribution network automation,” International Journal of Electrical Power & Energy Systems , vol. 139, p. 107967, 7 2022."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "O. B. Kundačina, P. M. Vidović, and M. R. Petković, “Solving dynamic distribution network reconfiguration using deep reinforcement learning,” Electrical Engineering , vol. 104, no. 3, pp. 1487–1501, 6 2022."
+    }
+  ]
+}

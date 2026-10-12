@@ -1,0 +1,130 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2404.02078",
+  "title": "Advancing LLM Reasoning Generalists with Preference Trees",
+  "authors": "Lifan Yuan, Ganqu Cui, Hanbin Wang, Ning Ding, Xingyao Wang, Jia Deng, Boji Shan, Huimin Chen, Ruobing Xie, Yankai Lin, Zhenghao Liu, Bowen Zhou, Hao Peng, Zhiyuan Liu, Maosong Sun",
+  "year": "2024",
+  "categories": [
+    "cs.AI",
+    "cs.CL",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2404.02078",
+  "html_url": "https://arxiv.org/html/2404.02078",
+  "license": "http://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Introduction",
+  "word_count": 573,
+  "text": "Current alignment techniques have significantly advanced the development of open-source large language models (LLMs) that effectively meet user expectations and align with human values [1,2]. On complex reasoning, success has been achieved by specializing models for specific capabilities, such as coding [3,4,5] and solving math problems [6,7,8,9]. However, these models still fall short, by large margins, of the most advanced proprietary models in their all-around capabilities to tackle a diverse range of challenging problems. We conjecture that this performance gap can be primarily attributed to (1) the lack of high-quality alignment data and (2) the underexploration of preference learning techniques for improving models’ complex reasoning capabilities. In this paper, we take strides towards bridging this gap by addressing both factors and developing Eurus.\n\nEurus consists of a suite of LLMs finetuned from Mistral-7B [10] and CodeLLaMA-70B [11]. Across a diverse set of complex reasoning benchmarks that are mostly out-of-distribution (OOD), Eurus achieves state-of-the-art overall performance among all open-source models. In particular, Eurus excels in solving challenging problems that often require sophisticated planning, reasoning, tool integration, and the ability to interact with and learn from the environment and users. As shown in Figure 1, on university-level STEM questions TheoremQA [12] and competition-level coding problems LeetCode Contest [4], Eurus -70B significantly outperforms all open-source models, achieving comparable performance to GPT-3.5 Turbo.\n\nEurus models are trained on UltraInteract, our newly-curated, large-scale, and high-quality alignment data specifically designed to improve LLMs’ reasoning capabilities. UltraInteract consists of a diverse set of instructions spanning math, coding, and logical reasoning problems from 12 established datasets. For each instruction, UltraInteract collects a preference tree that includes: (1) Diverse planning strategies in a unified pattern, such as sequential processing [13] and tool creation [14], followed by executing step-by-step actions formatted in either text or code, to provide divserse reasoning trajectories. (2) Multi-turn interaction trajectories with the environment and the critique, to improve models’ capabilities to learn from feedback and correct previous errors [15]. (3) Paired correct and incorrect actions organized in tree structures, to facilitate preference learning. In total, UltraInteract contains 86K instructions and 220K action pairs, where each pair consists of an instruction, a correct response, and an incorrect one. Conceptually, UltraInteract ’s data resemble imbalanced binary trees as shown in Figure 2.\n\nUltraInteract can be used in both supervised fine-tuning and preference learning. Our experiments show that, using UltraInteract along with established datasets in instruction fine-tuning already achieves strong performance. UltraInteract further facilitates preference learning for reasoning tasks, improving the performance even further with KTO [16] and NCA [17]. Surprisingly, applied to an instruction finetuned Eurus model, DPO [18] hurts the performance.\n\nThrough careful analysis, we provide evidence that the performance in reasoning correlates with the value of rewards of chosen data—a higher final reward often indicates a better reasoning capability. Besides, our investigation suggests that DPO may be less suitable for reasoning tasks than KTO and NCA. Inspired by this fresh finding, we devise a new objective for reward modeling to augment the Bradley-Terry objective [19], explicitly encouraging training to increase the absolute rewards of chosen solution and decrease those of rejected data. Furthermore, UltraInteract leads to our reward model Eurus-RM-7B, which achieves a better correlation with human annotators than all existing models on AutoJ [20] and MT-Bench [21], including GPT-4 [22]. Eurus-RM-7B demonstrates especially strong preference modeling performance on reasoning tasks.\n\nCheckpoints of our Eurus models, accompanying UltraInteract alignment data to reproduce this research, will be publicly available.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib48",
+      "text": "Touvron et al. (2023) Hugo Touvron, Louis Martin, Kevin R. Stone, Peter Albert, Amjad Almahairi, Yasmine Babaei, Nikolay Bashlykov, Soumya Batra, Prajjwal Bhargava, Shruti Bhosale, Daniel M. Bikel, Lukas Blecher, Cristian Cantón Ferrer, Moya Chen, Guillem Cucurull, David Esiobu, Jude Fernandes, Jeremy Fu, Wenyin Fu, Brian Fuller, Cynthia Gao, Vedanuj Goswami, Naman Goyal, Anthony S. Hartshorn, Saghar Hosseini, Rui Hou, Hakan Inan, Marcin Kardas, Viktor Kerkez, Madian Khabsa, Isabel M. Kloumann, A. V. Korenev, Punit Singh Koura, Marie-Anne Lachaux, Thibaut Lavril, Jenya Lee, Diana Liskovich, Yinghai Lu, Yuning Mao, Xavier Martinet, Todor Mihaylov, Pushkar Mishra, Igor Molybog, Yixin Nie, Andrew Poulton, Jeremy Reizenstein, Rashi Rungta, Kalyan Saladi, Alan Schelten, Ruan Silva, Eric Michael Smith, R. Subramanian, Xia Tan, Binh Tang, Ross Taylor, Adina Williams, Jian Xiang Kuan, Puxin Xu, Zhengxu Yan, Iliyan Zarov, Yuchen Zhang, Angela Fan, Melanie Kambadur, Sharan Narang, Aurelien Rodriguez, Robert Stojnic, Sergey Edunov, and Thomas Scialom. Llama 2: Open foundation and fine-tuned chat models. ArXiv preprint , abs/2307.09288, 2023."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib49",
+      "text": "Tunstall et al. (2023) Lewis Tunstall, Edward Beeching, Nathan Lambert, Nazneen Rajani, Kashif Rasul, Younes Belkada, Shengyi Huang, Leandro von Werra, Clémentine Fourrier, Nathan Habib, et al. Zephyr: Direct distillation of lm alignment. ArXiv preprint , abs/2310.16944, 2023."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib54",
+      "text": "Wei et al. (2023) Yuxiang Wei, Zhe Wang, Jiawei Liu, Yifeng Ding, and Lingming Zhang. Magicoder: Source code is all you need, 2023."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib17",
+      "text": "Guo et al. (2024a) Daya Guo, Qihao Zhu, Dejian Yang, Zhenda Xie, Kai Dong, Wentao Zhang, Guanting Chen, Xiao Bi, Yu Wu, Y. K. Li, Fuli Luo, Yingfei Xiong, and Wenfeng Liang. Deepseek-coder: When the large language model meets programming - the rise of code intelligence. ArXiv preprint , abs/2401.14196, 2024a."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib62",
+      "text": "Zheng et al. (2024) Tianyu Zheng, Ge Zhang, Tianhao Shen, Xueling Liu, Bill Yuchen Lin, Jie Fu, Wenhu Chen, and Xiang Yue. Opencodeinterpreter: Integrating code generation with execution and refinement. ArXiv preprint , abs/2402.14658, 2024."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib15",
+      "text": "Fu et al. (2023) Yao Fu, Hao Peng, Litu Ou, Ashish Sabharwal, and Tushar Khot. Specializing smaller language models towards multi-step reasoning. In Proceedings of the International Conference on Machine Learning , 2023."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib60",
+      "text": "Yue et al. (2023) Xiang Yue, Xingwei Qu, Ge Zhang, Yao Fu, Wenhao Huang, Huan Sun, Yu Su, and Wenhu Chen. Mammoth: Building math generalist models through hybrid instruction tuning. ArXiv preprint , abs/2309.05653, 2023."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib32",
+      "text": "Luo et al. (2023a) Haipeng Luo, Qingfeng Sun, Can Xu, Pu Zhao, Jianguang Lou, Chongyang Tao, Xiubo Geng, Qingwei Lin, Shifeng Chen, and Dongmei Zhang. Wizardmath: Empowering mathematical reasoning for large language models via reinforced evol-instruct. ArXiv preprint , abs/2308.09583, 2023a."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib47",
+      "text": "Toshniwal et al. (2024) Shubham Toshniwal, Ivan Moshkov, Sean Narenthiran, Daria Gitman, Fei Jia, and Igor Gitman. Openmathinstruct-1: A 1.8 million math instruction tuning dataset. arXiv preprint arXiv: Arxiv-2402.10176 , 2024."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib21",
+      "text": "Jiang et al. (2023a) Albert Q Jiang, Alexandre Sablayrolles, Arthur Mensch, Chris Bamford, Devendra Singh Chaplot, Diego de las Casas, Florian Bressand, Gianna Lengyel, Guillaume Lample, Lucile Saulnier, et al. Mistral 7b. ArXiv preprint , abs/2310.06825, 2023a."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib44",
+      "text": "Roziere et al. (2023) Baptiste Roziere, Jonas Gehring, Fabian Gloeckle, Sten Sootla, Itai Gat, Xiaoqing Ellen Tan, Yossi Adi, Jingyu Liu, Tal Remez, Jérémy Rapin, et al. Code llama: Open foundation models for code. ArXiv preprint , abs/2308.12950, 2023."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib8",
+      "text": "Chen et al. (2023) Wenhu Chen, Ming Yin, Max W.F. Ku, Yixin Wan, Xueguang Ma, Jianyu Xu, Tony Xia, Xinyi Wang, and Pan Lu. Theoremqa: A theorem-driven question answering dataset. ArXiv preprint , abs/2305.12524, 2023."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib53",
+      "text": "Wei et al. (2022) Jason Wei, Xuezhi Wang, Dale Schuurmans, Maarten Bosma, Ed Huai hsin Chi, F. Xia, Quoc Le, and Denny Zhou. Chain of thought prompting elicits reasoning in large language models. ArXiv preprint , abs/2201.11903, 2022."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib41",
+      "text": "Qian et al. (2023) Cheng Qian, Chi Han, Yi Ren Fung, Yujia Qin, Zhiyuan Liu, and Heng Ji. Creator: Tool creation for disentangling abstract and concrete reasoning of large language models. In Conference on Empirical Methods in Natural Language Processing , 2023."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib51",
+      "text": "Wang et al. (2023b) Xingyao Wang, Zihan Wang, Jiateng Liu, Yangyi Chen, Lifan Yuan, Hao Peng, and Heng Ji. Mint: Evaluating llms in multi-turn interaction with tools and language feedback. ArXiv preprint , abs/2309.10691, 2023b."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib14",
+      "text": "Ethayarajh et al. (2024) Kawin Ethayarajh, Winnie Xu, Niklas Muennighoff, Dan Jurafsky, and Douwe Kiela. Kto: Model alignment as prospect theoretic optimization. ArXiv preprint , abs/2402.01306, 2024."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib6",
+      "text": "Chen et al. (2024a) Huayu Chen, Guande He, Hang Su, and Jun Zhu. Noise contrastive alignment of language models with explicit rewards. ArXiv preprint , abs/2402.05369, 2024a."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib43",
+      "text": "Rafailov et al. (2023) Rafael Rafailov, Archit Sharma, Eric Mitchell, Stefano Ermon, Christopher D. Manning, and Chelsea Finn. Direct preference optimization: Your language model is secretly a reward model. ArXiv preprint , abs/2305.18290, 2023."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib5",
+      "text": "Bradley & Terry (1952) Ralph Allan Bradley and Milton E. Terry. Rank analysis of incomplete block designs: I. the method of paired comparisons. Biometrika , 39, 1952."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib25",
+      "text": "Li et al. (2023a) Junlong Li, Shichao Sun, Weizhe Yuan, Run-Ze Fan, Hai Zhao, and Pengfei Liu. Generative judge for evaluating alignment. ArXiv preprint , abs/2310.05470, 2023a."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib61",
+      "text": "Zheng et al. (2023) Lianmin Zheng, Wei-Lin Chiang, Ying Sheng, Siyuan Zhuang, Zhanghao Wu, Yonghao Zhuang, Zi Lin, Zhuohan Li, Dacheng Li, Eric P. Xing, Haotong Zhang, Joseph Gonzalez, and Ion Stoica. Judging llm-as-a-judge with mt-bench and chatbot arena. ArXiv preprint , abs/2306.05685, 2023."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib38",
+      "text": "OpenAI (2023) OpenAI. Gpt-4 technical report, 2023."
+    }
+  ]
+}

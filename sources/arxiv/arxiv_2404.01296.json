@@ -1,0 +1,93 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2404.01296",
+  "title": "MagicMirror: Fast and High-Quality Avatar Generation with a Constrained Search Space",
+  "authors": "Armand Comas-MassaguÃ©, Di Qiu, Menglei Chai, Marcel BÃ¼hler, Amit Raj, Ruiqi Gao, Qiangeng Xu, Mark Matthews, Paulo Gotardo, Octavia Camps, Sergio Orts-Escolano, Thabo Beeler",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2404.01296",
+  "html_url": "https://arxiv.org/html/2404.01296",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 805,
+  "text": "Customizable 3D human avatars are central for many experiences such as gaming, v-tubing, augmented and virtual reality (AR/VR), or telepresence applications. Intuitive editing and personalization techniques for such avatars are highly desirable, as customized avatars provide a greater sense of engagement, ownership and aid adoption of the aforementioned technologies. Traditional CGI editing techniques, however, are still difficult, non-intuitive, and laborious for the average user. Recently, text-prompting has emerged as a natural and intuitive interface to control the creation and customization of highly complex generative outputs, due to the impressive progress of Language-Image modeling [1] and Text-to-Image Diffusion Models [2]. Two main approaches have emerged for generative modeling of 3D assets: direct 3D modeling, and neural rendering techniques leveraging 2D images.\n\nDirect 3D models largely conform to the text-to-image paradigm which train a generative model from a large dataset of labeled 3D assets [3].\n\nSourcing such data at scale, however, is difficult and expensive [4]. 3D assets are nowhere nearly as abundant as the 2D images easily available on the Internet. Furthermore, 3D assets that are available typically lack the rich semantic information that often accompanies Internet images. Consequently, the results from this category typically lack diversity and quality compared to their 2D large-scale counterparts.\n\nThe second category of methods leverage the implicit 3D knowledge within 2D generative models, lifting 2D outputs onto 3D via differential rendering and novel objective functions. Several designs of these objective functions have been proposed, including simple reconstruction losses based on transformed 2D images [5], high-level text-image misalignment scores [6], and model distillation [7].\n\nThese methods work best if the outputs of the 2D model are multi-view consistent, which is usually not the case, leading to non-convergence and infamous \"Janus face\" artifacts [7]. Although appealing, this second category of methods has several key challenges.\n\nFirst, despite their ability to generate large amounts of text-guided 2D images and supervisory signals, they are not guaranteed to be multi-view consistent.\n\nConsequently, 3D optimization suffers from conflicting supervision.\n\nThis issue can be mitigated by reducing the amount of overlap between views, through reduced view count, and evenly distributing views. However, a possible unfortunate effect is in making the problem ill-posed, thus leading to poor results.\n\nAn approach to improve reconstructions might then be to improve the multi-view consistency of existing 2D image generators.\n\nThis could be achieved by training on multi-view data and sharing information across views [8,9].\n\nWhile hopeful, this approach still bears the burden of sourcing multi-view data, often as difficult as sourcing 3D assets described above.\n\nOther approaches based on model distillation require the use of a high classifier-free guidance weight [10], causing textureless and over-saturated results [7] and, more importantly, reducing diversity [11].\n\nAnother approach is to constrain the space of 3D objects of interest and their representation, similar to popular parametric blendshapes models that enable shape reconstruction given only partial information such as monocular landmarks [12]. For text-guided avatar generation and editing, existing works typically employ an object-specific parametric 3D morphable model (3DMM) [13] as underlying geometry proxy. However, avatar customization remains challenging because it requires creating novel, semantically meaningful geometric structures that need to introduce new out-of-model elements. So far, because of the crucial dependency on multi-view consistent supervision, it is still challenging to obtain high-quality avatar customizations that closely follow their associated text prompts.\n\nThis paper presents MagicMirror, our novel framework for text-guided 3D head avatar generation and editing whose visual quality improves upon the current state of the art. Our key idea is to derive constraints and priors that make the test-time optimization problem easier, and less dependent on photometric consistency. This idea is implemented via the following important framework components:\n\n- 1. A constrained initial solution space is first learned as a conditional NeRF model trained on an unannotated multi-view dataset of human heads; this flexible model can express a wide range of head appearances and geometries and subsequently facilitates fast avatar generation and editing.\n\n- 2. Leveraging a pre-trained text-to-image diffusion model and its ability to learn new concepts, we build a geometric prior by teaching this model to generate normal maps. This additional geometry prior encourages better view invariance, direct geometry optimization, and also largely mitigates the photometric inconsistency problem from conventional multi-view supervision.\n\n- 3. When optimizing our conditional NeRF, Score Distillation Sampling (SDS) [7] can lead to artifacts such as lack of texture and over saturation. We overcome these issues by adopting Variational Score Distillation (VSD) [11], allowing us to optimize both appearance and geometry with higher quality.\n\nAs demonstrated next, our framework generates custom avatars following specific text instructions with a high level of faithfulness and visual detail. As in DreamBooth [14,15], we leverage a re-contextualization technique that allows users to personalize their avatars with ease and high fidelity to their own identity, while making it fun to create and explore.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib54",
+      "text": "Radford, A., Kim, J.W., Hallacy, C., Ramesh, A., Goh, G., Agarwal, S., Sastry, G., Askell, A., Mishkin, P., Clark, J., Krueger, G., Sutskever, I.: Learning transferable visual models from natural language supervision. In: ICML 2021. vol. 139, pp. 8748–8763 (2021)"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib24",
+      "text": "Ho, J., Jain, A., Abbeel, P.: Denoising Diffusion Probabilistic Models (2020)"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib29",
+      "text": "Huang, X., Shao, R., Zhang, Q., Zhang, H., Feng, Y., Liu, Y., Wang, Q.: Humannorm: Learning normal diffusion model for high-quality and realistic 3d human generation. CoRR abs/2310.01406 (2023)"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib17",
+      "text": "Deitke, M., Schwenk, D., Salvador, J., Weihs, L., Michel, O., VanderBilt, E., Schmidt, L., Ehsani, K., Kembhavi, A., Farhadi, A.: Objaverse: A Universe of Annotated 3D Objects. In: CVPR (2023)"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib23",
+      "text": "Haque, A., Tancik, M., Efros, A.A., Holynski, A., Kanazawa, A.: Instruct-NeRF2NeRF: Editing 3D Scenes with Instructions. In: CVPR (2023)"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib68",
+      "text": "Wang, C., Jiang, R., Chai, M., He, M., Chen, D., Liao, J.: NeRF-Art: Text-Driven Neural Radiance Fields Stylization. IEEE TVCG (2023)"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib53",
+      "text": "Poole, B., Jain, A., Barron, J.T., Mildenhall, B.: Dreamfusion: Text-to-3d using 2d diffusion. In: ICLR 2023 (2023)"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib61",
+      "text": "Shi, Y., Wang, P., Ye, J., Long, M., Li, K., Yang, X.: Mvdream: Multi-view diffusion for 3d generation. CoRR abs/2308.16512 (2023)"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib46",
+      "text": "Liu, Y., Lin, C., Zeng, Z., Long, X., Liu, L., Komura, T., Wang, W.: Syncdreamer: Generating multiview-consistent images from a single-view image. CoRR abs/2309.03453 (2023)"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib25",
+      "text": "Ho, J., Salimans, T.: Classifier-free diffusion guidance. CoRR abs/2207.12598 (2022)"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib72",
+      "text": "Wang, Z., Lu, C., Wang, Y., Bao, F., Li, C., Su, H., Zhu, J.: Prolificdreamer: High-fidelity and diverse text-to-3d generation with variational score distillation. In: NeurIPS 2023 (2023)"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib16",
+      "text": "Daněček, R., Black, M.J., Bolkart, T.: EMOCA: Emotion Driven Monocular Face Capture and Animation. In: CVPR (2022)"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib5",
+      "text": "Blanz, V., Vetter, T.: A morphable model for the synthesis of 3d faces. In: SIGGRAPH 1999. pp. 187–194 (1999)"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib58",
+      "text": "Ruiz, N., Li, Y., Jampani, V., Pritch, Y., Rubinstein, M., Aberman, K.: Dreambooth: Fine tuning text-to-image diffusion models for subject-driven generation. In: CVPR 2023. pp. 22500–22510 (2023)"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib55",
+      "text": "Raj, A., Kaza, S., Poole, B., Niemeyer, M., Ruiz, N., Mildenhall, B., Zada, S., Aberman, K., Rubinstein, M., Barron, J., et al.: Dreambooth3d: Subject-driven text-to-3d generation (2023)"
+    }
+  ]
+}

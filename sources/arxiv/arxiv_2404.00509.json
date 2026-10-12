@@ -1,0 +1,134 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2404.00509",
+  "title": "DailyMAE: Towards Pretraining Masked Autoencoders in One Day",
+  "authors": "Jiantao Wu, Shentong Mo, Sara Atito, Zhenhua Feng, Josef Kittler, Muhammad Awais",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2404.00509",
+  "html_url": "https://arxiv.org/html/2404.00509",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 677,
+  "text": "Self-Supervised Learning (SSL) represents a transformative shift in machine learning, by harnessing unlabeled data for effective model training [1,2,3,4,5,6,7,8]. Such a learning paradigm benefits from large-scale datasets to learn rich representations for few-shot learning [9] and transfer learning [10,11]. Vast amount of unlabeled data on internet ignite the need to scale training of deep neural network models to large datasets. Currently, the success of SSL usually requires weeks of training on high performance clusters (HPC) [9,12,13]. For instance, iBOT [14] is trained for 193 hours on 16 V100s for ViT-S/16. These calculations don’t include testing of different hypothesis while developing a SSL framework which need to be tested on a decent scale of ImageNet-1K [15] with 1.2 millions samples for a considerable number of epochs. Therefore, efficient pretraining recipes are highly desired to accelerate the study of SSL algorithms, e.g., hyper-parameter tuning and fast validation for novel algorithms. To reduce the training time, some researchers train their models on a subset of ImageNet-1K [15], e.g., 10% samples [2]. However, there can be a performance gap when scaling the model to large datasets, that is, a model sophisticated in small datasets may not handle the diversity on complex problems.\n\nA lot of effort has been made to improve the training efficiency through Mix-Precision [16], FlashAttention [17], efficient architectures [4,18] and so on. FFCV [19] is proposed to remove the data loading bottleneck, which increases a throughput of images/s. Based on it, FFCV-SSL [20] accelerates SimCLR from 32 hours to 8 hours on 8 V100s. Masked autoencoders (MAEs) [4], by removing the masked tokens, accelerate training (by 3× or more) and achieve competitive performance. Despite the efficiency of MAEs, the original implementation still requires about 800 GPU hours (V100) to reproduce the results.\n\nIn this work, we aim to optimize the training efficiency on a single machine. Although the hardware has been improved dramatically in recent years, e.g. the H100 released in 2022 is 3x faster than V100 released in 2017, the data loading has become a major bottleneck for training a base model, as illustrated in Fig. 2. Yet, most of the machine learning libraries still use the Pytorch implementation, reading images from folders (IF), which significantly hinders the training process. To remove this bottleneck, we utilize FFCV [19] for fast data loading. We further study the effects of maximum resolution and image quality for compression, which is crucial to the trade-off between storage, throughput, and performance. In addition, we propose ‘crop decode’ to optimize FFCV for faster decoding and lower memory usage. Our improved FFCV, termed ESSL, is 27.6% faster and saves 13.7% memory compared to the original implementation.\n\nThe training process can be further sped up by progressive training, where the image size is gradually increasing during training [18,21]. A lot of effort has been made to train models on smaller images. One of advantages is to reduce the number of tokens, leading to lower computational costs. Another advantage is the regularization effect of preventing overfitting [22,23]. By gradually enhancing the data augmentation, the model can converge to a better minimum. However, most of the studies about progressive training are based on convolutional neural networks (CNNs) and focus on supervised learning. We revisit the application of progressive training with ViTs in mind for finetuning, because the image size is relative to the apparent size seen by a patch embedding. We further apply progressive training into pretraining. Surprisingly, a palindrome scheme for progressively decreasing and then increasing the image size during training, maintains the competitive performance and reduces training time. Our contributions can be summarized as\n\n- • We propose a machine learning library for masked autoencoders, where our pretraining process of mae-base/16 is 5.8x faster than the official one.\n\n- • We introduce the ‘crop decode’ to reduce the memory usage and accelerate the loading pipeline. We discuss the effects of compression with regard to the resolution and image quality.\n\n- • We propose a novel pretraining strategy utilizing a palindrome scheme. This approach surprisingly maintains competitive performance while achieving a 10.9% reduction in training time.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib34",
+      "text": "Oord, A.v.d., Li, Y., Vinyals, O.: Representation Learning with Contrastive Predictive Coding. CoRR abs/1807.03748 (2018), http://arxiv.org/abs/1807.03748 , arXiv: 1807.03748"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib3",
+      "text": "Atito, S., Awais, M., Kittler, J.: SiT: Self-supervised vIsion Transformer. ArXiv preprint abs/2104.03602 (2021), https://arxiv.org/abs/2104.03602"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib4",
+      "text": "Atito, S., Awais, M., Kittler, J.: GMML is All you Need (May 2022), http://arxiv.org/abs/2205.14986 , arXiv:2205.14986 [cs]"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib22",
+      "text": "He, K., Chen, X., Xie, S., Li, Y., Dollar, P., Girshick, R.: Masked Autoencoders Are Scalable Vision Learners. In: 2022 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR). pp. 15979–15988. IEEE, New Orleans, LA, USA (Jun 2022). https://doi.org/10.1109/CVPR52688.2022.01553, https://ieeexplore.ieee.org/document/9879206/"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib20",
+      "text": "Grill, J.B., Strub, F., Altche, F., Tallec, C., Richemond, P.H., Buchatskaya, E., Doersch, C., Pires, B.A., Guo, Z., Azar, M.G., Piot, B., Kavukcuoglu, K., Munos, R., Valko, M.: Bootstrap Your Own Latent - A New Approach to Self-Supervised Learning. In: Larochelle, H., Ranzato, M., Hadsell, R., Balcan, M.F., Lin, H.T. (eds.) Advances in Neural Information Processing Systems 33: Annual Conference on Neural Information Processing Systems 2020, NeurIPS 2020, December 6-12, 2020, virtual (2020), https://proceedings.neurips.cc/paper/2020/hash/f3ada80d5c4ee70142b17b8192b2958e-Abstract.html"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib31",
+      "text": "Mo, S., Sun, Z., Li, C.: Siamese prototypical contrastive learning. In: Proceedings of British Machine Vision Conference (2021)"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib32",
+      "text": "Mo, S., Sun, Z., Li, C.: Rethinking prototypical contrastive learning through alignment, uniformity and correlation. In: Proceedings of British Machine Vision Conference (2022)"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib33",
+      "text": "Mo, S., Sun, Z., Li, C.: Representation disentanglement in generative models with contrastive learning. In: 2023 IEEE/CVF Winter Conference on Applications of Computer Vision (WACV). pp. 1531–1540 (2023)"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib8",
+      "text": "Brown, T.B., Mann, B., Ryder, N., Subbiah, M., Kaplan, J., Dhariwal, P., Neelakantan, A., Shyam, P., Sastry, G., Askell, A., Agarwal, S., Herbert-Voss, A., Krueger, G., Henighan, T., Child, R., Ramesh, A., Ziegler, D.M., Wu, J., Winter, C., Hesse, C., Chen, M., Sigler, E., Litwin, M., Gray, S., Chess, B., Clark, J., Berner, C., McCandlish, S., Radford, A., Sutskever, I., Amodei, D.: Language Models are Few-Shot Learners (Jul 2020). https://doi.org/10.48550/arXiv.2005.14165, http://arxiv.org/abs/2005.14165 , arXiv:2005.14165 [cs]"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib13",
+      "text": "Chen, X., Xie, S., He, K.: An Empirical Study of Training Self-Supervised Vision Transformers (Aug 2021), http://arxiv.org/abs/2104.02057 , arXiv:2104.02057 [cs]"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib23",
+      "text": "He, K., Fan, H., Wu, Y., Xie, S., Girshick, R.B.: Momentum Contrast for Unsupervised Visual Representation Learning. In: 2020 IEEE/CVF Conference on Computer Vision and Pattern Recognition, CVPR 2020, Seattle, WA, USA, June 13-19, 2020. pp. 9726–9735. IEEE (2020). https://doi.org/10.1109/CVPR42600.2020.00975, https://doi.org/10.1109/CVPR42600.2020.00975"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib11",
+      "text": "Chen, M., Radford, A., Child, R., Wu, J., Jun, H., Luan, D., Sutskever, I.: Generative pretraining from pixels. In: International conference on machine learning. pp. 1691–1703. PMLR (2020)"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib17",
+      "text": "Devlin, J., Chang, M.W., Lee, K., Toutanova, K.: BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding. In: Proceedings of the 2019 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long and Short Papers). pp. 4171–4186. Association for Computational Linguistics, Minneapolis, Minnesota (2019). https://doi.org/10.18653/v1/N19-1423, https://aclanthology.org/N19-1423"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib47",
+      "text": "Zhou, J., Wei, C., Wang, H., Shen, W., Xie, C., Yuille, A., Kong, T.: iBOT: Image BERT Pre-Training with Online Tokenizer (Jan 2022), http://arxiv.org/abs/2111.07832 , arXiv:2111.07832 [cs]"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib36",
+      "text": "Russakovsky, O., Deng, J., Su, H., Krause, J., Satheesh, S., Ma, S., Huang, Z., Karpathy, A., Khosla, A., Bernstein, M., others: Imagenet large scale visual recognition challenge. International journal of computer vision 115 , 211–252 (2015), publisher: Springer"
+    },
+    {
+      "n": 16,
+      "id": "bib.bib30",
+      "text": "Micikevicius, P., Narang, S., Alben, J., Diamos, G., Elsen, E., Garcia, D., Ginsburg, B., Houston, M., Kuchaiev, O., Venkatesh, G., Wu, H.: Mixed Precision Training (Feb 2018), http://arxiv.org/abs/1710.03740 , arXiv:1710.03740 [cs, stat]"
+    },
+    {
+      "n": 17,
+      "id": "bib.bib16",
+      "text": "Dao, T., Fu, D., Ermon, S., Rudra, A., Ré, C.: FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness. Advances in Neural Information Processing Systems 35 , 16344–16359 (Dec 2022), https://proceedings.neurips.cc/paper_files/paper/2022/hash/67d57c32e20fd0a7a302cb81d36e40d5-Abstract-Conference.html"
+    },
+    {
+      "n": 18,
+      "id": "bib.bib38",
+      "text": "Tan, M., Le, Q.V.: EfficientNetV2: Smaller Models and Faster Training (Jun 2021), http://arxiv.org/abs/2104.00298 , arXiv:2104.00298 [cs] version: 3"
+    },
+    {
+      "n": 19,
+      "id": "bib.bib27",
+      "text": "Leclerc, G., Ilyas, A., Engstrom, L., Park, S.M., Salman, H., Madry, A.: FFCV: Accelerating Training by Removing Data Bottlenecks (Jun 2023). https://doi.org/10.48550/arXiv.2306.12517, http://arxiv.org/abs/2306.12517 , arXiv:2306.12517 [cs]"
+    },
+    {
+      "n": 20,
+      "id": "bib.bib7",
+      "text": "Bordes, F., Balestriero, R., Vincent, P.: Towards Democratizing Joint-Embedding Self-Supervised Learning (Mar 2023), http://arxiv.org/abs/2303.01986 , arXiv:2303.01986 [cs]"
+    },
+    {
+      "n": 21,
+      "id": "bib.bib24",
+      "text": "Howard, J.: fast.ai - Now anyone can train Imagenet in 18 minutes (Aug 2018), https://www.fast.ai/posts/2018-08-10-fastai-diu-imagenet.html"
+    },
+    {
+      "n": 22,
+      "id": "bib.bib39",
+      "text": "Touvron, H., Cord, M., Jegou, H.: DeiT III: Revenge of the ViT. In: European Conference on Computer Vision. p. 27 (2022)"
+    },
+    {
+      "n": 23,
+      "id": "bib.bib28",
+      "text": "Li, X., Wang, Z., Xie, C.: An Inverse Scaling Law for CLIP Training (Oct 2023), http://arxiv.org/abs/2305.07017 , arXiv:2305.07017 [cs]"
+    }
+  ]
+}

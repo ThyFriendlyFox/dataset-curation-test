@@ -1,0 +1,74 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2404.00103",
+  "title": "PikeLPN: Mitigating Overlooked Inefficiencies of Low-Precision Neural Networks",
+  "authors": "Marina Neseem, Conor McCullough, Randy Hsin, Chas Leichner, Shan Li, In Suk Chong, Andrew G. Howard, Lukasz Lew, Sherief Reda, Ville-Mikko Rautio, Daniele Moro",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2404.00103",
+  "html_url": "https://arxiv.org/html/2404.00103",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 621,
+  "text": "Quantization has long been established as a method to decrease the precision of neural network weights and activations effectively, resulting in smaller models and accelerated processing [1]. Recent studies have shown impressive results in image classification tasks, making the use of low-precision quantization (i.e., 4 bits or fewer) increasingly popular [2,3,4,5]. In these compact models, convolutional and fully connected layers are typically constrained to 4-bit precision or even less, while precision is maintained at higher levels in other layers of the network. For example, the state-of-the-art (SOTA) binary network PokeBNN [3] binarizes the convolutional layers of ResNet-50 [6], and to avoid accuracy loss, they incorporate extra skip connections, extra batch normalization layers, and parameterized activation functions (DPReLU) that are executed in high precision. As illustrated in Figure 2, while this strategy significantly reduces the cost of multiply-accumulate (MAC) operations, it shifts the energy burden to the elementwise operations within these remaining high-precision layers. Although there are fewer of these elementwise operations, they use more energy because they are still in high precision. This indicates a critical area of optimization to improve the overall efficiency of low-precision models.\n\nWe analyze the key efficiency bottlenecks in low-precision models uncovering a fundamental limitation of the efficiency metrics in literature, ACE [3], CPU64 [7,4], Unit-gate model [8] and FA-count [9]. Those metrics exclude the elementwise operations in arithmetic calculations, a sentiment grounded in the belief that their contribution to the total computation cost is negligible compared to MAC operations. Optimizing for those metrics drives researchers to prioritize the reduction of computational precision in Convolutional and Dense layers, yet they overlook the quantization of elementwise operations. As a result, operations such as batch normalization, activation functions, and quantization scaling multiplications, are often performed at full precision. Moreover, SOTA low-precision models tend to rely extensively on mechanisms like branching [10] and skip connections [6], which significantly increase energy costs associated with memory reads and writes. To overcome this issue, we propose ACE_{v2} which extends the efficiency metric ACE to account for all arithmetic operations in quantized neural networks including both elementwise and MAC operations. This would help guide researchers’ choices when designing low-precision models.\n\nGuided by our ACE_{v2} metric, we design PikeLPN – a novel family of efficient low-precision models. PikeLPN quantizes both elementwise and MAC operations. Remarkably, PikeLPN not only achieves a 3 \\times cost reduction compared to SOTA binary models [4,3], it also achieves competitive accuracy levels on ImageNet [11].\n\nOur contributions can be summarized as follows:\n\n- • We identify and analyze the overlooked cost of non-quantized elementwise operations in SOTA low-precision models. Our analysis shows that the non-quantized elementwise operations used in parameterized activation functions, batch normalization, and quantization scaling dominate the inference cost of low-precision models.\n\n- • We propose ACE_{v2} – an extension to the existing hardware-agnostic cost metric ACE. ACE_{v2} offers a better alignment with the cost of the low-precision models and their energy consumption on ML hardware by accounting for all arithmetic operations during inference.\n\n- • We propose PikeLPN – a novel family of low-precision architectures, which improves the efficiency of low-precision models by quantizing both elementwise and multiply-accumulate operations. Specifically, we propose (a) QuantNorm for effective batch normalization quantization, (b) Double Quantization where quantization parameters are also quantized, and (c) Distribution-Heterogeneous Quantization for Separable Convolution layers to tackle their distribution mismatch problem.\n\nThe rest of the paper is organized as follows. We review the related work in Section 2. In Section 3, we propose ACE_{v2} providing detailed analysis to the overlooked efficiency bottlenecks by previous cost metrics. Then, guided by the new cost metric, we propose our efficient PikeLPN model. Next, we compare PikeLPN to SOTA low-precision models in Section 4. Finally, we conclude in Section 5.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib11",
+      "text": "Amir Gholami, Sehoon Kim, Zhen Dong, Zhewei Yao, Michael W Mahoney, and Kurt Keutzer. A survey of quantization methods for efficient neural network inference. In Low-Power Computer Vision , pages 291–326. Chapman and Hall/CRC, 2022."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib34",
+      "text": "Eunhyeok Park and Sungjoo Yoo. Profit: A novel training method for sub-4-bit mobilenet models. In Computer Vision–ECCV 2020: 16th European Conference, Glasgow, UK, August 23–28, 2020, Proceedings, Part VI 16 , pages 430–446. Springer, 2020."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib48",
+      "text": "Yichi Zhang, Zhiru Zhang, and Lukasz Lew. Pokebnn: A binary pursuit of lightweight accuracy. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 12475–12485, 2022."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib29",
+      "text": "Zechun Liu, Zhiqiang Shen, Marios Savvides, and Kwang-Ting Cheng. Reactnet: Towards precise binary neural network with generalized activation functions. In Computer Vision–ECCV 2020: 16th European Conference, Glasgow, UK, August 23–28, 2020, Proceedings, Part XIV 16 , pages 143–159. Springer, 2020."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib35",
+      "text": "Hai Phan, Yihui He, Marios Savvides, Zhiqiang Shen, et al. Mobinet: A mobile binary network for image classification. In Proceedings of the IEEE/CVF winter conference on applications of computer vision , pages 3453–3462, 2020a."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib16",
+      "text": "Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. Deep residual learning for image recognition. In Proceedings of the IEEE conference on computer vision and pattern recognition , pages 770–778, 2016."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib31",
+      "text": "Brais Martinez, Jing Yang, Adrian Bulat, and Georgios Tzimiropoulos. Training binary neural networks with real-to-binary convolutions. arXiv preprint arXiv:2003.11535 , 2020."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib49",
+      "text": "Reto Zimmermann. Computer arithmetic: Principles, architectures, and vlsi design. Personal publication (Available at http://www. iis. ee. ethz. ch/ zimmi/-publications/comp arith notes. ps. gz) , 1999."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib38",
+      "text": "Charbel Sakr, Yongjune Kim, and Naresh Shanbhag. Analytical guarantees on numerical precision of deep neural networks. In International Conference on Machine Learning , pages 3007–3016. PMLR, 2017."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib19",
+      "text": "Gao Huang, Zhuang Liu, Laurens Van Der Maaten, and Kilian Q Weinberger. Densely connected convolutional networks. In Proceedings of the IEEE conference on computer vision and pattern recognition , pages 4700–4708, 2017."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib10",
+      "text": "Jia Deng, Wei Dong, Richard Socher, Li-Jia Li, Kai Li, and Li Fei-Fei. Imagenet: A large-scale hierarchical image database. In 2009 IEEE Conference on Computer Vision and Pattern Recognition , pages 248–255, 2009."
+    }
+  ]
+}

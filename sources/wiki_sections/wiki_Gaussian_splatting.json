@@ -1,0 +1,38 @@
+{
+  "source_type": "encyclopedia_article",
+  "source_id": "enwiki:Gaussian splatting#rev1374452696",
+  "title": "Gaussian splatting",
+  "authors": "Wikipedia contributors",
+  "year": "2026",
+  "url": "https://en.wikipedia.org/w/index.php?title=Gaussian_splatting&oldid=1374452696",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "3D Gaussian splatting",
+  "word_count": 604,
+  "text": "3D Gaussian splatting (3DGS) is a rasterization-based technique used in the field of real-time radiance fields for representing and rendering photorealistic three-dimensional scenes from a sparse set of two-dimensional images.[1,2] It enables the creation of high-quality real-time novel-view scenes by combining multiple photos or videos, addressing a significant challenge in the field.\n\nThe method represents scenes with 3D Gaussians that retain properties of continuous volumetric radiance fields, integrating sparse points produced during camera calibration. It introduces an anisotropic representation using 3D Gaussians to model radiance fields, along with an interleaved optimization and density control of the Gaussians. A fast visibility-aware rendering algorithm supporting anisotropic splatting is also proposed, catering to GPU usage.[2]\n\n### Method\n\n### Data collection\n\nSimilarly to neural radiance fields, 3DGS requires standard 2D images. Prior to training, the position and orientation of each image must be reconstructed via Structure from Motion (SfM). Sfm additionally provides the underlying sparse point cloud necessary for 3DGS initialization.[2]\n\n### Training\n\nThe method involves several key steps:\n\nInput: A set of images of a static scene along with camera positions, expressed as a sparse point cloud.\n\n3D Gaussians: Definition of mean, covariance matrix, and opacity for each Gaussian.\n\nColor representation: Using spherical harmonics to model view-dependent appearance.\n\nOptimization algorithm: Optimizing the parameters using stochastic gradient descent to minimize a loss function combining L1 loss and D-SSIM, inspired by the Plenoxels work.[3]\n\nRasterizer: Implementing a tile-based rasterizer for fast sorting and backward pass, enabling efficient blending of Gaussian components.\n\nThe method uses differentiable 3D Gaussian splatting, which is unstructured and explicit, allowing rapid rendering and projection to 2D splats. The covariance of the Gaussians can be thought of as configurations of an ellipsoid, which can be mathematically decomposed into a scaling matrix and a rotation matrix. The gradients for all parameters are derived explicitly to overcome any overhead due to autodiff.\n\nEach step of rendering is followed by a comparison to the training views available in the dataset. The optimization uses the difference to create a dense set of 3D Gaussians that represent the scene as accurately as possible.\n\n### Using\n\nAn optimized set of 3D Gaussians is saved onto the computer. Like in the training step, a renderer creates a view from these Gaussians.\n\nSeveral sets of Gaussians can be composed together into larger scenes.\n\n### Results and evaluation\n\nThe authors[2] tested their algorithm on 13 real scenes from previously published datasets and the synthetic Blender dataset.[4] They compared their method against state-of-the-art techniques like Mip-NeRF360,[5] InstantNGP,[6] and Plenoxels.[3] Quantitative evaluation metrics used were PSNR, L-PIPS, and SSIM.\n\nTheir fully converged model (30,000 iterations) achieves quality on par with or slightly better than Mip-NeRF360,[5] but with significantly reduced training time (35–45 minutes vs. 48 hours) and faster rendering (real-time vs. 10 seconds per frame). At 7,000 iterations (5–10 minutes of training), their method achieves comparable quality to InstantNGP[6] and Plenoxels.[3]\n\nFor synthetic bounded scenes (Blender dataset[4]), they achieved state-of-the-art results even with random initialization, starting from 100,000 uniformly random Gaussians.\n\n### Limitations\n\nSome limitations of the method include:\n\nElongated artifacts or \"splotchy\" Gaussians in some areas.\n\nOccasional popping artifacts due to large Gaussians created by the optimization, especially in regions with view-dependent appearance.\n\nHigher memory consumption compared to Neural Radiance Field (NeRF) based solutions, though still more compact than previous point-based approaches.\n\nMay require hyperparameter tuning (e.g., reducing position learning rate) for very large scenes.\n\nPeak GPU memory consumption during training can be high (over 20 GB) in the current unoptimized prototype.\n\nThe authors[2] note that some of these limitations could potentially be addressed through future improvements like better culling approaches, antialiasing, regularization, and compression techniques.",
+  "references": [
+    {
+      "n": 1,
+      "text": "soumyadip. (2024-12-17). 3D Gaussian Splatting - Paper Explained, Training NeRFStudio. https://learnopencv.com/3d-gaussian-splatting/"
+    },
+    {
+      "n": 2,
+      "text": "Kerbl, Bernhard. (2023-07-26). 3D Gaussian Splatting for Real-Time Radiance Field Rendering. ACM Transactions on Graphics. doi:10.1145/3592433"
+    },
+    {
+      "n": 3,
+      "text": "Fridovich-Keil, Sara. (June 2022). 2022 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR). IEEE. doi:10.1109/cvpr52688.2022.00542"
+    },
+    {
+      "n": 4,
+      "text": "Mildenhall, Ben. (2020). Computer Vision – ECCV 2020. Springer International Publishing. doi:10.1007/978-3-030-58452-8_24"
+    },
+    {
+      "n": 5,
+      "text": "Barron, Jonathan T.. (June 2022). 2022 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR). IEEE. doi:10.1109/cvpr52688.2022.00539"
+    },
+    {
+      "n": 6,
+      "text": "Müller, Thomas. (July 2022). Instant neural graphics primitives with a multiresolution hash encoding. ACM Transactions on Graphics. doi:10.1145/3528223.3530127"
+    }
+  ]
+}

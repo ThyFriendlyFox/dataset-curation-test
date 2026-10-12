@@ -1,0 +1,118 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2404.00373",
+  "title": "The Devil is in the Edges: Monocular Depth Estimation with Edge-aware Consistency Fusion",
+  "authors": "Pengzhi Li, Yikang Ding, Haohan Wang, Chengshuai Tang, Zhiheng Li",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2404.00373",
+  "html_url": "https://arxiv.org/html/2404.00373",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1018,
+  "text": "Monocular depth estimation (MDE) is a classical and fundamental computer vision task with a wide range of applications in autonomous driving, the metaverse, and robotics.\n\nWithout the depth data from depth sensors or geometric constraints from the posed multi-view images, it is tricky to recover the 3D structure of the observed scene from a single image. Recently, learning-based methods [1,2,3,4,5] demonstrate great potential in this task by using networks, (e.g., CNN [4] or transformers [6]) to map the RGB colors to depth values. Although various network architectures [7,8,9], loss functions [10,11], and training strategies [12,13,14] have been proposed to improve the estimated depth, existing methods still suffer from missing details and over-smooth estimations in the final depth. To handle this problem, several works exploit the edge information [15] and image segmentation [16] to enhance the depth details. Although these methods have made progress in predicting depth maps with details, the estimated depth in edges is still struggling, leading to over-smooth final predictions. Estimating high-quality depth maps with accurate edges and details remains a significant obstacle for MDE networks.\n\nThis paper aims to reduce the ambiguity in the important edges and detailed regions, as well as acquire finer overall depth predictions. We ask: what has the greatest impact on edge depth ? We perform various experiments and arrive at a conjecture: the edge itself hides the most critical information. The following analysis demonstrates our proposal from several perspectives.\n\n(i) By inspecting the predicted depths of the existing MDE networks [6,4,3], we find that they can obtain competent results in obvious and large edge regions, (e.g., edges of large foreground objects), but their predictions in low-contrast edges, long distance, and small edges are very fuzzy and inaccurate as shown in Fig. 1. We analyze and attribute this phenomenon to that networks do not capture all the edge information as the heavily-used convolution layers, downsampling and upsampling operations would smooth out small natural edge areas. To validate this ratiocination, we test the same pretrained MDE network [6] with different inputs: the original images, the corresponding edge maps, and the images with highlighted edges (by deleting edge pixels). As shown in Fig. 1, the edge maps and edge-highlighted images obtain clearer edges (please ignore the structural distortion in the depth maps). The aforementioned results indicate that the edge itself plays a critical role in producing fine details and edges.\n\n(ii) Another phenomenon that supports our conjecture is the performance drop of the degraded and cross-domain images. Some existing works [17,18] believe that MDE networks rely on geometric cues, occlusion boundaries, and textures to produce depth details. However, they cannot explain the significant performance gap between the normal and degraded images, as these factors would hardly be affected by the slight noise. Therefore, we attribute the performance drop to the disturbance of the edge information, which is more than sensitive to noise or blur. As illustrated in Fig. 1 (blue box), we compare the predicted depths on the degraded images, the corresponding edge maps, and the edge-highlighted images, the latter two inputs turn out to be robust to the image degradation, which suggests the key to producing clearer edges is to preserve and utilize the edge information. Furthermore, as shown in the yellow box, we utilize ControlNet’s [19] edge control conditions and stable diffusion models [20] to generate a series of images with diverse styles from the edge map. Despite the variations in texture and color information among these images, they consistently produce nearly identical depth maps. We attribute this phenomenon to the consistency in their edge structure information. Please see more details in the supplementary material. Driven by this analysis, we propose to dig into the edge information and use it to produce high-quality depth maps with accurate edges and details. Specifically, we present an Edge-aware Consistency Fusion network (ECFNet) which mainly consists of two parts: Layered Fusion Module (LFM) and Depth Consistency Module (DCM). LFM plays a role in acquiring clear edges by fusing the initial depth maps from the edge maps, the edge-highlighted images, and the original depth maps. The key idea of LFM derives from the fact that the edge itself helps predict sharper depth edges (see Fig. 1). As the quality of the detected edges would affect the fused depth, we develop a hybrid edge detection strategy to get high-quality edges, which incorporates the classical and learning-based edge detection methods. However, as the edge maps contain no texture and shadow cues, the corresponding predicted depth maps suffer from the wrong spatial structure and inaccurate scale. What’s more, even the same fixed MDE network can not guarantee the predictions from different inputs, (i.e., the original image, the corresponding edge map, and the edge-highlighted image) have the same depth range and distribution. The aforementioned two problems lead to a thorny phenomenon: the fused depth maps from LFM have clear edges but inaccurate overall structure. To handle this problem, we propose DCM to learn the local depth residual between the fused depth and the initial depth. The learned residual will be further used to update the fused depth. The goal of DCM is to maintain the high-frequency details and reduce the structural errors in the fused depth, which is critical to get the high-quality final depth.\n\nWe conduct various experiments to compare ECFNet with other methods and to validate the effectiveness of different modules. Extensive experimental results indicate that ECFNet achieves state-of-the-art performance compared to related methods, especially in producing accurate edge depth. We also illustrate that ECFNet achieves significantly superior performance to the existing SOTA methods when faced with degraded images.\n\nOur contributions can be summarized as follows:\n\n- • We explore and validate that edge information plays a critical role in producing high-quality depth maps with clear edges and details, providing new insights for cross-domain downstream tasks utilizing clear edge depth maps (see details in supplementary material).\n\n- • We present a novel edge-aware consistency fusion network (ECFNet) to predict accurate monocular depth, which consists of a layered fusion module and a depth consistency module.\n\n- • Experimental results on multiple datasets indicate that our method achieves state-of-the-art performance.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "Shariq Farooq Bhat, Ibraheem Alhashim, and Peter Wonka. Adabins: Depth estimation using adaptive bins. In Proc. IEEE Conf. Comp. Vis. Patt. Recogn. , 2021."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib21",
+      "text": "Iro Laina, Christian Rupprecht, Vasileios Belagiannis, Federico Tombari, and Nassir Navab. Deeper depth prediction with fully convolutional residual networks. In Int. Conf. 3D. Vis. , 2016."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib59",
+      "text": "Wei Yin, Jianming Zhang, Oliver Wang, Simon Niklaus, Long Mai, Simon Chen, and Chunhua Shen. Learning to recover 3d scene shape from a single image. In Proc. IEEE Conf. Comp. Vis. Patt. Recogn. , 2021b."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib39",
+      "text": "René Ranftl, Katrin Lasinger, David Hafner, Konrad Schindler, and Vladlen Koltun. Towards robust monocular depth estimation: Mixing datasets for zero-shot cross-dataset transfer. IEEE Transactions on Pattern Analysis and Machine Intelligence , 44(3), 2022."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib54",
+      "text": "Cho-Ying Wu, Jialiang Wang, Michael Hall, Ulrich Neumann, and Shuochen Su. Toward practical monocular indoor depth estimation. In Proc. IEEE Conf. Comp. Vis. Patt. Recogn. , 2022."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib38",
+      "text": "René Ranftl, Alexey Bochkovskiy, and Vladlen Koltun. Vision transformers for dense prediction. Proc. IEEE Int. Conf. Comp. Vis. , 2021."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib16",
+      "text": "Adrian Johnston and Gustavo Carneiro. Self-supervised monocular trained depth estimation using self-attention and discrete disparity volume. In Proc. IEEE Conf. Comp. Vis. Patt. Recogn. , 2020."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib33",
+      "text": "Matteo Poggi, Filippo Aleotti, Fabio Tosi, and Stefano Mattoccia. On the uncertainty of self-supervised monocular depth estimation. In Proc. IEEE Conf. Comp. Vis. Patt. Recogn. , 2020."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "Huan Fu, Mingming Gong, Chaohui Wang, Kayhan Batmanghelich, and Dacheng Tao. Deep ordinal regression network for monocular depth estimation. In Proc. IEEE Conf. Comp. Vis. Patt. Recogn. , 2018."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib58",
+      "text": "Wei Yin, Yifan Liu, and Chunhua Shen. Virtual normal: Enforcing geometric constraints for accurate and robust depth prediction. IEEE Transactions on Pattern Analysis and Machine Intelligence (TPAMI) , 2021a."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib56",
+      "text": "Ke Xian, Jianming Zhang, Oliver Wang, Long Mai, Zhe Lin, and Zhiguo Cao. Structure-guided ranking loss for single image depth prediction. In Proc. IEEE Conf. Comp. Vis. Patt. Recogn. , 2020."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib3",
+      "text": "Tian Chen, Shijie An, Yuan Zhang, Chongyang Ma, Huayan Wang, Xiaoyan Guo, and Wen Zheng. Improving monocular depth estimation by leveraging structural awareness and complementary datasets. In Proc. Eur. Conf. Comp. Vis. , 2020a."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib10",
+      "text": "Clément Godard, Oisin Mac Aodha, and Gabriel J Brostow. Unsupervised monocular depth estimation with left-right consistency. In Proc. IEEE Conf. Comp. Vis. Patt. Recogn. , 2017."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib53",
+      "text": "Alex Wong and Stefano Soatto. Bilateral cyclic constraint and adaptive regularization for unsupervised monocular depth prediction. In Proc. IEEE Conf. Comp. Vis. Patt. Recogn. , 2019."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib57",
+      "text": "Zhenheng Yang, Peng Wang, Wei Xu, Liang Zhao, and Ramakant Nevatia. Unsupervised learning of geometry from videos with edge-aware depth-normal consistency. In Proc. AAAI Conf. Artificial Intell. , 2018."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib62",
+      "text": "Shengjie Zhu, Garrick Brazil, and Xiaoming Liu. The Edge of Depth: Explicit constraints between segmentation and depth. In Proc. IEEE Conf. Comp. Vis. Patt. Recogn. , 2020."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib14",
+      "text": "Junjie Hu, Yan Zhang, and Takayuki Okatani. Visualization of convolutional neural networks for monocular depth estimation. In Proc. IEEE Int. Conf. Comp. Vis. , 2019."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib7",
+      "text": "Tom van Dijk and Guido de Croon. How do neural networks see depth in single images? In Proc. IEEE Int. Conf. Comp. Vis. , 2019."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib61",
+      "text": "Lvmin Zhang and Maneesh Agrawala. Adding conditional control to text-to-image diffusion models. arXiv preprint arXiv:2302.05543 , 2023."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib40",
+      "text": "Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, and Björn Ommer. High-resolution image synthesis with latent diffusion models. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 10684–10695, 2022."
+    }
+  ]
+}

@@ -1,0 +1,295 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2310.09690",
+  "title": "Configuration Validation with Large Language Models",
+  "authors": "Xinyu Lian, Yinfang Chen, Runxiang Cheng, Jie Huang, Parth Thakkar, Minjia Zhang, Tianyin Xu",
+  "year": "2024",
+  "categories": [
+    "cs.SE",
+    "cs.AI",
+    "cs.OS"
+  ],
+  "url": "https://arxiv.org/abs/2310.09690",
+  "html_url": "https://arxiv.org/html/2310.09690",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1113,
+  "text": "Modern software systems undertake hundreds to thousands of configuration changes on a daily basis [1,2,3,4,5,6,7]. For example, at Meta/Facebook, thousands of configuration file “diffs” are committed daily, outpacing the frequency of code changes [1,2]. Other systems such as at Google and Microsoft also frequently deploy configuration changes [5,3,6]. Such velocity of configuration changes inevitably leads to misconfigurations. Today, misconfigurations are among the dominating causes of production incidents [2,8,9,10,11,12,13,7,3].\n\nTo detect misconfigurations, today’s configuration management systems employ the “configuration-as-code” paradigm and enforce continuous configuration validation, ranging from static validation, to configuration testing, and to manual review and approval [1]. The configuration is first checked by validation code (aka validators) based on predefined correctness rules [1,14,15,16,17,18,19,20]; in practice, validators are written by engineers [1,14,15]. After passing validators, configuration changes are then tested with code to check program behavior [21,22]. Lastly, configuration changes are reviewed like source-code changes.\n\nThe aforementioned pipeline either relies on manual inspection to spot misconfigurations in the configuration file diffs, or requires significant engineering efforts to implement and maintain validators or test cases. However, these efforts are known to be costly and incomprehensive. For example, despite that mature projects all include extensive configuration validators, recent work [23,24,25,26,27,28,29] repeatedly shows that existing validators are insufficient. The reasons are twofold. First, with large-scale systems exposing hundreds to thousands of configuration parameters [30], implementing validators for every parameter becomes a significant overhead. Recent studies [23,1] report that many parameters are uncovered by existing validators, even in mature software projects. Second, it is non-trivial to validate a parameter, which could have many different correctness properties, such as type, range, semantic meaning, dependencies with other parameters, etc.; encoding all of them into validators is laborious and error-prone, not to mention the maintenance cost [31,32].\n\nUsing machine learning (ML) and natural language processing (NLP) to detect misconfigurations has been considered a promising approach to addressing the above challenges. Compared to manually written static validators, ML or NLP-based approaches are automatic, easy to scale to a large number of parameters, and applicable to different projects. Several ML/NLP-based misconfiguration detection techniques were proposed [33,34,35,36,37,38,39,40]. The key idea is to first learn correctness rules from field configuration data [41,34,35,36,38,40,33,42,43] or from documents [37,39], and then use the learned rules to detect misconfigurations in new configuration files. ML/NLP-based approaches have achieved good success. For example, Microsoft adopted PeerPressure [35,44] as a part of Microsoft Product Support Services (PSS) toolkits. It collects configuration data in Windows Registry from a large number of Windows users to learn statistical golden states of system configurations.\n\nHowever, ML/NLP-based misconfiguration detection is also significantly limited. First, the need for large volumes of system-specific configuration data makes it hard to apply those techniques outside corporations that collect user configurations (e.g., Windows Registry [40]) or maintain a knowledge base [39]. For example, in cloud systems where the same set of configurations is maintained by a small DevOps team [1,4], there is often no enough information for learning [24]. Moreover, prior ML/NLP-based detection techniques all target specific projects, and rely on predefined features [38], templates [34], or models [39], making them hard to generalize.\n\nRecent advances on Large Language Models (LLMs), such as GPT [45] and Codex [46], show promises to address some of the long-lasting limitations of traditional ML/NLP-based misconfiguration detection techniques. Specifically, LLMs are trained on massive amounts of public data, including configuration data—configuration files in software repositories, configuration documents, knowledge-based articles, Q&A websites for resolving configuration issues, etc. Hence, LLMs encode extensive knowledge of both common and project-specific configuration. Such knowledge can be utilized for configuration validation without the need for manual rule engineering. Furthermore, LLMs show the capability of generalization and reasoning [47,48] and can potentially “understand” configuration semantics. For example, they can not only understand that values of a port must be in the range of [0, 65535], but also reason that a specific configuration value represents a port (e.g., based on the name and description) and thus has to be within the range.\n\nCertainly, LLMs have limitations. They are known for hallucination and non-determinism [49,50]. Additionally, LLMs have limited input context, which can pose challenges when encoding extensive contexts like configuration file and related code. Moreover, they are reported to be biased to popular content in the training dataset. Fortunately, active efforts [51,52,53,54,55] are made to address these limitations.\n\nIn this paper, we present a first analysis on the feasibility and effectiveness of using LLMs such as GPT and Claude for configuration validation. As a first step, we empirically evaluate LLMs in the role of configuration validators, without additional fine-tuning or code generation. We focus on basic misconfigurations (those violating explicit correctness constraints) which are common misconfigurations encountered in the field [9]. We do not target environment-specific misconfigurations or bugs triggered by configuration (§ VII).\n\nTo do so, we develop Ciri, an LLM-empowered configuration validation framework. Ciri takes a configuration file or a file diff as the input; it outputs detected misconfigurations along with the reasons that explain them. Ciri integrates different LLMs such as GPT-4, Claude-3, and CodeLlama. Ciri devises effective prompt engineering with few-shot learning based on existing configuration data. Ciri also validates the outputs of LLMs to generate validation results, coping with the hallucination and non-determinism of LLMs. A key design principle of Ciri is separation of policy and mechanism. Ciri can serve as an open framework for experimenting with different models, prompt engineering, training datasets, and validation methods.\n\nWe study Ciri’s validation effectiveness using eight popular LLMs including remote models (GPT-4, GPT-3.5, Claude-3-Opus, and Claude-3-Sonnet), and locally housed models (CodeLlama-7B/13B/34B and DeepSeek). We evaluate ten widely deployed open-source systems with diverse types. Our study confirms the potential of using LLMs for configuration validation, e.g., Ciri with Claude-3-Opus detects 45 out of 51 real-world misconfigurations, outperforming recent configuration validation techniques. Our study also helps understand the design space of LLM-based validators like Ciri, especially in terms of prompt engineering with few-shot learning and voting. We find that using configuration data as shots can enhance validation effectiveness. Specifically, few-shot learning using both valid configuration and misconfiguration data achieves the highest effectiveness. Our results also reveal open challenges: Ciri struggles with certain types of misconfigurations such as dependency violations and version-specific misconfigurations. It is also biased to the popularity of configuration parameters, causing both false positives and false negatives.\n\nIn summary, this paper makes the following contributions:\n\n- • A new direction of configuration validation using pre-trained large language models (LLMs);\n\n- • Ciri, an LLM-empowered configuration validation framework and an open platform for configuration research;\n\n- • An empirical analysis on the effectiveness of LLM-based configuration validation, and its design space;\n\n- • We have released Ciri and other research artifacts at https://github.com/ciri4conf/ciri.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib70",
+      "text": "Tang, C., Kooburat, T., Venkatachalam, P., Chander, A., Wen, Z., Narayanan, A., Dowell, P., and Karl, R. Holistic Configuration Management at Facebook. In SOSP (2015)."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib45",
+      "text": "Maurer, B. Fail at Scale: Reliability in the Face of Rapid Change. Communications of the ACM (2015)."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib11",
+      "text": "Barroso, L. A., Hölzle, U., and Ranganathan, P. The Datacenter as a Computer: Designing Warehouse-Scale Machines , 3 ed. Morgan and Claypool Publishers, 2018."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib68",
+      "text": "Sherman, A., Lisiecki, P., Berkheimer, A., and Wein, J. ACMS: Akamai Configuration Management System. In NSDI (2005)."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib46",
+      "text": "Mehta, S., Bhagwan, R., Kumar, R., Ashok, B., Bansal, C., Maddila, C., Bird, C., Asthana, S., and Kumar, A. Rex: Preventing Bugs and Misconfiguration in Large Services using Correlated Change Analysis. In NSDI (2020)."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib13",
+      "text": "Beyer, B., Murphy, N. R., Rensin, D. K., Kawahara, K., and Thorne, S. Site Reliability Workbook: Practical Ways to Implement SRE . O’Reilly Media Inc., 2018."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib67",
+      "text": "Sayagh, M., Kerzazi, N., Adams, B., and Petrillo, F. Software Configuration Engineering in Practice: Interviews, Surveys, and Systematic Literature Review. TSE (2018)."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib26",
+      "text": "Gunawi, H. S., Hao, M., Suminto, R. O., Laksono, A., Satria, A. D., Adityatama, J., and Eliazar, K. J. Why Does the Cloud Stop Computing? Lessons from Hundreds of Service Outages. In SOCC (2016)."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib90",
+      "text": "Yin, Z., Ma, X., Zheng, J., Zhou, Y., Bairavasundaram, L. N., and Pasupathy, S. An Empirical Study on Configuration Errors in Commercial and Open Source Systems. In SOSP (2011)."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib89",
+      "text": "Xu, T., and Zhou, Y. Systems Approaches to Tackling Configuration Errors: A Survey. ACM Computing Surveys 47 , 4 (2015)."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib55",
+      "text": "Oppenheimer, D., Ganapathi, A., and Patterson, D. A. Why Do Internet Services Fail, and What Can Be Done About It? In USITS (2003)."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib33",
+      "text": "Kendrick, S. What Takes Us Down? USENIX ;login: (2012)."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib61",
+      "text": "Rabkin, A., and Katz, R. How Hadoop Clusters Break. IEEE Software Magazine (2013)."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib58",
+      "text": "Raab, M., and Barany, G. Challenges in Validating FLOSS Configuration. In OSS (2017)."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib12",
+      "text": "Baset, S., Suneja, S., Bila, N., Tuncer, O., and Isci, C. Usable Declarative Configuration Specification and Validation for Applications, Systems, and Cloud. In Middleware (2017)."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib29",
+      "text": "Huang, P., Bolosky, W. J., Sigh, A., and Zhou, Y. ConfValley: A Systematic Configuration Validation Framework for Cloud Services. In EuroSys (2015)."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib36",
+      "text": "Leuschner, L., Küttler, M., Stumpf, T., Baier, C., Härtig, H., and Klüppelholz, S. Towards Automated Configuration of Systems with Non-Functional Constraints. In HotOS-XVI (2017)."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib41",
+      "text": "Liao, X., Zhou, S., Li, S., Jia, Z., Liu, X., and He, H. Do You Really Know How to Configure Your Software? Configuration Constraints in Source Code May Help. IEEE Transactions on Reliability (2018)."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib50",
+      "text": "Nadi, S., Berger, T., Kästner, C., and Czarnecki, K. Where do configuration constraints stem from? an extraction approach and an empirical study. TSE (2015)."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib91",
+      "text": "Zhang, J., Piskac, R., Zhai, E., and Xu, T. Static Detection of Silent Misconfigurations with Deep Interaction Analysis. In OOPSLA (2021)."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib69",
+      "text": "Sun, X., Cheng, R., Chen, J., Ang, E., Legunsen, O., and Xu, T. Testing Configuration Changes in Context to Prevent Production Failures. In OSDI (2020)."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib87",
+      "text": "Xu, T., and Legunsen, O. Configuration Testing: Testing Configuration Values as Code and with Code. arXiv:1905.12195 (2019)."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib88",
+      "text": "Xu, T., Zhang, J., Huang, P., Zheng, J., Sheng, T., Yuan, D., Zhou, Y., and Pasupathy, S. Do Not Blame Users for Misconfigurations. In SOSP (2013)."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib86",
+      "text": "Xu, T., Jin, X., Huang, P., Zhou, Y., Lu, S., Jin, L., and Pasupathy, S. Early Detection of Configuration Errors to Reduce Failure Damage. In OSDI (2016)."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib38",
+      "text": "Li, S., Li, W., Liao, X., Peng, S., Zhou, S., Jia, Z., and Wang, T. ConfVD: System Reactions Analysis and Evaluation Through Misconfiguration Injection. IEEE Transactions on Reliability (2018)."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib32",
+      "text": "Keller, L., Upadhyaya, P., and Candea, G. ConfErr: A Tool for Assessing Resilience to Human Configuration Errors. In DSN (2008)."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib39",
+      "text": "Li, W., Jia, Z., Li, S., Zhang, Y., Wang, T., Xu, E., Wang, J., and Liao, X. Challenges and Opportunities: An In-Depth Empirical Study on Configuration Error Injection Testing. In ISSTA (2021)."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib74",
+      "text": "Wang, T., He, H., Liu, X., Li, S., Jia, Z., Jiang, Y., Liao, Q., and Li, W. ConfTainter: Static Taint Analysis For Configuration Options. In ASE (2023)."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib75",
+      "text": "Wang, T., Jia, Z., Li, S., Zheng, S., Yu, Y., Xu, E., Peng, S., and Liao, X. Understanding and Detecting On-the-Fly Configuration Bugs. In ICSE (2023)."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib85",
+      "text": "Xu, T., Jin, L., Fan, X., Zhou, Y., Pasupathy, S., and Talwadker, R. Hey, You Have Given Me Too Many Knobs! Understanding and Dealing with Over-Designed Configuration in System Software. In ESEC/FSE (2015)."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib93",
+      "text": "Zhang, S., and Ernst, M. D. Which Configuration Option Should I Change? In ICSE (2014)."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib94",
+      "text": "Zhang, Y., He, H., Legunsen, O., Li, S., Dong, W., and Xu, T. An Evolutionary Study of Configuration Design and Implementation in Cloud Systems. In ICSE (2021)."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib14",
+      "text": "Bhagwan, R., Mehta, S., Radhakrishna, A., and Garg, S. Learning Patterns in Configuration. In ASE (2021)."
+    },
+    {
+      "n": 34,
+      "id": "bib.bib92",
+      "text": "Zhang, J., Renganarayana, L., Zhang, X., Ge, N., Bala, V., Xu, T., and Zhou, Y. EnCore: Exploiting System Environment and Correlation Information for Misconfiguration Detection. In ASPLOS (2014)."
+    },
+    {
+      "n": 35,
+      "id": "bib.bib72",
+      "text": "Wang, H. J., Platt, J. C., Chen, Y., Zhang, R., and Wang, Y.-M. Automatic Misconfiguration Troubleshooting with PeerPressure. In OSDI (2004)."
+    },
+    {
+      "n": 36,
+      "id": "bib.bib35",
+      "text": "Le, F., Lee, S., Wong, T., Kim, H. S., and Newcomb, D. Minerals: Using Data Mining to Detect Router Misconfigurations. Tech. Rep. CMU-CyLab-06-008, Carnegie Mellon University, 2006."
+    },
+    {
+      "n": 37,
+      "id": "bib.bib83",
+      "text": "Xiang, C., Huang, H., Yoo, A., Zhou, Y., and Pasupathy, S. PracExtractor: Extracting Configuration Good Practices from Manuals to Detect Server Misconfigurations. In ATC (2020)."
+    },
+    {
+      "n": 38,
+      "id": "bib.bib56",
+      "text": "Palatin, N., Leizarowitz, A., Schuster, A., and Wolff, R. Mining for Misconfigured Machines in Grid Systems. In KDD (2006)."
+    },
+    {
+      "n": 39,
+      "id": "bib.bib57",
+      "text": "Potharaju, R., Chan, J., Hu, L., Nita-Rotaru, C., Wang, M., Zhang, L., and Jain, N. ConfSeer: Leveraging Customer Support Knowledge Bases for Automated Misconfiguration Detection. In VLDB (2015)."
+    },
+    {
+      "n": 40,
+      "id": "bib.bib77",
+      "text": "Wang, Y.-M., Verbowski, C., Dunagan, J., Chen, Y., Wang, H. J., Yuan, C., and Zhang, Z. STRIDER: A Black-box, State-based Approach to Change and Configuration Management and Support. In LISA (2003)."
+    },
+    {
+      "n": 41,
+      "id": "bib.bib34",
+      "text": "Kiciman, E., and Wang, Y.-M. Discovering Correctness Constraints for Self-Management of System Configuration. In ICAC (2004)."
+    },
+    {
+      "n": 42,
+      "id": "bib.bib66",
+      "text": "Santolucito, M., Zhai, E., and Piskac, R. Probabilistic Automated Language Learning for Configuration Files. In CAV (2016)."
+    },
+    {
+      "n": 43,
+      "id": "bib.bib65",
+      "text": "Santolucito, M., Zhai, E., Dhodapkar, R., Shim, A., and Piskac, R. Synthesizing Configuration File Specifications with Association Rule Learning. In OOPSLA (2017)."
+    },
+    {
+      "n": 44,
+      "id": "bib.bib30",
+      "text": "Huang, Q., Wang, H. J., and Borisov, N. Privacy-Preserving Friends Troubleshooting Network. In NDSS (2005)."
+    },
+    {
+      "n": 45,
+      "id": "bib.bib2",
+      "text": "ChatGPT. https://openai.com/blog/chatgpt , 2022."
+    },
+    {
+      "n": 46,
+      "id": "bib.bib3",
+      "text": "Codex. https://openai.com/blog/openai-codex , 2022."
+    },
+    {
+      "n": 47,
+      "id": "bib.bib78",
+      "text": "Wei, J., Wang, X., Schuurmans, D., Bosma, M., Ichter, B., Xia, F., Chi, E., Le, Q., and Zhou, D. Chain-of-Thought Prompting Elicits Reasoning in Large Language Models. arXiv:2201.11903 (2023)."
+    },
+    {
+      "n": 48,
+      "id": "bib.bib28",
+      "text": "Huang, J., and Chang, K. C.-C. Towards Reasoning in Large Language Models: A Survey. In Findings of ACL (2023)."
+    },
+    {
+      "n": 49,
+      "id": "bib.bib10",
+      "text": "Bang, Y., Cahyawijaya, S., Lee, N., Dai, W., Su, D., Wilie, B., Lovenia, H., Ji, Z., Yu, T., Chung, W., et al. A multitask, multilingual, multimodal evaluation of chatgpt on reasoning, hallucination, and interactivity. arXiv:2302.04023 (2023)."
+    },
+    {
+      "n": 50,
+      "id": "bib.bib95",
+      "text": "Zhang, Y., Li, Y., Cui, L., Cai, D., Liu, L., Fu, T., Huang, X., Zhao, E., Zhang, Y., Chen, Y., et al. Siren’s Song in the AI Ocean: A Survey on Hallucination in Large Language Models. arXiv:2309.01219 (2023)."
+    },
+    {
+      "n": 51,
+      "id": "bib.bib8",
+      "text": "Anthropic . Introducing 100k context windows. https://www.anthropic.com/index/100k-context-windows , 2023."
+    },
+    {
+      "n": 52,
+      "id": "bib.bib51",
+      "text": "Nakano, R., Hilton, J., Balaji, S., Wu, J., Ouyang, L., Kim, C., Hesse, C., Jain, S., Kosaraju, V., Saunders, W., Jiang, X., Cobbe, K., Eloundou, T., Krueger, G., Button, K., Knight, M., Chess, B., and Schulman, J. Webgpt: Browser-assisted question-answering with human feedback. arXiv:2112.09332 (2022)."
+    },
+    {
+      "n": 53,
+      "id": "bib.bib76",
+      "text": "Wang, X., Wei, J., Schuurmans, D., Le, Q., Chi, E., Narang, S., Chowdhery, A., and Zhou, D. Self-Consistency Improves Chain of Thought Reasoning in Language Models. arXiv:2203.11171 (2023)."
+    },
+    {
+      "n": 54,
+      "id": "bib.bib42",
+      "text": "Liu, Y., Yao, Y., Ton, J.-F., Zhang, X., Guo, R., Cheng, H., Klochkov, Y., Taufiq, M. F., and Li, H. Trustworthy llms: a survey and guideline for evaluating large language models’ alignment. arXiv:2308.05374 (2023)."
+    },
+    {
+      "n": 55,
+      "id": "bib.bib44",
+      "text": "Manakul, P., Liusie, A., and Gales, M. J. F. Selfcheckgpt: Zero-resource black-box hallucination detection for generative large language models. arXiv:2303.08896 (2023)."
+    }
+  ]
+}

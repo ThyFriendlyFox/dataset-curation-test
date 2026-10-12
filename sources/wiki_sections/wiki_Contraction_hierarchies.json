@@ -1,0 +1,42 @@
+{
+  "source_type": "encyclopedia_article",
+  "source_id": "enwiki:Contraction hierarchies#rev1375063967",
+  "title": "Contraction hierarchies",
+  "authors": "Wikipedia contributors",
+  "year": "2026",
+  "url": "https://en.wikipedia.org/w/index.php?title=Contraction_hierarchies&oldid=1375063967",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Algorithm",
+  "word_count": 1110,
+  "text": "The contraction hierarchies (CH) algorithm is a two-phase approach to the shortest path problem consisting of a preprocessing phase and a query phase. As road networks change rather infrequently, more time (seconds to hours) can be used to once precompute some calculations before queries are to be answered. Using this precomputed data, many queries can be answered taking very little time (microseconds) each.[1,2] CHs rely on shortcuts to achieve this speedup. A shortcut connects two vertices u and v not adjacent in the original graph. Its edge weight is the sum of the edge weights on the shortest u - v path.\n\nConsider two large cities connected by a highway. Between these two cities, there is a multitude of junctions leading to small villages and suburbs. Most drivers want to get from one city to the other – maybe as part of a larger route – and not take one of the exits on the way. In the graph representing this road layout, each intersection is represented by a node and edges are created between neighboring intersections. To calculate the distance between these two cities, the algorithm has to traverse all the edges along the way, adding up their length. Precomputing this distance once and storing it in an additional edge created between the two large cities will save calculations each time this highway has to be evaluated in a query. This additional edge is called a \"shortcut\" and has no counterpart in the real world. The contraction hierarchies algorithm has no knowledge about road types but is able to determine which shortcuts have to be created using the graph alone as input.\n\n### Preprocessing phase\n\nThe CH algorithm relies on shortcuts created in the preprocessing phase to reduce the search space – that is the number of vertices CH has to look at, at query time. To achieve this, iterative vertex contractions are performed. When contracting a vertex v it is temporarily removed from the graph G , and a shortcut is created between each pair \\{u, w\\} of neighboring vertices if the shortest path from u to w contains v .[3] The process of determining if the shortest path between u and w contains v is called witness search. It can be performed for example by computing a path from u to w using a forward search using only not yet contracted nodes.[2]\n\n### Node order\n\nThe vertices of the input graph have to be contracted in a way which minimizes the number of edges added to the graph by contractions. As optimal node ordering is NP-complete,[4] heuristics are used.[3]\n\nBottom-up and top-down heuristics exist. On one hand, the computationally cheaper bottom-up heuristics decide the order in which to contract the vertices in a greedy fashion; this means the order is not known in advance but rather the next node is selected for contraction after the previous contraction has been completed. Top-down heuristics on the other hand precompute the whole node ordering before the first node is contracted. This yields better results but needs more preprocessing time.[3]\n\nIn bottom-up heuristics, a combination of factors is used to select the next vertex for contraction. As the number of shortcuts is the primary factor that determines preprocessing and query runtime, we want to keep it as small as possible. The most important term by which to select the next node for contraction is therefore the net number of edges added when contracting a node x . This is defined as A(x)-|\\{(u, x) \\colon (u, x) \\in E\\}| where A(x) is the number of shortcuts that would be created if x were to be contracted and |\\{(u, x) \\colon (u, x) \\in E\\}| is the number of edges incident to x . Using this criterion alone, a linear path would result in a linear hierarchy (many levels) and no created shortcuts. By considering the number of nearby vertices that are already contracted, a uniform contraction and a flat hierarchy (less levels) is achieved. This can, for example, be done by maintaining a counter for each node that is incremented each time a neighboring vertex is contracted. Nodes with lower counters are then preferred to nodes with higher counters.[5]\n\nTop-down heuristics, on the other hand, yield better results but need more preprocessing time. They classify vertices that are part of many shortest paths as more important than those that are only needed for a few shortest paths. This can be approximated using nested dissections.[3] To compute a nested dissection, one recursively separates a graph into two parts, which are themselves then separated into two parts and so on. That is, find a subset of nodes S \\subseteq V which when removed from the graph G separate G into two disjunct pieces G_1, G_2 of approximately equal size such that S \\cup G_1 \\cup G_2 = G . Place all nodes v \\in S last in the node ordering and then recursively compute the nested dissection for G_1 and G_2 ,[6] the intuition being that all queries from one half of the graph to the other half of the graph need to pass through the small separator and therefore nodes in this separator are of high importance. Nested dissections can be efficiently calculated on road networks because of their small separators.[7]\n\n### Query phase\n\nIn the query phase, a bidirectional search is performed starting from the starting node s and the target node t on the original graph augmented by the shortcuts created in the preprocessing phase.[3] The most important vertex on the shortest path between s and t will be either s or t themselves or more important than both s and t . Therefore, the vertex u minimizing \\mathrm{dist}(s, u) + \\mathrm{dist}(u, t) is on the shortest s-t path in the original graph and \\mathrm{dist}(s, u) + \\mathrm{dist}(u, t) = \\mathrm{dist}(s, t) holds.[3] This, in combination with how shortcuts are created, means that both forward and backward search only need to relax edges leading to more important nodes (upwards) in the hierarchy which keeps the search space small.[2] In all up-(down-up)-down paths, the inner (down-up) can be skipped, because a shortcut has been created in the preprocessing stage.\n\n### Path retrieval\n\nA CH query, as described above, yields the time or distance from s to t but not the actual path. To obtain the list of edges (roads) on the shortest path, the shortcuts taken have to be unpacked. Each shortcut is the concatenation of two edges: either two edges of the original graph, or two shortcuts, or one original edge and one shortcut. Storing the middle vertex of each shortcut during contraction enables linear-time recursive unpacking of the shortest route.[3,2]",
+  "references": [
+    {
+      "n": 1,
+      "text": "Dibbelt, Julian. (5 April 2016). Customizable Contraction Hierarchies. Journal of Experimental Algorithmics. doi:10.1145/2886843"
+    },
+    {
+      "n": 2,
+      "text": "Geisberger, Robert. (2012). Exact Routing in Large Road Networks Using Contraction Hierarchies. Transportation Science. doi:10.1287/trsc.1110.0401"
+    },
+    {
+      "n": 3,
+      "text": "Bast, Hannah. (2016). Algorithm Engineering. doi:10.1007/978-3-319-49487-6_2"
+    },
+    {
+      "n": 4,
+      "text": "Bauer, Reinhard. (2010-03-01). Combining hierarchical and goal-directed speed-up techniques for dijkstra's algorithm. Journal of Experimental Algorithmics. doi:10.1145/1671970.1671976"
+    },
+    {
+      "n": 5,
+      "text": "Geisberger, Robert. (2008). Experimental Algorithms. Springer Berlin Heidelberg. doi:10.1007/978-3-540-68552-4_24"
+    },
+    {
+      "n": 6,
+      "text": "Bauer, Reinhard. (2016-09-13). Search-space size in contraction hierarchies. Theoretical Computer Science. doi:10.1016/j.tcs.2016.07.003"
+    },
+    {
+      "n": 7,
+      "text": "Delling, Daniel. (May 2011). 2011 IEEE International Parallel & Distributed Processing Symposium. doi:10.1109/ipdps.2011.108"
+    }
+  ]
+}

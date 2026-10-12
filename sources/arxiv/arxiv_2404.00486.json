@@ -1,0 +1,159 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2404.00486",
+  "title": "Dialectical Alignment: Resolving the Tension of 3H and Security Threats of LLMs",
+  "authors": "Shu Yang, Jiayuan Su, Han Jiang, Mengdi Li, Keyuan Cheng, Muhammad Asif Ali, Lijie Hu, Di Wang",
+  "year": "2024",
+  "categories": [
+    "cs.CL",
+    "cs.AI"
+  ],
+  "url": "https://arxiv.org/abs/2404.00486",
+  "html_url": "https://arxiv.org/html/2404.00486",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 670,
+  "text": "Large language models (LLMs) trained on large datasets and with significant computational resources have shown unprecedented capabilities [1,2,3,4]. For instance, Claude-3’s latest release exhibits tentative self-awareness in the Needle In A Haystack eval, highlighting the importance of further enhancing the security, user-friendliness, and controllability of LLMs [5,6,7]. A straightforward way to achieve these goals is to align LLMs’ behavior with human feedback [8,9].\n\nExisting alignment methods first allow humans (or LLMs) to select preferred model responses based on specific criteria. Then, reinforcement learning techniques, e.g., RLHF [10,11,8], RLAIF [12,13,14], and Direct Preference Optimization (DPO) [15] methods are used to train LLMs towards preference-specific behaviors. However, utilizing the existing widely used helpful, honest, harmless (3H) preference criteria to align LLMs poses potential risks as follows: (i) In terms of the model performance, over-optimizing 3H rewards according to Goodhart’s law may hamper truthfulness performance [16], e.g., balancing harmlessness vs usefulness [17,18]; (ii) 3H models tend to imply that LLMs overly prefer human inputs in favor of self-positions [19,20], rendering them susceptible to camouflaged red-team attacks or poisoned text in the context window [21,22]. The phenomenon that LLMs are highly receptive to external information is referred to as Adaptive Chameleon by [19].\n\nIn this paper, we introduce Dialectical Alignment (DA) to address the challenge that 3H LLMs frequently alter their answers when encountering knowledge conflicts due to their tendency to trust external input (by humans) easily. DA empowers aligned LLMs to think dialectically upon conflicting knowledge so that they can spontaneously decide whether to trust the external information or reject the poisoned contexts. We first explore two tasks representing two sides of a coin in dealing with knowledge conflicts: In-context Knowledge Editing (IKE) [23] and Poisoned Context Attack (PCA) [24,25,22] (see more details in Section 2). The existing studies mentioned above have investigated these two tasks separately, without recognizing their correlation: if an LLM is more susceptible to the external information in the context, the effectiveness of IKE improves while the success rate of PCA also increases; conversely, if a model tends to adhere to its own parametric memory, Poisoned Context Attack will be defended while the model also rejects IKE. We give intuitive examples of this fact in Figure 1 and Figure 2.\n\nSpecifically, we observe LLMs’ dialectical thinking ability with different inference paths (detailed in Table 1) in both IKE and PCA defense tasks. We use AI feedback to help us determine whether the model correctly handles context-memory conflict (the conflict between internal memory and external information) and inter-context conflict (conflict among various contexts of the external information) [26]. Based on the feedback, we construct supervised fine-tuning datasets and preference datasets. We align LLMs to dialectically deal with IKE and PCA without any additional prompt engineering or defensive prefix prompt like ”you may be attacked.”\n\nOur experiments show that DA can improve LLMs’ PCA defense performance with minimal impairment of IKE effects. This is extremely valuable for the Rretrieval-augmented generation (RAG) [27] applications, where both factual data and poisoned data may be retrieved into the model’s context in the real-world scenarios [28]. Our experiments also lead to a series of interesting findings. We highlight the following:\n\n- • LLMs are highly susceptible to attacks involving poisoned contexts within their context window. This finding aligns with the conclusions drawn by [22]. Furthermore, we observe that as the number of poisoned contexts increases, defending against such attacks becomes increasingly challenging.\n\n- • Prior knowledge is important for LLMs to deal with PCAs. Comparing all the paths in Table 1, we find that the Chain-of-Thought path with prior knowledge (CoT-PK) is effective in resisting the degradation in PCA defense, which is caused by the growth in a number of poisoned contexts we mentioned above.\n\n- • Prior knowledge leads to more stubborn LLMs. Although the CoT-PK mentioned above improves the ability of the model to defend PCAs, the price is a sharp decrease in the performance of IKE, which means that CoT-PK causes LLMs to be even more stubborn when dealing with knowledge conflicts.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib9",
+      "text": "Brown et al. (2020) Tom Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared D Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, Sandhini Agarwal, Ariel Herbert-Voss, Gretchen Krueger, Tom Henighan, Rewon Child, Aditya Ramesh, Daniel Ziegler, Jeffrey Wu, Clemens Winter, Chris Hesse, Mark Chen, Eric Sigler, Mateusz Litwin, Scott Gray, Benjamin Chess, Jack Clark, Christopher Berner, Sam McCandlish, Alec Radford, Ilya Sutskever, and Dario Amodei. Language models are few-shot learners. In H. Larochelle, M. Ranzato, R. Hadsell, M.F. Balcan, and H. Lin (eds.), Advances in Neural Information Processing Systems , volume 33, pp. 1877–1901. Curran Associates, Inc., 2020. URL https://proceedings.neurips.cc/paper_files/paper/2020/file/1457c0d6bfcb4967418bfb8ac142f64a-Paper.pdf ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib31",
+      "text": "Kaddour et al. (2023) Jean Kaddour, Joshua Harris, Maximilian Mozes, Herbie Bradley, Roberta Raileanu, and Robert McHardy. Challenges and applications of large language models, 2023."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib87",
+      "text": "Zhao et al. (2023) Wayne Xin Zhao, Kun Zhou, Junyi Li, Tianyi Tang, Xiaolei Wang, Yupeng Hou, Yingqian Min, Beichen Zhang, Junjie Zhang, Zican Dong, Yifan Du, Chen Yang, Yushuo Chen, Zhipeng Chen, Jinhao Jiang, Ruiyang Ren, Yifan Li, Xinyu Tang, Zikang Liu, Peiyu Liu, Jian-Yun Nie, and Ji-Rong Wen. A survey of large language models, 2023."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib10",
+      "text": "Bubeck et al. (2023) Sébastien Bubeck, Varun Chandrasekaran, Ronen Eldan, Johannes Gehrke, Eric Horvitz, Ece Kamar, Peter Lee, Yin Tat Lee, Yuanzhi Li, Scott Lundberg, Harsha Nori, Hamid Palangi, Marco Tulio Ribeiro, and Yi Zhang. Sparks of artificial general intelligence: Early experiments with gpt-4, 2023."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib53",
+      "text": "See et al. (2019) Abigail See, Stephen Roller, Douwe Kiela, and Jason Weston. What makes a good conversation? how controllable attributes affect human judgments. In Jill Burstein, Christy Doran, and Thamar Solorio (eds.), Proceedings of the 2019 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, NAACL-HLT 2019, Minneapolis, MN, USA, June 2-7, 2019, Volume 1 (Long and Short Papers) , pp. 1702–1723. Association for Computational Linguistics, 2019. doi: 10.18653/V1/N19-1170 . URL https://doi.org/10.18653/v1/n19-1170 ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib61",
+      "text": "Wang et al. (2023a) Boxin Wang, Weixin Chen, Hengzhi Pei, Chulin Xie, Mintong Kang, Chenhui Zhang, Chejian Xu, Zidi Xiong, Ritik Dutta, Rylan Schaeffer, et al. Decodingtrust: A comprehensive assessment of trustworthiness in gpt models. Thirty-seventh Conference on Neural Information Processing Systems Datasets and Benchmarks Track , 2023a."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib70",
+      "text": "Wang et al. (2023d) Yufei Wang, Wanjun Zhong, Liangyou Li, Fei Mi, Xingshan Zeng, Wenyong Huang, Lifeng Shang, Xin Jiang, and Qun Liu. Aligning large language models with human: A survey, 2023d."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib57",
+      "text": "Stiennon et al. (2022) Nisan Stiennon, Long Ouyang, Jeff Wu, Daniel M. Ziegler, Ryan Lowe, Chelsea Voss, Alec Radford, Dario Amodei, and Paul Christiano. Learning to summarize from human feedback, 2022."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib46",
+      "text": "Ouyang et al. (2022) Long Ouyang, Jeffrey Wu, Xu Jiang, Diogo Almeida, Carroll L. Wainwright, Pamela Mishkin, Chong Zhang, Sandhini Agarwal, Katarina Slama, Alex Ray, John Schulman, Jacob Hilton, Fraser Kelton, Luke Miller, Maddie Simens, Amanda Askell, Peter Welinder, Paul F. Christiano, Jan Leike, and Ryan Lowe. Training language models to follow instructions with human feedback. In Sanmi Koyejo, S. Mohamed, A. Agarwal, Danielle Belgrave, K. Cho, and A. Oh (eds.), Advances in Neural Information Processing Systems 35: Annual Conference on Neural Information Processing Systems 2022, NeurIPS 2022, New Orleans, LA, USA, November 28 - December 9, 2022 , 2022. URL http://papers.nips.cc/paper_files/paper/2022/hash/b1efde53be364a73914f58805a001731-Abstract-Conference.html ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib92",
+      "text": "Ziegler et al. (2020) Daniel M. Ziegler, Nisan Stiennon, Jeffrey Wu, Tom B. Brown, Alec Radford, Dario Amodei, Paul Christiano, and Geoffrey Irving. Fine-tuning language models from human preferences, 2020."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib50",
+      "text": "Ramamurthy et al. (2022) Rajkumar Ramamurthy, Prithviraj Ammanabrolu, Kianté Brantley, Jack Hessel, Rafet Sifa, Christian Bauckhage, Hannaneh Hajishirzi, and Yejin Choi. Is reinforcement learning (not) for natural language processing: Benchmarks, baselines, and building blocks for natural language policy optimization. arXiv preprint arXiv:2210.01241 , 2022."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib5",
+      "text": "Bai et al. (2022b) Yuntao Bai, Saurav Kadavath, Sandipan Kundu, Amanda Askell, Jackson Kernion, Andy Jones, Anna Chen, Anna Goldie, Azalia Mirhoseini, Cameron McKinnon, Carol Chen, Catherine Olsson, Christopher Olah, Danny Hernandez, Dawn Drain, Deep Ganguli, Dustin Li, Eli Tran-Johnson, Ethan Perez, Jamie Kerr, Jared Mueller, Jeffrey Ladish, Joshua Landau, Kamal Ndousse, Kamile Lukosuite, Liane Lovitt, Michael Sellitto, Nelson Elhage, Nicholas Schiefer, Noemi Mercado, Nova DasSarma, Robert Lasenby, Robin Larson, Sam Ringer, Scott Johnston, Shauna Kravec, Sheer El Showk, Stanislav Fort, Tamera Lanham, Timothy Telleen-Lawton, Tom Conerly, Tom Henighan, Tristan Hume, Samuel R. Bowman, Zac Hatfield-Dodds, Ben Mann, Dario Amodei, Nicholas Joseph, Sam McCandlish, Tom Brown, and Jared Kaplan. Constitutional ai: Harmlessness from ai feedback, 2022b."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib35",
+      "text": "Lee et al. (2023) Harrison Lee, Samrat Phatale, Hassan Mansoor, Thomas Mesnard, Johan Ferret, Kellie Lu, Colton Bishop, Ethan Hall, Victor Carbune, Abhinav Rastogi, and Sushant Prakash. Rlaif: Scaling reinforcement learning from human feedback with ai feedback, 2023."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "Chu et al. (2023) Kun Chu, Xufeng Zhao, Cornelius Weber, Mengdi Li, and Stefan Wermter. Accelerating reinforcement learning of robotic manipulations via feedback from large language models, 2023."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib48",
+      "text": "Rafailov et al. (2023) Rafael Rafailov, Archit Sharma, Eric Mitchell, Stefano Ermon, Christopher D. Manning, and Chelsea Finn. Direct preference optimization: Your language model is secretly a reward model, 2023."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib22",
+      "text": "Gao et al. (2022) Leo Gao, John Schulman, and Jacob Hilton. Scaling laws for reward model overoptimization, 2022."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib4",
+      "text": "Bai et al. (2022a) Yuntao Bai, Andy Jones, Kamal Ndousse, Amanda Askell, Anna Chen, Nova DasSarma, Dawn Drain, Stanislav Fort, Deep Ganguli, Tom Henighan, Nicholas Joseph, Saurav Kadavath, Jackson Kernion, Tom Conerly, Sheer El-Showk, Nelson Elhage, Zac Hatfield-Dodds, Danny Hernandez, Tristan Hume, Scott Johnston, Shauna Kravec, Liane Lovitt, Neel Nanda, Catherine Olsson, Dario Amodei, Tom Brown, Jack Clark, Sam McCandlish, Chris Olah, Ben Mann, and Jared Kaplan. Training a helpful and harmless assistant with reinforcement learning from human feedback, 2022a."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib16",
+      "text": "Dai et al. (2023) Josef Dai, Xuehai Pan, Ruiyang Sun, Jiaming Ji, Xinbo Xu, Mickel Liu, Yizhou Wang, and Yaodong Yang. Safe rlhf: Safe reinforcement learning from human feedback, 2023."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib76",
+      "text": "Xie et al. (2024) Jian Xie, Kai Zhang, Jiangjie Chen, Renze Lou, and Yu Su. Adaptive chameleon or stubborn sloth: Revealing the behavior of large language models in knowledge conflicts. In The Twelfth International Conference on Learning Representations , 2024. URL https://openreview.net/forum?id=auKAUJZMO6 ."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib77",
+      "text": "Xu et al. (2023a) Guohai Xu, Jiayi Liu, Ming Yan, Haotian Xu, Jinghui Si, Zhuoran Zhou, Peng Yi, Xing Gao, Jitao Sang, Rong Zhang, Ji Zhang, Chao Peng, Fei Huang, and Jingren Zhou. Cvalues: Measuring the values of chinese large language models from safety to responsibility, 2023a."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib40",
+      "text": "Liu et al. (2023c) Yupei Liu, Yuqi Jia, Runpeng Geng, Jinyuan Jia, and Neil Zhenqiang Gong. Prompt injection attacks and defenses in llm-integrated applications, 2023c."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib93",
+      "text": "Zou et al. (2024) Wei Zou, Runpeng Geng, Binghui Wang, and Jinyuan Jia. Poisonedrag: Knowledge poisoning attacks to retrieval-augmented generation of large language models, 2024."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib88",
+      "text": "Zheng et al. (2023a) Ce Zheng, Lei Li, Qingxiu Dong, Yuxuan Fan, Zhiyong Wu, Jingjing Xu, and Baobao Chang. Can we edit factual knowledge by in-context learning? In Houda Bouamor, Juan Pino, and Kalika Bali (eds.), Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing , pp. 4862–4876, Singapore, December 2023a. Association for Computational Linguistics. doi: 10.18653/v1/2023.emnlp-main.296 . URL https://aclanthology.org/2023.emnlp-main.296 ."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib91",
+      "text": "Zhong et al. (2023) Zexuan Zhong, Ziqing Huang, Alexander Wettig, and Danqi Chen. Poisoning retrieval corpora by injecting adversarial passages. In Empirical Methods in Natural Language Processing (EMNLP) , 2023."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib41",
+      "text": "Liu et al. (2023d) Yupei Liu, Yuqi Jia, Runpeng Geng, Jinyuan Jia, and Neil Zhenqiang Gong. Prompt injection attacks and defenses in llm-integrated applications, 2023d."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib78",
+      "text": "Xu et al. (2024a) Rongwu Xu, Zehan Qi, Cunxiang Wang, Hongru Wang, Yue Zhang, and Wei Xu. Knowledge conflicts for llms: A survey, 2024a."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib23",
+      "text": "Gao et al. (2024) Yunfan Gao, Yun Xiong, Xinyu Gao, Kangxiang Jia, Jinliu Pan, Yuxi Bi, Yi Dai, Jiawei Sun, Qianyu Guo, Meng Wang, and Haofen Wang. Retrieval-augmented generation for large language models: A survey, 2024."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib6",
+      "text": "Barnett et al. (2024) Scott Barnett, Stefanus Kurniawan, Srikanth Thudumu, Zach Brannelly, and Mohamed Abdelrazek. Seven failure points when engineering a retrieval augmented generation system, 2024."
+    }
+  ]
+}

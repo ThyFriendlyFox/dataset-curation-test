@@ -1,0 +1,118 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2404.00351",
+  "title": "Rethinking Attention-Based Multiple Instance Learning for Whole-Slide Pathological Image Classification: An Instance Attribute Viewpoint",
+  "authors": "Linghan Cai, Shenjin Huang, Ye Zhang, Jinpeng Lu, Yongbing Zhang",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2404.00351",
+  "html_url": "https://arxiv.org/html/2404.00351",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 921,
+  "text": "Histopathological examination is regarded as the gold standard for cancer diagnosis and prognosis in modern healthcare [1]. During these examinations, pathologists use a microscope to view specimens on stained slides, identifying tumor areas within tissue slices. With advances in scanning technology, traditional glass slides are increasingly being converted into digital whole-slide images (WSIs), providing significant opportunities for computer-assisted diagnosis. Nevertheless, the application of computational techniques in histopathological image analysis encounters great challenges: the enormous resolution of WSIs (e.g., 40,000 \\times 40,000 pixels) and the lack of fine-grained (patch-level) annotations [2]. Consequently, WSI classification is often formulated as a weakly supervised task using multiple instance learning (MIL) [3,4,5]. In the MIL paradigm, each WSI is treated as a labeled bag containing multiple unlabeled instances (tile patches). If a bag is negative, all instances within it are negative. Conversely, a positive WSI contains at least one positive instance.\n\nIn general, WSI classification requires the MIL framework to complete two tasks: bag classification and instance discrimination, corresponding to clinical diagnosis and tumor localization, respectively. As a seminal work, attention-based MIL (ABMIL) [6] addresses both tasks simultaneously and has therefore been widely adopted in WSI analysis. This architecture processes the input WSI in two steps: embedding image patches as instance-level features, and then aggregating the features into a bag-level representation. In the aggregation phase, an attention pooling operation assigns each instance an attention score, which weights the contribution to the bag aggregation and, to a certain extent, reflects the attribute of the instance (shown in Fig. 1 (a)). Building on the attention mechanism, subsequent studies [7,8,9,10] treat high-attention patches within a positive WSI as positive instances and exploit contrastive learning or prototype learning methods to refine the instance representation for improving classification accuracy.\n\nHowever, an open question remains in ABMIL: Can attention reliably distinguish between instances? This issue is critical as introducing mislabeled instances could harm MIL and confuse diagnosis [11]. In this paper, we argue that the level of attention in ABMIL is not a reliable measure of instance attributes for two reasons. Firstly, both positive and negative patches contribute to bag prediction. Typical negative instances have high attention, offering high confidence for negative bag prediction and prompting the network to identify positive instances. Secondly, a high level of attention does not necessarily indicate a high contribution to the prediction. As shown in Fig. 1 (a), the outcome of ABMIL is determined by both the attention pooling and bag classification head. Hence, instance discrimination based merely on attention level is incomplete and potentially misleading, and thus an effective measure of instance attributes is worth exploring.\n\nBesides the aforementioned issue, the assumption in MIL algorithms [6,12,13] that instances are independent limits WSI classification performance due to the negligence of significant correlations between patches. The correlations can be categorized into two types within this paper: intra-slide correlation and inter-slide correlation. For example, considering a tumor area, the intra-slide correlation emphasizes the spatial distribution of instances within a WSI, reflecting how tumor cells tend to cluster [14]. Similarly, the inter-slide relation reveals attribute consistency among tumor instances of the same subtype [15]. To model instance correlations, recent works [16,17,18] investigate Transformer [19] for aggregating instances. Despite great progress, the use of position encoding hinders the flexibility of MIL frameworks, as it imposes rigid spatial relationships. Furthermore, these methods do not establish instance connections across WSIs, leading to suboptimal generalization and difficulty in identifying hard instances.\n\nMotivated by the above discussions, we present an Attribute-Driven Multiple Instance Learning (AttriMIL) that comprehensively improves ABMIL in the pathological image classification task. To precisely represent instance attributes, we introduce an attribute scoring mechanism (shown in Fig. 1 (b)) that integrates attention pooling with bag classification head to quantify instances’ contribution to bag prediction. Based on attribute scores, a spatial attribute constraint is applied to maintain the spatial correlations among instances within a single WSI. Meanwhile, we develop an attribute ranking loss to model the instance correlation across WSIs, enhancing the network’s capability to distinguish challenging instances by emphasizing differences between positive and negative instances. Moreover, to model these correlations effectively, we employ a histopathology adaptive backbone that optimizes the pre-trained model at different stages, maximizing the model’s pathological feature extraction ability. In summary, the main contributions of this paper are as follows:\n\n- • An attribute-driven multiple instance learning (AttriMIL) framework is proposed for histopathological image analysis. In detail, AttriMIL improves the instance aggregation and bag prediction process of attention-based multiple instance learning (ABMIL) through attribute scoring, achieving effective instance attribute measurement.\n\n- • Considering patch correlations in WSIs, we introduce two instance constraints for regularizing the training of the MIL framework. For a WSI, a spatial attribute constraint is leveraged to model the spatial dependency between instances. For a set of WSIs, an attribute ranking loss is designed to highlight the attribute differences between instances of different subtypes.\n\n- • Inspired by the parameter-efficient fine-tuning technique [20], we develop a histopathology adaptive backbone for efficient pathological feature extraction, where the backbone enables our AttriMIL to model instance correlations at multiple feature levels.\n\n- • Extensive experiments validate the effectiveness of the proposed approaches, and AttriMIL derives state-of-the-art results on three public datasets. Notably, AttriMIL also exhibits potential in identifying out-of-detection (OOD) samples, offering a promising solution for developing a complete computer-aided pathological diagnosis system.\n\nThe rest of this study is organized as follows. Section II reviews MIL and parameter-efficient fine-tuning. Our method is described in Section III. Section IV provides experimental results. Discussion and conclusion are given in Section V.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "M. Y. Lu, T. Y. Chen, D. F. Williamson, M. Zhao, M. Shady, J. Lipkova, and F. Mahmood, “Ai-based pathology predicts origins for cancers of unknown primary,” Nature , vol. 594, no. 7861, pp. 106–110, 2021."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "C. L. Srinidhi, O. Ciga, and A. L. Martel, “Deep neural network models for computational histopathology: A survey,” Medical Image Analysis , vol. 67, p. 101813, 2021."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "G. Campanella, M. G. Hanna, L. Geneslaw, A. Miraflor, V. Werneck Krauss Silva, K. J. Busam, E. Brogi, V. E. Reuter, D. S. Klimstra, and T. J. Fuchs, “Clinical-grade computational pathology using weakly supervised deep learning on whole slide images,” Nature medicine , vol. 25, no. 8, pp. 1301–1309, 2019."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "L. Qu, X. Luo, S. Liu, M. Wang, and Z. Song, “Dgmil: Distribution guided multiple instance learning for whole slide image classification,” in International Conference on Medical Image Computing and Computer-Assisted Intervention . Springer, 2022, pp. 24–34."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "H. Zhang, Y. Meng, Y. Zhao, Y. Qiao, X. Yang, S. E. Coupland, and Y. Zheng, “Dtfd-mil: Double-tier feature distillation multiple instance learning for histopathology whole slide image classification,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2022, pp. 18 802–18 812."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "M. Ilse, J. Tomczak, and M. Welling, “Attention-based deep multiple instance learning,” in International conference on machine learning . PMLR, 2018, pp. 2127–2136."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "M. Y. Lu, D. F. Williamson, T. Y. Chen, R. J. Chen, M. Barbieri, and F. Mahmood, “Data-efficient and weakly supervised computational pathology on whole-slide images,” Nature biomedical engineering , vol. 5, no. 6, pp. 555–570, 2021."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "H. Wang, K. Song, J. Fan, Y. Wang, J. Xie, and Z. Zhang, “Hard patches mining for masked image modeling,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2023."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "J. Shi, L. Tang, Y. Li, X. Zhang, Z. Gao, Y. Zheng, C. Wang, T. Gong, and C. Li, “A structure-aware hierarchical graph-based multiple instance learning framework for pt staging in histopathological image,” IEEE Transactions on Medical Imaging , 2023."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "J.-G. Yu, Z. Wu, Y. Ming, S. Deng, Y. Li, C. Ou, C. He, B. Wang, P. Zhang, and Y. Wang, “Prototypical multiple instance learning for predicting lymph node metastasis of breast cancer from whole-slide pathological images,” Medical Image Analysis , vol. 85, p. 102748, 2023."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "L. Qu, Y. Ma, X. Luo, M. Wang, and Z. Song, “Rethinking multiple instance learning for whole slide image classification: A good instance classifier is all you need,” arXiv preprint arXiv:2307.02249 , 2023."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "Y. Chen, J. Bi, and J. Z. Wang, “Miles: Multiple-instance learning via embedded instance selection,” IEEE transactions on pattern analysis and machine intelligence , vol. 28, no. 12, pp. 1931–1947, 2006."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "M.-A. Carbonneau, V. Cheplygina, E. Granger, and G. Gagnon, “Multiple instance learning: A survey of problem characteristics and applications,” Pattern Recognition , vol. 77, pp. 329–353, 2018."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "K. J. Cheung and A. J. Ewald, “A collective route to metastasis: Seeding by tumor cell clusters,” Science , vol. 352, no. 6282, pp. 167–169, 2016."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "W. D. Travis, “Pathology of lung cancer,” Clinics in chest medicine , vol. 23, no. 1, pp. 65–81, 2002."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "R. J. Chen, C. Chen, Y. Li, T. Y. Chen, A. D. Trister, R. G. Krishnan, and F. Mahmood, “Scaling vision transformers to gigapixel images via hierarchical self-supervised learning,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2022, pp. 16 144–16 155."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "Z. Shao, H. Bian, Y. Chen, Y. Wang, J. Zhang, X. Ji et al. , “Transmil: Transformer based correlated multiple instance learning for whole slide image classification,” Advances in neural information processing systems , vol. 34, pp. 2136–2147, 2021."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "Z. Li, Y. Jiang, M. Lu, R. Li, and Y. Xia, “Survival prediction via hierarchical multimodal co-attention transformer: A computational histology-radiology solution,” IEEE Transactions on Medical Imaging , 2023."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "A. Dosovitskiy, L. Beyer, A. Kolesnikov, D. Weissenborn, X. Zhai, T. Unterthiner, M. Dehghani, M. Minderer, G. Heigold, S. Gelly et al. , “An image is worth 16x16 words: Transformers for image recognition at scale,” arXiv preprint arXiv:2010.11929 , 2020."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "X. He, C. Li, P. Zhang, J. Yang, and X. E. Wang, “Parameter-efficient model adaptation for vision transformers,” in Proceedings of the AAAI Conference on Artificial Intelligence , vol. 37, no. 1, 2023, pp. 817–825."
+    }
+  ]
+}

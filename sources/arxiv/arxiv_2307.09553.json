@@ -1,0 +1,83 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2307.09553",
+  "title": "Stream Types",
+  "authors": "Joseph W. Cutler, Christopher Watson, Emeka Nkurumeh, Phillip Hilliard, Harrison Goldstein, Caleb Stanford, Benjamin C. Pierce",
+  "year": "2024",
+  "categories": [
+    "cs.PL"
+  ],
+  "url": "https://arxiv.org/abs/2307.09553",
+  "html_url": "https://arxiv.org/html/2307.09553",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 845,
+  "text": "What is the type of a stream? A straightforward answer, dating back to the early days of functional programming [1], is that a stream is an unbounded sequence of items of a single fixed type, produced by one part of a system (or the external world) and consumed by another. This simple perspective has been immensely successful: the current programming models exposed by the most popular distributed stream processing eDSLs (e.g., Flink [2,3], Beam [4], Storm [5], and Heron [6]) typically offer just one type, Stream t.\n\nThis homogeneous treatment of streams leaves something to be desired. For one thing, streaming data sometimes arrives at a processing node from multiple sources in parallel. Using arrival times to impose an “incidental” order on such parallel data can make it difficult to ensure that processing is deterministic, because downstream results may then depend on factors like network latency [7,8]. Another issue with the homogeneous stream abstraction is that temporal patterns like bracketedness (every “begin” event has a following “end”) or the fact that with exactly k events are expected to arrive on a stream are invisible in its type. Programmers get no help from the type system to ensure such properties when producing a stream, nor can they rely on them when consuming a stream.\n\nOur principal contribution is a novel logical foundation for typed stream processing that can precisely describe streams with both complex sequential patterns and parallel structure. On this foundation, we build a calculus called \\lambda^{\\text{ST}} that is (a) expressive and type-safe for streams with such complex temporal patterns and (b) deterministic, even when inputs can arrive from multiple sources in parallel. We also present delta, an experimental language design based on \\lambda^{\\text{ST}}. (A full-blown distributed implementation of delta is left for future work.)\n\nPrograms in \\lambda^{\\text{ST}} are intuitively batch processors that operate over entire streams at once. But, since streams are in general unbounded, stream transformers can’t actually wait for “the entire input stream” to arrive before producing any output. The operational semantics of the \\lambda^{\\text{ST}} calculus is therefore designed to be incremental, producing partial outputs from partial inputs on the fly.\n\nA \\lambda^{\\text{ST}} program is interpreted as a function mapping any prefix of its input(s) to a prefix of its output plus a “resultant” term to transform the rest of the inputs to the rest of the output.\n\nOur stream types include two kinds of products, one representing a pair of streams in temporal sequence, the other a pair of streams in parallel. This structure is inspired both by Concurrent Kleene Algebras [9,10], which syntactically describe partially ordered series/parallel data, and by work by [11] and [7], where streams are modeled as partially ordered sets. We discover a suitable proof theory for this two-product formalism in a variant of O’Hearn and Pym’s Logic of Bunched Implications (BI) [12]. BI is well known as a foundation for separation logic [13], where its “separating conjunction” allows for local reasoning about separate regions of the heap in imperative programs. In \\lambda^{\\text{ST}}, we replace spatial separation with temporal separation: one product describes pairs of streams separated sequentially in time; the other describes pairs of temporally independent streams whose elements may arrive in interleaved fashion.\n\nConcretely, our contributions are:\n\n- (1) We propose stream types, a static discipline for distributed stream processing that generalizes the traditional homogeneous view of streams to a richer nested-parallel-and-sequential structure, and define \\lambda^{\\text{ST}}, a calculus of stream processing transformers inspired by a Curry-Howard-like correspondence with an ordered variant of BI. Terms in \\lambda^{\\text{ST}} are high level programs in a functional style that conceptually transform whole streams at once.\n\n- (2) We equip \\lambda^{\\text{ST}} with an operational semantics interpreting terms as incremental transformers that accept and produce finite prefixes of streams. Our main result is a powerful homomorphism theorem (Theorem 3.2) guaranteeing that the result of a transformer does not depend on how the input stream is divided into prefixes. This theorem implies that the semantics is deterministic: all interleavings of parallel sub-streams yield the same final result.\n\n- (3) We present delta, an experimental high-level functional language prototype based on the \\lambda^{\\text{ST}} calculus that serves as a tool for exploring the potential of richly typed stream programming. We demonstrate by example how delta enables type-safe programming for streams with complex patterns and how it prevents nondeterminism. Programming patterns from stream processing practice are elegantly supported by this richer model, including MapReduce-like pipelines, temporal integrity constraints, windowing, punctuation, parallelism control, routing, and side outputs.\n\nSection 2 explores some concrete cases where \\lambda^{\\text{ST}} ’s structured types can prevent common stream processing bugs and enable cleaner programming patterns. Section 3 presents Kernel \\lambda^{\\text{ST}}, a minimal subset with just the features needed to state and understand the main technical results. Section 4 extends this presentation to Full \\lambda^{\\text{ST}}. Section 5 develops several further examples. Sections 6 and 7 discuss related and future work. An overview of our prototype implementation of delta can be found in Appendix A; technical details omitted from the main paper in Appendix C; and expanded versions of the examples in Appendix B.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib18",
+      "text": "Burge (1975) William H Burge. 1975. Stream processing functions. IBM Journal of Research and Development 19, 1 (1975)."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib30",
+      "text": "Foundation (2019a) Apache Software Foundation. 2019a. Apache Flink. https://flink.apache.org/ . (Accessed July 2022.)."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib19",
+      "text": "Carbone et al . (2015) Paris Carbone, Asterios Katsifodimos, Stephan Ewen, Volker Markl, Seif Haridi, and Kostas Tzoumas. 2015. Apache Flink: Stream and Batch Processing in a Single Engine. Bulletin of the IEEE Computer Society Technical Committee on Data Engineering 36, 4 (2015)."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib35",
+      "text": "Foundation (2021) Apache Software Foundation. 2021. Apache Beam. https://beam.apache.org/ . (Accessed July 2022.)."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib34",
+      "text": "Foundation (2019e) Apache Software Foundation. 2019e. Apache Storm. https://storm.apache.org/ . (Accessed July 2022.)."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib31",
+      "text": "Foundation (2019b) Apache Software Foundation. 2019b. Apache Heron (originally Twitter Heron). https://heron.incubator.apache.org/ . (Accessed July 2022.)."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib59",
+      "text": "Mamouras et al . (2019) Konstantinos Mamouras, Caleb Stanford, Rajeev Alur, Zachary G Ives, and Val Tannen. 2019. Data-trace types for distributed stream processing systems. In 40th ACM SIGPLAN Conference on Programming Language Design and Implementation (PLDI) ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib67",
+      "text": "Schneider et al . (2013) Scott Schneider, Martin Hirzel, Buğra Gedik, and Kun-Lung Wu. 2013. Safe data parallelism for general streaming. IEEE Trans. Comput. 64, 2 (2013)."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib44",
+      "text": "Hoare et al . (2009) CAR (Tony) Hoare, Bernhard Möller, Georg Struth, and Ian Wehrman. 2009. Concurrent Kleene Algebra. In CONCUR 2009-Concurrency Theory: 20th International Conference, CONCUR 2009, Bologna, Italy, September 1-4, 2009. Proceedings 20 . Springer, 399–414."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib53",
+      "text": "Kappé et al . (2019) Tobias Kappé, Paul Brunet, Bas Luttik, Alexandra Silva, and Fabio Zanasi. 2019. On series-parallel pomset languages: Rationality, context-freeness and automata. Journal of Logical and Algebraic Methods in Programming 103 (2019), 130–153. https://doi.org/10.1016/j.jlamp.2018.12.001"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib4",
+      "text": "Alur et al . (2021) Rajeev Alur, Phillip Hilliard, Zachary G Ives, Konstantinos Kallas, Konstantinos Mamouras, Filip Niksic, Caleb Stanford, Val Tannen, and Anton Xue. 2021. Synchronization Schemas. Invited contribution, Principles of Database Systems ."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib63",
+      "text": "O’Hearn and Pym (1999) Peter W O’Hearn and David J Pym. 1999. The logic of bunched implications. Bulletin of Symbolic Logic 5, 2 (1999), 215–244."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib66",
+      "text": "Reynolds (2002) John C Reynolds. 2002. Separation logic: A logic for shared mutable data structures. In Proceedings 17th Annual IEEE Symposium on Logic in Computer Science . IEEE, 55–74."
+    }
+  ]
+}

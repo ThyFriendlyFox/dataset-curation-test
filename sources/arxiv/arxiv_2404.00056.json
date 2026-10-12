@@ -1,0 +1,40 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2404.00056",
+  "title": "Fingerprinting web servers through Transformer-encoded HTTP response headers",
+  "authors": "Patrick Darwinkel",
+  "year": "2024",
+  "categories": [
+    "cs.CR",
+    "cs.LG",
+    "cs.NI"
+  ],
+  "url": "https://arxiv.org/abs/2404.00056",
+  "html_url": "https://arxiv.org/html/2404.00056",
+  "license": "http://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Introduction",
+  "word_count": 1014,
+  "text": "In the field of cybersecurity, it is well-established that having knowledge of software vendor and version is essential in locating vulnerabilities. Many public vulnerability databases exist, which contain information about which specific software version is vulnerable to which exploit. As such, systems that are not frequently updated are at risk of being vulnerable to attacks. This was common knowledge back in 1997, and the HTTP/1.1 protocol specification even contains a warning that the Server: header - which explicitly reveals this version information - should be implemented cautiously. System administrators should thus be careful to reveal as little of this information as possible to the public. Over 25 years later, a typical response to an HTTP request divulges this information by default, even though it is perfectly feasible to configure web server software to hide or falsify the Server: header.\n\nSoftware fingerprinting is essentially the process of attempting to determine the type and version of software based purely on its input and output behaviour. One of the first academic papers about software fingerprinting specifically in the context of web servers was published by [2]. They demonstrated that hiding the Server: header is insufficient to counter all attempts at fingerprinting. The essence of their paper is that fingerprinting is possible because each software implementation of the HTTP protocol handles certain requests differently. [2] argue that this is because the specification leaves room for lexical, syntactic, and semantic ambiguity. This can be exploited by crafting several ambiguous HTTP requests, and comparing how different implementations respond to them.\n\nTo the best of our knowledge, the first machine learning approach to web server fingerprinting was devised by [3]. In order to study several distinguishing features of the World Wide Web, they trained a classifier to determine the confidence of a certain web server being of a certain type. They found that this was possible, although their methodology was not powerful enough to distinguish individual versions.\n\nThere is very little public academic research on the topic of web server fingerprinting (as noted by both [3] in [3] and [4] in [4]), considering how fundamental the Hypertext Transfer Protocol is to almost all modern infrastructure. As a universal request-response protocol operating at the application layer of the Internet Protocol, it is not only used by web browsers to retrieve web pages. Its practical applications range from smart fridges submitting analytics and usage data to their original manufacturer, to self-driving vehicles requesting firmware updates. As of writing, classical rule-based systems are still the standard tools for web server fingerprinting. These expert systems have some fundamental limitations as they do not scale well to increasingly large possible combinations of input, require labour-intensive feature engineering, and have no efficient strategy to rank similar, but not identical input. Although these existing systems still work well, we hypothesize that 20 years after the publication of the first research paper and the development of the first fingerprinting tool, it should be possible to develop a system that outperforms them in terms of accuracy and specificity.\n\nAs such, the overall aim of this study is to investigate the feasibility of using state-of-the-art deep learning, big data, and natural language processing techniques to improve the ability to detect vulnerable web server versions, as compared to existing rule-based systems. As we will further outline in section 2, there is grounding in academic literature that indicates that this is a promising, novel approach.\n\nFirst, we will break down our goal into concrete research questions, and explain how our work improves upon the experiment by [3]. In section 2, we will further discuss relevant aspects of web server fingerprinting, anomaly detection in the HTTP domain, and document embedding and representation. Section 3 continues by describing the source of our data and section 4 describes how we intend to use it to answer our research questions. We then discuss our findings in section 5. We end this work with section 6, in which we answer our research questions, and describe the limitations and potential for future work.\n\n## 1.1 Research questions\n\n## Can we improve upon the accuracy of server type prediction set by [3] ?\n\nWe follow some of the suggestions that [3] give for future work, namely increasing the amount of test cases, increasing the sample size, and having more data per sample (i.e., more than just a status response code for each test case).\n\n## Can we build a classifier that can discriminate specific server versions?\n\nThe experiment by [3] could not meaningfully discriminate between specific server software versions. The two challenges that arise are the lack of predictive features and the sparsity and variability of target classes.\n\nTo tackle the first issue, our experiment not only has a larger sample size but also more meaningful data per sample. In addition, a deep learning model should be able to exploit this better in comparison to a multinomial naive Bayes classifier. The second issue is more fundamental. Since it is very likely that the Server: header labels follow a Zipfian distribution, the amount of target classes may run into the tens of thousands. In this work, we investigate some strategies to prepare a workable set of target classes.\n\n## Can we use an NLP architecture to represent status lines as well as other HTTP header features?\n\nThe strategies we have outlined above represent several improvements over the experiment by [3]. However, it still implies the use of a categorically encoded string of text that will, presumably, only have a couple of thousand unique combinations at most.\n\nWe propose using a state-of-the-art Transformer model to create dense, context-aware vector space embeddings to represent HTTP response headers. These embeddings preserve ordering information, which many of the research papers mentioned in section 2 show is a significant factor in the fingerprinting process. These embeddings can then be used in a neural network to perform multiclass classification. Although for this experiment we will only use the first line of the HTTP header, the technique should scale to entire headers. Using complete headers is unfortunately not possible in this work due to computational and storage constraints.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib9",
+      "text": "Fielding et al. (1997) Roy T. Fielding, Henrik Nielsen, Jeffrey Mogul, Jim Gettys, and Tim Berners-Lee. 1997. Hypertext Transfer Protocol – HTTP/1.1 . RFC 2068."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib16",
+      "text": "Lee et al. (2002) D. Lee, J. Rowe, C. Ko, and K. Levitt. 2002. Detecting and defending against web-server fingerprinting . In 18th Annual Computer Security Applications Conference, 2002. Proceedings. , pages 321–330."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib7",
+      "text": "Book et al. (2013) Theodore Book, Martha Witick, and Dan S. Wallach. 2013. Automated generation of web server fingerprints ."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib2",
+      "text": "Al-Hakimi and Bax (2021) Shadi Al-Hakimi and Freek Bax. 2021. Hunting for malicious infrastructure using big data . SNE Master Research Projects 2020 - 2021, University of Amsterdam ."
+    }
+  ]
+}

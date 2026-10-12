@@ -1,0 +1,130 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.14589",
+  "title": "ReAct Meets ActRe: When Language Agents Enjoy Training Data Autonomy",
+  "authors": "Zonghan Yang, Peng Li, Ming Yan, Ji Zhang, Fei Huang, Yang Liu",
+  "year": "2024",
+  "categories": [
+    "cs.AI",
+    "cs.CL",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2403.14589",
+  "html_url": "https://arxiv.org/html/2403.14589",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 630,
+  "text": "The rapid development of Large Language Models (LLMs) [1,2,3,4] has led to the prosperity of language agents. Leveraging the ability of LLMs, language agents have demonstrated impressive performances in diverse decision-making scenarios by interacting with the environments autonomously [5,6,7,8].\n\nRecently, increasing efforts have been made to train language agents with open-sourced LLMs. The multi-step trajectories that describe the entire task-solving process of a language agent are used as training data, which consist of environmental observations, internal reasoning texts, and external actions. The collection of such trajectories is therefore essential, which are currently categorized into two paradigms in Fig. 1 (a) and (b). The first paradigm is to leverage expert demonstrations [9]. However, the expense of human labor hampers the scalability of the approach. Another paradigm is implementing different agent frameworks to gather diverse trajectories with proprietary LLMs [10,11,12,13]. However, the exploration coverage in the training data is still upper-bounded by the full set of prompting techniques. Besides, implementing diverse agent frameworks requires considerable human efforts and proprietary LLM calls [14]. To ease the data collection process in diverse scenarios, [15] and [16] propose unified data formats by elucidating the comprising submodules in agent trajectories. However, as obtained by converting human-annotated data or one single defaulted prompting scheme, the agent trajectories are still limited in diversity and scalability. Considering that an environment automatically returns observations and rewards with action inputs, it should serve as an infinite data generator. While [17] propose an exploration-based agent framework for self-improvement, the gathered trajectories consist of only interleaved external actions and environmental observations, without textual rationales that could steer better behavior of language agents. We ask the following question: Can a language agent autonomously gather high-quality trajectories, with textual annotations suitable for its further training?\n\nIn this work, we propose A 3 T, a framework that enables Autonomous Annotation of Agent Trajectories in the style of ReAct [18] for self-improvement with minimal human supervision. The central idea is to exploit both the in-context language ability and the decision-making ability of a language agent: To collect diverse trajectories, an agent could randomly sample external actions from the action space at arbitrary steps. However, the corresponding reason for the sampled action should be annotated for a ReAct-style agent. To facilitate this, we propose ActRe, an act-then-reason prompting agent that explains the reason for the sampled action. With ActRe, the ReAct-style agent composes extra reason-then-act trajectories for each failed task by inversely prepending the ActRe-prompted reason to the randomly sampled action. After the execution of each composed trajectory, the agent receives a terminal reward from the environment, which automatically annotates the quality of the trajectory. The gathered successful trajectories are then supplemented with the failed trajectory by the ReAct-style agent alone for contrastive self-training, where we use policy gradient methods [19] with binarized rewards for LLM fine-tuning. As new agents are trained, more trajectories can be gathered and accumulated, which forms a closed loop for the self-improvement of language agents as shown in Fig. 1 -(c).\n\nWe validate our A 3 T framework in the textual embodied environment AlfWorld [20] and the online shopping environment WebShop [9]. We use QLoRA [21] to fine-tune Mistral-7B-Instruct-v0.2 [22] in the training experiments. Experimental performances demonstrate significant improvement over state-of-the-art agent techniques: On AlfWorld, our trained agent achieves a 96% success rate in unseen scenarios with a single trial. On WebShop, the success rate of our agent reaches 49%, which matches the average human performance (50%). In the setting of iterative refinement, after four rounds of data collection and contrastive self-training, the accumulated success rate becomes 100% on AlfWorld and 54.8% on WebShop, narrowing the gap with human experts (59.6% on WebShop). A 3 T paves the way for agents with improved autonomy through the closed loop of self-annotation and contrastive self-training.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib15",
+      "text": "OpenAI (2023) OpenAI. GPT-4 technical report. CoRR , abs/2303.08774, 2023. doi: 10.48550/ARXIV.2303.08774 . URL https://doi.org/10.48550/arXiv.2303.08774 ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib24",
+      "text": "Touvron et al. (2023) Hugo Touvron, Louis Martin, Kevin Stone, Peter Albert, Amjad Almahairi, Yasmine Babaei, Nikolay Bashlykov, Soumya Batra, Prajjwal Bhargava, Shruti Bhosale, et al. Llama 2: Open foundation and fine-tuned chat models. arXiv preprint arXiv:2307.09288 , 2023."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib23",
+      "text": "Team et al. (2023) Gemini Team, Rohan Anil, Sebastian Borgeaud, Yonghui Wu, Jean-Baptiste Alayrac, Jiahui Yu, Radu Soricut, Johan Schalkwyk, Andrew M Dai, Anja Hauth, et al. Gemini: a family of highly capable multimodal models. arXiv preprint arXiv:2312.11805 , 2023."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib8",
+      "text": "Jiang et al. (2024) Albert Q Jiang, Alexandre Sablayrolles, Antoine Roux, Arthur Mensch, Blanche Savary, Chris Bamford, Devendra Singh Chaplot, Diego de las Casas, Emma Bou Hanna, Florian Bressand, et al. Mixtral of experts. arXiv preprint arXiv:2401.04088 , 2024."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib26",
+      "text": "Wang et al. (2023) Guanzhi Wang, Yuqi Xie, Yunfan Jiang, Ajay Mandlekar, Chaowei Xiao, Yuke Zhu, Linxi Fan, and Anima Anandkumar. Voyager: An open-ended embodied agent with large language models. arXiv preprint arXiv: Arxiv-2305.16291 , 2023."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib14",
+      "text": "Mirchandani et al. (2023) Suvir Mirchandani, Fei Xia, Pete Florence, Brian Ichter, Danny Driess, Montserrat Gonzalez Arenas, Kanishka Rao, Dorsa Sadigh, and Andy Zeng. Large language models as general pattern machines. In Proceedings of the 7th Conference on Robot Learning (CoRL) , 2023."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib36",
+      "text": "Zheng et al. (2024) Boyuan Zheng, Boyu Gou, Jihyung Kil, Huan Sun, and Yu Su. Gpt-4v(ision) is a generalist web agent, if grounded. arXiv preprint arXiv:2401.01614 , 2024."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib28",
+      "text": "Wu et al. (2024) Zhiyong Wu, Chengcheng Han, Zichen Ding, Zhenmin Weng, Zhoumianze Liu, Shunyu Yao, Tao Yu, and Lingpeng Kong. Os-copilot: Towards generalist computer agents with self-improvement, 2024."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib30",
+      "text": "Yao et al. (2022) Shunyu Yao, Howard Chen, John Yang, and Karthik Narasimhan. Webshop: Towards scalable real-world web interaction with grounded language agents. In S. Koyejo, S. Mohamed, A. Agarwal, D. Belgrave, K. Cho, and A. Oh (eds.), Advances in Neural Information Processing Systems , volume 35, pp. 20744–20757. Curran Associates, Inc., 2022."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib17",
+      "text": "Qin et al. (2023) Yujia Qin, Shihao Liang, Yining Ye, Kunlun Zhu, Lan Yan, Yaxi Lu, Yankai Lin, Xin Cong, Xiangru Tang, Bill Qian, et al. Toolllm: Facilitating large language models to master 16000+ real-world apis. arXiv preprint arXiv:2307.16789 , 2023."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib34",
+      "text": "Zeng et al. (2023) Aohan Zeng, Mingdao Liu, Rui Lu, Bowen Wang, Xiao Liu, Yuxiao Dong, and Jie Tang. Agenttuning: Enabling generalized agent abilities for llms. arXiv preprint arXiv:2310.12823 , 2023."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib2",
+      "text": "Chen et al. (2023) Baian Chen, Chang Shu, Ehsan Shareghi, Nigel Collier, Karthik Narasimhan, and Shunyu Yao. Fireact: Toward language agent fine-tuning. arXiv preprint arXiv:2310.05915 , 2023."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib1",
+      "text": "Aksitov et al. (2023) Renat Aksitov, Sobhan Miryoosefi, Zonglin Li, Daliang Li, Sheila Babayan, Kavya Kopparapu, Zachary Fisher, Ruiqi Guo, Sushant Prakash, Pranesh Srinivasan, et al. Rest meets react: Self-improvement for multi-step reasoning llm agent. arXiv preprint arXiv:2312.10003 , 2023."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib29",
+      "text": "Yang et al. (2024) Zonghan Yang, An Liu, Zijun Liu, Kaiming Liu, Fangzhou Xiong, Yile Wang, Zeyuan Yang, Qingyuan Hu, Xinrui Chen, Zhenhe Zhang, Fuwen Luo, Zhicheng Guo, Peng Li, and Yang Liu. Towards unified alignment between agents, humans, and environment. arXiv preprint arXiv:2402.07744 , 2024."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib32",
+      "text": "Yin et al. (2023) Da Yin, Faeze Brahman, Abhilasha Ravichander, Khyathi Chandu, Kai-Wei Chang, Yejin Choi, and Bill Yuchen Lin. Agent lumos: Unified and modular training for open-source language agents. arXiv preprint arXiv:2311.05657 , 2023."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib35",
+      "text": "Zhang et al. (2024) Jianguo Zhang, Tian Lan, Rithesh Murthy, Zhiwei Liu, Weiran Yao, Juntao Tan, Thai Hoang, Liangwei Yang, Yihao Feng, Zuxin Liu, et al. Agentohana: Design unified data and training pipeline for effective agent learning. arXiv preprint arXiv:2402.15506 , 2024."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib22",
+      "text": "Song et al. (2024) Yifan Song, Da Yin, Xiang Yue, Jie Huang, Sujian Li, and Bill Yuchen Lin. Trial and error: Exploration-based trajectory optimization for llm agents. arXiv preprint arXiv:2403.02502 , 2024."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib31",
+      "text": "Yao et al. (2023) Shunyu Yao, Jeffrey Zhao, Dian Yu, Nan Du, Izhak Shafran, Karthik R Narasimhan, and Yuan Cao. React: Synergizing reasoning and acting in language models. In The Eleventh International Conference on Learning Representations , 2023. URL https://openreview.net/forum?id=WE_vluYUL-X ."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib27",
+      "text": "Williams (1992) Ronald J Williams. Simple statistical gradient-following algorithms for connectionist reinforcement learning. Machine learning , 8:229–256, 1992."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "Shridhar et al. (2021) Mohit Shridhar, Xingdi Yuan, Marc-Alexandre Côté, Yonatan Bisk, Adam Trischler, and Matthew Hausknecht. ALFWorld: Aligning Text and Embodied Environments for Interactive Learning. In Proceedings of the International Conference on Learning Representations (ICLR) , 2021. URL https://arxiv.org/abs/2010.03768 ."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib4",
+      "text": "Dettmers et al. (2023) Tim Dettmers, Artidoro Pagnoni, Ari Holtzman, and Luke Zettlemoyer. Qlora: Efficient finetuning of quantized llms. arXiv preprint arXiv:2305.14314 , 2023."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib7",
+      "text": "Jiang et al. (2023) Albert Q Jiang, Alexandre Sablayrolles, Arthur Mensch, Chris Bamford, Devendra Singh Chaplot, Diego de las Casas, Florian Bressand, Gianna Lengyel, Guillaume Lample, Lucile Saulnier, et al. Mistral 7b. arXiv preprint arXiv:2310.06825 , 2023."
+    }
+  ]
+}

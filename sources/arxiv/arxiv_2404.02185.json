@@ -1,0 +1,120 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2404.02185",
+  "title": "NeRFCodec: Neural Feature Compression Meets Neural Radiance Fields for Memory-Efficient Scene Representation",
+  "authors": "Sicheng Li, Hao Li, Yiyi Liao, Lu Yu",
+  "year": "2024",
+  "categories": [
+    "cs.CV",
+    "cs.GR",
+    "eess.IV"
+  ],
+  "url": "https://arxiv.org/abs/2404.02185",
+  "html_url": "https://arxiv.org/html/2404.02185",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 663,
+  "text": "Neural Radiance Fields (NeRF) [1] have emerged as a popular scene representation for novel view synthesis. As a promising representation for immersive media, how to compress NeRF with a better storage-quality trade-off is a significant problem for efficient communication and storage.\n\nWhile the deep MLPs used in NeRF [1] are parameter-efficient, the hybrid representation [2,3], which combines feature grids and small MLPs, has become the mainstream due to its high reconstruction quality, fast training speed, and efficient rendering. However, its drawback lies in the significant storage requirements. Consequently, subsequent research efforts have emerged to reduce the storage footprint of the hybrid representation without compromising reconstruction quality.\n\nOne line of work focuses on efficient data structure design of feature grids, which involves using more parameter-efficient data structures, e.g., tensor factorization-based representations [4,5] and multi-resolution hash grids [6], to replace dense voxel grids. These methods allow for reducing the number of parameters, e.g., from 1GB to 50MB, without sacrificing the quality. However, this size still requires further reduction.\n\nAnother line of work focuses on compressing parameters using compression techniques like quantization [7,8,9] and entropy coding [8]. However, most works in this field overlook another effective compression method, transform coding [10], that transforms the original data to another space based on linear [11,12] or non-linear mapping [13]. The image compression community demonstrates that the combination of transform coding, quantization, and entropy coding leads to the most competitive compression performance [14,15,16]. Recently, there is a work named Masked Wavelet NeRF [17], which is the first to consider transform coding together with quantization and entropy coding in NeRF compression and achieves promising performance. Despite the success, Masked Wavelet NeRF only leverages a linear transform, which has proved to be less effective than learned non-linear transform in neural image compression [18,19,20].\n\nTherefore, motivated by advances in neural image compression, we introduce NeRFCodec, a NeRF compression framework that integrates non-linear transform, quantization, and entropy coding for compressing feature planes in hybrid NeRF to achieve memory-efficient scene representation. A key question is, how do we obtain the non-linear basis? Existing 2D neural image compression methods obtain such a non-linear transform by training an encoder-decoder network on millions of images, while it is infeasible to train such a neural codec on millions of 3D scenes. We find that, surprisingly, existing neural image codec trained on natural images can serve as a strong backbone for compressing feature planes of NeRF, when partially tailored and tuned to each scene. Specifically, we first pre-train a hybrid NeRF on one scene, and feed the feature planes into a well-trained 2D image neural codec by replacing its encoder and decoder heads (i.e., the first and last layers) to adjust to the target channel dimension. Next, we adapt the full encoder and the decoder head to fit this scene while keeping the remaining parts of the decoder frozen. This is supervised by rate-distortion loss, with the goal of decoding the feature planes for high image rendering quality while maintaining a low bitrate of the latent code via an entropy loss. After training, the latent code predicted by the encoder and the decoder head parameters are quantized and entropy-coded into a bitstream for transmission.\n\nOur experimental results demonstrate that NeRFCodec pushes the frontier of the rate-distortion trade-off compared to existing NeRF compression methods [8,17,9]. Our method only uses 0.5 MB to represent a single scene while maintaining high visual fidelity, as shown in Fig. 1.\n\nWe summarize our contributions as follows:\n\n- • We introduce NeRFCodec, an end-to-end compression framework for plane-based hybrid NeRF. It utilizes neural feature compression, combining non-linear transformation, quantization, and entropy coding for efficient compression of plane-based NeRF representations, which advances the frontier of rate-distortion performance for compact NeRF representations.\n\n- • We propose to re-use pre-trained neural 2D image codec with slight modification and fine-tune it to each scene individually via the supervision of rate-distortion loss.\n\n- • We demonstrate that our method could achieve superior rate-distortion performance compared to existing NeRF compression methods.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib28",
+      "text": "Ben Mildenhall, Pratul P Srinivasan, Matthew Tancik, Jonathan T Barron, Ravi Ramamoorthi, and Ren Ng. Nerf: Representing scenes as neural radiance fields for view synthesis. In Proc. of the European Conf. on Computer Vision (ECCV) , 2020."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib36",
+      "text": "Cheng Sun, Min Sun, and Hwann-Tzong Chen. Direct voxel grid optimization: Super-fast convergence for radiance fields reconstruction. In Proc. IEEE Conf. on Computer Vision and Pattern Recognition (CVPR) , 2022."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib43",
+      "text": "Alex Yu, Sara Fridovich-Keil, Matthew Tancik, Qinhong Chen, Benjamin Recht, and Angjoo Kanazawa. Plenoxels: Radiance fields without neural networks. Proc. IEEE Conf. on Computer Vision and Pattern Recognition (CVPR) , 2022."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib9",
+      "text": "Anpei Chen, Zexiang Xu, Andreas Geiger, Jingyi Yu, and Hao Su. Tensorf: Tensorial radiance fields. In Proc. of the European Conf. on Computer Vision (ECCV) , 2022."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib8",
+      "text": "Eric R. Chan, Connor Z. Lin, Matthew A. Chan, Koki Nagano, Boxiao Pan, Shalini De Mello, Orazio Gallo, Leonidas J. Guibas, Jonathan Tremblay, Sameh Khamis, Tero Karras, and Gordon Wetzstein. Efficient geometry-aware 3d generative adversarial networks. In Proc. IEEE Conf. on Computer Vision and Pattern Recognition (CVPR) , 2022."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib30",
+      "text": "Thomas Müller, Alex Evans, Christoph Schied, and Alexander Keller. Instant neural graphics primitives with a multiresolution hash encoding. ACM Trans. on Graphics , 2022."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib37",
+      "text": "Towaki Takikawa, Alex Evans, Jonathan Tremblay, Thomas Müller, Morgan McGuire, Alec Jacobson, and Sanja Fidler. Variable bitrate neural fields. In ACM Trans. on Graphics , pages 1–9, 2022."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib24",
+      "text": "Lingzhi Li, Zhen Shen, Zhongshu Wang, Li Shen, and Liefeng Bo. Compressing volumetric radiance fields to 1 mb. In Proc. IEEE Conf. on Computer Vision and Pattern Recognition (CVPR) , pages 4222–4231, 2023."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib33",
+      "text": "Seungjoo Shin and Jaesik Park. Binary radiance fields. Advances in Neural Information Processing Systems (NeurIPS) , 2023."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib18",
+      "text": "Vivek K Goyal. Theoretical foundations of transform coding. IEEE Signal Processing Magazine , 18(5):9–21, 2001."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib23",
+      "text": "Adrian S Lewis and G Knowles. Image compression using the 2-d wavelet transform. IEEE Transactions on image Processing , 1(2):244–250, 1992."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib40",
+      "text": "Andrew B Watson et al. Image compression using the discrete cosine transform. Mathematica journal , 4(1):81, 1994."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib2",
+      "text": "Johannes Ballé, Philip A Chou, David Minnen, Saurabh Singh, Nick Johnston, Eirikur Agustsson, Sung Jin Hwang, and George Toderici. Nonlinear transform coding. IEEE Journal of Selected Topics in Signal Processing , 15(2):339–353, 2020."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib34",
+      "text": "Athanassios Skodras, Charilaos Christopoulos, and Touradj Ebrahimi. The jpeg 2000 still image compression standard. IEEE Signal Processing Magazine , 18(5):36–58, 2001."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib35",
+      "text": "Gary J Sullivan, Jens-Rainer Ohm, Woo-Jin Han, and Thomas Wiegand. Overview of the high efficiency video coding (hevc) standard. IEEE Transactions on circuits and systems for video technology , 22(12):1649–1668, 2012."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib6",
+      "text": "Benjamin Bross, Ye-Kui Wang, Yan Ye, Shan Liu, Jianle Chen, Gary J Sullivan, and Jens-Rainer Ohm. Overview of the versatile video coding (vvc) standard and its applications. IEEE Transactions on Circuits and Systems for Video Technology , 31(10):3736–3764, 2021."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib32",
+      "text": "Daniel Rho, Byeonghyeon Lee, Seungtae Nam, Joo Chan Lee, Jong Hwan Ko, and Eunbyung Park. Masked wavelet representation for compact neural radiance fields. In Proc. IEEE Conf. on Computer Vision and Pattern Recognition (CVPR) , pages 20680–20690, 2023."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib10",
+      "text": "Zhengxue Cheng, Heming Sun, Masaru Takeuchi, and Jiro Katto. Learned image compression with discretized gaussian mixture likelihoods and attention modules. In Proc. IEEE Conf. on Computer Vision and Pattern Recognition (CVPR) , pages 7939–7948, 2020."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "Dailan He, Ziming Yang, Weikun Peng, Rui Ma, Hongwei Qin, and Yan Wang. Elic: Efficient learned image compression with unevenly grouped space-channel contextual adaptive coding. In Proc. IEEE Conf. on Computer Vision and Pattern Recognition (CVPR) , pages 5718–5727, 2022."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "Yueyu Hu, Wenhan Yang, Zhan Ma, and Jiaying Liu. Learning end-to-end lossy image compression: A benchmark. IEEE Trans. on Pattern Analysis and Machine Intelligence (PAMI) , 44(8):4194–4211, 2021."
+    }
+  ]
+}

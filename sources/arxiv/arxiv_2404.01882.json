@@ -1,0 +1,218 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2404.01882",
+  "title": "Scene Adaptive Sparse Transformer for Event-based Object Detection",
+  "authors": "Yansong Peng, Hebei Li, Yueyi Zhang, Xiaoyan Sun, Feng Wu",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2404.01882",
+  "html_url": "https://arxiv.org/html/2404.01882",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 640,
+  "text": "Event cameras asynchronously capture the illumination changes of each pixel in a bionic way and possess several advantages, such as high temporal resolution (>10K fps) and a wide dynamic range (>120 dB) [1]. Unlike frame cameras that capture the whole scene at a fixed rate, event cameras exclusively record sparse event streams when objects are in motion, resulting in no events generated in static scenes. This distinctive trait enables event cameras to operate with low power consumption (<10 mW) [1].\n\nBuilding on these unique advantages of event cameras, event-based object detection excels in challenging motion and lighting conditions, and offers energy-efficient solutions in power-constrained environments [2,3,4,5,6,7]. However, as the raw events are asynchronous, traditional Image-based networks can not be directly applied to them. To overcome this problem, prior works often convert events into Image-like representations, such as event voxel [8], event histogram [9], and time surface [10,11] first. Features are extracted from these representations using different neural network architectures, including CNN-based [12,13,14,15], SNN-based [16,17,18,19,20], and GNN-based networks [21,22]. Recently, many innovative works have demonstrated that Vision Transformers can achieve superior performance on event-based object detection tasks [23,24,25]. However, the quadratic computational complexity of self-attention in Transformers hinders model scalability [26], which challenges the balance between performance and efficiency for event-based object detection. The high power consumption of such dense operation also diminishes the low power consumption advantage of event cameras. Additionally, we observe that due to the high sparsity of events, a majority of the computational cost of the Transformer is unnecessary. Especially for high-resolution event streams, such as those in the 1Mpx [5] dataset, while higher resolution brings more detail, event sparsity can fluctuate by several hundred times. During self-attention computations, the blank regions without any events are also encoded as tokens and participate in calculations. Our goal is to reduce this unnecessary computational overhead.\n\nWe revisit the mainstream Image-based sparse Transformers, which are also designed to reduce the computational overhead of self-attention. Most of them achieve token-level sparsification based on global self-attention [27,28,29,30,31,32,33,34]. Some studies among them achieve adaptive sparsification [27,28], but they are unable to choose the optimal sparsity for individual samples. What’s more, despite computing much fewer tokens than the original ViT [35], they still require significantly more computational resources than window-based Transformers [36,37,38,39] that leverage compute-efficient window self-attention. Consequently, the computational cost remains a barrier for high-resolution object detection tasks. SparseViT (SViT) [40] proposes a sparse window-based Transformer architecture. However, it relies on a manually selected window pruning ratio, which may discard important windows containing objects. This results in poor robustness in certain scenarios, particularly when many objects smaller than the window scale are present.\n\nIn this work, we introduce Scene Adaptive Sparse Transformer (SAST) for event-based object detection. SAST achieves window-token co-sparsification in a window-based Transformer architecture. As shown in Fig. 1, SAST greatly reduces computational overhead (A-FLOPs: Attention-related FLOPs, exclusive of the computations incurred by convolutional layers.), while simultaneously enhancing performance. Moreover, it leverages the scoring and selection modules, realizing scene-specific sparsity optimization which can adaptively choose the optimal sparsification strategy based on the complexity of different scenes. We also propose the Masked Sparse Window Self-Attention (MS-WSA), which efficiently performs self-attention on selected tokens with unequal window sizes and isolates all context leakage to achieve optimal performance. Our main contributions are summarized in the following.\n\n- • We develop a highly efficient and powerful SAST for event-based object detection, which maintains a remarkable balance between performance and efficiency.\n\n- • We propose innovative scoring and selection modules, which assess the importance of each window and token and perform co-sparsification on them.\n\n- • We devise the MS-WSA, which efficiently performs window self-attention on selected tokens with unequal window sizes and avoids context leakage.\n\n- • Experimental results on 1Mpx and Gen1 datasets demonstrate the superiority of SAST, surpassing all dense and sparse networks.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib12",
+      "text": "Guillermo Gallego, Tobi Delbrück, and Garrick Orchard, et al. Event-based vision: A survey. IEEE Transactions on Pattern Analysis and Machine Intelligence , 2022."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib31",
+      "text": "Zichen Liang, Guang Chen, Zhijun Li, Peigen Liu, and Alois Knoll. Event-based object detection with lightweight spatial attention mechanism. In The IEEE International Conference on Advanced Robotics and Mechatronics (ICARM) , 2021."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib63",
+      "text": "Jiqing Zhang, Xin Yang, Yingkai Fu, Xiaopeng Wei, Baocai Yin, and Bo Dong. Object tracking by jointly exploiting frame and event domain. In ICCV , 2021."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib20",
+      "text": "Zhuangyi Jiang, Pengfei Xia, Kai Huang, Walter Stechele, Guang Chen, Zhenshan Bing, and Alois Knoll. Mixed frame-/event-driven fast pedestrian detection. In ICRA , 2019."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib43",
+      "text": "Etienne Perot, Pierre de Tournemire, Davide Nitti, Jonathan Masci, and Amos Sironi. Learning to detect objects with a 1 megapixel event camera. In NeurIPS , 2020."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib28",
+      "text": "Jianing Li, Jia Li, Lin Zhu, Xijie Xiang, Tiejun Huang, and Yonghong Tian. Asynchronous spatio-temporal memory network for continuous event-based object detection. IEEE Transactions on Image Processing , 2022."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib41",
+      "text": "Yansong Peng, Yueyi Zhang, Peilin Xiao, Xiaoyan Sun, and Feng Wu. Better and faster: Adaptive event conversion for event-based object detection. In AAAI , 2023a."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib67",
+      "text": "Alex Zihao Zhu, Liangzhe Yuan, Kenneth Chaney, and Kostas Daniilidis. Unsupervised event-based learning of optical flow, depth and egomotion. In CVPRW , 2019."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib39",
+      "text": "Diederik Paul Moeys, Federico Corradi, Emmett Kerr, Philip Vance, Gautham Das, Daniel Neil, Dermot Kerr, and Tobi Delbrück. Steering a predator robot using a mixed frame/event-driven convolutional neural network. In The International Conference on Event-based Control, Communication, and Signal Processing (EBCCSP) , 2016."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib26",
+      "text": "Xavier Lagorce, Garrick Orchard, Francesco Galluppi, Bertram E. Shi, and Ryad B. Benosman. Hots: A hierarchy of event-based time-surfaces for pattern recognition. IEEE Transactions on Pattern Analysis and Machine Intelligence , 2017."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib51",
+      "text": "Amos Sironi, Manuele Brambilla, Nicolas Bourdis, Xavier Lagorce, and Ryad B. Benosman. Hats: Histograms of averaged time surfaces for robust event-based object classification. CVPR , 2018."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib14",
+      "text": "Daniel Gehrig, Antonio Loquercio, Konstantinos G. Derpanis, and Davide Scaramuzza. End-to-end learning of representations for asynchronous event-based data. In ICCV , 2019."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib10",
+      "text": "Tobias Fischer and Michael Milford. Event-based visual place recognition with ensembles of temporal windows. IEEE Robotics and Automation Letters , 2020."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib13",
+      "text": "Shan Gao, Guangqian Guo, and C. L. Philip Chen. Event-based incremental broad learning system for object classification. In IEEE/CVF International Conference on Computer Vision Workshop (ICCVW) , 2019."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib33",
+      "text": "Mengyun Liu, Na Qi, Yunhui Shi, and Baocai Yin. An attention fusion network for event-based vehicle object detection. In ICIP , 2021a."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib59",
+      "text": "Hao Wu, Yueyi Zhang, Wenming Weng, Yongting Zhang, Zhiwei Xiong, Zhengjun Zha, Xiaoyan Sun, and Feng Wu. Training spiking neural networks with accumulated spiking flow. In AAAI , 2021."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib6",
+      "text": "Loic Cordone, Benoît Miramond, and Phillipe Thierion. Object detection with spiking neural networks on automotive event data. In Proceedings of the IEEE International Joint Conference on Neural Networks (IJCNN) , 2022."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib34",
+      "text": "Qianhui Liu, Dong Xing, Huajin Tang, De Ma, and Gang Pan. Event-based action recognition using motion information and spiking neural networks. In IJCAI , 2021b."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib27",
+      "text": "Junhaeng Lee, Tobi Delbrück, and Michael Pfeiffer. Training deep spiking neural networks using backpropagation. Frontiers in Neuroscience , 2016."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib9",
+      "text": "Wei Fang, Zhaofei Yu, Yanqi Chen, Timothée Masquelier, Tiejun Huang, and Yonghong Tian. Incorporating learnable membrane time constant to enhance learning of spiking neural networks. In ICCV , 2021."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib30",
+      "text": "Yijin Li, Han Zhou, Bangbang Yang, Ye Zhang, Zhaopeng Cui, Hujun Bao, and Guofeng Zhang. Graph-based asynchronous event processing for rapid object recognition. In ICCV , 2021b."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib49",
+      "text": "Simon Schaefer, Daniel Gehrig, and Davide Scaramuzza. Aegnn: Asynchronous event-based graph neural networks. In CVPR , 2022."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib15",
+      "text": "Mathias Gehrig and Davide Scaramuzza. Recurrent vision transformers for object detection with event cameras. In CVPR , 2023."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib42",
+      "text": "Yansong Peng, Yueyi Zhang, Zhiwei Xiong, Xiaoyan Sun, and Feng Wu. Get: Group event transformer for event-based vision. In ICCV , 2023b."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib16",
+      "text": "Ryuhei Hamaguchi, Yasutaka Furukawa, Masaki Onishi, and Ken Sakurada. Hierarchical neural memory network for low latency event processing. In CVPR , 2023."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib52",
+      "text": "Yi Tay, Mostafa Dehghani, Dara Bahri, and Donald Metzler. Efficient transformers: A survey. ACM Computing Surveys , 2022."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib35",
+      "text": "Xiangcheng Liu, Tianyi Wu, and Guodong Guo. Adaptive sparse vit: Towards learnable adaptive token pruning by fully exploiting self-attention. In CVPR , 2022a."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib61",
+      "text": "Hongxu Yin, Arash Vahdat, Jose Alvarez, Arun Mallya, Jan Kautz, and Pavlo Molchanov. A-ViT: Adaptive tokens for efficient vision transformer. In CVPR , 2022."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib24",
+      "text": "Zhenglun Kong, Peiyan Dong, Xiaolong Ma, Xin Meng, Wei Niu, Mengshu Sun, Xuan Shen, Geng Yuan, Bin Ren, Hao Tang, et al. Spvit: Enabling faster vision transformers via latency-aware soft token pruning. In ECCV , 2022."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib3",
+      "text": "Xiang Chen, Hao Li, Mingqiang Li, and Jinshan Pan. Learning a sparse transformer network for effective image deraining. In CVPR , 2023a."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib2",
+      "text": "Tianlong Chen, Yu Cheng, Zhe Gan, Lu Yuan, Lei Zhang, and Zhangyang Wang. Chasing sparsity in vision transformers: An end-to-end exploration. In NeurIPS , 2021."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib22",
+      "text": "Sehoon Kim, Sheng Shen, David Thorsley, Amir Gholami, Joseph Hassoun, and Kurt Keutzer. Learned token pruning for transformers. SIGKDD , 2021."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib40",
+      "text": "Bowen Pan, Yifan Jiang, Rameswar Panda, Zhangyang Wang, Rogério Feris, and Aude Oliva. Ia-red 2 {}^{\\mbox{2}} : Interpretability-aware redundancy reduction for vision transformers. In NeurIPS , 2021."
+    },
+    {
+      "n": 34,
+      "id": "bib.bib45",
+      "text": "Yongming Rao, Wenliang Zhao, Benlin Liu, Jiwen Lu, Jie Zhou, and Cho-Jui Hsieh. Dynamicvit: Efficient vision transformers with dynamic token sparsification. In NeurIPS , 2021."
+    },
+    {
+      "n": 35,
+      "id": "bib.bib8",
+      "text": "Alexey Dosovitskiy, Lucas Beyer, Alexander Kolesnikov, Dirk Weissenborn, Xiaohua Zhai, Thomas Unterthiner, Mostafa Dehghani, Matthias Minderer, Georg Heigold, Sylvain Gelly, Jakob Uszkoreit, and Neil Houlsby. An image is worth 16x16 words: Transformers for image recognition at scale. ICLR , 2021."
+    },
+    {
+      "n": 36,
+      "id": "bib.bib36",
+      "text": "Ze Liu, Yutong Lin, Yue Cao, Han Hu, Yixuan Wei, Zheng Zhang, Stephen Lin, and Baining Guo. Swin transformer: Hierarchical vision transformer using shifted windows. In ICCV , 2021c."
+    },
+    {
+      "n": 37,
+      "id": "bib.bib37",
+      "text": "Ze Liu, Han Hu, Yutong Lin, Zhuliang Yao, Zhenda Xie, Yixuan Wei, Jia Ning, Yue Cao, Zheng Zhang, Li Dong, Furu Wei, and Baining Guo. Swin transformer v2: Scaling up capacity and resolution. In CVPR , 2022b."
+    },
+    {
+      "n": 38,
+      "id": "bib.bib65",
+      "text": "Zizhao Zhang, Han Zhang, Long Zhao, Ting Chen, , Sercan Ö. Arık, and Tomas Pfister. Nested hierarchical transformer: Towards accurate, data-efficient and interpretable visual understanding. In AAAI , 2022b."
+    },
+    {
+      "n": 39,
+      "id": "bib.bib54",
+      "text": "Zhengzhong Tu, Hossein Talebi, Han Zhang, Feng Yang, Peyman Milanfar, Alan Bovik, and Yinxiao Li. Maxvit: Multi-axis vision transformer. In ECCV , 2022."
+    },
+    {
+      "n": 40,
+      "id": "bib.bib4",
+      "text": "Xuanyao Chen, Zhijian Liu, Haotian Tang, Li Yi, Hang Zhao, and Song Han. Sparsevit: Revisiting activation sparsity for efficient high-resolution vision transformer. In CVPR , 2023b."
+    }
+  ]
+}

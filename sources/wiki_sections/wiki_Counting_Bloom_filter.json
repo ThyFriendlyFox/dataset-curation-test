@@ -1,0 +1,30 @@
+{
+  "source_type": "encyclopedia_article",
+  "source_id": "enwiki:Counting Bloom filter#rev1375063343",
+  "title": "Counting Bloom filter",
+  "authors": "Wikipedia contributors",
+  "year": "2026",
+  "url": "https://en.wikipedia.org/w/index.php?title=Counting_Bloom_filter&oldid=1375063343",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Variants",
+  "word_count": 491,
+  "text": "### Invertible Bloom filter\n\nAn invertible Bloom filter (IBF) is a variant of the counting Bloom filter that allows for listing of the remaining element, given there are not too may of them. There is, however, a small chance that multiple hash collisions can render a element unrecoverable.[1,2]\n\nLike a CBF, an IBF consists of a hash table B which uses k hash functions h1...hk and stores a counter in each of its m cells. Alongside each counter, it also stores a sum of elements and a sum of element hashes using a new hash function g. There is also a second hash table C to recover elements that could not be recovered using B, which also has m cells but only uses two hash functions f1 and f2. The total number of elements (n) is also stored.\n\nTo insert an element x, do the following:\n\nincrement n\n\nfor each 1 ≤ i ≤ k do\n\nincrement B[hi(x)].count\n\nadd x to B[hi(x)].idSum\n\nadd g(x) to B[hi(x)].hashSum\n\nfor each i in {1, 2} do\n\nincrement C[fi(x)].count\n\nadd x to C[fi(x)].idSum\n\nadd g(x) to C[fi(x)].hashSum\n\nLikewise, to remove an element x, do the following:\n\ndecrement n\n\nfor each 1 ≤ i ≤ k do\n\ndecrement B[hi(x)].count\n\nsubtract x from B[hi(x)].idSum\n\nsubtract g(x) from B[hi(x)].hashSum\n\nfor each i in {1, 2} do\n\ndecrement C[fi(x)].count\n\nsubtract x from C[fi(x)].idSum\n\nsubtract g(x) from C[fi(x)].hashSum\n\nRepeated insertions and removals can be simplified.\n\nA cell is considered \"pure\" if it contains only one distinct element x, which can be checked using g(B[i].idSum/B[i].count) = B[i].hashSum/B[i].count. If a cell is pure, then x can be recovered by dividing the idSum by the count. To list the remaining elements (\"stragglers\"), do the following:\n\nwhile there is a pure cell i in B do\n\nlet x := B[i].idSum/B[i].count\n\nif B[i].count > 0 then\n\n(this is a good element)\n\noutput x\n\nfor 1 ≤ i ≤ B[i].count do\n\nremove element x from B and C\n\nelse\n\n(this is a false delete)\n\nfor 1 ≤ i ≤ -B[i].count do\n\ninsert element x into B and C\n\nif n ≠ 0 then\n\n(there are conflicts in B)\n\nrepeat the above while loop, but swap B and C\n\n### Invertible Bloom lookup table\n\nAn invertible Bloom lookup table (IBLT) is a variant of the invertible Bloom filter that also stores associated values with each key. The difference is that an IBLT also stores a valueSum in each cell, which can be used to obtain the value for a given key.[3]\n\nIf there are no extraneous deletions (where a key is deleted without being inserted first) or duplicates (where a key is inserted multiple times), then the hashkeySum can be omitted. In this case, pure cells can be detected by checking whether count = 1.\n\nA hashvalueSum may also be stored in each cell to verify that only one value has been inserted for the corresponding key.\n\nIBLTs are suitable for use in databases, networking[3] and compression.[4]",
+  "references": [
+    {
+      "n": 1,
+      "text": "Choi, Eunji. (2024). Decoding Errors in Difference-Invertible Bloom Filters: Analysis and Resolution. IEEE Access. doi:10.1109/ACCESS.2024.3377222"
+    },
+    {
+      "n": 2,
+      "text": "Eppstein, David. (2011). Straggler Identification in Round-Trip Data Streams via Newton's Identities and Invertible Bloom Filters. IEEE Transactions on Knowledge and Data Engineering. doi:10.1109/TKDE.2010.132"
+    },
+    {
+      "n": 3,
+      "text": "Goodrich, Michael T.. (2011). 2011 49th Annual Allerton Conference on Communication, Control, and Computing (Allerton). doi:10.1109/Allerton.2011.6120248"
+    },
+    {
+      "n": 4,
+      "text": "Fleischhacker, Nils. (2024). Invertible Bloom Lookup Tables with Less Memory and Randomness. Leibniz International Proceedings in Informatics. doi:10.4230/LIPIcs.ESA.2024.54"
+    }
+  ]
+}

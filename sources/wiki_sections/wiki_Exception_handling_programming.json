@@ -1,0 +1,50 @@
+{
+  "source_type": "encyclopedia_article",
+  "source_id": "enwiki:Exception handling (programming)#rev1378995886",
+  "title": "Exception handling (programming)",
+  "authors": "Wikipedia contributors",
+  "year": "2026",
+  "url": "https://en.wikipedia.org/w/index.php?title=Exception_handling_%28programming%29&oldid=1378995886",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Exception handling implementation",
+  "word_count": 626,
+  "text": "The implementation of exception handling in programming languages typically involves a fair amount of support from both a code generator and the runtime system accompanying a compiler. (It was the addition of exception handling to C++ that ended the useful lifetime of the original C++ compiler, Cfront.[1]) Two schemes are most common. The first, , generates code that continually updates structures about the program state in terms of exception handling.[2] Typically, this adds a new element to the stack frame layout that knows what handlers are available for the function or method associated with that frame; if an exception is thrown, a pointer in the layout directs the runtime to the appropriate handler code. This approach is compact in terms of space, but adds execution overhead on frame entry and exit. It was commonly used in many Ada implementations, for example, where complex generation and runtime support was already needed for many other language features. Microsoft's 32-bit Structured Exception Handling (SEH) uses this approach with a separate exception stack.[3] Dynamic registration, being fairly straightforward to define, is amenable to proof of correctness.[4]\n\nThe second scheme, and the one implemented in many production-quality C++ compilers and 64-bit Microsoft SEH, is a table-driven approach. This creates static tables at compile time and link time that relate ranges of the program counter to the program state with respect to exception handling.[5] Then, if an exception is thrown, the runtime system looks up the current instruction location in the tables and determines what handlers are in play and what needs to be done. This approach minimizes executive overhead for the case where an exception is not thrown. This happens at the cost of additional space for lookup tables but this space can be allocated into read-only, special-purpose data sections that are not loaded or relocated until an exception is actually thrown.[6] The location (in memory) of the code for handling an exception need not be located within (or even near) the region of memory where the rest of the function's code is stored, which may improve cache locality on the happy path. To mitigate the space overhead an implementation can store the tables in a format optimized for compactness.[7] An implementation that does not pre-load the exception handling tables would need to incur the cost of loading/caching the tables into memory if/when the first exception is thrown. Throwing an exception incurs the cost of table lookup to find the appropriate handler, and of unwinding the stack. However, table lookup schemes have minimal performance cost if no exception is thrown. Since exceptions in C++ are supposed to be exceptional (i.e. uncommon/rare) events, the phrase \"zero-cost exceptions\" is sometimes used to describe exception handling in C++. Like runtime type identification (RTTI), exceptions might not adhere to C++'s zero-overhead principle as implementing exception handling at run-time requires a non-zero amount of memory for the lookup table.[8] For this reason, exception handling (and RTTI) can be disabled in many C++ compilers, which may be useful for systems with very limited memory[8] (such as embedded systems). This second approach is also superior in terms of achieving thread safety.\n\nIn comparison to C++ where any type may be thrown and caught, in Java only types extending java.lang.Throwable can be thrown and caught, and java.lang.Throwable has two direct descendants: java.lang.Error (indicating a serious problem a reasonable program need not catch), and java.lang.Exception (any other condition that a reasonable program may want to catch and handle). java.lang.Error is typically reserved for extremely serious problems beyond the scope of the program, such as java.lang.OutOfMemoryError, java.lang.ThreadDeath, or java.lang.AssertionError.\n\nOther definitional and implementation schemes have been proposed as well. For languages that support metaprogramming, approaches that involve no overhead at all (beyond the already present support for reflection) have been advanced.[9]",
+  "references": [
+    {
+      "n": 1,
+      "text": "Scott Meyers, The Most Important C++ Software...Ever , 2006"
+    },
+    {
+      "n": 2,
+      "text": "D. Cameron, P. Faust, D. Lenkov, M. Mehta, \"A portable implementation of C++ exception handling\", Proceedings of the C++ Conference (August 1992) USENIX."
+    },
+    {
+      "n": 3,
+      "text": "Peter Kleissner. (February 14, 2009). Windows Exception Handling - Peter Kleissner. http://stoned-vienna.com/html/index.php?page=windows-exception-handling"
+    },
+    {
+      "n": 4,
+      "text": "Graham Hutton, Joel Wright, \"Compiling Exceptions Correctly \". Proceedings of the 7th International Conference on Mathematics of Program Construction, 2004."
+    },
+    {
+      "n": 5,
+      "text": "Lajoie, Josée. (March–April 1994). Exception handling – Supporting the runtime mechanism. C++ Report."
+    },
+    {
+      "n": 6,
+      "text": "Schilling, Jonathan L.. (August 1998). Optimizing away C++ exception handling. SIGPLAN Notices. doi:10.1145/286385.286390"
+    },
+    {
+      "n": 7,
+      "text": "Mo, Modi. (2019-03-07). Making C++ Exception Handling Smaller On x64. C++ Team Blog. https://devblogs.microsoft.com/cppblog/making-cpp-exception-handling-smaller-x64/"
+    },
+    {
+      "n": 8,
+      "text": "Stroustrup, Bjarne. (18 November 2019). C++ exceptions and alternatives. http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p1947r0.pdf"
+    },
+    {
+      "n": 9,
+      "text": "M. Hof, H. Mössenböck, P. Pirkelbauer, \"Zero-Overhead Exception Handling Using Metaprogramming \", Proceedings SOFSEM'97, November 1997, Lecture Notes in Computer Science 1338, pp. 423-431."
+    }
+  ]
+}

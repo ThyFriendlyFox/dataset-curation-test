@@ -1,0 +1,94 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2404.02276",
+  "title": "Heterogeneous Data Access Model for Concurrency Control and Methods to Deal with High Data Contention",
+  "authors": "Alexander Thomasian",
+  "year": "2024",
+  "categories": [
+    "cs.DB",
+    "cs.PF"
+  ],
+  "url": "https://arxiv.org/abs/2404.02276",
+  "html_url": "https://arxiv.org/html/2404.02276",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 692,
+  "text": "Data Base Management Systems - DBMS s are an extension of file systems, where multiple interrelated files are stored together. Early network and hierarchical DBMSs were linked lists on disks, which required complex programming to navigate the lists. Unlike files which are used in batch systems, most DBMSs are used in OnLine Transaction Processing - OLTP environments, which to ensure database integrity and transaction - txn correctness require Concurrency Control - CC.\n\nRelational databases use keys to uniquely identify rows or records in tables and foreign keys to link rows, e.g., students to departments, so that department information need not be repeated in student records. Logical links replace physical links (disk addresses), which results in increased processing cost for relational queries. For frequent queries denormalization can be used to avoid costly joins [1]. The SQL programming language developed for manipulating relational databases results in tremendous increase in programming productivity, making the increased cost of hardware resource consumption worthwhile. The efficiency of execution plans to process SQL programs depends on the quality of query optimizers [1]. For a given logical database design a good physical DB design is important for the sake of performance, e.g., given a list of queries determine indices.\n\nCC has two basic locking modes: Shared - S and eXclusive X, where only S locks are compatible with each other. Deadlocks arising due to lock upgrades from S to X are dealt with by introducing Update - U locks, which are only compatible with S-locks. According to two-Phase Locking - 2PL txns which acquire locks during their execution do not release locks until all locks have been acquired, while strict 2PL facilitates recovery by releasing locks when txn completes and commits. Txn recovery requires logging after and before images of modified data [2], [1], [3].\n\nAs part of the development of System R relational DBMS a well-defined hierarchy of locking modes was developed and is adopted by other relational DBMSs [2], [1], [3]. Figure 8.5 in [2] depicts a popular lock with a FCFS queue. Granted locks (IS, IX, IS, IS, IS), Waiting locks (S, IS, IX, IS, IS) IX/IS are intention locks implying that the table holds records locked in X or S mode. When all X-locks are released then the IX lock is released too: Granted locks (IS, IS, IS, IS, S, IS), Waiting locks (IX, IS, IS).\n\nThere have been numerous abstract analytic and simulation studies of database lock/data contention, such as S and X-locks lock requests uniformly distributed over all database objects [4,5]. There have been few analyses of lock traces to characterize locking behavior [6], [7]. Lock and latch contention is also measured, where latches are a low level serialization mechanism which are released as soon as the processing on the locked object is completed. The case against latch-free algorithms in a multicore systems is made in [8]. Studies of database lock contention are reported in [9] in the context of Sybase DBMS [9] and [10] in the context in IBM’s Db2 in the Appendix. https://www.cs.umd.edu/ abadi/papers/determinism-vldb10.pdf\n\nAccording to Chapter 22 in [11] locking may cause severe performance degradation in the popular MySQL databases. There are four categories of lock issues: flush locks (making tables readonly), metadata locks, record-level locks, and deadlocks.\n\nIn addition to locking Optimistic CC - OCC [12], [13], also described as ”Improved Conflict Resolution”, on p.568) in [1] and TimeStamp-Ordering - TSO method were compared via analysis and simulation in [14]. TSO was shown to be outperformed by other two methods although it was not evaluated with MultiVersion CC - MVCC schemes [1], [15].\n\nThe paper is organized as follows. Lock contention studies limited to X-locks and S-locks are discussed in Section II. The analyses of a single and multiple txn classes accessing a single or multiple Data Base Regions - DBRs are discussed in Section III and Section IV, respectively. Analytic methods to evaluate the performance of txn processing systems taking into account lock contention are discussed in Section V. Methods to prevent deadlocks and reduce lock contention are discussed in Section VI. Conclusions are drawn in Section VII. A measurement tool for IBM’s Db2 is outlined in the Appendix.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib30",
+      "text": "R. Ramakrishnan, J. Gehrke Database Management Systems, 3rd ed. McGraw-Hill 2002."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib14",
+      "text": "J. Gray, A. Reuter: Transaction Processing: Concepts and Techniques. Morgan-Kaufmann Publishers 1993."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "P. A. Bernstein and E. Newcomer. Principles of Transaction Processing, 2nd ed. Morgan-Kaufmann/Elsevier 2009."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib53",
+      "text": "A. Thomasian. Database Concurrency Control - Methods, Performance and Analysis. Advances in Database Systems 1, Kluwer / Springer 1996."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib57",
+      "text": "A. Thomasian: Concurrency Control: Methods, Performance, and Analysis. ACM Computing Surveys 30(1): 70-119 (1998)"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib62",
+      "text": "P. S. Yu, D. M. Dias J. T. Robinson, B. R. Iyer, D. Cornell. Distributed Concurrency Control Analysis for Data Sharing. In Proc. 11th Int’l Computer Measurement Group - CMG 1985 Conf. pp. 13-20."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib38",
+      "text": "V. Singhal, A. J. Smith. Analysis of Locking Behavior in Three Real Database Systems. VLDB J. 6(1): 40-52 (1997)"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "J. M. Faleiro, Daniel J. Abadi. Latch-free Synchronization in Database Systems: Silver Bullet or Fool’s Gold? In 8th Biennial Conf. on Innovative Data Systems Research, CIDR 2017."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib39",
+      "text": "Sybase (An SAP Company) Performance and Tuning Series: Locking and Concurrency Control Adaptive Server Enterprise. https://infocenter.sybase.com/help/topic/com.sybase.infocenter.dc00938.1570/pdf/locking.pdf"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib29",
+      "text": "F. M. Ottaviani. Measuring DB2 Locks and Latches: parts 1-3."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib21",
+      "text": "J. Krogh. MySQL 8 Query Performance Tuning : a Systematic Method for Improving Execution Speeds. Apress, New York, NY 2020"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib22",
+      "text": "H. T. Kung, John T. Robinson: On Optimistic Methods for Concurrency Control. ACM Trans. Database Systems 6(2): 213-226 (1981)"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib12",
+      "text": "P. A. Franaszek, J. T. Robinson, A. Thomasian: Concurrency Control for High Contention Environments. ACM Trans. Database Systems 17(2): 304-345 (1992)."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib33",
+      "text": "I. K. Ryu. Performance Analysis of Database Concurrency Control Methods. PhD Thesis, EE-Systems Dept. USC, 1985."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib61",
+      "text": "G. Weikum, G. Vossen. Transactional Information Systems: Theory, Algorithms, and the Practice of Concurrency Control and Recovery. Morgan Kaufmann, 2002."
+    }
+  ]
+}
