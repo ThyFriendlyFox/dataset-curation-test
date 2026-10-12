@@ -1,0 +1,54 @@
+{
+  "source_type": "encyclopedia_article",
+  "source_id": "enwiki:Load-link/store-conditional#rev1379774755",
+  "title": "Load-link/store-conditional",
+  "authors": "Wikipedia contributors",
+  "year": "2026",
+  "url": "https://en.wikipedia.org/w/index.php?title=Load-link%2Fstore-conditional&oldid=1379774755",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Implementations",
+  "word_count": 360,
+  "text": "LL/SC instructions are supported by:\n\nAlpha: ldl_l[1]/stl_c[2] and ldq_l[1]/stq_c[2]\n\nPowerPC/Power ISA: lwarx/stwcx and ldarx/stdcx[3,4]\n\nMIPS: ll/sc[5] and lld/scd[6]\n\nARM: ldrex/strex (ARMv6,[7] v7 and v8-M[8]), and ldxr/stxr (ARMv8-A[9])\n\nRISC-V: lr/sc[10]\n\nARC: LLOCK/SCOND\n\nSome CPUs require the address being accessed exclusively to be configured in write-through mode.\n\nAll of these platforms provide weak LL/SC. The PowerPC implementation allows an LL/SC pair to wrap loads and even stores to other cache lines (although this approach is vulnerable to false cache line sharing). This allows it to implement, for example, lock-free reference counting in the face of changing object graphs with arbitrary counter reuse (which otherwise requires double compare-and-swap, DCAS). RISC-V provides an architectural guarantee of eventual progress for LL/SC sequences of limited length.\n\nTypically, CPUs track the load-linked address at a cache-line granularity, such that the store-conditional will only succeed if the cache line has been an an exclusive (to this processor) cache state continuously since the linked load. Any other processor must demote it from this state before a write (store-conditional or an ordinary store) may complete.\n\nSome ARM implementations define platform dependent blocks, ranging from 8 bytes to 2048 bytes, and an LL/SC attempt in any given block fails if there is between the LL and SC a normal memory access inside the same block. Other ARM implementations fail if there is a modification anywhere in the whole address space. The former implementation is the stronger and most practical.\n\nLL/SC fits naturally into a load–store architecture, as reads and writes are separate instructions which can use the standard instruction pipeline. Also, both instructions can be performed using only two registers (address and value), fitting naturally into common 2-operand ISAs. The most significant complication is the need to report a boolean success indication from the store. CAS, on the other hand, requires three registers (address, old value, new value) and a dependency between the value read and the value written. x86, for example, only allows the address and new value to be located arbitrarily; the old value must be in the EAX register. Modern chips, which translate complex instructions into internal micro-operations, may well translate a CAS instruction into separate LL/SC micro-operations.",
+  "references": [
+    {
+      "n": 1,
+      "text": "Alpha Architecture Reference Manual. https://download.majix.org/dec/alpha_arch_ref.pdf#page=79"
+    },
+    {
+      "n": 2,
+      "text": "Alpha Architecture Reference Manual. https://download.majix.org/dec/alpha_arch_ref.pdf#page=83"
+    },
+    {
+      "n": 3,
+      "text": "May, Cathy. (1993). The PowerPC architecture: A SPECIFICATION FOR A NEW FAMILY OF RISC PROCESSORS. Morgan Kaufmann PUblishers, Inc."
+    },
+    {
+      "n": 4,
+      "text": "Kacmarcik, Cary. (1995). Optimizing PowerPC Code. Addison-Wesley Publishing Company."
+    },
+    {
+      "n": 5,
+      "text": "APPLICATION NOTE MIPS R4000 Synchronization Primitives. https://www.cs.auckland.ac.nz/compsci313s2c/resources/MIPSLLSC.pdf#page=13"
+    },
+    {
+      "n": 6,
+      "text": "APPLICATION NOTE MIPS R4000 Synchronization Primitives. https://www.cs.auckland.ac.nz/compsci313s2c/resources/MIPSLLSC.pdf#page=9"
+    },
+    {
+      "n": 7,
+      "text": "ARM11 MPCore™ Processor Revision: r2p0 Technical Reference Manual. https://documentation-service.arm.com/static/5e8e1e0388295d1e18d368b2"
+    },
+    {
+      "n": 8,
+      "text": "Arm®v8-M Architecture Reference Manual. https://documentation-service.arm.com/static/615c3754e4f35d2484678be7"
+    },
+    {
+      "n": 9,
+      "text": "ARMv8-A Synchronization primitives. https://documentation-service.arm.com/static/5efa1989dbdee951c1ccdea1"
+    },
+    {
+      "n": 10,
+      "text": "(2017-05-07). The RISC-V Instruction Set Manual, Volume 1: User-Level ISA, Version 2.2. https://riscv.org/wp-content/uploads/2017/05/riscv-spec-v2.2.pdf"
+    }
+  ]
+}

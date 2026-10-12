@@ -1,0 +1,66 @@
+{
+  "source_type": "encyclopedia_article",
+  "source_id": "enwiki:Initial ramdisk#rev1359897550",
+  "title": "Initial ramdisk",
+  "authors": "Wikipedia contributors",
+  "year": "2026",
+  "url": "https://en.wikipedia.org/w/index.php?title=Initial_ramdisk&oldid=1359897550",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Implementation",
+  "word_count": 1299,
+  "text": "An image of this initial root file system (along with the kernel image) must be stored somewhere accessible by the Linux bootloader or the boot firmware of the computer. This can be the root file system itself, a boot image on an optical disc, a small partition on a local disk (a boot partition, usually using ext2 or FAT file systems), or a TFTP server (on systems that can boot from Ethernet).\n\nThe bootloader will load the kernel and initial root file system image into memory and then start the kernel, passing in the memory address of the image. At the end of its boot sequence, the kernel tries to determine the format of the image from its first few blocks of data, which can lead either to the initrd or initramfs scheme.\n\nIn the initrd scheme, the image may be a file system image (optionally compressed), which is made available in a special block device (/dev/ram) that is then mounted as the initial root file system.[1] The driver for that file system must be compiled statically into the kernel. Many distributions originally used compressed ext2 file system images, while the others (including Debian 3.1) used cramfs in order to boot on memory-limited systems, since the cramfs image can be mounted in-place without requiring extra space for decompression. Once the initial root file system is up, the kernel executes /linuxrc as its first process;[2] when it exits, the kernel assumes that the real root file system has been mounted and executes /sbin/init to begin the normal user-space boot process.[1]\n\nIn the initramfs scheme (available since the Linux kernel 2.6.13), the image may be a cpio archive (optionally compressed) or a concatenation of such archives. The archive is unpacked by the kernel into a special instance of a tmpfs that becomes the initial root file system. This scheme has the advantage of not requiring an intermediate file system or block drivers to be compiled into the kernel.[3] Some systems use the dracut package to create an initramfs image.[4] In the initramfs scheme, the kernel executes /init as its first process that is not expected to exit.[3] For some applications, initramfs can use the casper utility to create a writable environment using unionfs to overlay a persistence layer over a read-only root filesystem image. For example, overlay data can be stored on a USB flash drive, while a compressed SquashFS read-only image stored on a live CD acts as a root filesystem.[5,6]\n\nDepending on which algorithms were compiled statically into it, the kernel can unpack initrd/initramfs images compressed with gzip, bzip2, LZMA, XZ, LZO, LZ4,[7] and zstd.\n\n### Mount preparations\n\nSome Linux distributions such as Debian will generate a customized initrd image which contains only whatever is necessary to boot some particular computer, such as ATA, SCSI and filesystem kernel modules. These typically embed the location and type of the root file system.\n\nOther Linux distributions (such as Fedora and Ubuntu) generate a more generic initrd image. These start only with the device name of the root file system (or its UUID) and must discover everything else at boot time. In this case, the software must perform a complex cascade of tasks to get the root file system mounted:\n\nAny hardware drivers that the boot process depends on must be loaded. A common arrangement is to pack kernel modules for common storage devices onto the initrd and then invoke a hotplug agent to pull in modules matching the computer's detected hardware.\n\nOn systems which display a boot splash screen, the video hardware must be initialized and a user-space helper started to paint animations onto the display in lockstep with the boot process.\n\nIf the root file system is on NFS, it must then bring up the primary network interface, invoke a DHCP client, with which it can obtain a DHCP lease, extract the name of the NFS share and the address of the NFS server from the lease, and mount the NFS share.\n\nIf the root file system appears to be on a software RAID device, there is no way of knowing which devices the RAID volume spans; the standard MD utilities must be invoked to scan all available block devices and bring the required ones online.\n\nIf the root file system appears to be on a logical volume, the LVM utilities must be invoked to scan for and activate the volume group containing it.\n\nIf the root file system is on an encrypted block device, the software needs to invoke a helper script to prompt the user to type in a passphrase and/or insert a hardware token (such as a smart card or a USB security dongle), and then create a decryption target with the device mapper.\n\nSome distributions use an event-driven hotplug agent such as udev, which invokes helper programs as hardware devices, disk partitions and storage volumes matching certain rules come online. This allows discovery to run in parallel, and to progressively cascade into arbitrary nestings of LVM, RAID or encryption to get at the root file system.\n\nWhen the root file system finally becomes visible, any maintenance tasks that cannot run on a mounted root file system are done, the root file system is mounted read-only, and any processes that must continue running (such as the splash screen helper and its command FIFO) are hoisted into the newly mounted root file system.\n\nThe final root file system cannot simply be mounted over /, since that would make the scripts and tools on the initial root file system inaccessible for any final cleanup tasks:\n\nOn an initrd, the new root is mounted at a temporary mount point and rotated into place with pivot_root(8) (which was introduced specifically for this purpose). This leaves the initial root file system at a mount point (such as /initrd) where normal boot scripts can later unmount it to free up memory held by the initrd.\n\nOn an initramfs, the initial root file system cannot be rotated away.[8] Instead, it is simply emptied and the final root file system mounted over the top.\n\nMost initial root file systems implement /linuxrc or /init as a shell script and thus include a minimal shell (usually /bin/ash) along with some essential user-space utilities (usually the BusyBox toolkit). To further save space, the shell, utilities and their supporting libraries are typically compiled with space optimizations enabled (such as with gcc's \"-Os\" flag) and linked against klibc, a minimal version of the C library written specifically for this purpose.[9]\n\n### Other uses\n\nInstallers for Linux distributions typically run entirely from an initramfs, as they must be able to host the installer interface and supporting tools before any persistent storage has been set up.\n\nTiny Core Linux[10] and Puppy Linux[11] can run entirely from initrd.\n\n### Similarities in other operating systems\n\nSince Windows Vista,[12] Windows can boot from a WIM disk image file, for which the file format is published;[13] it is similar to the ZIP format except that it supports hard links, deduplicated chunks, and uses chunk-by-chunk compression. In this case, the whole WIM is initially loaded into RAM, followed by the kernel initialisation. Next, the loaded WIM is available as a SystemRoot with an assigned drive letter. The Windows installer uses this so it boots from BOOT.WIM, and then uses INSTALL.WIM as the collection of the Windows files to be installed.\n\nAlso, Windows Preinstallation Environment (Windows PE) uses the same, being a base for separate-boot versions of some antivirus and backup/disaster recovery software.\n\nIt is also possible to install Windows so that it will always boot from a WIM or VHD file placed on a physical drive. However, this is rarely used since the Windows boot loader is capable of loading the .sys files for boot-time kernel modules itself, which is the task that requires initrd in Linux.",
+  "references": [
+    {
+      "n": 1,
+      "text": "Almesberger, Werner. (2000). Using the initial RAM disk (initrd). https://www.kernel.org/doc/Documentation/initrd.txt"
+    },
+    {
+      "n": 2,
+      "text": "linux/do_mounts_initrd.c at 4f671fe2f9523a1ea206f63fe60a7c7b3a56d5c7 · torvalds/linux · GitHub. GitHub. https://github.com/torvalds/linux/blob/4f671fe2f9523a1ea206f63fe60a7c7b3a56d5c7/init/do_mounts_initrd.c#L74"
+    },
+    {
+      "n": 3,
+      "text": "Landley, Rob. (2005-10-17). ramfs, rootfs, and initramfs docs, take 2. Linux kernel source tree. https://www.kernel.org/doc/Documentation/filesystems/ramfs-rootfs-initramfs.txt"
+    },
+    {
+      "n": 4,
+      "text": "Petersen, Richard Leland. (2010). Fedora 13: Administration, Networking, Security. Surfing Turtle Press. https://books.google.com/books?id=rQRJG8s1ugQC"
+    },
+    {
+      "n": 5,
+      "text": "Ubuntu Manpage: casper - a hook for initramfs-tools to boot live systems. manpages.ubuntu.com. https://manpages.ubuntu.com/manpages/precise/man7/casper.7.html"
+    },
+    {
+      "n": 6,
+      "text": "Shawn Powers. \"Casper, the Friendly (and Persistent) Ghost\". Linux Journal. 2012."
+    },
+    {
+      "n": 7,
+      "text": "Kyungsik Lee. (2013-05-30). LZ4 Compression and Improving Boot Time. events.linuxfoundation.org. https://events.static.linuxfound.org/sites/events/files/lcjpcojp13_klee.pdf"
+    },
+    {
+      "n": 8,
+      "text": "Fish, Richard. (2005-07-06). pivot_root from initramfs causes circular reference in mount tree. Linux Kernel Bug Tracker. http://bugzilla.kernel.org/show_bug.cgi?id=4857"
+    },
+    {
+      "n": 9,
+      "text": "Garzik, Jeff. (2002-11-02). initramfs merge, part 1 of N. Linux kernel mailing list. https://lkml.org/lkml/2002/11/2/17"
+    },
+    {
+      "n": 10,
+      "text": "Tiny Core Linux - Concepts. ibiblio.org. http://distro.ibiblio.org/tinycorelinux/concepts.html"
+    },
+    {
+      "n": 11,
+      "text": "Barry Kauler. Puppy Linux Release Announcement. ibiblio.org. http://distro.ibiblio.org/puppylinux/puppy-5.3/release-Slacko-5.3.htm"
+    },
+    {
+      "n": 12,
+      "text": "Windows Imaging File Format (WIM). microsoft.com. https://technet.microsoft.com/en-us/library/cc749478%28v=ws.10%29.aspx"
+    },
+    {
+      "n": 13,
+      "text": "Download Windows Imaging File Format (WIM) from Official Microsoft Download Center. Microsoft.com. https://www.microsoft.com/en-us/download/details.aspx?id=13096"
+    }
+  ]
+}

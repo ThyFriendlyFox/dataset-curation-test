@@ -1,0 +1,54 @@
+{
+  "source_type": "encyclopedia_article",
+  "source_id": "enwiki:Logical Volume Manager (Linux)#rev1362915950",
+  "title": "Logical Volume Manager (Linux)",
+  "authors": "Wikipedia contributors",
+  "year": "2026",
+  "url": "https://en.wikipedia.org/w/index.php?title=Logical_Volume_Manager_%28Linux%29&oldid=1362915950",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Features",
+  "word_count": 857,
+  "text": "### Basic functionality\n\nVolume groups (VGs) can be resized online by absorbing new physical volumes (PVs) or ejecting existing ones.\n\nLogical volumes (LVs) can be resized online by concatenating extents onto them or truncating extents from them.\n\nLVs can be moved between PVs.\n\nCreation of read-only snapshots of logical volumes (LVM1), leveraging a copy on write (CoW) feature,[1] or read/write snapshots (LVM2)\n\nVGs can be split or merged in situ as long as no LVs span the split. This can be useful when migrating whole LVs to or from offline storage.\n\nLVM objects can be tagged for administrative convenience.[2]\n\nVGs and LVs can be made active as the underlying devices become available through use of the lvmetad daemon.[3]\n\n### Advanced functionality\n\nHybrid volumes can be created using the dm-cache target, which allows one or more fast storage devices, such as flash-based SSDs, to act as a cache for one or more slower hard disk drives.[4]\n\nThinly provisioned LVs can be allocated from a pool.[5]\n\nOn newer versions of device mapper, LVM is integrated with the rest of device mapper enough to ignore the individual paths that back a dm-multipath device if devices/multipath_component_detection=1 is set in lvm.conf. This prevents LVM from activating volumes on an individual path instead of the multipath device.[6]\n\n### RAID\n\nLVs can be created to include RAID functionality, including RAID 1, 5 and 6.[7]\n\nEntire LVs or their parts can be striped across multiple PVs, similarly to RAID 0.\n\nA RAID 1 backend device (a PV) can be configured as \"write-mostly\", resulting in reads being avoided to such devices unless necessary.[8]\n\nRecovery rate can be limited using lvchange --raidmaxrecoveryrate and lvchange --raidminrecoveryrate to maintain acceptable I/O performance while rebuilding a LV that includes RAID functionality.\n\n### High availability\n\nThe LVM also works in a shared-storage cluster in which disks holding the PVs are shared between multiple host computers, but can require an additional daemon to mediate metadata access via a form of locking.\n\nCLVM\n\nA distributed lock manager is used to broker concurrent LVM metadata accesses. Whenever a cluster node needs to modify the LVM metadata, it must secure permission from its local clvmd, which is in constant contact with other clvmd daemons in the cluster and can communicate a desire to get a lock on a particular set of objects.\n\nHA-LVM\n\nCluster-awareness is left to the application providing the high availability function. For the LVM's part, HA-LVM can use CLVM as a locking mechanism, or can continue to use the default file locking and reduce \"collisions\" by restricting access to only those LVM objects that have appropriate tags. Since this simpler solution avoids contention rather than mitigating it, no concurrent accesses are allowed, so HA-LVM is considered useful only in active-passive configurations.\n\nlvmlockd\n\n, a stable LVM component that is designed to replace clvmd by making the locking of LVM objects transparent to the rest of LVM, without relying on a distributed lock manager.[9] It saw massive development during 2016.[10]\n\nThe above described mechanisms only resolve the issues with LVM's access to the storage. The file system selected to be on top of such LVs must either support clustering by itself (such as GFS2 or VxFS) or it must only be mounted by a single cluster node at any time (such as in an active-passive configuration).\n\n### Volume group allocation policy\n\nLVM VGs must contain a default allocation policy for new volumes created from it. This can later be changed for each LV using the lvconvert -A command, or on the VG itself via vgchange --alloc. To minimize fragmentation, LVM will attempt the strictest policy (contiguous) first and then progress toward the most liberal policy defined for the LVM object until allocation finally succeeds.\n\nIn RAID configurations, almost all policies are applied to each leg in isolation. For example, even if a LV has a policy of cling, expanding the file system will not result in LVM using a PV if it is already used by one of the other legs in the RAID setup. LVs with RAID functionality will put each leg on different PVs, making the other PVs unavailable to any other given leg. If this was the only option available, expansion of the LV would fail. In this sense, the logic behind cling will only apply to expanding each of the individual legs of the array.\n\nAvailable allocation policies are:\n\nContiguous – forces all LEs in a given LV to be adjacent and ordered. This eliminates fragmentation but severely reduces a LV expandability.\n\nCling – forces new LEs to be allocated only on PVs already used by an LV. This can help mitigate fragmentation as well as reduce vulnerability of particular LVs should a device go down, by reducing the likelihood that other LVs also have extents on that PV.\n\nNormal – implies near-indiscriminate selection of PEs, but it will attempt to keep parallel legs (such as those of a RAID setup) from sharing a physical device.\n\nAnywhere – imposes no restrictions whatsoever. Highly risky in a RAID setup as it ignores isolation requirements, undercutting most of the benefits of RAID. For linear volumes, it can result in increased fragmentation.",
+  "references": [
+    {
+      "n": 1,
+      "text": "(29 May 2018). BTRFS performance compared to LVM+EXT4 with regards to database workloads. https://blog.pythian.com/btrfs-performance-compared-lvmext4-regards-database-workloads/"
+    },
+    {
+      "n": 2,
+      "text": "Tagging LVM2 Storage Objects. Micro Focus International. https://www.suse.com/documentation/sles11/stor_admin/data/lvmtagging.html"
+    },
+    {
+      "n": 3,
+      "text": "The Metadata Daemon. Red Hat Inc. https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/6/html/Logical_Volume_Manager_Administration/metadatadaemon.html"
+    },
+    {
+      "n": 4,
+      "text": "(22 May 2014). Using LVM's new cache feature. https://rwmj.wordpress.com/2014/05/22/using-lvms-new-cache-feature/"
+    },
+    {
+      "n": 5,
+      "text": "2.3.5. Thinly-Provisioned Logical Volumes (Thin Volumes). Access.redhat.com. https://access.redhat.com/site/documentation/en-US/Red_Hat_Enterprise_Linux/6/html/Logical_Volume_Manager_Administration/thinprovisioned_volumes.html"
+    },
+    {
+      "n": 6,
+      "text": "4.101.3. RHBA-2012:0161 — lvm2 bug fix and enhancement update. https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/5/html/5.8_Technical_Notes/lvm2.html"
+    },
+    {
+      "n": 7,
+      "text": "5.4.16. RAID Logical Volumes. Access.redhat.com. https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/6/html/Logical_Volume_Manager_Administration/LV.html#raid_volumes"
+    },
+    {
+      "n": 8,
+      "text": "Controlling I/O Operations on a RAID1 Logical Volume. redhat.com. https://access.redhat.com/site/documentation/en-US/Red_Hat_Enterprise_Linux/6/html/Logical_Volume_Manager_Administration/raid1-writebehind.html"
+    },
+    {
+      "n": 9,
+      "text": "(15 Mar 2013). Re: LVM snapshot with Clustered VG [SOLVED]. https://www.spinics.net/lists/lvm/msg21756.html"
+    },
+    {
+      "n": 10,
+      "text": "\"vmlockd.c git history\". https://sourceware.org/git/?p=lvm2.git;a=history;f=lib/locking/lvmlockd.c;h=master;hb=HEAD"
+    }
+  ]
+}

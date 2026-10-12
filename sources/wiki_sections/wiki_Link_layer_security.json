@@ -1,0 +1,54 @@
+{
+  "source_type": "encyclopedia_article",
+  "source_id": "enwiki:Link layer security#rev1334950842",
+  "title": "Link layer security",
+  "authors": "Wikipedia contributors",
+  "year": "2026",
+  "url": "https://en.wikipedia.org/w/index.php?title=Link_layer_security&oldid=1334950842",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Vulnerabilities and mitigation strategies",
+  "word_count": 1123,
+  "text": "### Wired networks\n\n### Content Address Memory (CAM) table exhaustion attack\n\nThe data link layer addresses data packets based on the destination hardware's physical Media Access Control (MAC) address. Switches within the network maintain Content Address Tables (CAMs) that maps the switch's ports to specific MAC addresses. These tables allow the switch to securely deliver the packet to its intended physical address only. Using the switch to connect only the systems that are communicating provides much greater security than a network hub, which broadcasts all traffic over all ports,[1] allowing an eavesdropper to intercept and monitor all network traffic.\n\nA CAM Table Exhaustion Attack basically turns a switch into a hub.[2] The attacker floods the CAM table with new MAC-to-port mappings until the table's fixed memory allotment is full. At this point the switch no longer knows how to deliver traffic based on a MAC-to-port mapping, and defaults to broadcasting traffic over all ports. An adversary is then able to intercept and monitor all network traffic traversing the switch to include passwords, emails, instant messages, etc.[3]\n\nThe CAM table-overflow attack can be mitigated by configuring port security on the switch. This option provides for either the specification of the MAC addresses on a particular switch port or the specification of the number of MAC addresses that can be learned by a switch port. When an invalid MAC address is detected on the port, the switch can either block the offending MAC address or shut down the port.[4]\n\n### Address Routing Protocol (ARP) spoofing\n\nAt the data link layer a logical IP address assigned by the network layer is translated into a physical MAC address. In order to ensure reliable data communications all switches in the network must maintain up-to-date tables for mapping logical (IP) to physical (MAC) addresses. If a client or switch is unsure of the IP-to-MAC mapping of a data packet it receives it will send an Address Resolution Protocol (ARP) message to the nearest switch asking for the MAC address associated with the particular IP address. Once this is accomplished the client or switch will update its table to reflect the new mapping. In an ARP spoofing attack the adversary broadcasts the IP address of the machine to be attacked along with its own MAC address. All neighboring switches will then update their mapping tables and begin transmitting data destined to the attacked system's IP address to the attacker's MAC address.[2] Such an attack is commonly referred to as a \"man in the middle\" attack.\n\nDefenses against ARP spoofing generally rely on some form of certification or cross-checking of ARP responses. Uncertified ARP responses are blocked. These techniques may be integrated with the Dynamic Host Configuration Protocol (DHCP) server so that both dynamic and static IP addresses are certified. This capability may also be implemented in individual hosts or may be integrated into Ethernet switches or other network equipment.[5]\n\n### Dynamic Host Configuration Protocol (DHCP) starvation\n\nWhen a client system without an IP address enters a network it will request an IP address from the resident DHCP server. The DHCP server will reserve an IP address (so anyone else asking for one is not granted this one) and it will send that IP address to the device along with a lease identifying how long the address will be valid. Normally, from this point, the device will respond by confirming the IP address with the DHCP server and the DHCP server finally responds with an acknowledgement.\n\nIn a DHCP starvation attack, once the adversary receives the IP address and the lease period from the DHCP server, the adversary does not respond with the confirmation. Instead, the adversary floods the DHCP server with IP address requests until all addresses within the server's address space have been reserved (exhausted). At this point, any hosts wishing to join the network will be denied access, resulting in a denial of service. The adversary can then set up a rogue DHCP server so that clients receive incorrect network settings and as a result transmit data to an attacker's machine.[6]\n\nOne method for mitigating this type of attack is to use the IP source guard feature available on many Ethernet switches. The IP guard initially blocks all traffic except DHCP packets. When a client receives a valid IP address from the DHCP server the IP address and switch port relationship are bound in an Access Control List (ACL). The ACL then restricts traffic only to those IP addresses configured in the binding.[7]\n\n### Wireless networks\n\n### Hidden node attack\n\nIn a wireless network many hosts or nodes are sharing a common medium. If nodes A and B are both wireless laptop computers communicating in an office environment their physical separation may require that they communicate through a wireless access point. But only one device can transmit at a time in order to avoid packet collisions. Prior to transmitting, Node A sends out a Ready to Send (RTS) signal. If it is not receiving any other traffic the access point will broadcast a Clear to Send (CTS) signal over the network. Node A will then begin transmitting while Node B knows to hold off transmitting its data for the time being. Even though it cannot directly communicate with Node A, i.e. Node A is hidden, it knows to wait based on its communication with the access point. An attacker can exploit this functionality by flooding the network with CTS messages. Then every node assumes there is a hidden node trying to transmit and will hold its own transmissions, resulting in a denial of service.[8]\n\nPreventing hidden node attacks requires a network tool such as NetEqualizer.[8] Such a tool monitors access point traffic and develops a baseline level of traffic. Any spikes in CTS/RTS signals are assumed to be the result of a hidden node attack and are subsequently blocked.\n\n### De-auth (de-authentication) attack\n\nAny client entering a wireless network must first authenticate with an access point (AP) and is thereafter associated with that access point. When the client leaves it sends a deauthentication, or deauth, message to disassociate itself with the access point. An attacker can send deauth messages to an access point tied to client IP addresses thereby knocking the users off-line and requiring continued re-authenticate, giving the attacker valuable insight into the reauthentication handshaking that occurs.[9]\n\nTo mitigate this attack, the access point can be set up to delay the effects of deauthentication or disassociation requests (e.g., by queuing such requests for 5–10 seconds) thereby giving the access point an opportunity to observe subsequent packets from the client. If a data packet arrives after a deauthentication or disassociation request is queued, that request is discarded since a legitimate client would never generate packets in that order.[10]",
+  "references": [
+    {
+      "n": 1,
+      "text": "CAM Table & STP Attacks. Polytechnic Institute of New York University. http://isis.poly.edu/courses/cs996-pent-test-f2004/Lectures/pre1.pdf"
+    },
+    {
+      "n": 2,
+      "text": "O'Connor, Terrence. Detecting and Responding to Data Link Layer Attacks. SANS Institute. http://www.sans.org/reading_room/whitepapers/detection/detecting-responding-data-link-layer-attacks_33513"
+    },
+    {
+      "n": 3,
+      "text": "Akeung, Darryl. Switch Security – DHCP Starvation and Flooding CAM Tables (Fail Open) Part 1. http://dakeung.com/2011/12/20/switch-security-dhcp-starvation-and-flooding-cam-tables-fail-open-part-1/"
+    },
+    {
+      "n": 4,
+      "text": "Network Security at the Data Link Layer (Layer 2) of LAN. Javvin Network Management & Security. http://www.javvin.com/networksecurity/NetworkSecurity.html"
+    },
+    {
+      "n": 5,
+      "text": "Gmoskov. ARP Spoofing Attack and Defense. http://think-security.com/arp-spoofing-attack-and-defense/"
+    },
+    {
+      "n": 6,
+      "text": "Dmitry, Davletbaev. Dhcpstarv - DHCP Starvation Utility. SourceForge.net. https://dhcpstarv.sourceforge.net/"
+    },
+    {
+      "n": 7,
+      "text": "Mitigating Layer 2 Attacks. http://icon.clnchina.com.cn/attachment/0/7/8/8870_Mitigating%20Layer%202%20Attacks.pdf"
+    },
+    {
+      "n": 8,
+      "text": "NetEqualizer Lite and Hidden Nodes: A Real Solution to a Virtual Problem. NetEqualizer. https://www.netequalizer.com/Hidden_Node_White_Paper.php"
+    },
+    {
+      "n": 9,
+      "text": "Deauthentication. Aircrack-ng. https://www.aircrack-ng.org/doku.php?id=deauthentication"
+    },
+    {
+      "n": 10,
+      "text": "Bellado, John. Deauthentication Attack. Proceedings of the USENIX Security Symposium, Aug 2003. http://sysnet.ucsd.edu/~bellardo/pubs/usenix-sec03-80211dos-html/node11.html"
+    }
+  ]
+}

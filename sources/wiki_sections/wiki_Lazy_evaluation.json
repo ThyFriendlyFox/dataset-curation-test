@@ -1,0 +1,66 @@
+{
+  "source_type": "encyclopedia_article",
+  "source_id": "enwiki:Lazy evaluation#rev1369487086",
+  "title": "Lazy evaluation",
+  "authors": "Wikipedia contributors",
+  "year": "2026",
+  "url": "https://en.wikipedia.org/w/index.php?title=Lazy_evaluation&oldid=1369487086",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Laziness and eagerness",
+  "word_count": 1132,
+  "text": "### Controlling eagerness in lazy languages\n\nIn lazy programming languages such as Haskell, although the default is to evaluate expressions only when they are demanded, it is possible in some cases to make code more eager—or conversely, to make it more lazy again after it has been made more eager. This can be done by explicitly coding something which forces evaluation (which may make the code more eager) or avoiding such code (which may make the code more lazy). Strict evaluation usually implies eagerness, but they are technically different concepts.\n\nHowever, there is an optimisation implemented in some compilers called strictness analysis, which, in some cases, allows the compiler to infer that a value will always be used. In such cases, this may render the programmer's choice of whether to force that particular value or not, irrelevant, because strictness analysis will force strict evaluation.\n\nIn Haskell, marking constructor fields strict means that their values will always be demanded immediately. The seq function can also be used to demand a value immediately and then pass it on, which is useful if a constructor field should generally be lazy. However, neither of these techniques implements recursive strictness—for that, a function called deepSeq was invented.\n\nAlso, pattern matching in Haskell 98 is strict by default, so the ~ qualifier has to be used to make it lazy.[1]\n\n### Simulating laziness in eager languages\n\n### C++\n\nIn C++, the std::ranges library uses lazy range adaptors.[2]\n\n### Java\n\nIn Java, lazy evaluation can be done by using objects that have a method to evaluate them when the value is needed. The body of this method must contain the code required to perform this evaluation. Since the introduction of lambda expressions in Java SE8, Java has supported a compact notation for this. The following example generic interface provides a framework for lazy evaluation:[3,4]\n\nThe Lazy interface with its eval() method is equivalent to the Supplier interface with its get() method in the java.util.function library.[5,6]\n\nEach class that implements the Lazy interface must provide an eval method, and instances of the class may carry whatever values the method needs to accomplish lazy evaluation. For example, consider the following code to lazily compute and print 210:\n\nIn the above, the variable a initially refers to a lazy integer object created by the lambda expression () -> 1. Evaluating this lambda expression is similar to constructing a new instance of an anonymous class that implements Lazy<Integer> with an eval method returning 1.\n\nEach iteration of the loop links a to a new object created by evaluating the lambda expression inside the loop. Each of these objects holds a reference to another lazy object, b, and has an eval method that calls b.eval() twice and returns the sum. The variable b is needed here to meet Java's requirement that variables referenced from within a lambda expression be effectively final.\n\nThis is an inefficient program because this implementation of lazy integers does not memoize the result of previous calls to eval. It also involves considerable autoboxing and unboxing. What may not be obvious is that, at the end of the loop, the program has constructed a linked list of 11 objects and that all of the actual additions involved in computing the result are done in response to the call to a.eval() on the final line of code. This call recursively traverses the list to perform the necessary additions.\n\nWe can build a Java class that memoizes a lazy object as follows:[3,4]\n\nThis allows the previous example to be rewritten to be far more efficient. Where the original ran in time exponential in the number of iterations, the memoized version runs in linear time:\n\nJava's lambda expressions are just syntactic sugar. Anything that can be written with a lambda expression can be rewritten as a call to construct an instance of an anonymous inner class implementing the interface, and any use of an anonymous inner class can be rewritten using a named inner class, and any named inner class can be moved to the outermost nesting level.\n\n### JavaScript\n\nIn JavaScript, lazy evaluation can be simulated by using a generator. For example, the stream of all Fibonacci numbers can be written, using memoization, in the following TypeScript code:\n\n### Kotlin\n\nIn Kotlin variables can be initialized lazily using the lazy{}[7] function to initialize Delegated properties[8] with the by clause like so:\n\nYou can run this example yourself by going to the Kotlin Playground.\n\n### Verification\n\nTo verify that the program lazily loaded isThePizzaReady instead of initializing it beforehand as true we need to check the output of the program.As we can see when the program reads from isThePizzaReady it prints out a statement we put inside the lazy code block on line 4. We can also verify that it did not run the lazy block twice and reused the previous output of it via the fact that:\n\nThe program did not throw an exception, the assert function will throw an AssertErrorif the output of isThePizzaReady is false.[9] which can only happen if the lazy block is executed more than once.\n\nThe statement on line 4 does not execute more than once.\n\n### Python\n\nIn Python 2.x the range() function[10] computes a list of integers. The entire list is stored in memory when the first assignment statement is evaluated, so this is an example of eager or immediate evaluation:\n\nIn Python 3.x the range() function[11] returns a generator which computes elements of the list on demand. Elements are only generated when they are needed (e.g., when print(r[12]) is evaluated in the following example), so this is an example of lazy or deferred evaluation:\n\nThis change to lazy evaluation saves execution time for large ranges which may never be fully referenced and memory usage for large ranges where only one or a few elements are needed at any time.\n\nIn Python 2.x is possible to use a function called xrange() which returns an object that generates the numbers in the range on demand. The advantage of xrange is that generated object will always take the same amount of memory.\n\nFrom version 2.2 forward, Python manifests lazy evaluation by implementing iterators (lazy sequences) unlike tuple or list sequences. For instance (Python 2):\n\nThe above example shows that lists are evaluated when called, but in case of iterator, the first element '0' is printed when need arises.\n\n### .NET\n\nIn the .NET framework, it is possible to do lazy evaluation using the class .[13] The class can be easily exploited in F# using the keyword, while the method will force the evaluation. There are also specialized collections like that provide built-in support for lazy evaluation.\n\nIn C# and VB.NET, the class is directly used.\n\nOr with a more practical example:\n\nAnother way is to use the keyword:",
+  "references": [
+    {
+      "n": 1,
+      "text": "Lazy pattern match - HaskellWiki. http://www.haskell.org/haskellwiki/Lazy_pattern_match"
+    },
+    {
+      "n": 2,
+      "text": "Ranges library (since C++20). cppreference.com. https://en.cppreference.com/w/cpp/ranges.html"
+    },
+    {
+      "n": 3,
+      "text": "Grzegorz Piwowarek, Leveraging Lambda Expressions for Lazy Evaluation in Java, 4Comprehension, July 25, 2018."
+    },
+    {
+      "n": 4,
+      "text": "Douglas W. Jones, CS:2820 Notes, Fall 2020, Lecture 25, retrieved Jan. 2021."
+    },
+    {
+      "n": 5,
+      "text": "Interface Suppier<T>, retrieved Oct. 2020."
+    },
+    {
+      "n": 6,
+      "text": "Bloch, Joshua. (2018). \"Effective Java: Programming Language Guide\". Addison-Wesley."
+    },
+    {
+      "n": 7,
+      "text": "lazy Core API – Kotlin Programming Language. Kotlin Help. https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/lazy.html"
+    },
+    {
+      "n": 8,
+      "text": "Delegated properties Kotlin. Kotlin Help. https://kotlinlang.org/docs/delegated-properties.html"
+    },
+    {
+      "n": 9,
+      "text": "assert Core API – Kotlin Programming Language. Kotlin Help. https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/assert.html"
+    },
+    {
+      "n": 10,
+      "text": "2. Built-in Functions — Python 2.7.11 documentation. https://docs.python.org/library/functions.html#range"
+    },
+    {
+      "n": 11,
+      "text": "2. Built-in Functions — Python 3.5.1 documentation. https://docs.python.org/py3k/library/functions.html#range"
+    },
+    {
+      "n": 12,
+      "text": "Casas, A.. (2006). A Syntactic Approach to Combining Functional Notation, Lazy Evaluation, and Higher-Order in LP Systems. Springer. doi:10.1007/11737414_11"
+    },
+    {
+      "n": 13,
+      "text": "Lazy(T) Class (System). Microsoft. http://msdn.microsoft.com/de-de/library/vstudio/dd642331.aspx"
+    }
+  ]
+}

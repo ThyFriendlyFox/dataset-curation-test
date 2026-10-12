@@ -1,0 +1,26 @@
+{
+  "source_type": "encyclopedia_article",
+  "source_id": "enwiki:Intel 8253#rev1352499759",
+  "title": "Intel 8253",
+  "authors": "Wikipedia contributors",
+  "year": "2026",
+  "url": "https://en.wikipedia.org/w/index.php?title=Intel_8253&oldid=1352499759",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Features",
+  "word_count": 624,
+  "text": "The timer has three counters, numbered 0 to 2.[1] Each channel can be programmed to operate in one of six modes. Once programmed, the channels operate independently.[2]\n\nEach counter has two input pins – \"CLK\" (clock input) and \"GATE\" – and one pin, \"OUT\", for data output. The three counters are 16-bit down counters independent of each other, and can be easily read by the CPU.[3]\n\nData bus buffer contains the logic to buffer the data bus between the microprocessor and the internal registers. It has 8 input pins, usually labelled as D7..D0, where D7 is the MSB.\n\nRead/write logic has 5 pins, which are listed below. The \"\" denotes X is an active low signal.\n\n: read signal\n\n: write signal\n\n: chip select signal\n\nA0, A1: address lines\n\nOperation mode of the PIT is changed by setting the above hardware signals. For example, to write to the Control Word Register, one needs to set =0, =1, =0, A1=A0=1.\n\nThe control word register contains the programmed information which will be sent (by the microprocessor) to the device. It defines how each channel of the PIT logically works. Each access to these ports takes about 1 μs.\n\nTo initialize the counters, the microprocessor must write a control word (CW) in this register. This can be done by setting proper values for the pins of the Read/Write Logic block and then by sending the control word to the Data/Bus Buffer block.\n\nThe control word register contains 8 bits, labeled D7..D0 (D7 is the MSB). The decoding is somewhat complex. Most values set the parameters for one of the three counters:\n\nThe most significant two bits (if not 11) select the counter register the command applies to.\n\nThe next two bits (if not 00) select the format that will be used for subsequent read/write access to the counter register. This is commonly set to a mode where accesses alternate between the least-significant and most-significant bytes. One difference between the 8253 and 8254 is that the former had one internal bit which affected both reads and writes, so if the format was set to 2-byte, a read of the lsbyte would cause a following write to be directed to the msbyte. The 8254 used separate bits for reads and writes.\n\nThe next three bits select the mode that the counter will operate in.\n\nThe least significant bit selects whether the counter will operate in binary or BCD. (BCD counting almost never used and may not be implemented properly in emulators or southbridges.)\n\nHowever, there are two other forms:\n\nLatch the count for a given timer. The next read will, rather than returning the counter value at the moment of the read, return the counter value at the moment of the latch command. After the read completes, later reads will return the current counter. When the latch command is used, the mode and BCD status are not changed.\n\n(8254 only) Latch the status and/or count for multiple timers. This allows multiple simultaneous latch commands using a bitmap. Also, the current channel configuration may be read back in addition to the count.\n\nWhen setting the PIT, the microprocessor first sends a control message, then a count message to the PIT. The counting process will start after the PIT has received these messages, and, in some cases, if it detects the rising edge from the GATE input signal.\n\nStatus byte format. Bit 7 allows software to monitor the current state of the OUT pin. Bit 6 indicates when the count can be read; when this bit is 1, the counting element has not yet been loaded and cannot be read back by the processor. Bits 5 through 0 are the same as the last bits written to the control register.",
+  "references": [
+    {
+      "n": 1,
+      "text": "8254/82C54: Introduction to Programmable Interval Timer. Intel Corporation. http://www.intel.com:80/design/archives/periphrl/docs/7203.htm"
+    },
+    {
+      "n": 2,
+      "text": "Intel 82C54 CHMOS Programmabe Interval Timer. http://download.intel.com/design/archives/periphrl/docs/23124406.pdf"
+    },
+    {
+      "n": 3,
+      "text": "MSM 82c53 Datasheet. http://www.sharpmz.org/download/8253.pdf"
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "source_type": "encyclopedia_article",
+  "source_id": "enwiki:Kernel methods for vector output#rev1315765933",
+  "title": "Kernel methods for vector output",
+  "authors": "Wikipedia contributors",
+  "year": "2025",
+  "url": "https://en.wikipedia.org/w/index.php?title=Kernel_methods_for_vector_output&oldid=1315765933",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Example kernels",
+  "word_count": 1026,
+  "text": "### Separable\n\nA simple, but broadly applicable, class of multi-output kernels can be separated into the product of a kernel on the input-space and a kernel representing the correlations among the outputs:[1]\n\n(\\mathbf{K}(\\mathbf{x},\\mathbf{x'}))_{d,d'} = k(\\mathbf{x},\\mathbf{x'})k_T(d,d')\n\nk : scalar kernel on \\mathcal{X} \\times \\mathcal{X}\n\nk_T : scalar kernel on \\{1, \\ldots ,D\\} \\times \\{1, \\ldots ,D\\}\n\nIn matrix form: \\mathbf{K}(\\mathbf{x},\\mathbf{x'}) = k(\\mathbf{x},\\mathbf{x'})\\mathbf{B}\n\nwhere \\mathbf{B} is a D \\times D symmetric and positive semi-definite matrix. Note, setting \\mathbf{B} to the identity matrix treats the outputs as unrelated and is equivalent to solving the scalar-output problems separately.\n\nFor a slightly more general form, adding several of these kernels yields sum of separable kernels (SoS kernels).\n\n### From regularization literature\n\nSources:[1,2,3,4,5]\n\n### Derived from regularizer\n\nOne way of obtaining k_T is to specify a regularizer which limits the complexity of f in a desirable way, and then derive the corresponding kernel. For certain regularizers, this kernel will turn out to be separable.\n\nMixed-effect regularizer\n\nR(\\mathbf{f}) = A_\\omega(C_\\omega \\sum\\limits_{l=1}^D \\| f_l \\|_k^2 + \\omega D \\sum\\limits_{l=1}^D \\| f_l - \\bar{f} \\|_k^2)\n\nwhere:\n\nA_\\omega = \\frac{1}{2(1 - \\omega)(1 - \\omega + \\omega D)}\n\nC_\\omega = (2 - 2\\omega + \\omega D)\n\n\\bar{f} = \\frac{1}{D} \\sum\\limits_{q=1}^D f_q\n\nK_\\omega(x,x') = k(x,x')(\\omega \\mathbf{1} + (1-\\omega) \\mathbf{I}_D\n\nwhere \\mathbf{1} \\text{ is a } D \\times D matrix with all entries equal to 1.\n\nThis regularizer is a combination of limiting the complexity of each component of the estimator ( f_l ) and forcing each component of the estimator to be close to the mean of all the components. Setting \\omega = 0 treats all the components as independent and is the same as solving the scalar problems separately. Setting \\omega = 1 assumes all the components are explained by the same function.\n\nCluster-based regularizer\n\nR(\\mathbf{f}) = \\varepsilon_1 \\sum_{c=1}^r \\sum_{l \\in I(c)} \\| f_l - \\bar{f_c}\\|_k^2 + \\varepsilon_2 \\sum\\limits_{c=1}^r m_c \\| \\bar{f_c}\\|_k^2\n\nwhere:\n\nI(c) is the index set of components that belong to cluster c\n\nm_c is the cardinality of cluster c\n\n\\bar{f_c} = \\frac{1}{m_c} \\sum\\limits_{q \\in I(c)} f_q\n\n\\mathbf{M}_{l,q} = \\frac{1}{m_c} if l and q both belong to cluster c ( \\mathbf{M}_{l,q} = 0 otherwise\n\nK(x,x') = k(x,x') \\mathbf{G}^\\dagger\n\nwhere \\mathbf{G}_{l,q} = \\varepsilon_1 \\delta_{lq} + (\\varepsilon_2 - \\varepsilon_1)\\mathbf{M}_{l,q}\n\nThis regularizer divides the components into r clusters and forces the components in each cluster to be similar.\n\nGraph regularizer\n\nR(\\mathbf{f}) = \\frac{1}{2} \\sum\\limits_{l,q=1}^D \\Vert f_l - f_q \\Vert_k^2 \\mathbf{M}_{lq} + \\sum\\limits_{l=1}^D \\Vert f_l \\Vert_k^2 \\mathbf{M}_{l,l}\n\nwhere \\mathbf{M} \\text{ is a } D \\times D matrix of weights encoding the similarities between the components\n\nK(x,x') = k(x,x') \\mathbf{L}^\\dagger\n\nwhere \\mathbf{L} = \\mathbf{D} - \\mathbf{M} , \\mathbf{D}_{l,q} = \\delta_{l,q}(\\sum\\limits_{h=1}^D \\mathbf{M}_{l,h} + \\mathbf{M}_{l,q})\n\nNote, \\mathbf{L} is the graph laplacian. See also: graph kernel.\n\n### Learned from data\n\nSeveral approaches to learning \\mathbf{B} from data have been proposed.[1] These include: performing a preliminary inference step to estimate \\mathbf{B} from the training data,[6] a proposal to learn \\mathbf{B} and \\mathbf{f} together based on the cluster regularizer,[7] and sparsity-based approaches which assume only a few of the features are needed.[8,9]\n\n### From Bayesian literature\n\n### Linear model of coregionalization (LMC)\n\nIn LMC, outputs are expressed as linear combinations of independent random functions such that the resulting covariance function (over all inputs and outputs) is a valid positive semidefinite function. Assuming D outputs \\left\\{f_d(\\textbf{x})\\right\\}_{d=1}^D with \\textbf{x} \\in \\mathcal{\\textbf{R}}^p , each f_d is expressed as:\n\nf_d(\\textbf{x}) = \\sum_{q=1}^Q{a_{d,q}u_q(\\textbf{x})}\n\nwhere a_{d,q} are scalar coefficients and the independent functions u_q(\\textbf{x}) have zero mean and covariance cov [u_q(\\textbf{x}),u_{q'}(\\textbf{x}')] = k_q(\\textbf{x},\\textbf{x}') if q=q' and 0 otherwise. The cross covariance between any two functions f_d(\\textbf{x}) and f_{d'}(\\textbf{x}) can then be written as:\n\n\\operatorname{cov}[f_d(\\textbf{x}),f_{d'}(\\textbf{x}')] = \\sum_{q=1}^Q{\\sum_{i=1}^{R_q}{a_{d,q}^ia_{d',q}^{i}k_q(\\textbf{x},\\textbf{x}')}} = \\sum_{q=1}^Q{b_{d,d'}^qk_q(\\textbf{x},\\textbf{x}')}\n\nwhere the functions u_q^i(\\textbf{x}) , with q=1,\\cdots,Q and i=1,\\cdots,R_q have zero mean and covariance cov [u_q^i(\\textbf{x}),u_{q'}^{i'}(\\textbf{x})'] = k_q(\\textbf{x},\\textbf{x}') if i=i' and q=q' . But \\operatorname{cov}[f_d(\\textbf{x}),f_{d'}(\\textbf{x}')] is given by (\\textbf{K}(\\textbf{x},\\textbf{x}'))_{d,d'} . Thus the kernel \\textbf{K}(\\textbf{x},\\textbf{x}') can now be expressed as\n\n\\textbf{K}(\\textbf{x},\\textbf{x}') = \\sum_{q=1}^Q{\\textbf{B}_qk_q(\\textbf{x},\\textbf{x}')}\n\nwhere each \\textbf{B}_q \\in \\mathcal{\\textbf{R}}^{D \\times D} is known as a coregionalization matrix. Therefore, the kernel derived from LMC is a sum of the products of two covariance functions, one that models the dependence between the outputs, independently of the input vector \\textbf{x} (the coregionalization matrix \\textbf{B}_q ), and one that models the input dependence, independently of \\left\\{f_d(\\textbf{x})\\right\\}_{d=1}^D (the covariance function k_q(\\textbf{x},\\textbf{x}') ).\n\n### Intrinsic coregionalization model (ICM)\n\nThe ICM is a simplified version of the LMC, with Q=1 . ICM assumes that the elements b_{d,d'}^q of the coregionalization matrix \\mathbf{B}_q can be written as b_{d,d'}^q = v_{d,d'}b_q , for some suitable coefficients v_{d,d'} . With this form for b_{d,d'}^q :\n\n\\operatorname{cov} \\left [f_d(\\mathbf{x}),f_{d'}(\\mathbf{x}') \\right ] = \\sum_{q=1}^Q{v_{d,d'}b_qk_q (\\mathbf{x},\\mathbf{x}')} = v_{d,d'}\\sum_{q=1}^Q{b_qk_q(\\mathbf{x},\\mathbf{x}')} = v_{d,d'}k(\\mathbf{x},\\mathbf{x}')\n\nwhere\n\nk(\\mathbf{x},\\mathbf{x}') = \\sum_{q=1}^Q{b_qk_q(\\mathbf{x},\\mathbf{x}')}.\n\nIn this case, the coefficients\n\nv_{d,d'} = \\sum_{i=1}^{R_1}{a_{d,1}^ia_{d',1}^i} = b_{d,d'}^1\n\nand the kernel matrix for multiple outputs becomes \\mathbf{K}(\\mathbf{x},\\mathbf{x}') = k(\\mathbf{x},\\mathbf{x}')\\mathbf{B} . ICM is much more restrictive than the LMC since it assumes that each basic covariance k_q(\\mathbf{x},\\mathbf{x}') contributes equally to the construction of the autocovariances and cross covariances for the outputs. However, the computations required for the inference are greatly simplified.\n\n### Semiparametric latent factor model (SLFM)\n\nAnother simplified version of the LMC is the semiparametric latent factor model (SLFM), which corresponds to setting R_q = 1 (instead of Q = 1 as in ICM). Thus each latent function u_q has its own covariance.\n\n### Non-separable\n\nWhile simple, the structure of separable kernels can be too limiting for some problems.\n\nNotable examples of non-separable kernels in the regularization literature include:\n\nMatrix-valued exponentiated quadratic (EQ) kernels designed to estimate divergence-free or curl-free vector fields (or a convex combination of the two)[1,10]\n\nKernels defined by transformations[1,11]\n\nIn the Bayesian perspective, LMC produces a separable kernel because the output functions evaluated at a point \\textbf{x} only depend on the values of the latent functions at \\textbf{x} . A non-trivial way to mix the latent functions is by convolving a base process with a smoothing kernel. If the base process is a Gaussian process, the convolved process is Gaussian as well. We can therefore exploit convolutions to construct covariance functions.[12] This method of producing non-separable kernels is known as process convolution. Process convolutions were introduced for multiple outputs in the machine learning community as \"dependent Gaussian processes\".[13]",
+  "references": [
+    {
+      "n": 1,
+      "text": "Mauricio A. Álvarez, Lorenzo Rosasco, and Neil D. Lawrence, \"Kernels for Vector-Valued Functions: A Review,\" Foundations and Trends in Machine Learning 4, no. 3 (2012): 195–266. doi: 10.1561/2200000036 arXiv:1106.6251"
+    },
+    {
+      "n": 2,
+      "text": "C.A. Micchelli and M. Pontil. On learning vector–valued functions. Neural Computation, 17:177–204, 2005."
+    },
+    {
+      "n": 3,
+      "text": "C. A. Micchelli and M. Pontil. Kernels for multi-task learning. In Advances in Neural Information Processing Systems (NIPS). MIT Press, 2004."
+    },
+    {
+      "n": 4,
+      "text": "T.Evgeniou, C.A.Micchelli, and M.Pontil. Learning multiple tasks with kernel methods. Journal of Machine Learning Research, 6:615–637, 2005."
+    },
+    {
+      "n": 5,
+      "text": "L. Baldassarre, L. Rosasco, A. Barla, and A. Verri. Multi-output learning via spectral filtering. Technical report, Massachusetts Institute of Technology, 2011. MIT-CSAIL-TR-2011-004, CBCL-296."
+    },
+    {
+      "n": 6,
+      "text": "Hans Wackernagel. Multivariate Geostatistics. Springer-Verlag Heidelberg New york, 2003."
+    },
+    {
+      "n": 7,
+      "text": "Laurent Jacob, Francis Bach, and Jean-Philippe Vert. Clustered multi-task learning: A convex formulation. In NIPS 21, pages 745–752, 2008."
+    },
+    {
+      "n": 8,
+      "text": "Andreas Argyriou, Theodoros Evgeniou, and Massimiliano Pontil. Convex multi-task feature learning. Machine Learning, 73(3):243–272, 2008."
+    },
+    {
+      "n": 9,
+      "text": "Andreas Argyriou, Andreas Maurer, and Massimiliano Pontil. An algorithm for transfer learning in a heterogeneous environment. In ECML/PKDD (1), pages 71–85, 2008."
+    },
+    {
+      "n": 10,
+      "text": "I. Maceˆdo and R. Castro. Learning divergence-free and curl-free vector fields with matrix-valued kernels. Technical report, Instituto Nacional de Matematica Pura e Aplicada, 2008."
+    },
+    {
+      "n": 11,
+      "text": "A. Caponnetto, C.A. Micchelli, M. Pontil, and Y. Ying. Universal kernels for multi-task learning. Journal of Machine Learning Research, 9:1615–1646, 2008."
+    },
+    {
+      "n": 12,
+      "text": "D. Higdon, \"Space and space-time modeling using process convolutions, Quantitative methods for current environmental issues, 37–56, 2002"
+    },
+    {
+      "n": 13,
+      "text": "P. Boyle and M. Frean, \"Dependent gaussian processes, Advances in Neural Information Processing Systems, 17:217–224, MIT Press, 2005"
+    }
+  ]
+}

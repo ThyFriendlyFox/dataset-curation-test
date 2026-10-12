@@ -1,0 +1,34 @@
+{
+  "source_type": "encyclopedia_article",
+  "source_id": "enwiki:Keepalive#rev1335153359",
+  "title": "Keepalive",
+  "authors": "Wikipedia contributors",
+  "year": "2026",
+  "url": "https://en.wikipedia.org/w/index.php?title=Keepalive&oldid=1335153359",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "TCP keepalive",
+  "word_count": 572,
+  "text": "Transmission Control Protocol (TCP) keepalives are an optional feature, and if included must default to off.[1]\n\n### Probe TCP packets\n\nA proper keepalive packet (sometimes called a probe) contains no data. It is exceptionally tolerated to optionally enable the use of 1 \"garbage octet\" in the keepalive packet but this is only to comply with erroneous TCP implementations.[1] In an Ethernet network, keepalive packets result in frames of minimum size (64 bytes[2]).\n\n### Keepalive algorithm and configuration\n\nRegarding TCP keepalive, RFC 1122 only describes conditions under which a keepalive packet can be sent, what the packet contains, how destination host must behave (ACK reply) when receiving it and that dataless ACK packet transmission is unreliable, even in TCP (which implies that a connection can actually still be operational but that an intermediary might be discarding ACK packets with no data). However, besides a configurable interval (or at least 2 hours by default) at which keepalive packets can be sent, no particular algorithm is prescribed.[1] Consequentially, operating systems vary in how they implement TCP keepalive.\n\nFor example, Windows Server 2008 and Windows Vista use a simple RFC-compliant implementation that sends a keepalive packet at a single configurable time interval;[3] they make no time interval distinction between the first keepalive packet sent on the connection and those sent afterwards if no reply was received from the destination host. While under Linux, three parameters[4] are used to configure TCP keepalive:\n\nA keepalive delay which tells after how much time the first keepalive packet will be sent on an apparently idle connection.\n\nA keepalive interval which is the duration between two successive keepalive retransmissions, if acknowledgement to the previous keepalive transmission is not received.\n\nA keepalive probe count which is the maximal number of consecutive unresponded keepalive packets before declaring that remote end is not available.\n\n### General behavior\n\nWhen two hosts are connected over a network via TCP/IP, TCP keepalive packets can be used to determine if the connection is still valid, and terminate it if needed.\n\nMost hosts that support TCP also support TCP keepalive. Each host (or peer) periodically sends a TCP packet to its peer which solicits a response. If a certain number of keepalives are sent and no response (ACK) is received, the sending host will terminate the connection from its end. If a connection has been terminated due to a TCP keepalive time-out and the other host eventually sends a packet for the old connection, the host that terminated the connection will send a packet with the RST flag set to signal the other host that the old connection is no longer active. This will force the other host to terminate its end of the connection so a new connection can be established.\n\n### Real world default behavior\n\nTypically, TCP keepalives are sent every 45 or 60 seconds on an idle TCP connection, and the connection is dropped after 3 sequential ACKs are missed. This varies by host, e.g. by default, Windows PCs send the first TCP keepalive packet after 7200000ms (2 hours), then send 5 keepalives at 1000ms intervals, dropping the connection if there is no response to any of the keepalive packets. Linux hosts send the first TCP Keepalive packet after 2 hours (default since Linux 2.2), then send 9 keepalive probes (default since Linux 2.2) at 75 seconds (default since Linux 2.4) intervals, dropping the connection if there is no response to any of the Keepalive packets.[5]",
+  "references": [
+    {
+      "n": 1,
+      "text": "Braden, Robert T.. (October 1989). Requirements for Internet Hosts - Communication Layers. IETF. doi:10.17487/RFC1122"
+    },
+    {
+      "n": 2,
+      "text": "(2016). IEEE Standard for Ethernet. IEEE Standard for Ethernet, 802.3-2015 – section one. doi:10.1109/IEEESTD.2016.7428776"
+    },
+    {
+      "n": 3,
+      "text": "(2011-09-05). Additional Registry Entries. learn.microsoft.com. https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2008-r2-and-2008/dd349797(v=ws.10)"
+    },
+    {
+      "n": 4,
+      "text": "Using TCP keepalive under Linux. tldp.org. http://tldp.org/HOWTO/TCP-Keepalive-HOWTO/usingkeepalive.html"
+    },
+    {
+      "n": 5,
+      "text": "tcp(7) - Linux manual page. https://man7.org/linux/man-pages/man7/tcp.7.html"
+    }
+  ]
+}
