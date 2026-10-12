@@ -1,0 +1,138 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2310.16298",
+  "title": "Stencil Matrixization",
+  "authors": "Wenxuan Zhao, Liang Yuan, Baicheng Yan, Penghao Ma, Yunquan Zhang, Long Wang, Zhe Wang",
+  "year": "2024",
+  "categories": [
+    "cs.DC"
+  ],
+  "url": "https://arxiv.org/abs/2310.16298",
+  "html_url": "https://arxiv.org/html/2310.16298",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 714,
+  "text": "Matrix registers and associated operations have recently been equipped in processors as powerful units for accelerating modern AI and high-performance computing applications. As Matrix Multiplication (GEMM) is a fundamental computation pattern in these applications, many commercial hardware accelerators, such as NVIDIA Tensor Cores [1], Google TPUs [2] and Intel AMXs [3], have been designed to incorporate matrix-matrix multiplication instructions to offer O(n^{3}) arithmetic operations with O(n^{2}) operands. The arithmetic density, i.e, the number of floating point operations performed per byte is O(n), one order of magnitude greater than other traditional instructions.\n\nIt is well-known that GEMM can be implemented with inner products or outer products. Inner product instructions exist in some architectures, e.g., ARMv8.4. However, it only completes O(n) arithmetic operations. On the contrary, the outer product performs O(n^{2}) calculations in a single instruction. It can also be used as the building block of other computations such as triangular solvers. Several architectures have proposed outer product accelerator units in their processors, such as the Scalable Matrix Extension (SME) in ARM [4] and the Math Matrix Accelerator (MMA) in IBM Power10 [5].\n\nThe outer product is fed with two vectors and produces a matrix. Each element in the output matrix is a product of corresponding values in the two input vectors. The outer product is clearly more lightweight compared with the matrix multiplication. It provides more opportunities to develop flexible algorithms for more problems other than dense linear algebra computing, and more possibilities to optimize the instruction pipelines, data organization and data reuses among input vectors.\n\nThe stencil computation is identified as one of the thirteen Berkeley motifs [6] and represents a very common class of nested loops in scientific and engineering applications, dynamic programming, and image processing algorithms. Stencils can be classified in terms of the dimension of the space grid (1D, 2D…), the shape (box, star…) and the order.\n\nExisting work on stencil computation mainly focuses on tiling [7,8,9], parallelization [10,11,12] and vectorization [13,14,15]. Several pieces of literature discuss the stencil algorithms on GPU [16,17,18] and other many-core processors [19], and the transformation of stencil computation to matrix multiplications [20,21]. To the best of our knowledge, there is no stencil algorithm targeting the vector outer product accelerator.\n\nMost of the existing work adopts the conventional gather view of a stencil definition, where each output element is calculated by summing its neighbor input elements. This perspective makes it difficult to utilize outer products for stencil computations. The scatter view of a stencil [22] describes the updating pattern of one single input element. This standpoint has been used for fine-grained in-core optimizations, e.g., improving the data reuse [23] and eliminating the register spilling [24] by combining the gather and scatter views for a single dimension and a single element, respectively.\n\nThis paper proposes a novel stencil algorithm using vector outer products. Unlike previous work, the new algorithm arises from the stencil definition in the scatter mode. The algorithm for a 2D stencil is initially expressed with formulas of vector outer products by a series of extensions to the scatter mode. Then it is adapted to other stencil types by identifying a key concept underlying the algorithm, and it is also analyzed theoretically concerning this concept. The implementation incorporates a set of optimizations to improve the memory reference pattern, execution pipeline and data reuse by considering various algorithmic options and the data sharing between input vectors. This paper makes the following contributions:\n\n- • We propose a stencil algorithm using vector outer products. The theoretical aspects of the algorithm are also analyzed.\n\n- • We implement the algorithm with a set of optimizations to boost the in-core performance. We also design an automatic code generator.\n\n- • We demonstrate the effectiveness of the proposed algorithm, showing substantial performance improvement over a range of 2D and 3D stencils.\n\nThe remainder of this paper is organized as follows. Section 2 provides some background on matrix accelerator units and stencil computations. Section 3 describes the stencil algorithm that utilizes vector outer product operations, and also offers a detailed theoretical analysis. Section 4 presents a set of optimizations on the memory reference and data reuse. Section 5 evaluates the performance on a simulator using various 2D and 3D stencils. Section 6 reviews related work and Section 7 summarizes the paper.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib40",
+      "text": "NVIDIA (2020) NVIDIA. 2020. NVIDIA V100 TENSOR CORE GPU . https://www.nvidia.com/en-us/data-center/v100/"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib16",
+      "text": "Google (2021) Google. 2021. Tensor Processing Units (TPUs) . https://cloud.google.com/tpu"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib25",
+      "text": "Intel (2021) Intel. 2021. Intel® Advanced Matrix Extensions Overview . https://www.intel.com/content/www/us/en/products/docs/accelerator-engines/advanced-matrix-extensions/overview.html"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib51",
+      "text": "Weidmann (2021) Martin Weidmann. 2021. Scalable Matrix Extension for the Armv9-A Architecture - Architectures and Processors blog - Arm Community blogs - Arm Community . https://community.arm.com/arm-community-blogs/b/architectures-and-processors-blog/posts/scalable-matrix-extension-armv9-a-architecture/"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib24",
+      "text": "IBM (2020) IBM. 2020. IBM Power10 Business Inferencing at Scale with Matrix Math Accelerator (MMA) - IBM Developer . https://developer.ibm.com/tutorials/power10-business-inferencing-at-scale-with-mma/"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib5",
+      "text": "Asanovic et al . (2006) K. Asanovic, R. Bodik, B. Catanzaro, J. Gebis, P. Husbands, K. Keutzer, D. Patterson andxs W. Plishker, J. Shalf, S. Williams, and K. Yelick. 2006. The Landscape of Parallel Computing Research: A View from Berkeley . Technical Report UCB/EECS-2006-183. EECS Department, University of California at Berkeley."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib6",
+      "text": "Bandishti et al . (2012) V. Bandishti, I. Pananilath, and U. Bondhugula. 2012. Tiling stencil computations to maximize parallelism (SC ’12) . 1–11."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib50",
+      "text": "Tang et al . (2011) Yuan Tang, Rezaul Alam Chowdhury, Bradley C. Kuszmaul, Chi-Keung Luk, and Charles E. Leiserson. 2011. The Pochoir Stencil Compiler (SPAA ’11) . 117–128."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib59",
+      "text": "Yuan et al . (2017) Liang Yuan, Yunquan Zhang, Peng Guo, and Shan Huang. 2017. Tessellating stencils. In Proceedings of the International Conference for High Performance Computing, Networking, Storage and Analysis . 1–13."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib30",
+      "text": "Krishnamoorthy et al . (2007) Sriram Krishnamoorthy, Muthu Baskaran, Uday Bondhugula, J. Ramanujam, Atanas Rountev, and P Sadayappan. 2007. Effective Automatic Parallelization of Stencil Computations (PLDI ’07) . 235–244."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "Datta et al . (2008) Kaushik Datta, Mark Murphy, Vasily Volkov, Samuel Williams, Jonathan Carter, Leonid Oliker, David Patterson, John Shalf, and Katherine Yelick. 2008. Stencil Computation Optimization and Auto-tuning on State-of-the-art Multicore Architectures (SC ’08) . Article 4, 12 pages."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib60",
+      "text": "Zhang and Mueller (2012) Yongpeng Zhang and Frank Mueller. 2012. Auto-generation and Auto-tuning of 3D Stencil Codes on GPU Clusters (CGO ’12) . 155–164."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib21",
+      "text": "Henretty et al . (2011) Tom Henretty, Kevin Stock, Louis-Noël Pouchet, Franz Franchetti, J. Ramanujam, and P. Sadayappan. 2011. Data Layout Transformation for Stencil Computations on Short-vector SIMD Architectures (CC’11/ETAPS’11) . 225–245."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib57",
+      "text": "Yount (2015) Charles Yount. 2015. Vector Folding: Improving Stencil Performance via Multi-Dimensional SIMD-Vector Representation. In Proceedings of the 2015 IEEE 17th International Conference on High Performance Computing and Communications, 2015 IEEE 7th International Symposium on Cyberspace Safety and Security, and 2015 IEEE 12th International Conf on Embedded Software and Systems (HPCC-CSS-ICESS ’15) . IEEE Computer Society, USA, 865–870. https://doi.org/10.1109/HPCC-CSS-ICESS.2015.27"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib58",
+      "text": "Yuan et al . (2021) Liang Yuan, Hang Cao, Yunquan Zhang, Kun Li, Pengqi Lu, and Yue Yue. 2021. Temporal vectorization for stencils. In Proceedings of the International Conference for High Performance Computing, Networking, Storage and Analysis . 1–13."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib17",
+      "text": "Grosser et al . (2014a) Tobias Grosser, Albert Cohen, Justin Holewinski, P. Sadayappan, and Sven Verdoolaege. 2014a. Hybrid Hexagonal/Classical Tiling for GPUs (CGO ’14) . 66–75."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib38",
+      "text": "Nguyen et al . (2010) A. Nguyen, N. Satish, J. Chhugani, C. Kim, and P. Dubey. 2010. 3.5-D Blocking Optimization for Stencil Computations on Modern CPUs and GPUs (SC ’10) . 1–13."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib34",
+      "text": "Lutz et al . (2013) Thibaut Lutz, Christian Fensch, and Murray Cole. 2013. PARTANS: An Autotuning Framework for Stencil Computation on multi-GPU Systems. ACM Trans. Archit. Code Optim. 9, 4, Article 59 (Jan. 2013), 24 pages."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib10",
+      "text": "Cui et al . (2010) Hui-Min Cui, Lei Wang, Dong-Rui Fan, and Xiao-Bing Feng. 2010. Landing Stencil Code on Godson-T. J. Comput. Sci. Technol. 25, 4 (July 2010), 886–894."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib33",
+      "text": "Liu et al . (2022) Xiaoyan Liu, Yi Liu, Hailong Yang, Jianjin Liao, Mingzhen Li, Zhongzhi Luan, and Depei Qian. 2022. Toward Accelerated Stencil Computation by Adapting Tensor Core Unit on GPU. In ICS ’22, . 1–12."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib7",
+      "text": "Bhat et al . ([n. d.]) Puneeth Bhat, Pedro Caldeira, David Edelsohn, Gordon Fossum, Brad Frey, Nemanja Ivanovic, Chip Kerchner, Vincent Lim, Shakti Kapoor, Tulio Machado Filho, Silvia Melitta Mueller, Brett Olsson, Satish Sadasivam, Baptiste Saleil, Bill Schmidt, Rajalakshmi Srinivasaraghavan, Shricharan Srivatsan, Brian Thompto, Andreas Wagner, and Nelson Wu. [n. d.]. A matrix math facility for Power ISA processors. In Arxiv 2021 . 1–12."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib61",
+      "text": "Zhao et al . (2019a) Tuowen Zhao, Protonu Basu, Samuel Williams, Mary Hall, and Hans Johansen. 2019a. Exploiting reuse and vectorization in blocked stencil computations on CPUs and GPUs. In Proceedings of the International Conference for High Performance Computing, Networking, Storage and Analysis . 1–44."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib12",
+      "text": "de la Cruz and Araya-Polo (2014) Raúl de la Cruz and Mauricio Araya-Polo. 2014. Algorithm 942: Semi-Stencil. ACM Trans. Math. Softw. 40, 3, Article 23 (April 2014), 39 pages."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib47",
+      "text": "Stock et al . (2014) Kevin Stock, Martin Kong, Tobias Grosser, Louis-Noël Pouchet, Fabrice Rastello, Jagannathan Ramanujam, and Ponnuswamy Sadayappan. 2014. A framework for enhancing data reuse via associative reordering. In Proceedings of the 35th ACM SIGPLAN Conference on Programming Language Design and Implementation . 65–76."
+    }
+  ]
+}

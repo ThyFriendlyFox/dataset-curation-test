@@ -1,0 +1,165 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2308.02747",
+  "title": "SureFED: Robust Federated Learning via Uncertainty-Aware Inward and Outward Inspection",
+  "authors": "Nasimeh Heydaribeni, Ruisi Zhang, Tara Javidi, Cristina Nita-Rotaru, Farinaz Koushanfar",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.DC",
+    "cs.MA"
+  ],
+  "url": "https://arxiv.org/abs/2308.02747",
+  "html_url": "https://arxiv.org/html/2308.02747",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1111,
+  "text": "In contemporary large networks, decentralized operations involve individual devices (clients) having access to their local datasets. However, these local datasets often lack the capacity to learn a global model with sufficient accuracy, and privacy concerns impede raw data sharing among clients. To address these challenges, federated learning algorithms [1] like Federated Averaging have been proposed. Furthermore, an array of extensions were introduced to enable improved scalability in a peer-to-peer setting or adaptation to non-IID data distributions [2,3,4,5,6,7].\n\nHowever, federated learning algorithms have been shown to be vulnerable to various byzantine and adversarial attacks, including data and model poisoning attacks [8,9,10,11,12,13,14]. State of the art defense methods in federated learning can be categorized into (1) statistics-based defenses [15,16,17,18,19], such as Trimmed Mean [15] and Clipping [20], (2) defenses based on model evaluation on a local dataset [21,22], such as Zeno [21], and (3) defenses based on model comparison with the server’s local model, such as FLTrust [23].\n\nStatistics-based defense methods use a statistically robust quantity, such as median, instead of mean, in the model aggregation to eliminate the effect of byzantine updates on the aggregated value. Such methods rely on the assumption that the majority of clients are benign, aiming to protect statistical measures like median from being influenced by a minority of poisoned updates. The defense methods in the second category, such as Zeno [21], draw samples from a clean local dataset and evaluate a model update based the amount of improvement in the loss function. The defenses in the third category, such as FLTrust [23], are based on bootstrapping the trust using the server’s local model. FLTrust assumes that the server has access to a clean local dataset. The server computes a model update using its local dataset similar to what clients do and compares received updates with its own.\n\nThe existing defense methods have been shown to be vulnerable to specific attacks such as colluding attacks of ”A Little is Enough” [24] and Trojan attacks [25]. In addition, the statistics-based defense methods require the majority of clients to be benign. Some methods, such as Trimmed Mean [15] and Zeno [21], necessitate knowledge of an upper bound on the number of compromised clients. Zeno is also inherently vulnerable to Trojan attacks due to their stealthy nature. FLTrust has also been shown to be vulnerable to specific attacks that target methods based on cosine similarity [26]. A potential drawback of FLTrust is that if the server’s model becomes poisoned early on in the training process, the future model evaluations become meaningless.\n\nThis paper introduces SureFED, which utilizes uncertainty quantification to address limitations in the existing literature. SureFED draws inspirations from the state of the art defense methods described earlier and further incorporates additional essential components to address the known vulnerabilities of the existing methods. SureFED employs a peer-to-peer federated learning setting in which each client has access to a local dataset but also obtains models from other clients. In contrast with prior work, in SureFED, the clients train two distinct models: a social model, designed to capture the benefits of federated operation by aggregating the models trained on diverse datasets across the network, and a Local Bayesian Model, trained exclusively on each client’s local dataset to be utilized as a model evaluation basis with explicit uncertainty quantification. We note that these local models are never aggregated with the received updates; Instead, they are used in an Uncertainty Aware Model Evaluation of the model updates to subsequently aggregate them with the social model based on a new secure aggregation rule. Additionally, SureFED employs an introspection procedure, in which each client evaluates its own social model using its clean local model. This ensures the system’s ability to revert to a clean state after potential contamination.\n\nThe process of model evaluation and aggregation in SureFED draws inspiration from the concepts found in social science such as bounded confidence models of opinion dynamics [27], which aim to simulate how humans alter their opinions during interactions with others. In this regard, SureFED seeks to emulate the innate intelligence of humans within the complex domain of AI. Notably, in SureFED, each received model update is independently evaluated without the need for comparisons with other updates. This feature allows SureFED to function without requiring a majority of benign clients or knowledge of the number of compromised clients.\n\nWe investigate and demonstrate the superior performance of SureFED under a broad set of byzantine and adversarial attacks. In particular, we consider six colluding and non-colluding data and model poisoning attacks, namely, Label-Flipping [10], Trojan [25], Bit-Flip [28], General Random [28], A little is Enough [24], and Gaussian [29] Attacks. A little is Enough and Trojan attacks are colluding attacks, while Trojan attack is also a stealthy attack. We compare our results with the state of the art defense methods described above. Specifically, we compare SureFED with Trimmed Mean [15], and Clipping [20] from the first category, Zeno [21], which is the state of the art in the second category, and FLTrust [23], which is the state of the art defense belonging to the third category. We also compare with BayP2PFL [6], as a variational peer-to-peer federated learning baseline without a defense method to confirm that SureFED’s robustness does not come at the cost of reliability and/or performance. In addition to experimental analysis, we provide theoretical guarantees for the robustness of SureFED in a decentralized linear regression setting under non-IID data distribution. Note that theoretical guarantees in non-IID settings are rarely found in the literature. In summary, our contributions are as follows:\n\n- • We introduce SureFED, a new peer-to-peer federated learning algorithm which is robust to a variety of data and model poisoning attacks.\n\n- • SureFED is shown to have the following desirable properties: (i) its robustness does not require the majority of the benign nodes over the compromised ones and is agnostic to the number of byzantine workers; (ii) SureFED effectively adapts to and derives benefits from the non-IID datasets of benign clients. (iii) SureFED is robust to numerous poisoning attacks and shows superior performance compared to the state of the art defense methods.\n\n- • We theoretically prove the robustness of SureFED in a decentralized linear regression setting under certain poisoning attacks. We prove that the benign nodes in SureFED learn the correct model parameter under Label-Flipping attacks. We then generalize our theoretical results to the General Random model poisoning attack.\n\n- • Comprehensive, Proof-of-Concept evaluations on benchmark data from image classification (MNIST, FEMNIST, and CIFAR10) demonstrate the superiority of SureFED over the existing defense methods, namely, Zeno, Trimmed Mean, Clipping, and FLTrust. The robustness is evaluated with respect to all six considered types of poisoning attacks.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib24",
+      "text": "Brendan McMahan, Eider Moore, Daniel Ramage, Seth Hampson, and Blaise Aguera y Arcas. Communication-efficient learning of deep networks from decentralized data. In Artificial intelligence and statistics , pages 1273–1282. PMLR, 2017."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib27",
+      "text": "Abhijit Guha Roy, Shayan Siddiqui, Sebastian Pölsterl, Nassir Navab, and Christian Wachinger. Braintorrent: A peer-to-peer environment for decentralized federated learning. arXiv preprint arXiv:1905.06731 , 2019."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib22",
+      "text": "Anusha Lalitha, Osman Cihan Kilinc, Tara Javidi, and Farinaz Koushanfar. Peer-to-peer federated learning on graphs. arXiv preprint arXiv:1901.11173 , 2019."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib33",
+      "text": "Han Wang, Luis Muñoz-González, David Eklund, and Shahid Raza. Non-iid data re-balancing at iot edge with peer-to-peer federated learning for anomaly detection. In Proceedings of the 14th ACM Conference on Security and Privacy in Wireless and Mobile Networks , pages 153–163, 2021."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib35",
+      "text": "Tobias Wink and Zoltan Nochta. An approach for peer-to-peer federated learning. In 2021 51st Annual IEEE/IFIP International Conference on Dependable Systems and Networks Workshops (DSN-W) , pages 150–157. IEEE, 2021."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib34",
+      "text": "Xinghan Wang, Anusha Lalitha, Tara Javidi, and Farinaz Koushanfar. Peer-to-peer variational federated learning over arbitrary graphs. IEEE Journal on Selected Areas in Information Theory , 2022."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib1",
+      "text": "Maruan Al-Shedivat, Jennifer Gillenwater, Eric Xing, and Afshin Rostamizadeh. Federated learning via posterior averaging: A new perspective and practical algorithms. arXiv preprint arXiv:2010.05273 , 2020."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib23",
+      "text": "Lingjuan Lyu, Han Yu, and Qiang Yang. Threats to federated learning: A survey. arXiv preprint arXiv:2003.02133 , 2020."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib30",
+      "text": "Ziteng Sun, Peter Kairouz, Ananda Theertha Suresh, and H Brendan McMahan. Can you really backdoor federated learning? arXiv preprint arXiv:1911.07963 , 2019."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib31",
+      "text": "Vale Tolpegin, Stacey Truex, Mehmet Emre Gursoy, and Ling Liu. Data poisoning attacks against federated learning systems. In European Symposium on Research in Computer Security , pages 480–501. Springer, 2020."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib16",
+      "text": "Malhar S Jere, Tyler Farnan, and Farinaz Koushanfar. A taxonomy of attacks on federated learning. IEEE Security & Privacy , 19(2):20–28, 2020."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib4",
+      "text": "Arjun Nitin Bhagoji, Supriyo Chakraborty, Prateek Mittal, and Seraphin Calo. Analyzing federated learning through an adversarial lens. In International Conference on Machine Learning , pages 634–643. PMLR, 2019."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib40",
+      "text": "Gokberk Yar, Cristina Nita-Rotaru, and Alina Oprea. Backdoor attacks in peer-to-peer federated learning. arXiv preprint arXiv:2301.09732 , 2023."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib29",
+      "text": "Giorgio Severi, Matthew Jagielski, Gökberk Yar, Yuxuan Wang, Alina Oprea, and Cristina Nita-Rotaru. Network-level adversaries in federated learning. arXiv preprint arXiv:2208.12911 , 2022."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib41",
+      "text": "Dong Yin, Yudong Chen, Ramchandran Kannan, and Peter Bartlett. Byzantine-robust distributed learning: Towards optimal statistical rates. In International Conference on Machine Learning , pages 5650–5659. PMLR, 2018."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib5",
+      "text": "Peva Blanchard, El Mahdi El Mhamdi, Rachid Guerraoui, and Julien Stainer. Machine learning with adversaries: Byzantine tolerant gradient descent. Advances in Neural Information Processing Systems , 30, 2017."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib7",
+      "text": "Amine Boussetta, El Mahdi El Mhamdi, Rachid Guerraoui, Alexandre David Olivier Maurer, and Sébastien Louis Alexandre Rouault. Aksel: Fast byzantine sgd. In Proceedings of the 24th International Conference on Principles of Distributed Systems (OPODIS 2020) , number CONF. Schloss Dagstuhl–Leibniz-Zentrum für Informatik, 2021."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib10",
+      "text": "Yudong Chen, Lili Su, and Jiaming Xu. Distributed statistical machine learning in adversarial settings: Byzantine gradient descent. Proceedings of the ACM on Measurement and Analysis of Computing Systems , 1(2):1–25, 2017."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib12",
+      "text": "Rachid Guerraoui, Sébastien Rouault, et al. The hidden vulnerability of distributed learning in byzantium. In International Conference on Machine Learning , pages 3521–3530. PMLR, 2018."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib2",
+      "text": "Eugene Bagdasaryan, Andreas Veit, Yiqing Hua, Deborah Estrin, and Vitaly Shmatikov. How to backdoor federated learning. In International Conference on Artificial Intelligence and Statistics , pages 2938–2948. PMLR, 2020."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib38",
+      "text": "Cong Xie, Sanmi Koyejo, and Indranil Gupta. Zeno: Distributed stochastic gradient descent with suspicion-based fault-tolerance. In International Conference on Machine Learning , pages 6893–6901. PMLR, 2019."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib39",
+      "text": "Cong Xie, Sanmi Koyejo, and Indranil Gupta. Zeno++: Robust fully asynchronous sgd. In International Conference on Machine Learning , pages 10495–10503. PMLR, 2020."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib9",
+      "text": "Xiaoyu Cao, Minghong Fang, Jia Liu, and Neil Zhenqiang Gong. Fltrust: Byzantine-robust federated learning via trust bootstrapping. 2021."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib3",
+      "text": "Gilad Baruch, Moran Baruch, and Yoav Goldberg. A little is enough: Circumventing defenses for distributed learning. Advances in Neural Information Processing Systems , 32, 2019."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib36",
+      "text": "Chulin Xie, Keli Huang, Pin-Yu Chen, and Bo Li. Dba: Distributed backdoor attacks against federated learning. In International Conference on Learning Representations , 2020."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib18",
+      "text": "Harsh Kasyap and Somanath Tripathy. Hidden vulnerabilities in cosine similarity based poisoning defense. In 2022 56th Annual Conference on Information Sciences and Systems (CISS) , pages 263–268. IEEE, 2022."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib15",
+      "text": "Rainer Hegselmann, Ulrich Krause, et al. Opinion dynamics and bounded confidence models, analysis, and simulation. Journal of artificial societies and social simulation , 5(3), 2002."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib37",
+      "text": "Cong Xie, Oluwasanmi Koyejo, and Indranil Gupta. Generalized byzantine-tolerant sgd. arXiv preprint arXiv:1802.10116 , 2018."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib26",
+      "text": "Krishna Pillutla, Sham M Kakade, and Zaid Harchaoui. Robust aggregation for federated learning. IEEE Transactions on Signal Processing , 70:1142–1154, 2022."
+    }
+  ]
+}
