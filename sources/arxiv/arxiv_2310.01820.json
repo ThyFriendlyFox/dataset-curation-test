@@ -1,0 +1,133 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2310.01820",
+  "title": "Towards Robust Fidelity for Evaluating Explainability of Graph Neural Networks",
+  "authors": "Xu Zheng, Farhad Shirani, Tianchun Wang, Wei Cheng, Zhuomin Chen, Haifeng Chen, Hua Wei, Dongsheng Luo",
+  "year": "2024",
+  "categories": [
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2310.01820",
+  "html_url": "https://arxiv.org/html/2310.01820",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 794,
+  "text": "Graph Neural Networks (GNNs) have become a cornerstone for processing graph-structured data, achieving impressive outcomes across various domains such as node classification and link prediction [1,2,3,4]. However, with their proliferation in sensitive sectors like healthcare and fraud detection, the demand for understanding their decision-making processes has grown significantly [5,6,7]. To address this challenge, explanation techniques have been proposed for GNNs, most commonly focusing on identifying a subgraph that dominates the model’s prediction in a post-hoc sense [8,9,10].\n\nIn the design and study of explainable GNNs, both model design and choice of evaluation metrics are important. While most efforts have primarily been made to develop new network architectures and optimization objectives to achieve more accurate explanations [8,9,10], in this paper, we underscore the critical importance of choosing the right evaluation metrics for the achieved explanations. In an ideal scenario, quantitative evaluation of an explanation subgraph can be achieved by comparing it with a gold standard or ground truth explanation [8]. Yet, in real-world applications, such ground truth explanation subgraphs are a rarity, often making direct comparisons impracticable. In lieu of this, surrogate fidelity metrics, namely Fid_{+}, Fid_{-}, and Fid_{\\Delta}, have been included to gauge the faithfulness of explanation subgraphs. At its core, the intuition driving such fidelity metrics is straightforward: if a subgraph is discriminative to the model, the prediction should change significantly when it is removed from the input. Otherwise, the prediction should be maintained. Hence, Fid_{+} is defined as the difference in accuracy (or predicted probability) between the original prediction and the new predictions of non-explanation subgraph which is obtained by masking out the explanation subgraph [11,12], and Fid_{-} measures the difference between predictions of the original graph and explanation subgraph [13]. As prevailing standards, these Fidelity metrics and their variants have been widely used in existing popular platforms, such as GraphFramEx [14], GraphXAI [15], GNNX-BENCH [16], and DIG [17].\n\nAlthough intuitively correct, we argue that the aforementioned Fidelity metrics come with significant drawbacks due to the impractical assumption that the to-be-explained model can make accurate predictions of the explanation subgraph (in Fid_{-}) or non-explanation subgraph (in Fid_{+}). This does not hold in a wide range of real-world scenarios, because when edges are removed, the resultant subgraphs might be Out Of Distribution (OOD) [18,19]. For example, in MUTAG dataset [20], each graph is a molecule with nodes representing atoms and edges describing the chemical bonds. The functional group NO_{2} is considered the dominating subgraph that causes a molecule to be mutagenic. The explanation subgraph only consists of 2 edges, which is much smaller than whole molecular graphs. Such disparities in properties introduce distribution shifts, putting the Fidelity metrics on shaky grounds, because of the violation of a key assumption in machine learning: the training and test data come from the same distribution [21].\n\nTo build an evaluation foundation for eXplainable AI (XAI) in the graph domain, In this paper, we investigate robust fidelity measurements for evaluating the correctness of explanations. There are several non-trivial challenges associated with this problem. First, the to-be-explained GNN model is usually evaluated as a black-box model, which cannot be re-trained to ensure the generalization capacity [21]. Second, the evaluation method is required to be stable and ideally deterministic. As a result, complex parametric methods, such as adversarial perturbations [22,23], are not suitable as the results are affected by randomly initiated parameters.\n\nWe provide an information theoretic framework for GNN explainability. We define an explanation graph as a subgraph of the input that satisfies two conditions: 1) the explanation graph is an (almost) sufficient statistic of the input graph with respect to the output label, and 2) the size of the explanation graph is small compared to the input graph. Based on this, we provide two notions of explainability, namely, explainability of a classification task and explainability of a classifier for the task (Definitions 2 and 3). We quantify the relation between these two notions for low-error classifiers and classification tasks (Theorem 1). Computing the resulting information theoretic fidelity measure requires knowledge of the underlying graph statistics, which is not possible in most real-world scenarios of interest. We propose a generalized class of surrogate fidelity measures that are robust to distribution shift issues in a wide range of scenarios (Proposition A.4). Our contributions are summarized as follows.\n\n- • We pioneer in spotlighting the inherent shortcomings of widely accepted evaluation methodologies in the explainable graph learning domain.\n\n- • Grounded in solid theoretical underpinnings, we introduce novel evaluation metrics that are resilient to distribution shifts, enhancing their applicability in real-world contexts. This metric notably approximates evaluations conducted with ground truth explanations more closely.\n\n- • Through rigorous empirical analyses on a diverse mix of synthetic and real datasets, we validate that our approach resonates well with gold standard benchmarks.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib22",
+      "text": "Kipf & Welling (2017) Thomas N. Kipf and Max Welling. Semi-supervised classification with graph convolutional networks. In International Conference on Learning Representations , 2017. URL https://openreview.net/forum?id=SJU4ayYgl ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib17",
+      "text": "Hamilton et al. (2017) Will Hamilton, Zhitao Ying, and Jure Leskovec. Inductive representation learning on large graphs. Advances in neural information processing systems , 30, 2017."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib40",
+      "text": "Veličković et al. (2018) Petar Veličković, Guillem Cucurull, Arantxa Casanova, Adriana Romero, Pietro Liò, and Yoshua Bengio. Graph attention networks. In International Conference on Learning Representations , 2018. URL https://openreview.net/forum?id=rJXMpikCZ ."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib38",
+      "text": "Scarselli et al. (2008) Franco Scarselli, Marco Gori, Ah Chung Tsoi, Markus Hagenbuchner, and Gabriele Monfardini. The graph neural network model. IEEE transactions on neural networks , 20(1):61–80, 2008."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib49",
+      "text": "Zhang et al. (2022a) He Zhang, Bang Wu, Xingliang Yuan, Shirui Pan, Hanghang Tong, and Jian Pei. Trustworthy graph neural networks: Aspects, methods and trends. arXiv preprint arXiv:2205.07424 , 2022a."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib42",
+      "text": "Wu et al. (2022) Bingzhe Wu, Jintang Li, Junchi Yu, Yatao Bian, Hengtong Zhang, CHaochao Chen, Chengbin Hou, Guoji Fu, Liang Chen, Tingyang Xu, et al. A survey of trustworthy graph learning: Reliability, explainability, and privacy protection. arXiv preprint arXiv:2205.10014 , 2022."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib26",
+      "text": "Li et al. (2022) Yiqiao Li, Jianlong Zhou, Sunny Verma, and Fang Chen. A survey of explainable graph neural networks: Taxonomy and evaluation metrics. arXiv preprint arXiv:2207.12599 , 2022."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib45",
+      "text": "Ying et al. (2019) Zhitao Ying, Dylan Bourgeois, Jiaxuan You, Marinka Zitnik, and Jure Leskovec. Gnnexplainer: Generating explanations for graph neural networks. Advances in neural information processing systems , 32, 2019."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib29",
+      "text": "Luo et al. (2020) Dongsheng Luo, Wei Cheng, Dongkuan Xu, Wenchao Yu, Bo Zong, Haifeng Chen, and Xiang Zhang. Parameterized explainer for graph neural network. Advances in neural information processing systems , 33:19620–19631, 2020."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib47",
+      "text": "Yuan et al. (2021) Hao Yuan, Haiyang Yu, Jie Wang, Kang Li, and Shuiwang Ji. On explainability of graph neural networks via subgraph explorations. In International Conference on Machine Learning , pp. 12241–12252. PMLR, 2021."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib35",
+      "text": "Pope et al. (2019) Phillip E Pope, Soheil Kolouri, Mohammad Rostami, Charles E Martin, and Heiko Hoffmann. Explainability methods for graph convolutional neural networks. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pp. 10772–10781, 2019."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib5",
+      "text": "Bajaj et al. (2021) Mohit Bajaj, Lingyang Chu, Zi Yu Xue, Jian Pei, Lanjun Wang, Peter Cho-Ho Lam, and Yong Zhang. Robust counterfactual explanations on graph neural networks. Advances in Neural Information Processing Systems , 34:5644–5655, 2021."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib48",
+      "text": "Yuan et al. (2022) Hao Yuan, Haiyang Yu, Shurui Gui, and Shuiwang Ji. Explainability in graph neural networks: A taxonomic survey. IEEE Transactions on Pattern Analysis and Machine Intelligence , 2022."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib2",
+      "text": "Amara et al. (2022) Kenza Amara, Zhitao Ying, Zitao Zhang, Zhichao Han, Yang Zhao, Yinan Shan, Ulrik Brandes, Sebastian Schemm, and Ce Zhang. Graphframex: Towards systematic evaluation of explainability methods for graph neural networks. In The First Learning on Graphs Conference , 2022. URL https://openreview.net/forum?id=rGVGf1T-dK ."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib1",
+      "text": "Agarwal et al. (2023) Chirag Agarwal, Owen Queen, Himabindu Lakkaraju, and Marinka Zitnik. Evaluating explainability for graph neural networks. Scientific Data , 10(144), 2023. URL https://www.nature.com/articles/s41597-023-01974-x ."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib23",
+      "text": "Kosan et al. (2023) Mert Kosan, Samidha Verma, Burouj Armgaan, Khushbu Pahwa, Ambuj Singh, Sourav Medya, and Sayan Ranu. Gnnx-bench: Unravelling the utility of perturbation-based gnn explainers through in-depth benchmarking. arXiv preprint arXiv:2310.01794 , 2023."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib28",
+      "text": "Liu et al. (2021) Meng Liu, Youzhi Luo, Limei Wang, Yaochen Xie, Hao Yuan, Shurui Gui, Haiyang Yu, Zhao Xu, Jingtun Zhang, Yi Liu, et al. Dig: A turnkey library for diving into graph deep learning research. The Journal of Machine Learning Research , 22(1):10873–10881, 2021."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib15",
+      "text": "Fang et al. (2023c) Junfeng Fang, Xiang Wang, An Zhang, Zemin Liu, Xiangnan He, and Tat-Seng Chua. Cooperative explanations of graph neural networks. In Proceedings of the Sixteenth ACM International Conference on Web Search and Data Mining , pp. 616–624, 2023c."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib14",
+      "text": "Fang et al. (2023b) Junfeng Fang, Wei Liu, An Zhang, Xiang Wang, Xiangnan He, Kun Wang, and Tat-Seng Chua. On regularization for explaining graph neural networks: An information theory perspective, 2023b. URL https://openreview.net/forum?id=5rX7M4wa2R˙ ."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib11",
+      "text": "Debnath et al. (1991) Asim Kumar Debnath, Rosa L Lopez de Compadre, Gargi Debnath, Alan J Shusterman, and Corwin Hansch. Structure-activity relationship of mutagenic aromatic and heteroaromatic nitro compounds. correlation with molecular orbital energies and hydrophobicity. Journal of medicinal chemistry , 34(2):786–797, 1991."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib19",
+      "text": "Hooker et al. (2019) Sara Hooker, Dumitru Erhan, Pieter-Jan Kindermans, and Been Kim. A benchmark for interpretability methods in deep neural networks. Advances in neural information processing systems , 32, 2019."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib18",
+      "text": "Hase et al. (2021) Peter Hase, Harry Xie, and Mohit Bansal. The out-of-distribution problem in explainability and search methods for feature importance explanations. Advances in neural information processing systems , 34:3650–3666, 2021."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib20",
+      "text": "Hsieh et al. (2021) Cheng-Yu Hsieh, Chih-Kuan Yeh, Xuanqing Liu, Pradeep Kumar Ravikumar, Seungyeon Kim, Sanjiv Kumar, and Cho-Jui Hsieh. Evaluations and methods for explanation through robustness analysis. In International Conference on Learning Representations , 2021. URL https://openreview.net/forum?id=4dXmpCDGNp7 ."
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2312.04282",
+  "title": "Adaptive Recursive Query Optimization",
+  "authors": "Anna Herlihy, Guillaume Martres, Anastasia Ailamaki, Martin Odersky",
+  "year": "2024",
+  "categories": [
+    "cs.DB",
+    "cs.PL"
+  ],
+  "url": "https://arxiv.org/abs/2312.04282",
+  "html_url": "https://arxiv.org/html/2312.04282",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 610,
+  "text": "The advanced algorithms powering contemporary applications require increasingly expressive query capabilities beyond traditional relational algebra, for example iterative or fixed-point computations. This demand has led to a resurgence in the use of recursion in analytical queries, yet the development of recursive query optimization techniques lags behind those established for non-recursive queries.\n\nSupport for recursion was added to the ANSI’99 SQL standard, and yet most relational data management systems are not optimized for the specific needs of recursive queries: during the execution of a recursive query, resulting relations from the current iteration are fed as input into the next iteration of query evaluation. As a result, the relation cardinalities can change unpredictably and the number of iterations required to execute the query is unknown ahead of time. Existing cardinality estimation techniques assume input relation cardinalities do not change during execution, and so cannot guarantee high-quality join orders after the initial iteration.\n\nInstead, developers turn to Datalog for high-performance recursive query processing. Datalog is a popular query language for recursive queries that has been used for Java program analysis [1], TensorFlow [2], Ethereum Virtual Machine [3], AWS network analysis [4], and other performance-critical applications. Most Datalog execution engines follow a bottom-up evaluation [5] strategy, in which subqueries in the form of unions of conjunctive queries are repeatedly applied to relations. State-of-the-art Datalog execution engines provide manual or offline join-order optimizations for these subqueries, but require a profiling stage and cannot adapt if the real-time data does not match what was profiled.\n\nTo avoid error-prone cardinality estimation [6], adaptive query processing (AQP) uses runtime information to tune query optimization [7]. This can be combined with code-generating data management systems [8,9,10] that improve query execution performance by avoiding interpretation overhead by partially evaluating query plans into compiled executables. However, code-generating AQP systems do not regenerate and compile code at runtime, instead jumping between precompiled plans or code blocks to avoid the prohibitively high cost of invoking an optimizing compiler during query execution [11,12]. Because recursive queries require repeated execution of subqueries where results from the previous iteration are fed into the next iteration, an optimal query plan will not stay optimal over the execution of a single program and the number of potential paths is prohibitively large to enumerate or compile ahead-of-time. Thus, there is a need for query optimization techniques that can leverage runtime information to meet the specific optimization criteria of recursive query processing.\n\nTo address these challenges, this work introduces Adaptive Metaprogramming, a novel technique for runtime optimization and repeated re-optimization of recursive queries. We implement and evaluate the design in Carac, a system that tightly integrates a specialized Datalog execution engine with a general-purpose programming language and leverages Multi-Stage Programming [13], a known technique from the Programming Languages community, to support runtime code generation. Ultimately, the goal of Carac is to illustrate a novel optimization approach that leverages advanced metaprogramming language capabilities that would enable any recursive query processing engine to continuously reapply optimizations. This paper makes the following contributions:\n\n- • We introduce Adaptive Metaprogramming, a technique that combines the power of code-generating just-in-time data management systems with Multi-Stage Programming to enable adaptive, continuous query re-optimization by regenerating code at runtime.\n\n- • We leverage Adaptive Metaprogramming to enable a custom optimization for Datalog queries to select efficient join orders of conjunctive subqueries at different stages in the lifetime of the query: from ahead-of-time, when only queries are available, to just-in-time, where runtime statistics like relation cardinalities are available.\n\n- • Through our custom Datalog engine Carac, we show how Adaptive Metaprogramming can speed up unoptimized Datalog queries over 5000x while maintaining a 6x speedup over manually hand-optimized queries.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "Y. Smaragdakis and M. Bravenboer, “Using datalog for fast and easy program analysis,” in Proceedings of the First International Conference on Datalog Reloaded , ser. Datalog’10. Berlin, Heidelberg: Springer-Verlag, 2010, p. 245–251. [Online]. Available: https://doi.org/10.1007/978-3-642-24206-9_14"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "S. Lagouvardos, J. T. Dolby, N. Grech, A. Antoniadis, and Y. Smaragdakis, “Static analysis of shape in tensorflow programs,” in ECOOP , 2020."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "N. Grech, L. Brent, B. Scholz, and Y. Smaragdakis, “Gigahorse: Thorough, declarative decompilation of smart contracts,” in 2019 IEEE/ACM 41st International Conference on Software Engineering (ICSE) , 2019, pp. 1176–1186."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "J. Backes, S. Bayless, B. Cook, C. Dodge, A. Gacek, A. Hu, T. Kahsai, B. Kocik, E. Kotelnikov, J. Kukovec, S. McLaughlin, J. Reed, N. Rungta, J. Sizemore, M. Stalzer, P. Srinivasan, P. Subotic, C. Varming, and B. Whaley, Reachability Analysis for AWS-Based Networks . Springer International Publishing, 07 2019, pp. 231–241."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "J. D. Ullman, “Bottom-up beats top-down for datalog,” in ACM SIGACT-SIGMOD-SIGART Symposium on Principles of Database Systems , 1989."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "V. Leis, A. Gubichev, A. Mirchev, P. Boncz, A. Kemper, and T. Neumann, “How good are query optimizers, really?” Proc. VLDB Endow. , vol. 9, no. 3, p. 204–215, nov 2015. [Online]. Available: https://doi.org/10.14778/2850583.2850594"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "A. Deshpande, J. M. Hellerstein, and V. Raman, “Adaptive query processing: why, how, when, what next,” in Proceedings of the ACM SIGMOD International Conference on Management of Data, Chicago, Illinois, USA, June 27-29, 2006 , 2006, pp. 806–807. [Online]. Available: https://doi.org/10.1145/1142473.1142603"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "T. Kersten, V. Leis, A. Kemper, T. Neumann, A. Pavlo, and P. Boncz, “Everything you always wanted to know about compiled and vectorized queries but were afraid to ask,” Proc. VLDB Endow. , vol. 11, no. 13, p. 2209–2222, sep 2018. [Online]. Available: https://doi.org/10.14778/3275366.3284966"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "A. Kohn, V. Leis, and T. Neumann, “Adaptive execution of compiled queries,” in 2018 IEEE 34th International Conference on Data Engineering (ICDE) , 2018, pp. 197–208."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "M. Karpathiotakis, I. Alagiannis, T. Heinis, M. Branco, and A. Ailamaki, “Just-in-time data virtualization: Lightweight data management with vida,” in Seventh Biennial Conference on Innovative Data Systems Research, CIDR 2015, Asilomar, CA, USA, January 4-7, 2015, Online Proceedings . www.cidrdb.org, 2015. [Online]. Available: http://cidrdb.org/cidr2015/Papers/CIDR15_Paper8.pdf"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "P. Menon, A. Ngom, L. Ma, T. C. Mowry, and A. Pavlo, “Permutable compiled queries: Dynamically adapting compiled queries without recompiling,” Proc. VLDB Endow. , vol. 14, no. 2, p. 101–113, nov 2020. [Online]. Available: https://doi.org/10.14778/3425879.3425882"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "T. Schmidt, P. Fent, and T. Neumann, “Efficiently compiling dynamic code for adaptive query processing,” 13th Workshop on Accelerating Analytics and Data Management , Sep 2022."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "W. Taha, A Gentle Introduction to Multi-Stage Programming, Part II . Berlin, Heidelberg: Springer-Verlag, 2007, p. 260–290. [Online]. Available: https://doi.org/10.1007/978-3-540-88643-3_6"
+    }
+  ]
+}

@@ -1,0 +1,225 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.12188",
+  "title": "PETScML: Second-order solvers for training regression problems in Scientific Machine Learning",
+  "authors": "Stefano Zampini, Umberto Zerbinati, George Turkiyyah, David Keyes",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.MS",
+    "math.OC"
+  ],
+  "url": "https://arxiv.org/abs/2403.12188",
+  "html_url": "https://arxiv.org/html/2403.12188",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1095,
+  "text": "In recent years, there has been a growing interest in incorporating data-driven approaches into computational science and engineering, inspired by the advancements in deep-learning methods [1,2]. This trend has given rise to the emerging discipline of scientific machine learning (SciML), which aims to tackle domain-specific data challenges by harnessing the predictive capabilities, interpretability, and domain knowledge offered by physics-based models. One of the attractions of neural network models lies in their ability to handle high-dimensional function approximations [3,4]; this has led to the design of numerous techniques as scientific tools for uncovering the underlying physical laws hidden within experimental data. Examples include the discovery of partial differential equations (PDEs) [5], the learning of PDEs [6,7], and PDE solvers [8,9]. Noteworthily, deep-learning techniques have successfully pushed the boundaries of molecular dynamics simulations, enabling accurate simulations with hundreds of millions of atoms through ab initio methods [10], and they have also been applied to solving the Hamilton–Jacobi–Bellman equations encountered in deterministic control problems [11].\n\n## 1.1 Background\n\nNon-convex minimization problems are a fundamental challenge when training deep-learning models. The loss landscape can be very complicated, given the presence of multiple minima and saddle points, each possessing distinct generalization properties. Second-order optimization methods applied to over-parametrized deep-learning training problems have demonstrated overfitting tendencies, which hinder their generalization capabilities. This has led to the widespread preference for stochastic first-order methods, as they naturally introduce regularization in the stochastic regime, which helps to mitigate overfitting [12]. Nevertheless, the landscape of deep learning is ever-evolving, and in the era of vast datasets, we find ourselves in a highly informative data regime for training these models. The sheer volume of data can potentially shift the paradigm, creating a setting where overfitting might no longer severely impact generalization capabilities, challenging conventional wisdom and opening doors to novel approaches.\n\nCurrent practice for training deep-learning models is based on stochastic first-order methods that possess superior capabilities in finding local minima with better generalization properties for over-parametrized networks and data-scarce contexts, for example gradient descent with momentum [13] and, to cite only a few, its adaptive relatives ADAM [14], ADAMW [15], ADAGRAD [16]. Despite the appealing simplicity of these methods, their effectiveness depends on the training task and it quickly reaches a plateau as larger parameter sizes are attempted. Hyperparameter tuning, including setting the mini-batch size, the learning rate, and the annealing schedule, also depends on the learning task and lacks theoretical support. In practice, grid-searching for a satisfactory set of hyper-parameters adds substantial expense when training new models.\n\nOn the other hand, given the large volume of data and better characterizations of the empirical risk functions, in the context of SciML we may expect a smaller influence of the “approximation” and “generalization” errors on the approximation properties. This, in turn, shifts the emphasis more towards the effective minimization of the “training” error, for which stochastic first-order methods are not the best choice.\n\n## 1.2 Related work\n\nSecond-order methods have been extensively used and analyzed in the simulation and numerical optimization literature and have succeeded in inverse problems in various settings. Their dimension-independent convergence rate, robustness with respect to the condition number of the Hessian matrix, and a much smaller set of hyper-parameters have made them the primary tool for large-scale optimization in these areas. When it comes to deep-learning training, however, their straightforward usage is relatively inefficient, and their memory and computational costs pose fundamental challenges to their successful application. This has led to several recent research works to adapt these methods to the context and the extreme scales of current deep-learning. Stochastic versions of quasi-Newton methods have been explored [17,18,19,20,21,22,23,24,25,26,27,28,29] and have provided improved performance and robustness over first-order methods. However, all these methods require modifications of the network implementation to store and operate on intermediate products.\n\nThe rise of deep-learning has paralleled impressive advances in the development of high-quality and highly efficient open-source software frameworks. However, most of the focus has been on the design of the various architectural network components and the efficient implementation of automatic differentiation for the back-propagation algorithm. While first-order methods are relatively straightforward to implement, second-order solvers have received little, if any, attention from the deep-learning framework communities, and users of these frameworks are thus left with a limited number of choices to train their models. Much remains to follow early successes in these directions, above all in the context of matrix-free Newton-like methods, where recent works have just analyzed their complexity and recently demonstrated their applicability to academic benchmark problems [30,31]. For a recent effort to recast many of the stochastic Quasi-Newton methods cited above under the same computational framework, see [32].\n\n## 1.3 Contributions\n\nHere, we are interested in matrix-free solvers because of their general applicability. However, these solvers are characterized by a more complicated structure requiring a deeper hierarchy of components, like line-search algorithms, Krylov methods, and preconditioners. These components are at the core of high-performance libraries designed to solve large-scale minimization problems; through carefully crafted application programming interfaces, the scientific community has extensively validated them on various applications, and they can offer a completely new arsenal of methods to tackle the deep-learning training problem. In this work, we present PETScML, which is a lightweight Python interface exposing neural networks written using PyTorch [33] or JAX [34] to the Portable and Extensible Toolkit for Scientific Computing (PETSc) [35] and its Python bindings module petsc4py [36], that allows quick experimentation with the many different optimization solvers offered by PETSc.\n\nTo showcase the efficacy of PETScML, we focus on a particular source of applications for regression tasks in SciML to empirically demonstrate that second-order methods can improve trained model accuracies by superior exploitation of the smoothness of the continuous fields and the richness of the datasets used, outperforming the hand-tuned adaptive first-order methods used to validate the techniques. In particular, we focus on the construction of inexpensive-to-evaluate surrogate models [37,38,39,40] where networks are trained to learn the realization of the parameter-to-observable maps used to solve inverse problems, Bayesian inversions, and ultimately tackle the design-of-experiments framework. Improving the generalization accuracy of surrogate neural operators can offer a large speed-up in these applications and enable a qualitatively new level of training performance, accuracy, and robustness [41].\n\nThe paper is organized as follows. Section 2 introduces the minimization problem in training deep-learning models and describes the matrix-free solvers studied in the paper. Section 3 gives an overview of the software framework, while Section 4 contains numerical results testing the solvers on a series of test cases taken from the recent literature. Section 5 provides further discussions and concludes the paper.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib36",
+      "text": "Yann LeCun, Yoshua Bengio, and Geoffrey Hinton. Deep learning. nature , 521(7553):436–444, 2015."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib62",
+      "text": "Jürgen Schmidhuber. Deep learning in neural networks: An overview. Neural networks , 61:85–117, 2015."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib16",
+      "text": "George Cybenko. Approximation by superpositions of a sigmoidal function. Mathematics of control, signals and systems , 2(4):303–314, 1989."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib28",
+      "text": "Kurt Hornik, Maxwell Stinchcombe, and Halbert White. Multilayer feedforward networks are universal approximators. Neural networks , 2(5):359–366, 1989."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib11",
+      "text": "Steven L Brunton, Joshua L Proctor, and J Nathan Kutz. Discovering governing equations from data by sparse identification of nonlinear dynamical systems. Proceedings of the national academy of sciences , 113(15):3932–3937, 2016."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib58",
+      "text": "Maziar Raissi. Deep hidden physics models: Deep learning of nonlinear partial differential equations. The Journal of Machine Learning Research , 19(1):932–955, 2018."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "Nicolas Boullé, Christopher J Earls, and Alex Townsend. Data-driven discovery of Green’s functions with human-understandable deep learning. Scientific reports , 12(1):4824, 2022."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib59",
+      "text": "Maziar Raissi, Paris Perdikaris, and George E Karniadakis. Physics-informed neural networks: A deep learning framework for solving forward and inverse problems involving nonlinear partial differential equations. Journal of Computational physics , 378:686–707, 2019."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib75",
+      "text": "Bing Yu et al. The deep ritz method: a deep learning-based numerical algorithm for solving variational problems. Communications in Mathematics and Statistics , 6(1):1–12, 2018."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib31",
+      "text": "Weile Jia, Han Wang, Mohan Chen, Denghui Lu, Lin Lin, Roberto Car, E Weinan, and Linfeng Zhang. Pushing the limit of molecular dynamics with ab initio accuracy to 100 million atoms with machine learning. In SC20: International conference for high performance computing, networking, storage and analysis , pages 1–14. IEEE, 2020."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib50",
+      "text": "Tenavi Nakamura-Zimmerer, Qi Gong, and Wei Kang. Adaptive deep learning for high-dimensional hamilton–jacobi–bellman equations. SIAM Journal on Scientific Computing , 43(2):A1221–A1247, 2021."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib64",
+      "text": "Samuel L Smith, Benoit Dherin, David GT Barrett, and Soham De. On the origin of implicit regularization in stochastic gradient descent. 9th International Conference on Learning Representations, ICLR 2021 , 2021."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib66",
+      "text": "Ilya Sutskever, James Martens, George Dahl, and Geoffrey Hinton. On the importance of initialization and momentum in deep learning. In International conference on machine learning , pages 1139–1147. PMLR, 2013."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib32",
+      "text": "Diederik P Kingma and Jimmy Ba. ADAM: A method for stochastic optimization. arXiv preprint arXiv:1412.6980 , 2014."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib42",
+      "text": "Ilya Loshchilov and Frank Hutter. Decoupled weight decay regularization. arXiv preprint arXiv:1711.05101 , 2017."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib21",
+      "text": "John Duchi, Elad Hazan, and Yoram Singer. Adaptive subgradient methods for online learning and stochastic optimization. Journal of machine learning research , 12(7), 2011."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib57",
+      "text": "J. Gregory Pauloski, Qi Huang, Lei Huang, Shivaram Venkataraman, Kyle Chard, Ian Foster, and Zhao Zhang. KAISA: An adaptive second-order optimizer framework for deep neural networks. In Proceedings of the International Conference for High Performance Computing, Networking, Storage and Analysis , SC ’21, New York, NY, USA, 2021. Association for Computing Machinery."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib24",
+      "text": "Donald Goldfarb, Yi Ren, and Achraf Bahamou. Practical quasi-newton methods for training deep neural networks. In Proceedings of the 34th International Conference on Neural Information Processing Systems , NeurIPS, pages 201:1–11, 2020."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib68",
+      "text": "Jan van den Brand, Binghui Peng, Zhao Song, and Omri Weinstein. Training (Overparametrized) Neural Networks in Near-Linear Time. In James R. Lee, editor, 12th Innovations in Theoretical Computer Science Conference (ITCS 2021) , volume 185 of Leibniz International Proceedings in Informatics (LIPIcs) , pages 63:1–63:15, Dagstuhl, Germany, 2021. Schloss Dagstuhl–Leibniz-Zentrum für Informatik."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib72",
+      "text": "Zhewei Yao, Amir Gholami, Sheng Shen, Mustafa Mustafa, Kurt Keutzer, and Michael Mahoney. AdaHessian: An adaptive second order optimizer for machine learning. Proceedings of the AAAI Conference on Artificial Intelligence , 35(12):10665–10673, May 2021."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib6",
+      "text": "Léon Bottou, Frank E. Curtis, and Jorge Nocedal. Optimization methods for large-scale machine learning. SIAM Review , 60(2):223–311, 2018."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib47",
+      "text": "James Martens and Ilya Sutskever. Learning recurrent neural networks with Hessian-free optimization. In Proceedings of the 28th international conference on machine learning (ICML-11) , pages 1033–1040, 2011."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib55",
+      "text": "Kazuki Osawa, Yohei Tsuji, Yuichiro Ueno, Akira Naruse, Rio Yokota, and S. Matsuoka. Second-order optimization method for large mini-batch: Training resnet-50 on imagenet in 35 epochs. ArXiv , abs/1811.12019, 2018."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib26",
+      "text": "Vineet Gupta, Tomer Koren, and Yoram Singer. Shampoo: Preconditioned stochastic tensor optimization. 2018."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib2",
+      "text": "Rohan Anil, Vineet Gupta, Tomer Koren, Kevin Regan, and Yoram Singer. Second order optimization made practical. CoRR , abs/2002.09018, 2020."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib37",
+      "text": "Xi-Lin Li. Preconditioned stochastic gradient descent. IEEE transactions on neural networks and learning systems , 29(5):1454–1466, 2017."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib46",
+      "text": "James Martens and Roger Grosse. Optimizing neural networks with kronecker-factored approximate curvature. In International conference on machine learning , pages 2408–2417. PMLR, 2015."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib71",
+      "text": "Minghan Yang, Dong Xu, Zaiwen Wen, Mengyun Chen, and Pengxiang Xu. Sketch-based empirical natural gradient methods for deep learning. Journal of Scientific Computing , 92(3):94, 2022."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib52",
+      "text": "Thomas O’Leary-Roseberry, Nick Alger, and Omar Ghattas. Low rank saddle free newton: A scalable method for stochastic nonconvex optimization, 2021."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib41",
+      "text": "Yang Liu and Fred Roosta. Convergence of Newton-MR under inexact Hessian information. SIAM Journal on Optimization , 31(1):59–90, 2021."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib70",
+      "text": "Peng Xu, Fred Roosta, and Michael W Mahoney. Newton-type methods for non-convex optimization under inexact Hessian information. Mathematical Programming , 184(1-2):35–70, 2020."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib54",
+      "text": "Kazuki Osawa, Satoki Ishikawa, Rio Yokota, Shigang Li, and Torsten Hoefler. ASDL: A unified interface for gradient preconditioning in pytorch. arXiv preprint arXiv:2305.04684 , 2023."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib56",
+      "text": "Adam Paszke, Sam Gross, Francisco Massa, Adam Lerer, James Bradbury, Gregory Chanan, Trevor Killeen, Zeming Lin, Natalia Gimelshein, Luca Antiga, Alban Desmaison, Andreas Kopf, Edward Yang, Zachary DeVito, Martin Raison, Alykhan Tejani, Sasank Chilamkurthy, Benoit Steiner, Lu Fang, Junjie Bai, and Soumith Chintala. Pytorch: An imperative style, high-performance deep learning library. Advances in neural information processing systems , 32, 2019."
+    },
+    {
+      "n": 34,
+      "id": "bib.bib23",
+      "text": "Roy Frostig, Matthew James Johnson, and Chris Leary. Compiling machine learning programs via high-level tracing. Systems for Machine Learning , 4(9), 2018."
+    },
+    {
+      "n": 35,
+      "id": "bib.bib4",
+      "text": "Satish Balay, Shrirang Abhyankar, Mark F. Adams, Steven Benson, Jed Brown, Peter Brune, Kris Buschelman, Emil M. Constantinescu, Lisandro Dalcin, Alp Dener, Victor Eijkhout, Jacob Faibussowitsch, William D. Gropp, Václav Hapla, Tobin Isaac, Pierre Jolivet, Dmitry Karpeev, Dinesh Kaushik, Matthew G. Knepley, Fande Kong, Scott Kruger, Dave A. May, Lois Curfman McInnes, Richard Tran Mills, Lawrence Mitchell, Todd Munson, Jose E. Roman, Karl Rupp, Patrick Sanan, Jason Sarich, Barry F. Smith, Stefano Zampini, Hong Zhang, Hong Zhang, and Junchao Zhang. PETSc Web page, 2023."
+    },
+    {
+      "n": 36,
+      "id": "bib.bib17",
+      "text": "Lisandro D Dalcin, Rodrigo R Paz, Pablo A Kler, and Alejandro Cosimo. Parallel distributed computing using Python. Advances in Water Resources , 34(9):1124–1139, 2011."
+    },
+    {
+      "n": 37,
+      "id": "bib.bib53",
+      "text": "Thomas O’Leary-Roseberry, Peng Chen, Umberto Villa, and Omar Ghattas. Derivative-informed neural operator: An efficient framework for high-dimensional parametric derivative learning. Journal of Computational Physics , 496:112555, 2024."
+    },
+    {
+      "n": 38,
+      "id": "bib.bib34",
+      "text": "Nikola B Kovachki, Zongyi Li, Burigede Liu, Kamyar Azizzadenesheli, Kaushik Bhattacharya, Andrew M Stuart, and Anima Anandkumar. Neural Operator: Learning maps between function spaces with applications to PDEs. J. Mach. Learn. Res. , 24(89):1–97, 2023."
+    },
+    {
+      "n": 39,
+      "id": "bib.bib43",
+      "text": "Lu Lu, Pengzhan Jin, Guofei Pang, Zhongqiang Zhang, and George Em Karniadakis. Learning nonlinear operators via DeepONet based on the universal approximation theorem of operators. Nature machine intelligence , 3(3):218–229, 2021."
+    },
+    {
+      "n": 40,
+      "id": "bib.bib8",
+      "text": "Nicolas Boullé, Diana Halikias, and Alex Townsend. Elliptic PDE learning is provably data-efficient. Proceedings of the National Academy of Sciences , 120(39):e2303904120, 2023."
+    },
+    {
+      "n": 41,
+      "id": "bib.bib19",
+      "text": "Maarten V de Hoop, Daniel Zhengyu Huang, Elizabeth Qian, and Andrew M Stuart. The cost-accuracy trade-off in operator learning with neural networks. Journal of Machine Learning , 2022."
+    }
+  ]
+}

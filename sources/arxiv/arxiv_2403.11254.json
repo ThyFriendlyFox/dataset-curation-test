@@ -1,0 +1,123 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.11254",
+  "title": "Efficiently Detecting Reentrancy Vulnerabilities in Complex Smart Contracts",
+  "authors": "Zexu Wang, Jiachi Chen, Yanlin Wang, Yu Zhang, Weizhe Zhang, Zibin Zheng",
+  "year": "2024",
+  "categories": [
+    "cs.SE"
+  ],
+  "url": "https://arxiv.org/abs/2403.11254",
+  "html_url": "https://arxiv.org/html/2403.11254",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1004,
+  "text": "As decentralized applications (DApps) become more versatile in functionality, the complexity of the underlying contract logic has correspondingly increased. This escalation in complexity poses significant challenges for existing tools in detecting vulnerabilities within complex contracts. Reentrancy vulnerabilities are one of the most notorious types [1]. Starting from the DAO Reentrancy attack [2] in 2016 that caused a $150 million loss in digital assets, Reentrancy attacks on blockchain continue to occur. Concurrently, many academic studies and tools for detecting Reentrancy vulnerabilities have emerged.\n\nVarious approaches have been employed to detect Reentrancy vulnerabilities, including symbolic execution [3,4,5,6,7], fuzz testing [8,9,10,11], static analysis [12,13,14], and formal verification [15,16,13]. However, most existing tools have been evaluated on relatively simple contract datasets, e.g., the SmartBugs Dataset [17], lacking experimental assessments on real-world complex contracts. To ascertain their efficacy in complex DApps, Zheng et al. [18] curated a dataset that comprises 895 vulnerabilities. These vulnerabilities were obtained from 1,322 open-source DApp audit reports provided by 30 blockchain security companies, covering 25 types of vulnerabilities. Compared to the SmartBugs dataset [17], it has approximately 25 times the average lines of code and 30 times the average function count. The study also evaluated five state-of-the-art vulnerability detection tools [14,8,7,16,13] on this dataset. The experimental results revealed that most tools had a low success detection rate (less than 30%), especially for Reentrancy vulnerabilities (less than 11%). This emphasizes the necessity of focusing on detecting real-world vulnerabilities in complex contracts rather than simple toy contracts in future research.\n\nReal-world Reentrancy attack events usually involve complex function call relationships. However, most existing tools focus only on the security of a single function within the contract, which is insufficient to guarantee the overall contract safety. Compositional Reentrancy vulnerabilities of smart contracts are introduced by cross-contract interactions, such as cross-function Reentrancy [19] and cross-contract Reentrancy [20], presenting considerable challenges. Effective detection of compositional Reentrancy vulnerabilities requires a thorough analysis of contract interactions and a systematic examination of data and control flow transitions. Incorporating program semantics could enhance the accuracy of identifying critical data and control flows, thereby improving compositional Reentrancy vulnerability detection effectiveness. Additionally, the computation of dynamic jump addresses poses another major challenge, often resulting in incomplete Control Flow Graph (CFG) paths. Despite complex function call relationships may generate numerous execution paths, many current tools predominantly rely on static stack simulation for path recovery. This method struggles with dynamic jump addresses, leaving CFG paths incomplete and compromising the accuracy of symbolic execution. Therefore, the analysis of compositional Reentrancy vulnerability and CFG path recovery are the key challenges in complex contract Reentrancy vulnerability detection.\n\nTo address these challenges, we propose the SliSE method, which combines symbolic execution with program slicing to detect Reentrancy vulnerabilities in complex contracts. The detection process is divided into two stages: Warning Search and Symbolic Execution Verification. In the Warning Search stage, program slicing is performed based on program dependencies to search and extract critical paths. Subsequently, in the Symbolic Execution Verification stage, the reachability of these critical paths is further verified to achieve efficient Reentrancy vulnerability detection. Through program dependency analysis, the I-PDG (Inter-contract Program Dependency Graph) of contract is constructed, which can provide cross-contract data and control dependencies. Combined with our Reentrancy vulnerability slicing standards, the I-PDG is sliced to prune paths. SliSE analyzes program dependency among critical instruction statements (such as require, assert, etc.) to model the semantics, then identifies data and control flow transitions. With this information, it verifies whether these semantics adhere to the secure C-E-I (Check->Effect->Interaction) patten. This pattern mandates timely state updates before interacting with external contracts, maintaining atomicity of transactions and prevent Reentrancy (see section 2 for details). If deviations from this pattern are detected, SliSE generates a warning that includes the corresponding function and location information. In the Symbolic Execution Verification stage, SliSE employs the CFG path recovery algorithm to recovery execution paths and gather essential path constraints. Finally, it proves the reachability of the path and the existence of vulnerabilities through constraint solving.\n\nWe evaluated SliSE’s performance by comparing the detection results with eight state-of-the-art tools, analyzing its performance in detecting Reentrancy vulnerabilities from complex contracts. The results show that SliSE performs well in detecting complex contract Reentrancy vulnerabilities, with the F1 score of 78.65%, significantly exceeding the highest score of 9.26% achieved by the eight state-of-the-art tools. To assess its effectiveness in detecting Reentrancy vulnerabilities on Ethereum, we used two publicly available datasets [21,17], SliSE demonstrated an outstanding recall rate of 92.68% and maintained the highest F1 scores compared to the existing tools. Through ablation experiments for each stage, we confirmed the critical importance of each stage in the overall process. Notably, precise path pruning during stage I is instrumental for efficient vulnerability detection. This path pruning process contributed to a significant increase in the F1 score, elevating it from 6.59% to 78.65%. Additionally, with the stage II of symbolic execution verification, we observed a substantial reduction in false positives, resulting in a precision improvement from 47.30% to 72.16%. Overall, SliSE provides a robust and efficient method to efficiently detect Reentrancy vulnerabilities in complex contracts.\n\nThe main contributions of our work are as follows:\n\n- (1) We propose an approach that combines program slicing and symbolic execution to efficiently detect Reentrancy vulnerabilities within complex contracts. By pruning and verifying the reachability of critical paths, we achieve effective detection.\n\n- (2) We design the SliSE tool, which efficiently detects complex contracts Reentrancy vulnerabilities. Comparative experiments with state-of-the-art tools substantiate its effectiveness and efficiency.\n\n- (3) We have made our SliSE tool’s source code and experimental dataset publicly available at https://github.com/SliSE-SC/SliSE.\n\nThe paper is organized as follows. In Section 2, we provide essential background and highlight challenges in detecting complex contract Reentrancy vulnerabilities through motivating examples. Section 3 outlines the workflow and technical details of SliSE. We evaluate the performance and efficiency of SliSE in Section 4, while Section 5 discusses existing tool capabilities in complex contract Reentrancy vulnerability detection and threats analysis. Section 6 summarizes related work, and Section 7 concludes this paper.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib6",
+      "text": "Chen et al . (2023) Jiachi Chen, Mingyuan Huang, Zewei Lin, Peilin Zheng, and Zibin Zheng. 2023. To Healthier Ethereum: A Comprehensive and Iterative Smart Contract Weakness Enumeration. arXiv:cs.SE/2308.10227"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib12",
+      "text": "Daian (2016) Phil Daian. 2016. Analysis of the DAO exploit. https://hackingdistributed.com/2016/06/18/analysis-of-the-dao-exploit/"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib28",
+      "text": "Mossberg et al . (2019) Mark Mossberg, Felipe Manzano, Eric Hennenfent, Alex Groce, Gustavo Grieco, Josselin Feist, Trent Brunson, and Artem Dinaburg. 2019. Manticore: A user-friendly symbolic execution framework for binaries and smart contracts. In 2019 34th IEEE/ACM International Conference on Automated Software Engineering (ASE) . IEEE, 1186–1189."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib26",
+      "text": "Luu et al . (2016) Loi Luu, Duc-Hiep Chu, Hrishi Olickel, Prateek Saxena, and Aquinas Hobor. 2016. Making Smart Contracts Smarter. In Proceedings of the 2016 ACM SIGSAC Conference on Computer and Communications Security (CCS ’16) . Association for Computing Machinery, New York, NY, USA, 254–269. https://doi.org/10.1145/2976749.2978309"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib43",
+      "text": "Zhang et al . (2019) William Zhang, Sebastian Banescu, Leonardo Pasos, Steven Stewart, and Vijay Ganesh. 2019. Mpro: Combining static and symbolic analysis for scalable testing of smart contract. In 2019 IEEE 30th International Symposium on Software Reliability Engineering (ISSRE) . IEEE, 456–462."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib37",
+      "text": "Torres et al . (2018) Christof Ferreira Torres, Julian Schütte, and Radu State. 2018. Osiris: Hunting for integer bugs in ethereum smart contracts. In Proceedings of the 34th Annual Computer Security Applications Conference . 664–676."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib10",
+      "text": "ConsenSys (2020) ConsenSys. 2020. Mythril. https://github.com/ConsenSys/mythril"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib9",
+      "text": "Choi et al . (2021) Jaeseung Choi, Doyeon Kim, Soomin Kim, Gustavo Grieco, Alex Groce, and Sang Kil Cha. 2021. SMARTIAN: Enhancing Smart Contract Fuzzing with Static and Dynamic Data-Flow Analyses. In 2021 36th IEEE/ACM International Conference on Automated Software Engineering (ASE) . 227–239. https://doi.org/10.1109/ASE51524.2021.9678888"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib22",
+      "text": "Jiang et al . (2018) Bo Jiang, Ye Liu, and W. K. Chan. 2018. ContractFuzzer: Fuzzing Smart Contracts for Vulnerability Detection. In Proceedings of the 33rd ACM/IEEE International Conference on Automated Software Engineering (ASE ’18) . Association for Computing Machinery, New York, NY, USA, 259–269. https://doi.org/10.1145/3238147.3238177"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib29",
+      "text": "Nguyen et al . (2020) Tai D. Nguyen, Long H. Pham, Jun Sun, Yun Lin, and Quang Tran Minh. 2020. SFuzz: An Efficient Adaptive Fuzzer for Solidity Smart Contracts. In Proceedings of the ACM/IEEE 42nd International Conference on Software Engineering (ICSE ’20) . Association for Computing Machinery, New York, NY, USA, 778–788. https://doi.org/10.1145/3377811.3380334"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib33",
+      "text": "So et al . (2021) Sunbeom So, Seongjoon Hong, and Hakjoo Oh. 2021. SmarTest: Effectively Hunting Vulnerable Transaction Sequences in Smart Contracts through Language Model-Guided Symbolic Execution. In 30th USENIX Security Symposium (USENIX Security 21) . 1361–1378."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib41",
+      "text": "Ye et al . (2020) Jiaming Ye, Mingliang Ma, Yun Lin, Yulei Sui, and Yinxing Xue. 2020. Clairvoyance: Cross-contract static analysis for detecting practical reentrancy vulnerabilities in smart contracts. In Proceedings of the ACM/IEEE 42nd International Conference on Software Engineering: Companion Proceedings . 274–275."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "Feist et al . (2019) Josselin Feist, Gustavo Grieco, and Alex Groce. 2019. Slither: a static analysis framework for smart contracts. In 2019 IEEE/ACM 2nd International Workshop on Emerging Trends in Software Engineering for Blockchain (WETSEB) . IEEE, 8–15."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib2",
+      "text": "Bose et al . (2022) Priyanka Bose, Dipanjan Das, Yanju Chen, Yu Feng, Christopher Kruegel, and Giovanni Vigna. 2022. SAILFISH: Vetting Smart Contract State-Inconsistency Bugs in Seconds. In 2022 IEEE Symposium on Security and Privacy (SP) . 161–178. https://doi.org/10.1109/SP46214.2022.9833721"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib11",
+      "text": "Contro et al . (2021) Filippo Contro, Marco Crosara, Mariano Ceccato, and Mila Dalla Preda. 2021. Ethersolve: Computing an accurate control-flow graph from ethereum bytecode. In 2021 IEEE/ACM 29th International Conference on Program Comprehension (ICPC) . IEEE, 127–137."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib38",
+      "text": "Tsankov et al . (2018) Petar Tsankov, Andrei Dan, Dana Drachsler-Cohen, Arthur Gervais, Florian Bünzli, and Martin Vechev. 2018. Securify: Practical Security Analysis of Smart Contracts. In Proceedings of the 2018 ACM SIGSAC Conference on Computer and Communications Security (CCS ’18) . Association for Computing Machinery, New York, NY, USA, 67–82. https://doi.org/10.1145/3243734.3243780"
+    },
+    {
+      "n": 17,
+      "id": "bib.bib32",
+      "text": "smartbugs (2020) smartbugs. 2020. Smartbugs wild dataset. https://github.com/smartbugs/smartbugs-wild"
+    },
+    {
+      "n": 18,
+      "id": "bib.bib46",
+      "text": "Zheng et al . (2023a) Zibin Zheng, Jianzhong Su, Jiachi Chen, David Lo, Zhijie Zhong, and Mingxi Ye. 2023a. DAppSCAN: Building Large-Scale Datasets for Smart Contract Weaknesses in DApp Projects. arXiv:cs.SE/2305.08456"
+    },
+    {
+      "n": 19,
+      "id": "bib.bib35",
+      "text": "Thummavet (2022a) Phuwanai Thummavet. 2022a. Solidity Security By Example 04: Cross-Function Reentrancy. https://medium.com/valixconsulting/solidity-smart-contract-security-by-example-04-cross-function-reentrancy-de9cbce0558e"
+    },
+    {
+      "n": 20,
+      "id": "bib.bib36",
+      "text": "Thummavet (2022b) Phuwanai Thummavet. 2022b. Solidity Security By Example 05: Cross-Contract Reentrancy. https://medium.com/valixconsulting/solidity-smart-contract-security-by-example-05-cross-contract-reentrancy-30f29e2a01b9"
+    },
+    {
+      "n": 21,
+      "id": "bib.bib47",
+      "text": "Zheng et al . (2023b) Zibin Zheng, Neng Zhang, Jianzhong Su, Zhijie Zhong, Mingxi Ye, and Jiachi Chen. 2023b. Turn the Rudder: A Beacon of Reentrancy Detection for Smart Contracts on Ethereum. In Proceedings of the 45th International Conference on Software Engineering (ICSE ’23) . IEEE Press, 295–306. https://doi.org/10.1109/ICSE48619.2023.00036"
+    }
+  ]
+}

@@ -1,0 +1,109 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.10780",
+  "title": "Segment Any Object Model (SAOM): Real-to-Simulation Fine-Tuning Strategy for Multi-Class Multi-Instance Segmentation",
+  "authors": "Mariia Khan, Yue Qiu, Yuren Cong, Jumana Abu-Khalaf, David Suter, Bodo Rosenhahn",
+  "year": "2024",
+  "categories": [
+    "cs.CV",
+    "cs.AI"
+  ],
+  "url": "https://arxiv.org/abs/2403.10780",
+  "html_url": "https://arxiv.org/html/2403.10780",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "INTRODUCTION",
+  "word_count": 835,
+  "text": "Segmentation is one of the main tasks in computer vision, which is commonly used in applications such as object detection and tracking [1], medical image analysis [2], and robotics [3]. In the last few years, there has been a revolution in computer vision research due to large foundational models [4,5,6,7,8], that can perform zero-shot generalization for new domains without additional training.\n\nThe recent Segment Anything Model (SAM) [4] can use various input prompts like points, bounding boxes, or masks for segmentation. Moreover, SAM can work in the “everything” mode, where it is asked to provide a valid mask at each point in a pre-defined point grid on an image. For each point in the grid, SAM predicts multiple output masks. The nested masks are often at most three deep: a part,\n\nAccording to [9], SAM can generalize well to natural images, but it has several limitations in real-world applications. SAM tends to favor selecting foreground object masks and is less effective in low-contrast applications [9]. SAM has also a limited understanding of professional data in the box mode and the “everything” mode [9].\n\nWe examine the performance of SAM across several real-world segmentation applications in the “everything” mode and observe that SAM tends to output part and sub-part segmentation masks rather than segmentation masks of the complete objects. However, obtaining segmentation masks of the complete objects plays a crucial role in various computer vision applications: security for identification and tracking of objects, medical imaging for surgery planning and diagnosis, sports analytics for player tracking, and robotics for effective manipulation and grasping. Since these tasks involve analyzing previously unseen data, there are no predefined prompts for SAM input. Thus, SAM can be only used in the “everything” mode.\n\nTo the best of our knowledge, there has been limited analysis in the literature regarding the applicability of SAM to indoor scene understanding [10], for which segmentation plays a key role. This is particularly relevant in applications like domestic robots, as the robotic agents learn from interactions with their surroundings. As agents usually are required to explore unseen environments, there are no prompts to serve as inputs to SAM, restricting its use to the ”everything” mode.\n\nAs collecting training data in real-world is costly and time-consuming, research related to various robotic tasks is typically performed using simulators. Our experiments, examining SAM’s performance in the “everything” mode, were conducted on images collected within the Ai2Thor [11] simulator (Fig. 4).\n\nFor indoor environments only a few simulators render realistic outputs [12,13]; most of the existing simulators [11,14,15,16] produce animated scenes. SAM was trained on the SA-1B dataset [4], which consists of natural images from real-life scenes. It can be the main reason for SAM’s tendency to output part or sub-part segmentation masks in the “everything” mode (Fig. 1).\n\nTherefore, we propose a new domain invariant fine-tuning strategy for multi-class multi-instance segmentation and apply it to the indoor scene understanding task. Inspired by works using synthetic data for training a model and then testing its performance on real-image benchmarks [17,18], we propose a novel Real-Sim fine-tuning method (Fig. 2). In the real-to-sim training phase, images from simplified simulated environments are used to fine-tune SAM. The fine-tuning aims to recognize the whole objects instead of their parts in the “everything” mode. As SAM predicts object masks only and does not generate labels, we also add a classifier while fine-tuning. In the sim-to-real inference phase, the fine-tuned SAM is directly used in real-world scenarios without any training on real-world data.\n\nWe evaluate our SAM’s fine-tuned version – Segment Any Object Model (SAOM) – adapted for semantic segmentation of objects in indoor environments (Fig. 1) using Ai2Thor simulator [11]. We use 54 different interactable object classes of 3 sizes: small (e.g. mug, plate), medium (e.g. laptop, box), and large (e.g. dining table, sofa). Experimental results on sim-to-real transfer (Section 5.5) demonstrate that our Real-Sim strategy has a promising generalization performance in real environments (Fig. 1) and low training costs. Our contributions can be summarized as follows:\n\n- • A new domain invariant SAM’s Real-Sim fine-tuning strategy (Section 4). The proposed strategy is suitable for multi-class multi-instance semantic segmentation task in the “everything” mode. In the real-to-sim training phase, we propose a novel nearest neighbour assignment method (Section 4.2). We substitute the original object point prompts with their nearest neighbours from a pre-defined point grid on an image to make the model functional in the “everything” mode.\n\n- • A SAM’s fine-tuned version adapted for semantic segmentation of whole objects in indoor environments – SAOM. The model achieves acceptable generalization results on real-world scenes without using real-life data during training (Section 5).\n\n- • A new dataset for SAOM evaluation is created within the Ai2Thor simulator (Section 3), which is also suitable for other segmentation tasks such as semantic or instance segmentation. Additionally, during the sim-to-real inference stage, we created and utilized a compact set of images in diverse contexts from real indoor environments (Section 5.5). Both dataset and code will be released after publication.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "Qiang Wang, Li Zhang, Luca Bertinetto, Weiming Hu, and Philip HS Torr, “Fast online object tracking and segmentation: A unifying approach,” in Proceedings of the IEEE/CVF conference on Computer Vision and Pattern Recognition , 2019, pp. 1328–1338."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "Jun Ma and Bo Wang, “Segment anything in medical images,” arXiv preprint arXiv:2304.12306 , 2023."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "Kiana Ehsani, Roozbeh Mottaghi, and Ali Farhadi, “Segan: Segmenting and generating the invisible,” in Proceedings of the IEEE conference on computer vision and pattern recognition , 2018, pp. 6144–6153."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "Alexander Kirillov, Eric Mintun, Nikhila Ravi, Hanzi Mao, Chloe Rolland, Laura Gustafson, Tete Xiao, Spencer Whitehead, Alexander C Berg, Wan-Yen Lo, et al., “Segment anything,” arXiv preprint arXiv:2304.02643 , 2023."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "Tom Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared D Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, et al., “Language models are few-shot learners,” Advances in neural information processing systems , vol. 33, pp. 1877–1901, 2020."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "Hugo Touvron, Thibaut Lavril, Gautier Izacard, Xavier Martinet, Marie-Anne Lachaux, Timothée Lacroix, Baptiste Rozière, Naman Goyal, Eric Hambro, Faisal Azhar, et al., “Llama: Open and efficient foundation language models,” arXiv preprint arXiv:2302.13971 , 2023."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "Xueyan Zou, Jianwei Yang, Hao Zhang, Feng Li, Linjie Li, Jianfeng Gao, and Yong Jae Lee, “Segment everything everywhere all at once,” arXiv preprint arXiv:2304.06718 , 2023."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "Xinlong Wang, Xiaosong Zhang, Yue Cao, Wen Wang, Chunhua Shen, and Tiejun Huang, “Seggpt: Segmenting everything in context,” arXiv preprint arXiv:2304.03284 , 2023."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "Wei Ji, Jingjing Li, Qi Bi, Wenbo Li, and Li Cheng, “Segment anything is not always perfect: An investigation of sam on different real-world applications,” arXiv preprint arXiv:2304.05750 , 2023."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "Siyuan Huang, Zhengkai Jiang, Hao Dong, Yu Qiao, Peng Gao, and Hongsheng Li, “Instruct2act: Mapping multi-modality instructions to robotic actions with large language model,” arXiv preprint arXiv:2305.11176 , 2023."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "Eric Kolve, Roozbeh Mottaghi, Winson Han, Eli VanderBilt, Luca Weihs, Alvaro Herrasti, Matt Deitke, Kiana Ehsani, Daniel Gordon, Yuke Zhu, et al., “Ai2-thor: An interactive 3d environment for visual ai,” arXiv preprint arXiv:1712.05474 , 2017."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "Manolis Savva, Abhishek Kadian, Oleksandr Maksymets, Yili Zhao, Erik Wijmans, Bhavana Jain, Julian Straub, Jia Liu, Vladlen Koltun, Jitendra Malik, et al., “Habitat: A platform for embodied ai research,” in Proceedings of the IEEE/CVF international conference on computer vision , 2019, pp. 9339–9347."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "Chuang Gan, Jeremy Schwartz, Seth Alter, Damian Mrowca, Martin Schrimpf, James Traer, Julian De Freitas, Jonas Kubilius, Abhishek Bhandwaldar, Nick Haber, et al., “Threedworld: A platform for interactive multi-modal physical simulation,” arXiv preprint arXiv:2007.04954 , 2020."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "Claudia Yan, Dipendra Misra, Andrew Bennnett, Aaron Walsman, Yonatan Bisk, and Yoav Artzi, “Chalet: Cornell house agent learning environment,” arXiv preprint arXiv:1801.07357 , 2018."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "Xiaofeng Gao, Ran Gong, Tianmin Shu, Xu Xie, Shu Wang, and Song-Chun Zhu, “Vrkitchen: an interactive 3d virtual environment for task-oriented learning,” arXiv preprint arXiv:1903.05757 , 2019."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "Chengshu Li, Fei Xia, Roberto Martín-Martín, Michael Lingelbach, Sanjana Srivastava, Bokui Shen, Kent Vainio, Cem Gokmen, Gokul Dharan, Tanish Jain, et al., “igibson 2.0: Object-centric simulation for robot learning of everyday household tasks,” arXiv preprint arXiv:2108.03272 , 2021."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "Michael J Black, Priyanka Patel, Joachim Tesch, and Jinlong Yang, “Bedlam: A synthetic dataset of bodies exhibiting detailed lifelike animated motion,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2023, pp. 8726–8737."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "Naijun Liu, Yinghao Cai, Tao Lu, Rui Wang, and Shuo Wang, “Real–sim–real transfer for real-world robot control policy learning with deep reinforcement learning,” Applied Sciences , vol. 10, no. 5, pp. 1555, 2020."
+    }
+  ]
+}

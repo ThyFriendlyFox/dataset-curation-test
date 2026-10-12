@@ -1,0 +1,129 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2311.10517",
+  "title": "Mind the map! Accounting for existing map information when estimating online HDMaps from sensor",
+  "authors": "RÃ©my Sun, Li Yang, Diane Lingrand, FrÃ©dÃ©ric Precioso",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2311.10517",
+  "html_url": "https://arxiv.org/html/2311.10517",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 810,
+  "text": "Autonomous Driving [1,2] represents a complex problem that promises to significantly change how we interact with transportation. While full vehicle automation still seems quite a ways away [3], partially autonomous vehicles now populate a number of road systems in the world [1]. These vehicles need to process a wealth of information to function, from the raw sensor data [4] to elaborate maps of road networks [2,5].\n\nHigh Definition maps (HDMaps), in particular, represent a crucial component of the research on self-driving cars [2,6] (see Fig. 1 for a few simple examples of maps, with road boundaries represented by green polylines, lane dividers by lime polylines and pedestrian crossings by blue polygons). Although maps are not a typical input of neural networks, they contain necessary information to help the car understand the world it must navigate. As such, significant efforts have gone into incorporating this new type of data into solutions [2,7]. These efforts have shown HDMaps’ remarkable benefits both for fundamental problems like Object Detection [8] to precise trajectory forecasting problems [5,7].\n\nThese maps are however expensive to acquire and maintain, requiring precise data acquisition and exacting human labeling [6,9]. There has therefore been a strong push [10,11] to approximate HDMaps from sensor data. Seminal work [12] has proved even rough estimated maps useful for trajectory forecasting.\n\nWhile recent methods like MapTRv2 [13] have become proficient at generating online HDMaps from raw sensors, we feel they overlook very useful and nearly always available data: existing maps. We posit here that outdated or lower quality maps should usually be available and prove to significantly improve the estimated HDMaps as illustrated in Fig. 1. Indeed, even “map-free” models tend to use lower-quality satnav maps [14], and estimated maps could always be available as long as a vehicle went through a place once.\n\nIn this paper, we explore the central postulate that even inaccurate existing maps improve the estimation of HDMaps from raw sensors.After providing some context on our method and the field in Sec. 2, we propose two distinct technical contributions: In Sec. 3, we outline reasonable scenarios under which an inaccurate map can be available along with practical implementations, and in Sec. 4, we propose MapEX, an architecture that can generate HDMaps from sensor data while accounting for existing map information. Finally, we present results in Sec. 5 with experiments on the nuScenes dataset [15].\n\nContributions We detail the following three contributions in this paper:\n\n- • We propose to account for existing map information when estimating online HDMaps from sensor data.\n\n- • We discuss reasonable scenarios under which existing maps are not perfect. We also provide realistic implementations of these scenarios and the code for the nuScenes dataset.\n\n- • We introduce MapEX, a new query based HDMap estimation framework that can incorporate existing map information when estimating an online HDMap from sensors. In particular, we introduce with MapEX both a novel way to incorporate existing map information with non-learnable existing (EX) queries, and a way to ensure the model uses this information by pre-attributing predictions to known ground truth correspondences during training.\n\nImpact We believe these contributions are of substantial interest to the field as:\n\n- • MapEX drastically lowers the bar needed to obtain good and cost-effective map estimations. In one scenario where we use HDMaps with noisy (or “shifted”) map element positions, for instance, MapEX reaches a 84.8% mAP score which is an improvement of 38% over the MapTRv2 detector it is based on. This is also a 8% improvement over the state-of-the-art set by MapNeXt [16] using a foundation model image backbone [17] (vs. our ResNet-50 backbone). As estimated maps become more complex, MapEX will become more and more crucial to good and cost-effective performance.\n\n- • MapEX is the first method to directly integrate an existing map corresponding precisely to the sensor data from the given location (i.e. the input sample) to guide online HDMap estimation. To the best of our knowledge, this is a blind spot of the literature, with previous works only considering geolocalized satellite maps [18], SDMaps [19,20], or trying to retrieve an existing map similar to the sample from a pre-computed database [21]. None of these methods leverage sensor data to correct a flawed existing map.\n\n- • We provide the implementation of existing map scenarios for online HDMap estimation following three realistic scenarios. Our implementations very importantly provide both (flawed) existing HDMaps and the true HDMap for each sample. This is not the case in the existing Trust but Verify [22] map change detection dataset which only provides the existing HDMap and a label as to whether a change has occurred.\n\nMap nomenclature We work on local 30m\\times 60m maps restricted to a sample’s surroundings. True maps are the ground truth maps, existing maps are the maps available as inputs, predicted maps are the maps estimated by a model.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib25",
+      "text": "Kuutti, S., Bowden, R., Jin, Y., Barber, P., Fallah, S.: A survey of deep learning applications to autonomous vehicle control. IEEE Transactions on Intelligent Transportation Systems (2020)"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib12",
+      "text": "Gao, J., Sun, C., Zhao, H., Shen, Y., Anguelov, D., Li, C., Schmid, C.: VectorNet: Encoding HD Maps and Agent Dynamics From Vectorized Representation. In: CVPR (2020)"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib43",
+      "text": "Teng, S., Hu, X., Deng, P., Li, B., Li, Y., Ai, Y., Yang, D., Li, L., Xuanyuan, Z., Zhu, F., Chen, L.: Motion planning for autonomous driving: The state of the art and future perspectives. IEEE Transactions on Intelligent Vehicles (2023)"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib15",
+      "text": "Gu, J., Hu, C., Zhang, T., Chen, X., Wang, Y., Wang, Y., Zhao, H.: Vip3d: End-to-end visual trajectory prediction via 3d agent queries. In: CVPR (2023)"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib30",
+      "text": "Liang, M., Yang, B., Hu, R., Chen, Y., Liao, R., Feng, S., Urtasun, R.: Learning lane graph representations for motion forecasting. In: ICCV (2020)"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib11",
+      "text": "Elghazaly, G., Frank, R., Harvey, S., Safko, S.: High-definition maps: Comprehensive survey, challenges, and future perspectives. IEEE Open Journal of Intelligent Transportation Systems (2023)"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib39",
+      "text": "Park, D., Ryu, H., Yang, Y., Cho, J., Kim, J., Yoon, K.J.: Leveraging future relationship reasoning for vehicle trajectory prediction (frm). In: ICLR (2023)"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib18",
+      "text": "Hausler, S., Garg, S., Chakravarty, P., Shrivastava, S., Vora, A., Milford, M.: Displacing objects: Improving dynamic vehicle detection via visual place recognition under adverse conditions. IROS (2023)"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib22",
+      "text": "Jeong, J., Yoon, J.Y., Lee, H., Darweesh, H., Sung, W.: Tutorial on high-definition map generation for automated driving in urban environments. Sensors (2022)"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib5",
+      "text": "Can, Y.B., Liniger, A., Paudel, D.P., Van Gool, L.: Structured bird’s-eye-view traffic scene understanding from onboard images. In: ICCV (2021)"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib31",
+      "text": "Liao, B., Chen, S., Wang, X., Cheng, T., Zhang, Q., Liu, W., Huang, C.: MapTR: Structured modeling and learning for online vectorized HD map construction. In: ICLR (2023)"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib34",
+      "text": "Liu, Y., Yuantian, Y., Wang, Y., Wang, Y., Zhao, H.: Vectormapnet: End-to-end vectorized hd map learning. In: ICML (2023)"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib32",
+      "text": "Liao, B., Chen, S., Zhang, Y., Jiang, B., Zhang, Q., Liu, W., Huang, C., Wang, X.: Maptrv2: An end-to-end framework for online vectorized hd map construction. arXiv preprint (2023)"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib1",
+      "text": "Learning to drive like a human. https://wayve.ai/thinking/learning-to-drive-like-a-human/ (2019), 2019-04-03"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib4",
+      "text": "Caesar, H., Bankiti, V., Lang, A.H., Vora, S., Liong, V.E., Xu, Q., Krishnan, A., Pan, Y., Baldan, G., Beijbom, O.: nuScenes: A multimodal dataset for autonomous driving. arXiv preprint (2019)"
+    },
+    {
+      "n": 16,
+      "id": "bib.bib29",
+      "text": "Li, T.: Mapnext: Revisiting training and scaling practices for online vectorized hd map construction. arXiv preprint (2024)"
+    },
+    {
+      "n": 17,
+      "id": "bib.bib46",
+      "text": "Wang, W., Dai, J., Chen, Z., Huang, Z., Li, Z., Zhu, X., Hu, X., Lu, T., Lu, L., Li, H., et al.: Internimage: Exploring large-scale vision foundation models with deformable convolutions. In: CVPR (2023)"
+    },
+    {
+      "n": 18,
+      "id": "bib.bib13",
+      "text": "Gao, W., Fu, J., Jing, H., Zheng, N.: Complementing onboard sensors with satellite map: A new perspective for hD map construction. ICRA (2024)"
+    },
+    {
+      "n": 19,
+      "id": "bib.bib2",
+      "text": "Anonymous: P-mapnet: Far-seeing map constructer enhanced by both SDMap and HDMap priors. In: Submitted to ICLR (2023), under review"
+    },
+    {
+      "n": 20,
+      "id": "bib.bib36",
+      "text": "Luo, K.Z., Weng, X., Wang, Y., Wu, S., Li, J., Weinberger, K.Q., Wang, Y., Pavone, M.: Augmenting lane perception and topology understanding with standard definition navigation maps. arXiv preprint (2023)"
+    },
+    {
+      "n": 21,
+      "id": "bib.bib47",
+      "text": "Wu, X., Lau, K., Ferroni, F., Ošep, A., Ramanan, D.: Pix2map: Cross-modal retrieval for inferring street maps from images. In: CVPR (2023)"
+    },
+    {
+      "n": 22,
+      "id": "bib.bib26",
+      "text": "Lambert, J.W., Hays, J.: Trust, but Verify: Cross-modality fusion for hd map change detection. In: NeurIPS Datasets and Benchmarks (2021)"
+    }
+  ]
+}

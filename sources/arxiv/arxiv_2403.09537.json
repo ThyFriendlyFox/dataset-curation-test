@@ -1,0 +1,68 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.09537",
+  "title": "Analyzing and Mitigating (with LLMs) the Security Misconfigurations of Helm Charts from Artifact Hub",
+  "authors": "Francesco Minna, Fabio Massacci, Katja Tuma",
+  "year": "2024",
+  "categories": [
+    "cs.SE"
+  ],
+  "url": "https://arxiv.org/abs/2403.09537",
+  "html_url": "https://arxiv.org/html/2403.09537",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 642,
+  "text": "Kubernetes (K8s) has become the de-facto standard tool to orchestrate container-based applications in the cloud, reported to be used by 64% of organizations in production environments from the 2022 Cloud Native Computing Foundation (CNCF) annual survey [1]. Helm is a package manager which is used to help deploy applications on K8s clusters. It allows defining applications as charts, a set of folders and files that bundle all resources and dependencies needed by an application, reducing the need to manually write and manage K8s YAML files.\n\nThese charts often contain different types of misconfigurations [2,3], and several static analysis tools have been developed to detect them, such as Checkov [4], Datree [5], and KICS [6], to name a few. Based on rule-based policies, these tools analyze Helm charts and K8s YAML files and highlight security risks, such as missing memory limits or an over-privileged security context for a container. Such tools can detect configuration lines in a YAML file, such as the allowPrivilegeEscalation: true option, that would allow a container to escalate privileges during execution, which is considered a bad practice, according to the K8s CIS Benchmarks. However, even if some of these misconfigurations may seem trivial to detect, they are still very present in the wild; additionally, other options, such as wrong network policies, may not be trivial to detect.\n\nFor example, a blog post by Checkov developers describes the number and type of misconfigurations reported by Checkov on several charts [2]. For such misconfigurations, there exist several rule-based policies (e.g., “Prevent containers from escalating privileges” — allow Privilege Escalation: false), that check whether a YAML key is present or not, and eventually its value.\n\nExisting tools have different policies and different configurations may satisfy the same policy; however, most rule-based tools do not suggest or implement any mitigations for the corresponding misconfigurations. On the other hand, Large Language Models (LLM), such as Google Gemini [7] and ChatGPT [8], allow, among other things, to write, understand, and refactor source code. Therefore, we are interested in evaluating whether LLMs could be used to refactor a K8s deployment file by implementing new safer configurations. Since LLMs can generate wrong and inconsistent results, for instance, due to flawed training data sources [9], we are also interested in measuring their reliability to determine whether they can be used to generate secure cloud configurations. Indeed, a recent study has found that LMM-assisted users produced critical security bugs at a rate no greater than 10% more compared to users coding without LLMs [10].\n\nThe goal of this study is to mine and empirically evaluate the security of Helm charts, in terms of misconfigurations, compare the performance of existing tools, and measure to what extent LLMs could be used for removing misconfigurations. In doing so, we plan to investigate what is the general status of charts available on Artifact Hub, for example, in terms of the number of misconfigurations reported. We are also interested in what policies are available by default in each tool, and whether there are unique policies or, in other words, if certain misconfigurations can only be detected by one tool. At the same time, we also want to investigate if and how Large Language Models (LLM) can be used to remove misconfigurations, and whether the implemented mitigations will satisfy the tool policies. By doing so, this study will shed light on the security of Helm charts, existing tools, and whether LLMs can improve it.\n\nThe rest of this registered report is organized as follows. In the next section § 2, we provide some background and related work about Helm Charts security and configuration repair. In § 3, we present our research questions, and in § 4 we present our execution plan to answer such questions. Finally, in § 5 we present some findings from our preliminary study, concluding with the threats to validity § 6.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib8",
+      "text": "CNCF (2022) CNCF. 2022. CNCF 2022 Annual Survey. https://www.cncf.io/reports/cncf-annual-survey-2022/ . Dec. 2023."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib16",
+      "text": "Johnson (2021) Matt Johnson. 2021. Top trends from analyzing the security posture of open-source Helm charts . Technical Report. Bridgecrew. Available on the web at https://bridgecrew.io/blog/open-source-helm-security-research/ ."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib22",
+      "text": "Rahman et al . (2023) Akond Rahman, Shazibul Islam Shamim, Dibyendu Brinto Bose, and Rahul Pandita. 2023. Security Misconfigurations in Open Source Kubernetes Manifests: An Empirical Study. ACM TOSEM 33, 1 (jan 2023), 37 pages. https://doi.org/10.1145/3579639"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib7",
+      "text": "Cloud (2023) Prisma Cloud. 2023. Checkov. https://www.checkov.io. Dec. 2023."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib9",
+      "text": "Datree (2023) Datree. 2023. Datree. https://www.datree.io. Dec. 2023."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "Checkmarx (2023) Checkmarx. 2023. KICS. https://kics.io. Dec. 2023."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib12",
+      "text": "Google (2022) Google. 2022. Gemini - Chat Based AI Tool from Google. https://gemini.google.com. Dec. 2023."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib17",
+      "text": "OpenAI (2022) OpenAI. 2022. ChatGPT. https://chat.openai.com/. Dec. 2023."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib14",
+      "text": "Huang et al . (2023) Lei Huang, Weijiang Yu, Weitao Ma, Weihong Zhong, Zhangyin Feng, Haotian Wang, Qianglong Chen, Weihua Peng, Xiaocheng Feng, Bing Qin, and Ting Liu. 2023. A Survey on Hallucination in Large Language Models: Principles, Taxonomy, Challenges, and Open Questions. arXiv:2311.05232 [cs.CL]"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib25",
+      "text": "Sandoval et al . (2023) Gustavo Sandoval, Hammond Pearce, Teo Nys, Ramesh Karri, Siddharth Garg, and Brendan Dolan-Gavitt. 2023. Lost at C: A User Study on the Security Implications of Large Language Model Code Assistants. In 32nd USENIX Security Symposium (USENIX Security 23) . USENIX Association, Anaheim, CA, 2205–2222. https://www.usenix.org/conference/usenixsecurity23/presentation/sandoval"
+    }
+  ]
+}

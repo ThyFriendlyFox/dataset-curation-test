@@ -1,0 +1,73 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2308.07233",
+  "title": "A Unifying Generator Loss Function for Generative Adversarial Networks",
+  "authors": "Justin Veiner, Fady Alajaji, Bahman Gharesifard",
+  "year": "2024",
+  "categories": [
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2308.07233",
+  "html_url": "https://arxiv.org/html/2308.07233",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1141,
+  "text": "Generative adversarial networks (GANs), first introduced by Goodfellow et al. in 2014 [1], have a variety of applications in media generation [2], image restoration [3], and data privacy [4]. GANs aim to generate synthetic data that closely resembles the original real data with (unknown) underlying distribution {P_{\\mathbf{x}}}. The GAN is trained such that the distribution of the generated data, {P_{\\mathbf{g}}}, approximates {P_{\\mathbf{x}}} well. More specifically, low-dimensional random noise is fed to a generator neural network G to produce synthetic data. Real data and the generated data are then given to a discriminator neural network D scoring the data between 0 and 1, with a score close to 1 meaning that the discriminator thinks the data belongs to the real dataset. The discriminator and generator play a minimax game, where the aim is to minimize the generator’s loss and maximize the discriminator’s loss.\n\nSince their initial introduction, several variants of GAN have been proposed. Deep convolutional GAN (DCGAN) [5] utilizes the same loss functions as VanillaGAN (the original GAN), combining GANs with convolutional neural networks, which are helpful when applying GANs to image data as they extract visual features from the data. DCGANs are more stable than the baseline model, but can suffer from mode collapse, which occurs when the generator learns that a select number of images can easily fool the discriminator, resulting in the generator only generating those images. Another notable issue with VanillaGAN is the tendency for the generator network’s gradients to vanish. In the early stages of training, the discriminator lacks confidence, assigning generated data values close to zero. Therefore, the objective function tends to zero, resulting in small gradients and a lack of learning. To mitigate this issue, a non-saturating generator loss function was proposed in [1] so that gradients do not vanish early on in training.\n\nIn the original (VanillaGAN) problem setup, the objective function, expressed as a negative sum of two Shannon cross-entropies, is to be minimized by the generator and maximized by the discriminator. It is demonstrated that if the discriminator is fixed to be optimal (i.e., as a maximizer of the objective function), the GAN’s minimax game can be reduced to minimizing the Jensen-Shannon divergence (JSD) between the real and generated data’s probability distributions [1]. An analogous result was proven in [6] for RényiGANs, a dual-objective GAN using distinct discriminator and generator loss functions. More specifically, under a canonical discriminator loss function (as in [1]), and a generator loss function expressed in terms of two Rényi cross-entropies, it is shown that the RényiGAN optimization problem reduces to minimizing the Jensen-Rényi divergence, hence extending VanillaGAN’s result.\n\nNowozin et al. generalized VanillaGAN by formulating a class of loss functions in [7] parametrized by a lower semicontinuous convex function f, devising f -GAN. More specifically, the f -GAN problem consists of minimizing an f -divergence between the true data distribution and the generator distribution via a minimax optimization of a Fenchel conjugate representation of the f -divergence, where the VanillaGAN discriminator’s role (as a binary classifier) is replaced by a variational function estimating the ratio of the true data and generator distributions. The f -GAN loss function may be tedious to derive, as it requires the computation of the Fenchel conjugate of f. It can be shown that f -GAN can interpolate between VanillaGAN and HellingerGAN, among others [7].\n\nMore recently, \\alpha -GAN was presented in [8], where the aim is to derive a class of loss functions parameterized by \\alpha>0, expressed in terms of a class probability estimation (CPE) loss between a real label y\\in\\{0,1\\} and predicted label \\hat{y}\\in[0,1] [8]. The ability to control \\alpha as a hyperparameter is beneficial to be able to apply one system to multiple datasets, as two datasets may be optimal under different \\alpha values. This work was further analyzed in [9] and expanded in [10] by introducing the dual-objective (\\alpha_{D},\\alpha_{G}) -GAN, which allowed for the generator and discriminator loss functions to have a distinct \\alpha parameter with the aim of improving training stability. When \\alpha_{D}=\\alpha_{G}, the \\alpha -GAN optimization reduces to minimizing an Arimoto divergence, as originally derived in [8]. Note that \\alpha -GAN can recover several f -GANs, such as HellingerGAN, VanillaGAN, WassersteinGAN and Total Variation GAN [8]. Furthermore, in their more recent work which unifies [8,9,10], the authors establish, under some conditions, a one-to-one correspondence between CPE loss based GANs (such as \\alpha -GANs) and f -GANs that use a symmetric f -divergence; see [11]. They also prove various generalization and estimation error bounds for (\\alpha_{D},\\alpha_{G}) -GANs and illustrate their ability in mitigating training instability for synthetic Gaussian data as well as the Celeb-A and LSUN Classroom image datasets. The various (\\alpha_{D},\\alpha_{G}) -GAN equilibrium results do not provide an analogous result to the JSD and Jensen-Rényi divergence minimization for the VanillaGAN [1] and RényiGAN [6] problems, respectively, as it does not involve a Jensen-type divergence.\n\nThe main objective of our work is to present a unifying approach that provides an axiomatic framework to encompass several existing GAN generator loss functions so that the GAN optimization can be simplified in terms of a Jensen-type divergence. In particular, our framework classifies the set of \\alpha -parameterized CPE-based loss functions \\mathcal{L}_{\\alpha}, generalizing the \\alpha -loss function in [8,9,10,11]. We then propose \\mathcal{L}_{\\alpha} -GAN, a dual objective GAN that uses a function from this class for the generator, and uses any canonical discriminator loss function that admits the same optimizer as VanillaGAN [1]. We show that under some regularity (convexity/concavity) conditions on \\mathcal{L}_{\\alpha}, the minimax game played with these two loss functions is equivalent to the minimization of a Jensen- f_{\\alpha} -divergence, a Jensen-type divergence and another natural extension of the Jensen-Shannon divergence (in addition to the Jensen-Rényi divergence [6]), where the generating function f_{\\alpha} of the divergence is directly computed from the CPE loss function \\mathcal{L}_{\\alpha}. This result recovers various prior dual-objective GAN equilibrium results, thus unifying them under one parameterized generator loss function. The newly obtained Jensen- f_{\\alpha} -divergence, which is noted to belong to the class of symmetric f -divergences with different generating functions (see Remark 1), is a useful measure of dissimilarity between distributions as it requires a convex function f with a restricted domain given by the interval [0,2] (see Remark 2) in addition to its symmetry and finiteness properties.\n\nThe rest of the paper is organized as follows. In Section 2, we review f -divergence measures and introduce the Jensen- f -divergence as an extension of the Jensen-Shannon divergence. In Section 3, we establish our main result regarding the optimization of our unifying generator loss function (Theorem 1), and show that it can be applied to a large class of known GANs (Lemmas 2 - 4). We conduct experiments in Section 4 by implementing different manifestations of \\mathcal{L}_{\\alpha} -GAN on three datasets, MNIST, CIFAR-10 and Stacked MNIST. Finally, we conclude the paper in Section 5.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib10",
+      "text": "Ian Goodfellow, Jean Pouget-Abadie, Mehdi Mirza, Bing Xu, David Warde-Farley, Sherjil Ozair, Aaron Courville, and Yoshua Bengio. Generative adversarial nets. In Z. Ghahramani, M. Welling, C. Cortes, N. Lawrence, and K.Q. Weinberger, editors, Advances in Neural Information Processing Systems , volume 27, pages 2672–2680. Curran Associates, Inc., 2014."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib21",
+      "text": "Yong-Hoon Kwon and Min-Gyu Park. Predicting future frames using retrospective cycle GAN. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , June 2019."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib29",
+      "text": "Xingang Pan, Xiaohang Zhan, Bo Dai, Dahua Lin, Chen Change Loy, and Ping Luo. Exploiting deep generative prior for versatile image restoration and manipulation. IEEE Transactions on Pattern Analysis and Machine Intelligence , 44(11):7474–7489, 2021."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib14",
+      "text": "James Jordon, Jinsung Yoon, and Mihaela Van Der Schaar. PATE-GAN: Generating synthetic data with differential privacy guarantees. In Proceedings of the International Conference on Learning Representations , 2018."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib30",
+      "text": "Alec Radford, Luke Metz, and Soumith Chintala. Unsupervised representation learning with deep convolutional generative adversarial networks. In Proceedings of the 9th International Conference on Image and Graphics , pages 97–108, 2017."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib5",
+      "text": "Himesh Bhatia, William Paul, Fady Alajaji, Bahman Gharesifard, and Philippe Burlina. Least k k th-order and Rényi generative adversarial networks. Neural Computation , 33(9):2473–2510, 2021."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib27",
+      "text": "Sebastian Nowozin, Botond Cseke, and Ryota Tomioka. f-gan: Training generative neural samplers using variational divergence minimization. Advances in Neural Information Processing Systems , 29, 2016."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib19",
+      "text": "Gowtham R Kurri, Tyler Sypherd, and Lalitha Sankar. Realizing GANs via a tunable loss function. In Proceedings of the IEEE Information Theory Workshop (ITW) , pages 1–6, 2021."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib20",
+      "text": "Gowtham R Kurri, Monica Welfert, Tyler Sypherd, and Lalitha Sankar. α \\alpha -GAN: Convergence and estimation guarantees. In Proceedings of the IEEE International Symposium on Information Theory (ISIT) , pages 276–281, 2022."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib35",
+      "text": "Monica Welfert, Kyle Otstot, Gowtham R Kurri, and Lalitha Sankar. ( α D , α G ) (\\alpha_{D},\\alpha_{G}) -GANs: Addressing GAN training instabilities via dual objectives. In Proceedings of the IEEE International Symposium on Information Theory (ISIT) , 2023."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib34",
+      "text": "Monica Welfert, Gowtham R. Kurri, Kyle Otstot, and Lalitha Sankar. Addressing GAN training instabilities via tunable classification losses, 2023."
+    }
+  ]
+}

@@ -1,0 +1,108 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2310.00164",
+  "title": "PRIME: Prioritizing Interpretability in Failure Mode Extraction",
+  "authors": "Keivan Rezaei, Mehrdad Saberi, Mazda Moayeri, Soheil Feizi",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2310.00164",
+  "html_url": "https://arxiv.org/html/2310.00164",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 959,
+  "text": "A plethora of reasons (spurious correlations, imbalanced data, corrupted inputs, etc.) may lead a model to underperform on a specific subpopulation; we term this a failure mode. Failure modes are challenging to identify due to the black-box nature of deep models, and further, they are often obfuscated by common metrics like overall accuracy, leading to a false sense of security. However, these failures can have significant real-world consequences, such as perpetuating algorithmic bias [1] or unexpected catastrophic failure under distribution shift. Thus, the discovery and description of failure modes is crucial in building reliable AI, as we cannot fix a problem without first diagnosing it.\n\nDetection of failure modes or biases within trained models has been studied in the literature. Prior work [2,3] requires humans in the loop to get a sense of biases or subpopulations on which a model underperforms. Some other methods [4,5,6,7] do the process of capturing and intervening in hard inputs without providing human-understandable descriptions for challenging subpopulations. Providing human-understandable and interpretable descriptions for failure modes not only enables humans to easily understand hard subpopulations, but enables the use of text-to-image methods [8,9,10,11] to generate relevant images corresponding to failure modes to improve model’s accuracy over them.\n\nRecent work [12,13,14,15] takes an important step in improving failure mode diagnosis by additionally finding natural language descriptions of detected failure modes, namely via leveraging modern vision-language models. These methodologies leverage the shared vision-language latent space, discerning intricate clusters or directions within this space, and subsequently attributing human-comprehensible descriptions to them. However, questions have been raised regarding the quality of the generated descriptions, i.e., there is a need to ascertain whether the captions produced genuinely correspond to the images within the identified subpopulation. Additionally, it is essential to determine whether these images convey shared semantic attributes that can be effectively articulated through textual descriptions.\n\nIn this work, we investigate whether or not the latent representation space is a good proxy for semantic space. In fact, we consider two attributed datasets: CelebA [16] and CUB-200 [17] and observe that two samples sharing many semantic attributes may indeed lie far away in latent space, while nearby instances may not share any semantics (see Section 5.2). Hence, existing methods may suffer from relying on representation space as clusters and directions found in this space may contain images with different semantic attributes leading to less coherent descriptions.\n\nInspired by this observation and the significance of faithful descriptions, we propose PRIME. In this method, we suggest to reverse the prevailing paradigm in failure mode diagnosis. That is, we put interpretability first. In our method, we start by obtaining human-understandable concepts (tags) of images using a pre-trained tagging model and examine model’s behavior conditioning on the presence or absence of a combination of those tags. In particular, we consider different groups of tags and check whether (1) there is a significant drop in model’s accuracy over images that represent all tags in the group and (2) that group is minimal, i.e., images having only some of those tags are easier images for the model. When a group of tags satisfies both of these conditions, we identify it as a failure mode which can be effectively described by these tags. Figure 2 shows the overview of our approach and compares it with existing methods.\n\nAs an example, by running PRIME on a trained model over Living17, we realize that images where a black ape is hanging from a tree branch identify a hard subpopulation such that model’s accuracy drops from 86.23\\% to 41.88\\%. Crucially, presence of all 3 of these tags is necessary, i.e., when we consider images that have 1 or 2 of these 3 tags, the accuracy of model is higher. Figure 3 illustrates these failure modes. We further study the effect of number of tags in Section 5.1.\n\nTo further validate our method, we examine data unseen during the computation of our failure mode descriptions. We observe that the images that match a failure mode lead the model to similarly struggle. That is, we demonstrate generalizability of our failure modes, crucially, directly from the succinct text descriptions. While reflecting the quality of our descriptions, this allows for bringing in generative models. We validate this claim by generating hard images using some of the failure mode’s descriptions and compare the accuracy of model on them with some other generated images that correspond to easier subpopulations.\n\nFinally, we show that PRIME produces better descriptions for detected failure modes in terms of similarity, coherency, and specificity of descriptions, compared to prior work that does not prioritize interpretability. Evaluating description quality is challenging and typically requires human assessment, which can be impractical for extensive studies. To mitigate that, inspired by CLIPScore [18], we present a suite of three automated metrics that harness vision-language models to evaluate the quality. These metrics quantify both the intra-group image-description similarity and coherency, while also assessing the specificity of descriptions to ensure they are confined to the designated image groups. We mainly observe that due to putting interpretability first and considering different combinations of tags (concepts), we observe improvements in the quality of generated descriptions. We discuss PRIME ’s limitations in Appendix A.1.\n\nSummary of Contribution.\n\n- 1. We propose PRIME to extract and explain failure modes of a model in human-understandable terms by prioritizing interpretability.\n\n- 2. Using a suite of three automated metrics to evaluate the quality of generated descriptions, we observe improvements in our method compared to strong baselines such as [12] and [13] on various datasets.\n\n- 3. We advocate for the concept of putting interpretability first by providing empirical evidence derived from latent space analysis, suggesting that distance in latent space may at times be a misleading measure of semantic similarity for explaining model failure modes.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib2",
+      "text": "Buolamwini & Gebru (2018) Joy Buolamwini and Timnit Gebru. Gender shades: Intersectional accuracy disparities in commercial gender classification. In Conference on fairness, accountability and transparency , pp. 77–91. PMLR, 2018."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib39",
+      "text": "Tsipras et al. (2020) Dimitris Tsipras, Shibani Santurkar, Logan Engstrom, Andrew Ilyas, and Aleksander Madry. From imagenet to image classification: Contextualizing progress on benchmarks. In International Conference on Machine Learning , pp. 9625–9635. PMLR, 2020."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib40",
+      "text": "Vasudevan et al. (2022) Vijay Vasudevan, Benjamin Caine, Raphael Gontijo Lopes, Sara Fridovich-Keil, and Rebecca Roelofs. When does dough become a bagel? analyzing the remaining mistakes on imagenet. Advances in Neural Information Processing Systems , 35:6720–6734, 2022."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib38",
+      "text": "Sohoni et al. (2020b) Nimit Sohoni, Jared Dunnmon, Geoffrey Angus, Albert Gu, and Christopher Ré. No subclass left behind: Fine-grained robustness in coarse-grained classification problems. Advances in Neural Information Processing Systems , 33:19339–19352, 2020b."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib26",
+      "text": "Nam et al. (2020) Junhyun Nam, Hyuntak Cha, Sungsoo Ahn, Jaeho Lee, and Jinwoo Shin. Learning from failure: De-biasing classifier from biased classifier. Advances in Neural Information Processing Systems , 33:20673–20684, 2020."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib19",
+      "text": "Kim et al. (2019) Michael P Kim, Amirata Ghorbani, and James Zou. Multiaccuracy: Black-box post-processing for fairness in classification. In Proceedings of the 2019 AAAI/ACM Conference on AI, Ethics, and Society , pp. 247–254, 2019."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib23",
+      "text": "Liu et al. (2021) Evan Z Liu, Behzad Haghgoo, Annie S Chen, Aditi Raghunathan, Pang Wei Koh, Shiori Sagawa, Percy Liang, and Chelsea Finn. Just train twice: Improving group robustness without training group information. In International Conference on Machine Learning , pp. 6781–6792. PMLR, 2021."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib31",
+      "text": "Ramesh et al. (2022) Aditya Ramesh, Prafulla Dhariwal, Alex Nichol, Casey Chu, and Mark Chen. Hierarchical text-conditional image generation with clip latents. arXiv preprint arXiv:2204.06125 , 1(2):3, 2022."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib32",
+      "text": "Rombach et al. (2022) Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, and Björn Ommer. High-resolution image synthesis with latent diffusion models. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pp. 10684–10695, 2022."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib34",
+      "text": "Saharia et al. (2022) Chitwan Saharia, William Chan, Saurabh Saxena, Lala Li, Jay Whang, Emily L Denton, Kamyar Ghasemipour, Raphael Gontijo Lopes, Burcu Karagol Ayan, Tim Salimans, et al. Photorealistic text-to-image diffusion models with deep language understanding. Advances in Neural Information Processing Systems , 35:36479–36494, 2022."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib18",
+      "text": "Kattakinda et al. (2022) Priyatham Kattakinda, Alexander Levine, and Soheil Feizi. Invariant learning via diffusion dreamed distribution shifts. arXiv preprint arXiv:2211.10370 , 2022."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib7",
+      "text": "Eyuboglu et al. (2022) Sabri Eyuboglu, Maya Varma, Khaled Saab, Jean-Benoit Delbrouck, Christopher Lee-Messer, Jared Dunnmon, James Zou, and Christopher Ré. Domino: Discovering systematic errors with cross-modal embeddings, 2022."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib16",
+      "text": "Jain et al. (2022) Saachi Jain, Hannah Lawrence, Ankur Moitra, and Aleksander Madry. Distilling model failures as directions in latent space, 2022."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib20",
+      "text": "Kim et al. (2023) Younghyun Kim, Sangwoo Mo, Minkyu Kim, Kyungmin Lee, Jaeho Lee, and Jinwoo Shin. Bias-to-text: Debiasing unknown visual biases through language interpretation, 2023."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib5",
+      "text": "d’Eon et al. (2021) Greg d’Eon, Jason d’Eon, James R. Wright, and Kevin Leyton-Brown. The spotlight: A general method for discovering systematic errors in deep learning models, 2021."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib24",
+      "text": "Liu et al. (2015) Ziwei Liu, Ping Luo, Xiaogang Wang, and Xiaoou Tang. Deep learning face attributes in the wild. In Proceedings of International Conference on Computer Vision (ICCV) , December 2015."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib42",
+      "text": "Wah et al. (2011) C. Wah, S. Branson, P. Welinder, P. Perona, and S. Belongie. Caltech-ucsd birds-200-2011 (cub-200-2011). Technical Report CNS-TR-2011-001, California Institute of Technology, 2011."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib11",
+      "text": "Hessel et al. (2021) Jack Hessel, Ari Holtzman, Maxwell Forbes, Ronan Le Bras, and Yejin Choi. Clipscore: A reference-free evaluation metric for image captioning. ArXiv , abs/2104.08718, 2021. URL https://api.semanticscholar.org/CorpusID:233296711 ."
+    }
+  ]
+}

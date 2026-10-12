@@ -1,0 +1,90 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.06754",
+  "title": "ALaRM: Align Language Models via Hierarchical Rewards Modeling",
+  "authors": "Yuhang Lai, Siyuan Wang, Shujun Liu, Xuanjing Huang, Zhongyu Wei",
+  "year": "2024",
+  "categories": [
+    "cs.CL",
+    "cs.AI",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2403.06754",
+  "html_url": "https://arxiv.org/html/2403.06754",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 659,
+  "text": "Current LLM-assisted AI systems have shown remarkable performance in a wide range of tasks [1,2,3,4], and benefit from different forms of human supervision signals [5,6]. While supervised learning relies on human-written demonstrations to unlock the emergent abilities gained from pretraining on huge text and code corpora, RLHF utilizes generation comparisons labeled by humans to further fine-tune the LLMs for better alignment with human expectations, which has been demonstrated to be able to reduce undesired model generations like harmful contents [7] or hallucinations [8].\n\nHowever, human oversight capabilities are finite. As recent LLMs are capable of doing more complex work and even surpass human performance in some areas, it becomes more difficult to write good enough demonstrations even for human experts [9]. Comparisons between several model generations can be intuitively easier to get from a crowd-sourcing platform though, previous research [10,11] has revealed that human annotations can be inconsistent and unreliable in evaluations between two or more model outputs for complex tasks like long text generations, producing unstable rewards in RLHF. While stable rewards are the key to successful reinforcement learning, the sparsity nature of current holistic rewards further stresses this challenge [12]. Moreover, various scenarios hidden behind the tasks can differentiate preference standards [13], thus degrading the annotation consistency and value alignment on downstream applications, e.g., concise vs. comprehensive summary in text summarization, and literary vs. technical style in machine translation. Then we ask the question, how to get reliable and scalable supervision signals within limited human oversight capabilities?\n\nTo take an initial step towards addressing this issue, we introduce a new framework ALaRM hierarchically modeling both holistic and aspect-specific rewards, which is motivated by 1) fine-grained RLHF [11] that categorizes different error types for more accurate and easier annotation, 2) task decomposition in hierarchical reinforcement learning [14] that helps to overcome sparse rewards. At the core of our framework is to seek stronger supervision signals: As shown in Figure 1, solely using the holistic reward can make it difficult to reach the shadowed \"superior area\" which represents better alignment with human preference. Thus we employ multiple rewards combined in a hierarchical way to stabilize the optimization direction for more accurate and consistent guidance into the superior area. Firstly, we list several aspect-specific rewards corresponding to the task and perform the selection by their inconsistency with the holistic reward in pairwise comparisons. Later in the RLHF training process, the chosen rewards are combined with the holistic reward as a whole once the sampled generation receives a high holistic reward, which is above a certain threshold value. The aspect-specific rewards can either come from reward models trained on comparison datasets annotated along a specific dimension (e.g., honesty) or simply be toolkit-calculated metrics (e.g., token count), with an arbitrary density at either the token level or the sequence level. In addition, we proactively transform the aspect-specific rewards to guarantee that their cumulative values are positive, thereby motivating the policy to surpass the threshold for higher returns, which enriches the effectiveness of the hierarchical structure.\n\nWe apply our framework to two text generation tasks: long-form question answering (QA) and machine translation (MT). Long-form QA represents difficult annotations for complex tasks, and MT represents more flexible and various preference standards behind the tasks. For each of them, we employ gpt-3.5-turbo as the evaluator for pairwise comparisons. We empirically demonstrate that our framework outperforms the compared baselines. The ablation studies and corresponding analyses further show that our framework effectively provides stronger supervision signals toward human preference in both scenarios.\n\nCollectively, we highlight our contributions as follows: 1) To our knowledge, we are the first to propose a framework that hierarchically models both holistic and aspect-specific rewards in RLHF, 2) we investigate how to perform reward selection to mitigate rewards conflicting, 3) we demonstrate the effectiveness of ALaRM as pursuing more accurate and consistent supervision signals on two text generation tasks through comprehensive ablation studies and analyses, shedding light on its potential for scalable oversight.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib5",
+      "text": "Brown et al. (2020) Tom Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared D Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, Sandhini Agarwal, Ariel Herbert-Voss, Gretchen Krueger, Tom Henighan, Rewon Child, Aditya Ramesh, Daniel Ziegler, Jeffrey Wu, Clemens Winter, Chris Hesse, Mark Chen, Eric Sigler, Mateusz Litwin, Scott Gray, Benjamin Chess, Jack Clark, Christopher Berner, Sam McCandlish, Alec Radford, Ilya Sutskever, and Dario Amodei. 2020. Language models are few-shot learners . In Advances in Neural Information Processing Systems , volume 33, pages 1877–1901. Curran Associates, Inc."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib9",
+      "text": "Chen et al. (2021) Mark Chen, Jerry Tworek, Heewoo Jun, Qiming Yuan, Henrique Ponde de Oliveira Pinto, Jared Kaplan, Harri Edwards, Yuri Burda, Nicholas Joseph, Greg Brockman, Alex Ray, Raul Puri, Gretchen Krueger, Michael Petrov, Heidy Khlaaf, Girish Sastry, Pamela Mishkin, Brooke Chan, Scott Gray, Nick Ryder, Mikhail Pavlov, Alethea Power, Lukasz Kaiser, Mohammad Bavarian, Clemens Winter, Philippe Tillet, Felipe Petroski Such, Dave Cummings, Matthias Plappert, Fotios Chantzis, Elizabeth Barnes, Ariel Herbert-Voss, William Hebgen Guss, Alex Nichol, Alex Paino, Nikolas Tezak, Jie Tang, Igor Babuschkin, Suchir Balaji, Shantanu Jain, William Saunders, Christopher Hesse, Andrew N. Carr, Jan Leike, Josh Achiam, Vedant Misra, Evan Morikawa, Alec Radford, Matthew Knight, Miles Brundage, Mira Murati, Katie Mayer, Peter Welinder, Bob McGrew, Dario Amodei, Sam McCandlish, Ilya Sutskever, and Wojciech Zaremba. 2021. Evaluating large language models trained on code ."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib40",
+      "text": "Touvron et al. (2023) Hugo Touvron, Louis Martin, Kevin Stone, Peter Albert, Amjad Almahairi, Yasmine Babaei, Nikolay Bashlykov, Soumya Batra, Prajjwal Bhargava, Shruti Bhosale, Dan Bikel, Lukas Blecher, Cristian Canton Ferrer, Moya Chen, Guillem Cucurull, David Esiobu, Jude Fernandes, Jeremy Fu, Wenyin Fu, Brian Fuller, Cynthia Gao, Vedanuj Goswami, Naman Goyal, Anthony Hartshorn, Saghar Hosseini, Rui Hou, Hakan Inan, Marcin Kardas, Viktor Kerkez, Madian Khabsa, Isabel Kloumann, Artem Korenev, Punit Singh Koura, Marie-Anne Lachaux, Thibaut Lavril, Jenya Lee, Diana Liskovich, Yinghai Lu, Yuning Mao, Xavier Martinet, Todor Mihaylov, Pushkar Mishra, Igor Molybog, Yixin Nie, Andrew Poulton, Jeremy Reizenstein, Rashi Rungta, Kalyan Saladi, Alan Schelten, Ruan Silva, Eric Michael Smith, Ranjan Subramanian, Xiaoqing Ellen Tan, Binh Tang, Ross Taylor, Adina Williams, Jian Xiang Kuan, Puxin Xu, Zheng Yan, Iliyan Zarov, Yuchen Zhang, Angela Fan, Melanie Kambadur, Sharan Narang, Aurelien Rodriguez, Robert Stojnic, Sergey Edunov, and Thomas Scialom. 2023. Llama 2: Open foundation and fine-tuned chat models ."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib41",
+      "text": "Wang et al. (2023a) Lei Wang, Chen Ma, Xueyang Feng, Zeyu Zhang, Hao Yang, Jingsen Zhang, Zhiyuan Chen, Jiakai Tang, Xu Chen, Yankai Lin, Wayne Xin Zhao, Zhewei Wei, and Ji-Rong Wen. 2023a. A survey on large language model based autonomous agents ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib45",
+      "text": "Wei et al. (2022) Jason Wei, Maarten Bosma, Vincent Zhao, Kelvin Guu, Adams Wei Yu, Brian Lester, Nan Du, Andrew M. Dai, and Quoc V Le. 2022. Finetuned language models are zero-shot learners . In International Conference on Learning Representations ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib37",
+      "text": "Stiennon et al. (2020) Nisan Stiennon, Long Ouyang, Jeffrey Wu, Daniel Ziegler, Ryan Lowe, Chelsea Voss, Alec Radford, Dario Amodei, and Paul F Christiano. 2020. Learning to summarize with human feedback . In Advances in Neural Information Processing Systems , volume 33, pages 3008–3021. Curran Associates, Inc."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib2",
+      "text": "Bai et al. (2022) Yuntao Bai, Andy Jones, Kamal Ndousse, Amanda Askell, Anna Chen, Nova DasSarma, Dawn Drain, Stanislav Fort, Deep Ganguli, Tom Henighan, Nicholas Joseph, Saurav Kadavath, Jackson Kernion, Tom Conerly, Sheer El-Showk, Nelson Elhage, Zac Hatfield-Dodds, Danny Hernandez, Tristan Hume, Scott Johnston, Shauna Kravec, Liane Lovitt, Neel Nanda, Catherine Olsson, Dario Amodei, Tom Brown, Jack Clark, Sam McCandlish, Chris Olah, Ben Mann, and Jared Kaplan. 2022. Training a helpful and harmless assistant with reinforcement learning from human feedback ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib28",
+      "text": "Ouyang et al. (2022) Long Ouyang, Jeffrey Wu, Xu Jiang, Diogo Almeida, Carroll Wainwright, Pamela Mishkin, Chong Zhang, Sandhini Agarwal, Katarina Slama, Alex Ray, John Schulman, Jacob Hilton, Fraser Kelton, Luke Miller, Maddie Simens, Amanda Askell, Peter Welinder, Paul F Christiano, Jan Leike, and Ryan Lowe. 2022. Training language models to follow instructions with human feedback . In Advances in Neural Information Processing Systems , volume 35, pages 27730–27744. Curran Associates, Inc."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib22",
+      "text": "Lai et al. (2023) Yuhang Lai, Chengxi Li, Yiming Wang, Tianyi Zhang, Ruiqi Zhong, Luke Zettlemoyer, Wen-Tau Yih, Daniel Fried, Sida Wang, and Tao Yu. 2023. DS-1000: A natural and reliable benchmark for data science code generation . In Proceedings of the 40th International Conference on Machine Learning , volume 202 of Proceedings of Machine Learning Research , pages 18319–18345. PMLR."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib20",
+      "text": "Krishna et al. (2023) Kalpesh Krishna, Erin Bransom, Bailey Kuehl, Mohit Iyyer, Pradeep Dasigi, Arman Cohan, and Kyle Lo. 2023. LongEval: Guidelines for human evaluation of faithfulness in long-form summarization . In Proceedings of the 17th Conference of the European Chapter of the Association for Computational Linguistics , pages 1650–1669, Dubrovnik, Croatia. Association for Computational Linguistics."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib47",
+      "text": "Wu et al. (2023) Zeqiu Wu, Yushi Hu, Weijia Shi, Nouha Dziri, Alane Suhr, Prithviraj Ammanabrolu, Noah A Smith, Mari Ostendorf, and Hannaneh Hajishirzi. 2023. Fine-grained human feedback gives better rewards for language model training . In Advances in Neural Information Processing Systems , volume 36, pages 59008–59033. Curran Associates, Inc."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib8",
+      "text": "Cao et al. (2024) Meng Cao, Lei Shu, Lei Yu, Yun Zhu, Nevan Wichers, Yinxiao Liu, and Lei Meng. 2024. Drlc: Reinforcement learning with dense rewards from llm critic ."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib19",
+      "text": "Jang et al. (2023) Joel Jang, Seungone Kim, Bill Yuchen Lin, Yizhong Wang, Jack Hessel, Luke Zettlemoyer, Hannaneh Hajishirzi, Yejin Choi, and Prithviraj Ammanabrolu. 2023. Personalized soups: Personalized large language model alignment via post-hoc parameter merging ."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib29",
+      "text": "Pateria et al. (2021) Shubham Pateria, Budhitama Subagdja, Ah-hwee Tan, and Chai Quek. 2021. Hierarchical reinforcement learning: A comprehensive survey . ACM Comput. Surv. , 54(5)."
+    }
+  ]
+}

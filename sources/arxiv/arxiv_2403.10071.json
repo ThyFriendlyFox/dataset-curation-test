@@ -1,0 +1,133 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.10071",
+  "title": "Codebook Transfer with Part-of-Speech for Vector-Quantized Image Modeling",
+  "authors": "Baoquan Zhang, Huaibin Wang, Luo Chuyao, Xutao Li, Liang Guotao, Yunming Ye, Xiaochen Qi, Yao He",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2403.10071",
+  "html_url": "https://arxiv.org/html/2403.10071",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 774,
+  "text": "With the development of multi-modal learning on representation and generation, unifying all modality with transformer has attracted increasing interest on computer vision and multi-modal domains [1,2,3]. It is well-known that transformer [4] is proposed for modeling discrete token sequence data like text, which is very difficult to directly apply on continuous image data. To address this problem, Vector-Quantized Image Modeling (VQIM) is proposed and has received wide attention recently. VQIM, as a fundamental problem in machine learning, aims to encode an image with a discrete token sequence similar to texts [5,6].\n\nExisting studies [5,7,8,9,10] effectively address this VQIM problem by learning a discrete codebook from scratch and in a code-independent manner to quantize continuous feature representation into a discrete token sequence. For example, in [5], Oord et al. propose an encoder-decoder network (called VQ-VAE) to learn and quantize a latent feature space by selecting its nearest neighbor in the codebook as the discrete vector (i.e., token) and training the VQ-VAE model by a simple reconstruction loss. Esser et al. [7] further enhance the VQ-VAE by additionally introducing an adversarial loss. Although these methods have shown superior performance on VQIM, they suffer from a codebook collapse issue [11], i.e., only a few code vectors perform optimization during training, whereas a majority of them are never updated (i.e., “die off”). This limits the VQIM performance in these existing methods. To address this codebook collapse issue, recently, some new VQIM techniques are developed from the perspective of codebook update [12,13,14,9], quantization [15,16,17], or regularization [8] for robust codebook learning.\n\nIn this paper, we also focus on robust codebook learning but present a new perspective (i.e., codebook transfer) for alleviating codebook collapse. Our insight is that neglecting the relationship between code vectors and codebook priors to learn a discrete codebook from scratch is actually very difficult, which may be a key reason causing codebook collapse, i.e., some code vectors can rarely be optimized without regard to the relationship between codes and good codebook priors such that die off finally. Inspired by recent pretrained language models [18,19,20], we find that some superior codebooks have been well pretrained in some models (e.g., CLIP [20] and GloVe [21]) and these code vectors in the codebook are not fully independent, which contains abundant transferable relationships between codes from language to vision [22,23]. For example, as shown in Figure 1, 1) the vision-similar “orange” and “yellow” are indeed closer than vision-dissimilar “yellow” and “blue” in adjective codebook space; and 2) two parts (“breast” and “belly”) with similar vision are also closer than “belly” and “wheel” with dissimilar vision in noun codebook space. Resorting to such transferable relationships, VQIM codebook can be well learned by code cooperative optimization for alleviating the codebook collapse, e.g., although the ”orange” code is not selected to optimize, but its code vector can also be well learned by resorting to its relationship with the ”yellow” code (see Figure 3 for more details).\n\nBased on this idea, we propose a novel codebook transfer framework with part-of-speech, which transfers the abundant semantic knowledge of codebook from pretrained language models in order to enhance VQIM codebook learning, called VQCT. Specifically, we first introduce a pretrained language model and part-of-speech knowledge (e.g., WordNet) as priors. Then, we construct a set of vision-related codebook (i.e., adjective and noun codebooks) from the pretrained codebook of language models by filtering out vision-unrelated tokens according to their part-of-speech. Finally, a novel graph convolution-based codebook transfer networks is designed to model the VQIM codebook in a transfer mapping manner from language to vision, which aims to resort to the abundant knowledge from pretrained codebooks to enhance the VQIM codebook learning. The advantage of such design is that 1) the abundant knowledge from well-pretrained codebooks can be fully exploited for providing good codebook priors; and 2) our codebook is generative but not directly learnable such that the semantic relationships between codes can be fully exploited for achieving cooperative optimization between codes.\n\nOur main contributions can be summarized as follows:\n\n- • We propose a new perspective, i.e., codebook transfer from language models to VQIM, to alleviate the codebook collapse issue. Its advantage is that the abundant transferable relationships from language codebooks can be fully exploited for enhancing codebook learning.\n\n- • Resorting to part-of-speech knowledge, we construct a set of vision-related codebooks (i.e., adjective and noun codebooks) and design a novel graph convolution-based codebook transfer network. In particular, our codebook is generative rather than directly optimized. Its advantage is that cooperative optimization between codes can be achieved for alleviating codebook collapse issue.\n\n- • We conduct comprehensive experiments on four datasets, which verify the effectiveness of our VQCT method.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib9",
+      "text": "Rohit Girdhar, Alaaeldin El-Nouby, Zhuang Liu, Mannat Singh, Kalyan Vasudev Alwala, Armand Joulin, and Ishan Misra. Imagebind: One embedding space to bind them all. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 15180–15190, 2023."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib41",
+      "text": "Deyao Zhu, Jun Chen, Xiaoqian Shen, Xiang Li, and Mohamed Elhoseiny. Minigpt-4: Enhancing vision-language understanding with advanced large language models. arXiv preprint arXiv:2304.10592 , 2023."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib37",
+      "text": "Renrui Zhang, Jiaming Han, Aojun Zhou, Xiangfei Hu, Shilin Yan, Pan Lu, Hongsheng Li, Peng Gao, and Yu Qiao. Llama-adapter: Efficient fine-tuning of language models with zero-init attention. arXiv preprint arXiv:2303.16199 , 2023b."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib28",
+      "text": "Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N Gomez, Łukasz Kaiser, and Illia Polosukhin. Attention is all you need. Advances in neural information processing systems , 30, 2017."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib27",
+      "text": "Aaron Van Den Oord, Oriol Vinyals, et al. Neural discrete representation learning. Advances in neural information processing systems , 30, 2017."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib20",
+      "text": "Jialun Peng, Dong Liu, Songcen Xu, and Houqiang Li. Generating diverse structure for image inpainting with hierarchical vq-vae. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 10775–10784, 2021."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "Patrick Esser, Robin Rombach, and Bjorn Ommer. Taming transformers for high-resolution image synthesis. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 12873–12883, 2021."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib36",
+      "text": "Jiahui Zhang, Fangneng Zhan, Christian Theobalt, and Shijian Lu. Regularized vector quantization for tokenized image synthesis. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 18467–18476, 2023a."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib38",
+      "text": "Chuanxia Zheng and Andrea Vedaldi. Online clustered codebook. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 22798–22807, 2023."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib5",
+      "text": "Ming Ding, Zhuoyi Yang, Wenyi Hong, Wendi Zheng, Chang Zhou, Da Yin, Junyang Lin, Xu Zou, Zhou Shao, Hongxia Yang, et al. Cogview: Mastering text-to-image generation via transformers. Advances in Neural Information Processing Systems , 34:19822–19835, 2021."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib25",
+      "text": "Aurko Roy, Ashish Vaswani, Arvind Neelakantan, and Niki Parmar. Theory and experiments on vector quantized autoencoders. arXiv preprint arXiv:1805.11063 , 2018."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib24",
+      "text": "Ali Razavi, Aaron Van den Oord, and Oriol Vinyals. Generating diverse high-fidelity images with vq-vae-2. Advances in neural information processing systems , 32, 2019."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib31",
+      "text": "Will Williams, Sam Ringer, Tom Ash, David MacLeod, Jamie Dougherty, and John Hughes. Hierarchical quantized autoencoders. Advances in Neural Information Processing Systems , 33:4524–4535, 2020."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib4",
+      "text": "Prafulla Dhariwal, Heewoo Jun, Christine Payne, Jong Wook Kim, Alec Radford, and Ilya Sutskever. Jukebox: A generative model for music. arXiv preprint arXiv:2005.00341 , 2020."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib1",
+      "text": "Alexei Baevski, Steffen Schneider, and Michael Auli. vq-wav2vec: Self-supervised learning of discrete speech representations. arXiv preprint arXiv:1910.05453 , 2019."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib26",
+      "text": "Yuhta Takida, Takashi Shibuya, WeiHsiang Liao, Chieh-Hsin Lai, Junki Ohmura, Toshimitsu Uesaka, Naoki Murata, Shusuke Takahashi, Toshiyuki Kumakura, and Yuki Mitsufuji. Sq-vae: Variational bayes on discrete representation with self-annealed stochastic quantization. arXiv preprint arXiv:2205.07547 , 2022."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib29",
+      "text": "Tung-Long Vuong, Trung Le, He Zhao, Chuanxia Zheng, Mehrtash Harandi, Jianfei Cai, and Dinh Phung. Vector quantized wasserstein auto-encoder. arXiv preprint arXiv:2302.05917 , 2023."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib14",
+      "text": "Jacob Devlin Ming-Wei Chang Kenton and Lee Kristina Toutanova. Bert: Pre-training of deep bidirectional transformers for language understanding. In Proceedings of naacL-HLT , page 2, 2019."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib22",
+      "text": "Alec Radford, Jeffrey Wu, Rewon Child, David Luan, Dario Amodei, Ilya Sutskever, et al. Language models are unsupervised multitask learners. OpenAI blog , 1(8):9, 2019."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib23",
+      "text": "Alec Radford, Jong Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry, Amanda Askell, Pamela Mishkin, Jack Clark, et al. Learning transferable visual models from natural language supervision. In International conference on machine learning , pages 8748–8763. PMLR, 2021."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "Jeffrey Pennington, Richard Socher, and Christopher D Manning. Glove: Global vectors for word representation. In Proceedings of the 2014 conference on empirical methods in natural language processing (EMNLP) , pages 1532–1543, 2014."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib35",
+      "text": "Baoquan Zhang, Xutao Li, Yunming Ye, Zhichao Huang, and Lisai Zhang. Prototype completion with primitive knowledge for few-shot learning. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 3754–3762, 2021."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib32",
+      "text": "Chen Xing, Negar Rostamzadeh, Boris Oreshkin, and Pedro O O Pinheiro. Adaptive cross-modal few-shot learning. Advances in Neural Information Processing Systems , 32, 2019."
+    }
+  ]
+}

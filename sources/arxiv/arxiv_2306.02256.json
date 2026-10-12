@@ -1,0 +1,83 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2306.02256",
+  "title": "Less is More: Revisiting the Gaussian Mechanism for Differential Privacy",
+  "authors": "Tianxi Ji, Pan Li",
+  "year": "2024",
+  "categories": [
+    "cs.CR"
+  ],
+  "url": "https://arxiv.org/abs/2306.02256",
+  "html_url": "https://arxiv.org/html/2306.02256",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1139,
+  "text": "Differential privacy (DP) [1,2] has been increasingly recognized as the fundamental building block for privacy-preserving database query, sharing, and analysis. In this area, one important privacy guarantee is (\\epsilon,\\delta) -DP. It means that, except with a small probability of \\delta, the presence or absence of any data record in a dataset cannot change the probability of observing a specific query result of the dataset by more than a multiplicative factor of e^{\\epsilon}.\n\nThe classic Gaussian mechanism, proposed by Dwork et al. [1], is an essential tool to achieve (\\epsilon,\\delta) -DP. Particularly, when the output of a query function is a high dimensional vector, the classic Gaussian mechanism will add independent and identically distributed (i.i.d.) noise to each component of the result (see Definition 3 and [2], [1]).\n\nThis standard practice has spread widely into many fields. For example, a differentially private mechanism returns noisy answers to a set of queries by adding i.i.d. noise to each query result [3]. Privacy-preserving learning employs differentially private stochastic gradient descent through perturbing each component of the gradient with i.i.d. Gaussian noise [4]. Unfortunately, as we will show later, the adoption of the classic Gaussian mechanism greatly hinders the utility (accuracy) of the sanitized query results because the expected accuracy loss (Definition 1) of the classic Gaussian mechanism is on the order of M(\\Delta_{2}f)^{2}, where \\Delta_{2}f is the l_{2} sensitivity of the query function and M is the dimension of the query results. We refer to this as the curse of full-rank covariance matrices.\n\nAccuracy Loss [3,5]. The accuracy loss of a differentially private output perturbation mechanism (\\mathcal{M}) is\n\nwhere \\bm{x} denotes a dataset, f(\\bm{x}) is the query result on dataset \\bm{x}, and \\mathbf{n} is the noise vector added to the query result.\n\nWe can see from (1) that the accuracy loss is equal to the magnitude of the additive noise. Due to the randomness involved in the noise, \\mathcal{L} is nondeterministic. Thus, we investigate the expected value of accuracy loss, i.e., \\mathbb{E}[\\mathcal{L}].\n\n## 1.1 The Curse of Full-Rank Covariance Matrices\n\nHere, we provide a high-level description on the identified curse of full-rank covariance matrices, while the details are deferred to Section 3.\n\nThe Identified Curse. Let \\bm{x} be a dataset, f(\\bm{x})\\in\\mathbb{R}^{M} the queried results, and \\mathbf{n}\\in\\mathbb{R}^{M} the perturbation noises introduced by the classic Gaussian mechanism (or its variants, e.g., the analytic Gaussian mechanism [6], and the Matrix-Variate Gaussian (MVG) mechanism [7]), respectively. Then, the expected accuracy loss is equal to the trace of the covariance matrix of the Gaussian noise \\mathbf{n}, i.e., \\mathbb{E}[\\mathcal{L}]=Tr[Cov(\\mathbf{n})], where Cov(\\mathbf{n}) denotes the covariance matrix of the noise \\mathbf{n}.\n\nSince existing Gaussian mechanisms always introduce noise that has a full-rank covariance matrix, i.e., rank(Cov(\\mathbf{n}))=M, where Cov(\\mathbf{n}) is symmetric and positive definite [8], \\mathbb{E}[\\mathcal{L}] is equivalent to the summation of M positive eigenvalues of Cov(\\mathbf{n}) and hence generally high. In Section 3, we will prove Proposition 1 when f(\\bm{x}) is in a vector form and in a matrix form under different variants of the classic Gaussian mechanism.\n\n## 1.2 Lifting the Curse: Main Contributions\n\nTo lift the identified curse, we resort to the singular multivariate Gaussian distribution [9,10,11,12,13] (Definition 7) with a rank-1 covariance matrix and develop the R ank-1 S ingular M ultivariate G aussian (R1SMG) mechanism. Our idea is motivated by an ignored clue in Dwork and Roth’s proof for the DP guarantee of the Gaussian mechanism [2]. Specifically, Dwork and Roth proved that by projecting the additive noise \\mathbf{n}\\in\\mathbb{R}^{M} onto a fixed set of orthonormal basis vectors (e.g., \\bm{b}_{1},\\bm{b}_{2},\\cdots,\\bm{b}_{M}), only the coefficient of a single basis vector (e.g., \\mathbf{n}^{T}\\bm{b}_{1}) contributes to the privacy guarantee (more details are deferred to Section 4). However, this important clue has been ignored in the literature. To the best of our knowledge, our work is the first to discover and leverage this ignored clue.\n\nThe main contributions of this paper are summarized as follows.\n\n(1) A new DP Mechanism and Privacy Guarantee (Definition 8 and Theorem 5). We develop the R1SMG mechanism that can achieve (\\epsilon,\\delta) -DP guarantee on high dimensional query results f(\\bm{x})\\in\\mathbb{R}^{M} (M>2). The covariance matrix, denoted as \\bm{\\Pi}, of the noise introduced by the R1SMG mechanism is a random rank-1 symmetric positive semi-definite matrix, whose eigenvector is randomly sampled from the unit sphere embedded in \\mathbb{R}^{M}. Let \\sigma_{*} be the eigenvalue of the rank-1 covariance matrix \\bm{\\Pi}. We prove that a sufficient condition for the R1SMG mechanism to achieve (\\epsilon,\\delta) -DP is \\sigma_{*}\\geq\\frac{2(\\Delta_{2}f)^{2}}{\\epsilon\\psi}, where \\Delta_{2}f is the l_{2} sensitivity of the query function f, \\psi=\\Big(\\frac{\\delta\\Gamma(\\frac{M-1}{2})}{\\sqrt{\\pi}\\Gamma(\\frac{M}{2})}\\Big)^{\\frac{2}{M-2}}, and \\Gamma(\\cdot) is Gamma function. Note that similar to that in the classic Gaussian mechanism where 0<\\epsilon<1, we have 0<\\epsilon<1/M in the R1SMG mechanism. In other words, The R1SMG mechanism can work well under very strict privacy budget.\n\n(2) Expected accuracy loss on a much lower order than that of existing Gaussian mechanisms. We prove that the expected accuracy loss of f(\\bm{x}) caused by the R1SMG mechanism (i.e., ||{R1SMG}(f(\\bm{x}))-f(\\bm{x})||_{2}^{2}) is lower bounded by C_{R}(\\Delta_{2}f)^{2}, where for any fixed feasible \\epsilon, C_{R}=\\frac{2}{\\epsilon\\psi} has a decreasing trend as M increases and converges to \\frac{2}{\\epsilon} as M goes large (Theorem 7). In contrast, the classic Gaussian, analytic Gaussian, and MVG mechanisms result in expected accuracy loss that is lower bounded by C_{C}(\\Delta_{2}f)^{2}, C_{A}(\\Delta_{2}f)^{2}, and C_{M}(\\Delta_{2}f)^{2}, respectively, where C_{C}=\\frac{2\\ln\\left(\\frac{1.25}{\\delta}\\right)}{\\epsilon^{2}}M, C_{A}=\\frac{\\left(\\Phi^{-1}(\\delta)\\right)^{2}+\\epsilon}{\\epsilon^{2}}M, and C_{M}=\\frac{\\frac{5}{4}H_{r}+\\frac{1}{4}H_{r,\\frac{1}{2}}}{2\\epsilon}MN (for query results in \\mathbb{R}^{M\\times N}, i.e., in a matrix form). Therefore, by using the R1SMG mechanism, less is more in the sense that noise of a much lower order of magnitude is needed compared with that of existing Gaussian mechanisms.\n\n(3) Higher stability of the perturbed results (Theorem 8 and 9). We theoretically show that the accuracy of the perturbed f(\\bm{x}) obtained by the R1SMG mechanism is more stable than the other mechanisms. By “stable”, we mean that it is less likely for the R1SMG mechanism to generate noise with large magnitude that overwhelms f(\\bm{x}).\n\n(4) Applications. We perform three case studies, including differentially private 2D histogram query, principal component analysis, and deep learning, to validate that the R1SMG mechanism can achieve better data utility in various applications by introducing less noise, i.e., less is more.\n\nTable 1 summarizes and compares our proposed R1SMG mechanism with the classic Gaussian mechanism and its variants from the perspective of expected accuracy loss parameterized by the noise parameters and utility stability.\n\nRoadmap. We review the preliminaries for this study in Section 2. Next, we identify the curse of full-rank covariance matrices in various types of Gaussian mechanisms in Section 3. In Section 4, we revisit Dwork and Roth’s proof, and identify a previously ignored clue that motivates our work. After that, we formally develop the R1SMG mechanism in Section 5. In Section 6, we analyze the utility stability achieved by our mechanism and theoretically compare it with other mechanisms. Section 7 presents the case studies. Section 8 discusses the related works. Finally, Section 9 concludes the paper.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib15",
+      "text": "Cynthia Dwork, Krishnaram Kenthapadi, Frank McSherry, Ilya Mironov, and Moni Naor. Our data, ourselves: Privacy via distributed noise generation. In Serge Vaudenay, editor, Advances in Cryptology - EUROCRYPT 2006 , pages 486–503, Berlin, Heidelberg, 2006. Springer Berlin Heidelberg."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib17",
+      "text": "Cynthia Dwork and Aaron Roth. The algorithmic foundations of differential privacy. Foundations and Trends® in Theoretical Computer Science , 9(3–4):211–407, 2014."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib35",
+      "text": "Aleksandar Nikolov, Kunal Talwar, and Li Zhang. The geometry of differential privacy: the sparse and approximate cases. In Proceedings of the forty-fifth annual ACM symposium on Theory of computing , pages 351–360, 2013."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib3",
+      "text": "Martin Abadi, Andy Chu, Ian Goodfellow, H Brendan McMahan, Ilya Mironov, Kunal Talwar, and Li Zhang. Deep learning with differential privacy. In Proceedings of the 2016 ACM SIGSAC conference on computer and communications security , pages 308–318, 2016."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib22",
+      "text": "Moritz Hardt and Kunal Talwar. On the geometry of differential privacy. In Proceedings of the forty-second ACM symposium on Theory of computing , pages 705–714, 2010."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib5",
+      "text": "Borja Balle and Yu-Xiang Wang. Improving the gaussian mechanism for differential privacy: Analytical calibration and optimal denoising. In International Conference on Machine Learning , pages 394–403. PMLR, 2018."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib11",
+      "text": "Thee Chanyaswad, Alex Dytso, H. Vincent Poor, and Prateek Mittal. Mvg mechanism: Differential privacy under matrix-valued query. In Proceedings of the 2018 ACM SIGSAC Conference on Computer and Communications Security , CCS ’18, pages 230–246, New York, NY, USA, 2018. ACM."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib10",
+      "text": "George Casella and Roger L Berger. Statistical inference , volume 2. Duxbury Pacific Grove, CA, 2002."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib28",
+      "text": "Chinubhai G Khatri. Some results for the singular normal multivariate regression models. Sankhyā: The Indian Journal of Statistics, Series A , pages 267–280, 1968."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib14",
+      "text": "Harald Cramér. Mathematical methods of statistics , volume 43. Princeton university press, 1999."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib40",
+      "text": "Calyampudi Radhakrishna Rao and Mathematischer Statistiker. Linear statistical inference and its applications , volume 2. Wiley New York, 1973."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib43",
+      "text": "Muni Shanker Srivastava and CG Khatri. An introduction to multivariate statistics. 2009."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib30",
+      "text": "Koon-Shing Kwong and Boris Iglewicz. On singular multivariate normal distribution and its applications. Computational statistics and data analysis , 22(3):271–285, 1996."
+    }
+  ]
+}

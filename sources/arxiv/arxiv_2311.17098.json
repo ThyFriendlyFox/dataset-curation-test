@@ -1,0 +1,169 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2311.17098",
+  "title": "DyRA: Portable Dynamic Resolution Adjustment Network for Existing Detectors",
+  "authors": "Daeun Seo, Hoeseok Yang, Hyungshin Kim",
+  "year": "2024",
+  "categories": [
+    "cs.CV",
+    "cs.AI"
+  ],
+  "url": "https://arxiv.org/abs/2311.17098",
+  "html_url": "https://arxiv.org/html/2311.17098",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 768,
+  "text": "Deep learning has demonstrated remarkable performance in computer vision applications such as object detection [1,2] and segmentation [3,4]. However, achieving consistent accuracy in real-world applications remains a challenge due to the variability of instance sizes [5,6,7]. The variation in size is often significant in object detection, which can cause the robustness of accuracy vulnerable [8]. Several solutions have been proposed to address this problem, either by optimizing the architecture of neural networks [9,10,7] or by augmenting the input data [11,12,8]. In data augmentation, resolution adjustment can effectively address the problem without changing the network architecture.\n\nFig. 1 illustrates why varying image resolution can improve detection accuracy. Due to the scale-variant performance of detection networks, objects with extreme sizes, either large or small, are not well identified. To alleviate this shortcoming, resizing the image containing huge or tiny objects to a lower or higher resolution, i.e., matching the resolution to the original capacity of the detector, can help the network recognize objects more efficiently. If the resolution of the image can be properly adjusted, the accuracy of the detection will be effectively enhanced, which is the main focus of this work. Moreover, a careful resolution selection can lead the network to extract richer information since the resolution is a crucial hyper-parameter for the performance of networks [13,14].\n\nThere are several approaches to optimizing the resolution, which can be classified into three: The first is to scale the input images with predefined resolutions and apply them as data-augmentation to the networks [11,8], which is also applicable to transformer-based networks [15,16,17,18]. The dynamic resolution network [19] allows adaptive resolution by selecting one of these sizes. However, an obvious drawback of this approach is that it requires manual work to determine candidate resolutions, relying on expert knowledge with lots of trial and error. To eliminate such need for human expertise, the second approach, automated augmentation search [6], has been proposed to enable an optimized resolution for each image or box. The last is the run-time adaptive scaling [20], which optimizes the resolution on the fly without domain-specific knowledge.\n\nIn this paper, we propose a portable run-time adaptive scaling network called DyRA, which produces an image-specific scale factor. Fig. 2(a) illustrates how the proposed image scaler can be plugged into an existing detector. Note that the input to the scaler module is the image, while its output is a single scale factor for the resolution. DyRA is designed as a separate companion neural network with convolution and transformer blocks and is jointly trained with a conventional object detector. By jointly training these two networks, the scale factor can be optimized to maximize the performance of the detector while learning the input-specific scale factor.\n\nWhen training DyRA, two newly designed loss functions are applied, which are depicted in Fig. 2(b). The image typically includes several different-sized objects, which makes it hard to decide the scale factor to provide accuracy gain for all instances. Hence, ParetoScaleLoss aims to minimize the accuracy drop caused by the size variation by employing Pareto optimality [21] and Maximum Likelihood Estimation (MLE) [22] from ScaleLoss, which is for box-specific scale factor. The optimization of the box-level scale factor is executed by enlarging or reducing it based on the given box size. BalanceLoss modifies the overall scale factor’s position based on the localization performance to have a network-aware scale factor. Through these loss functions, the scale factor can be optimized for scale robustness while considering the performance of the detector.\n\nDifferent from prior approaches, DyRA provides high portability to existing detectors without domain-specific knowledge about the input data once after the training. For instance, the automatic scaling decision in Hao et al. [20] is not transferable to other detectors because the entire neural network is adapted by the resized image. To the best of our knowledge, DyRA is the first attempt to dynamically optimize the hyper-parameter in a fully separable network from existing networks in an end-to-end manner. Furthermore, our network yields a continuous scale factor that offers extensive scale coverage, resulting in higher detection performance. This is crucial because selecting from a few discrete sizes can lead to a distribution mismatch due to the continuous range of the resolution.\n\nWe verified the effectiveness of the proposed approach with various object detectors on MS-COCO [23], PascalVOC [24], and DOTA [25]. In COCO, detectors achieved an AP (average precision) improvement of 1.4% on RetinaNet [26], 1.0% on Faster R-CNN [27], 1.5% on FCOS [28], 1.5% on DINO [29], and 1.2% on H-deforamble-DETR [30] compared to the multi-resolution strategy. In PascalVOC and DOTA, the AP of Faster-RCNN enhanced by 1.8% and 2.3%, respectively.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib57",
+      "text": "Wang, J., Chen, K., Yang, S., Loy, C.C., Lin, D.: Region proposal by guided anchoring. In: Proceedings of the IEEE/CVF conference on computer vision and pattern recognition. pp. 2965–2974 (2019)"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib43",
+      "text": "Redmon, J., Divvala, S., Girshick, R., Farhadi, A.: You only look once: Unified, real-time object detection. In: Proceedings of the IEEE conference on computer vision and pattern recognition. pp. 779–788 (2016)"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib38",
+      "text": "Long, J., Shelhamer, E., Darrell, T.: Fully convolutional networks for semantic segmentation. In: Proceedings of the IEEE conference on computer vision and pattern recognition. pp. 3431–3440 (2015)"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib1",
+      "text": "Badrinarayanan, V., Kendall, A., Cipolla, R.: Segnet: A deep convolutional encoder-decoder architecture for image segmentation. IEEE transactions on pattern analysis and machine intelligence 39 (12), 2481–2495 (2017)"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib56",
+      "text": "Wang, H., Kembhavi, A., Farhadi, A., Yuille, A.L., Rastegari, M.: Elastic: Improving cnns with dynamic scaling policies. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 2258–2267 (2019)"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib8",
+      "text": "Chen, Y., Li, Y., Kong, T., Qi, L., Chu, R., Li, L., Jia, J.: Scale-aware automatic augmentation for object detection. In: Proceedings of the IEEE/CVF conference on computer vision and pattern recognition. pp. 9563–9572 (2021)"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib29",
+      "text": "Li, Y., Chen, Y., Wang, N., Zhang, Z.: Scale-aware trident networks for object detection. In: Proceedings of the IEEE/CVF international conference on computer vision. pp. 6054–6063 (2019)"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib46",
+      "text": "Singh, B., Davis, L.S.: An analysis of scale invariance in object detection snip. In: Proceedings of the IEEE conference on computer vision and pattern recognition. pp. 3578–3587 (2018)"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib30",
+      "text": "Lin, T.Y., Dollár, P., Girshick, R., He, K., Hariharan, B., Belongie, S.: Feature pyramid networks for object detection. In: Proceedings of the IEEE conference on computer vision and pattern recognition. pp. 2117–2125 (2017)"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib34",
+      "text": "Liu, S., Qi, L., Qin, H., Shi, J., Jia, J.: Path aggregation network for instance segmentation. In: Proceedings of the IEEE conference on computer vision and pattern recognition. pp. 8759–8768 (2018)"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib35",
+      "text": "Liu, W., Anguelov, D., Erhan, D., Szegedy, C., Reed, S., Fu, C.Y., Berg, A.C.: Ssd: Single shot multibox detector. In: Computer Vision–ECCV 2016: 14th European Conference, Amsterdam, The Netherlands, October 11–14, 2016, Proceedings, Part I 14. pp. 21–37. Springer (2016)"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib47",
+      "text": "Singh, B., Najibi, M., Davis, L.S.: Sniper: Efficient multi-scale training. Advances in neural information processing systems 31 (2018)"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib48",
+      "text": "Tan, M., Le, Q.: Efficientnet: Rethinking model scaling for convolutional neural networks. In: International conference on machine learning. pp. 6105–6114. PMLR (2019)"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib49",
+      "text": "Tan, M., Pang, R., Le, Q.V.: Efficientdet: Scalable and efficient object detection. In: Proceedings of the IEEE/CVF conference on computer vision and pattern recognition. pp. 10781–10790 (2020)"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib50",
+      "text": "Tian, R., Wu, Z., Dai, Q., Hu, H., Qiao, Y., Jiang, Y.G.: Resformer: Scaling vits with multi-resolution training. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 22721–22731 (2023)"
+    },
+    {
+      "n": 16,
+      "id": "bib.bib37",
+      "text": "Liu, Z., Lin, Y., Cao, Y., Hu, H., Wei, Y., Zhang, Z., Lin, S., Guo, B.: Swin transformer: Hierarchical vision transformer using shifted windows. In: Proceedings of the IEEE/CVF international conference on computer vision. pp. 10012–10022 (2021)"
+    },
+    {
+      "n": 17,
+      "id": "bib.bib36",
+      "text": "Liu, Z., Hu, H., Lin, Y., Yao, Z., Xie, Z., Wei, Y., Ning, J., Cao, Y., Zhang, Z., Dong, L., et al.: Swin transformer v2: Scaling up capacity and resolution. In: Proceedings of the IEEE/CVF conference on computer vision and pattern recognition. pp. 12009–12019 (2022)"
+    },
+    {
+      "n": 18,
+      "id": "bib.bib63",
+      "text": "Zhang, H., Zhang, P., Hu, X., Chen, Y.C., Li, L., Dai, X., Wang, L., Yuan, L., Hwang, J.N., Gao, J.: Glipv2: Unifying localization and vision-language understanding. Advances in Neural Information Processing Systems 35 , 36067–36080 (2022)"
+    },
+    {
+      "n": 19,
+      "id": "bib.bib68",
+      "text": "Zhu, M., Han, K., Wu, E., Zhang, Q., Nie, Y., Lan, Z., Wang, Y.: Dynamic resolution network. Advances in Neural Information Processing Systems 34 , 27319–27330 (2021)"
+    },
+    {
+      "n": 20,
+      "id": "bib.bib21",
+      "text": "Hao, Z., Liu, Y., Qin, H., Yan, J., Li, X., Hu, X.: Scale-aware face detection. In: Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition. pp. 6186–6195 (2017)"
+    },
+    {
+      "n": 21,
+      "id": "bib.bib9",
+      "text": "Coello, C.A.C.: Evolutionary algorithms for solving multi-objective problems. Springer (2007)"
+    },
+    {
+      "n": 22,
+      "id": "bib.bib39",
+      "text": "Maron, O., Lozano-Pérez, T.: A framework for multiple-instance learning. Advances in neural information processing systems 10 (1997)"
+    },
+    {
+      "n": 23,
+      "id": "bib.bib32",
+      "text": "Lin, T.Y., Maire, M., Belongie, S., Hays, J., Perona, P., Ramanan, D., Dollár, P., Zitnick, C.L.: Microsoft coco: Common objects in context. In: Computer Vision–ECCV 2014: 13th European Conference, Zurich, Switzerland, September 6-12, 2014, Proceedings, Part V 13. pp. 740–755. Springer (2014)"
+    },
+    {
+      "n": 24,
+      "id": "bib.bib15",
+      "text": "Everingham, M., Van Gool, L., Williams, C.K., Winn, J., Zisserman, A.: The pascal visual object classes (voc) challenge. International journal of computer vision 88 , 303–338 (2010)"
+    },
+    {
+      "n": 25,
+      "id": "bib.bib60",
+      "text": "Xia, G.S., Bai, X., Ding, J., Zhu, Z., Belongie, S., Luo, J., Datcu, M., Pelillo, M., Zhang, L.: Dota: A large-scale dataset for object detection in aerial images. In: Proceedings of the IEEE conference on computer vision and pattern recognition. pp. 3974–3983 (2018)"
+    },
+    {
+      "n": 26,
+      "id": "bib.bib31",
+      "text": "Lin, T.Y., Goyal, P., Girshick, R., He, K., Dollár, P.: Focal loss for dense object detection. In: Proceedings of the IEEE international conference on computer vision. pp. 2980–2988 (2017)"
+    },
+    {
+      "n": 27,
+      "id": "bib.bib44",
+      "text": "Ren, S., He, K., Girshick, R., Sun, J.: Faster r-cnn: Towards real-time object detection with region proposal networks. Advances in neural information processing systems 28 (2015)"
+    },
+    {
+      "n": 28,
+      "id": "bib.bib52",
+      "text": "Tian, Z., Shen, C., Chen, H., He, T.: Fcos: Fully convolutional one-stage object detection. In: Proceedings of the IEEE/CVF international conference on computer vision. pp. 9627–9636 (2019)"
+    },
+    {
+      "n": 29,
+      "id": "bib.bib6",
+      "text": "Caron, M., Touvron, H., Misra, I., Jégou, H., Mairal, J., Bojanowski, P., Joulin, A.: Emerging properties in self-supervised vision transformers. In: Proceedings of the IEEE/CVF international conference on computer vision. pp. 9650–9660 (2021)"
+    },
+    {
+      "n": 30,
+      "id": "bib.bib26",
+      "text": "Jia, D., Yuan, Y., He, H., Wu, X., Yu, H., Lin, W., Sun, L., Zhang, C., Hu, H.: Detrs with hybrid matching. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 19702–19712 (2023)"
+    }
+  ]
+}

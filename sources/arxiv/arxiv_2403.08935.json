@@ -1,0 +1,88 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.08935",
+  "title": "Formalizing Date Arithmetic and Statically Detecting Ambiguities for the Law",
+  "authors": "RaphaÃ«l Monat, Aymeric Fromherz, Denis Merigoux",
+  "year": "2024",
+  "categories": [
+    "cs.PL"
+  ],
+  "url": "https://arxiv.org/abs/2403.08935",
+  "html_url": "https://arxiv.org/html/2403.08935",
+  "license": "http://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Introduction",
+  "word_count": 1170,
+  "text": "From filesystems to web servers, time representations are pervasive in modern computer systems. While several libraries and standards were proposed throughout the years, current well-established approaches such as Unix time [1] used in the standard C library or Windows’ FILETIME [2] represent dates and time as a number of seconds or nanoseconds that have elapsed since an arbitrary date.\n\nThis approach is sufficient for many usecases, in particular when dates are only used for logging purposes, or for determining the chronology of two events. However, it does not permit more complex arithmetic, for instance the addition of months or years, that span a variable number of days. For these usecases, mainstream programming languages offer different libraries that adopt different conventions. For example, Python’s datetime module [3] forbids the addition of months, while Java’s java.time library [4] silently rounds invalid dates onto the largest pre-existing date, hiding ambiguous computations from programmers.\n\nGiven the variety of libraries and behaviors across languages, programming with date arithmetic is thus highly error-prone, and developers’ assumptions about how dates behave might vary from project to project. When developing systems whose correctness is critical and that heavily depend on date computations, such as expert legal systems that rule our social and financial lives, this issue becomes highly concerning. As an example, consider the following excerpt from Section 121 of the US Internal Revenue Code [5], which defines the “Exclusion of gain from sale of principal residence”.\n\nThis paragraph differentiates between two cases, depending on whether a sale occurred not later than 2 years after a given date. While applying this paragraph is straightforward in most real-world cases, corner cases raise interesting questions. In particular, when considering leap years, what should be the result of adding two years to February 29th? When manually computing taxes, lawyers would be able to detect the ambiguity, and to reach a decision based on legal precedents. If handled automatically by a computer however, the computation may be done incorrectly; computing February 29 2004 + 2 years in Java using java.time would return February 28 2006, while performing the same computation using the date utility from Coreutils returns March 1 2006.\n\nSimilar computations are pervasive in expert legal systems; the corresponding regulations rely on them to determine whether a citizen is eligible to social benefits or a resident for tax purposes. Errors in such systems can have dramatic consequences; case in point, the incorrect implementation of Louvois, the former French military payroll system, led to several families either receiving over-payments that they had to reimburse years later, or incomplete paychecks totaling a few cents [6]. For such critical software, it is therefore paramount to provide clear semantics for date computations to avoid mistakes based on erroneous assumptions about a library’s behavior. Additionally, such a semantics can form the basis for further analyses, paving the way for the automated detection of date-related ambiguities as part of the development process.\n\nUnfortunately, while elegant in theory, a universal semantics for dates and date arithmetic would not be usable in practice; when possible ambiguities are identified in law texts, legislators oftentimes extend or modify the law itself to avoid them. For instance, article 641 of the French civil procedure code [7] specifies that, when adding a positive duration to a date to compute a deadline, the rounding, if needed, should go down. Such articles often have narrow application scopes; similar articles in other branches of the law might either leave rounding unspecified, or adopt a different convention. In the US, date computations when filing motions are heavily specified, however the complexity and amount of corner cases led to no less than 27 subsequent notes and amendments to provide clarifications [8]. Other regulations instead attempt to escape ambiguities due to month or year additions by reducing such computations to a nonambiguous number of days. Such regulations heavily vary depending on the country and the branch of law considered: acts from the Council of European Communities consider that a month should be treated as 30 days [9], while the Indian Supreme Court took the opposite approach, enacting that the duration of a month for customs purposes is variable [10]. To enable their adoption in a variety of contexts, date libraries therefore require their semantics to be configurable by developers.\n\nThe lowest granularity of date arithmetic we focus on is the day level. Our literature review and communications with lawyers in different countries have indeed shown that this kind of date arithmetic is sufficient for the kind of tax and social benefits computations that are the core application target of Catala.\n\nIn this paper, we aim to provide a sound foundation for critical software relying on date computations, through the following contributions:\n\n## Formally Capturing Date Computations.\n\nWe first present a formal semantics of date computations (Sec. 2). Our formalization relies on a base semantics, which is universal and does not specify a rounding mode but instead provides facilities to round on-demand. We leverage these facilities to derive a rounding-specific semantics for different rounding policies. We mechanize this semantics in the F ⋆ proof assistant, and prove several theorems establishing necessary conditions for, e.g., the monotonicity or associativity of computations (Sec. 3). As part of this mechanization, we also identify seemingly intuitive properties that do not hold in practice, and exhibit counter-examples.\n\n## Automatically Detecting Date Ambiguities.\n\nBuilding on the semantics, we define a notion of rounding-insensitivity, which captures that the result of evaluating a program’s expression does not depend on the chosen rounding policy (Sec. 4). Aiming to automatically identify possibly harmful ambiguities, we then propose a new static analysis based on abstract interpretation [11] targeting this 2-safety hyperproperty. We implement our analysis in the Mopsa static analyzer [12,13]. We show that with relational numerical abstract domains, our analysis enables precise reasoning. In addition, our implementation provides actionable counter-example hints which will help users understand why a given expression is rounding-sensitive.\n\n## Contribution to Date Arithmetic Libraries.\n\nTo enable the adoption of this work in existing projects, we implement an OCaml library abiding by our formal semantics, which exposes common rounding modes, as well as an option to abort when ambiguous computations are detected. Our library is standalone and open-source, and easily integrable in OCaml developments. We also survey the behavior of mainstream date arithmetic libraries (Sec. 6), and provide litmus tests that can be used to easily understand how a library behaves with respect to date rounding.\n\n## Case Study: Integration in the Catala Language.\n\nTo demonstrate the applicability of our approach in real-world programs, we replace previous handling of dates in the Catala language [14], a recent domain-specific language for formalizing computational law, by our library. We also extend the Mopsa [12,13] static analyzer to support a subset of the Catala language, enabling us to analyze Catala programs for rounding-insensitivity. We evaluate our approach against an existing Catala implementation of the French housing benefits, and automatically identify several date-related ambiguities in the Catala model. This work is in the process of being upstreamed in the Catala compiler.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib53",
+      "text": "The Open Group: time. https://pubs.opengroup.org/onlinepubs/9699919799.2018edition/functions/time.html (2017)"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib36",
+      "text": "Microsoft: Filetime (minwinbase.h). https://learn.microsoft.com/en-us/windows/win32/api/minwinbase/ns-minwinbase-filetime (2021)"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib46",
+      "text": "Python Software Foundation: datetime — basic date and time types. https://docs.python.org/3/library/datetime.html (2023)"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib43",
+      "text": "Oracle: Package java.time. https://docs.oracle.com/javase/8/docs/api/java/time/package-summary.html (2023)"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib25",
+      "text": "Internal Revenue Service: Exclusion of gain from sale of principal residence. https://www.law.cornell.edu/uscode/text/26/121 (2017)"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib42",
+      "text": "Monin, J.: Louvois, le logiciel qui a mis l’armée à terre. https://www.radiofrance.fr/franceinter/podcasts/secrets-d-info/louvois-le-logiciel-qui-a-mis-l-armee-a-terre-8752880 (2018)"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib30",
+      "text": "Legifrance: Article 641 - code de procédure civile. https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000006411002 (1976)"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib14",
+      "text": "Cornell Law School: Rule 6. computing and extending time; time for motion papers. https://www.law.cornell.edu/rules/frcp/rule_6 (2016)"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib15",
+      "text": "Council of the European Communities: Regulation (eec, euratom) no 1182/71 of the council of 3 june 1971. https://eur-lex.europa.eu/LexUriServ/LexUriServ.do?uri=CELEX%3A31971R1182%3AEN%3AHTML (1971)"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib4",
+      "text": "Arora, C.M.: What is the concept of “month” while computing limitation period under the custom act? https://itatonline.org/digest/articles/what-is-the-concept-of-month-while-computing-limitation-period-under-the-custom-act/ (2020)"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib16",
+      "text": "Cousot, P., Cousot, R.: Abstract interpretation: a unified lattice model for static analysis of programs by construction or approximation of fixpoints. In: Proceedings of the ACM Symposium on Principles of Programming Languages (POPL) (1977)"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib28",
+      "text": "Journault, M., Miné, A., Monat, R., Ouadjaout, A.: Combinations of reusable abstract domains for a multilingual static analyzer. In: VSTTE, Lecture Notes in Computer Science, vol. 12031, pp. 1–18, Springer (2019)"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib29",
+      "text": "Journault, M., Miné, A., Monat, R., Ouadjaout, A.: The MOPSA static analyzer (2023), URL https://gitlab.com/mopsa/mopsa-analyzer/"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib34",
+      "text": "Merigoux, D., Chataing, N., Protzenko, J.: Catala: a programming language for the law. In: Proceedings of the International Conference on Functional Programming (ICFP) (2021a)"
+    }
+  ]
+}

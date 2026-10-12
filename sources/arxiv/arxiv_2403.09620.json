@@ -1,0 +1,103 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.09620",
+  "title": "PosSAM: Panoptic Open-vocabulary Segment Anything",
+  "authors": "Vibashan VS, Shubhankar Borse, Hyojin Park, Debasmit Das, Vishal Patel, Munawar Hayat, Fatih Porikli",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2403.09620",
+  "html_url": "https://arxiv.org/html/2403.09620",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 695,
+  "text": "Segment Anything Model (SAM) [1] shows remarkable promptable mask generation capabilities. While the existing approaches struggle with generalization to new objects, SAM can effectively generalize to a variety of visual concepts and image distributions, thanks to its large-scale pretraining using 1 billion masks. Instead of relying on costly human annotations, SAM plays a dual role as a data engine to generate and refine its masks during training iteratively.\n\nDespite its potential, SAM faces a significant limitation in generating instance and class-aware masks, which are vital for various downstream segmentation tasks. For example, as illustrated in Fig. 1, SAM tends to over-segment objects, resulting in masks that lack instance-awareness. Further, SAM [1] has proposed text prompting to predict class-aware masks; however, the paper stated that the current SAM can work only with simple prompts targeting a single class, thereby limiting its applicability to only semantic segmentation. To address these instance and class-aware limitations, existing approaches resort to specialized networks to obtain more capable prompts. For example, GroundingDINO [2] initially predicts bounding boxes, while Semantic Segment-Anything (SSA) [3] concurrently employs a segmentation model. Similarly, the recently introduced Semantic-SAM [4] relies on a segmentation model i.e. Mask-DINO [5]. Although these methods offer potential, their additional disjoint steps lead to inefficiency and a lack of end-to-end awareness. Moreover, the bounding box-based methods can only generate instance masks and lack the ability to perform panoptic segmentation. Our method addresses these limitations by introducing a unified end-to-end trainable approach that leverages SAM’s rich spatial features for generating class-agnostic panoptic masks in an open-vocabulary setting, enabling SAM for downstream segmentation tasks.\n\nMost open-vocabulary segmentation methods [6,7,8,9,10,11,12,13] rely on CLIP [14] for alignment, mask generation or classification. For instance, MaskCLIP [15] and OVSeg [13] adopt a two-stage approach by adapting frozen CLIP for alignment and classification. Similarly, FC-CLIP [16] and OMG-Seg [7] leverage a frozen CLIP backbone for mask-generation as well as classification. However, we argue that leveraging SAM for mask generation due to its rich feature representation. To illustrate this, we compare feature clustering results from different backbones in Fig. 2. SAM’s cluster map demonstrates more precise object boundaries compared to CLIP. This motivates us to leverage SAM as a backbone for class-agnostic mask generation due to its strong spatial and localization awareness. Additionally, we empirically observed that the SAM decoder generates poor panoptic masks (see Table. 6). Therefore, following prior OV works [16,7,17,9,13], we employ Mask2former as our mask decoder.\n\nPosSAM (pronounced possum) addresses the key challenges to enable SAM for open-vocabulary segmentation by generating instance-aware masks, classifying class-agnostic SAM features, and effectively distinguishing between seen (in-vocabulary) and unseen (out-of-vocabulary) categories. We leverage a feature pyramid network to project SAM ViT features into hierarchical multi-scale feature maps, which are then used by the mask decoder to obtain instance-aware masks. As our backbone remains fixed during training, we introduce an auxiliary IoU prediction task to regularize generated masks for instance-awareness. For OV classification, solely relying on discriminative CLIP features makes the model biased towards the training set i.e. seen classes. To mitigate this bias, we introduce a Local Discriminative Pooling (LDP) module (Sec. 3.4) that facilitates the interaction between discriminative CLIP features and class-agnostic SAM features, thereby avoiding overfitting to seen classes during training. During inference, we propose a novel Mask-Aware Selective Ensemble (MASE) algorithm which leverages both IoU scores and LDP confidence scores to adaptively distinguish between in-vocabulary and out-of-vocabulary classes for robust real-world OV segmentation. Our proposed method demonstrates state-of-the-art performance across various open-vocabulary segmentation tasks.\n\nOur contributions can be summarized as:\n\n- • We introduce PosSAM, an open-vocabulary panoptic segmentation model that generates class and instance-aware masks with excellent generalization to a variety of visual concepts by unifying SAM and CLIP in an end-to-end trainable framework.\n\n- • We develop a novel Local Discriminative Pooling (LDP) module to enhance discriminative CLIP features with class-agnostic SAM features for an unbiased OV classification.\n\n- • We introduce the Mask-Aware Selective Ensembling algorithm to adaptively discern between seen and unseen classes by leveraging IoU and LDP confidence scores for each image.\n\n- • We conduct extensive experiments and demonstrate superior performance over existing state-of-the-art open-vocabulary panoptic segmentation methods across multiple benchmark datasets.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib34",
+      "text": "Kirillov, A., Mintun, E., Ravi, N., Mao, H., Rolland, C., Gustafson, L., Xiao, T., Whitehead, S., Berg, A.C., Lo, W.Y., et al.: Segment anything. arXiv preprint arXiv:2304.02643 (2023)"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib46",
+      "text": "Liu, S., Zeng, Z., Ren, T., Li, F., Zhang, H., Yang, J., Li, C., Yang, J., Su, H., Zhu, J., et al.: Grounding dino: Marrying dino with grounded pre-training for open-set object detection. arXiv preprint arXiv:2303.05499 (2023)"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib8",
+      "text": "Chen, J., Yang, Z., Zhang, L.: Semantic segment anything. https://github.com/fudan-zvg/Semantic-Segment-Anything (2023)"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib38",
+      "text": "Li, F., Zhang, H., Sun, P., Zou, X., Liu, S., Yang, J., Li, C., Zhang, L., Gao, J.: Semantic-sam: Segment and recognize anything at any granularity. arXiv preprint arXiv:2307.04767 (2023)"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib37",
+      "text": "Li, F., Zhang, H., Liu, S., Zhang, L., Ni, L.M., Shum, H.Y., et al.: Mask dino: Towards a unified transformer-based framework for object detection and segmentation. In: CVPR (2023)"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib87",
+      "text": "Zhou, Z., Lei, Y., Zhang, B., Liu, L., Liu, Y.: Zegclip: Towards adapting clip for zero-shot semantic segmentation. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 11175–11185 (2023)"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib41",
+      "text": "Li, X., Yuan, H., Li, W., Ding, H., Wu, S., Zhang, W., Li, Y., Chen, K., Loy, C.C.: Omg-seg: Is one model good enough for all segmentation? arXiv preprint arXiv:2401.10229 (2024)"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib50",
+      "text": "Ma, C., Yang, Y., Wang, Y., Zhang, Y., Xie, W.: Open-vocabulary semantic segmentation with frozen vision-language models. In: BMVC (2022)"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib88",
+      "text": "Zou, X., Dou, Z.Y., Yang, J., Gan, Z., Li, L., Li, C., Dai, X., Behl, H., Wang, J., Yuan, L., et al.: Generalized decoding for pixel, image, and language. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 15116–15127 (2023)"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib73",
+      "text": "Xu, M., Zhang, Z., Wei, F., Hu, H., Bai, X.: Side adapter network for open-vocabulary semantic segmentation. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 2945–2954 (2023)"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib86",
+      "text": "Zhou, C., Loy, C.C., Dai, B.: Extract free dense labels from clip. In: European Conference on Computer Vision. pp. 696–712. Springer (2022)"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib17",
+      "text": "Ding, J., Xue, N., Xia, G.S., Dai, D.: Decoupling zero-shot semantic segmentation. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 11583–11592 (2022)"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib44",
+      "text": "Liang, F., Wu, B., Dai, X., Li, K., Zhao, Y., Zhang, H., Zhang, P., Vajda, P., Marculescu, D.: Open-vocabulary semantic segmentation with mask-adapted clip. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 7061–7070 (2023)"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib56",
+      "text": "Radford, A., Kim, J.W., Hallacy, C., Ramesh, A., Goh, G., Agarwal, S., Sastry, G., Askell, A., Mishkin, P., Clark, J., et al.: Learning transferable visual models from natural language supervision. In: International conference on machine learning. pp. 8748–8763. PMLR (2021)"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib18",
+      "text": "Ding, Z., Wang, J., Tu, Z.: Open-vocabulary universal image segmentation with maskclip. In: ICML (2023)"
+    },
+    {
+      "n": 16,
+      "id": "bib.bib78",
+      "text": "Yu, Q., He, J., Deng, X., Shen, X., Chen, L.C.: Convolutions die hard: Open-vocabulary segmentation with single frozen convolutional clip. arXiv preprint arXiv:2308.02487 (2023)"
+    },
+    {
+      "n": 17,
+      "id": "bib.bib71",
+      "text": "Xu, J., Liu, S., Vahdat, A., Byeon, W., Wang, X., De Mello, S.: Open-Vocabulary Panoptic Segmentation with Text-to-Image Diffusion Models. arXiv preprint arXiv:2303.04803 (2023)"
+    }
+  ]
+}

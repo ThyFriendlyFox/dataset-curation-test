@@ -1,0 +1,128 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.07420",
+  "title": "DragAnything: Motion Control for Anything using Entity Representation",
+  "authors": "Weijia Wu, Zhuang Li, Yuchao Gu, Rui Zhao, Yefei He, David Junhao Zhang, Mike Zheng Shou, Yan Li, Tingting Gao, Di Zhang",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2403.07420",
+  "html_url": "https://arxiv.org/html/2403.07420",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 697,
+  "text": "Recently, there have been significant advancements in video generation, with notable works such as Imagen Video [1], Gen-2 [2], PikaLab [3], SVD [4], and SORA [5] garnering considerable attention from the community. However, the pursuit of controllable video generation has encountered relatively slower progress, notwithstanding its pivotal significance. Unlike controllable static image generation [6,7,8], controllable video generation poses a more intricate challenge, demanding not only spatial content manipulation but also precise temporal motion control.\n\nRecently, trajectory-based motion control [9,10,11,12] has been proven to be a user-friendly and efficient solution for controllable video generation. Compared to other guidance signals such as masks or depth maps, drawing a trajectory provides a simple and flexible approach. Early trajectory-based [9,10,13,14] works utilized optical flow or recurrent neural networks to control the motion of objects in controllable video generation. As one of the representative works, DragNUWA [12] encodes sparse strokes into dense flow space, which is then used as a guidance signal for controlling the motion of objects. Similarly, MotionCtrl [11] directly encodes the trajectory coordinates of each object into a vector map, using this vector map as a condition to control the motion of the object. These works have made significant contributions to the controllable video generation. However, an important question has been overlooked: Can a single point on the target truly represent the target?\n\nCertainly, a single pixel point cannot represent an entire object, as shown in Figure 2 (a)-(b). Thus, dragging a single pixel point may not precisely control the object it corresponds to. As shown in Figure 1, given the trajectory of a pixel on a star of starry sky, the model may not distinguish between controlling the motion of the star or that of the entire starry sky; it merely drags the associated pixel area. Indeed, resolving this issue requires clarifying two concepts: 1) What entity. Identifying the specific area or entity to be dragged. 2) How to drag. How to achieve dragging only the selected area, meaning separating the background from the foreground that needs to be dragged. For the first challenge, interactive segmentation [15,16] is an efficient solution. For instance, in the initial frame, employing SAM [15] allows us to conveniently select the region we want to control. In comparison, the second technical issue poses a greater challenge. To address this, this paper proposes a novel Entity Representation to achieve precise motion control for any entity in the video.\n\nSome works [17,18,19] has already demonstrated the effectiveness of using latent features to represent corresponding objects. Anydoor [17] utilizes features from Dino v2 [20] to handle object customization, while VideoSwap [18] and DIFT [19] employ features from the diffusion model [7] to address video editing tasks. Inspired by these works, we present DragAnything, which utilize the latent feature of the diffusion model to represent each entity. As shown in Figure 2 (d), based on the coordinate indices of the entity mask, we can extract the corresponding semantic features from the diffusion feature of the first frame. We then use these features to represent the entity, achieving entity-level motion control by manipulating the spatial position of the corresponding latent feature.\n\nIn our work, DragAnything employs SVD [4] as the foundational model. Training DragAnything requires video data along with the motion trajectory points and the entity mask of the first frame. To obtain the required data and annotations, we utilize the video segmentation benchmark [21] to train DragAnything. The mask of each entity in the first frame is used to extract the central coordinate of that entity, and then CoTrack [22] is utilized to predict the motion trajectory of the point as the entity motion trajectory.\n\nOur main contributions are summarized as follows:\n\n- • New insights for trajectory-based controllable generation that reveal the differences between pixel-level motion and entity-level motion.\n\n- • Different from the drag pixel paradigm, we present DragAnything, which can achieve true entity-level motion control with the entity representation.\n\n- • DragAnything achieves SOTA performance for FVD, FID, and User Study, surpassing the previous method by 26\\% in human voting for motion control. DragAnything supports interactive motion control for anything in context, including background (e.g., sky), as shown in Figure 6 and Figure 9.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib22",
+      "text": "Ho, J., Chan, W., Saharia, C., Whang, J., Gao, R., Gritsenko, A., Kingma, D.P., Poole, B., Norouzi, M., Fleet, D.J., et al.: Imagen video: High definition video generation with diffusion models. arXiv preprint arXiv:2210.02303 (2022)"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib13",
+      "text": "Esser, P., Chiu, J., Atighehchian, P., Granskog, J., Germanidis, A.: Structure and content-guided video synthesis with diffusion models. In: Proceedings of the IEEE/CVF International Conference on Computer Vision. pp. 7346–7356 (2023)"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib1",
+      "text": "https://www.pika.art/"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib3",
+      "text": "Blattmann, A., Dockhorn, T., Kulal, S., Mendelevitch, D., Kilian, M., Lorenz, D., Levi, Y., English, Z., Voleti, V., Letts, A., et al.: Stable video diffusion: Scaling latent video diffusion models to large datasets. arXiv preprint arXiv:2311.15127 (2023)"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib38",
+      "text": "Tim, B., Peebles, B., Holmes, C., DePue, W., Guo, Y., Jing, L., Schnurr, D., Taylor, J., Troy, L., Luhman, E., Ng, C.W.Y., Wang, R., Ramesh, A.: Video generation models as world simulators (2024)"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib52",
+      "text": "Zhang, L., Rao, A., Agrawala, M.: Adding conditional control to text-to-image diffusion models. In: Proceedings of the IEEE/CVF International Conference on Computer Vision. pp. 3836–3847 (2023)"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib33",
+      "text": "Rombach, R., Blattmann, A., Lorenz, D., Esser, P., Ommer, B.: High-resolution image synthesis with latent diffusion models. In: Proceedings of the IEEE/CVF conference on computer vision and pattern recognition. pp. 10684–10695 (2022)"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib32",
+      "text": "Ramesh, A., Dhariwal, P., Nichol, A., Chu, C., Chen, M.: Hierarchical text-conditional image generation with clip latents. arXiv preprint arXiv:2204.06125 1 (2), 3 (2022)"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib19",
+      "text": "Hao, Z., Huang, X., Belongie, S.: Controllable video generation with sparse trajectories. In: Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition. pp. 7854–7863 (2018)"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib2",
+      "text": "Ardino, P., De Nadai, M., Lepri, B., Ricci, E., Lathuilière, S.: Click to move: Controlling video generation with sparse motion. In: Proceedings of the IEEE/CVF International Conference on Computer Vision. pp. 14749–14758 (2021)"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib42",
+      "text": "Wang, Z., Yuan, Z., Wang, X., Chen, T., Xia, M., Luo, P., Shan, Y.: Motionctrl: A unified and flexible motion controller for video generation. arXiv preprint arXiv:2312.03641 (2023)"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib49",
+      "text": "Yin, S., Wu, C., Liang, J., Shi, J., Li, H., Ming, G., Duan, N.: Dragnuwa: Fine-grained control in video generation by integrating text, image, and trajectory. arXiv preprint arXiv:2308.08089 (2023)"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib4",
+      "text": "Blattmann, A., Milbich, T., Dorkenwald, M., Ommer, B.: ipoke: Poking a still image for controlled stochastic video synthesis. In: Proceedings of the IEEE/CVF International Conference on Computer Vision. pp. 14707–14717 (2021)"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib5",
+      "text": "Blattmann, A., Milbich, T., Dorkenwald, M., Ommer, B.: Understanding object dynamics for interactive image-to-video synthesis. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 5171–5181 (2021)"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib26",
+      "text": "Kirillov, A., Mintun, E., Ravi, N., Mao, H., Rolland, C., Gustafson, L., Xiao, T., Whitehead, S., Berg, A.C., Lo, W.Y., et al.: Segment anything. arXiv preprint arXiv:2304.02643 (2023)"
+    },
+    {
+      "n": 16,
+      "id": "bib.bib40",
+      "text": "Wang, X., Zhang, X., Cao, Y., Wang, W., Shen, C., Huang, T.: Seggpt: Segmenting everything in context. arXiv preprint arXiv:2304.03284 (2023)"
+    },
+    {
+      "n": 17,
+      "id": "bib.bib11",
+      "text": "Chen, X., Huang, L., Liu, Y., Shen, Y., Zhao, D., Zhao, H.: Anydoor: Zero-shot object-level image customization. arXiv preprint arXiv:2307.09481 (2023)"
+    },
+    {
+      "n": 18,
+      "id": "bib.bib16",
+      "text": "Gu, Y., Zhou, Y., Wu, B., Yu, L., Liu, J.W., Zhao, R., Wu, J.Z., Zhang, D.J., Shou, M.Z., Tang, K.: Videoswap: Customized video subject swapping with interactive semantic point correspondence. arXiv preprint arXiv:2312.02087 (2023)"
+    },
+    {
+      "n": 19,
+      "id": "bib.bib37",
+      "text": "Tang, L., Jia, M., Wang, Q., Phoo, C.P., Hariharan, B.: Emergent correspondence from image diffusion. Advances in Neural Information Processing Systems 36 (2024)"
+    },
+    {
+      "n": 20,
+      "id": "bib.bib31",
+      "text": "Oquab, M., Darcet, T., Moutakanni, T., Vo, H., Szafraniec, M., Khalidov, V., Fernandez, P., Haziza, D., Massa, F., El-Nouby, A., et al.: Dinov2: Learning robust visual features without supervision. arXiv preprint arXiv:2304.07193 (2023)"
+    },
+    {
+      "n": 21,
+      "id": "bib.bib30",
+      "text": "Miao, J., Wang, X., Wu, Y., Li, W., Zhang, X., Wei, Y., Yang, Y.: Large-scale video panoptic segmentation in the wild: A benchmark. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 21033–21043 (2022)"
+    },
+    {
+      "n": 22,
+      "id": "bib.bib25",
+      "text": "Karaev, N., Rocco, I., Graham, B., Neverova, N., Vedaldi, A., Rupprecht, C.: Cotracker: It is better to track together. arXiv:2307.07635 (2023)"
+    }
+  ]
+}

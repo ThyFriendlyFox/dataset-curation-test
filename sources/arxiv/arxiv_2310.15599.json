@@ -1,0 +1,244 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2310.15599",
+  "title": "Grasp Multiple Objects with One Hand",
+  "authors": "Yuyang Li, Bo Liu, Yiran Geng, Puhao Li, Yaodong Yang, Yixin Zhu, Tengyu Liu, Siyuan Huang",
+  "year": "2024",
+  "categories": [
+    "cs.RO",
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2310.15599",
+  "html_url": "https://arxiv.org/html/2310.15599",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1141,
+  "text": "Infants, between 6 to 9 months of age, transition from using a rudimentary “grabbing” technique with their entire hand to a more refined “pincer grasp,” involving only a subset of fingers [1]. This developmental progression underpins advanced object manipulation skills, including the ability to grasp multiple objects [2,3]. Similarly, in robotics, significant advancements have been made in multi-fingered dexterous hands [4,5,6,7,8,9], enabling intricate grasping and in-hand manipulation tasks [10,11,12,13,14,15,16] and enhancing interaction capabilities for embodied intelligence.\n\nHowever, the majority of existing research in robotic grasping focuses on single-object scenarios [7,8,4,5,6]. Common strategies often mirror the action of enveloping the object with the hand and squeezing the fingers towards it [17,6], effectively reducing the use of sophisticated dexterous hands to mere parallel grippers. This overlooks the rich potential of their complex articulated structure and kinematic redundancy.\n\nIn this work, we delve into the less-explored domain of multi-object grasping, an intricate task that necessitates meticulous management of the hand’s dexterous kinematics and dynamics. Our objective is to manipulate a multi-fingered dexterous hand to simultaneously grasp and lift multiple objects placed on a table. Distinct from single-object grasping, multi-object grasping demands independent force closure on each object. In this scenario, each object is a separate entity with no rigid interconnection, presenting unique challenges:\n\n## Diverse Configurations\n\nMulti-object grasping encompasses a broad spectrum of object configurations influenced by varying geometries, combinations, and placements. This diversity is further compounded by the various hand configurations, necessitating the development of adaptable and flexible grasping strategies [3,9].\n\n## Intricate Kinematics\n\nThe task of multi-object grasping requires using the full extent of the hand’s workspace, as each object occupies a significant portion of it. Simple contacts via the palm or fingertips are insufficient. Instead, the entire length and sides of the fingers must be engaged [3,9], necessitating a carefully configured grasping pose for effective force closure on each object while avoiding collisions.\n\n## Complex Dynamics\n\nThe traditional enveloping and squeezing approach, typically employed in single-object grasping, is inadequate for multi-object scenarios. Repositioning a finger to better grasp one object might jeopardize the grasp on another. Therefore, precise control and fine-tuning of the wrenches at each contact point become imperative.\n\nTo address these challenges, we introduce MultiGrasp, a computational framework devised for multi-object grasping. As depicted in Fig. 1, MultiGrasp begins by generating a pre-grasp pose for the given target objects. This pose represents a preliminary hand configuration, serving as a goal strategy for execution. Utilizing this strategy, the framework employs an execution policy to control the hand in picking up the objects. To demonstrate this process, we have constructed Grasp’Em, a large-scale synthetic dataset comprising 90k diverse multi-object grasps, utilizing the Shadow Hand. Moreover, we devise a new grasp generation model [18,19], enabling the efficient generation of pre-grasp poses for novel object configurations. For grasp execution, we propose a dual-stage policy that integrates motion planning for reaching and a learned policy for lifting. In simulations, our method demonstrates a success rate of 44.13\\% in dual-object grasping with a Shadow Hand and shows scalability to handle more objects. Additionally, real-world experiments validate its practical effectiveness.\n\nTo summarize, the primary contributions of this work are: (i) the creation of Grasp’Em, a large-scale synthetic dataset explicitly curated for multi-object grasping research; (ii) the formulation of the first gcrl (gcrl) policy dedicated to the simultaneous grasping and lifting of multiple objects; (iii) the augmentation of the execution policy for enhanced adaptability to novel object configurations and imprecise pre-grasp poses, achieved through specialist distillation and curriculum learning; (iv) the comprehensive framework MultiGrasp, which advances current robotic systems to achieve multi-object grasping.\n\n## I-A Related Work\n\n## Generating dexterous grasping\n\nConditioned on the target objects, the generation of grasping poses for dexterous hands presents a complex challenge due to intricate kinematics and physical constraints. Research in this domain primarily bifurcates into analytical and data-driven approaches [20].\n\nAnalytical methods have a long history, with early research focusing on algorithmic solutions for hand- and object-specific grasping poses [21,22,23,24]. GraspIt! [17] extended this to arbitrary hands and objects, albeit predominantly through a reach-and-squeeze strategy, limiting the diversity of grasping poses. Recent works have introduced generalized grasp quality metrics, such as force closure and Q_{1}, enabling faster and more adaptable grasp synthesis [7,25,26].\n\nConversely, data-driven approaches learn the distribution of feasible grasping poses [27,28,19], or utilize proxy representations such as contact points [29] and contact maps [6,4,30,31], conditioned on the characteristics of the objects.\n\nContemporary research endeavors to reach human-level interaction capabilities, including functional grasping [32], generalizable grasping [6], and multi-object grasping [9].\n\n## Multi-object grasping\n\nThe goal of multi-object grasping is to identify optimal hand configurations for holding multiple objects simultaneously. Research in this area predominantly follows two distinct methodologies. The first approach emphasizes grasping a collection of simple objects, such as balls, bricks, or pencils, with a focus on efficiency in the grasping process. This method often relies on the contacts between objects for grasp stability [33,34,35,36,37]. It typically does not necessitate extensive kinematic redundancy, offering efficient grasping capabilities but at the cost of limited individual object manipulation. The second approach, however, utilizes the hand’s kinematic redundancy by engaging different hand regions to grasp each object. This method allows for more detailed control over individual objects [9]. Our work is more in line with this second approach, where the focus is on maintaining the ability to maneuver each object independently while also enhancing overall grasp efficiency.\n\n## Reinforcement learning\n\nRobotic operation in complex physical environments often presents significant challenges for analytical solutions, particularly due to noisy sensory inputs. In such scenarios, rl has become a favored choice for decision-making and control [38,39,40,41]. The emphasis of rl -based manipulation has largely been on single-object interactions [15,42,4,5,43]. These approaches tend to be inadequate for learning the intricate grasping techniques necessary for dexterous hands. For the complex task of multi-object grasping using dexterous hands where diverse object configurations pose additional challenges, conventional rl strategies are often insufficient. In our work, we employ gcrl [44] to develop robust lifting policies, accelerated by IsaacGym [45].\n\n## I-B Overview of MultiGrasp\n\nFormally, we consider a tabletop scenario populated with multiple objects, denoted as \\mathbf{O}=\\{O_{j}\\}_{j=1}^{N_{o}}. Each object O_{j} is represented as a point cloud in \\mathbb{R}^{N\\times 3}, sampled from its surface S(O_{j}). The objective is to identify a sequence of hand actions, \\mathcal{A}=\\{a^{t}\\}_{t=1}^{T}, enabling the robotic hand to simultaneously grasp all objects. We primarily concentrate on scenarios where the objects are sufficiently proximate for simultaneous grasping.\n\nFig. 1 illustrates the framework. For the given objects \\mathbf{O}, a pre-grasp pose H=(p,R,q) is proposed, encapsulating all targets; p denotes the hand’s position, R its orientation, and q the joint angles. Two methods sample H: a detailed synthetic algorithm (Sec. II-A) and a fast generative model (Sec. II-B). The grasp execution involves following a trajectory to H and then lifting the objects with a learned policy (Sec. III).",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "C. Von Hofsten, “An action perspective on motor development,” Trends in Cognitive Sciences , vol. 8, no. 6, pp. 266–272, 2004."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "H. Moll and M. Tomasello, “Infant cognition,” Current Biology , vol. 20, no. 20, pp. R872–R875, 2010."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "A. Billard and D. Kragic, “Trends and challenges in robot manipulation,” Science , vol. 364, no. 6446, p. eaat8414, 2019."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "Y. Xu, W. Wan, J. Zhang, H. Liu, Z. Shan, H. Shen, R. Wang, H. Geng, Y. Weng, J. Chen et al. , “Unidexgrasp: Universal robotic dexterous grasping via learning diverse proposal generation and goal-conditioned policy,” in CVPR , 2023, pp. 4737–4746."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "W. Wan, H. Geng, Y. Liu, Z. Shan, Y. Yang, L. Yi, and H. Wang, “Unidexgrasp++: Improving dexterous grasping policy learning via geometry-aware curriculum and iterative generalist-specialist learning,” in ICCV , 2023."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "P. Li, T. Liu, Y. Li, Y. Zhu, Y. Yang, and S. Huang, “Gendexgrasp: Generalizable dexterous grasping,” in ICRA , 2023."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "T. Liu, Z. Liu, Z. Jiao, Y. Zhu, and S.-C. Zhu, “Synthesizing diverse and physically stable grasps with arbitrary hand structures using differentiable force closure estimator,” RA-L , vol. 7, no. 1, pp. 470–477, 2021."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "Q. She, R. Hu, J. Xu, M. Liu, K. Xu, and H. Huang, “Learning high-dof reaching-and-grasping via dynamic representation of gripper-object interaction,” TOG , vol. 41, no. 4, pp. 1–14, 2022."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "K. Yao and A. Billard, “Exploiting kinematic redundancy for robotic grasping of multiple objects,” T-RO , 2023."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "M. T. Mason and J. K. Salisbury Jr, Robot hands and the mechanics of manipulation . The MIT Press, Cambridge, MA, 1985."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "N. C. Dafle, A. Rodriguez, R. Paolini, B. Tang, S. S. Srinivasa, M. Erdmann, M. T. Mason, I. Lundberg, H. Staab, and T. Fuhlbrigge, “Extrinsic dexterity: In-hand manipulation with external forces,” in ICRA , 2014."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "D. Rus, “In-hand dexterous manipulation of piecewise-smooth 3-d objects,” IJRR , vol. 18, no. 4, pp. 355–381, 1999."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "B. Calli, K. Srinivasan, A. Morgan, and A. M. Dollar, “Learning modes of within-hand manipulation,” in ICRA , 2018."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "O. M. Andrychowicz, B. Baker, M. Chociej, R. Jozefowicz, B. McGrew, J. Pachocki, A. Petron, M. Plappert, G. Powell, A. Ray et al. , “Learning dexterous in-hand manipulation,” IJRR , vol. 39, no. 1, pp. 3–20, 2020."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "T. Chen, J. Xu, and P. Agrawal, “A system for general in-hand object re-orientation,” in CoRL , 2021."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "Z.-H. Yin, B. Huang, Y. Qin, Q. Chen, and X. Wang, “Rotating without seeing: Towards in-hand dexterity through touch,” arXiv preprint arXiv:2303.10880 , 2023."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "A. T. Miller and P. K. Allen, “Graspit! a versatile simulator for robotic grasping,” RA-M , vol. 11, no. 4, pp. 110–122, 2004."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "J. Ho, A. Jain, and P. Abbeel, “Denoising diffusion probabilistic models,” in NeurIPS , 2020."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "S. Huang, Z. Wang, P. Li, B. Jia, T. Liu, Y. Zhu, W. Liang, and S.-C. Zhu, “Diffusion-based generation, optimization, and planning in 3d scenes,” in CVPR , 2023."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "J. Bohg, A. Morales, T. Asfour, and D. Kragic, “Data-driven grasp synthesis—a survey,” T-RO , vol. 30, no. 2, pp. 289–309, 2013."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "J. Ponce, S. Sullivan, J.-D. Boissonnat, and J.-P. Merlet, “On characterizing and computing three-and four-finger force-closure grasps of polyhedral objects,” in ICRA , 1993."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib22",
+      "text": "J. Ponce, S. Sullivan, A. Sudsang, J.-D. Boissonnat, and J.-P. Merlet, “On computing four-finger equilibrium and force-closure grasps of polyhedral objects,” IJRR , vol. 16, no. 1, pp. 11–35, 1997."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib23",
+      "text": "J.-W. Li, H. Liu, and H.-G. Cai, “On computing three-finger force-closure grasps of 2-d and 3-d objects,” IEEE Transactions on Robotics and Automation , vol. 19, no. 1, pp. 155–161, 2003."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib24",
+      "text": "C. Eppner, A. Mousavian, and D. Fox, “Acronym: A large-scale grasp dataset based on simulation,” in ICRA , 2021."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib25",
+      "text": "R. Wang, J. Zhang, J. Chen, Y. Xu, P. Li, T. Liu, and H. Wang, “Dexgraspnet: A large-scale robotic dexterous grasp dataset for general objects based on simulation,” in ICRA . IEEE, 2023, pp. 11 359–11 366."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib26",
+      "text": "D. Turpin, L. Wang, E. Heiden, Y.-C. Chen, M. Macklin, S. Tsogkas, S. Dickinson, and A. Garg, “Grasp’d: Differentiable contact-rich grasp synthesis for multi-fingered hands,” in ECCV , 2022."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib27",
+      "text": "H. Jiang, S. Liu, J. Wang, and X. Wang, “Hand-object contact consistency reasoning for human grasps generation,” in ICCV , 2021."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib28",
+      "text": "J. Lundell, E. Corona, T. N. Le, F. Verdoja, P. Weinzaepfel, G. Rogez, F. Moreno-Noguer, and V. Kyrki, “Multi-fingan: Generative coarse-to-fine sampling of multi-finger grasps,” in ICRA , 2021."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib29",
+      "text": "L. Shao, F. Ferreira, M. Jorda, V. Nambiar, J. Luo, E. Solowjow, J. A. Ojea, O. Khatib, and J. Bohg, “Unigrasp: Learning a unified model to grasp with multifingered robotic hands,” RA-L , 2020."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib30",
+      "text": "S. Brahmbhatt, A. Handa, J. Hays, and D. Fox, “Contactgrasp: Functional multi-finger grasp synthesis from contact,” in IROS , 2019."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib31",
+      "text": "P. Grady, C. Tang, C. D. Twigg, M. Vo, S. Brahmbhatt, and C. C. Kemp, “Contactopt: Optimizing contact to improve grasps,” in CVPR , 2021."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib32",
+      "text": "A. Agarwal, S. Uppal, K. Shaw, and D. Pathak, “Dexterous functional grasping,” in CoRL , 2023."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib33",
+      "text": "T. Yamada and H. Yamamoto, “Static grasp stability analysis of multiple spatial objects,” Journal of Control Science and Engineering , vol. 3, pp. 118–139, 2015."
+    },
+    {
+      "n": 34,
+      "id": "bib.bib34",
+      "text": "B. Donald, L. Gariepy, and D. Rus, “Distributed manipulation of multiple objects using ropes,” in ICRA , 2000."
+    },
+    {
+      "n": 35,
+      "id": "bib.bib35",
+      "text": "K. Harada and M. Kaneko, “Kinematics and internal force in grasping multiple objects,” in IROS , 1998."
+    },
+    {
+      "n": 36,
+      "id": "bib.bib36",
+      "text": "W. C. Agboh, J. Ichnowski, K. Goldberg, and M. R. Dogar, “Multi-object grasping in the plane,” in The International Symposium of Robotics Research , 2022."
+    },
+    {
+      "n": 37,
+      "id": "bib.bib37",
+      "text": "Y. Sun, E. Amatova, and T. Chen, “Multi-object grasping-types and taxonomy,” in ICRA , 2022."
+    },
+    {
+      "n": 38,
+      "id": "bib.bib38",
+      "text": "J. Hwangbo, J. Lee, A. Dosovitskiy, D. Bellicoso, V. Tsounis, V. Koltun, and M. Hutter, “Learning agile and dynamic motor skills for legged robots,” Science Robotics , vol. 4, no. 26, p. eaau5872, 2019."
+    },
+    {
+      "n": 39,
+      "id": "bib.bib39",
+      "text": "J. Lee, J. Hwangbo, L. Wellhausen, V. Koltun, and M. Hutter, “Learning quadrupedal locomotion over challenging terrain,” Science Robotics , vol. 5, no. 47, p. eabc5986, 2020."
+    },
+    {
+      "n": 40,
+      "id": "bib.bib40",
+      "text": "T. Miki, J. Lee, J. Hwangbo, L. Wellhausen, V. Koltun, and M. Hutter, “Learning robust perceptive locomotion for quadrupedal robots in the wild,” Science Robotics , vol. 7, no. 62, p. eabk2822, 2022."
+    },
+    {
+      "n": 41,
+      "id": "bib.bib41",
+      "text": "F. Jenelten, J. He, F. Farshidian, and M. Hutter, “Dtc: Deep tracking control,” Science Robotics , vol. 9, no. 86, p. eadh5401, 2024."
+    },
+    {
+      "n": 42,
+      "id": "bib.bib42",
+      "text": "Y. Geng, B. An, H. Geng, Y. Chen, Y. Yang, and H. Dong, “Rlafford: End-to-end affordance learning for robotic manipulation,” in ICRA , 2023."
+    },
+    {
+      "n": 43,
+      "id": "bib.bib43",
+      "text": "Y. Chen, T. Wu, S. Wang, X. Feng, J. Jiang, Z. Lu, S. McAleer, H. Dong, S.-C. Zhu, and Y. Yang, “Towards human-level bimanual dexterous manipulation with reinforcement learning,” in NeurIPS , 2022."
+    },
+    {
+      "n": 44,
+      "id": "bib.bib44",
+      "text": "M. Liu, M. Zhu, and W. Zhang, “Goal-conditioned reinforcement learning: Problems and solutions,” in IJCAI , 2022."
+    },
+    {
+      "n": 45,
+      "id": "bib.bib45",
+      "text": "V. Makoviychuk, L. Wawrzyniak, Y. Guo, M. Lu, K. Storey, M. Macklin, D. Hoeller, N. Rudin, A. Allshire, A. Handa et al. , “Isaac gym: High performance gpu-based physics simulation for robot learning,” arXiv preprint arXiv:2108.10470 , 2021."
+    }
+  ]
+}

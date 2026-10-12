@@ -1,0 +1,98 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2401.00865",
+  "title": "Xorbits: Automating Operator Tiling for Distributed Data Science",
+  "authors": "Weizheng Lu, Kaisheng He, Xuye Qin, Chengjie Li, Zhong Wang, Tao Yuan, Xia Liao, Feng Zhang, Yueguo Chen, Xiaoyong Du",
+  "year": "2024",
+  "categories": [
+    "cs.DC"
+  ],
+  "url": "https://arxiv.org/abs/2401.00865",
+  "html_url": "https://arxiv.org/html/2401.00865",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 776,
+  "text": "Data science (DS) pipelines are increasingly prevalent in today’s world, owing to the emerging applications of machine learning (ML), artificial intelligence (AI), and data-driven business intelligence (BI) [1,2]. Dataframe and array systems, specifically pandas [3] and NumPy [4], form the most substantial portion of data science pipelines. The two libraries have gained widespread recognition among developers globally [5] primarily attributed to their various operators, flexible usage, and user-friendly interfaces. However, these two packages suffer scalability problems as they cannot distribute to multi-cores or multi-nodes, missing big data processing capability [6]. As datasets rapidly grow and workloads become more complex, there is an ever-increasing need to scale these libraries by utilizing computational resources far beyond what a single CPU-only node can offer. Several frameworks, such as PySpark [7], Dask [8], Ray [9], mpi4py [10], and Modin [11], have been developed to address scalability concerns for data science workloads. However, our empirical studies reveal two significant issues with these tools. First, they struggle with handling extremely large datasets due to poor data partitioning and out-of-memory (OOM) problems, particularly in data-skewing scenarios. These systems build the computation graphs and partition data primarily by estimating the size of initial data sources ahead of runtime [2]. However, the size of in-memory data can fluctuate after executing a series of data science operators, potentially diverging from the initial size. This can lead to memory exhaustion on specific worker nodes, especially during shuffle-intensive operations such as groupby or merge. Second, they are not fully compatible with widely-used pandas and NumPy APIs [12,13]. This necessitates substantial code rewriting from users and is problematic as most data scientists only specialize in data modeling rather than parallel programming. These challenges significantly hinder users aiming to scale their data science workloads.\n\nTo address these problems, we develop Xorbits, a scalable data science engine that enables parallel execution of workloads like data-loading, preprocessing, scientific computing, analyzing, machine learning, etc. First, to optimize computation graphs at a finer granularity, we design three types of graphs—tileable graph (logical plan), chunk graph (coarse-grained physical plan), and subtask graph (fine-grained physical plan), in conjunction with a multi-stage map-combine-reduce programming model. Second, we introduce a novel dynamic tiling approach for automatic graph construction. This approach can switch between graph construction and graph execution, enabling us to build graphs by leveraging metadata from execution. It considers the current operator’s actual input data shape. Leveraging this real-time metadata, Xorbits can effectively partition and process data without encountering OOM issues, even when the data’s shape substantially deviates from the initial data source. Third, given the tiled graph, we employ graph-level and operator-level fusion. We also apply various optimizations, such as an intermediate storage service that utilizes different levels of storage devices, especially memory.\n\nXorbits can act as a drop-in replacement for the single-node data science libraries (i.e., pandas, NumPy, HuggingFace’s datasets, etc) while ensuring competitive performance. Since Xorbits’ APIs are identical to the original libraries, using Xorbits simply requires replacing the import code. As a result, users can scale data science programs with as many computing resources as they desire. As of October 2023, Xorbits and its predecessor, Mars [14], have earned 3.4k stars on GitHub and have nearly 3k weekly downloads. Our users have successfully deployed Xorbits into their production environments, with up to 5,000 CPU cores. Xorbits has significantly expedited various data science and machine learning tasks such as financial risk management, fraud detection, user behavior analysis, and e-commerce recommendations.\n\nWe evaluate Xorbits’ performance on dataframe and array operations using a combination of industry-standard benchmarks, such as TPCx-AI [15] and TPC-H [16], along with real-world workloads. Compared to the fastest state-of-the-art solutions, Xorbits achieves a substantial 2.66 \\times average speedup on data science operations that are supported by all baseline systems. Regarding API coverage, Xorbits attains a compatibility rate of 96.7%, surpassing the fastest framework by an impressive margin of 60 percentage points. To provide an understanding of our optimizations, including dynamic tiling, we present an ablation analysis that delves into their effects on performance.\n\nTo summarize, this paper makes the following contributions:\n\n- • We present the design of Xorbits, formalize three types of computation graphs, and propose the multi-stage map-combine-reduce computation model.\n\n- • We propose the dynamic tiling approach, which leverages metadata from execution to partition data automatically.\n\n- • We provide the details of optimization and implementations, including graph fusion, intermediate storage service, and auto re-chunking,.\n\n- • We evaluate Xorbits against existing systems like PySpark, Dask, and Modin on various benchmarks. We demonstrate significant speedups over these systems on data science pipelines, data analysis, and array computing workloads. Additionally, Xorbits supports a wide range of APIs and usage patterns.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "C. Yan and Y. He, “Auto-Suggest: Learning-to-Recommend Data Preparation Steps Using Data Science Notebooks,” in Proceedings of the 2020 International Conference on Management of Data (SIGMOD 2020), Portland, OR, USA: ACM, 2020, pp. 1539–1554."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "D. Petersohn, S. Macke, D. Xin, W. Ma, D. Lee, X. Mo, et al., “Towards scalable dataframe systems,” Proceedings of the VLDB Endowment. vol. 13, no. 12, pp. 2033–2046, 2020."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib4",
+      "text": "W. McKinney, “Data structures for statistical computing in python,” in Proceedings of the 9th python in science conference 2010 (SciPy 2010), Austin, USA, 2010, pp. 56–61"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib5",
+      "text": "C. R. Harris, K. J. Millman, S. J. van der Walt, R. Gommers, P. Virtanen, D. Cournapeau, et al., “Array programming with NumPy,” Nature, vol. 585, no. 7825, pp. 357–362, Sep 2020"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib6",
+      "text": "“2023 Developer Survey” https://survey.stackoverflow.co/2023/ (accessed Sep. 28, 2023)."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib7",
+      "text": "“GlobalInterpreterLock - Python Wiki.” https://wiki.python.org/moin/GlobalInterpreterLock (accessed Jun. 26, 2023)."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib8",
+      "text": "M. Zaharia, R. S. Xin, P. Wendell, T. Das, M. Armbrust, A. Dave, et al., “Apache spark: a unified engine for big data processing,” Communications of the ACM, vol. 59, no. 11, pp. 56–65, 2016."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib9",
+      "text": "M. Rocklin, “Dask: Parallel Computation with Blocked algorithms and Task Scheduling,” presented at the Python in Science Conference, Austin, TX, USA, 2015, pp. 126–132."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib10",
+      "text": "P. Moritz, R. Nishihara, S. Wang, A. Tumanov, R. Liaw, E. Liang, et al., “Ray: A distributed framework for emerging AI applications,” in Proceedings of the 13th USENIX conference on operating systems design and implementation (OSDI 2018), Carlsbad, CA, USA: USENIX Association, 2018, pp. 561–577."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib11",
+      "text": "L. Dalcín, R. Paz, and M. Storti, “MPI for python,” Journal of Parallel and Distributed Computing, vol. 65, no. 9, pp. 1108–1115, 2005."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib12",
+      "text": "D. Petersohn, D. Tang, R. Durrani, A. Melik-Adamyan, J. E. Gonzalez, A. D. Joseph, and A. G. Parameswaran, “Flexible rule-based decomposition and metadata independence in modin: a parallel dataframe system,” Proceedings of the VLDB Endowment, vol. 15, no. 3, pp. 739–751, Nov. 2021."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib13",
+      "text": "“From/to pandas and PySpark DataFrames” https://spark.apache.org/docs/3.5.0/api/python/user_guide/pandas_on_spark/pandas_on_spark/pandas_pyspark.html (accessed Aug. 26, 2023)."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib14",
+      "text": "“Dask DataFrames Best Practices” https://docs.dask.org/en/stable/dataframe-best-practices.html (accessed Sep. 26, 2023)."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib15",
+      "text": "”Mars” https://github.com/mars-project/mars (accessed Oct. 21, 2023)."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib16",
+      "text": "C. Brücke, P. Härtling, R. D. E. Palacios, H. Patel, and T. Rabl, “TPCx-AI - an industry standard benchmark for artificial intelligence and machine learning systems,” Proceedings of the VLDB Endowment, vol. 16, no. 12, pp. 3649–3661, 2023."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib17",
+      "text": "P. Boncz, T. Neumann, and O. Erling, “TPC-H analyzed: Hidden messages and lessons learned from an influential benchmark,” in Performance characterization and benchmarking, Cham: Springer International Publishing, 2014, pp. 61–76."
+    }
+  ]
+}

@@ -1,0 +1,93 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.03906",
+  "title": "On HTLC-Based Protocols for Multi-Party Cross-Chain Swaps",
+  "authors": "Emily Clark, Chloe Georgiou, Katelyn Poon, Marek Chrobak",
+  "year": "2024",
+  "categories": [
+    "cs.DS"
+  ],
+  "url": "https://arxiv.org/abs/2403.03906",
+  "html_url": "https://arxiv.org/html/2403.03906",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1206,
+  "text": "In his 2018 paper [1], Herlihy introduced a model for multi-party asset swaps across different blockchains. In this model an asset swap is represented by a strongly connected directed graph (digraph), with each vertex corresponding to one party and each arc representing a pre-arranged asset transfer between two parties. Given such a digraph, the goal is to design a protocol to implement the transfer of all assets. There is no guarantee that all parties will follow the protocol — some parties may attempt to cheat, even colluding between themselves, or behave irrationally. The protocol must guarantee, irrespective of the behavior of other parties, that each honest party will end up with an outcome that it considers acceptable. The protocol should also discourage cheating, so that any coalition of parties cannot improve its outcome by deviating from the protocol. These two conditions are called safety and strong Nash equilibrium, respectively. A protocol that satisfies these conditions is called atomic (see the formal definitions in Section 3).\n\nIn this model, Herlihy [1] developed an atomic protocol for multi-party asset swaps in arbitrary strongly connected digraphs. This result constitutes a major advance in our understanding of fundamental principles of asset swaps, as it shows that it is possible, in principle, to securely implement complex transactions involving multiple parties even if their assets are hosted on multiple blockchains. Yet the practical significance of his protocol is limited due to its intricacy and high computational complexity. Asset transfers in this protocol are realized via smart contracts that need to store and process the whole swap digraph, and designing these contracts involves solving \\mathbb{NP} -hard graph problems, like finding long paths or a small feedback vertex set. To achieve the safety property, it uses an elaborate cryptographic scheme involving nested digital signatures. Another concern is privacy: since the execution of the protocol requires the parties to know the topology of the whole swap digraph, they also receive information about asset transfers between other parties.\n\nHerlihy’s paper [1] also mentions a simplified and more efficient version of his protocol. In terms of cryptographic tools, this simpler protocol uses only standard smart contracts called hash time-lock contracts (HTLC’s), that require only one secret/hashlock pair and a time-out mechanism. This protocol, however, has only limited applicability: it works correctly only for special types of digraphs, that we call bottleneck digraphs in our paper. These are strongly connected digraphs in which all cycles overlap on at least one vertex.\n\nThis raises a natural question, already posed in [1]: Is there a simple and efficient protocol for multi-party asset swaps that is atomic and works on all strongly connected digraphs?\n\nOur contributions. Our work was motivated by the above question. Specifically, the question we address is this: Is it possible to solve the cross-chain swap problem with an atomic protocol that is computationally efficient and uses only HTLCs for asset transfers? We show that, while such HTLC-based protocols are not possible for arbitrary digraphs, the class of digraphs that have such protocols is much broader than just bottleneck digraphs. In fact, we give a complete characterization of digraphs that have HTLC-based protocols. We call them reuniclus graphs. A reuniclus graph consists of a number of (weakly) biconnected components, with each component being an induced bottleneck subgraph. These components form a hierarchical tree-like structure, where the bottleneck of each non-root component is an articulation vertex belonging to its parent component. (See the formal definition in Section 4.2).\n\nTo establish our characterization, we need to formalize the concepts of HTLCs and HTLC-based protocols. In our model, an HTLC is a smart contract used to transfer an asset from its seller to its buyer that (roughly) works like this: After it’s created by the seller, the contract stores (escrows) this asset secured with a hashlock value and with a timeout (expiration) value, both provided by the seller. To claim this asset, the buyer must provide a secret value that matches the hashlock. If the asset is not successfully claimed by the buyer before its timeout, the contract automatically returns the asset to the seller. In a HTLC-based protocol, all asset transfers are implemented with HTLCs, and each party is allowed to generate one secret/hashlock pair, with the hashlock value obtained from the secret value using a one-way permutation.\n\nIn this terminology, our main contribution can be stated as follows:\n\nA swap digraph G has an atomic HTLC-based protocol if and only if G is a reuniclus digraph.\n\nThe proof of Theorem 1 conists of two parts. The sufficiency condition is proved in Section 4, where we provide an HTLC-based atomic protocol for asset swaps in reuniclus digraphs. Our most technically challenging contribution is the proof of the necessity condition, presented in Section 5. This proof shows that non-reuniclus digraphs do not have atomic HTLC-protocols for asset swaps.\n\nAlong the way we also obtain a full characterization of digraphs that admit HTLC-protocols when only one party is allowed to create a secret/hashlock pair. Herlihy [1] showed that bottleneck graphs have such protocols. We complement this result by proving that the bottleneck property is also necessary.\n\nOur asset-swap model is in fact a slight generalization of the one in [1], as it uses a relaxed definition of the preference relation, which allows each party to customize some of the preferences between its outcomes. As we explain in Section 3, all crucial properties of the model in [1] remain valid. Among these, the most critical is given in Lemma 1, which says that in this model the strong Nash equlibrium property is in essence a consequence of the safety property of a protocol; thus, in a way, it comes “for free”.\n\nRelated work. The problem of securely exchanging digital products between two untrustful parties has been studied since 1990s under the name of fair exchange. As simultaneous exchange is not feasible in a typical electronic setting, protocols for fair exchage rely on a trusted party and use cryptographic tools to reduce the need for this trusted party to interfere – see for example [2,3,4,5,6]. In the asset-swap model from [1], adopted in our paper, one can think of smart contracts as playing the role of trusted parties.\n\nStarting in early 2000’s, with different users holding assets on a quickly growing number of different blockchains, cross-chain interoperability tools became necessary to allow these users to trade their assets. An atomic swap concept was one of the proposed tools to address this issue. The concept itself and some early implementations of asset-swap protocols (see, for example [7]) predate the work of Herlihy [1], although his paper was first to provide systematic treatment of such protocols and extend it to multiple parties.\n\nIn recent years there has been intensive research activity aimed at improving various aspects of asset-swap protocols. The preference relation of the participants in the model from [1] is very rudimentary, and some refinements of this preference model were studied in [8,9]. Some proposals [10,11] address the issue of “ griefing”, when one party needs to wait for the counter-party to act, while its assets are locked and unaccessible. Other directions of study include investigations of protocol’s time and space complexity [9], privacy issues [12], and generalizations of swaps to more complex transactions [13,14,15].",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib8",
+      "text": "Maurice Herlihy. Atomic cross-chain swaps. In Proceedings of the 2018 ACM Symposium on Principles of Distributed Computing , PODC ’18, pages 245–254, New York, NY, USA, 2018. ACM."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib12",
+      "text": "Silvio Micali. Simple and fast optimistic protocols for btcwiki electronic exchange. In Proceedings of the Twenty-second Annual Symposium on Principles of Distributed Computing , PODC ’03, pages 12–19, New York, NY, USA, 2003. ACM."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib6",
+      "text": "Matt Franklin and Gene Tsudik. Secure group barter: Multi-party fair exchange with semi-trusted neutral parties. In Rafael Hirchfeld, editor, Financial Cryptography , pages 90–102, Berlin, Heidelberg, 1998. Springer Berlin Heidelberg."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib3",
+      "text": "Michael Ben-Or, Oded Goldreich, Silvio Micali, and Ronald L. Rivest. A fair protocol for signing contracts. In Wilfried Brauer, editor, Automata, Languages and Programming , pages 43–52, Berlin, Heidelberg, 1985. Springer Berlin Heidelberg."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib1",
+      "text": "N. Asokan, Matthias Schunter, and Michael Waidner. Optimistic protocols for fair exchange. In Proceedings of the 4th ACM Conference on Computer and Communications Security , CCS ’97, pages 7–17, New York, NY, USA, 1997. ACM."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib2",
+      "text": "N. Asokan, Victor Shoup, and Michael Waidner. Optimistic fair exchange of digital signatures. IEEE Journal on Selected Areas in Communications , 18:593–610, 1997."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib14",
+      "text": "Tier Nolan. Alt chains and atomic transfers. https://bitcointalk.org/index.php?topic=193281.msg2224949#msg2224949 , 2013. [Online; accessed 23-January-2021]."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib4",
+      "text": "Eric Chan, Marek Chrobak, and Mohsen Lesani. Cross-chain swaps with preferences. In 36th IEEE Computer Security Foundations Symposium, CSF 2023, Dubrovnik, Croatia, July 10-14, 2023 , pages 261–275. IEEE, 2023."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib10",
+      "text": "Soichiro Imoto, Yuichi Sudo, Hirotsugu Kakugawa, and Toshimitsu Masuzawa. Atomic cross-chain swaps with improved space and local time complexity, 2019."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib11",
+      "text": "Subhra Mazumdar. Towards faster settlement in htlc-based cross-chain atomic swaps, 2022."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib15",
+      "text": "Yingjie Xue and Maurice Herlihy. Hedging against sore loser attacks in cross-chain transactions. In Proceedings of the 2021 ACM Symposium on Principles of Distributed Computing , PODC’21, page 155–164, New York, NY, USA, 2021. Association for Computing Machinery."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib5",
+      "text": "Apoorvaa Deshpande and Maurice Herlihy. Privacy-preserving cross-chain atomic swaps. In International Conference on Financial Cryptography and Data Security , pages 540–549. Springer, 2020."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib9",
+      "text": "Maurice Herlihy, Barbara Liskov, and Liuba Shrira. Cross-chain deals and adversarial commerce. arXiv preprint arXiv:1905.09743 , 2019."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib13",
+      "text": "Sri AravindaKrishnan Thyagarajan, Giulio Malavolta, and Pedro Moreno-Sánchez. Universal atomic swaps: Secure exchange of coins across all blockchains. Cryptology ePrint Archive , 2021."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib7",
+      "text": "Ethan Heilman, Sebastien Lipmann, and Sharon Goldberg. The arwen trading protocols. In International Conference on Financial Cryptography and Data Security , pages 156–173. Springer, 2020."
+    }
+  ]
+}

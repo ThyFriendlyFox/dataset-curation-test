@@ -1,0 +1,39 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.10746",
+  "title": "Vector search with small radiuses",
+  "authors": "Gergely Szilvasy, Pierre-Emmanuel MazarÃ©, Matthijs Douze",
+  "year": "2024",
+  "categories": [
+    "cs.CV",
+    "cs.DB"
+  ],
+  "url": "https://arxiv.org/abs/2403.10746",
+  "html_url": "https://arxiv.org/html/2403.10746",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 700,
+  "text": "Similarity search is a task of information retrieval widely used in various applications, including ranking, recommendations, or trust and safety. Given a query item, the objective is to find the most similar item from a collection (the database). The items can be images, videos, text, products, social media posts, etc. To enable efficient search, both the database entities and the queries can be encoded as high-dimensional vectors, typically neural embeddings [1,2,3]. Instead of exhaustively comparing queries with the entire database, we employ approximate nearest neighbor search algorithms, that strike a balance between computational cost (time and space) and search accuracy.\n\nIn the classical web search setting, a user submits a query to the system, which returns a ranked list of results of fixed size. The results are then displayed to the user by decreasing order of relevance with a fixed number of results. In the embedding space, this is implemented by retrieving a fixed number of results per query vector: it is k -nearest-neighbor search (k-NN).\n\nHowever, for real-world collections of items, most query items will have no match while others may have millions. Besides, embedding extractors are commonly designed so that a distance threshold can distinguish matching from non-matching item pairs. Therefore, the relevant search criterion, rather than k-NN search, is to select all database items that are closer than a threshold to the query vector: this is range search. The range search results in embedding space undergo a post-verification stage: the pairs of query-database item are analyzed with a more computationally demanding method to distinguish correct from incorrect matches. For example, for image retrieval, the post-verification may consist in analyzing the images to do pairwise matching. There is a limited post-processing budget.\n\nTherefore, in this work, we consider a setting different from k-NN. The retrieval application does bulk processing, i.e. a large number of queries are processed at once. The range search threshold is set to yield a number of pairs corresponding to the post-verification budget.\n\nEvaluating range search is delicate. For most embedding distributions, the number of ground truth neighbors varies a lot from one query vector to another, to the point that most queries have no neighbor at all. This is partly because the number of matches for the items are imbalanced themselves, but also because the embedding vector distributions tend to be of varying density depending on the neighborhood [4]. Therefore, range search relies on a subset of the query points. Moreover, the distances to most ground truth neighbors are near the range search boundary, which makes the set of neighbors sensitive to low levels of noise.\n\nWe derive a principled metric, RSM, to benchmark range search for bulk search. RSM is based on a very simple model of the filtering ability of the post-processing method. RSM is fast to evaluate and unaffected by the boundary effects of range search.\n\nPractical vector search methods rely on non-exhaustive search to drive down the search time at some cost in accuracy. For example, the IVF method partitions the dataset at building time and visits only a subset of partitions at search time. Besides, to reduce the memory consumption of datasets, the embedding vectors are often compressed to binary vectors or other forms of quantization. These techniques are well studied for k-NN search. Using our new RSM tool, we evaluate IVF indexes and vector compression for bulk range search.\n\nWe find that the optimal indexes for these settings are not the same as for the classical k-NN. Useful range search results tend to be near the query vectors. Therefore, for non-exhaustive indexes, exploring less promising clusters of database vectors quickly yields diminishing returns. Similarly, using accurate vector representations that consume more memory have less impact than for k-NN search. In fact, binary representations compared with Hamming distances, that are fast but much less accurate than quantization based approaches, are relatively competitive in a range search setting.\n\nThe paper starts by reviewing related work in Section 2 and introduces the dataset used throughout for experiments (Section 3). In section 4, we justify and derive the RSM metric. Section 5 applies this metric to vector search experiments, and we conclude with a summary of our key observations in Section 6.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib33",
+      "text": "Ed Pizzi, Sreya Dutta Roy, Sugosh Nagavara Ravindra, Priya Goyal, and Matthijs Douze. A self-supervised descriptor for image copy detection. In Proc. CVPR , 2022."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib10",
+      "text": "Mathilde Caron, Ishan Misra, Julien Mairal, Priya Goyal, Piotr Bojanowski, and Armand Joulin. Unsupervised learning of visual features by contrasting cluster assignments. Proc. NeurIPS , 2020."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib15",
+      "text": "Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. Bert: Pre-training of deep bidirectional transformers for language understanding. arXiv preprint arXiv:1810.04805 , 2018."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib25",
+      "text": "Herve Jegou, Hedi Harzallah, and Cordelia Schmid. A contextual dissimilarity measure for accurate and efficient image search. In 2007 IEEE Conference on computer vision and pattern recognition , pages 1–8. IEEE, 2007."
+    }
+  ]
+}

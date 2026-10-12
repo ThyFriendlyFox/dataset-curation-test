@@ -1,0 +1,45 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.09706",
+  "title": "Schema-Aware Multi-Task Learning for Complex Text-to-SQL",
+  "authors": "Yangjun Wu, Han Wang",
+  "year": "2024",
+  "categories": [
+    "cs.CL",
+    "cs.AI",
+    "cs.DB"
+  ],
+  "url": "https://arxiv.org/abs/2403.09706",
+  "html_url": "https://arxiv.org/html/2403.09706",
+  "license": "http://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Introduction",
+  "word_count": 632,
+  "text": "Text-to-SQL aims to automatically translate a natural language utterance to the corresponding executable SQL query in a given database. By helping the great majority of users who are unfamiliar with the query language, this task has many real-world application scenarios and attracts a great deal of interest. Recently, the large-scale cross-domain text-to-SQL dataset Spider [1] has been released, which contains thousands of complex queries with keywords of JOIN, GROUP BY, etc. Its databases do not overlap between the train and test sets, which requires semantic parsers to have robust inference capability on complex SQL queries.\n\nGiven a question and a large database with multiple tables, neural semantic parsers are expected to encode the internal database relations and model the alignment between schema items and question words. Most existing works [2,3,4,5] inject schema linking into an encoder-decoder network to bridge the mismatch between intent expressed in natural language and the correlated schema table or column. The links are usually obtained via greedy string matching. Considering the example in Figure 1, \" name \" in the question would link to shop.name, employee.name and shop.manager\\_name, but only employee.name is the valid. Unfortunately, all the candidate links are directly fed into the networks to obtain the learnable embeddings regardless of noisy links, where a non-negligible consequence is downgrading the alignment quality and hindering the downstream decoding procedures.\n\nDuring the decoding phase, current semantic parsers usually struggle to choose proper schema items (e.g., tables, columns) for those long and hard SQL queries due to the large search space. Moreover, methods that use exact-set-match accuracy as the evaluation metric would cause the above issue to be more prominent. Because only True or False is given, making it is hard to determine which columns or table names are selected incorrectly. For instance, in the first error case shown in Figure 2, the unexpected column maker in table car\\_makers is inferred in the SELECT clause, which makes the clause wrong, and it’s not desired in the GROUP BY clause. In another case, SELECT and GROUP BY clauses are correctly generated, but the co-presence schema items (car\\_makers.id=model\\_list.maker) in the JOIN ON clause are failed to reason out. The error cases demonstrate the significance of paying attention to identifying the schema item or co-occurrence schema items while synthesizing complex SQL queries.\n\nInspired by these observations, we propose a schema-aware M ulti- T ask learning framework called MTSQL to address the two challenging issues. Specifically, we introduce three tasks, including 1) a schema linking classification task to focus on enhancing the quality of alignment between the natural language question and database schemas. 2) A novel phrase-level task named operator-centric triple extraction to concentrate on capturing the correlated schema items with their relationship, such as the triple (car\\_makers.\\_id, model\\_list.maker, JOIN\\_ON\\_CC) extracted from Figure 2. 3) The standard SQL generation task to synthesize complex SQL queries. MTSQL can leverage the fusion of feature information by sharing the weight parameters to raise schema awareness. Further, we utilize the predicted triples to build a rule set as a grammar constraint (GC) module. During the inferencing process, the GC acts as a driver to filter the SQL syntax sub-trees that meet the syntax rules, improving the selection accuracy of SQL operators and schema items.\n\nExperimental results on the benchmark dataset Spider indicate that our framework obtains 75.6% execution with values accuracy on the overall SQL queries, which performs competitive performance. Turning to the complex SQL queries with JOIN, our approach achieves 64.2% accuracy on the development set with JOIN (Spider_join) and 30.0% accuracy on another more complex dataset (United_Join), both are state-of-the-art. Particularly, further analyses confirm that MTSQL can lead to 2.4 and 1.6 points improvements on Spider_join and United_Join in extra hard scenarios, which verifies that our proposed framework is more robust and effective for complex text-to-SQL.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib24",
+      "text": "Yu et al. (2018) Tao Yu, Rui Zhang, Kai Yang, Michihiro Yasunaga, Dongxu Wang, Zifan Li, James Ma, Irene Li, Qingning Yao, Shanelle Roman, Zilin Zhang, and Dragomir Radev. 2018. Spider: A large-scale human-labeled dataset for complex and cross-domain semantic parsing and text-to-SQL task . In Proceedings of the 2018 Conference on Empirical Methods in Natural Language Processing , pages 3911–3921, Brussels, Belgium. Association for Computational Linguistics."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib8",
+      "text": "Guo et al. (2019) Jiaqi Guo, Zecheng Zhan, Yan Gao, Yan Xiao, Jian-Guang Lou, Ting Liu, and Dongmei Zhang. 2019. Towards complex text-to-SQL in cross-domain database with intermediate representation . In Proceedings of the 57th Annual Meeting of the Association for Computational Linguistics , pages 4524–4535, Florence, Italy. Association for Computational Linguistics."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib6",
+      "text": "Gan et al. (2021) Yujian Gan, Xinyun Chen, Jinxia Xie, Matthew Purver, John R. Woodward, John Drake, and Qiaofu Zhang. 2021. Natural SQL: Making SQL easier to infer from natural language specifications . In Findings of the Association for Computational Linguistics: EMNLP 2021 , pages 2030–2042, Punta Cana, Dominican Republic. Association for Computational Linguistics."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib13",
+      "text": "Rubin and Berant (2021) Ohad Rubin and Jonathan Berant. 2021. SmBoP: Semi-autoregressive bottom-up semantic parsing . In Proceedings of the 2021 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies , pages 311–324, Online. Association for Computational Linguistics."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib17",
+      "text": "Shi et al. (2020) Peng Shi, Patrick Ng, Zhiguo Wang, Henghui Zhu, Alexander Hanbo Li, Jun Wang, Cícero Nogueira dos Santos, and Bing Xiang. 2020. Learning contextual representations for semantic parsing with generation-augmented pre-training . CoRR , abs/2012.10309."
+    }
+  ]
+}

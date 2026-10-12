@@ -1,0 +1,123 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.10082",
+  "title": "CrossGLG: LLM Guides One-shot Skeleton-based 3D Action Recognition in a Cross-level Manner",
+  "authors": "Tingbing Yan, Wenzheng Zeng, Yang Xiao, Xingyu Tong, Bo Tan, Zhiwen Fang, Zhiguo Cao, Joey Tianyi Zhou",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2403.10082",
+  "html_url": "https://arxiv.org/html/2403.10082",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 914,
+  "text": "Driven by the accessibility of low-cost 3D cameras like the Microsoft Kinect [1], 3D skeleton-based action recognition has emerged as an active area of research. Despite the remarkable progress, most works [2,3,4,5] focus on fully supervised settings that heavily rely on large-scale annotated data for feature learning, introducing high annotation costs. One feasible way to alleviate this is to conduct one-shot 3D action feature learning.\n\nTo this end, some pioneer [6,7,8,9,10,11] attempts have been made. They are all based on the raw 3D skeleton data, focusing on low-level information (e.g., joint localization). While they tend to suffer from the following defeats: (1) Existing methods generally can not focus on the crucial local areas, which leads to the loss of important details. (2) The lack of high-level semantic information to guide the models makes it difficult to grasp the deep overall motion characteristics, resulting in a weak generalization for unseen actions.\n\nSome studies [12,13] in the fields of psychology and neuroscience show that humans can easily identify critical motion clues and extrapolate local observations into global conclusions to recognize actions, even with a limited amount of observations. Inspired by this, our motivation is to utilize high-level human knowledge to guide feature learning, for effective one-shot action recognition. Thanks to the recent success of large language models trained on massive web data [14,15,16,17], we can manage to obtain high-level human knowledge from the text they generate. Thus, we propose CrossGLG, a novel architecture that utilizes knowledgeable text descriptions to guide skeleton feature learning in a global-local-global way.\n\nParticularly, as shown in Fig. 1 (a), the paradigm can be divided into 2 main phases: global-to-local (block in green), and local-to-global (block in blue). We first utilize a global action description to guide the skeleton encoder to focus on local informative joints (i.e., global-to-local). The global action description is obtained from an LLM by a designed prompt, which illustrates the important joints when a specific action occurs. We regard those mentioned joints as informative joints and design a Joint Importance Determination Module (JID) to let the skeleton encoder focus on those informative local joints. Such global-to-local guidance can let the skeleton encoder focus more on the important local clues for effective motion representation.\n\nBased on the enhanced local joint features, we further build a non-local interaction between local joint skeleton features and local joint-level motion descriptions generated from the LLM, to achieve the so-called local-to-global. Within it, effective feature exchange between local joint-level text-text, skeleton-skeleton, and skeleton-text has been established to enhance the global-aware ability of local features, forming a global summary of the action. In conclusion, the proposed cross-modal global-local-global guiding strategy lets the skeleton encoder first identify critical motion clues and then extrapolate local observations into global conclusions to effectively recognize actions.\n\nAnother issue is that for practical applications, the network is not capable of using text data during inference. To mitigate the asymmetry issue between the training and inference phases, we design a dual-branch architecture. Specifically, we divide the whole framework into a skeleton encoding branch and a cross-modal guidance branch, where the skeleton encoding branch is only responsible for skeleton feature encoding, and the cross-modal guidance branch is responsible for guiding the feature learning of the skeleton encoding branch, in the aforementioned global-local-global way. During training, we introduce a shared classifier to those two branches to reduce the feature gap between them. Such design not only lets features in the skeleton branch learn from the cross-modal guidance branch during training, but also keeps those two-branch features consistent so that only the skeleton encoder is needed during inference, without the need for any additional modal data.\n\nThe proposed CrossGLG makes the feature encoder learn fine-grained high-level semantic information from the text description both globally and locally. As shown in Fig. 1 (a), in the action ‘flick hair’, the joints of the arm and hand are of greater importance than joints such as the spine. Meanwhile, our visualization results show that for the novel class action that was not seen during training, the model without fine-tuning can still pay more attention to the informative clues. This implies that the model’s spatial information grasping ability has been greatly improved and can really focus on important local regions with strong generalization ability. Extensive experiments on three benchmark (i.e., NTU RGB+D 60 [18], NTU RGB+D 120 [11], and Kinetics [19]) also validate the effectiveness of the proposed method. Our method achieves state-of-the-art performance on both datasets in terms of accuracy and efficiency. Notably, CrossGLG outperforms the SOTA methods by 6.6\\% and 5.9\\% in the experimental settings of 20 and 80 base classes on NTU RGB+D 120 [11], while maintaining a model size that is only 2.8% of the previous SOTA [7]. Moreover, as shown in Fig. 1 (b), CrossGLG can also serve as a plug-and-play module that can substantially enhance the performance of different SOTA skeleton encoders [7,20,21] with a neglectable cost during inference.\n\nIn summary, our contributions are summarized below:\n\n\\bullet We are the first to consider text descriptions from large language models to facilitate one-shot skeleton-based 3D human action recognition.\n\n\\bullet We design CrossGLG, a novel architecture that utilizes knowledgeable text descriptions to guide skeleton feature learning in a global-local-global way, for effective one-shot 3D action recognition.\n\n\\bullet We propose a dual-branch architecture to address the asymmetry issue between training and testing.\n\n\\bullet CrossGLG can serve as a plug-and-play module that can substantially enhance the performance of different SOTA skeleton encoders with a neglectable cost during inference.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib40",
+      "text": "Zhang, Z.: Microsoft kinect sensor and its effect. IEEE multimedia 19 (2), 4–10 (2012)"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib37",
+      "text": "Yan, S., Xiong, Y., Lin, D.: Spatial temporal graph convolutional networks for skeleton-based action recognition. In: Proceedings of the AAAI conference on artificial intelligence. vol. 32 (2018)"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib24",
+      "text": "Plizzari, C., Cannici, M., Matteucci, M.: Spatial temporal transformer network for skeleton-based action recognition. In: Pattern Recognition. ICPR International Workshops and Challenges: Virtual Event, January 10–15, 2021, Proceedings, Part III. pp. 694–701. Springer (2021)"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib16",
+      "text": "Li, M., Chen, S., Chen, X., Zhang, Y., Wang, Y., Tian, Q.: Actional-structural graph convolutional networks for skeleton-based action recognition. In: Proceedings of the IEEE/CVF conference on computer vision and pattern recognition. pp. 3595–3603 (2019)"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib14",
+      "text": "Lee, J., Lee, M., Lee, D., Lee, S.: Hierarchically decomposed graph convolutional networks for skeleton-based action recognition. In: Proceedings of the IEEE/CVF International Conference on Computer Vision. pp. 10444–10453 (2023)"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib42",
+      "text": "Zhu, A., Ke, Q., Gong, M., Bailey, J.: Adaptive local-component-aware graph convolutional network for one-shot skeleton-based action recognition. In: Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision. pp. 6038–6047 (2023)"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib43",
+      "text": "Zhu, W., Ma, X., Liu, Z., Liu, L., Wu, W., Wang, Y.: Motionbert: A unified perspective on learning human motion representations. In: Proceedings of the IEEE/CVF International Conference on Computer Vision. pp. 15085–15099 (2023)"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib20",
+      "text": "Memmesheimer, R., Häring, S., Theisen, N., Paulus, D.: Skeleton-dml: Deep metric learning for skeleton-based one-shot action recognition. In: Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision. pp. 3702–3710 (2022)"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib21",
+      "text": "Memmesheimer, R., Theisen, N., Paulus, D.: Sl-dml: Signal level deep metric learning for multimodal one-shot action recognition. In: 2020 25th International conference on pattern recognition. pp. 4573–4580. IEEE (2021)"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib34",
+      "text": "Wang, L., Koniusz, P.: Uncertainty-dtw for time series and sequences. In: European Conference on Computer Vision. pp. 176–195. Springer (2022)"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib17",
+      "text": "Liu, J., Shahroudy, A., Perez, M., Wang, G., Duan, L.Y., Kot, A.C.: Ntu rgb+ d 120: A large-scale benchmark for 3d human activity understanding. IEEE transactions on pattern analysis and machine intelligence 42 (10), 2684–2701 (2019)"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib2",
+      "text": "Blake, R., Shiffrar, M.: Perception of human motion. Annu. Rev. Psychol. 58 , 47–73 (2007)"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib8",
+      "text": "Hadad, B., Schwartz, S., Maurer, D., Lewis, T.L.: Motion perception: a review of developmental changes and the role of early visual experience. Frontiers in integrative neuroscience 9 , 49 (2015)"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib3",
+      "text": "Brown, T., Mann, B., Ryder, N., Subbiah, M., Kaplan, J.D., Dhariwal, P., Neelakantan, A., Shyam, P., Sastry, G., Askell, A., et al.: Language models are few-shot learners. Advances in neural information processing systems 33 , 1877–1901 (2020)"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib18",
+      "text": "Liu, P., Yuan, W., Fu, J., Jiang, Z., Hayashi, H., Neubig, G.: Pre-train, prompt, and predict: A systematic survey of prompting methods in natural language processing. ACM Computing Surveys 55 (9), 1–35 (2023)"
+    },
+    {
+      "n": 16,
+      "id": "bib.bib22",
+      "text": "Ouyang, L., Wu, J., Jiang, X., Almeida, D., Wainwright, C., Mishkin, P., Zhang, C., Agarwal, S., Slama, K., Ray, A., et al.: Training language models to follow instructions with human feedback. Advances in Neural Information Processing Systems 35 , 27730–27744 (2022)"
+    },
+    {
+      "n": 17,
+      "id": "bib.bib35",
+      "text": "Wei, J., Wang, X., Schuurmans, D., Bosma, M., Xia, F., Chi, E., Le, Q.V., Zhou, D., et al.: Chain-of-thought prompting elicits reasoning in large language models. Advances in Neural Information Processing Systems 35 , 24824–24837 (2022)"
+    },
+    {
+      "n": 18,
+      "id": "bib.bib28",
+      "text": "Shahroudy, A., Liu, J., Ng, T.T., Wang, G.: Ntu rgb+ d: A large scale dataset for 3d human activity analysis. In: Proceedings of the IEEE conference on computer vision and pattern recognition. pp. 1010–1019 (2016)"
+    },
+    {
+      "n": 19,
+      "id": "bib.bib12",
+      "text": "Kay, W., Carreira, J., Simonyan, K., Zhang, B., Hillier, C., Vijayanarasimhan, S., Viola, F., Green, T., Back, T., Natsev, P., et al.: The kinetics human action video dataset. arXiv preprint arXiv:1705.06950 (2017)"
+    },
+    {
+      "n": 20,
+      "id": "bib.bib15",
+      "text": "Lee, J., Lee, M., Lee, D., Lee, S.: Hierarchically decomposed graph convolutional networks for skeleton-based action recognition. In: Proceedings of the IEEE/CVF International Conference on Computer Vision. pp. 10444–10453 (2023)"
+    },
+    {
+      "n": 21,
+      "id": "bib.bib5",
+      "text": "Chi, H.g., Ha, M.H., Chi, S., Lee, S.W., Huang, Q., Ramani, K.: Infogcn: Representation learning for human skeleton-based action recognition. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 20186–20196 (2022)"
+    }
+  ]
+}

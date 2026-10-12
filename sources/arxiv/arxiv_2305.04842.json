@@ -1,0 +1,79 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2305.04842",
+  "title": "Outcome Separation Logic: Local Reasoning for Correctness and Incorrectness with Computational Effects",
+  "authors": "Noam Zilberstein, Angelina Saliling, Alexandra Silva",
+  "year": "2024",
+  "categories": [
+    "cs.LO",
+    "cs.PL"
+  ],
+  "url": "https://arxiv.org/abs/2305.04842",
+  "html_url": "https://arxiv.org/html/2305.04842",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 871,
+  "text": "Compositional reasoning using separation logic [1] and bi-abduction [2] has helped scale static analysis to industrial software with hundreds of millions of lines of code, making it possible to analyze code changes without disrupting the fast-paced engineering culture that developers are accustomed to [3,4].\n\nWhile the ideal of fully automated program verification remains elusive, analysis tools can boost confidence in code correctness by ensuring that a program will not go wrong in a variety of ways. In languages like C or C++, this includes ensuring that a program will not crash due to a segmentation fault or leak memory. However, a static analyzer failing to prove the absence of bugs does not imply that the program is incorrect; it could be a false positive.\n\nMany programs are, in fact, incorrect. Analysis tools capable of finding bugs are thus in some cases more useful than verification tools, since the reported errors lead directly to tangible code improvements [5]. Motivated by the need to identify bugs, Incorrectness Logic [6] and Incorrectness Separation Logic (ISL) [7,8] were recently introduced.\n\nWhile ISL enjoys compositionality just like separation logic, the semantics of SL and ISL are incompatible—specifications and analysis tools cannot readily be shared between them. Further, the soundness of local reasoning in each separation logic variant relies on particular assumptions, meaning that no single program logic has a frame rule that can handle all of the following:\n\nComputational Effects. The idea that program commands must be local actions [9] is central to the frame rule. In order to achieve locality, the semantics of memory allocation is often forced to be nondeterministic [10], but this approach is not suitable for local reasoning in alternative execution models such as probabilistic computation.\n\nMay and Must properties. Separation logic can only express properties that must occur, whereas ISL can only express properties that may occur. A logic for both correctness and incorrectness properties must handle both may and must properties.\n\nUnder-approximation. Bug-finding static analyses operate more efficiently by only inspecting a subset of the program paths—the ones that lead to a bug. But many separation logics are fault avoiding; the precondition must specify the resources needed to execute all traces, and therefore the entire program must be inspected. Fault avoidance is unsuitable in logics for incorrectness.\n\nIn this paper, we show that local reasoning is sound under new assumptions, which do not force any particular evaluation model and are therefore compatible with both correctness and incorrectness reasoning. To that end, we introduce Outcome Separation Logic (OSL), a single program logic that can handle all of the aforementioned scenarios. Our contributions are as follows.\n\nOutcome Separation Logic. Our main contribution is Outcome Separation Logic (OSL), an extension of the recently introduced Outcome Logic (OL) [11] for reasoning about pointer programs. While OL already supports correctness and incorrectness reasoning in programs with a variety of effects and much of the metatheory and inference rules carry over from it, the key novelty of OSL is that it is fundamentally based on separation-logic-style heap assertions, which allowed us to develop a frame rule for local reasoning and compositional symbolic execution.\n\nThis was no simple feat; while the soundness of the frame rule is intricate and nuanced even in partial correctness Hoare Logic [10], moving to a logic that supports a variety of assertions about termination, reachability, and probabilistic reasoning complicates the story significantly. OSL is the first program logic that supports local reasoning for both correctness and incorrectness, with the ability to also under-approximate program paths. On top of that, using an algebraic representation of choice, the soundness proof of our frame rule extends to other execution models too, such as probabilistic programs.\n\nSymbolic execution algorithms. As a proof of concept for how OSL enables the consolidation of correctness and incorrectness analysis, we present symbolic execution algorithms to analyze C-like pointer programs. The core algorithm finds all the reachable outcomes, and is therefore tailored for correctness reasoning. We also define a single-path variant—modeled after Incorrectness Logic based bug-finding algorithms (Pulse [7] and Pulse-X [5])—inferring specifications in which the postcondition is just one of the (possibly many) outcomes. While enjoying the scalability benefit of dropping paths, our algorithm can also soundly re-use procedure summaries generated by the correctness algorithm so as to not re-analyze the same procedure.\n\nThese algorithms are based on bi-abduction, which handles sequential programs by reconciling the postcondition of one precomputed spec with the precondition of the next [2,12]. Since programs with effects are not purely sequential, but rather have branching that arises from, e.g., nondeterministic or probabilistic choice, we also introduce tri-abduction, a new form of inference for composing branches in an effectful program.\n\nWe begin in Section 2 by outlining the challenges of local reasoning in a highly expressive program logic. Next, in Sections 3 and 4, we define Outcome Separation Logic (OSL), show three instantiations, and prove the soundness of the frame rule. In Section 5, we define our symbolic execution algorithm and tri-abduction, which is inspired by bi-abduction but is used for branching rather than sequential composition. In Section 6, we examine two case studies to show the applicability of these algorithms and finally we conclude in Sections 7 and 8 by discussing outlooks and related work.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib52",
+      "text": "Reynolds (2002) J.C. Reynolds. 2002. Separation logic: a logic for shared mutable data structures. In Proceedings 17th Annual IEEE Symposium on Logic in Computer Science . 55–74. https://doi.org/10.1109/LICS.2002.1029817"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib18",
+      "text": "Calcagno et al . (2009) Cristiano Calcagno, Dino Distefano, Peter O’Hearn, and Hongseok Yang. 2009. Compositional Shape Analysis by Means of Bi-Abduction. In Proceedings of the 36th Annual ACM SIGPLAN-SIGACT Symposium on Principles of Programming Languages (Savannah, GA, USA) (POPL ’09) . Association for Computing Machinery, New York, NY, USA, 289–300. https://doi.org/10.1145/1480881.1480917"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib17",
+      "text": "Calcagno et al . (2015) Cristiano Calcagno, Dino Distefano, Jeremy Dubreil, Dominik Gabi, Pieter Hooimeijer, Martino Luca, Peter O’Hearn, Irene Papakonstantinou, Jim Purbrick, and Dulma Rodriguez. 2015. Moving Fast with Software Verification. In NASA Formal Methods , Klaus Havelund, Gerard Holzmann, and Rajeev Joshi (Eds.). Springer International Publishing, Cham, 3–11. https://doi.org/10.1007/978-3-319-17524-9_1"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib28",
+      "text": "Distefano et al . (2019) Dino Distefano, Manuel Fähndrich, Francesco Logozzo, and Peter W. O’Hearn. 2019. Scaling Static Analyses at Facebook. Commun. ACM 62, 8 (jul 2019), 62–70. https://doi.org/10.1145/3338112"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib39",
+      "text": "Le et al . (2022) Quang Loc Le, Azalea Raad, Jules Villard, Josh Berdine, Derek Dreyer, and Peter W. O’Hearn. 2022. Finding Real Bugs in Big Programs with Incorrectness Logic. Proc. ACM Program. Lang. 6, OOPSLA1, Article 81 (Apr 2022), 27 pages. https://doi.org/10.1145/3527325"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib47",
+      "text": "O’Hearn (2020) Peter W. O’Hearn. 2020. Incorrectness Logic. Proc. ACM Program. Lang. 4, POPL, Article 10 (Jan. 2020), 32 pages. https://doi.org/10.1145/3371078"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib49",
+      "text": "Raad et al . (2020) Azalea Raad, Josh Berdine, Hoang-Hai Dang, Derek Dreyer, Peter O’Hearn, and Jules Villard. 2020. Local Reasoning About the Presence of Bugs: Incorrectness Separation Logic. In Computer Aided Verification , Shuvendu K. Lahiri and Chao Wang (Eds.). Springer International Publishing, Cham, 225–252. https://doi.org/10.1007/978-3-030-53291-8_14"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib50",
+      "text": "Raad et al . (2022) Azalea Raad, Josh Berdine, Derek Dreyer, and Peter W. O’Hearn. 2022. Concurrent Incorrectness Separation Logic. Proc. ACM Program. Lang. 6, POPL, Article 34 (Jan 2022), 29 pages. https://doi.org/10.1145/3498695"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib20",
+      "text": "Calcagno et al . (2007) Cristiano Calcagno, Peter W. O’Hearn, and Hongseok Yang. 2007. Local Action and Abstract Separation Logic. In 22nd Annual IEEE Symposium on Logic in Computer Science (LICS 2007) . 366–378. https://doi.org/10.1109/LICS.2007.30"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib57",
+      "text": "Yang and O’Hearn (2002) Hongseok Yang and Peter O’Hearn. 2002. A Semantic Basis for Local Reasoning. In Foundations of Software Science and Computation Structures , Mogens Nielsen and Uffe Engberg (Eds.). Springer Berlin Heidelberg, Berlin, Heidelberg, 402–416. https://doi.org/10.1007/3-540-45931-6_28"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib59",
+      "text": "Zilberstein et al . (2023) Noam Zilberstein, Derek Dreyer, and Alexandra Silva. 2023. Outcome Logic: A Unifying Foundation for Correctness and Incorrectness Reasoning. Proc. ACM Program. Lang. 7, OOPSLA1, Article 93 (Apr 2023), 29 pages. https://doi.org/10.1145/3586045"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib19",
+      "text": "Calcagno et al . (2011) Cristiano Calcagno, Dino Distefano, Peter W. O’Hearn, and Hongseok Yang. 2011. Compositional Shape Analysis by Means of Bi-Abduction. J. ACM 58, 6, Article 26 (Dec 2011), 66 pages. https://doi.org/10.1145/2049697.2049700"
+    }
+  ]
+}

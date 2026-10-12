@@ -1,0 +1,114 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.11703",
+  "title": "LLaVA-UHD: an LMM Perceiving Any Aspect Ratio and High-Resolution Images",
+  "authors": "Ruyi Xu, Yuan Yao, Zonghao Guo, Junbo Cui, Zanlin Ni, Chunjiang Ge, Tat-Seng Chua, Zhiyuan Liu, Maosong Sun, Gao Huang",
+  "year": "2024",
+  "categories": [
+    "cs.CV",
+    "cs.AI"
+  ],
+  "url": "https://arxiv.org/abs/2403.11703",
+  "html_url": "https://arxiv.org/html/2403.11703",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 735,
+  "text": "Recent progress in Large Multimodal Models (LMMs) [1,2,3,4,5] has witnessed a significant surge in vision-language understanding, reasoning, and interaction capabilities. This is achieved by projecting visual signals into Large Language Models (LLMs) to enable their visual perception of the world, where visual encoding strategy plays a fundamental role [6,7,4]. Real-world images are known to reside in a wide range of aspect ratios and resolutions, presenting significant challenges for LMMs in various applications.\n\nHowever, most existing LMMs [8,2,4] perceive images in a fixed aspect ratio (i.e., 1:1) and a low resolution (i.e., 224 \\times 224). The compromise to this simplified setting typically leads to severe shape distortion and blur of image contents. The problem significantly hurts the capabilities of LMMs, especially for fine-grained capabilities, such as small object understanding [9] and optical character recognition [10,5,11]. Moreover, the issue also exacerbates hallucination problems (i.e., producing textual responses not factually grounded in images), since models can only learn to make best guesses to blurred images [12,13].\n\nTo achieve image perception in varied aspect ratios and high resolutions for LMMs, there are two main challenges: (1) Adaptivity. Since visual encoders (e.g., CLIP-ViT [14]) are pretrained in fixed resolutions, it can be difficult to deal with images in a wide range of aspect ratios and resolutions. Simple image interpolation that deviates far from the pretraining scenarios can result in out-of-distribution issues. (2) Efficiency. Directly encoding high-resolution images using vision Transformers [15] requires quadratic computation cost with respect to image sizes. In addition, it can be even more costly for LLMs to process the large number of visual tokens from high-resolution images (e.g., 4096 tokens for 896 \\times 896 images in ViT-L/14).\n\nMoreover, careless visual encoding strategies can even result in systematic flaws in correctness. For example, despite its powerful capabilities in various aspects, it has been commonly reported that GPT-4V [16] can surprisingly struggle in some basic capabilities, such as identifying the number of objects [17]. The mechanistic cause for such embarrassment remains largely unknown. In this work, we perform the first mechanistic investigation of GPT-4V flaws from the perspective of visual encoding strategy. Our controlled experiments in probing GPT-4V show that the problem can be partially rooted in its visual encoding strategy in dealing with high-resolution images. Investigation on LLaVA-1.5 [18], a representative open-source LMM also shows systematic issues in correctness, indicating their potential vulnerability for adversarial attacks.\n\nTo address the challenges, we present LLaVA-UHD, a large multimodal model that efficiently perceives any aspect ratio and high-resolution images. The model has three key components: (1) At the core of LLaVA-UHD is an image modularization strategy that divides native-resolution images into smaller variable-sized slices for efficient and extensible encoding. In comparison to recent works that fit images into several fixed aspect ratios and resolutions [19,3], the variable-sized slices in LLaVA-UHD enable full adaptivity to native-resolution images without padding or shape-distorting resizing. This is in analogy to the better adaptivity of using water drops vs. ice cubes in full-filling variable-sized glasses. We also show that the strategy guarantees minor deviation from the pretraining setting of visual encoders to maximally retain their capabilities. (2) The visual tokens are condensed by a compression layer to modest lengths, largely reducing the computation for LLMs. (3) Finally, the compressed slice tokens are organized in a spatial schema to inform LLMs about the slice positions in the image.\n\nComprehensive experiments on 9 benchmarks show that LLaVA-UHD significantly improves the capabilities of LMMs, outperforming established counterparts trained with 2-3 orders of magnitude more data. Notably, our model built on LLaVA-1.5 336×336 supports 672 \\times 1088 resolution images using only 94% inference computation, and achieves 6.4 accuracy improvement on TextVQA and 3.2 accuracy improvement on POPE. The advantage enlarges with more extreme aspect ratios. We also show that instruction tuning on ViT parameters is sufficient for adaptation to a broad range of images. Moreover, the model can be efficiently trained in academic settings, within 23 hours (vs. 26 hours of LLaVA-1.5) on 8 A100 GPUs.\n\nThe contribution of this work can be summarized as threefold: (1) We perform the first mechanistic investigation of GPT-4V from the perspective of visual encoding strategy and expose systematic flaws. (2) We present LLaVA-UHD, a large multimodal model that can efficiently perceive any aspect ratio and high-resolution images. (3) We conduct comprehensive experiments to demonstrate the effectiveness of LLaVA-UHD on 9 popular benchmarks, and also provide analysis for deeper understanding of the model.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib26",
+      "text": "Haotian Liu, Chunyuan Li, Yuheng Li, Bo Li, Yuanhan Zhang, Sheng Shen, and Yong Jae Lee. LLaVA-NeXT: Improved reasoning, ocr, and world knowledge. https://llava-vl.github.io/blog/2024-01-30-llava-next/ . 2024."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib11",
+      "text": "Wenliang Dai, Junnan Li, Dongxu Li, Anthony Meng Huat Tiong, Junqi Zhao, Weisheng Wang, Boyang Li, Pascale Fung, and Steven Hoi. InstructBLIP: Towards general-purpose vision-language models with instruction tuning. arXiv preprint arXiv:2305.06500 , 2023."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib23",
+      "text": "Zhang Li, Biao Yang, Qiang Liu, Zhiyin Ma, Shuo Zhang, Jingxu Yang, Yabo Sun, Yuliang Liu, and Xiang Bai. Monkey: Image resolution and text label are important things for large multi-modal models. arXiv preprint arXiv:2311.06607 , 2023d."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib28",
+      "text": "Haotian Liu, Chunyuan Li, Qingyang Wu, and Yong Jae Lee. Visual instruction tuning. NeurIPS , 36, 2024b."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "Jinze Bai, Shuai Bai, Shusheng Yang, Shijie Wang, Sinan Tan, Peng Wang, Junyang Lin, Chang Zhou, and Jingren Zhou. Qwen-VL: A frontier large vision-language model with versatile abilities. arXiv preprint arXiv:2308.12966 , 2023."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib21",
+      "text": "Junnan Li, Dongxu Li, Silvio Savarese, and Steven Hoi. BLIP-2: Bootstrapping language-image pre-training with frozen image encoders and large language models. ICML , 2023b."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib3",
+      "text": "Jean-Baptiste Alayrac, Jeff Donahue, Pauline Luc, Antoine Miech, Iain Barr, Yana Hasson, Karel Lenc, Arthur Mensch, Katherine Millican, Malcolm Reynolds, Roman Ring, Eliza Rutherford, Serkan Cabi, Tengda Han, Zhitao Gong, Sina Samangooei, Marianne Monteiro, Jacob L. Menick, Sebastian Borgeaud, Andy Brock, Aida Nematzadeh, Sahand Sharifzadeh, Mikolaj Binkowski, Ricardo Barreira, Oriol Vinyals, Andrew Zisserman, and Karén Simonyan. Flamingo: a visual language model for few-shot learning. In NeurIPS , 2022."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "Keqin Chen, Zhao Zhang, Weili Zeng, Richong Zhang, Feng Zhu, and Rui Zhao. Shikra: Unleashing multimodal llm’s referential dialogue magic. arXiv preprint arXiv:2306.15195 , 2023b."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib20",
+      "text": "Bo Li, Peiyuan Zhang, Jingkang Yang, Yuanhan Zhang, Fanyi Pu, and Ziwei Liu. OtterHD: A high-resolution multi-modality model. arXiv preprint arXiv:2311.04219 , 2023a."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib42",
+      "text": "Jiabo Ye, Anwen Hu, Haiyang Xu, Qinghao Ye, Ming Yan, Guohai Xu, Chenliang Li, Junfeng Tian, Qi Qian, Ji Zhang, et al. UReader: Universal OCR-free visually-situated language understanding with multimodal large language model. arXiv preprint arXiv:2310.05126 , 2023a."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib17",
+      "text": "Wenyi Hong, Weihan Wang, Qingsong Lv, Jiazheng Xu, Wenmeng Yu, Junhui Ji, Yan Wang, Zihan Wang, Yuxiao Dong, Ming Ding, et al. CogAgent: A visual language model for gui agents. arXiv preprint arXiv:2312.08914 , 2023."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib37",
+      "text": "Zhiqing Sun, Sheng Shen, Shengcao Cao, Haotian Liu, Chunyuan Li, Yikang Shen, Chuang Gan, Liang-Yan Gui, Yu-Xiong Wang, Yiming Yang, et al. Aligning large multimodal models with factually augmented RLHF. arXiv preprint arXiv:2309.14525 , 2023."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib44",
+      "text": "Tianyu Yu, Yuan Yao, Haoye Zhang, Taiwen He, Yifeng Han, Ganqu Cui, Jinyi Hu, Zhiyuan Liu, Hai-Tao Zheng, Maosong Sun, et al. RLHF-V: Towards trustworthy MLLMs via behavior alignment from fine-grained correctional human feedback. In CVPR , 2024."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib34",
+      "text": "Alec Radford, Jong Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry, Amanda Askell, Pamela Mishkin, Jack Clark, et al. Learning transferable visual models from natural language supervision. In ICML , pages 8748–8763, 2021."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib13",
+      "text": "Alexey Dosovitskiy, Lucas Beyer, Alexander Kolesnikov, Dirk Weissenborn, Xiaohua Zhai, Thomas Unterthiner, Mostafa Dehghani, Matthias Minderer, Georg Heigold, Sylvain Gelly, et al. An image is worth 16x16 words: Transformers for image recognition at scale. ICLR , 2021."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib2",
+      "text": "Josh Achiam, Steven Adler, Sandhini Agarwal, Lama Ahmad, Ilge Akkaya, Florencia Leoni Aleman, Diogo Almeida, Janko Altenschmidt, Sam Altman, Shyamal Anadkat, et al. GPT-4 technical report. arXiv preprint arXiv:2303.08774 , 2023."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib41",
+      "text": "Zhengyuan Yang, Linjie Li, Kevin Lin, Jianfeng Wang, Chung-Ching Lin, Zicheng Liu, and Lijuan Wang. The dawn of LMMs: Preliminary explorations with gpt-4v (ision). arXiv preprint arXiv:2309.17421 , 9(1):1, 2023."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib27",
+      "text": "Haotian Liu, Chunyuan Li, Yuheng Li, and Yong Jae Lee. Improved baselines with visual instruction tuning. arXiv preprint arXiv:2310.03744 , 2023a."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib24",
+      "text": "Ziyi Lin, Chris Liu, Renrui Zhang, Peng Gao, Longtian Qiu, Han Xiao, Han Qiu, Chen Lin, Wenqi Shao, Keqin Chen, Jiaming Han, Siyuan Huang, Yichi Zhang, Xuming He, Hongsheng Li, and Yu Qiao. SPHINX: the joint mixing of weights, tasks, and visual embeddings for multi-modal large language models. arXiv preprint arXiv:2311.07575 , 2023."
+    }
+  ]
+}

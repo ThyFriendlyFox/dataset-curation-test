@@ -1,0 +1,93 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2310.05079",
+  "title": "Revisiting Block-based Quantisation: What is Important for Sub-8-bit LLM Inference?",
+  "authors": "Cheng Zhang, Jianyi Cheng, Ilia Shumailov, George A. Constantinides, Yiren Zhao",
+  "year": "2023",
+  "categories": [
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2310.05079",
+  "html_url": "https://arxiv.org/html/2310.05079",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 619,
+  "text": "Pre-trained Large Language Models (LLMs) [1,2,3] have demonstrated impressive performance on a range of Natural Language Processing (NLP) tasks. However, their underlying computational and memory costs are a critical bottleneck to their usability. For instance, the larger variants in the GPT family scale up to hundreds of billions of parameters, requiring at least 300GB of memory to store these parameters in a float16 format [1]. Quantisation serves as a natural solution for reducing the cost of running inference on these LLMs [4,5,6], as a low-precision format enables cost savings across all relevant efficiency metrics: reduced on-chip memory, increased arithmetic intensity for matrix multiplies, and decreased DRAM bandwidth requirement. On the other hand, the growing popularity of running services such as ChatGPT [7] provides an impetus for exploring the use of custom silicon to support LLM inference. This raises the question: What would a low-precision number system look like in these near-future LLM hardware accelerators (ASICs)?\n\nLLM quantisation is challenging because of the activations with large absolute magnitudes, also known as activation outliers [8,5]. Previous approaches have proposed various techniques to address such outliers. However, these either require additional treatments in the integer quantisation domain (LLM.int8() and SmoothQuant) or yield unsatisfactory performance (ZeroQuant); and prior work has primarily focused on arithmetics that can be ported to GPUs. We observe that the presence of outliers necessitates different scaling factors at a finer granularity than per-tensor or per-token level [4,5]. This insight naturally leads us to revisit arithmetic systems with small exponents, such as MiniFloat [9], Block Minifloat [10], Block Logarithm [11], and Block Floating Point [12], as they can effectively represent outliers in Transformer models. To the best of our knowledge, our work is the first to systemically investigate short-exponent arithmetics for LLM quantisation.\n\nFigure 1 illustrates the variance of the tensors joining the GEMMs in an OPT-6.7B [3]. After feeding 128 samples from Wikitext2 to the pretrained float32 model, we make three interesting observations. 1) The variance of most activations in Figure 1 increases with the depth of the layer; 2) Certain tensors (e.g. \\mathbf{K}) consistently have a greater variance compared to others; 3) All the weight variance is smaller than activations. Similar trends can be observed in other LLMs. We provide a variance plot of Vicuna-7B [15] in Appendix (Figure 4).\n\nThe presence of varying numerical ranges across layers and tensors poses a challenge to the efficacy of a single quantisation configuration for the entire network. From an arithmetic perspective, we refer to this phenomenon as numerical scaling offsets, as it requires different numerical ranges and granularities for quantisation. To ensure optimal performance, these layers should be subjected to fine-grained non-linear quantisation strategies.\n\nTable 1 provides a comparison between our work and existing LLM quantisation methods. Our quantisation considers all GEMMs (8/8) in transformer layers and both Post-Training-Quantisation (PTQ) and Training-After-Quatisation (TAQ) scenarios. In this work, we also explore suitable places to perform TAQ and quantisation search within the entire NLP pipeline. We make the following contributions:\n\n- • We address the LLM quantisation problem with activation outliers and examine it as a scaling offsets problem from an arithmetic design perspective. We demonstrate the efficacy of a family of arithmetic systems with short exponents shared across a block of numbers.\n\n- • We propose a novel quantisation framework based on block arithmetic, and demonstrate its effectiveness in performing W6A6 inference for various tasks. Our nearly-lossless W6A6 outperforms prior work in terms of arithmetic density and memory density, without requiring data calibration or fine-tuning.\n\n- • We present two methods to achieve 4-bit quantisation on downstream tasks: one is fine-tuning-based, and the other is mixed-precision search. The latter further demonstrates the potential advantage of shifting LLM inference to cost-effective ASICs.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib8",
+      "text": "Brown et al. (2020) Tom Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared D Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, et al. 2020. Language models are few-shot learners. Advances in neural information processing systems , 33:1877–1901."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib6",
+      "text": "Black et al. (2021) Sid Black, Leo Gao, Phil Wang, Connor Leahy, and Stella Biderman. 2021. GPT-Neo: Large Scale Autoregressive Language Modeling with Mesh-Tensorflow . If you use this software, please cite it using these metadata."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib48",
+      "text": "Zhang et al. (2022) Susan Zhang, Stephen Roller, Naman Goyal, Mikel Artetxe, Moya Chen, Shuohui Chen, Christopher Dewan, Mona Diab, Xian Li, Xi Victoria Lin, et al. 2022. Opt: Open pre-trained transformer language models. arXiv preprint arXiv:2205.01068 ."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib45",
+      "text": "Yao et al. (2022) Zhewei Yao, Reza Yazdani Aminabadi, Minjia Zhang, Xiaoxia Wu, Conglong Li, and Yuxiong He. 2022. Zeroquant: Efficient and affordable post-training quantization for large-scale transformers. Advances in Neural Information Processing Systems , 35:27168–27183."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib44",
+      "text": "Xiao et al. (2022) Guangxuan Xiao, Ji Lin, Mickael Seznec, Julien Demouth, and Song Han. 2022. Smoothquant: Accurate and efficient post-training quantization for large language models. arXiv preprint arXiv:2211.10438 ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib14",
+      "text": "Dettmers et al. (2022) Tim Dettmers, Mike Lewis, Younes Belkada, and Luke Zettlemoyer. 2022. Llm. int8 (): 8-bit matrix multiplication for transformers at scale. arXiv preprint arXiv:2208.07339 ."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib29",
+      "text": "OpenAI (2022) OpenAI. 2022. Introducing chatgpt . Accessed on June, 23th, 2023."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib7",
+      "text": "Bondarenko et al. (2021) Yelysei Bondarenko, Markus Nagel, and Tijmen Blankevoort. 2021. Understanding and overcoming the challenges of efficient transformer quantization. arXiv preprint arXiv:2109.12948 ."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib35",
+      "text": "Sun et al. (2019) Xiao Sun, Jungwook Choi, Chia-Yu Chen, Naigang Wang, Swagath Venkataramani, Vijayalakshmi Viji Srinivasan, Xiaodong Cui, Wei Zhang, and Kailash Gopalakrishnan. 2019. Hybrid 8-bit floating point (hfp8) training and inference for deep neural networks. Advances in neural information processing systems , 32."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib19",
+      "text": "Fox et al. (2021) Sean Fox, Seyedramin Rasoulinezhad, Julian Faraone, Philip Leong, et al. 2021. A block minifloat representation for training deep neural networks. In International Conference on Learning Representations ."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib28",
+      "text": "Miyashita et al. (2016) Daisuke Miyashita, Edward H Lee, and Boris Murmann. 2016. Convolutional neural networks using logarithmic data representation. arXiv preprint arXiv:1603.01025 ."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib24",
+      "text": "Kalliojarvi and Astola (1996) Kari Kalliojarvi and Jaakko Astola. 1996. Roundoff errors in block-floating-point systems. IEEE transactions on signal processing , 44(4):783–790."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib20",
+      "text": "Frantar et al. (2022) Elias Frantar, Saleh Ashkboos, Torsten Hoefler, and Dan Alistarh. 2022. Gptq: Accurate post-training quantization for generative pre-trained transformers. arXiv preprint arXiv:2210.17323 ."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib38",
+      "text": "Vaswani et al. (2017) Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N Gomez, Łukasz Kaiser, and Illia Polosukhin. 2017. Attention is all you need. Advances in neural information processing systems , 30."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib50",
+      "text": "Zheng et al. (2023) Lianmin Zheng, Wei-Lin Chiang, Ying Sheng, Siyuan Zhuang, Zhanghao Wu, Yonghao Zhuang, Zi Lin, Zhuohan Li, Dacheng Li, Eric Xing, et al. 2023. Judging llm-as-a-judge with mt-bench and chatbot arena. arXiv preprint arXiv:2306.05685 ."
+    }
+  ]
+}

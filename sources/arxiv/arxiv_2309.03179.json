@@ -1,0 +1,64 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2309.03179",
+  "title": "SLiMe: Segment Like Me",
+  "authors": "Aliasghar Khani, Saeid Asgari Taghanaki, Aditya Sanghi, Ali Mahdavi Amiri, Ghassan Hamarneh",
+  "year": "2024",
+  "categories": [
+    "cs.CV",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2309.03179",
+  "html_url": "https://arxiv.org/html/2309.03179",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 908,
+  "text": "Image segmentation is a multifaceted problem, with solutions existing at various levels of granularity. For instance, in applications like expression recognition or facial alignment, segmenting images of faces into basic regions like nose and eyes might suffice. However, in visual effects applications, more detailed segments such as eye bags, forehead, and chin are necessary for tasks like wrinkle removal. Moreover, from the perspective of an end-user, a straightforward and effective approach to guide a segmentation method is determining what to segment and the desired level of detail across a broad set of images by providing only one or a few segmented examples for the method to use for training. Meanwhile, the user should not need to curate a large dataset with segmentation masks, train a large segmentation model, or encode elaborate and specific properties of target objects into the model. As a result, a customizable segmentation method that can adapt to different levels of granularity, using a few annotated samples, and provide users with the ability to intuitively define and refine the target segmentation according to their specific requirements, is of high importance.\n\nRecent research has tackled the lack of segmentation data by delving into zero-shot, textual description based segmentation, and few-shot learning. DiffSeg [1] is a zero-shot segmentation method based on SD, which segments everything in the image. However, DiffSeg cannot be used to segment a specific object or part in the test images given a train sample, because its segmentation is not controllable in terms of which object to segment and segmentation granularity. Peekaboo [2] is another work, which uses textual description for segmentation. To this end, given an image and a textual description of the target object to be segmented, they use Stable Diffusion and its loss function to optimize a randomly initialized segmentation mask to reach the desired mask. Nevertheless, it cannot be used to segmentation of test images given train images, because the textual description of the target object in each image is unique and is not transferrable. Another promising method is ReGAN [3]. ReGAN first trains a GAN [4] on the data of a specific class they aim to segment. Following this, they generate data by this GAN and the user manually annotates the generated data. Then both the generated data’s features from the GAN and the annotations are utilized to train a segmentation model. In contrast, SegDDPM [5] extracts features from a pre-trained diffusion model (DM) and trains an ensemble of MLPs for segmentation using few labeled data. Both excel in segmentation with 10-50 examples but struggle with extremely limited samples. Furthermore, these models require training on data specific to each category. For instance, to segment horses, it is necessary to collect a large dataset of horse images, a task that can be inherently cumbersome.\n\nWhereas, SegGPT [6] employs one-shot learning, training on color-randomized segmentation data which includes both instance and part-level masks. During inference, it segments only one region in a target image using a reference image and its binary segmentation mask. While SegGPT is effective, it demands a significant amount of annotated segmentation data for initial training, keeping the challenge of training effectively with a single annotation still unaddressed.\n\nIn this paper, we propose Segment Like Me (SLiMe), which segments any object/part from the same category based on a given image and its segmentation mask with an arbitrary granularity level in a one-shot manner, avoiding the need for extensive annotated segmentation data or training a generative model like GAN for a specific class (see Figure 1 and Figure 8 for some examples). For this purpose, we leverage the rich knowledge of existing large-scale pre-trained vision/language model, Stable Diffusion (SD) [7]. Recent studies like [8] have shown that the cross-attention maps of models like SD highlight different regions of the image when the corresponding text changes. This property has been utilized to modify generated images [8] and to achieve image correspondence [9]. Expanding on this idea, we present two key insights. First, the multifaceted segmentation problem can be framed as a one-shot optimization task where we fine-tune the text embeddings of SD to capture semantic details such as segmented regions guided by a reference image and its segmentation mask, where each text embedding corresponds to a distinct segmented region. Second, we observed that using standalone cross-attention maps lead to imprecise segmentations, as depicted in Figure 2. To rectify this, we propose a novel weighted accumulated self (WAS)-attention map (see Section 4). This attention map incorporates crucial semantic boundary information and employs higher-resolution self-attention maps, ensuring enhanced segmentation accuracy.\n\nBased on these insights, SLiMe uses a single image and its segmentation mask to fine-tune SD’s text embeddings through cross- and WAS-attention maps. These refined embeddings emphasize segmented regions within these attention maps, and are used to segment real-world images during inference, mirroring the granularity of the segmented region from the image used for optimization. Through various quantitative and qualitative experiments, we highlight the efficacy of our approach. SLiMe, even when reliant on just one or a handful of examples, proves to be better or comparable to supervised counterparts demanding extensive training. Furthermore, despite not being trained on a specific category, SLiMe outperforms other few-shot techniques on average and on most parts, across almost all the datasets. For instance, we outperform ReGAN [3] by nearly 10\\% and SegDDPM [5] by approximately 2\\% in a 10-sample setting. Additionally, in a 1-sample context, we exceed SegGPT by around 12\\% and SegDDPM by nearly 11\\%.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib29",
+      "text": "Tian et al. (2023) Junjiao Tian, Lavisha Aggarwal, Andrea Colaco, Zsolt Kira, and Mar Gonzalez-Franco. Diffuse, attend, and segment: Unsupervised zero-shot segmentation using stable diffusion. arXiv preprint arXiv:2308.12469 , 2023."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib3",
+      "text": "Burgert et al. (2022) Ryan Burgert, Kanchana Ranasinghe, Xiang Li, and Michael S Ryoo. Peekaboo: Text to image diffusion models are zero-shot segmentors. arXiv preprint arXiv:2211.13224 , 2022."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib30",
+      "text": "Tritrong et al. (2021) Nontawat Tritrong, Pitchaporn Rewatbowornwong, and Supasorn Suwajanakorn. Repurposing gans for one-shot semantic part segmentation. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pp. 4475–4485, 2021."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib12",
+      "text": "Goodfellow et al. (2014) Ian Goodfellow, Jean Pouget-Abadie, Mehdi Mirza, Bing Xu, David Warde-Farley, Sherjil Ozair, Aaron Courville, and Yoshua Bengio. Generative adversarial nets. Advances in neural information processing systems , 27, 2014."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib1",
+      "text": "Baranchuk et al. (2021) Dmitry Baranchuk, Ivan Rubachev, Andrey Voynov, Valentin Khrulkov, and Artem Babenko. Label-efficient semantic segmentation with diffusion models. arXiv preprint arXiv:2112.03126 , 2021."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib33",
+      "text": "Wang et al. (2023) Xinlong Wang, Xiaosong Zhang, Yue Cao, Wen Wang, Chunhua Shen, and Tiejun Huang. Seggpt: Segmenting everything in context. arXiv preprint arXiv:2304.03284 , 2023."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib23",
+      "text": "Rombach et al. (2022a) Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, and Björn Ommer. High-resolution image synthesis with latent diffusion models. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pp. 10684–10695, 2022a."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib16",
+      "text": "Hertz et al. (2022) Amir Hertz, Ron Mokady, Jay Tenenbaum, Kfir Aberman, Yael Pritch, and Daniel Cohen-Or. Prompt-to-prompt image editing with cross attention control. arXiv preprint arXiv:2208.01626 , 2022."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib15",
+      "text": "Hedlin et al. (2023) Eric Hedlin, Gopal Sharma, Shweta Mahajan, Hossam Isack, Abhishek Kar, Andrea Tagliasacchi, and Kwang Moo Yi. Unsupervised semantic correspondence using stable diffusion. arXiv preprint arXiv:2305.15581 , 2023."
+    }
+  ]
+}

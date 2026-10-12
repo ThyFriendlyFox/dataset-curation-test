@@ -1,0 +1,157 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2311.00860",
+  "title": "Zero Coordinate Shift: Whetted Automatic Differentiation for Physics-informed Operator Learning",
+  "authors": "Kuangdai Leng, Mallikarjun Shankar, Jeyan Thiyagalingam",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.AI",
+    "cs.NA",
+    "math.NA",
+    "physics.comp-ph"
+  ],
+  "url": "https://arxiv.org/abs/2311.00860",
+  "html_url": "https://arxiv.org/html/2311.00860",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 631,
+  "text": "Physics-informed machine learning offers a versatile framework for the emulation and inversion of partial differential equations (PDEs) in physics [1,2], extensible to other types of differential equations such as stochastic differential equations [3], integro-differential equations [4], and fractional differential equations [5]. This deep learning-based paradigm has originated from the physics-informed neural networks (PINNs) [6,7,8,9], targeted at learning a map x\\mapsto u, with x being the coordinates of the collocation points sampled from the domain and u the solution field. An innate limitation of PINNs is the absence of generalisability over the variation of physical parameters, such as material properties, external sources, and initial and boundary conditions. Such a limitation has motivated the physics-informed neural operators (PINOs), such as the deep operator networks (DeepONets) [10] and the physics-informed Fourier neural operators (FNOs) [11], which learn a map p(x)\\mapsto u(x), with p(x) being any physical parameter of interest. In brief, PINNs learn a map between two vector spaces and PINOs a map between two function spaces; in many contexts, a PINO degenerates to a PINN given an invariant p(x).\n\nThe term “physics-informed” in PINNs and PINOs has a specific meaning: embedding the target PDE and its initial and boundary conditions into the loss function. Such embedded information is supposed to aid a neural network in understanding the underlying physics (rather than just fitting data) whereby to achieve a lower generalisation error with less training data. To compute the loss functions associated with a PDE and any of its non-Dirichlet boundary conditions, one needs the high-order derivatives of the network output w.r.t. the coordinates. For example, bending of an elastic plate and the stream function for incompressible 2-D fluids both involve a fourth-order PDE. Besides, the gradient of the PDE itself may serve as an even stronger regularisation [12], which further increments the required orders of derivatives. A powerful tool for derivative computation is automatic differentiation (AD), a pivotal technique behind today’s deep learning [13,14,15,16] and one of the major facilitators of physics-informed machine learning [1,2,9].\n\nTechnical advancements have been thriving since the establishment of mordern PINNs [8,9], e.g., multi-scale and multi-frequency models [17,18], domain decomposition techniques [19,20], adaptive activation functions [21] and data sampling [22,23], and embedding physics as hard constraints [24,25,26]. Despite such continuing efforts, we feel that less attention has been paid to AD, especially in view of that the coordinate derivatives in physics-informed machine learning differ from the well-known backpropagation (i.e., calculating the gradient of the loss function w.r.t. network weights) in many ways. A comprehensive survey of related work will be provided in the next section.\n\nIn this paper, we present a novel algorithm to reshape AD for operator learning, which can reduce both GPU memory consumption and wall time for training by an order of magnitude. Our algorithm, which we refer to as Zero Coordinate Shift (ZCS), inventively introduces one scalar-valued leaf variable for each dimension, simplifying the wanted coordinate derivatives from “many-roots-many-leaves” to “one-root-many-leaves” whereby the most powerful reverse-mode AD can be exploited to the maximum. Our algorithm lies at a lower level than the neural network (i.e., agnostic to the forward pass), imposing no restrictions on data, point sampling or network architecture. Furthermore, the implementation of ZCS is straightforward; our own implementation is by extending the DeepXDE package [27] with a very few overridden methods.\n\nThe remainder of this paper is organised as follows. In Section 2, we provide a more insightful review of the related work for further justification of our motivation. In Section 3, we will describe the theory and implementation of ZCS. We report our experiments in Section 4, including a benchmark analysis exhibiting the scaling behaviours of ZCS and a few PDE operators learned without data. Identified limitations are then described in Section 5 before the paper being concluded in Section 6.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "G. E. Karniadakis, I. G. Kevrekidis, L. Lu, P. Perdikaris, S. Wang, L. Yang, Physics-informed machine learning, Nature Reviews Physics 3 (6) (2021) 422–440."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "S. Cuomo, V. S. Di Cola, F. Giampaolo, G. Rozza, M. Raissi, F. Piccialli, Scientific machine learning through physics-informed neural networks: Where we are and what’s next, Journal of Scientific Computing 92 (2022) 88."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "L. Yang, D. Zhang, G. E. Karniadakis, Physics-informed generative adversarial networks for stochastic differential equations, SIAM Journal on Scientific Computing 42 (1) (2020) A292–A317."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "L. Yuan, Y.-Q. Ni, X.-Y. Deng, S. Hao, A-PINN: Auxiliary physics informed neural networks for forward and inverse problems of nonlinear integro-differential equations, Journal of Computational Physics 462 (2022) 111260."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "G. Pang, L. Lu, G. E. Karniadakis, fPINNs: Fractional physics-informed neural networks, SIAM Journal on Scientific Computing 41 (4) (2019) A2603–A2626."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "I. E. Lagaris, A. Likas, D. I. Fotiadis, Artificial neural networks for solving ordinary and partial differential equations, IEEE transactions on neural networks 9 (5) (1998) 987–1000."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "M. Dissanayake, N. Phan-Thien, Neural-network-based approximations for solving partial differential equations, communications in Numerical Methods in Engineering 10 (3) (1994) 195–201."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "J. Berg, K. Nyström, A unified deep artificial neural network approach to partial differential equations in complex geometries, Neurocomputing 317 (2018) 28–41."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "M. Raissi, P. Perdikaris, G. E. Karniadakis, Physics-informed neural networks: A deep learning framework for solving forward and inverse problems involving nonlinear partial differential equations, Journal of Computational physics 378 (2019) 686–707."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "L. Lu, P. Jin, G. Pang, Z. Zhang, G. E. Karniadakis, Learning nonlinear operators via deeponet based on the universal approximation theorem of operators, Nature machine intelligence 3 (3) (2021) 218–229."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "Z. Li, H. Zheng, N. Kovachki, D. Jin, H. Chen, B. Liu, K. Azizzadenesheli, A. Anandkumar, Physics-informed neural operator for learning partial differential equations, arXiv preprint arXiv:2111.03794 (2021)."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "J. Yu, L. Lu, X. Meng, G. E. Karniadakis, Gradient-enhanced physics-informed neural networks for forward and inverse pde problems, Computer Methods in Applied Mechanics and Engineering 393 (2022) 114823."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "A. G. Baydin, B. A. Pearlmutter, A. A. Radul, J. M. Siskind, Automatic differentiation in machine learning: a survey, Journal of Marchine Learning Research 18 (2018) 1–43."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "C. C. Margossian, A review of automatic differentiation and its efficient implementation, Wiley interdisciplinary reviews: data mining and knowledge discovery 9 (4) (2019) e1305."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "C. Yang, Y. Deng, J. Yao, Y. Tu, H. Li, L. Zhang, Fuzzing automatic differentiation in deep-learning libraries, arXiv preprint arXiv:2302.04351 (2023)."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "D. Johnson, T. Maxfield, Y. Jin, R. Fedkiw, Software-based automatic differentiation is flawed, arXiv preprint arXiv:2305.03863 (2023)."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "Ziqi, Liu, , 9594, , Z. Liu, Wei, Cai, , 9595, , W. Cai, Zhi-Qin, J. Xu, , 9596, , Z.-Q. J. Xu, Multi-scale deep neural network (MscaleDNN) for solving poisson-boltzmann equation in complex domains, Communications in Computational Physics 28 (5) (2020) 1970–2001."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "W. Cai, X. Li, L. Liu, A phase shift deep neural network for high frequency approximation and wave problems, SIAM Journal on Scientific Computing 42 (5) (2020) A3285–A3312."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "B. Moseley, A. Markham, T. Nissen-Meyer, Finite basis physics-informed neural networks (FBPINNs): a scalable domain decomposition approach for solving differential equations, arXiv preprint arXiv:2107.07871 (2021)."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "E. Kharazmi, Z. Zhang, G. E. Karniadakis, hp-vpinns: Variational physics-informed neural networks with domain decomposition, Computer Methods in Applied Mechanics and Engineering 374 (2021) 113547."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "A. D. Jagtap, K. Kawaguchi, G. Em Karniadakis, Locally adaptive activation functions with slope recovery for deep and physics-informed neural networks, Proceedings of the Royal Society A 476 (2239) (2020) 20200334."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib22",
+      "text": "Z. Mao, A. D. Jagtap, G. E. Karniadakis, Physics-informed neural networks for high-speed flows, Computer Methods in Applied Mechanics and Engineering 360 (2020) 112789."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib23",
+      "text": "J. Yu, L. Lu, X. Meng, G. E. Karniadakis, Gradient-enhanced physics-informed neural networks for forward and inverse PDE problems, Computer Methods in Applied Mechanics and Engineering 393 (2022) 114823."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib24",
+      "text": "S. Dong, N. Ni, A method for representing periodic functions and enforcing exactly periodic boundary conditions with deep neural networks, Journal of Computational Physics 435 (2021) 110242."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib25",
+      "text": "N. Sukumar, A. Srivastava, Exact imposition of boundary conditions with distance functions in physics-informed deep neural networks, Computer Methods in Applied Mechanics and Engineering 389 (2022) 114333."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib26",
+      "text": "J. Hendriks, C. Jidling, A. Wills, T. Schön, Linearly constrained neural networks, arXiv preprint arXiv:2002.01600 (2020)."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib27",
+      "text": "L. Lu, X. Meng, Z. Mao, G. E. Karniadakis, Deepxde: A deep learning library for solving differential equations, SIAM Review 63 (1) (2021) 208–228."
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2401.12046",
+  "title": "Fourier Transporter: Bi-Equivariant Robotic Manipulation in 3D",
+  "authors": "Haojie Huang, Owen Howell, Dian Wang, Xupeng Zhu, Robin Walters, Robert Platt",
+  "year": "2024",
+  "categories": [
+    "cs.RO",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2401.12046",
+  "html_url": "https://arxiv.org/html/2401.12046",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 632,
+  "text": "Imitation learning for manipulation tasks in \\mathrm{SE}(3) has emerged as a key topic in robotic learning. Imitation learning is attractive because of its practicality. In contrast to reinforcement learning wherein training happens via a period of autonomous interaction with the environment (which can potentially damage the robot and the environment), imitation learning requires only human demonstrations of the task to be performed which is often safer and easier to provide. Sample efficiency is critical here; the robot needs to learn to perform a task without requiring the human to provide an undue number of demonstrations. Unfortunately, many current state-of-the-art methods are not sample efficient. For example, even after training with one hundred demonstrations, methods like PerAct and RVT still struggle to solve standard RLBench tasks like Stack Wine or Stack Cups [1,2].\n\nWhy is sample efficiency such a challenge in three dimensions? A big reason is that these tasks are defined over \\mathrm{SE}(3) action spaces where the policy must output both a 3D position and \\mathrm{SO}(3) orientation. The orientation component here is a particular challenge for robot learning because \\mathrm{SO}(3) is not Euclidean and standard convolutional layers, which lack geodesic properties, are not well-adapted for \\mathrm{SO}(3) convolutions. Discretization of the group SO(3) is also difficult. For example, a grid sampling of 1000 different orientations in \\mathrm{SO}(3) still only realizes an angular resolution of 36^{\\degree}, which is insufficient for many manipulation tasks. Instead, existing methods, e.g. [1] or [2], often fall back on generic self-attention layers that do not take advantage of the geometry of \\mathrm{SO}(3).\n\nOne approach to this problem is to leverage neural-network policy models that are symmetric in \\mathrm{SO}(2) or \\mathrm{SO}(3). This has been explored primarily in \\mathrm{SO}(2) and \\mathrm{SE}(2) settings, e.g. [3] and [4], where significant gains in sample efficiency have been made using policy networks that incorporate steerable convolution kernels [5]. In \\mathrm{SO}(3), symmetric models have been mainly applied to pose or descriptor inference, e.g. [6] and [7], but not directly to policy learning. Moreover, most works do not address the dual symmetry present in many pick and place problems, sometimes referred to as bi-equivariance [7], where the pick-place action distribution transforms symmetrically (equivariantly) when a transformation is applied independently to either the pick or the place pose. This is illustrated in Figure 1. Independent rotations of the gear (g_{1}) and the slot (g_{2}) result in a change (a^{\\prime}=g_{2}ag_{1}^{-1}) in the requisite action needed to perform the insertion. While bi-equivariance in policy learning has been studied in \\mathrm{SO}(2) [8], models for encoding \\mathrm{SO}(3) bi-equivariance in a general policy learning setting have not yet been developed.\n\nThis paper proposes Fourier Transporter (FourTran), an approach to modeling \\mathrm{SE}(3) bi-equivariance using 3D convolutions and a Fourier representation of rotations. Unlike existing methods, e.g. Equivariant Descriptor Fields [7] and TAX-Pose [9], our method encodes \\mathrm{SO}(3) bi-equivariance inside a general purpose policy learning model rather than relying on point descriptors, which often require sample and optimization during inference. Our key innovation is to parameterize action distributions over \\mathrm{SO}(3) in the Fourier domain as coefficients of Wigner D -matrix entries. We embed this representation within a 3D translational convolution, thereby enabling us to do convolutions directly \\mathrm{SE}(3) without excessive computational cost and with minimal memory requirements. The end result is a policy learning model for imitation learning with high sample efficiency and high angular resolution that can outperform existing \\mathrm{SE}(3) methods by significant margins (Table 1). Our contributions are:\n\n- • We analyze problems with bi-equivariant symmetry and provide a general theoretical solution to leverage the coupled symmetries.\n\n- • We propose Fourier Transporter (FourTran) for leveraging bi-equivariant structure in manipulation pick-place problems in 2D and 3D.\n\n- • We achieve state-of-the-art performance on several RLbench tasks ([10]). Specifically, FourTran outperforms baselines by a margin of between six percent (Stack-Wine) and two-hundred percent (Stack-Cups).",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib37",
+      "text": "Shridhar et al. (2023) Mohit Shridhar, Lucas Manuelli, and Dieter Fox. Perceiver-actor: A multi-task transformer for robotic manipulation. In Conference on Robot Learning , pp. 785–799. PMLR, 2023."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib11",
+      "text": "Goyal et al. (2023) Ankit Goyal, Jie Xu, Yijie Guo, Valts Blukis, Yu-Wei Chao, and Dieter Fox. RVT: Robotic view transformer for 3d object manipulation. In 7th Annual Conference on Robot Learning , 2023. URL https://openreview.net/forum?id=0hPkttoGAf ."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib40",
+      "text": "Wang et al. (2021) Dian Wang, Robin Walters, Xupeng Zhu, and Robert Platt. Equivariant Q Q learning in spatial action spaces. In 5th Annual Conference on Robot Learning , 2021."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib22",
+      "text": "Jia et al. (2023) Mingxi Jia, Dian Wang, Guanang Su, David Klee, Xupeng Zhu, Robin Walters, and Robert Platt. Seil: Simulation-augmented equivariant imitation learning. In 2023 IEEE International Conference on Robotics and Automation (ICRA) , pp. 1845–1851. IEEE, 2023."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "Cohen & Welling (2017) Taco S Cohen and Max Welling. Steerable cnns. In International Conference on Learning Representations , 2017."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib23",
+      "text": "Klee et al. (2023) David Klee, Ondrej Biza, Robert Platt, and Robin Walters. Image to sphere: Learning equivariant features for efficient pose prediction. In The Eleventh International Conference on Learning Representations , 2023. URL https://openreview.net/forum?id=_2bDpAtr7PI ."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib34",
+      "text": "Ryu et al. (2022) Hyunwoo Ryu, Hong-in Lee, Jeong-Hoon Lee, and Jongeun Choi. Equivariant descriptor fields: Se (3)-equivariant energy-based models for end-to-end visual robotic manipulation learning. arXiv preprint arXiv:2206.08321 , 2022."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib14",
+      "text": "Huang et al. (2023a) Haojie Huang, Dian Wang, Arsh Tangri, Robin Walters, and Robert Platt. Leveraging symmetries in pick and place. arXiv preprint arXiv:2308.07948 , 2023a."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib30",
+      "text": "Pan et al. (2023) Chuer Pan, Brian Okorn, Harry Zhang, Ben Eisner, and David Held. Tax-pose: Task-specific cross-pose estimation for robot manipulation. In Conference on Robot Learning , pp. 1783–1792. PMLR, 2023."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib19",
+      "text": "James et al. (2020) Stephen James, Zicong Ma, David Rovick Arrojo, and Andrew J. Davison. Rlbench: The robot learning benchmark & learning environment. IEEE Robotics and Automation Letters , 2020."
+    }
+  ]
+}

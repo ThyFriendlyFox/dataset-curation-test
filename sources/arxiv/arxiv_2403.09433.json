@@ -1,0 +1,123 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.09433",
+  "title": "Open-Vocabulary Object Detection with Meta Prompt Representation and Instance Contrastive Optimization",
+  "authors": "Zhao Wang, Aoxue Li, Fengwei Zhou, Zhenguo Li, Qi Dou",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2403.09433",
+  "html_url": "https://arxiv.org/html/2403.09433",
+  "license": "http://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Introduction",
+  "word_count": 783,
+  "text": "Deep learning models have been successful in closed-set large-scale object detection, in which the carefully designed detectors [1,2,3,4] can accurately localize and classify the objects learned from the training set. However, these classical detectors always fail to generalize to unseen novel class objects during inference. Thanks to recent advancements in vision-language models [5,6,7], ViLD [8] extends the traditional closed-set object detection to an open-set scenario, named Open-Vocabulary Object Detection (OVOD). Under this OVOD setting, the detector is trained with only base classes, then tested on both base and novel classes. In ViLD, an object vocabulary (see Figure. 1a) is given to obtain text embeddings (a.k.a. class embeddings) through pretrained text encoder. The object class is predicted by finding the best matched one from the embedded object vocabulary, and the bounding box is obtained from the class-agnostic regression head.\n\nFrom recent works on OVOD [8,9], it has been widely studied that the proposal generator in a trained detector can generalize to novel classes well even the detector is trained only on the base classes. However, the current performance of open-vocabulary object detector degenerates and results in low AP when generalized to novel classes. Intuitively, the low performance is caused by the uncertain matching between proposal features and class embeddings. Under the OVOD setting with a large amount of classes, as shown in Figure 1a, many classes (e.g, puffin v.s. bird) are very similar, which may lead to mismatching between proposal features and class embeddings. Furthermore, as the detector can only be learned on the base classes, the detector fails to recognize unseen novel classes. There can be a set of highly similar candidate classes (including both base and novel classes) when the detector meets a novel class object, which brings high uncertainty to novel object class prediction. This infers too close clustering of data points from similar classes in the latent feature space, and thus the decision boundary crosses high density regions [10,11]. Meanwhile, the trained detector may misclassify a novel class object as background [12,13]. Current OVOD methods can not handle these issues effectively. DetPro [14] makes class embeddings learnable, while other works [9,15,16] train the model with more classes. Since only the base classes are given during training, the corresponding class embeddings in DetPro [14] result in overfitting on the base classes, which has been pointed out in few-shot vision-language learning [17]. In [9,15,16], they supplement lots of extra data from ImageNet21k [18], Conceptual Captions [19], or LAION-400M [20] in the training process, but it is unfair by including novel classes during training as demonstrated in OWL-ViT [21].\n\nTo alleviate the overfitting issue more efficiently, we propose a meta prompt learning scheme. Specifically, during each training iteration, in addition to batch-wise training data and its annotations, we randomly sample more class names from base object vocabulary to simulate the novel-class-emerging scenario as in OVOD setting. Then, these enriched text samples are used to learn prompts of text representations. With meta representation sampling scheme, we can obtain more discriminative text representations and thus improve the generalization ability to novel classes. Meanwhile, instead of randomly initializing the background class embedding, we learn the background prompt representation. With the learnable background class embedding, the detector can better distinguish the negative (background) proposals from positive (foreground) ones. The object vocabulary list can be extended with more easily-accessed class names and to further alleviate the overfitting issue (see Table 1). Further, we incorporate an instance-level contrastive learning scheme to promote the intra-class compactness and inter-class separation, which expands low-density regions in the latent feature space by narrowing the cluster of base classes during the detector training. With such instance contrastive learning strategy, the novel classes are potentially separated from the base ones in the latent space and thus benefits novel class generalization. As shown in Figure 1b, MIC decreases the error rate of predicting novel objects as base ones significantly, from 50.4% to 19.7%. These results demonstrate the effectiveness of our method for alleviating the extreme overfitting issue.\n\nOur main contributions are summarized as: 1) We introduce a novel meta prompt learning scheme to simulate a novel-class-emerging scenario, which boosts the generalization ability. Meanwhile, the learnable background prompt is incorporated to help the detector distinguish the positive and negative proposals. 2) We propose an instance-level contrastive learning strategy to promote intra-class compactness and inter-class separation, in which the contrastive pairs are built among foreground and background proposal samples. 3) We conduct extensive experiments on the benchmark dataset LVIS. Without knowledge distillation, ensemble model or extra training data, our method outperforms previous SOTA methods equipped with these complex techniques. Most importantly, our method shows great generalization ability on directly transferring to other datasets, such as COCO and Objects365.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bibx33",
+      "text": "[Ren et al.(2015)Ren, He, Girshick, and Sun] Shaoqing Ren, Kaiming He, Ross Girshick, and Jian Sun. Faster r-cnn: Towards real-time object detection with region proposal networks. Advances in neural information processing systems , 28, 2015."
+    },
+    {
+      "n": 2,
+      "id": "bib.bibx18",
+      "text": "[He et al.(2017)He, Gkioxari, Dollár, and Girshick] Kaiming He, Georgia Gkioxari, Piotr Dollár, and Ross Girshick. Mask r-cnn. In Proceedings of the IEEE international conference on computer vision , pages 2961–2969, 2017."
+    },
+    {
+      "n": 3,
+      "id": "bib.bibx3",
+      "text": "[Carion et al.(2020)Carion, Massa, Synnaeve, Usunier, Kirillov, and Zagoruyko] Nicolas Carion, Francisco Massa, Gabriel Synnaeve, Nicolas Usunier, Alexander Kirillov, and Sergey Zagoruyko. End-to-end object detection with transformers. In European conference on computer vision , pages 213–229. Springer, 2020."
+    },
+    {
+      "n": 4,
+      "id": "bib.bibx53",
+      "text": "[Zhu et al.(2021)Zhu, Su, Lu, Li, Wang, and Dai] Xizhou Zhu, Weijie Su, Lewei Lu, Bin Li, Xiaogang Wang, and Jifeng Dai. Deformable {detr}: Deformable transformers for end-to-end object detection. In International Conference on Learning Representations , 2021. URL https://openreview.net/forum?id=gZ9hCDWe6ke ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bibx32",
+      "text": "[Radford et al.(2021)Radford, Kim, Hallacy, Ramesh, Goh, Agarwal, Sastry, Askell, Mishkin, Clark, et al.] Alec Radford, Jong Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry, Amanda Askell, Pamela Mishkin, Jack Clark, et al. Learning transferable visual models from natural language supervision. In International Conference on Machine Learning , pages 8748–8763. PMLR, 2021."
+    },
+    {
+      "n": 6,
+      "id": "bib.bibx21",
+      "text": "[Jia et al.(2021)Jia, Yang, Xia, Chen, Parekh, Pham, Le, Sung, Li, and Duerig] Chao Jia, Yinfei Yang, Ye Xia, Yi-Ting Chen, Zarana Parekh, Hieu Pham, Quoc Le, Yun-Hsuan Sung, Zhen Li, and Tom Duerig. Scaling up visual and vision-language representation learning with noisy text supervision. In International Conference on Machine Learning , pages 4904–4916. PMLR, 2021."
+    },
+    {
+      "n": 7,
+      "id": "bib.bibx24",
+      "text": "[Li et al.(2022)Li, Zhang, Zhang, Yang, Li, Zhong, Wang, Yuan, Zhang, Hwang, et al.] Liunian Harold Li, Pengchuan Zhang, Haotian Zhang, Jianwei Yang, Chunyuan Li, Yiwu Zhong, Lijuan Wang, Lu Yuan, Lei Zhang, Jenq-Neng Hwang, et al. Grounded language-image pre-training. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 10965–10975, 2022."
+    },
+    {
+      "n": 8,
+      "id": "bib.bibx13",
+      "text": "[Gu et al.(2022)Gu, Lin, Kuo, and Cui] Xiuye Gu, Tsung-Yi Lin, Weicheng Kuo, and Yin Cui. Open-vocabulary object detection via vision and language knowledge distillation. In International Conference on Learning Representations , 2022. URL https://openreview.net/forum?id=lL3lnMbR4WU ."
+    },
+    {
+      "n": 9,
+      "id": "bib.bibx52",
+      "text": "[Zhou et al.(2022c)Zhou, Girdhar, Joulin, Krähenbühl, and Misra] Xingyi Zhou, Rohit Girdhar, Armand Joulin, Phillip Krähenbühl, and Ishan Misra. Detecting twenty-thousand classes using image-level supervision. European Conference on Computer Vision , 2022c."
+    },
+    {
+      "n": 10,
+      "id": "bib.bibx48",
+      "text": "[Zhou et al.(2003)Zhou, Bousquet, Lal, Weston, and Schölkopf] Dengyong Zhou, Olivier Bousquet, Thomas Lal, Jason Weston, and Bernhard Schölkopf. Learning with local and global consistency. Advances in neural information processing systems , 16, 2003."
+    },
+    {
+      "n": 11,
+      "id": "bib.bibx11",
+      "text": "[Grandvalet and Bengio(2004)] Yves Grandvalet and Yoshua Bengio. Semi-supervised learning by entropy minimization. Advances in neural information processing systems , 17, 2004."
+    },
+    {
+      "n": 12,
+      "id": "bib.bibx22",
+      "text": "[Joseph et al.(2021)Joseph, Khan, Khan, and Balasubramanian] KJ Joseph, Salman Khan, Fahad Shahbaz Khan, and Vineeth N Balasubramanian. Towards open world object detection. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 5830–5840, 2021."
+    },
+    {
+      "n": 13,
+      "id": "bib.bibx15",
+      "text": "[Gupta et al.(2022)Gupta, Narayan, Joseph, Khan, Khan, and Shah] Akshita Gupta, Sanath Narayan, KJ Joseph, Salman Khan, Fahad Shahbaz Khan, and Mubarak Shah. Ow-detr: Open-world detection transformer. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 9235–9244, 2022."
+    },
+    {
+      "n": 14,
+      "id": "bib.bibx7",
+      "text": "[Du et al.(2022)Du, Wei, Zhang, Shi, Gao, and Li] Yu Du, Fangyun Wei, Zihe Zhang, Miaojing Shi, Yue Gao, and Guoqi Li. Learning to prompt for open-vocabulary object detection with vision-language model. In IEEE Conference on Computer Vision and Pattern Recognition (CVPR) , 2022."
+    },
+    {
+      "n": 15,
+      "id": "bib.bibx9",
+      "text": "[Feng et al.(2022)Feng, Zhong, Jie, Chu, Ren, Wei, Xie, and Ma] Chengjian Feng, Yujie Zhong, Zequn Jie, Xiangxiang Chu, Haibing Ren, Xiaolin Wei, Weidi Xie, and Lin Ma. Promptdet: Towards open-vocabulary detection using uncurated images. In Proceedings of the European Conference on Computer Vision , 2022."
+    },
+    {
+      "n": 16,
+      "id": "bib.bibx1",
+      "text": "[Bangalath et al.(2022)Bangalath, Maaz, Khattak, Khan, and Shahbaz Khan] Hanoona Bangalath, Muhammad Maaz, Muhammad Uzair Khattak, Salman H Khan, and Fahad Shahbaz Khan. Bridging the gap between object and image-level representations for open-vocabulary detection. Advances in Neural Information Processing Systems , 35:33781–33794, 2022."
+    },
+    {
+      "n": 17,
+      "id": "bib.bibx50",
+      "text": "[Zhou et al.(2022b)Zhou, Yang, Loy, and Liu] Kaiyang Zhou, Jingkang Yang, Chen Change Loy, and Ziwei Liu. Conditional prompt learning for vision-language models. In IEEE Conference on Computer Vision and Pattern Recognition (CVPR) , 2022b."
+    },
+    {
+      "n": 18,
+      "id": "bib.bibx6",
+      "text": "[Deng et al.(2009)Deng, Dong, Socher, Li, Li, and Fei-Fei] Jia Deng, Wei Dong, Richard Socher, Li-Jia Li, Kai Li, and Li Fei-Fei. Imagenet: A large-scale hierarchical image database. In IEEE Conference on Computer Vision and Pattern Recognition (CVPR) , 2009."
+    },
+    {
+      "n": 19,
+      "id": "bib.bibx37",
+      "text": "[Sharma et al.(2018)Sharma, Ding, Goodman, and Soricut] Piyush Sharma, Nan Ding, Sebastian Goodman, and Radu Soricut. Conceptual captions: A cleaned, hypernymed, image alt-text dataset for automatic image captioning. In Proceedings of the 56th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) , pages 2556–2565, 2018."
+    },
+    {
+      "n": 20,
+      "id": "bib.bibx35",
+      "text": "[Schuhmann et al.(2021)Schuhmann, Vencu, Beaumont, Kaczmarczyk, Mullis, Katta, Coombes, Jitsev, and Komatsuzaki] Christoph Schuhmann, Richard Vencu, Romain Beaumont, Robert Kaczmarczyk, Clayton Mullis, Aarush Katta, Theo Coombes, Jenia Jitsev, and Aran Komatsuzaki. Laion-400m: Open dataset of clip-filtered 400 million image-text pairs. arXiv preprint arXiv:2111.02114 , 2021."
+    },
+    {
+      "n": 21,
+      "id": "bib.bibx31",
+      "text": "[Minderer et al.(2022)Minderer, Gritsenko, Stone, Neumann, Weissenborn, Dosovitskiy, Mahendran, Arnab, Dehghani, Shen, et al.] Matthias Minderer, Alexey Gritsenko, Austin Stone, Maxim Neumann, Dirk Weissenborn, Alexey Dosovitskiy, Aravindh Mahendran, Anurag Arnab, Mostafa Dehghani, Zhuoran Shen, et al. Simple open-vocabulary object detection with vision transformers. Proceedings of the European Conference on Computer Vision , 2022."
+    }
+  ]
+}

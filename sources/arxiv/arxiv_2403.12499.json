@@ -1,0 +1,123 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.12499",
+  "title": "Listwise Generative Retrieval Models via a Sequential Learning Process",
+  "authors": "Yubao Tang, Ruqing Zhang, Jiafeng Guo, Maarten de Rijke, Wei Chen, Xueqi Cheng",
+  "year": "2024",
+  "categories": [
+    "cs.IR"
+  ],
+  "url": "https://arxiv.org/abs/2403.12499",
+  "html_url": "https://arxiv.org/html/2403.12499",
+  "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+  "section": "Introduction",
+  "word_count": 982,
+  "text": "Document retrieval plays a critical role in many information retrieval (IR) related tasks, e.g., web search [1,2] and question answering [3,4]. It aims to return an initial set of potentially relevant documents from a large-scale document repository when given a query. Recently, a new retrieval paradigm called GR (GR) [5] for document retrieval has been proposed. The key idea is to fully parameterize different components of indexing and retrieval within a single consolidated model, in which the information of all the documents in a corpus is encoded into the model parameters. In essence, this paradigm formalizes the document retrieval task as a sequence-to-sequence (Seq2Seq) problem that directly maps string queries to relevant document identifiers (docids). Following the initial publication by [5], many subsequent investigations [6,7,8,9,10,11] have showcased the potential of this novel paradigm. In comparison to traditional dense retrieval [12,13,14,15], GR has several advantages:\n\n- (i) During training, such a consolidated model can be optimized directly in an end-to-end manner towards a global objective. By generating docids token-by-token in an autoregressive fashion and conditioning them on the query, we can capture fine-grained interactions between the query and the document.\n\n- (ii) During inference, the need for a complicated explicit index structure is eliminated. Instead, docid generation is performed using a vocabulary with tens of thousands of words, aligned with identifiers of all the documents in the corpus. Such autoregressive decoding significantly reduces the memory space and computational costs.\n\nThe majority of existing GR models relies on the standard Seq2Seq objective, i.e., maximum likelihood estimation (MLE) [16,17] with teacher forcing for learning. That is, during training, a number of queries are provided; each query is associated with a perfect ranked list of docids (in descending order of relevance scores); GR models operate in a pointwise manner. For example, as shown in Figure 1 (Top), existing works mainly focus on maximizing the likelihood of individual docids at a time. The final ranking is achieved by simply sorting the list based on the generated likelihood scores of these docids. In essence, the score assigned to each docid is independent of the other docids for a given query. This approach suffers from several issues: First, the learning objective under the MLE criterion is formalized as minimizing errors in generation of docids, rather than minimizing errors in rankings of docids, making it inconsistent with evaluation metrics like nDCG [18]. Second, given a query, the assumption that the query-docid pairs are generated independently and identically distributed (i.i.d.) is a strong assumption. Thirdly, the number of query-docid pairs can vary greatly from one query to another, leading to a GR model that is biased towards queries with a larger number of docid pairs [19].\n\nIn this paper, we design a novel listwise approach to GR, in which docid lists instead of individual docids are used as instances in learning, as shown in Figure 1 (Bottom). Inspired by listwise learning-to-rank [20,21,19], it is crucial to effectively capture the difference between a ranked list of docids produced by a GR model and the ranked list given as the ground truth. To formalize the listwise loss function for GR, our key idea is to view the problem of generating a ranked list of relevant docids as a sequential learning process: in each step we target to maximize the corresponding stepwise probability distribution. Specifically, at step 1, we aim to maximize the probability distribution that the top-1 docid is generated. At step i>1, we maximize the i -th probability distribution given the top i-1 docids. Leveraging the characteristics of GR, we define the probability distribution as the output sequence likelihood of generating each docid, token-by-token in an autoregressive fashion, and conditioned on the given query. To solve the sequential learning problem, we transform it into a single-objective optimization problem via linear scalarization, in which the position importance in ranking is highlighted [21]. By assigning appropriate weights to different ranking positions, the final listwise loss function can effectively emphasize the significance of each position and optimize the overall objective accordingly. The comparison between previous pointwise approaches and our proposed listwise approach for GR is illustrated in Figure 1. We refer to the GR model using the listwise loss function as ListGR.\n\nAt inference time, the trained ListGR model uses beam search to generate a ranked list of potentially-relevant docids, which are based on possibly erroneous previous steps. However, in the proposed listwise loss function, the predictive probability of each reference docid is maximized given the gold sub-sequence before it. To solve this decoding inconsistency problem, we propose to perform relevance calibration to re-train the model with a relevance calibration objective. This objective aims to calibrate the likelihood of generated candidate docids to better align with ground-truth ranked lists according to their relevance grades to the query.\n\nOur main contributions are the following:\n\n- (i) To the best of our knowledge, this is the first proposal for a listwise approach specifically designed for GR.\n\n- (ii) We formulate a listwise learning objective for GR, by directly minimizing the expected loss defined on the predicted docid list and the ground-truth list, and taking into account position information.\n\n- (iii) Our experimental results on five representative retrieval datasets demonstrate the effectiveness of our method, particularly on datasets with multi-graded relevance. Compared to the current state-of-the-art pointwise GR method, NCI, our approach achieves a significant improvement of 15.8% in terms of nDCG@5 on the ClueWeb 200K dataset.\n\nThe remainder of the paper is structured as follows. Section 2 introduces preliminary concepts necessary for understanding the proposed method. Section 3 outlines the details of our proposed method. Section 4 describes the experimental setup. Section 5 presents the experimental results and analysis, highlighting the performance of our method compared to existing approaches. Section 6 presents an overview of related work in the field. Finally, Section 7 provides a summary of the paper and discusses limitations and potential future research directions.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib71",
+      "text": "Nguyen et al . (2016) Tri Nguyen, Mir Rosenberg, Xia Song, Jianfeng Gao, Saurabh Tiwary, Rangan Majumder, and Li Deng. 2016. MS MARCO: A Human Generated MAchine Reading COmprehension Dataset. In Proceedings of the Workshop on Cognitive Computation: Integrating neural and symbolic approaches 2016 co-located with the 30th Annual Conference on Neural Information Processing Systems ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib20",
+      "text": "Craswell et al . (2020) Nick Craswell, Bhaskar Mitra, Emine Yilmaz, Daniel Campos, and Ellen M. Voorhees. 2020. Overview of the TREC 2019 Deep Learning Track. arXiv preprint arXiv:2003.07820 (2020)."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib34",
+      "text": "Guu et al . (2020) Kelvin Guu, Kenton Lee, Zora Tung, Panupong Pasupat, and Mingwei Chang. 2020. Retrieval Augmented Language Model Pre-training. In International conference on machine learning . 3929–3938."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib81",
+      "text": "Sakai et al . (2011) Tetsuya Sakai, Daisuke Ishikawa, Noriko Kando, Yohei Seki, Kazuko Kuriyama, and Chin-Yew Lin. 2011. Using Graded-relevance Metrics for Evaluating Community QA Answer Selection. In Proceedings of the fourth ACM international conference on Web search and data mining . 187–196."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib70",
+      "text": "Metzler et al . (2021) Donald Metzler, Yi Tay, Dara Bahri, and Marc Najork. 2021. Rethinking Search: Making Domain Experts Out of Dilettantes. In ACM Special Interest Group on Information Retrieval forum , Vol. 55. ACM New York, NY, USA, 1–27."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib85",
+      "text": "Tay et al . (2022) Yi Tay, Vinh Q Tran, Mostafa Dehghani, Jianmo Ni, and Dara Bahri. 2022. Transformer Memory as a Differentiable Search Index. In Advances in Neural Information Processing Systems , Vol. 35. 21831–21843."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib106",
+      "text": "Zhuang et al . (2022) Shengyao Zhuang, Houxing Ren, and Linjun Shou. 2022. Bridging the Gap between Indexing and Retrieval for Differentiable Search Index with Query Generation. arXiv preprint arXiv:2206.10128 (2022)."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib16",
+      "text": "Chen et al . (2022) Jiangui Chen, Ruqing Zhang, Jiafeng Guo, Yiqun Liu, Yixing Fan, and Xueqi Cheng. 2022. CorpusBrain: Pre-train a Generative Retrieval Model for Knowledge-Intensive Language Tasks. In Proceedings of the 31st ACM International Conference on Information & Knowledge Management . 191–200."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib88",
+      "text": "Wang et al . (2022) Yujing Wang, Yingyan Hou, Haonan Wang, Ziming Miao, Shibin Wu, Hao Sun, Qi Chen, Yuqing Xia, Chengmin Chi, Guoshuai Zhao, Zheng Liu, Xing Xie, Hao Sun, Weiwei Deng, Qi Zhang, and Mao Yang. 2022. A Neural Corpus Indexer for Document Retrieval. In Advances in Neural Information Processing Systems , Vol. 35. 25600–25614."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib23",
+      "text": "De Cao et al . (2021) Nicola De Cao, Gautier Izacard, Sebastian Riedel, and Fabio Petroni. 2021. Autoregressive Entity Retrieval. In International Conference on Learning Representations ."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "Bevilacqua et al . (2022) Michele Bevilacqua, Giuseppe Ottaviano, Patrick Lewis, Wen-tau Yih, Sebastian Riedel, and Fabio Petroni. 2022. Autoregressive Search Engines: Generating Substrings as Document Identifiers. In Advances in Neural Information Processing Systems . 31668–31683."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib100",
+      "text": "Zhan et al . (2020b) Jingtao Zhan, Jiaxin Mao, Yiqun Liu, Min Zhang, and Shaoping Ma. 2020b. RepBERT: Contextualized Text Embeddings for First-stage Retrieval. arXiv preprint arXiv:2006.15498 (2020)."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib64",
+      "text": "Luan et al . (2021) Yi Luan, Jacob Eisenstein, and Kristina Toutanova. 2021. Sparse, Dense, and Attentional Representations for Text Retrieval. Transactions of the Association for Computational Linguistics 9 (2021), 329–345."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib10",
+      "text": "Bentley (1975) Jon Louis Bentley. 1975. Multidimensional Binary Search Trees Used for Associative Searching. Commun. ACM 18, 9 (1975), 509–517."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib72",
+      "text": "Nie et al . (2020) Ping Nie, Yuyu Zhang, Xiubo Geng, Arun Ramamurthy, Le Song, and Daxin Jiang. 2020. DC-BERT: Decoupling Question and Document for Efficient Contextual Encoding. In Proceedings of the 43rd international ACM SIGIR conference on research and development in information retrieval . ACM, 1829–1832."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib32",
+      "text": "Goyal et al . (2016) Anirudh Goyal, Alex M. Lamb, Ying Zhang, Saizheng Zhang, Aaron C. Courville, and Yoshua Bengio. 2016. Professor Forcing: A New Algorithm for Training Recurrent Networks. Advances in neural information processing systems 29 (2016), 4601–4609."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib52",
+      "text": "LeCun et al . (2015) Yann LeCun, Yoshua Bengio, and Geoffrey Hinton. 2015. Deep Learning. Nature 521, 7553 (2015), 436–444."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib39",
+      "text": "Järvelin and Kekäläinen (2002) Kalervo Järvelin and Jaana Kekäläinen. 2002. Cumulated Gain-based Evaluation of IR Techniques. ACM Transactions on Information Systems 20 (2002), 422–446."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib12",
+      "text": "Cao et al . (2007) Zhe Cao, Tao Qin, Tie-Yan Liu, Ming-Feng Tsai, and Hang Li. 2007. Learning to Rank: From Pairwise Approach to Listwise Approach. In Proceedings of the 24th international conference on Machine learning . 129–136."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib92",
+      "text": "Xia et al . (2008) Fen Xia, Tie-Yan Liu, Jue Wang, Wensheng Zhang, and Hang Li. 2008. Listwise Approach to Learning to Rank: Theory and Algorithm. In Proceedings of the 25th international conference on Machine learning . 1192–1199."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib49",
+      "text": "Lan et al . (2014) Yanyan Lan, Yadong Zhu, Jiafeng Guo, Shuzi Niu, and Xueqi Cheng. 2014. Position-Aware ListMLE: A Sequential Learning Process for Ranking. In Proceedings of the Thirtieth Conference on Uncertainty in Artificial Intelligence . 449–458."
+    }
+  ]
+}

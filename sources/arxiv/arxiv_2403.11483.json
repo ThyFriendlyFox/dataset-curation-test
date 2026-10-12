@@ -1,0 +1,190 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.11483",
+  "title": "Open-World Semi-Supervised Learning for Node Classification",
+  "authors": "Yanling Wang, Jing Zhang, Lingxi Zhang, Lixin Liu, Yuxiao Dong, Cuiping Li, Hong Chen, Hongzhi Yin",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.AI",
+    "cs.SI"
+  ],
+  "url": "https://arxiv.org/abs/2403.11483",
+  "html_url": "https://arxiv.org/html/2403.11483",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1057,
+  "text": "With the advance of graph neural networks (GNNs), semi-supervised node classification [1,2,3,4,5,6,7] has achieved remarkable breakthroughs. Despite the success, most node classification models are developed under the closed-world setting, assuming that both labeled and unlabeled data originate from the same set of classes. In real-world scenarios, this assumption rarely holds true because it is impractical for humans to label all possible classes in the world. Therefore, some studies [8,9,10,11,12,13] explored open-world node classification, where test nodes are assumed to be from either seen classes or novel classes. These efforts treat nodes of novel classes as out-of-distribution (OOD) instances, thus assigning them into an outlier class. More practically, our work aims to classify test nodes into previously seen classes or multiple novel classes, formally named as open-world semi-supervised learning (open-world SSL) for node classification. Figure 1a illustrates an example in a coauthor network, where nodes represent authors, edges depict coauthor relationships, and the colors of the nodes denote the authors’ primary research fields. Since novel research fields emerge over time, and it is challenging to promptly update the label information, a model is desired to classify unlabeled authors into previously seen fields or newly emerging fields.\n\nThe key to solving this problem lies in high-quality node representation learning. However, as only seen classes have manually labeled nodes, the seen classes are often better learned than the novel classes to exhibit smaller intra-class variances in the embedding space. We illustrate the imbalance of intra-class variances between seen and novel classes on the right side of Figure 1a. In fact, the variance imbalance also occurs on other types of data. To alleviate the issue, efforts [14,15,16,17,18,19,20,21] in the field of computer vision commonly use a pre-trained ResNet [22] or a pre-trained Vision Transformer (ViT) [23] to obtain more compact representations for samples of novel classes. Nevertheless, graph community presently lacks general pre-trained feature encoders because data distributions can vary significantly across different graph types [24,25]. Although pre-trained graph encoders like GCC [24] and Graphormer [25] have been proposed, the related studies typically conduct pre-training and fine-tuning/prompting [26,27,28] on the same or similar types of graph data, which limits their applicability. Without a general and powerful pre-trained graph encoder, the variance imbalance between seen and novel classes naturally becomes a core factor to impact open-world SSL on a graph. Motivated by this, we target to (1) explore how the variance imbalance affects open-world SSL for node classification, and (2) design an effective method to alleviate the variance imbalance issue without relying on pre-trained graph encoders.\n\nTo achieve the goal, we start with a preliminary experiment on the well-known Coauthor CS graph dataset [29]. Firstly, we divide classes into seen classes and novel classes, and construct a labeled set and an unlabeled set (Cf. Section V). To quantify the variance imbalance and measure the separation between seen and novel classes, we introduce two metrics — imbalance rate and separation rate in Section III-B. Initially, we employ the unsupervised contrastive loss InfoNCE [30] to learn representations for both labeled and unlabeled nodes, enabling unbiased learning of seen and novel classes. Then we successively add supervised losses to retrain the model, including a supervised contrastive loss SupCon [31] and the classic cross-entropy (CE), to enhance the representation learning of labeled nodes. By doing this, the intra-class variances of seen classes can gradually decrease, leading to increasing imbalance rates (Cf. the second column of Figure 1b). Meanwhile, the seen classes become more separated from the novel classes, leading to increasing separation rates (Cf. the third column of Figure 1b). Under different imbalance/separation rates, we run K-Means [32] over node representations to cluster nodes, and align seen classes with specific clusters for final node classification. From Figure 1b, we make the following observations:\n\n- • When the separation rate is relatively low, the imbalance rate plays a crucial role in impacting the model performance on novel classes. Clearly, increasing the imbalance rate would decrease the accuracy on novel classes (Cf. InfoNCE vs. InfoNCE+SupCon), as dispersed node representations of novel classes are prone to be incorrectly clustered.\n\n- • When the seen classes are thoroughly learned and become well separated from the novel classes, the increase of the imbalance rate would not hurt the performance on novel classes (Cf. InfoNCE+SupCon vs. InfoNCE+SupCon+CE).\n\nOur theoretical analysis in Section IV-A supports these findings.\n\nInspired by the insights, we propose an IM balance- A ware method named OpenIMA for Open -world semi-supervised node classification — a simple and effective method to suppress the imbalance rate and increase the separation rate (demonstrated in Figure 1b). Specifically, we introduce pseudo labels to reduce the intra-class variances of novel classes and enhance the learning of seen classes. Generally, previous work trains a classifier in a supervised or semi-supervised manner for pseudo-labeling [15,33,34]. However, due to the absence of powerful pre-trained feature encoders for representing nodes, the node classifier tends to be seriously biased towards the seen classes. Therefore, we convert to unsupervised clustering to foster a more equitable pseudo-labeling. Considering the unordered nature of cluster IDs, we align clusters with classes. However, the clusters corresponding to novel classes can not be aligned, making the class IDs of novel classes remain unordered. Hence we adopt contrastive learning (CL) to learn the bias-reduced pseudo labels, as CL captures semantic knowledge by learning whether two samples come from the same class instead of assigning them to specific classes as done in cross-entropy.\n\nOverall, our work makes the following contributions:\n\n- • Based on empirical and theoretical analysis, we find that the imbalance of intra-class variances between seen and novel classes is a critical factor that impacts open-world SSL on a graph. To our knowledge, this is a pioneer work to theoretically analyze the imbalance of intra-class variances between seen and novel classes. Moreover, we investigate open-world SSL for node classification, which has been less-explored before.\n\n- • Based on our intriguing observations, we develop OpenIMA for open-world semi-supervised node classification, which alleviates the variance imbalance issue to more effectively learn seen and novel classes from scratch.\n\n- • We conduct comprehensive experiments on seven real-world node classification datasets by comparing OpenIMA with representative baselines. The experimental results demonstrate the superiority of OpenIMA over the baselines. Especially on Coauthor Physics and ogbn-Products, OpenIMA derives 11.8% and 12.5% gains of overall accuracy compared with the best baseline, respectively.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "T. N. Kipf and M. Welling, “Semi-supervised classification with graph convolutional networks,” in ICLR , 2017."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "W. L. Hamilton, Z. Ying, and J. Leskovec, “Inductive representation learning on large graphs,” in NeurIPS , 2017, pp. 1024–1034."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "K. Xu, W. Hu, J. Leskovec, and S. Jegelka, “How powerful are graph neural networks?” in ICLR , 2019."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "Z. Liu, C. Chen, L. Li, J. Zhou, X. Li, L. Song, and Y. Qi, “Geniepath: Graph neural networks with adaptive receptive paths,” in AAAI , 2019, pp. 4424–4431."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "Y. Wang, J. Zhang, S. Guo, H. Yin, C. Li, and H. Chen, “Decoupling representation learning and classification for gnn-based anomaly detection,” in SIGIR , 2021, pp. 1239–1248."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "J. Liu, M. He, G. Wang, N. Q. V. Hung, X. Shang, and H. Yin, “Imbalanced node classifcation beyond homophilic assumption,” in IJCAI , 2023, pp. 7206–7214."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "L. Qu, H. Zhu, R. Zheng, Y. Shi, and H. Yin, “Imgagn: Imbalanced network embedding via generative adversarial graph networks,” in KDD , 2021, pp. 1390–1398."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "M. Wu, S. Pan, and X. Zhu, “Openwgl: open-world graph learning for unseen class node classification,” Knowl. Inf. Syst. , vol. 63, no. 9, pp. 2405–2430, 2021."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "Y. Song and D. Wang, “Learning on graphs with out-of-distribution nodes,” in KDD , 2022, pp. 1635–1645."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "L. Galke, I. Vagliano, B. Franke, T. Zielke, and A. Scherp, “Lifelong learning in evolving graphs with limited labeled data and unseen class detection,” CoRR , vol. abs/2112.10558, 2021."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "L. Galke, I. Vagliano, B. Franke, T. Zielke, M. Hoffmann, and A. Scherp, “Lifelong learning on evolving graphs under the constraints of imbalanced classes and new classes,” Neural Networks , vol. 164, pp. 156–176, 2023."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "Y. Ming, Y. Sun, O. Dia, and Y. Li, “How to exploit hyperspherical embeddings for out-of-distribution detection?” in ICLR , 2023."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "Q. Zhang, Q. Li, X. Chen, P. Zhang, S. Pan, P. Fournier-Viger, and J. Z. Huang, “A dynamic variational framework for open-world node classification in structured sequences,” in ICDM , 2022, pp. 703–712."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "S. Vaze, K. Hant, A. Vedaldi, and A. Zisserman, “Generalized category discovery,” in CVPR , 2022, pp. 7482–7491."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "X. Wen, B. Zhao, and X. Qi, “Parametric classification for generalized category discovery: A baseline study,” in ICCV , 2023, pp. 16 544–16 554."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "S. Zhang, S. H. Khan, Z. Shen, M. Naseer, G. Chen, and F. S. Khan, “Promptcal: Contrastive affinity learning via auxiliary prompts for generalized novel category discovery,” in CVPR , 2023, pp. 3479–3488."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "F. Chiaroni, J. Dolz, I. M. Ziko, A. Mitiche, and I. B. Ayed, “Mutual information-based generalized category discovery,” CoRR , vol. abs/2212.00334, 2022."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "B. Ye, K. Gan, T. Wei, and M. Zhang, “Bridging the gap: Learning pace synchronization for open-world semi-supervised learning,” CoRR , vol. abs/2309.11930, 2023."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "B. Zhao, X. Wen, and K. Han, “Learning semi-supervised gaussian mixture models for generalized category discovery,” in ICCV , 2023, pp. 16 577–16 587."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "K. Cao, M. Brbic, and J. Leskovec, “Open-world semi-supervised learning,” in ICLR , 2022."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "Z. Sun, S. Chen, T. Yao, B. Yin, R. Yi, S. Ding, and L. Ma, “Contrastive pseudo learning for open-world deepfake attribution,” in ICCV , 2023, pp. 20 825–20 835."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib22",
+      "text": "K. He, X. Zhang, S. Ren, and J. Sun, “Deep residual learning for image recognition,” in CVPR , 2016, pp. 770–778."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib23",
+      "text": "A. Dosovitskiy, L. Beyer, A. Kolesnikov, D. Weissenborn, X. Zhai, T. Unterthiner, M. Dehghani, M. Minderer, G. Heigold, S. Gelly, J. Uszkoreit, and N. Houlsby, “An image is worth 16x16 words: Transformers for image recognition at scale,” in ICLR , 2021."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib24",
+      "text": "J. Qiu, Q. Chen, Y. Dong, J. Zhang, H. Yang, M. Ding, K. Wang, and J. Tang, “GCC: graph contrastive coding for graph neural network pre-training,” in KDD , 2020, pp. 1150–1160."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib25",
+      "text": "C. Ying, T. Cai, S. Luo, S. Zheng, G. Ke, D. He, Y. Shen, and T. Liu, “Do transformers really perform badly for graph representation?” in NeurIPS , 2021, pp. 28 877–28 888."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib26",
+      "text": "X. Sun, H. Cheng, J. Li, B. Liu, and J. Guan, “All in one: Multi-task prompting for graph neural networks,” in SIGKDD , 2023, pp. 2120–2131."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib27",
+      "text": "Z. Liu, X. Yu, Y. Fang, and X. Zhang, “Graphprompt: Unifying pre-training and downstream tasks for graph neural networks,” in WWW , 2023, pp. 417–428."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib28",
+      "text": "M. Sun, K. Zhou, X. He, Y. Wang, and X. Wang, “GPPT: graph pre-training and prompt tuning to generalize graph neural networks,” in SIGKDD , 2022, pp. 1717–1727."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib29",
+      "text": "O. Shchur, M. Mumme, A. Bojchevski, and S. Günnemann, “Pitfalls of graph neural network evaluation,” CoRR , vol. abs/1811.05868, 2018."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib30",
+      "text": "A. van den Oord, Y. Li, and O. Vinyals, “Representation learning with contrastive predictive coding,” CoRR , vol. abs/1807.03748, 2018."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib31",
+      "text": "P. Khosla, P. Teterwak, C. Wang, A. Sarna, Y. Tian, P. Isola, A. Maschinot, C. Liu, and D. Krishnan, “Supervised contrastive learning,” in NeurIPS , 2020, pp. 18 661–18 673."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib32",
+      "text": "D. Arthur and S. Vassilvitskii, “k-means++: the advantages of careful seeding,” in SODA , N. Bansal, K. Pruhs, and C. Stein, Eds. SIAM, 2007, pp. 1027–1035."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib33",
+      "text": "Y. Sun and Y. Li, “Opencon: Open-world contrastive learning,” Trans. Mach. Learn. Res. , vol. 2023, 2023."
+    },
+    {
+      "n": 34,
+      "id": "bib.bib34",
+      "text": "M. N. Rizve, N. Kardan, S. Khan, F. S. Khan, and M. Shah, “Openldn: Learning to discover novel classes for open-world semi-supervised learning,” in ECCV , vol. 13691, 2022, pp. 382–401."
+    }
+  ]
+}

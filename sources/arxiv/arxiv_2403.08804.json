@@ -1,0 +1,119 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.08804",
+  "title": "Forward Direct Feedback Alignment for Online Gradient Estimates of Spiking Neural Networks",
+  "authors": "Florian Bacho, Dminique Chu",
+  "year": "2024",
+  "categories": [
+    "cs.NE",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2403.08804",
+  "html_url": "https://arxiv.org/html/2403.08804",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 652,
+  "text": "## Introduction\n\nThe backpropagation algorithm (BP) [1] underpins a good part of modern neural network (NN) based AI. BP-based training algorithms continue to be the state of the art in many areas of machine learning ranging from benchmark problems such as the MNIST dataset [2] to the most recent transformer-based architectures [3]. While its success is undeniable, BP has some disadvantages. The main one is that BP is computationally expensive and relies on sequential processing of layers during both the forward and backward pass, limiting its scope for parallelisation. This is sometimes called backward locking [4].\n\nFurthermore, under BP the update of any particular connection weight in a neural network requires global information about the entire network. This entails intense data processing needs [5] and consequently high energy consumption [5,6]. Most importantly, BP is also not compatible with neuromorphic hardware platforms [7], such as Loihi [8] or SpiNNaker [9], because neuromorphic hardware cannot save the past states of neurons or reverse time.\n\nIn the light of this, there has been some recent interest in alternatives to BP that alleviate these issues. In the context of SNNs, random feedback learning, and particularly the Direct Feedback Alignment (DFA) algorithm is an interesting alternative to BP for online gradient approximation [10,11,12,13,14,15]. For example, the Event-Driven Random Backpropagation (eRBP) [10] and the e-prop [11,12] algorithms use random feedback connections to send error signals to hidden neurons at every time steps, thus continuously accumulating gradients during the inference. Unlike BP, DFA algorithms can be run efficiently on neuromorphic hardware. However, these algorithms constantly project errors to hidden neurons which can lead to significant computation and energy consumption on hardware.\n\nAlternatives such as the Spike-Train Level Direct Feedback Alignment (ST-DFA) [13] or the Error-Modulated Spike-Timing-Dependent Plasticity (EMSTDP) [14,15] algorithms accumulate local changes of weights during the inference and send a single error signal to hidden neurons through random direct feedback connections. These approaches are more energy-efficient because the error projection is only performed once, thus requiring fewer operations. They have also have been successfully implemented on neuromorphic hardware and demonstrated promising performance and lower energy consumption compared to offline training on GPUs [13,15,12].\n\nHowever, they have significant shortcomings. The most important one is that the performance of the algorithms is far behind the state of the art, i.e. far behind BP. It is generally thought that DFA algorithms rely on the alignment between weight and feedback connections [16,17]. In the context of rate-coded neural networks it has recently been shown that the strong bias introduced by the random feedback connections affects the convergence rate of DFA. A solution for this was proposed in the form of the FDFA algorithm [18], which enhanced DFA by learning the feedback matrices using Forward-AD. This proved to be highly successful in the context of rate-coded (non-spiking) neurons.\n\nThe main contribution of this paper is the Spiking Forward Direct Feedback Alignment (SFDFA) algorithm and adaptation of FDFA to SNNs. While the main idea of the two algorithms are the same, a number of conceptual modifications were necessary for SFDFA. Firstly, Forward-AD is not suitable for SNNs, and we use instead, as an alternative, graded spikes to estimate the weight between output and hidden neurons. Secondly, since spikes are non-differentiable, new different approaches are necessary in order compute gradients. Here we choose an approach based on [19] which computes gradients of spike times of neurons. Unlike, [19], however, we allow multiple spikes per neurons, which in turn required a novel approaches to compute local gradient (see [20] for a similar approach). Thirdly, as we found, the approach we took leads to a singularity where the the gradient diverges; we propose an ad-hoc solution for this. Using extensive simulations on a variety of benchmark problems, we demonstrate that SFDFA is effective, outperforming previous neuromorphic algorithms on a variety of tasks. However, it remains consistently below the current state of the art, as set by BP.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib28",
+      "text": "Rumelhart et al (1986) Rumelhart DE, Hinton GE, Williams RJ (1986) Learning representations by back-propagating errors. nature 323(6088):533–536"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib20",
+      "text": "LeCun et al (2010) LeCun Y, Cortes C, Burges C (2010) Mnist handwritten digit database. ATT Labs [Online] Available: http://yannlecuncom/exdb/mnist 2"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib19",
+      "text": "Launay et al (2020) Launay J, Poli I, Boniface F, et al (2020) Direct feedback alignment scales to modern deep learning tasks and architectures. In: Proceedings of the 34th International Conference on Neural Information Processing Systems. Curran Associates Inc., Red Hook, NY, USA, NIPS’20"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib16",
+      "text": "Huo et al (2018) Huo Z, Gu B, Yang Q, et al (2018) Decoupled parallel backpropagation with convergence guarantee. 1804.10574"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib7",
+      "text": "Crafton et al (2019) Crafton B, Parihar A, Gebhardt E, et al (2019) Direct feedback alignment with sparse connections for local learning. Frontiers in neuroscience 13:525"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib14",
+      "text": "Han and Yoo (2019) Han D, Yoo Hj (2019) Direct feedback alignment based convolutional neural network training for low-power online learning processor. In: 2019 IEEE/CVF International Conference on Computer Vision Workshop (ICCVW), pp 2445–2452"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib23",
+      "text": "Neftci et al (2017a) Neftci EO, Augustine C, Paul S, et al (2017a) Event-driven random back-propagation: Enabling neuromorphic deep learning machines. Frontiers in Neuroscience 11:324"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib9",
+      "text": "Davies et al (2018) Davies M, Srinivasa N, Lin TH, et al (2018) Loihi: A neuromorphic manycore processor with on-chip learning. IEEE Micro 38(1):82–99. 10.1109/MM.2018.112130359"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib11",
+      "text": "Furber et al (2014) Furber SB, Galluppi F, Temple S, et al (2014) The spinnaker project. Proceedings of the IEEE 102(5):652–665. 10.1109/JPROC.2014.2304638"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib24",
+      "text": "Neftci et al (2017b) Neftci EO, Augustine C, Paul S, et al (2017b) Event-driven random back-propagation: Enabling neuromorphic deep learning machines. Frontiers in Neuroscience 11. 10.3389/fnins.2017.00324 , URL https://doi.org/10.3389/fnins.2017.00324"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib3",
+      "text": "Bellec et al (2020) Bellec G, Scherr F, Subramoney A, et al (2020) A solution to the learning dilemma for recurrent networks of spiking neurons. Nature Communications 11(1). 10.1038/s41467-020-17236-y"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib27",
+      "text": "Rostami et al (2022) Rostami A, Vogginger B, Yan Y, et al (2022) E-prop on SpiNNaker 2: Exploring online learning in spiking RNNs on neuromorphic hardware. Frontiers in Neuroscience 16. 10.3389/fnins.2022.1018006 , URL https://doi.org/10.3389/fnins.2022.1018006"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib21",
+      "text": "Lee et al (2020) Lee J, Zhang R, Zhang W, et al (2020) Spike-train level direct feedback alignment: Sidestepping backpropagation for on-chip training of spiking neural nets. Frontiers in Neuroscience 14. 10.3389/fnins.2020.00143"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib29",
+      "text": "Shrestha et al (2019) Shrestha A, Fang H, Wu Q, et al (2019) Approximating back-propagation for a biologically plausible local learning rule in spiking neural networks. In: Proceedings of the International Conference on Neuromorphic Systems. Association for Computing Machinery, New York, NY, USA, ICONS ’19, 10.1145/3354265.3354275"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib30",
+      "text": "Shrestha et al (2021) Shrestha A, Fang H, Rider DP, et al (2021) In-hardware learning of multilayer spiking neural networks on a neuromorphic processor. In: 2021 58th ACM/IEEE Design Automation Conference (DAC), pp 367–372, 10.1109/DAC18074.2021.9586323"
+    },
+    {
+      "n": 16,
+      "id": "bib.bib25",
+      "text": "Nøkland (2016) Nøkland A (2016) Direct feedback alignment provides learning in deep neural networks. In: Lee D, Sugiyama M, Luxburg U, et al (eds) Advances in Neural Information Processing Systems, vol 29. Curran Associates, Inc."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib26",
+      "text": "Refinetti et al (2021) Refinetti M, D’Ascoli S, Ohana R, et al (2021) Align, then memorise: the dynamics of learning with feedback alignment. In: International Conference on Machine Learning, pp 8925–8935"
+    },
+    {
+      "n": 18,
+      "id": "bib.bib2",
+      "text": "Bacho and Chu (2024) Bacho F, Chu D (2024) Low-variance forward gradients using direct feedback alignment and momentum. Neural Networks 169:572–583. https://doi.org/10.1016/j.neunet.2023.10.051 , URL https://www.sciencedirect.com/science/article/pii/S0893608023006172"
+    },
+    {
+      "n": 19,
+      "id": "bib.bib13",
+      "text": "Göltz et al (2021) Göltz J, Kriener L, Baumbach A, et al (2021) Fast and energy-efficient neuromorphic deep learning with first-spike times 3(9):823–835"
+    },
+    {
+      "n": 20,
+      "id": "bib.bib1",
+      "text": "Bacho and Chu (2023) Bacho F, Chu D (2023) Exploring tradeoffs in spiking neural networks. Neural Computation 35(10):1627–1656. URL https://kar.kent.ac.uk/101545/"
+    }
+  ]
+}

@@ -1,0 +1,248 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2311.17061",
+  "title": "HumanGaussian: Text-Driven 3D Human Generation with Gaussian Splatting",
+  "authors": "Xian Liu, Xiaohang Zhan, Jiaxiang Tang, Ying Shan, Gang Zeng, Dahua Lin, Xihui Liu, Ziwei Liu",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2311.17061",
+  "html_url": "https://arxiv.org/html/2311.17061",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 823,
+  "text": "Creating high-quality 3D humans from user condition is of great importance to a wide variety of applications, ranging from virtual try-on [1,2,3,4] to immersive telepresence [5,6,7,8,9,10]. To this end, researchers explore the task of text-driven 3D human generation, which synthesizes the character’s appearance and geometry based on text prompts. Traditional methods resort to a hand-crafted pipeline, where 3D models are first regressed from multi-view human captures, and then undergo a series of manual processes like rigging and skinning [11,12,13,14]. To ease human labor for 3D asset creation of diverse layouts, the exemplar work DreamFusion [15] proposes score distillation sampling (SDS) to harness rich 2D text-to-image prior (e.g., Stable Diffusion [16], Imagen [17]) by optimizing 3D scenes to render samples that reside on the manifold of higher likelihood. Though accomplishing reasonable results on single objects [18,19,20,21], it is hard for them to model detailed human bodies with complex articulations.\n\nTo incorporate structural guidance, recent text-driven 3D human studies combine SDS with body shape models such as SMPL [22] and imGHUM [23]. In particular, a common paradigm is to integrate human priors into representations like mesh and neural radiance field (NeRF), either by taking the body shape as mesh/density initialization [24,25,26], or by learning a deformation field based on linear blend skinning (LBS) [27,28,29]. However, they mostly compromise to trade-off between efficiency and quality: the mesh-based methods [30,31,32] struggle to model fine topologies like accessories and wrinkles; while the NeRF-based methods [33,34,35] are time/memory-consuming to render high-resolution results. How to achieve fine-grained generation efficiently remains an unsolved problem.\n\nRecently, the explicit neural representation of 3D Gaussian Splatting (3DGS) [36] provides a new perspective for real-time scene reconstruction. It enables multi-scale modeling across multiple granularities, which is suitable for 3D human generation. Nevertheless, it is non-trivial to exploit such representation in this task with two challenges: 1) 3DGS characterizes a tile-based rasterization by sorting and \\alpha -blending anisotropic splats within each view frustum, which only back-propagates a small set of high-confidence Gaussians. However, as verified in the 3D surface-/volume-rendering studies [37,38,39,40], sparse gradient could hinder network optimization of geometry and appearance. Therefore, structural guidance is required in 3DGS, especially for the human domain that demands hierarchical structure modeling and generation controllability. 2) The naive SDS necessitates a large classifier-free guidance (CFG) [41] scale for image-text alignment (e.g., 100 as used in [15]). But it sacrifices visual quality with over-saturated patterns, making realistic human generation difficult. Besides, due to the stochasticity of SDS loss, the original gradient-based density control in 3DGS is unstable, which incurs blurry results with floating artifacts.\n\nIn this paper, we propose an efficient yet effective framework, HumanGaussian, that generates high-quality 3D humans with fine-grained geometry and realistic appearance. Our intuition lies in that 3D Gaussian Splatting is an efficient renderer with periodic Gaussian shrinkage or growing, where such adaptive density control can be naturally guided by intrinsic human structures. The key is to incorporate explicit structural guidance and gradient regularization to facilitate Gaussian optimization. Specifically, we first propose a Structure-Aware SDS that jointly learns human appearance and geometry. Unlike previous studies [42,43,36] that adopt the generic priors like Structure-from-Motion (SfM) points or Point-E [44], we instead anchor the Gaussian initial positions on the SMPL-X mesh. The subsequent densification and pruning processes thus focus on regions around the body surface, effectively capturing geometric deformations like accessories and wrinkles. Additionally, we extend the pre-trained Stable Diffusion [16] to simultaneously denoise the image RGB and depth as our SDS source model. Such dual-branch design distills the joint distribution of two spatially-aligned targets (i.e., RGB and depth), which boosts the Gaussian convergence with both structural guidance and textural realism. To further improve renderings with natural appearance, we devise an Annealed Negative Prompt Guidance. In particular, we decompose SDS into a noisier generative score and a cleaner classifier score, where equipping the latter term with a decreasing negative prompt guidance enables realistic generation under nominal CFG scales (e.g., 7.5), as also proven in concurrent text-to-3D studies [45,46]. In this way, we manage to avoid over-saturated patterns with appropriate CFG scales that well balance sample quality and diversity. Moreover, due to the high variance of SDS loss, directly relying on gradient information to control densities results in blurry geometry [36]. In contrast, we propose to eliminate floating artifacts based on Gaussian size in a prune-only phase.\n\nTo summarize, our main contributions are three-fold: 1) We propose an efficient yet effective framework HumanGaussian for high-quality 3D human generation with fine-grained geometry and realistic appearance. As one of the earliest attempts in taming Gaussian Splatting for text-driven 3D human domain, we hope to pave the way for future research. 2) We propose the Structure-Aware SDS to jointly learn human appearance and geometry with explicit structural guidance. 3) We devise the Annealed Negative Prompt Guidance to guarantee realistic results and eliminate floating artifacts. Extensive experiments demonstrate the superior efficiency and competitive quality of our framework, rendering vivid 3D humans under diverse scenarios.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib78",
+      "text": "Bochao Wang, Huabin Zheng, Xiaodan Liang, Yimin Chen, Liang Lin, and Meng Yang. Toward characteristic-preserving image-based virtual try-on network. In Proceedings of the European conference on computer vision (ECCV) , pages 589–604, 2018a."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib69",
+      "text": "Igor Santesteban, Nils Thuerey, Miguel A Otaduy, and Dan Casas. Self-supervised collision handling via generative 3d garment models for virtual try-on. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 11763–11773, 2021."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib70",
+      "text": "Igor Santesteban, Miguel Otaduy, Nils Thuerey, and Dan Casas. Ulnef: Untangled layered neural fields for mix-and-match virtual try-on. Advances in Neural Information Processing Systems , 35:12110–12125, 2022."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib29",
+      "text": "Xuan Ju, Ailing Zeng, Chenchen Zhao, Jianan Wang, Lei Zhang, and Qiang Xu. Humansd: A native skeleton-guided diffusion model for human image generation. arXiv preprint arXiv:2304.04269 , 2023c."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib39",
+      "text": "Ruilong Li, Kyle Olszewski, Yuliang Xiu, Shunsuke Saito, Zeng Huang, and Hao Li. Volumetric human teleportation. In ACM SIGGRAPH 2020 Real-Time Live! , pages 1–1. 2020."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib67",
+      "text": "Shunsuke Saito, Tomas Simon, Jason Saragih, and Hanbyul Joo. Pifuhd: Multi-level pixel-aligned implicit function for high-resolution 3d human digitization. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 84–93, 2020."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib98",
+      "text": "Lingting Zhu, Xian Liu, Xuanyu Liu, Rui Qian, Ziwei Liu, and Lequan Yu. Taming diffusion models for audio-driven co-speech gesture generation. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 10544–10553, 2023."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib42",
+      "text": "Xian Liu, Qianyi Wu, Hang Zhou, Yuanqi Du, Wayne Wu, Dahua Lin, and Ziwei Liu. Audio-driven co-speech gesture video generation. Advances in Neural Information Processing Systems , 35:21386–21399, 2022a."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib27",
+      "text": "Xuan Ju, Ailing Zeng, Yuxuan Bian, Shaoteng Liu, and Qiang Xu. Direct inversion: Boosting diffusion-based editing with 3 lines of code. arXiv preprint arXiv:2310.01506 , 2023a."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib28",
+      "text": "Xuan Ju, Ailing Zeng, Jianan Wang, Qiang Xu, and Lei Zhang. Human-art: A versatile human-centric dataset bridging natural and artificial scenes. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 618–629, 2023b."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib3",
+      "text": "Bernd Bickel, Mario Botsch, Roland Angst, Wojciech Matusik, Miguel Otaduy, Hanspeter Pfister, and Markus Gross. Multi-scale capture of facial geometry and motion. ACM transactions on graphics (TOG) , 26(3):33–es, 2007."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib26",
+      "text": "Hanbyul Joo, Hao Liu, Lei Tan, Lin Gui, Bart Nabbe, Iain Matthews, Takeo Kanade, Shohei Nobuhara, and Yaser Sheikh. Panoptic studio: A massively multiview system for social motion capture. In Proceedings of the IEEE International Conference on Computer Vision , pages 3334–3342, 2015."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib38",
+      "text": "Jiefeng Li, Chao Xu, Zhicun Chen, Siyuan Bian, Lixin Yang, and Cewu Lu. Hybrik: A hybrid analytical-neural inverse kinematics solution for 3d human pose and shape estimation. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 3383–3393, 2021."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib35",
+      "text": "Muhammed Kocabas, Chun-Hao P Huang, Otmar Hilliges, and Michael J Black. Pare: Part attention regressor for 3d human body estimation. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 11127–11137, 2021."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib59",
+      "text": "Ben Poole, Ajay Jain, Jonathan T Barron, and Ben Mildenhall. Dreamfusion: Text-to-3d using 2d diffusion. arXiv preprint arXiv:2209.14988 , 2022."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib65",
+      "text": "Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, and Björn Ommer. High-resolution image synthesis with latent diffusion models. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 10684–10695, 2022."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib66",
+      "text": "Chitwan Saharia, William Chan, Saurabh Saxena, Lala Li, Jay Whang, Emily L Denton, Kamyar Ghasemipour, Raphael Gontijo Lopes, Burcu Karagol Ayan, Tim Salimans, et al. Photorealistic text-to-image diffusion models with deep language understanding. Advances in Neural Information Processing Systems , 35:36479–36494, 2022."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib64",
+      "text": "Elad Richardson, Gal Metzer, Yuval Alaluf, Raja Giryes, and Daniel Cohen-Or. Texture: Text-guided texturing of 3d shapes. arXiv preprint arXiv:2302.01721 , 2023."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib50",
+      "text": "Gal Metzer, Elad Richardson, Or Patashnik, Raja Giryes, and Daniel Cohen-Or. Latent-nerf for shape-guided generation of 3d shapes and textures. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 12663–12673, 2023."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib83",
+      "text": "Zhengyi Wang, Cheng Lu, Yikai Wang, Fan Bao, Chongxuan Li, Hang Su, and Jun Zhu. Prolificdreamer: High-fidelity and diverse text-to-3d generation with variational score distillation. arXiv preprint arXiv:2305.16213 , 2023b."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib6",
+      "text": "Rui Chen, Yongwei Chen, Ningxin Jiao, and Kui Jia. Fantasia3d: Disentangling geometry and appearance for high-quality text-to-3d content creation. arXiv preprint arXiv:2303.13873 , 2023b."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib46",
+      "text": "Matthew Loper, Naureen Mahmood, Javier Romero, Gerard Pons-Moll, and Michael J Black. Smpl: A skinned multi-person linear model. In Seminal Graphics Papers: Pushing the Boundaries, Volume 2 , pages 851–866. 2023."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib1",
+      "text": "Thiemo Alldieck, Hongyi Xu, and Cristian Sminchisescu. imghum: Implicit generative models of 3d human shape and articulated pose. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 5461–5470, 2021."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib20",
+      "text": "Fangzhou Hong, Mingyuan Zhang, Liang Pan, Zhongang Cai, Lei Yang, and Ziwei Liu. Avatarclip: Zero-shot text-driven generation and animation of 3d avatars. arXiv preprint arXiv:2205.08535 , 2022b."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib93",
+      "text": "Yifei Zeng, Yuanxun Lu, Xinya Ji, Yao Yao, Hao Zhu, and Xun Cao. Avatarbooth: High-quality and customizable 3d human avatar generation. arXiv preprint arXiv:2306.09864 , 2023."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib36",
+      "text": "Nikos Kolotouros, Thiemo Alldieck, Andrei Zanfir, Eduard Gabriel Bazavan, Mihai Fieraru, and Cristian Sminchisescu. Dreamhuman: Animatable 3d avatars from text. arXiv preprint arXiv:2306.09329 , 2023."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib4",
+      "text": "Yukang Cao, Yan-Pei Cao, Kai Han, Ying Shan, and Kwan-Yee K Wong. Dreamavatar: Text-and-shape guided 3d human avatar generation via diffusion models. arXiv preprint arXiv:2304.00916 , 2023."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib85",
+      "text": "Chung-Yi Weng, Brian Curless, Pratul P Srinivasan, Jonathan T Barron, and Ira Kemelmacher-Shlizerman. Humannerf: Free-viewpoint rendering of moving people from monocular video. In Proceedings of the IEEE/CVF conference on computer vision and pattern Recognition , pages 16210–16220, 2022."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib92",
+      "text": "Zhengming Yu, Wei Cheng, Xian Liu, Wayne Wu, and Kwan-Yee Lin. Monohuman: Animatable human neural field from monocular video. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 16943–16953, 2023b."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib41",
+      "text": "Tingting Liao, Hongwei Yi, Yuliang Xiu, Jiaxaing Tang, Yangyi Huang, Justus Thies, and Michael J Black. Tada! text to animatable digital avatars. arXiv preprint arXiv:2308.10899 , 2023."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib25",
+      "text": "Ruixiang Jiang, Can Wang, Jingbo Zhang, Menglei Chai, Mingming He, Dongdong Chen, and Jing Liao. Avatarcraft: Transforming text into neural human avatars with parameterized shape and pose control. arXiv preprint arXiv:2303.17606 , 2023."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib90",
+      "text": "Kim Youwang, Kim Ji-Yeon, and Tae-Hyun Oh. Clip-actor: Text-driven recommendation and stylization for animating human meshes. In European Conference on Computer Vision , pages 173–191. Springer, 2022."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib22",
+      "text": "Xin Huang, Ruizhi Shao, Qi Zhang, Hongwen Zhang, Ying Feng, Yebin Liu, and Qing Wang. Humannorm: Learning normal diffusion model for high-quality and realistic 3d human generation. arXiv preprint arXiv:2310.01406 , 2023a."
+    },
+    {
+      "n": 34,
+      "id": "bib.bib94",
+      "text": "Huichao Zhang, Bowen Chen, Hao Yang, Liao Qu, Xu Wang, Li Chen, Chao Long, Feida Zhu, Kang Du, and Min Zheng. Avatarverse: High-quality & stable 3d avatar creation from text and pose. arXiv preprint arXiv:2308.03610 , 2023a."
+    },
+    {
+      "n": 35,
+      "id": "bib.bib23",
+      "text": "Yukun Huang, Jianan Wang, Ailing Zeng, He Cao, Xianbiao Qi, Yukai Shi, Zheng-Jun Zha, and Lei Zhang. Dreamwaltz: Make a scene with complex 3d animatable avatars. arXiv preprint arXiv:2305.12529 , 2023b."
+    },
+    {
+      "n": 36,
+      "id": "bib.bib33",
+      "text": "Bernhard Kerbl, Georgios Kopanas, Thomas Leimkühler, and George Drettakis. 3d gaussian splatting for real-time radiance field rendering. ACM Transactions on Graphics (ToG) , 42(4):1–14, 2023."
+    },
+    {
+      "n": 37,
+      "id": "bib.bib17",
+      "text": "John C Hart. Sphere tracing: A geometric method for the antialiased ray tracing of implicit surfaces. The Visual Computer , 12(10):527–545, 1996."
+    },
+    {
+      "n": 38,
+      "id": "bib.bib76",
+      "text": "Towaki Takikawa, Joey Litalien, Kangxue Yin, Karsten Kreis, Charles Loop, Derek Nowrouzezahrai, Alec Jacobson, Morgan McGuire, and Sanja Fidler. Neural geometric level of detail: Real-time rendering with implicit 3d shapes. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 11358–11367, 2021."
+    },
+    {
+      "n": 39,
+      "id": "bib.bib31",
+      "text": "James T Kajiya and Brian P Von Herzen. Ray tracing volume densities. ACM SIGGRAPH computer graphics , 18(3):165–174, 1984."
+    },
+    {
+      "n": 40,
+      "id": "bib.bib52",
+      "text": "Ben Mildenhall, Pratul P Srinivasan, Matthew Tancik, Jonathan T Barron, Ravi Ramamoorthi, and Ren Ng. Nerf: Representing scenes as neural radiance fields for view synthesis. Communications of the ACM , 65(1):99–106, 2021."
+    },
+    {
+      "n": 41,
+      "id": "bib.bib18",
+      "text": "Jonathan Ho and Tim Salimans. Classifier-free diffusion guidance. arXiv preprint arXiv:2207.12598 , 2022."
+    },
+    {
+      "n": 42,
+      "id": "bib.bib89",
+      "text": "Taoran Yi, Jiemin Fang, Guanjun Wu, Lingxi Xie, Xiaopeng Zhang, Wenyu Liu, Qi Tian, and Xinggang Wang. Gaussiandreamer: Fast generation from text to 3d gaussian splatting with point cloud priors. arXiv preprint arXiv:2310.08529 , 2023."
+    },
+    {
+      "n": 43,
+      "id": "bib.bib7",
+      "text": "Zilong Chen, Feng Wang, and Huaping Liu. Text-to-3d using gaussian splatting. arXiv preprint arXiv:2309.16585 , 2023c."
+    },
+    {
+      "n": 44,
+      "id": "bib.bib54",
+      "text": "Alex Nichol, Heewoo Jun, Prafulla Dhariwal, Pamela Mishkin, and Mark Chen. Point-e: A system for generating 3d point clouds from complex prompts. arXiv preprint arXiv:2212.08751 , 2022."
+    },
+    {
+      "n": 45,
+      "id": "bib.bib32",
+      "text": "Oren Katzir, Or Patashnik, Daniel Cohen-Or, and Dani Lischinski. Noise-free score distillation. arXiv preprint arXiv:2310.17590 , 2023."
+    },
+    {
+      "n": 46,
+      "id": "bib.bib91",
+      "text": "Xin Yu, Yuan-Chen Guo, Yangguang Li, Ding Liang, Song-Hai Zhang, and Xiaojuan Qi. Text-to-3d with classifier score distillation. arXiv preprint arXiv:2310.19415 , 2023a."
+    }
+  ]
+}

@@ -1,0 +1,108 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2311.11171",
+  "title": "LOSTU: Fast, Scalable, and Uncertainty-Aware Triangulation",
+  "authors": "SÃ©bastien Henry, John A. Christian",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2311.11171",
+  "html_url": "https://arxiv.org/html/2311.11171",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 672,
+  "text": "Triangulation describes the task of localizing a point by the intersection of two—or more—lines-of-position (LOPs). In computer vision applications, these LOPs are usually referred as projection rays and originate from lines-of-sight (LOS) directions that are transformed from a camera frame into the world frame. Such situations arise naturally in image-based 3D reconstruction and navigation problems. Although practical triangulation algorithms have been around for hundreds of years [1], it remains a problem of contemporary study.\n\nSeveral important points are to be considered when choosing a triangulation method: its optimality, its scalability to multiple views, and its projective invariance property. It can be shown that under the assumption of Gaussian 2D noise, the solution minimizing the reprojection error provides the maximum likelihood estimate and is projective invariant [2]. This type of approach is often named L_{2} or optimal triangulation, but this cost function is difficult to work with because it has multiple local minima [3] —unlike L_{\\infty} triangulation [4,5] that has a single local (and thus global) minimum.\n\nIn 2-view triangulation, the optimal solution can be found by solving for the root of a sixth-order polynomial [3], and faster alternative methods exist [6,7]. Yet, the problem quickly becomes intractable as more views are added. It is, for example, necessary to find the roots of a 47th degree polynomial for 3 views [8]. Some notable work has also been done to speed up 3-view triangulation [9,10] but is not scalable to more points. Triangulation algorithms like the direct linear transform (DLT) [2] and the midpoint method [3] are popular due to their scalability to multiple views. These, or L_{\\infty} triangulation [11], are often used to obtain an initial estimate that is then iteratively refined to minimize the reprojection error. However, the refinement can be slow and may not converge to the global optimum. Subsequent methods—like the linear optimal sine triangulation (LOST)—yield a closed-form, fast, and scalable solution to L_{2} triangulation by weighting the DLT [1]. This framework has been shown to give statistically similar results to the common iterative optimal approach [12].\n\nUnderstanding the limitations of L_{2} triangulation is essential. First, there are certain geometries (typically symmetric geometries) under which all triangulation methods perform similarly [3,1] and hence where optimal triangulation does not offer substantial performance gains. Furthermore, geometries involving low-parallax are a typical example where L_{2} triangulation performs poorly [3,13]. Regardless, L_{2} triangulation can provide substantial improvements over sub-optimal methods in general scenarios that are not symmetric and don’t have low parallax [3,1].\n\nSecond, minimizing the reprojection error is only optimal under the assumptions of Gaussian 2D noise on the image measurements and perfect knowledge of the camera parameters. Reference [14] argues that the midpoint method should be used over L_{2} optimal triangulation in the SfM process because of uncertainties in the extrinsic camera parameters. However, the midpoint remains a method that inherently minimizes the wrong cost function. A more appropriate approach under camera parameter uncertainties is to modify the L_{2} cost function in the iterative refinement process, as it is done in Ref. [15,16,17]. Spurred by the challenges in spacecraft localization, the LOST algorithm has been used to analyze the relative importance of planetary uncertainty and spacecraft camera attitude uncertainties [18], analytically. While the equations once again feature a linear system, no numerical simulation to validate that method has been done in Ref. [18] since it was concluded that these effects were mostly negligible in spaceflight.\n\nThis paper carefully studies triangulation under camera pose uncertainty and address performance effects with traditional triangulation methods. By the geometric equivalence between intersection and resection [1], we show that “planetary position uncertainties” become “camera center uncertainties” in a reconstruction scenario. We extend the framework in Refs. [1,18], to introduce LOSTU: a general uncertainty-aware and non-iterative framework for triangulation. Existing studies, like Ref. [14] and [16], either lack uncertainty-aware optimal triangulation methods or use iterative refinement within a larger framework. Therefore, we perform simulations to experimentally validate LOSTU and the advantages of considering camera parameter uncertainties. These benefits are further demonstrated in a maximum likelihood sequential reconstruction pipeline.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib27",
+      "text": "Henry, S., Christian, J.A.: Absolute triangulation algorithms for space exploration. Journal of Guidance, Control, and Dynamics 46 (1), 21–46 (2023). https://doi.org/10.2514/1.G006989"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib26",
+      "text": "Hartley, R., Zisserman, A.: Multiple View Geometry in Computer Vision. Cambridge University Press, 2 edn. (2004). https://doi.org/10.1017/CBO9780511811685"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib23",
+      "text": "Hartley, R.I., Sturm, P.: Triangulation. Computer Vision and Image Understanding 68 (2), 146–157 (1997). https://doi.org/10.1006/cviu.1997.0547"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib22",
+      "text": "Hartley, R., Schaffalitzky, F.: L/sub /spl infin// minimization in geometric reconstruction problems. In: Proceedings of the 2004 IEEE Computer Society Conference on Computer Vision and Pattern Recognition, 2004. CVPR 2004. vol. 1, pp. I–I (2004). https://doi.org/10.1109/CVPR.2004.1315073"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib32",
+      "text": "Kahl, F., Hartley, R.: Multiple-view geometry under the L ∞ L_{\\infty} -norm. IEEE Transactions on Pattern Analysis and Machine Intelligence 30 (9), 1603–1617 (2008). https://doi.org/10.1109/TPAMI.2007.70824"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib33",
+      "text": "Kanatani, K., Sugaya, Y., Niitsuma, H.: Triangulation from two views revisited: Hartley-sturm vs. optimal correction. In: Proceedings of the British Machine Vision Conference. pp. 18.1–18.10. BMVA Press (2008). https://doi.org/doi:10.5244/C.22.18"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib40",
+      "text": "Lindstrom, P.: Triangulation made easy. In: 2010 IEEE Computer Society Conference on Computer Vision and Pattern Recognition. pp. 1554–1561 (2010). https://doi.org/10.1109/CVPR.2010.5539785"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib56",
+      "text": "Stewenius, H., Schaffalitzky, F., Nister, D.: How hard is 3-view triangulation really? In: Tenth IEEE International Conference on Computer Vision (ICCV’05) Volume 1. vol. 1, pp. 686–693 Vol. 1 (2005). https://doi.org/10.1109/ICCV.2005.115"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib4",
+      "text": "Byröd, M., Josephson, K., Åström, K.: Fast optimal three view triangulation. In: Yagi, Y., Kang, S.B., Kweon, I.S., Zha, H. (eds.) Computer Vision – ACCV 2007. pp. 549–559. Springer Berlin Heidelberg, Berlin, Heidelberg (2007)"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib36",
+      "text": "Kukelova, Z., Pajdla, T., Bujnak, M.: Fast and stable algebraic solution to l2 three-view triangulation. In: 2013 International Conference on 3D Vision - 3DV 2013. pp. 326–333 (2013). https://doi.org/10.1109/3DV.2013.50"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib44",
+      "text": "Lu, F., Hartley, R.: A fast optimal algorithm for l2 triangulation. In: Yagi, Y., Kang, S.B., Kweon, I.S., Zha, H. (eds.) Computer Vision – ACCV 2007. pp. 279–288. Springer Berlin Heidelberg, Berlin, Heidelberg (2007)"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib35",
+      "text": "Krishnan, A., Henry, S., Dellart, F., Christian, J.: Lost in triangulation. https://gtsam.org/2023/02/04/lost-triangulation.html (February 4 2023)"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib37",
+      "text": "Lee, S.H., Civera, J.: Triangulation: Why optimize? In: British Machine Vision Conference (2019)"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib47",
+      "text": "Nasiri, S.M., Hosseini, R., Moradi, H.: The optimal triangulation method is not really optimal. IET Image Processing 17 (10), 2855–2865 (2023). https://doi.org/https://doi.org/10.1049/ipr2.12831, https://ietresearch.onlinelibrary.wiley.com/doi/abs/10.1049/ipr2.12831"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib3",
+      "text": "Bedekar, A., Haralick, R.: A bayesian method for triangulation and its application to finding corresponding points. In: Proceedings., International Conference on Image Processing. vol. 2, pp. 362–365 vol.2 (1995). https://doi.org/10.1109/ICIP.1995.537490"
+    },
+    {
+      "n": 16,
+      "id": "bib.bib21",
+      "text": "Haner, S., Heyden, A.: Covariance propagation and next best view planning for 3d reconstruction. In: Fitzgibbon, A., Lazebnik, S., Perona, P., Sato, Y., Schmid, C. (eds.) Computer Vision – ECCV 2012. pp. 545–556. Springer Berlin Heidelberg, Berlin, Heidelberg (2012). https://doi.org/10.1007/978-3-642-33709-3_39"
+    },
+    {
+      "n": 17,
+      "id": "bib.bib38",
+      "text": "Lee, S.H., Civera, J.: Robust uncertainty-aware multiview triangulation. arXiv preprint arXiv:2008.01258 (2020)"
+    },
+    {
+      "n": 18,
+      "id": "bib.bib28",
+      "text": "Henry, S., Christian, J.A.: Analytical methods in triangulation-based celestial localization. Journal of Astronautical Sciences 70 (37) (2023). https://doi.org/10.1007/s40295-023-00402-x"
+    }
+  ]
+}

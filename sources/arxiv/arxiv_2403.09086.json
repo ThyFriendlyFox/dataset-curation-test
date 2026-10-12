@@ -1,0 +1,148 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.09086",
+  "title": "Learning from straggler clients in federated learning",
+  "authors": "Andrew Hard, Antonious M. Girgis, Ehsan Amid, Sean Augenstein, Lara McConnaughey, Rajiv Mathews, Rohan Anil",
+  "year": "2024",
+  "categories": [
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2403.09086",
+  "html_url": "https://arxiv.org/html/2403.09086",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1026,
+  "text": "Cross-device federated learning (FL) [1] is a distributed computation paradigm in which a central server trains a global model by learning from data distributed across many client devices. Data heterogeneity and system heterogeneity across clients differentiate cross-device FL from other distributed optimization settings. Data heterogeneity refers to the fact that the data are not independently and identically distributed across clients (non-IID). System heterogeneity results from the many different device types that participate in training, each with different storage, communication, and computation constraints [2]. This heterogeneity leads to straggler clients in FL that take significantly more time to compute and return local model updates.\n\nStandard FL algorithms such as FedAvg [1], FedAdam [3], and FedProx [4] utilize synchronous training rounds. In each round, a cohort of clients is sampled from a population. The clients receive a global model from the central server, update the model by processing locally cached training data, and upload the updated model back to the server. The server aggregates updated models from the clients in order to update the global model. In the synchronous setting, the server waits until all clients from the cohort (including stragglers) report back before updating the global model. The duration of each round is dictated by the slowest client in the cohort. Thus, synchronous FL algorithms can be slow to achieve a target accuracy in the presence of stragglers created by the natural heterogeneity of FL.\n\nProduction deployments perform cohort over-selection [5] to mitigate the impact of stragglers in FL. The orchestrating server selects a larger client cohort than required at the beginning of each FL round, uses the fastest clients to compute a global model update on the server, and discards the straggler client updates. Since the server doesn’t have to wait for stragglers, over-selection significantly speeds up the training process and makes it robust to client dropouts. However, the final global model may be biased against stragglers.\n\nAsynchronous optimization has been studied previously in server-based distributed settings [6,7,8,9] as well as federated settings [10,11,12,13]. Asynchronous FL abandons the notion of the synchronized round: the server schedules training on multiple clients in parallel and aggregates client updates as they are received. The decoupling of client computations and server updates speeds up training [11]. Convergence rates for asynchronous FL are proportional to the maximum client delay [14,11,15], though convergence is not always stable empirically.\n\nWhy do we care if global models are biased against straggler clients? In real-world FL, device characteristics (RAM, connection speed) may be correlated with socioeconomic factors. Failing to learn from straggler clients could result in models that perform poorly for certain groups within a population. In the hypothetical case of federated speech models, existing straggler mitigation techniques could result in higher word error rates for some dialects.\n\n## 1.1 Summary of contributions\n\nThe goal of this work is to learn more effectively from straggler clients in FL, while maintaining competitive trade-offs for training time and overall accuracy. Our contributions are listed below.\n\n- • We construct a realistic Monte Carlo (MC) model for simulating client latency, based on observations of real-world applications of FL.\n\n- • We propose different client latency distributions in order to understand how FL algorithms utilize additional training examples and novel data domains from straggler clients.\n\n- • We measure the performance of existing algorithms such as FedAvg, FedAdam, and FedBuff in simulations with straggler clients, and identify improvements including exponential moving averages (EMA), knowledge distillation regularization, and proximal terms that improve the accuracy-training time trade-off.\n\n- • We propose two novel algorithms, FARe-DUST and FeAST-on-MSG, that are based on the concepts of knowledge distillation and EMA, respectively. These algorithms are capable of learning more from straggler clients with extreme time delays, while also training quickly and maintaining excellent overall accuracy.\n\n## 1.2 Related work\n\nStragglers are a common problem for distributed learning. Prior works have explored mitigation based on data replication and coding theory [16,17,18]. These techniques are incompatible with FL because the central server (by design) cannot access client data [2]. Standard FL algorithms such as FedAvg [1] and its variants [3,4,19] utilize synchronous server updates that can be delayed by stragglers. FedProx [4] proposed assigning different local epochs for each client depending on their local computation speed. This approach does not account for communication latency, a significant source of delay. Cohort over-selection [5] can mitigate the delay caused by stragglers in synchronous FL, but it leads to under-representation of stragglers in the global model [12]. Finally, InclusiveFL [20] addresses the straggler under-representation issue by scaling the trainable model size according to the available client resources.\n\n[10,14], and [21] studied a form of asynchronous stochastic gradient descent (async-SGD) in which the server updates the global model upon receipt of each client update. Methods have been proposed to down-weight straggler updates based on delay [22,10,23]. While such methods can improve total accuracy and training speed, they still induce a bias against straggler clients by down-scaling or dropping extremely delayed updates. FedBuff [11,12] eschews down-weighting and aggregates client updates in a buffer before updating the global model.\n\nProbabilistic wall clock training time models have been explored previously for distributed ML [24] and FL [25,26,13]. Prior works mostly focus on a shifted-exponential parameterization of latency and assume that runtime is proportional to the number of steps of SGD. All computation nodes feature the same latency distribution, and stragglers are distinguished only by having more training points.\n\nGlobal model performance for straggler clients has also been explored in multiple contexts. [12] showed that FedAvg with over-selection biased the training distribution and led to worse performance for clients with many examples, while FedBuff did not. [26] explored fairness via the impact of cohort size on accuracy for individual client datasets.\n\nScenarios in which key data domains exist predominantly on straggler clients have not been explored thoroughly. Such cases are important for real-world FL, since stragglers often correspond to older and cheaper devices and may be correlated with socioeconomic factors. Excluding stragglers may create models that are biased and not representative of the entire population. Our work explores problems in which straggler clients feature unique data domains that are not present on fast clients.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "Brendan McMahan, Eider Moore, Daniel Ramage, Seth Hampson, and Blaise Aguera y Arcas. Communication-efficient learning of deep networks from decentralized data. In Artificial intelligence and statistics , pages 1273–1282. PMLR, 2017."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "Peter Kairouz, H Brendan McMahan, Brendan Avent, Aurélien Bellet, Mehdi Bennis, Arjun Nitin Bhagoji, Kallista Bonawitz, Zachary Charles, Graham Cormode, Rachel Cummings, et al. Advances and open problems in federated learning. Foundations and Trends® in Machine Learning , 14(1–2):1–210, 2021."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "Sashank Reddi, Zachary Charles, Manzil Zaheer, Zachary Garrett, Keith Rush, Jakub Konečnỳ, Sanjiv Kumar, and H Brendan McMahan. Adaptive federated optimization. arXiv preprint arXiv:2003.00295 , 2020."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "Tian Li, Anit Kumar Sahu, Manzil Zaheer, Maziar Sanjabi, Ameet Talwalkar, and Virginia Smith. Federated optimization in heterogeneous networks. Proceedings of Machine Learning and Systems , 2:429–450, 2020."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "Keith Bonawitz, Hubert Eichner, Wolfgang Grieskamp, Dzmitry Huba, Alex Ingerman, Vladimir Ivanov, Chloe Kiddon, Jakub Konečnỳ, Stefano Mazzocchi, Brendan McMahan, et al. Towards federated learning at scale: System design. Proceedings of Machine Learning and Systems , 1:374–388, 2019."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "Angelia Nedić, Dimitri P Bertsekas, and Vivek S Borkar. Distributed asynchronous incremental subgradient methods. Studies in Computational Mathematics , 8(C):381–407, 2001."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "Horia Mania, Xinghao Pan, Dimitris Papailiopoulos, Benjamin Recht, Kannan Ramchandran, and Michael I Jordan. Perturbed iterate analysis for asynchronous stochastic optimization. arXiv preprint arXiv:1507.06970 , 2015."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "Alekh Agarwal and John C Duchi. Distributed delayed stochastic optimization. Advances in neural information processing systems , 24, 2011."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "Konstantin Mishchenko, Francis Bach, Mathieu Even, and Blake Woodworth. Asynchronous sgd beats minibatch sgd under arbitrary delays. arXiv preprint arXiv:2206.07638 , 2022."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "Cong Xie, Sanmi Koyejo, and Indranil Gupta. Asynchronous federated optimization. arXiv preprint arXiv:1903.03934 , 2019."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "John Nguyen, Kshitiz Malik, Hongyuan Zhan, Ashkan Yousefpour, Mike Rabbat, Mani Malek, and Dzmitry Huba. Federated learning with buffered asynchronous aggregation. In International Conference on Artificial Intelligence and Statistics , pages 3581–3607. PMLR, 2022."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "Dzmitry Huba, John Nguyen, Kshitiz Malik, Ruiyu Zhu, Mike Rabbat, Ashkan Yousefpour, Carole-Jean Wu, Hongyuan Zhan, Pavel Ustinov, Harish Srinivas, et al. Papaya: Practical, private, and scalable federated learning. Proceedings of Machine Learning and Systems , 4:814–832, 2022."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "Jinhyun So, Ramy E Ali, Başak Güler, and A Salman Avestimehr. Secure aggregation for buffered asynchronous federated learning. arXiv preprint arXiv:2110.02177 , 2021."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "Anastasia Koloskova, Sebastian U Stich, and Martin Jaggi. Sharper convergence guarantees for asynchronous sgd for distributed and federated learning. arXiv preprint arXiv:2206.08307 , 2022."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "Sebastian U Stich and Sai Praneeth Karimireddy. The error-feedback framework: Better rates for sgd with delayed gradients and compressed communication. arXiv preprint arXiv:1909.05350 , 2019."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "Da Wang, Gauri Joshi, and Gregory Wornell. Using straggler replication to reduce latency in large-scale parallel computing. ACM SIGMETRICS Performance Evaluation Review , 43(3):7–11, 2015."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "Can Karakus, Yifan Sun, Suhas Diggavi, and Wotao Yin. Straggler mitigation in distributed optimization through data encoding. Advances in Neural Information Processing Systems , 30, 2017."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "Ganesh Ananthanarayanan, Ali Ghodsi, Scott Shenker, and Ion Stoica. Effective straggler mitigation: Attack of the clones. In 10th USENIX Symposium on Networked Systems Design and Implementation (NSDI 13) , pages 185–198, 2013."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "Tzu-Ming Harry Hsu, Hang Qi, and Matthew Brown. Measuring the effects of non-identical data distribution for federated visual classification. arXiv preprint arXiv:1909.06335 , 2019."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "Ruixuan Liu, Fangzhao Wu, Chuhan Wu, Yanlin Wang, Lingjuan Lyu, Hong Chen, and Xing Xie. No one left behind: Inclusive federated learning over heterogeneous devices. Proceedings of the 28th ACM SIGKDD Conference on Knowledge Discovery and Data Mining , 2022."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "John Tsitsiklis, Dimitri Bertsekas, and Michael Athans. Distributed asynchronous deterministic and stochastic gradient optimization algorithms. IEEE transactions on automatic control , 31(9):803–812, 1986."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib22",
+      "text": "Qiyuan Wang, Qianqian Yang, Shibo He, Zhiguo Shui, and Jiming Chen. Asyncfeded: Asynchronous federated learning with euclidean distance based adaptive weight aggregation. arXiv preprint arXiv:2205.13797 , 2022."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib23",
+      "text": "Shuxin Zheng, Qi Meng, Taifeng Wang, Wei Chen, Nenghai Yu, Zhi-Ming Ma, and Tie-Yan Liu. Asynchronous stochastic gradient descent with delay compensation. In International Conference on Machine Learning , pages 4120–4129. PMLR, 2017."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib24",
+      "text": "Kangwook Lee, Maximilian Lam, Ramtin Pedarsani, Dimitris Papailiopoulos, and Kannan Ramchandran. Speeding up distributed machine learning using codes. IEEE Transactions on Information Theory , 64(3):1514–1529, 2017."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib25",
+      "text": "Amirhossein Reisizadeh, Isidoros Tziotis, Hamed Hassani, Aryan Mokhtari, and Ramtin Pedarsani. Straggler-resilient federated learning: Leveraging the interplay between statistical accuracy and system heterogeneity. IEEE Journal on Selected Areas in Information Theory , 3(2):197–205, 2022."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib26",
+      "text": "Zachary Charles, Zachary Garrett, Zhouyuan Huo, Sergei Shmulyian, and Virginia Smith. On large-cohort training for federated learning. Advances in neural information processing systems , 34:20461–20475, 2021."
+    }
+  ]
+}

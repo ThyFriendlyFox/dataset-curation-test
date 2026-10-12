@@ -1,0 +1,70 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2311.14272",
+  "title": "CRISP: Hybrid Structured Sparsity for Class-aware Model Pruning",
+  "authors": "Shivam Aggarwal, Kuluhan Binici, Tulika Mitra",
+  "year": "2024",
+  "categories": [
+    "cs.CV",
+    "cs.AR",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2311.14272",
+  "html_url": "https://arxiv.org/html/2311.14272",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 733,
+  "text": "Machine learning has become ubiquitous for a broad range of applications, from computer vision [1] to natural language processing [2]. While universal models trained on large-scale datasets provide accurate predictions over a wide range of classes, individual users often encounter only a tiny subset of these classes in their daily lives [3]. As such, deploying these models to end-users can be resource-intensive and wasteful. One way to address this challenge is to personalize these models for individual users, focusing only on the classes relevant to them.\n\nClass-aware personalization offers a promising avenue to significantly reduce the resource requirements of deployed models, thereby enhancing their efficiency and reducing the carbon footprint on edge devices. One naive approach for this task is unstructured pruning, where weights can be randomly pruned based on class preferences. However, such methods do not yield noticeable hardware improvements unless the model is highly sparse (\\sim 99%) due to the irregular memory access pattern [4]. Existing class-aware pruning methods such as CAP’NN [3], MyML [5] and OCAP [6] leverage structured pruning such as channel or filter pruning based on user affinity, but they struggle to maintain high model accuracy, particularly at high sparsity levels as they eliminate entire channels from the weight matrix.\n\nAn important advancement in structured pruning research is the introduction of fine-grained 2:4 structured sparsity [7], which selectively retains two non-zero values out of every four consecutive tensor values, as shown in Fig. 4 (left). This particular form of sparsity has gained support from NVIDIA GPU [8], resulting in theoretical speedup gains of up to 2 \\times compared to the dense counterparts. The fine-grained 2:4 sparsity pattern limits the sparsity ratio, allowing only 50% of the total model capacity to be sparse. Nevertheless, different models exhibit varying degrees of compressibility, with models like ResNet-50 being heavily over-parameterized and thus prunable with ease, in contrast to more compact models such as MobileNetV2, as shown in Fig. 2. In this work, we aim to explore extending this granularity to varying N:M ratios.\n\nNonetheless, this approach still imposes a fixed per-layer pruning ratio on the model, which limits the ability to selectively remove irrelevant layers from the network in a non-uniform manner. As illustrated in Fig. 2, it becomes evident that specific layers can benefit from more aggressive pruning (\\sim 99%) compared to others. Additionally, since we are primarily focusing on a small subset of the original class distribution, it becomes feasible to proportionally reduce the model size. However, directly varying the fine-grained N:M ratio per layer introduces increased algorithmic complexity [9] and requires a multitude of hyperparameters, making it impractical for edge devices.\n\nAn alternative approach is coarse-grained block sparsity [10], where entire blocks within the network are pruned, resulting in a more regular access pattern and improved computational efficiency. Unfortunately, using coarse-grained block sparsity can lead to uneven effects on model accuracy, particularly when critical weights are concentrated within a single block. As demonstrated in Fig. 3, block pruning struggles to maintain performance as the sparsity rate reaches over 80 %. In contrast, our proposed framework CRISP maintains decent accuracy (\\sim 85%) across high compression rates (> 92%).\n\nCRISP introduces a novel pruning framework designed for class-aware personalization, leveraging hybrid structured sparsity. We achieve the best of both worlds by inherently integrating fine-grained N:M sparsity with coarse-grained block sparsity to achieve high sparsity levels while preserving model accuracy. We utilize a gradient-based class-aware saliency score to carefully select the most significant weight values corresponding to user-preferred classes. Our approach performs global model pruning, ensuring an equal number of non-zero blocks in each row, facilitating efficient hardware implementation.\n\nOur contributions can be summarized as follows:\n\n- • We introduce CRISP, a novel, accurate user-preference-aware pruning framework for model personalization.\n\n- • We propose a unique hybrid structured sparsity pattern incorporating fine-grained N:M and coarse-grained block sparsity to achieve high model accuracy with superior hardware efficiency.\n\n- • We introduce an iterative pruning strategy based on class-aware saliency estimation, eliminating an equal number of blocks from each row in the weight matrix.\n\n- • We experiment with three popular models: ResNet-50, VGG-16, and MobileNetV2, achieving comparable accuracy to their dense counterparts across varying user-preferred classes on CIFAR-100 and ImageNet datasets.\n\n- • We design an accelerator-level hardware design leveraging our hybrid structured sparsity and compare it with state-of-the-art sparse accelerators, achieving up to 14 \\times speedup and 30 \\times energy efficiency.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "K. Simonyan et al. Very deep convolutional networks for large-scale image recognition. In ICLR’15 ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "Z. Dai et al. Transformer-xl: Attentive language models beyond a fixed-length context. ArXiv , abs/1901.02860, 2019."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "M. Hemmat et al. Cap’nn: Class-aware personalized neural network inference. In DAC’20 ."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "E. Qin et al. Sigma: A sparse and irregular gemm accelerator with flexible interconnects for dnn training. In HPCA’20 ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "V. Goyal et al. Myml: User-driven machine learning. In DAC’21 ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "Ye-Da Ma et al. Ocap: On-device class-aware pruning for personalized edge dnn models. JSA’23 ."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "A. K. Mishra et al. Accelerating sparse deep neural networks. ArXiv , abs/2104.08378, 2021."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "Nvidia ampere sparse tensor core. In Technical report, NVIDIA’20 ."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "W. Sun et al. Dominosearch: Find layer-wise fine-grained n:m sparse schemes from dense neural networks. In NeurIPS’21 ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "S. Gray et al. Gpu kernels for block-sparse weights. 2017."
+    }
+  ]
+}

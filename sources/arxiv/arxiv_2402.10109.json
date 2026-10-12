@@ -1,0 +1,90 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2402.10109",
+  "title": "Towards Reducing Diagnostic Errors with Interpretable Risk Prediction",
+  "authors": "Denis Jered McInerney, William Dickinson, Lucy C. Flynn, Andrea C. Young, Geoffrey S. Young, Jan-Willem van de Meent, Byron C. Wallace",
+  "year": "2024",
+  "categories": [
+    "cs.AI",
+    "cs.CL",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2402.10109",
+  "html_url": "https://arxiv.org/html/2402.10109",
+  "license": "http://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Introduction",
+  "word_count": 625,
+  "text": "A major source of poor patient outcomes and unnecessary costs in healthcare are missed or delayed diagnoses. A recent report estimated that diagnostic errors result in around 795,000 serious harms annually [1]. Furthermore, many diagnostic errors result from information transfer problems [2]. This is unsurprising given “note bloat”, i.e., the widespread problem of information overload in EHR notes, often due to copied or irrelevant information which obfuscates relevant information. All of this motivates the potential of providing more efficient mechanisms to access relevant information in EHRs as a means to reduce these errors.\n\nOne approach to helping practitioners make use of EHR is to train NLP models to provide predictions about patient risk for various illnesses [3,4,5], but these systems are often lack transparency. Even when systems have high accuracy, clinicians may still prefer simple linear models as clinical decision support tools [6]. Prior work has focused on developing inherently interpretable models with minimal tradeoff in predictive performance, e.g., in the general domain with Neural Additive Models [7] and in healthcare with \\textrm{GA}^{2} Ms [8]. Recently, zero-shot instruction-tuned LLMs have been shown capable of extracting information from clinical text [9], which in turn facilitates interpretable predictions [10,11].\n\nIn this work, we combine the power and flexibility of zero-shot instruction-tuned LLMs with the transparency and modeling ability of Neural Additive Models (NAMs) to train a risk-prediction model that can also surface evidence to support predictions. We use an LLM (FLAN-T5-XXL; [12]) to generate abstractive “evidence” from EHR, which is then processed by a simpler model (Clinical BERT; [13]) to produce features for a Neural Additive Model (Figure 2). This provides flexibility—the model can make inferences and condense information into fluent text snippets—but brings risk of “hallucinations”.\n\nThis approach is “interpretable” insofar as it produces “evidence” in the form of human-understandable intermediate variables: Abstractive text with associated risks, providing insight into factors that informed predictions. Related approaches to “interpretability” (Figure 1) include using relevance scores to weight and combine information from different sentences (B), and those that use LLM prompts to infer feature values (C). Our approach permits greater flexibility than (C), while maintaining a more faithful interpretability in comparison to (B); see Table 1.\n\nOne complication is that we would like fine-grained, accurate labels to train our predictor (see section 4.1); ICD codes do not meet these criteria [14]. Instead of ICD codes, which are noisy and temporally coarse (observed at the end of an encounter with discharge summaries), we propose to synthetically extract diagnosis labels from each report using an LLM. In some cases, this has been shown to be more aligned with true diagnoses [11].\n\nWe focus our evaluation on how this system impacts clinical decision-making. Specifically, we examine settings where risk of misdiagnosis is high and the consequences severe. Our methods work within the confines of data present in electronic health record, which allows the model to be trained on any EHR. LLMs can be run locally and are only used for inference, so privacy and compute resources are not an issue.\n\nOur contributions are summarized as follows:\n\nInterpretable Risk Prediction with LLMs. We propose an approach to risk prediction that offers a particular form of interpretability in that it can expose faithful relationships between specific pieces of retrieved evidence and an output prediction.\n\nExtracting Future Targets with LLMs. We present a method to extract target diagnoses for use in training from the unstructured text in the future of a patient’s medical record that are more granular than ICD codes in the time dimension, and we validate with clinician annotations that the extracted labels are accurate.\n\nIn-depth Annotation of Usefulness. We validate how much evidence-wise interpretability can positively impact a clinician’s expert judgement in high-impact settings which feature the greatest risk of misdiagnosis.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib14",
+      "text": "Newman-Toker et al. (2023) David E Newman-Toker, Najlla Nassery, Adam C Schaffer, Chihwen Winnie Yu-Moe, Gwendolyn D Clemens, Zheyu Wang, Yuxin Zhu, Ali S. Saber Tehrani, Mehdi Fanai, Ahmed Hassoon, and Dana Siegal. 2023. Burden of serious harms from diagnostic error in the usa . BMJ Quality & Safety ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib23",
+      "text": "Zwaan et al. (2010) Laura Zwaan, Martine de Bruijne, Cordula Wagner, Abel Thijs, Marleen Smits, Gerrit van der Wal, and Daniëlle R. M. Timmermans. 2010. Patient Record Review of the Incidence, Consequences, and Causes of Diagnostic Adverse Events . Archives of Internal Medicine , 170(12):1015–1021."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib15",
+      "text": "Rasmy et al. (2021) Laila Rasmy, Yang Xiang, Ziqian Xie, Cui Tao, and Degui Zhi. 2021. Med-BERT: pretrained contextualized embeddings on large-scale structured electronic health records for disease prediction . npj Digital Medicine , 4(1):86."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib11",
+      "text": "Li et al. (2021) Yikuan Li, Mohammad Mamouei, Gholamreza Salimi-Khorshidi, Shishir Rao, Abdelaali Hassaine, Dexter Canoy, Thomas Lukasiewicz, and Kazem Rahimi. 2021. Hi-behrt: Hierarchical transformer-based model for accurate prediction of clinical events using multimodal longitudinal electronic health records . IEEE journal of biomedical and health informatics , 27:1106 – 1117."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib21",
+      "text": "Yang et al. (2023) Zhichao Yang, Avijit Mitra, Weisong Liu, Dan Berlowitz, and Hong Yu. 2023. Transformehr: transformer-based encoder-decoder generative model to enhance prediction of disease outcomes using electronic health records . Nature Communications , 14."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib8",
+      "text": "Goldstein et al. (2016) Benjamin A Goldstein, Ann Marie Navar, Michael J Pencina, and John P A Ioannidis. 2016. Opportunities and challenges in developing risk prediction models with electronic health records data: a systematic review . Journal of the American Medical Informatics Association , 24(1):198–208."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib1",
+      "text": "Agarwal et al. (2020) Rishabh Agarwal, Nicholas Frosst, Xuezhou Zhang, Rich Caruana, and Geoffrey E. Hinton. 2020. Neural additive models: Interpretable machine learning with neural nets . ArXiv , abs/2004.13912."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib6",
+      "text": "Caruana et al. (2015) Rich Caruana, Yin Lou, Johannes Gehrke, Paul Koch, Marc Sturm, and Noemie Elhadad. 2015. Intelligible Models for HealthCare: Predicting Pneumonia Risk and Hospital 30-day Readmission . In Proceedings of the 21th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining , KDD ’15, pages 1721–1730, New York, NY, USA. Association for Computing Machinery."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib2",
+      "text": "Agrawal et al. (2022) Monica Agrawal, Stefan Hegselmann, Hunter Lang, Yoon Kim, and David Sontag. 2022. Large language models are few-shot clinical information extractors . In Proceedings of the 2022 Conference on Empirical Methods in Natural Language Processing , pages 1998–2022, Abu Dhabi, United Arab Emirates. Association for Computational Linguistics."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib13",
+      "text": "McInerney et al. (2023) Denis McInerney, Geoffrey Young, Jan-Willem van de Meent, and Byron Wallace. 2023. CHiLL: Zero-shot custom interpretable feature extraction from clinical notes with large language models . In Findings of the Association for Computational Linguistics: EMNLP 2023 , pages 8477–8494, Singapore. Association for Computational Linguistics."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib5",
+      "text": "Alsentzer et al. (2023) Emily Alsentzer, Mary-Jette Rasmussen, Raíssa Schmitt Fontoura, Andrew Cull, Brett K. Beaulieu-Jones, Kathryn J. Gray, D. Bates, and Vesela P. Kovacheva. 2023. Zero-shot interpretable phenotyping of postpartum hemorrhage using large language models . NPJ Digital Medicine , 6."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib7",
+      "text": "Chung et al. (2022) Hyung Won Chung, Le Hou, Shayne Longpre, Barret Zoph, Yi Tay, William Fedus, Eric Li, Xuezhi Wang, Mostafa Dehghani, Siddhartha Brahma, et al. 2022. Scaling instruction-finetuned language models. arXiv preprint arXiv:2210.11416 ."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib4",
+      "text": "Alsentzer et al. (2019) Emily Alsentzer, John Murphy, William Boag, Wei-Hung Weng, Di Jindi, Tristan Naumann, and Matthew McDermott. 2019. Publicly available clinical BERT embeddings . In Proceedings of the 2nd Clinical Natural Language Processing Workshop , pages 72–78, Minneapolis, Minnesota, USA. Association for Computational Linguistics."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib17",
+      "text": "Searle et al. (2020) Thomas Searle, Zina Ibrahim, and Richard JB Dobson. 2020. Experimental evaluation and development of a silver-standard for the mimic-iii clinical coding dataset. arXiv preprint arXiv:2006.07332 ."
+    }
+  ]
+}

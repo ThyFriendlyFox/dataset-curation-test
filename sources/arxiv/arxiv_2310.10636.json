@@ -1,0 +1,88 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2310.10636",
+  "title": "Dual-Encoders for Extreme Multi-Label Classification",
+  "authors": "Nilesh Gupta, Devvrit Khatri, Ankit S Rawat, Srinadh Bhojanapalli, Prateek Jain, Inderjit Dhillon",
+  "year": "2024",
+  "categories": [
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2310.10636",
+  "html_url": "https://arxiv.org/html/2310.10636",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1011,
+  "text": "Dual-encoder (DE) models have been highly successful in dense retrieval tasks for open-domain question answering (openQA) systems [1,2,3], where they efficiently retrieve relevant passages or documents from a large corpus given a user’s query. These models map both queries and documents into a shared embedding space, enabling efficient retrieval using fast similarity search methods [4,5]. Notably, openQA benchmarks are often characterized by multi-class (most queries are tagged with a single positive document) and limited (each document in the corpus has zero or very few tagged queries i.e. zero/few-shot scenario) training data. On these benchmarks, models are required to generalize and retrieve relevant documents even though they might not have appeared in the training set.\n\nAnother important retrieval scenario that frequently arises in real-world applications such as search engines [6] and recommendation systems [7,8] is where we want to perform retrieval for multiple documents/items from a large collection based on a significant number of seen examples per document/item, i.e., a many-shot scenario. Such tasks are often formulated as extreme multi-label classification (XMC) tasks, where each document/item to be retrieved is considered as a separate label [9]. XMC also appears in other emerging applications such as retrieval augmented generation (RAG) [10]. In particular, when multiple documents can potentially contain the desired answer, the retrieval task in RAG closely aligns with an XMC problem. Typically, XMC algorithms need to both “memorize” and “generalize”. That is, for each label they need to memorize the type of queries that are relevant; e.g., for a product to product recommendation scenario, the algorithm should memorize which products can lead to click on a particular product using the provided product-product co-click data. At the same time, the algorithm should generalize on unseen queries.\n\nIt is a prevailing belief in the XMC community that due to the semantic gap and knowledge-intensive nature of XMC benchmarks, DE by themselves are not sufficient to attain good performance [11]. As a measure to overcome the semantic gap and enable memorization, state-of-the-art (SOTA) XMC methods augment DE with either per-label classifiers [12,13] or auxiliary parameters [11]. We explore this belief by performing a simple experiment on a synthetic dataset where a random query text is associated with a random document text, and the task is to memorize these random correlations during retrieval. We find that DE models are able to perform this task with perfect accuracy at least on up to 1M scale datasets (cf. Section C.1), disputing the previously held belief in the literature.\n\nIn light of the aforementioned synthetic experiment, this work aims to answer the following question: “Are pure DE models sufficient for XMC tasks?” A Pure DE model is desirable because: 1) unlike XMC methods, DE methods are parameter efficient i.e. the model size (consequently the number of trainable parameters) does not scales linearly with the number of labels (see Figure 1). 2) XMC methods require re-training or model updates on encountering new labels. In contrast, DE methods can generalize to new labels based on their features. Interestingly, our work shows that pure DE models can indeed match or even outperform SOTA XMC methods by up to 2% even on the largest public XMC benchmarks while being 20 \\times smaller in model size. The key to the improved performance is the right loss formulation for the underlying task and the use of extensive negatives to give consistent and unbiased loss feedback. We refer to DE models trained with the proposed approach as DEXML (Dual-Encoders for eXtreme Multi-Label classification).\n\nWe begin by analyzing existing multi-label and contrastive training losses like One-versus-All Binary Cross-Entropy (OvA-BCE) and InfoNCE, highlighting how they may be inadequate for training dual-encoder models in XMC. Specifically, we note that OvA-BCE does not train effectively and InfoNCE disincentivizes confident predictions. To overcome these limitations, we propose a simple modification to the InfoNCE loss as the \\mathsf{DecoupledSoftmax} loss which removes the undesirable correlation between positive labels during training. We further extend our loss design to {\\mathsf{SoftTop}\\text{-k}} loss which is tailored to optimize prediction accuracy within a specific prediction budget size (k). This can be particularly relevant to XMC applications where the goal is to make a fixed number of highly accurate predictions from a vast set of possible labels. Moreover, we note that XMC problems involve a long tail of labels, which at the query level manifests as a large number of highly relevant negatives. To this end, in order to establish the full potential of DE methods, we first study our proposed loss using all the negatives in the loss term. Naturally, including all negatives is challenging for million-label scale datasets. To this end, we provide a memory-efficient distributed implementation that can use multiple GPUs and a modified gradient cache [14] approach to scale DE training to largest public XMC benchmarks even with a modest GPU setup (see Table 1, 9). We further study the performances and implications of approximations of the proposed loss functions using standard hard negative mining approaches. In summary, the contributions of this work include:\n\n- • We demonstrate that dual-encoder methods alone can achieve SOTA performance on XMC tasks leading to a more parameter-efficient and generalizable approach for XMC. This also unifies the approaches for XMC and retrieval problems, paving the way for simplified and universally applicable solutions.\n\n- • We analyze and show existing multi-label and contrastive training losses are not appropriate for training dual-encoder models in XMC settings. Specifically, we note that OvA-BCE does not train effectively and InfoNCE disincentivizes confident predictions.\n\n- • We propose a simple modification to the InfoNCE loss, namely \\mathsf{DecoupledSoftmax} loss, which overcomes the limitations. We further extend our loss design to {\\mathsf{SoftTop}\\text{-k}} loss which is tailored to optimize prediction accuracy within a specific prediction budget size.\n\n- • Lastly, we explore applications of our proposed loss functions on an RAG task in Section C.9 which shows promise for our proposed approach over standard encoder training in RAG.\n\nBefore providing a detailed account of our contributions in Section 4 and 5, we begin by discussing relevant literature in Section 2 and introducing necessary background in Section 3.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib30",
+      "text": "Lee et al. (2019) Kenton Lee, Ming-Wei Chang, and Kristina Toutanova. Latent retrieval for weakly supervised open domain question answering. In Anna Korhonen, David R. Traum, and Lluís Màrquez (eds.), Proceedings of the 57th Conference of the Association for Computational Linguistics, ACL 2019, Florence, Italy, July 28- August 2, 2019, Volume 1: Long Papers , pp. 6086–6096. Association for Computational Linguistics, 2019."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib28",
+      "text": "Karpukhin et al. (2020) Vladimir Karpukhin, Barlas Oguz, Sewon Min, Patrick Lewis, Ledell Wu, Sergey Edunov, Danqi Chen, and Wen-tau Yih. Dense passage retrieval for open-domain question answering. In Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing (EMNLP) , pp. 6769–6781, Online, November 2020. Association for Computational Linguistics. doi: 10.18653/v1/2020.emnlp-main.550 . URL https://aclanthology.org/2020.emnlp-main.550 ."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib50",
+      "text": "Qu et al. (2021) Yingqi Qu, Yuchen Ding, Jing Liu, Kai Liu, Ruiyang Ren, Wayne Xin Zhao, Daxiang Dong, Hua Wu, and Haifeng Wang. RocketQA: An optimized training approach to dense passage retrieval for open-domain question answering. In Proceedings of the 2021 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies , pp. 5835–5847, Online, June 2021. Association for Computational Linguistics. doi: 10.18653/v1/2021.naacl-main.466 . URL https://aclanthology.org/2021.naacl-main.466 ."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib17",
+      "text": "Guo et al. (2020) Ruiqi Guo, Philip Sun, Erik Lindgren, Quan Geng, David Simcha, Felix Chern, and Sanjiv Kumar. Accelerating large-scale inference with anisotropic vector quantization. In International Conference on Machine Learning , 2020. URL https://arxiv.org/abs/1908.10396 ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib25",
+      "text": "Johnson et al. (2021) Jeff Johnson, Matthijs Douze, and Hervé Jégou. Billion-scale similarity search with gpus. IEEE Transactions on Big Data , 7(3):535–547, 2021. doi: 10.1109/TBDATA.2019.2921572 ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib40",
+      "text": "Mitra & Craswell (2018) Bhaskar Mitra and Nick Craswell. An introduction to neural information retrieval. Foundations and Trends® in Information Retrieval , 13(1):1–126, 2018. ISSN 1554-0669. doi: 10.1561/1500000061 . URL http://dx.doi.org/10.1561/1500000061 ."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib9",
+      "text": "Covington et al. (2016) Paul Covington, Jay Adams, and Emre Sargin. Deep neural networks for youtube recommendations. In Proceedings of the 10th ACM Conference on Recommender Systems , RecSys ’16, pp. 191–198, New York, NY, USA, 2016. Association for Computing Machinery. ISBN 9781450340359. doi: 10.1145/2959100.2959190 . URL https://doi.org/10.1145/2959100.2959190 ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib67",
+      "text": "Zhang et al. (2019) Shuai Zhang, Lina Yao, Aixin Sun, and Yi Tay. Deep learning based recommender system: A survey and new perspectives. ACM Comput. Surv. , 52(1), feb 2019. ISSN 0360-0300. doi: 10.1145/3285029 . URL https://doi.org/10.1145/3285029 ."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib6",
+      "text": "Bhatia et al. (2016) K. Bhatia, K. Dahiya, H. Jain, P. Kar, A. Mittal, Y. Prabhu, and M. Varma. The extreme classification repository: Multi-label datasets and code, 2016. URL http://manikvarma.org/downloads/XC/XMLRepository.html ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib31",
+      "text": "Lewis et al. (2020) Patrick Lewis, Ethan Perez, Aleksandra Piktus, Fabio Petroni, Vladimir Karpukhin, Naman Goyal, Heinrich Küttler, Mike Lewis, Wen-tau Yih, Tim Rocktäschel, et al. Retrieval-augmented generation for knowledge-intensive nlp tasks. Advances in Neural Information Processing Systems , 33:9459–9474, 2020."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "Dahiya et al. (2023b) K. Dahiya, S. Yadav, S. Sondhi, D. Saini, S. Mehta, J. Jiao, S. Agarwal, P. Kar, and M. Varma. Deep encoders with auxiliary parameters for extreme classification. In Proceedings of the ACM SIGKDD Conference on Knowledge Discovery and Data Mining , August 2023b."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib10",
+      "text": "Dahiya et al. (2023a) K. Dahiya, N. Gupta, D. Saini, A. Soni, Y. Wang, K. Dave, J. Jiao, K. Gururaj, P. Dey, A. Singh, D. Hada, V. Jain, B. Paliwal, A. Mittal, S. Mehta, R. Ramjee, S. Agarwal, P. Kar, and M. Varma. Ngame: Negative mining-aware mini-batching for extreme classification. In Proceedings of the ACM International Conference on Web Search and Data Mining , March 2023a."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib41",
+      "text": "Mittal et al. (2021a) Anshul Mittal, Kunal Dahiya, Sheshansh Agrawal, Deepak Saini, Sumeet Agarwal, Purushottam Kar, and Manik Varma. Decaf: Deep extreme classification with label features. In Proceedings of the 14th ACM International Conference on Web Search and Data Mining , WSDM ’21, pp. 49–57, New York, NY, USA, 2021a. Association for Computing Machinery. ISBN 9781450382977. doi: 10.1145/3437963.3441807 . URL https://doi.org/10.1145/3437963.3441807 ."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib15",
+      "text": "Gao et al. (2021) Luyu Gao, Yunyi Zhang, Jiawei Han, and Jamie Callan. Scaling deep contrastive learning batch size under memory limited setup. In Proceedings of the 6th Workshop on Representation Learning for NLP (RepL4NLP-2021) , pp. 316–321, Online, August 2021. Association for Computational Linguistics. doi: 10.18653/v1/2021.repl4nlp-1.31 . URL https://aclanthology.org/2021.repl4nlp-1.31 ."
+    }
+  ]
+}

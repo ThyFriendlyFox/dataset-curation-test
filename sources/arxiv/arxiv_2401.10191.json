@@ -1,0 +1,79 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2401.10191",
+  "title": "Divide and not forget: Ensemble of selectively trained experts in Continual Learning",
+  "authors": "Grzegorz RypeÅÄ, Sebastian Cygert, Valeriya Khan, Tomasz TrzciÅski, Bartosz ZieliÅski, BartÅomiej Twardowski",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2401.10191",
+  "html_url": "https://arxiv.org/html/2401.10191",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 764,
+  "text": "In Continual Learning (CL), tasks are presented to the learner sequentially as a stream of non-i.i.d data. The model has only access to the data in the current task. Therefore, it is prone to catastrophic forgetting of previously acquired knowledge [1,2]. This effect has been extensively studied in Class Incremental Learning (CIL), where the goal is to train the classifier incrementally and achieve the best accuracy for all classes seen so far. One of the most straightforward solutions to alleviate forgetting is to store exemplars of each class. However, its application is limited, e.g., due to privacy concerns or in memory-constrained devices [3]. That is why more challenging, exemplar-free CIL solutions attract a lot of attention.\n\nMany recent CIL methods that do not store exemplars rely on having a strong feature extractor right from the beginning of incremental learning steps. This extractor is trained on the larger first task, which provides a substantial amount of data (i.e., 50% of all available classes) [4,5,6], or it starts from a large pre-trained model that remains unchanged [7,8] that eliminates the problem of representational drift [9]. However, these methods perform poorly when little training data is available upfront. In Fig. 1, we illustrate both CIL setups, with and without the more significant first task. The trend is evident when we have a lot of data in the first task - results steadily improve over time. However, the progress is not evident for the setup with equal splits, where a frozen (or nearly frozen by high regularization) feature extractor does not yield good results. This setup is more challenging as it requires the whole network to continually learn new features (plasticity) and face the problem of catastrophic forgetting of already learned ones (stability).\n\nOne solution for this problem is architecture-based CIL methods, notably by expanding the network structure beyond a single model. Expert Gate [10] creates a new expert, defined as a neural network, for each task to mitigate forgetting. However, it can potentially result in unlimited growth in the number of parameters. Therefore, more advanced ensembling solutions, like CoSCL [11], limit the computational budget using a fixed number of experts trained in parallel to generate features ensemble. In order to prevent forgetting, regularization is applied to all ensembles during training a new task, limiting their plasticity. [12] propose ensembling multiple models for continual learning with exemplars for experience-replay. To perform efficient ensembling and control a number of the model’s parameters, they enforce the model’s connectivity to keep several ensembles fixed. However, exemplars are still necessary, and as in CoSCL, task-id is required during the inference.\n\nAs a remedy for the above issues, we introduce a novel ensembling method for exemplar-free CIL called SEED: S election of E xperts for E nsemble D iversification. Similarly to CoSCL and [12], SEED uses a fixed number of experts in the ensemble. However, only a single expert is updated while learning a new task. That, in turn, mitigates forgetting and encourages diversification between the experts. While only one expert is being trained, the others still participate in predictions. In SEED, the training does not require more computation than single-model solutions. The right expert for the update is selected based on the current ensemble state and new task data. The selection aims to limit representation drift for the classifier. The ensemble classifier uses multivariate Gaussian distribution representation associated with each expert (see Fig. 2). At the inference time, Bayes classification from all the experts is used for a final prediction. As a result, SEED achieves state-of-the-art accuracy for task-aware and task-agnostic scenarios while maintaining the high plasticity of the resulting model under different data distribution shifts within tasks.\n\nIn conclusion, the main contributions of our paper are as follows:\n\n- • We introduce SEED, a new method that leverages an ensemble of experts where a new task is selectively trained with only a single expert, which mitigates forgetting, encourages diversification between experts and causes no computational overhead during the training.\n\n- • We introduce a unique method for selecting an expert based on multivariate Gauss distributions of each class in the ensemble that limits representational drift for a selected expert. At the inference time, SEED uses the same rich class representation to perform Bayes classification and make predictions in a task-agnostic way.\n\n- • With the series of experiments, we show that existing methods that start CIL from a strong feature extractor later during the training mainly focus on stability. In contrast, SEED also holds high plasticity and outperforms other methods without any assumption of the class distribution during incremental learning sessions.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib6",
+      "text": "French (1999) Robert M French. Catastrophic forgetting in connectionist networks. Trends in cognitive sciences , 3(4):128–135, 1999."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib19",
+      "text": "McCloskey & Cohen (1989) Michael McCloskey and Neal J Cohen. Catastrophic interference in connectionist networks: The sequential learning problem. In Psychology of learning and motivation , volume 24, pp. 109–165. Elsevier, 1989."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib25",
+      "text": "Ravaglia et al. (2021) Leonardo Ravaglia, Manuele Rusci, Davide Nadalini, Alessandro Capotondi, Francesco Conti, and Luca Benini. A tinyml platform for on-device continual learning with quantized latent replays. IEEE Journal on Emerging and Selected Topics in Circuits and Systems , 11(4):789–802, 2021."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib12",
+      "text": "Hou et al. (2019) Saihui Hou, Xinyu Pan, Chen Change Loy, Zilei Wang, and Dahua Lin. Learning a unified classifier incrementally via rebalancing. In IEEE Conference on Computer Vision and Pattern Recognition, CVPR 2019, Long Beach, CA, USA, June 16-20, 2019 , pp. 831–839, 2019."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib45",
+      "text": "Zhu et al. (2022) Kai Zhu, Wei Zhai, Yang Cao, Jiebo Luo, and Zheng-Jun Zha. Self-sustaining representation expansion for non-exemplar class-incremental learning. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pp. 9296–9305, 2022."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib22",
+      "text": "Petit et al. (2023) Grégoire Petit, Adrian Popescu, Hugo Schindler, David Picard, and Bertrand Delezoide. Fetril: Feature translation for exemplar-free class-incremental learning. In Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision , pp. 3911–3920, 2023."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "Hayes & Kanan (2020a) Tyler L. Hayes and Christopher Kanan. Lifelong machine learning with deep streaming linear discriminant analysis. In The IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) Workshops , June 2020a."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib36",
+      "text": "Wang et al. (2022c) Zifeng Wang, Zizhao Zhang, Chen-Yu Lee, Han Zhang, Ruoxi Sun, Xiaoqi Ren, Guolong Su, Vincent Perot, Jennifer Dy, and Tomas Pfister. Learning to prompt for continual learning. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pp. 139–149, 2022c."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib40",
+      "text": "Yu et al. (2020) Lu Yu, Bartlomiej Twardowski, Xialei Liu, Luis Herranz, Kai Wang, Yongmei Cheng, Shangling Jui, and Joost van de Weijer. Semantic drift compensation for class-incremental learning. In 2020 IEEE/CVF Conference on Computer Vision and Pattern Recognition, CVPR 2020, Seattle, WA, USA, June 13-19, 2020 , pp. 6980–6989. IEEE, 2020."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib1",
+      "text": "Aljundi et al. (2017) Rahaf Aljundi, Punarjay Chakravarty, and Tinne Tuytelaars. Expert gate: Lifelong learning with a network of experts. In Conference on Computer Vision and Pattern Recognition , CVPR, 2017."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib35",
+      "text": "Wang et al. (2022b) Liyuan Wang, Xingxing Zhang, Qian Li, Jun Zhu, and Yi Zhong. Coscl: Cooperation of small continual learners is stronger than a big one. In Computer Vision - ECCV 2022 - 17th European Conference, Tel Aviv, Israel, October 23-27, 2022, Proceedings, Part XXVI , pp. 254–271, 2022b."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib5",
+      "text": "Doan et al. (2022) Thang Doan, Seyed Iman Mirzadeh, and Mehrdad Farajtabar. Continual learning beyond a single model. arXiv preprint arXiv:2202.09826 , 2022."
+    }
+  ]
+}

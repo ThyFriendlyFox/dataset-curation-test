@@ -1,0 +1,124 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2306.14009",
+  "title": "Boosting Multitask Learning on Graphs through Higher-Order Task Affinities",
+  "authors": "Dongyue Li, Haotian Ju, Aneesh Sharma, Hongyang R. Zhang",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.SI"
+  ],
+  "url": "https://arxiv.org/abs/2306.14009",
+  "html_url": "https://arxiv.org/html/2306.14009",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1083,
+  "text": "Given multiple node label prediction tasks on graphs, can we design a model to predict all of them simultaneously? For example, consider supervised, overlapping community detection [1]: Given a set of labels as a seed set, can we learn to predict whether another node of the graph belongs to a community? This is an example of multi-label learning: The input involves labels of multiple communities. The goal is to predict community labels for the remaining nodes of each community. In this paper, we cast this multi-label classification problem into a more general formulation of multitask learning [2,3], which has numerous other applications in knowledge graphs [4] and protein-protein interactions [5]. Traditionally, multitask learning works by fitting a single model on all tasks [6,7]. By contrast, we investigate task relationships on graphs with a shared graph neural network. We observe notable negative transfers between various tasks. We address this challenge by designing a boosting procedure to cluster tasks into groups and then fit multiple graph neural networks, one for each task group.\n\nNegative transfer refers to scenarios where learning multiple tasks using a shared encoder can worsen performance compared to single-task learning (STL) for one task [8], and this has been observed for various data modalities [9,10,11,12]. The cause can often be attributed to heterogeneity in input features or dataset sizes. Much less is known about graph data. [13] and [14] identify structural differences for transfer learning on graphs due to the graph diffusion process. These structural differences can also cause negative interference in multitask learning. Thus, building multitask graph neural networks requires better modeling of structural differences between tasks. This modeling could also be used to identify task grouping [15].\n\nThe classical multitask learning literature has studied task relatedness through heuristics and theoretical perspectives [2,16,7]. These results do not naturally apply to nonlinear neural networks. A naive solution to optimize multitask learning performance is to search through all possible combinations of tasks to select the best subset. This is costly to compute for a large number of tasks. Prior work [17] computes pairwise task affinity scores by training one model for every pair of tasks and approximates higher-order task affinities by averaging first-order affinity scores. [15,18] compute first-order task affinities using gradient similarity. These methods are much more efficient than naive search, but they ignore higher-order relationships among tasks, such as combining more than two tasks. This is critical as higher-order task affinities can exhibit more complexities. We observe that they cannot be reliably predicted from first-order affinity scores (cf. Figure 5, Section 5.1) as transfer relationships are not monotone or submodular, meaning that adding more task data does not necessarily help performance (see Figure 4, Section 3.2). Moreover, naively computing all pairwise affinities requires fitting T^{2} models given T tasks, which is costly even for tens of tasks.\n\nThis paper’s main contribution is to design an efficient algorithm to cluster tasks into similar groups while accounting for higher-order transfer relationships. One can compare the performance of a multitask model, such as a GNN trained on all tasks, against several multitask GNNs, each trained for a task group. Section 5 shows that this approach yields the best results among a wide set of baselines on various real-world datasets. Our method can be viewed as a boosting procedure [19] and can be used on top of any graph learning algorithm.\n\nApproach. We outline the overall procedure; See also Figure 1 for an illustration. Given T tasks, we first compute a task affinity score \\theta_{i,j} for every pair of tasks i and j. A higher value of \\theta_{i,j} indicates task j transfers better to task i while also accounting for the presence of other tasks. Conceptually, \\theta_{i,j} is similar to the feature importance score in random forests when hundreds of other features are available. This higher-order task affinity score can also predict whether a set of tasks transfer positively or negatively to a target task. Given the affinity score matrix [\\theta_{i,j}]_{T\\times T}, we use a spectral clustering algorithm [20,21] to separate tasks into similar groups, which is more suitable for joint training. Specifically, our algorithm optimizes the sum of task affinity scores within groups through spectral clustering.\n\nNext, we describe the steps to estimate the affinity score matrix. A naive approach is to compute each entry individually, requiring O(T^{2}) complexity. We design an efficient sampling procedure that only requires O(T) complexity. Concretely, we sample n=O(T) random subsets from \\{1,2,\\dots,T\\} of a fixed size \\alpha (in practice, \\alpha=5 suffices). We fit an MTL model for each subset and evaluate its prediction loss for each task in the subset; Let f_{i}(S) denote the prediction loss of task i, given a subset S\\subseteq\\{1,2,\\dots,T\\}, which we evaluate on a holdout set. Thus, f_{i}(S) measures the information transfer from S to i. Then, we compute \\theta_{i,j} as the average among all subsets including i,j:\n\nTo rigorously justify the rationale behind our affinity scores, we conduct a theoretical analysis in a stochastic block model style setting, where tasks follow a well-separated structure. We prove that under this planted model, the affinity score matrix [\\theta_{i,j}]_{T\\times T} exhibits a block-diagonal structure, each block corresponding to one cluster. This characterization shows that the spectral clustering algorithm recovers the underlying task structure.\n\nSummary of Contributions. The contribution of this work is threefold. First, we design a task affinity score to measure higher-order task relationships and estimate the scores with an efficient sampling procedure, which only requires fitting O(T) MTL models. Second, we propose a spectral clustering step to find task groups based on the affinity score matrix. We provide recovery guarantees for this clustering procedure and show that the affinity scores can be used to provably group related tasks in a planted model. Third, we validate the benefit of our boosting approach using various community detection and molecular graph prediction datasets. The experimental results show that our approach improves test accuracy over different community detection and MTL baselines.\n\nOrganization. The rest of this paper is organized as follows. We first outline related work in Section 2. In Section 3, we provide empirical grounding for the claim that accounting for negative transfer among tasks is crucial for MTL on graphs. Our boosting procedure is described in Section 4, followed by a thorough empirical study of its performance in Section 5. Finally, in Section 6, we describe the theoretical analysis of our algorithm. In Appendix A, we provide complete proofs for our theoretical results. In Appendix B, we describe additional experimental results left from the main text.",
+  "references": [
+    {
+      "n": 1,
+      "id": "biba.bibx30",
+      "text": "Chen et al. (2019a) Zhengdao Chen, Xiang Li and Joan Bruna “Supervised community detection with line graph neural networks” In ICLR , 2019"
+    },
+    {
+      "n": 2,
+      "id": "biba.bibx1",
+      "text": "Caruana (1997a) Rich Caruana “Multitask learning” In Machine learning , 1997"
+    },
+    {
+      "n": 3,
+      "id": "biba.bibx54",
+      "text": "Zhang & Yang (2021a) Yu Zhang and Qiang Yang “A survey on multi-task learning” In IEEE Transactions on Knowledge and Data Engineering , 2021"
+    },
+    {
+      "n": 4,
+      "id": "biba.bibx34",
+      "text": "Wang et al. (2019a) Hongwei Wang, Fuzheng Zhang, Miao Zhao, Wenjie Li, Xing Xie and Minyi Guo “Multi-task feature learning for knowledge graph enhanced recommendation” In World Wide Web , 2019"
+    },
+    {
+      "n": 5,
+      "id": "biba.bibx41",
+      "text": "Hu et al. (2020c) Weihua Hu, Bowen Liu, Joseph Gomes, Marinka Zitnik, Percy Liang, Vijay Pande and Jure Leskovec “Strategies for pre-training graph neural networks” In ICLR , 2020"
+    },
+    {
+      "n": 6,
+      "id": "biba.bibx12",
+      "text": "Crammer et al. (2008a) Koby Crammer, Michael Kearns and Jennifer Wortman “Learning from Multiple Sources.” In Journal of Machine Learning Research , 2008"
+    },
+    {
+      "n": 7,
+      "id": "biba.bibx13",
+      "text": "Ben-David et al. (2010a) Shai Ben-David, John Blitzer, Koby Crammer, Alex Kulesza, Fernando Pereira and Jennifer Vaughan “A theory of learning from different domains” In Machine learning , 2010"
+    },
+    {
+      "n": 8,
+      "id": "biba.bibx47",
+      "text": "Wu et al. (2020c) Sen Wu, Hongyang Zhang and Christopher Ré “Understanding and improving information transfer in multi-task learning” In ICLR , 2020"
+    },
+    {
+      "n": 9,
+      "id": "biba.bibx25",
+      "text": "Yang & Hospedales (2017a) Yongxin Yang and Timothy Hospedales “Deep multi-task representation learning: A tensor factorisation approach” In ICLR , 2017"
+    },
+    {
+      "n": 10,
+      "id": "biba.bibx45",
+      "text": "Vu et al. (2020a) Tu Vu, Tong Wang, Tsendsuren Munkhdalai, Alessandro Sordoni, Adam Trischler, Andrew Mattarella-Micke, Subhransu Maji and Mohit Iyyer “Exploring and predicting transferability across NLP tasks” In EMNLP , 2020"
+    },
+    {
+      "n": 11,
+      "id": "biba.bibx46",
+      "text": "Wu et al. (2020b) Sen Wu, Hongyang Zhang, Gregory Valiant and Christopher Ré “On the generalization effects of linear transformations in data augmentation” In ICML , 2020"
+    },
+    {
+      "n": 12,
+      "id": "biba.bibx50",
+      "text": "Li & Zhang (2021a) Dongyue Li and Hongyang. Zhang “Improved regularization and robustness for fine-tuning in neural networks” In NeurIPS , 2021"
+    },
+    {
+      "n": 13,
+      "id": "biba.bibx55",
+      "text": "Zhu et al. (2021a) Qi Zhu, Carl Yang, Yidan Xu, Haonan Wang, Chao Zhang and Jiawei Han “Transfer learning of graph neural networks with ego-graph information maximization” In NeurIPS , 2021"
+    },
+    {
+      "n": 14,
+      "id": "biba.bibx64",
+      "text": "Ju et al. (2023a) Haotian Ju, Dongyue Li, Aneesh Sharma and Hongyang Zhang “Generalization in Graph Neural Networks: Improved PAC-Bayesian Bounds on Graph Diffusion” In AISTATS , 2023"
+    },
+    {
+      "n": 15,
+      "id": "biba.bibx49",
+      "text": "Fifty et al. (2021a) Chris Fifty, Ehsan Amid, Zhe Zhao, Tianhe Yu, Rohan Anil and Chelsea Finn “Efficiently identifying task groupings for multi-task learning” In NeurIPS , 2021"
+    },
+    {
+      "n": 16,
+      "id": "biba.bibx6",
+      "text": "Ben-David & Schuller (2003a) Shai Ben-David and Reba Schuller “Exploiting task relatedness for multiple task learning” In Learning Theory and Kernel Machines , 2003, pp. 567–580 Springer"
+    },
+    {
+      "n": 17,
+      "id": "biba.bibx44",
+      "text": "Standley et al. (2020a) Trevor Standley, Amir Zamir, Dawn Chen, Leonidas Guibas, Jitendra Malik and Silvio Savarese “Which tasks should be learned together in multi-task learning?” In ICML , 2020"
+    },
+    {
+      "n": 18,
+      "id": "biba.bibx48",
+      "text": "Yu et al. (2020a) Tianhe Yu, Saurabh Kumar, Abhishek Gupta, Sergey Levine, Karol Hausman and Chelsea Finn “Gradient surgery for multi-task learning” In NeurIPS , 2020"
+    },
+    {
+      "n": 19,
+      "id": "biba.bibx3",
+      "text": "Breiman (2001a) Leo Breiman “Random forests” In Machine Learning , 2001"
+    },
+    {
+      "n": 20,
+      "id": "biba.bibx4",
+      "text": "Ng et al. (2001a) Andrew Ng, Michael Jordan and Yair Weiss “On spectral clustering: Analysis and an algorithm” In Advances in neural information processing systems 14 , 2001"
+    },
+    {
+      "n": 21,
+      "id": "biba.bibx2",
+      "text": "Shi & Malik (2000a) Jianbo Shi and Jitendra Malik “Normalized cuts and image segmentation” In IEEE Transactions on pattern analysis and machine intelligence Ieee, 2000"
+    }
+  ]
+}

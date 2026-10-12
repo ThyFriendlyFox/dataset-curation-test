@@ -1,0 +1,342 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.10748",
+  "title": "A Comprehensive Review of Latent Space Dynamics Identification Algorithms for Intrusive and Non-Intrusive Reduced-Order-Modeling",
+  "authors": "Christophe Bonneville, Xiaolong He, April Tran, Jun Sur Park, William Fries, Daniel A. Messenger, Siu Wun Cheung, Yeonjong Shin, David M. Bortz, Debojyoti Ghosh, Jiun-Shyan Chen, Jonathan Belof, Youngsoo Choi",
+  "year": "2024",
+  "categories": [
+    "cs.CE",
+    "cs.LG",
+    "cs.MS",
+    "cs.NA",
+    "math.NA"
+  ],
+  "url": "https://arxiv.org/abs/2403.10748",
+  "html_url": "https://arxiv.org/html/2403.10748",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1121,
+  "text": "In recent years, there has been an impressive growth in the development of numerical simulation methods to comprehend physical phenomena, resulting in enhanced accuracy and level of sophistication. Alongside this, there have been substantial advancements in computational hardware, making it more powerful and cost-effective. Consequently, numerical simulations have become widely adopted in numerous areas, such as engineering design, digital twins, decision-making processes [1,2,3,4,5], and a range of fields including aerospace, automotive, electronics, physics, and biology. [6,7,8,9,10,11,12,13].\n\nIn the realms of engineering and physics, computational simulations frequently involve the resolution of partial differential equations (PDEs) using various numerical approaches, such as finite difference/volume/element methods, particle methods, and others. Although these techniques are known for their precision and ability to produce detailed simulations when implemented appropriately, they require substantial computational resources. This becomes particularly true in complex, time-sensitive multiscale problems that deal with intricate physical phenomenons (for instance, turbulent fluid flows, the dynamics of plasma in fusion devices, and astrodynamic flows) on high resolution grids and meshes. As a result, conducting numerous high-fidelity simulations with these advanced solvers can present considerable computational challenges, especially in scenarios involving uncertainty quantification [14,15,16], inverse problems [14,17,18,16], design optimization [19,20], and optimal control [21].\n\nThe computational challenges in high-fidelity simulations have led to the creation of reduced-order models (ROMs). ROMs aim to streamline the complex calculations of the full-order model (the detailed high-fidelity simulation) by reducing the complexity of the problem. While the accuracy of ROMs may slightly drop compared to the full-order-model, they can be considerably faster which makes them very attractive in situations where a small compromise in accuracy is acceptable. Many ROM methods are based on projecting data snapshots from the full-order model.\n\nMethods like proper orthogonal decomposition (POD), the reduced basis method, and the balanced truncation method, which are linear projection techniques, have become increasingly popular in the field of reduced-order modeling (ROM) [22,23,24]. These approaches have demonstrated effectiveness in a range of applications, including fluid dynamics [25,26,27,28,29,30,31,32]. Recently, non-linear projection techniques [33,34,35,36], particularly those using auto-encoders [37,38], have started to gain traction as an alternative, as these methods achieved higher performance in problems characterized by dominant advection [33,39,40].\n\nProjection-based ROM methods driven by data are broadly divided into two categories: intrusive and non-intrusive. Intrusive ROMs, which are informed by the underlying physics, need direct access to the governing equations [23,36,34,35,26,28,29,32,41]. This aspect contributes to the sturdiness of their predictions and often requires a smaller amount of data from the full-order model (FOM). However, they also necessitate access to the FOM solver and specific details of implementation, like the discretized residual of the PDE. On the other hand, non-intrusive ROMs do not depend on the governing equations and are solely based on data-driven methods. These typically employ interpolation techniques to associate parameters with their respective ROM predictions [42,43,44,45]. Being entirely black-box in nature, however, these methods often lack interpretability and robustness, sometimes facing challenges in accurate generalization and showing limitations in performance.\n\nTo address these issues, newer strategies are integrating projection methods with latent space dynamics learning. In these approaches, the latent space is considered as a dynamical system governed by a set of ordinary differential equations (ODEs). By precisely identifying these ODEs, it becomes possible to forecast the dynamics within the latent space and then map them back into the space of full-order solutions.\n\nSeveral techniques have been developed to learn governing equations from data, including the popular method known as Sparse Identification of Non-Linear Dynamics (SINDy) [46]. SINDy works by forming a collection of potential terms for the governing ordinary differential equations (ODEs) and uses linear regression to calculate the relevant coefficients. This approach has been widely used and laid the groundwork for the development of various SINDy-based algorithms including both regression-based [47,48,49,50,51,52,53] and neural network approaches [54,55,56,57].\n\nChampion et al. [58] introduced a method to identify sets of governing ODEs directly in the latent space of an auto-encoder. Although this method shows promise, the identified ODEs are not parameterized based on simulation parameters, which limits its applicability across different scenarios. Conversely, Bai and Peng suggested a similar technique [59], but with a linear projection using proper orthogonal decomposition (POD), and they incorporated parameterization of the latent space ODEs. This enhancement allows for ROM predictions at any point in the parameter space. However, their approach faces challenges when applied to advection-dominated problems due to the limitations of POD.\n\nMore recently, a framework originally proposed by Fries et al. [39], Latent Space Dynamics Identification (LaSDI) was proposed. Building on the work of Champion et al. and Bai and Peng, the main idea of the LaSDI algorithm is to identify the sets of ODEs governing the auto-encoder latent space, each corresponding to one training data point from the full-order model (FOM). Then, the coefficients of each set of ODEs are interpolated with respect to the FOM parameters, which allows for estimating the set of latent space governing equations for any new parameter in the parameter space. Integrating the ODEs and passing them to the decoder allows to reconstruct the ROM prediction. This initial work laid the foundation for many follow-up LaSDI-based algorithms [39,40,60,61,62,63]. Directly building on LaSDI [39], Greedy -LaSDI (gLaSDI) [40] introduced additional constrains to the auto-encoder training loss, enhancing the model’s robustness. gLaSDI also introduced a novel active learning strategy, based on the PDE residual error (intrusive ROM), to acquire additional FOM data during training where it is the most needed. Subsequently, Gaussian Process LaSDI (GPLaSDI) was also introduced [60]. GPLaSDI builds on the elements introduced in gLaSDI, but also employs Gaussian process for interpolating the latent space governing ODEs. This allows for a purely data-driven active learning strategy (non-intrusive ROM), as well as predicting meaningful confidence bounds over the ROM predictions. More recently, WLaSDI [63], short for Weak form -LaSDI introduced a weak formulation to accurately learn the ODE dynamics of the latent space in the presence of substantial noise. Intriguingly, even when there is no noise, using WLaSDI yields a more accurate ROM in many cases. Thermodynamics -LaSDI (tLaSDI) [64] was also proposed, and introduces physical constrains to enforce the first and second laws of thermodynamics within the latent space, for enhanced accuracy.\n\nIn this chapter, we provide a comprehensive review of LaSDI algorithms. First, We go through the key LaSDI building blocks (sections 2.1, 2.2, 2.3, 2.6, 2.7 and 2.8) and also introduce elements more specific to WLaSDI (section 2.4), tLaSDI (section 2.5), gLaSDI (section 3.1) and GPLaSDI (section 3.2). Finally, We present results demonstrating the performance of the different LaSDI methods on various examples (sections 4.1, 4.2 and 4.3). Note that in this chapter, the term LaSDI usually refers the set of different LaSDI algorithms, but may (when specified) also refer to the original LaSDI paper [39].",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib58",
+      "text": "Raczynski, S.: Modeling and simulation : the computer science of illusion / Stanislaw Raczynski. RSP Series in Computer Simulation and Modeling, John Wiley & Sons, Ltd, Hertfordshire, England ; (2006 - 2006)"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib38",
+      "text": "Jones, D., Snider, C., Nassehi, A., Yon, J., Hicks, B.: Characterising the digital twin: A systematic literature review. CIRP Journal of Manufacturing Science and Technology 29 , 36–52 (2020). https://doi.org/https://doi.org/10.1016/j.cirpj.2020.02.002, https://www.sciencedirect.com/science/article/pii/S1755581720300110"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib2",
+      "text": "Review of digital twin about concepts, technologies, and industrial applications. Journal of Manufacturing Systems 58 , 346–361 (2020). https://doi.org/10.1016/J.JMSY.2020.06.017"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib12",
+      "text": "Calder, M., Craig, C., Culley, D., Cani, R., Donnelly, C., Douglas, R., Edmonds, B., Gascoigne, J., Gilbert, N., Hargrove, C., Hinds, D., Lane, D., Mitchell, D., Pavey, G., Robertson, D., Rosewell, B., Sherwin, S., Walport, M., Wilson, A.: Computational modelling for decision-making: Where, why, what, who and how. Royal Society Open Science 5 , 172096 (06 2018). https://doi.org/10.1098/rsos.172096"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib75",
+      "text": "Winsberg, E.: Computer Simulations in Science. In: Zalta, E.N., Nodelman, U. (eds.) The Stanford Encyclopedia of Philosophy. Metaphysics Research Lab, Stanford University, Winter 2022 edn. (2022)"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib20",
+      "text": "Cummings, R.M., Mason, W.H., Morton, S.A., McDaniel, D.R.: Applied Computational Aerodynamics: A Modern Engineering Approach. Cambridge Aerospace Series, Cambridge University Press (2015). https://doi.org/10.1017/CBO9781107284166"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib23",
+      "text": "Diston, D.: Computational Modelling and Simulation of Aircraft and the Environment: Platform Kinematics and Synthetic Environment, Aerospace Series, vol. 1. John Wiley & Sons Ltd, United Kingdom, 1 edn. (Apr 2009). https://doi.org/10.1002/9780470744130"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib44",
+      "text": "Kurec, K., Remer, M., Broniszewski, J., Bibik, P., Tudruj, S., Piechna, J.: Advanced modeling and simulation of vehicle active aerodynamic safety. Journal of Advanced Transportation 2019 , 1–17 (02 2019). https://doi.org/10.1155/2019/7308590"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib54",
+      "text": "Muhammad, A., Shanono, I.H.: Simulation of a car crash using ansys. In: 2019 15th International Conference on Electronics, Computer and Computation (ICECCO). pp. 1–5 (2019). https://doi.org/10.1109/ICECCO48375.2019.9043275"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib57",
+      "text": "Peterson, A.F., Ray, S.L., Mittra, R.:"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib71",
+      "text": "Thomas Rylander, Par Ingelström, A.B.: Computational Electromagnetics. Springer (2013)"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib70",
+      "text": "Thijssen, J.: Computational Physics. Cambridge University Press, 2 edn. (2007). https://doi.org/10.1017/CBO9781139171397"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib63",
+      "text": "Schwartz, R.: Biological Modeling and Simulation. MIT Press (2008)"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib6",
+      "text": "Biegler, L., Biros, G., Ghattas, O., Heinkenschloss, M., Keyes, D., Mallick, B., Marzouk, Y., Tenorio, L., van Bloemen Waanders, B., Willcox, K.: Large-scale inverse problems and quantification of uncertainty (2010). https://doi.org/10.1002/9780470685853, http://hdl.handle.net/10754/656260"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib64",
+      "text": "Smith, R.C.: Uncertainty quantification - theory, implementation, and applications. In: Computational science and engineering (2013)"
+    },
+    {
+      "n": 16,
+      "id": "bib.bib67",
+      "text": "Sternfels, R., Earls, C.J.: Reduced-order model tracking and interpolation to solve pde-based bayesian inverse problems. Inverse Problems 29 (7), 075014 (jun 2013). https://doi.org/10.1088/0266-5611/29/7/075014, https://dx.doi.org/10.1088/0266-5611/29/7/075014"
+    },
+    {
+      "n": 17,
+      "id": "bib.bib26",
+      "text": "Galbally, D., Fidkowski, K., Willcox, K., Ghattas, O.: Non-linear model reduction for uncertainty quantification in large-scale inverse problems. International Journal for Numerical Methods in Engineering 81 (12), 1581–1608 (2010). https://doi.org/https://doi.org/10.1002/nme.2746, https://onlinelibrary.wiley.com/doi/abs/10.1002/nme.2746"
+    },
+    {
+      "n": 18,
+      "id": "bib.bib24",
+      "text": "Fountoulakis, V., Earls, C.: Duct heights inferred from radar sea clutter using proper orthogonal bases. Radio Science 51 (10), 1614–1626 (2016). https://doi.org/https://doi.org/10.1002/2016RS005998, https://agupubs.onlinelibrary.wiley.com/doi/abs/10.1002/2016RS005998"
+    },
+    {
+      "n": 19,
+      "id": "bib.bib73",
+      "text": "Wang, S., Sturler, E.d., Paulino, G.H.: Large-scale topology optimization using preconditioned krylov subspace methods with recycling. International Journal for Numerical Methods in Engineering 69 (12), 2441–2468 (2007). https://doi.org/https://doi.org/10.1002/nme.1798, https://onlinelibrary.wiley.com/doi/abs/10.1002/nme.1798"
+    },
+    {
+      "n": 20,
+      "id": "bib.bib74",
+      "text": "White, D., Choi, Y., Kudo, J.: A dual mesh method with adaptivity for stress-constrained topology optimization. Structural and Multidisciplinary Optimization 61 (02 2020). https://doi.org/10.1007/s00158-019-02393-6"
+    },
+    {
+      "n": 21,
+      "id": "bib.bib18",
+      "text": "Choi, Y., Farhat, C., Murray, W., Saunders, M.: A practical factorization of a schur complement for pde-constrained distributed optimal control (2013). https://doi.org/10.48550/ARXIV.1312.5653, https://arxiv.org/abs/1312.5653"
+    },
+    {
+      "n": 22,
+      "id": "bib.bib5",
+      "text": "Berkooz, G., Holmes, P., Lumley, J.L.: The proper orthogonal decomposition in the analysis of turbulent flows. Annual Review of Fluid Mechanics 25 (1), 539–575 (1993). https://doi.org/10.1146/annurev.fl.25.010193.002543, https://doi.org/10.1146/annurev.fl.25.010193.002543"
+    },
+    {
+      "n": 23,
+      "id": "bib.bib60",
+      "text": "Rozza, G., Huynh, D., Patera, A.: Reduced basis approximation and a posteriori error estimation for affinely parametrized elliptic coercive partial differential equations. Archives of Computational Methods in Engineering 15 , 1–47 (09 2007). https://doi.org/10.1007/BF03024948"
+    },
+    {
+      "n": 24,
+      "id": "bib.bib62",
+      "text": "Safonov, M.G., Chiang, R.Y.: A schur method for balanced model reduction. 1988 American Control Conference pp. 1036–1040 (1988)"
+    },
+    {
+      "n": 25,
+      "id": "bib.bib46",
+      "text": "Lauzon, J.T., Cheung, S.W., Shin, Y., Choi, Y., Copeland, D.M., Huynh, K.: S-opt: A points selection algorithm for hyper-reduction in reduced order models (2022). https://doi.org/10.48550/ARXIV.2203.16494, https://arxiv.org/abs/2203.16494"
+    },
+    {
+      "n": 26,
+      "id": "bib.bib17",
+      "text": "Choi, Y., Coombs, D., Anderson, R.: Sns: A solution-based nonlinear subspace method for time-dependent model order reduction. SIAM Journal on Scientific Computing 42 (2), A1116–A1146 (2020). https://doi.org/10.1137/19M1242963, https://doi.org/10.1137/19M1242963"
+    },
+    {
+      "n": 27,
+      "id": "bib.bib65",
+      "text": "Stabile, G., Rozza, G.: Finite volume POD-galerkin stabilised reduced order methods for the parametrised incompressible navier–stokes equations. Computers & Fluids 173 , 273–284 (sep 2018). https://doi.org/10.1016/j.compfluid.2018.01.035, https://doi.org/10.1016/j.compfluid.2018.01.035"
+    },
+    {
+      "n": 28,
+      "id": "bib.bib36",
+      "text": "Iliescu, T., Wang, Z.: Variational multiscale proper orthogonal decomposition: Navier-stokes equations. Numerical Methods for Partial Differential Equations 30 (2), 641–663 (2014). https://doi.org/https://doi.org/10.1002/num.21835, https://onlinelibrary.wiley.com/doi/abs/10.1002/num.21835"
+    },
+    {
+      "n": 29,
+      "id": "bib.bib19",
+      "text": "Copeland, D.M., Cheung, S.W., Huynh, K., Choi, Y.: Reduced order models for lagrangian hydrodynamics. Computer Methods in Applied Mechanics and Engineering 388 , 114259 (jan 2022). https://doi.org/10.1016/j.cma.2021.114259, https://doi.org/10.1016/j.cma.2021.114259"
+    },
+    {
+      "n": 30,
+      "id": "bib.bib16",
+      "text": "Cheung, S.W., Choi, Y., Copeland, D.M., Huynh, K.: Local lagrangian reduced-order modeling for rayleigh-taylor instability by solution manifold decomposition (2022). https://doi.org/10.48550/ARXIV.2201.07335, https://arxiv.org/abs/2201.07335"
+    },
+    {
+      "n": 31,
+      "id": "bib.bib51",
+      "text": "McLaughlin, B., Peterson, J., Ye, M.: Stabilized reduced order models for the advection–diffusion–reaction equation using operator splitting. Computers & Mathematics with Applications 71 (11), 2407–2420 (2016). https://doi.org/https://doi.org/10.1016/j.camwa.2016.01.032, https://www.sciencedirect.com/science/article/pii/S0898122116300281 , proceedings of the conference on Advances in Scientific Computing and Applied Mathematics. A special issue in honor of Max Gunzburger’s 70th birthday"
+    },
+    {
+      "n": 32,
+      "id": "bib.bib43",
+      "text": "Kim, Y., Wang, K., Choi, Y.: Efficient space–time reduced order model for linear dynamical systems in python using less than 120 lines of code. Mathematics 9 (14) (2021). https://doi.org/10.3390/math9141690, https://www.mdpi.com/2227-7390/9/14/1690"
+    },
+    {
+      "n": 33,
+      "id": "bib.bib41",
+      "text": "Kim, Y., Choi, Y., Widemann, D., Zohdi, T.: A fast and accurate physics-informed neural network reduced order model with shallow masked autoencoder (2020). https://doi.org/10.48550/ARXIV.2009.11990, https://arxiv.org/abs/2009.11990"
+    },
+    {
+      "n": 34,
+      "id": "bib.bib40",
+      "text": "Kim, Y., Choi, Y., Widemann, D., Zohdi, T.: Efficient nonlinear manifold reduced order model (2020). https://doi.org/10.48550/ARXIV.2011.07727, https://arxiv.org/abs/2011.07727"
+    },
+    {
+      "n": 35,
+      "id": "bib.bib47",
+      "text": "Lee, K., Carlberg, K.T.: Model reduction of dynamical systems on nonlinear manifolds using deep convolutional autoencoders. Journal of Computational Physics 404 , 108973 (2020). https://doi.org/https://doi.org/10.1016/j.jcp.2019.108973, https://www.sciencedirect.com/science/article/pii/S0021999119306783"
+    },
+    {
+      "n": 36,
+      "id": "bib.bib22",
+      "text": "Diaz, A.N., Choi, Y., Heinkenschloss, M.: A fast and accurate domain-decomposition nonlinear manifold reduced order model (2023)"
+    },
+    {
+      "n": 37,
+      "id": "bib.bib34",
+      "text": "Hinton, G.E., Salakhutdinov, R.R.: Reducing the dimensionality of data with neural networks. Science 313 (5786), 504–507 (2006). https://doi.org/10.1126/science.1127647, https://www.science.org/doi/abs/10.1126/science.1127647"
+    },
+    {
+      "n": 38,
+      "id": "bib.bib21",
+      "text": "DeMers, D., Cottrell, G.: Non-linear dimensionality reduction. In: Hanson, S., Cowan, J., Giles, C. (eds.) Advances in Neural Information Processing Systems. vol. 5. Morgan-Kaufmann (1992), https://proceedings.neurips.cc/paper/1992/file/cdc0d6e63aa8e41c89689f54970bb35f-Paper.pdf"
+    },
+    {
+      "n": 39,
+      "id": "bib.bib25",
+      "text": "Fries, W.D., He, X., Choi, Y.: LaSDI: Parametric latent space dynamics identification. Computer Methods in Applied Mechanics and Engineering 399 , 115436 (sep 2022). https://doi.org/10.1016/j.cma.2022.115436, https://doi.org/10.1016/j.cma.2022.115436"
+    },
+    {
+      "n": 40,
+      "id": "bib.bib31",
+      "text": "He, X., Choi, Y., Fries, W.D., Belof, J., Chen, J.S.: gLaSDI: Parametric physics-informed greedy latent space dynamics identification 489 , 112267 (2023). https://doi.org/10.1016/j.jcp.2023.112267, https://www.sciencedirect.com/science/article/abs/pii/S0021999123003625"
+    },
+    {
+      "n": 41,
+      "id": "bib.bib50",
+      "text": "McBane, S., Choi, Y., Willcox, K.: Stress-constrained topology optimization of lattice-like structures using component-wise reduced order models. Computer Methods in Applied Mechanics and Engineering 400 , 115525 (2022)"
+    },
+    {
+      "n": 42,
+      "id": "bib.bib69",
+      "text": "Tapia, G., Khairallah, S.A., Matthews, M.J., King, W.E., Elwany, A.: Gaussian process-based surrogate modeling framework for process planning in laser powder-bed fusion additive manufacturing of 316l stainless steel. International Journal of Advanced Manufacturing Technology 94 (9-12) (9 2017). https://doi.org/10.1007/s00170-017-1045-z"
+    },
+    {
+      "n": 43,
+      "id": "bib.bib49",
+      "text": "Marjavaara, D.: Cfd driven optimization of hydraulic turbine draft tubes using surrogate models (2006)"
+    },
+    {
+      "n": 44,
+      "id": "bib.bib15",
+      "text": "Cheng, K., Zimmermann, R.: Sliced gradient-enhanced kriging for high-dimensional function approximation and aerodynamic modeling (04 2022)"
+    },
+    {
+      "n": 45,
+      "id": "bib.bib45",
+      "text": "Kutz, J.N.: Deep learning in fluid dynamics. Journal of Fluid Mechanics 814 , 1–4 (2017). https://doi.org/10.1017/jfm.2016.803"
+    },
+    {
+      "n": 46,
+      "id": "bib.bib11",
+      "text": "Brunton, S.L., Proctor, J.L., Kutz, J.N.: Discovering governing equations from data by sparse identification of nonlinear dynamical systems. Proceedings of the National Academy of Sciences 113 (15), 3932–3937 (2016). https://doi.org/10.1073/pnas.1517384113, https://www.pnas.org/doi/abs/10.1073/pnas.1517384113"
+    },
+    {
+      "n": 47,
+      "id": "bib.bib61",
+      "text": "Rudy, S.H., Brunton, S.L., Proctor, J.L., Kutz, J.N.: Data-driven discovery of partial differential equations. Science Advances 3 (4), e1602614 (2017). https://doi.org/10.1126/sciadv.1602614, https://www.science.org/doi/abs/10.1126/sciadv.1602614"
+    },
+    {
+      "n": 48,
+      "id": "bib.bib53",
+      "text": "Messenger, D.A., Bortz, D.M.: Weak SINDy: Galerkin-Based Data-Driven Model Selection. Multiscale Model. Simul. 19 (3), 1474–1497 (2021). https://doi.org/10.1137/20M1343166"
+    },
+    {
+      "n": 49,
+      "id": "bib.bib52",
+      "text": "Messenger, D.A., Bortz, D.M.: Weak SINDy For Partial Differential Equations. J. Comput. Phys. 443 , 110525 (Oct 2021). https://doi.org/10.1016/j.jcp.2021.110525"
+    },
+    {
+      "n": 50,
+      "id": "bib.bib10",
+      "text": "Bortz, D.M., Messenger, D.A., Dukic, V.: Direct Estimation of Parameters in ODE Models Using WENDy: Weak-form Estimation of Nonlinear Dynamics. Bull. Math. Biol. 85 (110) (2023). https://doi.org/DOI:10.1007/S11538-023-01208-6"
+    },
+    {
+      "n": 51,
+      "id": "bib.bib39",
+      "text": "Kang, S.H., Liao, W., Liu, Y.: IDENT: Identifying Differential Equations with Numerical Time Evolution. J Sci Comput 87 (1), 1 (Apr 2021). https://doi.org/10.1007/s10915-020-01404-9"
+    },
+    {
+      "n": 52,
+      "id": "bib.bib68",
+      "text": "Tang, M., Liao, W., Kuske, R., Kang, S.H.: WeakIdent: Weak formulation for Identifying Differential Equation using Narrow-fit and Trimming. J. Comput. Phys. p. 112069 (Mar 2023). https://doi.org/10.1016/j.jcp.2023.112069"
+    },
+    {
+      "n": 53,
+      "id": "bib.bib35",
+      "text": "Hirsh, S.M., Barajas-Solano, D.A., Kutz, J.N.: Sparsifying priors for bayesian uncertainty quantification in model discovery. Royal Society Open Science 9 (2), 211823 (2022). https://doi.org/10.1098/rsos.211823, https://royalsocietypublishing.org/doi/abs/10.1098/rsos.211823"
+    },
+    {
+      "n": 54,
+      "id": "bib.bib27",
+      "text": "Gao, L.M., Kutz, J.N.: Bayesian autoencoders for data-driven discovery of coordinates, governing equations and fundamental constants (2022). https://doi.org/10.48550/ARXIV.2211.10575, https://arxiv.org/abs/2211.10575"
+    },
+    {
+      "n": 55,
+      "id": "bib.bib14",
+      "text": "Chen, Z., Liu, Y., Sun, H.: Physics-informed learning of governing equations from scarce data. Nature Communications 12 (1) (oct 2021). https://doi.org/10.1038/s41467-021-26434-1, https://doi.org/10.1038/s41467-021-26434-1"
+    },
+    {
+      "n": 56,
+      "id": "bib.bib9",
+      "text": "Bonneville, C., Earls, C.: Bayesian deep learning for partial differential equation parameter discovery with sparse and noisy data. Journal of Computational Physics: X 16 , 100115 (2022). https://doi.org/https://doi.org/10.1016/j.jcpx.2022.100115, https://www.sciencedirect.com/science/article/pii/S2590055222000117"
+    },
+    {
+      "n": 57,
+      "id": "bib.bib66",
+      "text": "Stephany, R., Earls, C.: Pde-read: Human-readable partial differential equation discovery using deep learning. Neural Networks 154 , 360–382 (2022). https://doi.org/https://doi.org/10.1016/j.neunet.2022.07.008, https://www.sciencedirect.com/science/article/pii/S0893608022002660"
+    },
+    {
+      "n": 58,
+      "id": "bib.bib13",
+      "text": "Champion, K., Lusch, B., Kutz, J.N., Brunton, S.L.: Data-driven discovery of coordinates and governing equations. Proceedings of the National Academy of Sciences 116 (45), 22445–22451 (2019). https://doi.org/10.1073/pnas.1906995116, https://www.pnas.org/doi/abs/10.1073/pnas.1906995116"
+    },
+    {
+      "n": 59,
+      "id": "bib.bib4",
+      "text": "Bai, Z., Peng, L.: Non-intrusive nonlinear model reduction via machine learning approximations to low-dimensional operators (2021). https://doi.org/10.48550/ARXIV.2106.09658, https://arxiv.org/abs/2106.09658"
+    },
+    {
+      "n": 60,
+      "id": "bib.bib8",
+      "text": "Bonneville, C., Choi, Y., Ghosh, D., Belof, J.L.: Gplasdi: Gaussian process-based interpretable latent space dynamics identification through deep autoencoder. Computer Methods in Applied Mechanics and Engineering 418 , 116535 (2024). https://doi.org/https://doi.org/10.1016/j.cma.2023.116535, https://www.sciencedirect.com/science/article/pii/S004578252300659X"
+    },
+    {
+      "n": 61,
+      "id": "bib.bib7",
+      "text": "Bonneville, C., Choi, Y., Ghosh, D., Belof, J.L.: Data-driven autoencoder numerical solver with uncertainty quantification for fast physical simulations (2023)"
+    },
+    {
+      "n": 62,
+      "id": "bib.bib32",
+      "text": "He, X., Choi, Y., Fries, W.D., Belof, J.L., Chen, J.S.: Certified data-driven physics-informed greedy auto-encoder simulator (2022)"
+    },
+    {
+      "n": 63,
+      "id": "bib.bib72",
+      "text": "Tran, A., He, X., Messenger, D.A., Choi, Y., Bortz, D.M.: Weak-Form Latent Space Dynamics Identification. Comput. Methods Appl. Mech. Eng. (accepted) (2024)"
+    },
+    {
+      "n": 64,
+      "id": "bib.bib56",
+      "text": "Park, J.S.R., Cheung, S.W., Choi, Y., Shin, Y.: tLaSDI: Thermodynamics-informed latent space dynamics identification (2024), https://arxiv.org/abs/2403.05848"
+    }
+  ]
+}

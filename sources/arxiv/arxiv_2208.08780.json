@@ -1,0 +1,98 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2208.08780",
+  "title": "GraVoS: Voxel Selection for 3D Point-Cloud Detection",
+  "authors": "Oren Shrout, Yizhak Ben-Shabat, Ayellet Tal",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2208.08780",
+  "html_url": "https://arxiv.org/html/2208.08780",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 858,
+  "text": "3D object detection has gained an increasing importance in both industry and academia due to its wide range of applications, including autonomous driving and robotics [1,2]. LiDAR sensors are the de-facto standard acquisition devices for capturing 3D outdoor scenes (Fig. GraVoS: Voxel Selection for 3D Point-Cloud Detection). They produce sparse and irregular 3D point clouds, which are used in a variety of scene perception and understanding tasks.\n\nThere are three prominent challenges in outdoor point cloud datasets for detection. The first is the small size of the datasets, in terms of the number of scenes. The second is the large number of points in the scene vs. the small number of points on the training examples (objects). A single scene might contain hundreds of thousands, or even millions, of points but only a handful of objects. The third is class imbalance, where some classes might contain significantly more instances than the other classes. This often results in lower predictive accuracy for the infrequent classes [3,4].\n\nTo handle the first challenge, it was proposed to enrich the dataset during training with global operations, applied to the whole point cloud, such as rotation along the Z-axis, random flips along the X-axis, and coordinate scaling [5,6,7]. We note that most methods that solve the second and the third challenges indirectly also solve this first challenge.\n\nTo solve the second challenge, it is suggested to augment the scene by local operations, applied to points belonging to individual objects [8,9]. Local operations include random point drop out, frustum drop out, additive noise added to the object, intra-object mixing, and swapping regions between different objects.\n\nTo solve the third challenge, as well as the second one, [10,11,12,5] propose to add ground-truth objects from different point-clouds to the scene, for training. This type of augmentation indeed mitigates the imbalance. However, it does not take into account the network architecture, though Reuse et al. [13] show, through a series of experiments, that both local and global data augmentation for 3D object detection strongly depends not only on the dataset, but also on the network architecture. Thus, network-dependent augmentations are beneficial.\n\nWe present a novel network-dependent data modification approach that addresses the latter two challenges. (We address the first challenge indirectly, similarly to [10,11,12].) The key idea is to learn a subset of elements of the scene, which are meaningful for object detection. Inline with [13] ’s observation, meaningfulness is defined in the context of the network and not only of the scene. Considering only this subset as input will allow us not only to decrease the number of elements in the scene, but also to increase the class balance within a given scene.\n\nTo realize this idea, we focus on SoTA detection networks that transform point clouds into voxels as a first step in their pipeline. The main reason behind transferring the input to voxels is reducing the size of the input, as only the occupied voxels are then processed. This enables these systems to work on extremely large scenes. Obviously, another benefit of voxels is the ability to impose structure on the input.\n\nGenerally speaking, in this voxel-based setup, meaningful voxels are those for which the model \"struggles\" to locate the objects. Hence, the gradients play a major role in determining the meaningful voxels. Our approach is thus termed Gradient-based Voxel Selection (GraVoS).\n\nWe show that when focusing only on the meaningful voxels and removing the non-informative ones, most of the discarded voxels belong to the scene background. Few of the removed voxels are associated with the prevalent classes and almost none are associated with the non-prevalent classes. Our strategy may be contrasted with dropout augmentation techniques, which reduce the number of elements randomly [8,9].\n\nOur distribution balancing is demonstrated in Fig. GraVoS: Voxel Selection for 3D Point-Cloud Detection. Given a point cloud (cyan), our selected subset of the meaningful voxels (salmon) contains significantly few points from the background (the points are voxel centers here), more points on the objects that belong to the Car class (the most prevalent class), and almost all the points on the objects that belong the Pedestrian and the Cyclist classes.\n\nOur method is general and may be applied to different voxel-based networks. Furthermore, it comes at no additional inference time cost. We show results on four SoTA networks: SECOND [5], Part- A^{2} [12], Voxel R-CNN [14], and CenterPoint [15] on the well-established KITTI dataset [16,1]. The performance of all networks improves, in particular when considering the difficult categories of Pedestrian and Cyclist. For instance, the performance of [12] on the benchmark’s moderate subset improves by 2.32\\% & 1.15\\% for the non-prevalent classes (Cyclist and Pedestrian), which constitutes an error reduction of 8.20\\% & 2.77\\%, respectively.\n\nHence, the main contributions of this paper are:\n\n- • A novel & generic \"meaningful\" voxel selection method, called Gradient-based Voxel Selection.\n\n- • A training procedure that uses the selected voxels to improve 3D detection without additional data. This procedure combines information from different stages of the model’s training.\n\n- • Demonstrating improved performance of four voxel-based SoTA detection methods, successfully coping both with the inherent class imbalance and with the foreground-background imbalance.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib8",
+      "text": "Andreas Geiger, Philip Lenz, and Raquel Urtasun. Are we ready for autonomous driving? the kitti vision benchmark suite. In 2012 IEEE conference on computer vision and pattern recognition , pages 3354–3361. IEEE, 2012."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib32",
+      "text": "Sebastian Thrun, Mike Montemerlo, Hendrik Dahlkamp, David Stavens, Andrei Aron, James Diebel, Philip Fong, John Gale, Morgan Halpenny, Gabriel Hoffmann, et al. Stanley: The robot that won the darpa grand challenge. Journal of field Robotics , 23(9):661–692, 2006."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib12",
+      "text": "Justin M Johnson and Taghi M Khoshgoftaar. Survey on deep learning with class imbalance. Journal of Big Data , 6(1):1–54, 2019."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib17",
+      "text": "Kemal Oksuz, Baris Can Cam, Sinan Kalkan, and Emre Akbas. Imbalance problems in object detection: A review. IEEE transactions on pattern analysis and machine intelligence , 43(10):3388–3415, 2020."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib34",
+      "text": "Yan Yan, Yuxing Mao, and Bo Li. Second: Sparsely embedded convolutional detection. Sensors , 18(10):3337, 2018."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib36",
+      "text": "Bin Yang, Wenjie Luo, and Raquel Urtasun. Pixor: Real-time 3d object detection from point clouds. In Proceedings of the IEEE conference on Computer Vision and Pattern Recognition , pages 7652–7660, 2018."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib44",
+      "text": "Yin Zhou and Oncel Tuzel. Voxelnet: End-to-end learning for point cloud based 3d object detection. In Proceedings of the IEEE conference on computer vision and pattern recognition , pages 4490–4499, 2018."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib4",
+      "text": "Shuyang Cheng, Zhaoqi Leng, Ekin Dogus Cubuk, Barret Zoph, Chunyan Bai, Jiquan Ngiam, Yang Song, Benjamin Caine, Vijay Vasudevan, Congcong Li, et al. Improving 3d object detection through progressive population based augmentation. In European Conference on Computer Vision , pages 279–294. Springer, 2020."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib5",
+      "text": "Jaeseok Choi, Yeji Song, and Nojun Kwak. Part-aware data augmentation for 3d object detection in point cloud. In 2021 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS) , pages 3391–3397. IEEE, 2021."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib23",
+      "text": "Shaoshuai Shi, Chaoxu Guo, Li Jiang, Zhe Wang, Jianping Shi, Xiaogang Wang, and Hongsheng Li. Pv-rcnn: Point-voxel feature set abstraction for 3d object detection. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 10529–10538, 2020."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib24",
+      "text": "Shaoshuai Shi, Xiaogang Wang, and Hongsheng Li. Pointrcnn: 3d object proposal generation and detection from point cloud. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 770–779, 2019."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib25",
+      "text": "Shaoshuai Shi, Zhe Wang, Jianping Shi, Xiaogang Wang, and Hongsheng Li. From points to parts: 3d object detection from point cloud with part-aware and part-aggregation network. IEEE transactions on pattern analysis and machine intelligence , 43(8):2647–2664, 2020."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib22",
+      "text": "Matthias Reuse, Martin Simon, and Bernhard Sick. About the ambiguity of data augmentation for 3d object detection in autonomous driving. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 979–987, 2021."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib6",
+      "text": "Jiajun Deng, Shaoshuai Shi, Peiwei Li, Wengang Zhou, Yanyong Zhang, and Houqiang Li. Voxel r-cnn: Towards high performance voxel-based 3d object detection. arXiv preprint arXiv:2012.15712 , 1(2):4, 2020."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib41",
+      "text": "Tianwei Yin, Xingyi Zhou, and Philipp Krahenbuhl. Center-based 3d object detection and tracking. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 11784–11793, 2021."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib7",
+      "text": "Andreas Geiger, Philip Lenz, Christoph Stiller, and Raquel Urtasun. Vision meets robotics: The kitti dataset. The International Journal of Robotics Research , 32(11):1231–1237, 2013."
+    }
+  ]
+}

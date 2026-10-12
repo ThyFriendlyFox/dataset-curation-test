@@ -1,0 +1,108 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.10801",
+  "title": "Securely Fine-tuning Pre-trained Encoders Against Adversarial Examples",
+  "authors": "Ziqi Zhou, Minghui Li, Wei Liu, Shengshan Hu, Yechao Zhang, Wei Wan, Lulu Xue, Leo Yu Zhang, Dezhong Yao, Hai Jin",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2403.10801",
+  "html_url": "https://arxiv.org/html/2403.10801",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 880,
+  "text": "With triumphs of deep learning, researchers are dedicated to training models with strong performance to address the multifaceted challenges in the real world. However, constructing a capable model requires substantial labeled datasets and expensive computational resources, which significantly hinders their applications. Recently, the emergence of large pre-trained encoder (e.g., GPT [1], SimCLR [2], CLIP [3]) has significantly alleviated resource constraints, which are trained by model providers (e.g., Google, Meta, and OpenAI) through self-supervised learning (SSL) methods. Fine-tuning the pre-trained encoder, which enjoys powerful feature extraction prowess and knowledge transfer aptitude, is emerging as a new deep learning paradigm. For example, the CLIP provided by OpenAI has facilitated the flourishing of downstream tasks like Semantic Segmentation [4], Video Processing [5], 3D Point Cloud Classification [6].\n\nHowever, recent works have uncovered the potential security risks of pre-trained encoders [7,8,9,10,11]. PoisonedEncoder [9] injects crafted poisoned examples into the unlabeled pre-training data such that the target downstream classifiers inheriting the poisoned encoder will misclassify certain samples into target class. In a similar vein, BadEncoder [7] embeds a backdoor by fine-tuning a pre-trained encoder and subsequently disseminates the backdoored pre-trained encoder on third-party platforms (e.g., GitHub, hugging face). Any downstream model utilizing this encoder can be activated through a carefully designed trigger by an attacker for malicious purposes. While these backdoor attacks appear concerning, defense strategies are straightforward and easy-to-deploy, such as cleaning pre-training datasets or avoiding downloading from untrusted sources.\n\nUnlike backdoor attacks occurring in the training phase, adversarial attacks [12,13,14] stemming from the model’s inherent vulnerabilities [12] occur during the inference phase and are more threatening. Latest works [10,11,15] have successfully utilized a publicly available pre-trained encoder to craft downstream-agnostic adversarial examples (DAEs) to fool downstream tasks. Specifically, PAP [10] leverages the stability of shallow layers in a pre-trained encoder to design pre-trained perturbations for attacking downstream models after fine-tuning. AdvEncoder [11] utilizes a frequency-based generative framework to craft DAEs. These works demonstrate that, despite the lack of knowledge about the pre-training dataset and downstream tasks, attackers can still craft highly effective adversarial examples to compromise all the downstream tasks based on publicly available pre-trained encoders. This poses an intriguing problem:\n\nNotably, there are many solutions in effectively detecting adversarial examples like [16,17,18]. They are orthogonal to our design goals and can be easily integrated.\n\nIn this study, we start by examining existing defenses against adversarial examples to gauge their effectiveness in the pre-training paradigm. Our goal is to uncover the challenges in dealing with DAEs, as illustrated in Figure 1. Through extensive experiments on four kinds of defense methods, we find that none of them effectively counter recently proposed DAEs. We owe this to two key characteristics of pre-training: 1) The domain shift, caused by the distinct training data types between pre-training and downstream fine-tuning, makes it harder for the model to differentiate between benign examples and DAEs due to reduced diversity in the feature space; 2) The high sensitivity of pre-trained encoder, caused by catastrophic knowledge forgetting (i.e., loss of original feature extraction capability), significantly constrains the ability of the defender as achieving optimal model generalization is more desired. This puts us into a “pre-training dilemma” situation.\n\nTo address the aforementioned challenges, we present the inaugural downstream method, G enetic E volution- N urtured A dversarial F ine-tuning (Gen-AF). Our objective is to enhance the robustness of downstream models while preserving the inherent generalization capabilities of the pre-trained encoder. Gen-AF operates through a two-stage adversarial fine-tuning approach, comprising genetic-driven dual-track adversarial fine-tuning and evolutionary adaptability fine-tuning. In the first stage, to seamlessly inherit the pre-trained encoder, we introduce a bilevel-optimizer collaborative strategy. This strategy optimizes the parameters of the pre-trained encoder and the classifier separately, assigning a minimal learning rate for the pre-trained encoder and a standard learning rate for the classifier. Additionally, to counteract the potential reduction in model generalization during adversarial training, we implement genetic regularization. This technique maintains the relative positional relationships of natural samples within the representation space, thereby preserving the model’s inherent generalization capacity.\n\nMoving to the second stage, our aim is to retain the robust-sensitive layers trained adversarially while fine-tuning the robust-redundant layers. We construct a sensitivity dictionary for each network layer of the downstream model and select the top-k layers with the lowest robustness, keeping the remaining layers fixed. Subsequently, we undertake standard fine-tuning training for the selected layers to enhance the overall generalization of the downstream model. We verify the performance of Gen-AF against five SOTA universal adversarial attacks designed for pre-trained encoders, across ten popular SSL training methods, two pre-training datasets, and six downstream datasets. The results demonstrate that our method can effectively defend against DAEs, achieving a well-balanced trade-off between robustness and generalization.\n\nOur main contributions are summarized as follows:\n\n- • We extensively investigate existing defenses in the pre-trained paradigm and offer a comprehensive understanding in mitigating DAEs.\n\n- • We design the first genetic evolution-nurtured adversarial fine-tuning to bolster the robustness of downstream models while simultaneously maintaining the generalization ability inheriting from the pre-trained encoder.\n\n- • Our extensive experiments on ten self-supervised training methods and six datasets show that Gen-AF achieves high testing accuracy and robust testing accuracy against state-of-the-art DAEs. The results also demonstrate that Gen-AF can defend against backdoor attacks targeting pre-trained encoders without any modifications.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib6",
+      "text": "Tom B. Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, Sandhini Agarwal, Ariel Herbert-Voss, Gretchen Krueger, Tom Henighan, Rewon Child, Aditya Ramesh, Daniel M. Ziegler, Jeffrey Wu, Clemens Winter, Christopher Hesse, Mark Chen, Eric Sigler, Mateusz Litwin, Scott Gray, Benjamin Chess, Jack Clark, Christopher Berner, Sam McCandlish, Alec Radford, Ilya Sutskever, and Dario Amodei. Language models are few-shot learners. In Proceedings of the 34th International Conference on Neural Information Processing Systems (NeurIPS’20) , pages 1877–1901, 2020."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib12",
+      "text": "Ting Chen, Simon Kornblith, Mohammad Norouzi, and Geoffrey Hinton. A simple framework for contrastive learning of visual representations. In Proceedings of the International Conference on Machine Learning (ICML’20) , pages 1597–1607. PMLR, 2020."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib45",
+      "text": "Alec Radford, Jong Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry, Amanda Askell, Pamela Mishkin, Jack Clark, et al. Learning transferable visual models from natural language supervision. In Proceedings of the International Conference on Machine Learning (ICML’21) , pages 8748–8763. PMLR, 2021."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib65",
+      "text": "Ziqin Zhou, Yinjie Lei, Bowen Zhang, Lingqiao Liu, and Yifan Liu. Zegclip: Towards adapting clip for zero-shot semantic segmentation. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR’23) , pages 11175–11185, 2023."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib46",
+      "text": "Hanoona Rasheed, Muhammad Uzair Khattak, Muhammad Maaz, Salman Khan, and Fahad Shahbaz Khan. Fine-tuned clip models are efficient video learners. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR’23) , pages 6545–6554, 2023."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib29",
+      "text": "Tianyu Huang, Bowen Dong, Yunhan Yang, Xiaoshui Huang, Rynson WH Lau, Wanli Ouyang, and Wangmeng Zuo. Clip2point: Transfer clip to point cloud classification with image-depth pre-training. In Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV’23) , pages 22157–22167, 2023."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib30",
+      "text": "Jinyuan Jia, Yupei Liu, and Neil Zhenqiang Gong. Badencoder: Backdoor attacks to pre-trained encoders in self-supervised learning. In Proceedings of the IEEE Symposium on Security and Privacy (S&P’22) , pages 2043–2059. IEEE, 2022."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib49",
+      "text": "Aniruddha Saha, Ajinkya Tejankar, Soroush Abbasi Koohpayegani, and Hamed Pirsiavash. Backdoor attacks on self-supervised learning. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR’22) , pages 13337–13346, 2022."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib36",
+      "text": "Hongbin Liu, Jinyuan Jia, and Neil Zhenqiang Gong. Poisonedencoder: Poisoning the unlabeled pre-training data in contrastive learning. In Proceedings of the 31st USENIX Security Symposium (USENIX Security’22) , pages 3629–3645, 2022."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib3",
+      "text": "Yuanhao Ban and Yinpeng Dong. Pre-trained adversarial perturbations. In Proceedings of the 36th International Conference on Neural Information Processing Systems (NeurIPS’22) , 2022."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib64",
+      "text": "Ziqi Zhou, Shengshan Hu, Ruizhi Zhao, Qian Wang, Leo Yu Zhang, Junhui Hou, and Hai Jin. Downstream-agnostic adversarial examples. In Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV’23) , pages 4345–4355, 2023."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib21",
+      "text": "Ian J Goodfellow, Jonathon Shlens, and Christian Szegedy. Explaining and harnessing adversarial examples. arXiv preprint arXiv:1412.6572 , 2014."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib7",
+      "text": "Nicholas Carlini and David Wagner. Towards evaluating the robustness of neural networks. In Proceedings of the 38th IEEE Symposium on Security and Privacy (S&P’17) , pages 39–57. Ieee, 2017."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib61",
+      "text": "Yechao Zhang, Shengshan Hu, Leo Yu Zhang, Junyu Shi, Minghui Li, Xiaogeng Liu, and Hai Jin. Why Does Little Robustness Help? A Further Step Towards Understanding Adversarial Transferability. In Proceedings of the 45th IEEE Symposium on Security and Privacy (S&P’24) , 2024."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib63",
+      "text": "Ziqi Zhou, Shengshan Hu, Minghui Li, Hangtao Zhang, Yechao Zhang, and Hai Jin. Advclip: Downstream-agnostic adversarial examples in multimodal contrastive learning. In Proceedings of the 31st ACM International Conference on Multimedia (ACM MM’23) , pages 6311–6320, 2023."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib53",
+      "text": "Guanhong Tao, Shiqing Ma, Yingqi Liu, and Xiangyu Zhang. Attacks meet interpretability: Attribute-steered detection of adversarial samples. In Proceedings of the 32nd International Conference on Neural Information Processing Systems (NeurIPS’18) , 2018."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib57",
+      "text": "Xuwang Yin, Soheil Kolouri, and Gustavo K Rohde. Gat: Generative adversarial training for adversarial example detection and robust classification. In Proceedings of the International Conference on Learning Representations (ICLR’19) , 2019."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib35",
+      "text": "Bin Liang, Hongcheng Li, Miaoqiang Su, Xirong Li, Wenchang Shi, and Xiaofeng Wang. Detecting adversarial image examples in deep neural networks with adaptive noise reduction. IEEE Transactions on Dependable and Secure Computing , 18(1):72–85, 2018."
+    }
+  ]
+}

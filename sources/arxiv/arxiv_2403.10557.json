@@ -1,0 +1,100 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.10557",
+  "title": "Second-Order Information Matters: Revisiting Machine Unlearning for Large Language Models",
+  "authors": "Kang Gu, Md Rafi Ur Rashid, Najrin Sultana, Shagufta Mehnaz",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.AI",
+    "cs.CL"
+  ],
+  "url": "https://arxiv.org/abs/2403.10557",
+  "html_url": "https://arxiv.org/html/2403.10557",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1097,
+  "text": "Recent years have witnessed the prosperity of commercial products powered by large language models (LLMs). From the breakthrough of ChatGPT [1] to the rise of Midjourney [2], the capacity of LLMs has gone beyond typical text-related tasks such as question answering and code generation. However, ensuring responsible usage of LLM services is of utmost importance, given the lessons of previous privacy violations [3,4]. In 2021, the first legal case concerning an AI chatbot happened in South Korea, where the chatbot Iruda violated the Personal Information Protection Act after generating the exact home addresses and bank account numbers of actual individuals unintentionally. Very recently, the Times sued OpenAI and Microsoft, accusing the companies of infringing on its copyrights by using millions of its articles to train ChatGPT [5].\n\nTo ensure data safety, data privacy regulations such as GDPR [6] have granted users the right to revoke the use of their data by commercial services. However, from the perspective of service providers, making a trained model forget about the knowledge of specific training samples can be much more challenging than just deleting the user data from the database. In this paper, we study the problem of how a service provider handles incoming user requests regarding the removal of their data during the life cycle of the LLM service. Retraining the model from scratch ensures the erasure of target samples, while it is extremely expensive to practice for LLMs. It raises the question of how LLM practitioners can unlearn the models with much less time and computational resources.\n\nRecently, efficient unlearning approaches using gradient information have been explored [7,8,9]. Eldan et al. studied a novel approach to replace sensitive tokens within target samples with generic counterparts and finetune the LLMs on the modified samples [8]. It was shown that they effectively weakened the ability of Llama2 7B model to generate or recall Harry Potter-related content. Nevertheless, this approach does not generalize easily to non-fiction data since identifying private information is non-trivial and the standard of privacy differs by each individual [10]. Jang et al. showed that updating the model parameters by inverting the direction of gradients (gradient ascent) can erase the knowledge of target samples [7]. However, since the gradient ascent neglects the rest of the training data, it is uncontrollable how well the knowledge of the remaining data is maintained. The performance of the final model can vary drastically with different random seeds, which leaves the utility questionable. Chen and Yang [9] proposed an efficient unlearning approach by plugging lightweight unlearning layers into transformers. During training, the unlearning layers are learned to forget the requested data while the original LLM layers remained unchanged. Despite its effectiveness, this method modifies the architecture of the original models and has only been evaluated on T5 models.\n\nChallenges. The tremendous size of parameters as well as the high non-convexity make it challenging to design unlearning algorithms for LLMs. So far, existing LLM unlearning methods either: 1) compromise the generalizability in exchange for better performance on specific data/models [8,9], or 2) run efficiently while lacking robustness [7]. However, an ideal unlearning method should not only avoid introducing overhead (e.g. data engineering and architecture engineering) but also demonstrate robustness with respect to the effectiveness of erasure or the preservation of model utility.\n\nMotivation. To this end, we explore novel unlearning strategies for LLMs that can satisfy the aforementioned properties. For shallow (convex) machine learning models, certified removal [11] can largely remove the influence of deleted data points and derive an upper bound of residual information. Although certified removal cannot be applied directly to DNNs due to their non-convexity, it still implies the crucial role of second-order information in retaining the knowledge of remaining data and stabilizing the unlearning process. Intuitively, the model produced by an optimal unlearning algorithm should be indistinguishable from another model that has not seen the unlearning subset, which can be measured by Shannon Information, i.e. Kullback-Leibler (KL) divergence. Golatkar et al. [12] showed that employing Newton update as the unlearning algorithm is sufficient to make the aforementioned KL divergence converge to zero.\n\nOur Work. We first show that second-order information (Hessian) of LLMs can be approximated efficiently. Since the complexity of analytically calculating Hessian is quadratic with respect to the parameter size. Although it is feasible to do so for shallow models (e.g. logistic regression) [11], it quickly scales up to be prohibitively expensive when it comes to LLMs. Various approximation methods have been studied for accelerating the computation of the Hessian [13,14,12]. Kurtic et al. [14] proved that inverse empirical Fisher estimation can be accurate and scalable to the dimensionality of BERT models for pruning tasks. We adapt the inverse empirical Fisher estimation to multi-gpu setting such that it supports the scale of OPT 2.7B [15] as well as even larger models. Our empirical study shows that second-order information can be accurately approximated for unlearning.\n\nThus, we propose two unlearning algorithms for LLMs, namely Fisher Removal and Fisher Forgetting, which are both derived from Newton update. Compared with gradient ascent, Fisher Removal provides a stronger guarantee for the erasure of the unlearning subset while maintaining the LLM utility at a higher level. However, they both update the model parameters in an aggressive way such that the utility might degenerate noticeably after a few iterations of unlearning. To provide the utility guarantee, we further introduce Fisher Forgetting, a variant of Fisher Removal, which maintains the accuracy of LLMs even after going through multiple unlearning cycles.\n\nContributions We present two versions of unlearning algorithms for LLMs, which are derived from Newton update, namely Fisher Removal and Fisher Forgetting. An empirical study on four widely used NLP datasets is conducted to compare our methods with other baselines including finetuning, retraining, and gradient ascent. We further explore their mitigation effects for unintended memorization on two real-world datasets. Moreover, we uncover the relationship between unlearning and DP-SGD [16] through the study of the privacy-utility trade-off. The contributions of our work are summarized as follows:\n\n- (1) We introduce two novel unlearning strategies for LLMs and show that second-order information plays an important role in achieving robust unlearning outcomes.\n\n- (2) We extensively evaluate the capacity of each unlearning approach on four widely used NLP datasets as well as two real-world datasets. The codebase will be released to enable reproducibility.\n\n- (3) We discover that DP-SGD does not guarantee an equally optimal/suboptimal trade-off across different datasets, which implies it cannot replace the role of unlearning.\n\n- (4) We discuss the limitations such as the cost of approximating Hessian, and also point out directions for future work.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib20",
+      "text": "Liu et al . (2023) Yiheng Liu, Tianle Han, Siyuan Ma, Jiayue Zhang, Yuanyuan Yang, Jiaming Tian, Hao He, Antong Li, Mengshen He, Zhengliang Liu, et al . 2023. Summary of chatgpt-related research and perspective towards the future of large language models. Meta-Radiology (2023), 100017."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib4",
+      "text": "Borji (2022) Ali Borji. 2022. Generated faces in the wild: Quantitative comparison of stable diffusion, midjourney and dall-e 2. arXiv preprint arXiv:2210.00586 (2022)."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib24",
+      "text": "Park (2021) Jasmine Park. 2021. The first case where the personal information protection act was appliedto an ai system. (2021)."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib15",
+      "text": "Heikkilä (2022) Melissa Heikkilä. 2022. What does gpt-3 ”know” about me? (2022)."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib21",
+      "text": "Metz (2023) Cade Metz. 2023. OpenAI Says New York Times Lawsuit Against It Is ‘Without Merit’. (2023)."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib23",
+      "text": "of the European Union (2018) Council of the European Union. 2018. General Data Protection Regulation(GDPR). (2018). https://gdpr-info.eu/"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib16",
+      "text": "Jang et al . (2022) Joel Jang, Dongkeun Yoon, Sohee Yang, Sungmin Cha, Moontae Lee, Lajanugen Logeswaran, and Minjoon Seo. 2022. Knowledge unlearning for mitigating privacy risks in language models. arXiv preprint arXiv:2210.01504 (2022)."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib12",
+      "text": "Eldan and Russinovich (2023) Ronen Eldan and Mark Russinovich. 2023. Who’s Harry Potter? Approximate Unlearning in LLMs. arXiv preprint arXiv:2310.02238 (2023)."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib11",
+      "text": "Chen and Yang (2023) Jiaao Chen and Diyi Yang. 2023. Unlearn What You Want to Forget: Efficient Unlearning for LLMs. In Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing , Houda Bouamor, Juan Pino, and Kalika Bali (Eds.). Association for Computational Linguistics, Singapore, 12041–12052. https://doi.org/10.18653/v1/2023.emnlp-main.738"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib6",
+      "text": "Brown et al . (2022) Hannah Brown, Katherine Lee, Fatemehsadat Mireshghallah, Reza Shokri, and Florian Tramèr. 2022. What does it mean for a language model to preserve privacy?. In Proceedings of the 2022 ACM Conference on Fairness, Accountability, and Transparency . 2280–2292."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib14",
+      "text": "Guo et al . (2019) Chuan Guo, Tom Goldstein, Awni Hannun, and Laurens Van Der Maaten. 2019. Certified data removal from machine learning models. arXiv preprint arXiv:1911.03030 (2019)."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib13",
+      "text": "Golatkar et al . (2020) Aditya Golatkar, Alessandro Achille, and Stefano Soatto. 2020. Eternal sunshine of the spotless net: Selective forgetting in deep networks. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition . 9304–9312."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib29",
+      "text": "Warnecke et al . (2021) Alexander Warnecke, Lukas Pirch, Christian Wressnegger, and Konrad Rieck. 2021. Machine unlearning of features and labels. arXiv preprint arXiv:2108.11577 (2021)."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib18",
+      "text": "Kurtic et al . (2022) Eldar Kurtic, Daniel Campos, Tuan Nguyen, Elias Frantar, Mark Kurtz, Benjamin Fineran, Michael Goin, and Dan Alistarh. 2022. The optimal bert surgeon: Scalable and accurate second-order pruning for large language models. arXiv preprint arXiv:2203.07259 (2022)."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib32",
+      "text": "Zhang et al . (2022) Susan Zhang, Stephen Roller, Naman Goyal, Mikel Artetxe, Moya Chen, Shuohui Chen, Christopher Dewan, Mona Diab, Xian Li, Xi Victoria Lin, et al . 2022. Opt: Open pre-trained transformer language models. arXiv preprint arXiv:2205.01068 (2022)."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib2",
+      "text": "Abadi et al . (2016) Martin Abadi, Andy Chu, Ian Goodfellow, H Brendan McMahan, Ilya Mironov, Kunal Talwar, and Li Zhang. 2016. Deep learning with differential privacy. In Proceedings of the 2016 ACM SIGSAC conference on computer and communications security . 308–318."
+    }
+  ]
+}

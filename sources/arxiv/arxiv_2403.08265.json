@@ -1,0 +1,175 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.08265",
+  "title": "Random Search as a Baseline for Sparse Neural Network Architecture Search",
+  "authors": "Rezsa Farahani",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.AI",
+    "cs.NE"
+  ],
+  "url": "https://arxiv.org/abs/2403.08265",
+  "html_url": "https://arxiv.org/html/2403.08265",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1009,
+  "text": "Overparameterized neural networks are loosely characterized as networks that have a very high fitting (or memorization) capacity with respect to their training data. Although capable of memorization of their training data, these networks intriguingly achieve very low test error close to their training error rates [1,2]. Meanwhile, sparse neural networks have shown similar or better generalization performance than their dense counterparts while having higher parameter efficiency [3]. With increasing availability of hardware and software that support sparse computational operations [4,5], there has been a growing interest in finding sparse sub-networks within large overparameterized models to either improve generalization performance or to gain computational efficiency at the same performance level [6,7,8,3].\n\nEarlier works on creating efficient sparse sub-networks include the now popular pruning technique [9]. These were motivated by the desire to achieve compute efficiency in resource constraint applications by finding smaller networks within a larger network space without losing task performance quality [10]. The original pruning technique involves fully training a larger network on some task, discarding the task-irrelevant connections, and then fine-tuning the remaining sparse sub-network on the task to achieve the a level of performance near that of the larger network. Connections were originally pruned based on loss Hessians [9,11]. Later on, other techniques were proposed such as the removal of weak connections [12] based on weight value thresholds.\n\nFrankle & Carbin [13] proposed a method for more efficient training of overparameterized networks. In this method, named Iterative Magnitude Pruning with Rewinding (IMP), sub-networks of larger networks were found that could be trained to reach a similar level of performance to that of their larger superset network. The IMP process requires training a full network to convergence, pruning the network by removing or masking connections with weaker weights, and rewinding the weight values of the stronger connections to their initial values before re-training the sparse sub-network. The original IMP method requires resetting the sub-network weights to their original values, however, other studies have argued that this resetting may not be needed [14,15] which relaxes the need to preserve the non-pruned weights. Additionally, Liu et al. [14] show that both full training of the overparameterized model for pruning and fine-tuning sub-networks are also not required for certain architectures.\n\nOther work in this area include studies on weight-agnostic neural networks by Gaier & Ha [16], which by only evolving the network architecture and not training weights were able to achieve high accuracy values on the MNIST image classification task. In another line of work by Zhou et al. [15] and similarly in a follow up by Ramanujan et al. [17], a super mask is trained (with SGD) to score connection weights. A set of connections are then selected according to their weights’ scores for finding effective sparse connections in an overparameterized network. Most interestingly, Ramanujan et al. [17] demonstrated that the found sub-networks in randomly initialized overparameterized networks achieve good performance on certain tasks without making any updates to the original weight values. Finally, reinforcement learning (RL) methods have been applied for pruning networks with various degrees of success [18].\n\nIn this work, we aim to develop a baseline search method for finding desirable sparse configurations within overparameterized neural networks prior to full training. This baseline should be reasonably naive but also not a trivial one. We desire sparse networks that exhibit smaller deterioration in task performance compared to a full network, versus purely random sparse configurations at the same level of sparsity. If any search method should arrive at better initial configurations prior to gradient-based training as compared to our baseline, then there is support that the successful method is at least better than a baseline that is not deemed trivial. We propose our baseline for a class of methods that perform connection architecture search on the edges or nodes of an untrained larger overparameterized network with random weight initialization. They aim to find good sparsely connected sub-networks prior to training which would then be normally trained to convergence e.g. with stochastic gradient descent. Our proposed baseline is intended to help measure progress on sparsity search methods, and to control for randomness in initialization and other random factors that may result in fleeting success and non-reproducible results [19]. Some works have proposed sets of benchmark tasks for analyzing competing sparse networks, hoping to bring a more rigorous evaluation methodology to the field [20]. Our work contributes a baseline algorithm for sparsity search to this front.\n\nMost algorithms that search for effective sub-networks accomplish this by either pruning weak connections or by learning connection masks. In our approach towards establishing a baseline method, we use Random Search for finding good initialized sparse sub-networks within the larger network. We name this approach Weedout.\n\nWeedout involves executing a simple Random Search process as the most basic directed search method among the more elaborate Random Search Heuristics [21] methods. In effect, it is a Neural Architecture Search [22,23] process directed on the connection space of an overparameterized network. Random Search Heuristics (RSH), also known as Population-Based search methods or Evolutionary Computation, has a long record of being successfully applied to black-box optimization and machine learning problems. Recently, such methods have also been applied to large-scale Neural Architecture Search with success [22,24,25]. RSH methods scale well with computational resources, and are very amenable to parallel and distributed computation. Furthermore, Random Search is non-parametric, does not perform gradient-based learning, and lacks any inductive bias. On the downside, it is not sample efficient. But as a primitive evolutionary algorithm, it is often regarded as a baseline search method.\n\nWe combine this idea with findings from recent studies on the early stages of neural network training, which show that the early training phase involves the most dynamic and important computational activity through the SGD training process [26,27,28,29]. Additionally, several works have focused on finding good initializations prior to training [30,31]. We thus focus the Weedout procedure on the early training phase of overparameterized networks with the intention of finding better initialized sub-networks by using early performance scores which saves us from spending significant full training resources.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "C. Zhang, S. Bengio, M. Hardt, B. Recht, and O. Vinyals, “Understanding deep learning (still) requires rethinking generalization,” Commun. ACM , vol. 64, p. 107–115, feb 2021."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "B. Neyshabur, Z. Li, S. Bhojanapalli, Y. LeCun, and N. Srebro, “The role of over-parametrization in generalization of neural networks,” in International Conference on Learning Representations , 2019."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "T. Hoefler, D. Alistarh, T. Ben-Nun, N. Dryden, and A. Peste, “Sparsity in deep learning: pruning and growth for efficient inference and training in neural networks,” J. Mach. Learn. Res. , vol. 22, jan 2021."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "S. Srinivas, A. Subramanya, and R. V. Babu, “Training sparse neural networks,” in 2017 IEEE Conference on Computer Vision and Pattern Recognition Workshops (CVPRW) , pp. 455–462, 2017."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "Z. Zhang, H. Wang, S. Han, and W. J. Dally, “Sparch: Efficient architecture for sparse matrix multiplication,” in 2020 IEEE International Symposium on High Performance Computer Architecture (HPCA) , (Los Alamitos, CA, USA), pp. 261–274, IEEE Computer Society, feb 2020."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "T. Dettmers and L. Zettlemoyer, “Sparse networks from scratch: Faster training without losing performance,” CoRR , vol. abs/1907.04840, 2019."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "E. Elsen, M. Dukhan, T. Gale, and K. Simonyan, “Fast sparse convnets,” in 2020 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , (Los Alamitos, CA, USA), pp. 14617–14626, IEEE Computer Society, jun 2020."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "B. Graham, “Spatially-sparse convolutional neural networks,” CoRR , vol. abs/1409.6070, 2014."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "Y. Le Cun, J. S. Denker, and S. A. Solla, “Optimal brain damage,” in Proceedings of the 2nd International Conference on Neural Information Processing Systems , NIPS’89, (Cambridge, MA, USA), p. 598–605, MIT Press, 1989."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "D. Blalock, J. J. Gonzalez Ortiz, J. Frankle, and J. Guttag, “What is the state of neural network pruning?,” Proceedings of machine learning and systems , vol. 2, pp. 129–146, 2020."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "B. Hassibi, D. G. Stork, and G. J. Wolff, “Optimal brain surgeon and general network pruning,” in IEEE international conference on neural networks , pp. 293–299, IEEE, 1993."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "S. Han, J. Pool, J. Tran, and W. Dally, “Learning both weights and connections for efficient neural network,” Advances in neural information processing systems , vol. 28, 2015."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "J. Frankle and M. Carbin, “The lottery ticket hypothesis: Finding sparse, trainable neural networks. arxiv 2018,” arXiv preprint arXiv:1803.03635 , 1810."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "Z. Liu, M. Sun, T. Zhou, G. Huang, and T. Darrell, “Rethinking the value of network pruning,” in International Conference on Learning Representations , 2019."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "H. Zhou, J. Lan, R. Liu, and J. Yosinski, “Deconstructing lottery tickets: Zeros, signs, and the supermask,” Advances in neural information processing systems , vol. 32, 2019."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "A. Gaier and D. Ha, “Weight agnostic neural networks,” Advances in neural information processing systems , vol. 32, 2019."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "V. Ramanujan, M. Wortsman, A. Kembhavi, A. Farhadi, and M. Rastegari, “What’s hidden in a randomly weighted neural network? in 2020 ieee,” in CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pp. 11890–11899, 2019."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "M. Gupta, S. Aravindan, A. Kalisz, V. Chandrasekhar, and J. Lin, “Learning to prune deep neural networks via reinforcement learning,” CoRR , vol. abs/2007.04756, 2020."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "J. Frankle, G. K. Dziugaite, D. Roy, and M. Carbin, “Pruning neural networks at initialization: Why are we missing the mark?,” in International Conference on Learning Representations , 2021."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "S. Liu, T. Chen, Z. Zhang, X. Chen, T. Huang, A. K. JAISWAL, and Z. Wang, “Sparsity may cry: Let us fail (current) sparse neural networks together!,” in The Eleventh International Conference on Learning Representations , 2023."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "A. Auger and B. Doerr, eds., Theory of Randomized Search Heuristics . World Scientific, 2011."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib22",
+      "text": "P. Chrabaszcz, I. Loshchilov, and F. Hutter, “Back to basics: benchmarking canonical evolution strategies for playing atari,” in Proceedings of the 27th International Joint Conference on Artificial Intelligence , IJCAI’18, p. 1419–1426, AAAI Press, 2018."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib23",
+      "text": "T. Elsken, J. H. Metzen, and F. Hutter, “Neural architecture search: A survey,” Journal of Machine Learning Research , vol. 20, no. 55, pp. 1–21, 2019."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib24",
+      "text": "H. Liu, K. Simonyan, O. Vinyals, C. Fernando, and K. Kavukcuoglu, “Hierarchical representations for efficient architecture search,” in International Conference on Learning Representations , 2018."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib25",
+      "text": "E. Real, S. Moore, A. Selle, S. Saxena, Y. L. Suematsu, J. Tan, Q. V. Le, and A. Kurakin, “Large-scale evolution of image classifiers,” in International conference on machine learning , pp. 2902–2911, PMLR, 2017."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib26",
+      "text": "A. Achille, M. Rovere, and S. Soatto, “Critical learning periods in deep networks,” in International Conference on Learning Representations , 2019."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib27",
+      "text": "G. Gur-Ari, D. A. Roberts, and E. Dyer, “Gradient descent happens in a tiny subspace,” arXiv preprint arXiv:1812.04754 , 2018."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib28",
+      "text": "A. S. Golatkar, A. Achille, and S. Soatto, “Time matters in regularizing deep networks: Weight decay and data augmentation affect early learning dynamics, matter little near convergence,” Advances in Neural Information Processing Systems , vol. 32, 2019."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib29",
+      "text": "J. Frankle, D. J. Schwab, and A. S. Morcos, “The early phase of neural network training,” in International Conference on Learning Representations , 2020."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib30",
+      "text": "D. Mishkin and J. Matas, “All you need is a good init,” arXiv preprint arXiv:1511.06422 , 2015."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib31",
+      "text": "Y. N. Dauphin and S. Schoenholz, “Metainit: Initializing learning by learning to initialize,” in Advances in Neural Information Processing Systems (H. Wallach, H. Larochelle, A. Beygelzimer, F. d Alché-Buc, E. Fox, and R. Garnett, eds.), vol. 32, Curran Associates, Inc., 2019."
+    }
+  ]
+}

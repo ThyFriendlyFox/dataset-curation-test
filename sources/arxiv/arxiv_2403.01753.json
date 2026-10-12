@@ -1,0 +1,148 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.01753",
+  "title": "Training-Free Pretrained Model Merging",
+  "authors": "Zhengqi Xu, Ke Yuan, Huiqiong Wang, Yong Wang, Mingli Song, Jie Song",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2403.01753",
+  "html_url": "https://arxiv.org/html/2403.01753",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 751,
+  "text": "Great success has been achieved on various challenging tasks in computer vision by using deep neural networks, and a plethora of deep neural networks are developed and released publicly, with either their architectures and trained parameters (e.g., Pytorch Hub, Hugging Hub). These off-the-shelf models are finely-tuned for a wide range of tasks, providing users with substantial convenience. However, these models are restricted to the tasks they were trained on, and this limitation poses significant challenges in terms of model storage [1,2] and computation as the parameters of models continue to grow rapidly.\n\nGiven the abundance of well-trained models across various tasks, numerous research studies propose the amalgamation of multiple models into a single model that possesses multiple functionalities simultaneously. The existing body of literature can be broadly classified into two schools: training-based knowledge amalgamation [4,5,6,7,8,9,10,11,12,13] and training-free model merging [14,15,16]. The former is inspired by knowledge distillation and adopts the outputs from multiple pretrained teachers to train a student model, which amalgamates the knowledge from multiple models into a single one. However, these methods usually require an additional expensive training process to facilitate the transfer of knowledge from the teacher models to the student model. In contrast, The latter fully utilize the parameters of the pretrained models to construct the multi-talent model, thereby avoiding additional training. The mainstream involves constructing multi-task models by adding task vectors, which are computed by subtracting the pre-trained model’s parameter values from those of the fine-tuned model, together. However, these methods can only merge fine-tuned models derived from the same pre-trained initialization, that is an extremely limited prerequisites. Emerging work w.r.t. unit matching [17,18,19] shows promise to breaking the extra-training and pre-training curse, which has already reached zero-loss barriers in single-task model merging. However, the permutation invariance [20], a cornerstone for most unit matching methods, seems not applicable to merge models from multiple tasks and leads to a poor artifact.\n\nIn this work, we have cast doubt upon the matched units identified by existing unit matching algorithms. Reviewing prior work, current unit matching methods either represent units using weights or activation values [21]. Nonetheless, using either weights or activation values as the matching criterion is incomplete. In terms of weights, the weight of a unit reflects its connection strength with the units in the previous layer, but it cannot capture the information of specific features (i.e. scale, offset) due to the absence of input data. As shown in Fig. 1, there are many pairs of units with highly similar weights but entirely different activation values, leading to a significant change in the function of their merged units. In terms of activations, it is compelling to measure units by their activations since two models must learn similar features to accomplish the same task [22], yet the same task can be achieved by distinct parameters [23]. Moreover, a phenomenon is shown in Fig. 1 that the best-merged unit is one whose parents simultaneously exhibits high similarity in both weight and activation.\n\nMotivated by this, we propose a concise and effective model merging framework, termed merging under dual-space constraints(MuDSC) to achieve a more precise matching of relevant units. Specifically, the proposed MuDSC constrains the matching algorithm to find more suitable matches by linearly combining the similarity matrix of representations of units in both activation space and weight space. For the sake of rigor, we provide a formula derivation to prove the equivalence of this approach with a linear combination of optimization objectives in separate spaces. Moreover, we devise a novel iterative algorithm that simultaneously maximize the global similarity of matched units in both weight space and activation space. In addition, we devise two variant of matching algorithms proposed in and [24] to support the use of unit matching in networks with a group structure i.e. ViT [25] and Group Normalization [26].\n\nIn summary, the key contributions of this paper are:\n\n- 1. We highlight the inconsistency of unit similarity in weight space and activation space, demonstrating through a straightforward experiment the impact of this inconsistency on model merging.\n\n- 2. To take into account this inconsistency, we propose a novel model merging framework MuDSC (Merging under Dual-Space Constraints) that encourages both the activation spaces and weight spaces between two models be of high similarity.\n\n- 3. We present a vigorous experimental study and show that MuDSC can significantly boost the merged performance in manifold multi-task scenarios for various architectures. Further loss landscape visualization verifies that our solution locates in the overlapping part with unified lower loss of each task.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib11",
+      "text": "Chris Fifty, Ehsan Amid, Zhe Zhao, Tianhe Yu, Rohan Anil, and Chelsea Finn. Efficiently identifying task groupings for multi-task learning. Advances in Neural Information Processing Systems , 34:27503–27516, 2021."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib63",
+      "text": "Yu Zhang and Qiang Yang. A survey on multi-task learning. IEEE Transactions on Knowledge and Data Engineering , 34(12):5586–5609, 2021."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib16",
+      "text": "Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. Deep residual learning for image recognition. In Proceedings of the IEEE conference on computer vision and pattern recognition , pages 770–778, 2016."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib37",
+      "text": "Chengchao Shen, Xinchao Wang, Jie Song, Li Sun, and Mingli Song. Amalgamating knowledge towards comprehensive classification. In Proceedings of the AAAI Conference on Artificial Intelligence , pages 3068–3075, 2019a."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib56",
+      "text": "Jingwen Ye, Yixin Ji, Xinchao Wang, Kairi Ou, Dapeng Tao, and Mingli Song. Student becoming the master: Knowledge amalgamation for joint scene parsing, depth estimation, and more. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 2829–2838, 2019a."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib30",
+      "text": "Sihui Luo, Xinchao Wang, Gongfan Fang, Yao Hu, Dapeng Tao, and Mingli Song. Knowledge amalgamation from heterogeneous networks by common feature learning. In Proceedings of the 28th International Joint Conference on Artificial Intelligence (IJCAI) , 2019."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib54",
+      "text": "Xingyi Yang, Jingwen Ye, and Xinchao Wang. Factorizing knowledge in neural networks. In European Conference on Computer Vision , pages 73–91. Springer, 2022a."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib31",
+      "text": "Sihui Luo, Wenwen Pan, Xinchao Wang, Dazhou Wang, Haihong Tang, and Mingli Song. Collaboration by competition: Self-coordinated knowledge amalgamation for multi-talent student learning. In European Conference on Computer Vision , 2020."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib45",
+      "text": "Jidapa Thadajarassiri, Thomas Hartvigsen, Xiangnan Kong, and Elke A Rundensteiner. Semi-supervised knowledge amalgamation for sequence classification. Proceedings of the AAAI Conference on Artificial Intelligence , 35(11):9859–9867, 2021."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib20",
+      "text": "Yongcheng Jing, Yiding Yang, Xinchao Wang, Mingli Song, and Dacheng Tao. Amalgamating knowledge from heterogeneous graph neural networks. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 2021."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib7",
+      "text": "Marcus de Carvalho, Mahardhika Pratama, Jie Zhang, and Yajuan Sun. Class-incremental learning via knowledge amalgamation. In Machine Learning and Knowledge Discovery in Databases , pages 36–50, Cham, 2023. Springer Nature Switzerland."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib14",
+      "text": "Shangde Gao, Yichao Fu, Ke Liu, and Yuqiang Han. Contrastive knowledge amalgamation for unsupervised image classification. In Artificial Neural Networks and Machine Learning – ICANN 2023 , pages 192–204, Cham, 2023. Springer Nature Switzerland."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib46",
+      "text": "Jidapa Thadajarassiri, Thomas Hartvigsen, Walter Gerych, Xiangnan Kong, and Elke Rundensteiner. Knowledge amalgamation for multi-label classification via label dependency transfer. 37:9980–9988, 2023."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib18",
+      "text": "Gabriel Ilharco, Marco Tulio Ribeiro, Mitchell Wortsman, Ludwig Schmidt, Hannaneh Hajishirzi, and Ali Farhadi. Editing models with task arithmetic. In The Eleventh International Conference on Learning Representations , 2023."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib52",
+      "text": "Prateek Yadav, Derek Tam, Leshem Choshen, Colin Raffel, and Mohit Bansal. Resolving interference when merging models. In NeurIPS , New Orleans, USA, 2023. Proceedings of Machine Learning Research."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib53",
+      "text": "Enneng Yang, Zhenyi Wang, Li Shen, Shiwei Liu, Guibing Guo, Xingwei Wang, and Dacheng Tao. Adamerging: Adaptive model merging for multi-task learning. arXiv preprint arXiv:2310.02575 , 2023."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib22",
+      "text": "Keller Jordan, Hanie Sedghi, Olga Saukh, Rahim Entezari, and Behnam Neyshabur. REPAIR: REnormalizing permuted activations for interpolation repair. In The Eleventh International Conference on Learning Representations , 2023."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib40",
+      "text": "Sidak Pal Singh and Martin Jaggi. Model fusion via optimal transport. Advances in Neural Information Processing Systems , 33, 2020a."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib44",
+      "text": "Norman Tatro, Pin-Yu Chen, Payel Das, Igor Melnyk, Prasanna Sattigeri, and Rongjie Lai. Optimizing mode connectivity via neuron alignment. Advances in Neural Information Processing Systems , 33:15300–15311, 2020."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib10",
+      "text": "Rahim Entezari, Hanie Sedghi, Olga Saukh, and Behnam Neyshabur. The role of permutation invariance in linear mode connectivity of neural networks. arXiv preprint arXiv:2110.06296 , 2021."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib27",
+      "text": "Weishi Li, Yong Peng, Miao Zhang, Liang Ding, Han Hu, and Li Shen. Deep model fusion: A survey. arXiv preprint arXiv:2309.15698 , 2023."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib28",
+      "text": "Yixuan Li, Jason Yosinski, Jeff Clune, Hod Lipson, and John Hopcroft. Convergent learning: Do different neural networks learn the same representations? arXiv preprint arXiv:1511.07543 , 2015."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib12",
+      "text": "Jonathan Frankle and Michael Carbin. The lottery ticket hypothesis: Finding sparse, trainable neural networks. arXiv preprint arXiv:1803.03635 , 2018."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib43",
+      "text": "George Stoica, Daniel Bolya, Jakob Bjorner, Taylor Hearn, and Judy Hoffman. Zipit! merging models from different tasks without training, 2023."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib9",
+      "text": "Alexey Dosovitskiy, Lucas Beyer, Alexander Kolesnikov, Dirk Weissenborn, Xiaohua Zhai, Thomas Unterthiner, Mostafa Dehghani, Matthias Minderer, Georg Heigold, Sylvain Gelly, Jakob Uszkoreit, and Neil Houlsby. An image is worth 16x16 words: Transformers for image recognition at scale. In International Conference on Learning Representations , 2021."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib50",
+      "text": "Yuxin Wu and Kaiming He. Group normalization. In Proceedings of the European Conference on Computer Vision (ECCV) , 2018."
+    }
+  ]
+}

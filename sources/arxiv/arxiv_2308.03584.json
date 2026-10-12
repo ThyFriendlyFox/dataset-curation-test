@@ -1,0 +1,58 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2308.03584",
+  "title": "A Polystore Architecture Using Knowledge Graphs to Support Queries on Heterogeneous Data Stores",
+  "authors": "Leonardo Guerreiro Azevedo, Renan Francisco Santos Souza, Elton F. de S. Soares, Raphael M. Thiago, Julio Cesar Cardoso Tesolin, Ann C. Oliveira, Marcio Ferreira Moreno",
+  "year": "2024",
+  "categories": [
+    "cs.DB"
+  ],
+  "url": "https://arxiv.org/abs/2308.03584",
+  "html_url": "https://arxiv.org/html/2308.03584",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1160,
+  "text": "Several modern applications manipulate diverse datasets with different models and usages, employing specific tools and techniques, e.g., applications in medical informatics, oceanography, metagenomics, and exploration and production phases in Oil & Gas [1].\n\nFor example, in an oil reserves discovery scenario, independent workflows process sizeable raw data files to generate training and validation datasets used by Deep Learning (DL) models, as illustrated in Figure 1. Although the workflows do not have direct relationships, they comprise several activities that consume and generate data from/to heterogeneous data stores in which data are not directly linked.\n\nThe first workflow processes geological raw data files to extract necessary metadata. It also assesses missing and displaced information as a measurement of metadata quality. While data files reside on a Parallel File System, the data quality score and extracted metadata are stored in a relational DBMS (R-DBMS). The second workflow considers the high-quality data files and generates geospatial indexes. This generated data is used to accelerate geospatial queries over the geological data and is stored in a document-oriented DBMS (Doc DBMS). The third workflow also considers the high-quality data files and augments the raw geodata files with extra knowledge informed by geoscience experts. This meta-information is stored in a Triplestore System (T-DBMS). Finally, the last workflow prepares the learning datasets used by DL algorithms. It queries the data from Doc DBMS and the related knowledge from the T-DBMS to generate datasets, which are stored as HDF5 files in the Parallel File System, ready to be used by DL algorithms.\n\nIn this scenario, the user is a Machine Learning (ML) expert with deep knowledge in the domain. When reporting the ML model, the user must query the data residing in the heterogeneous data stores. For instance, he/she should run a query to discover what are the geographic coordinates extracted from the SEG-Y file that is being used to produce training and validation files and the spatial resolution between slices in the seismic data. To answer this query, he/she has to inspect data residing on the file and the document database. Besides using specific tools to access both systems, the user should also know how the data is inter-related, i.e., which lines of the file relate to objects of the document database. These issues illustrate the challenges of handling such scenarios: (i) the access to heterogeneous data stores; (ii) the linkage of heterogeneous data residing in remote distinct data stores.\n\nThe research question addressed in our work can be shortly enunciated as How to query data that are not explicitly connected residing on heterogeneous data stores?\n\nSeveral data management solutions have emerged to handle heterogeneous data access, such as distributed file systems (e.g., GFS [2] and HDFS), NoSQL databases (e.g., MongoDB, AllegroGraph), new data processing frameworks (e.g., Spark), and hybrid multimodal (e.g., OrientDB) or hybrid NewSQL (e.g., LeanXcale). In general, each solution handles a few kinds of data models or formats and does not addresses the diverse datasets required by modern applications [3]. On the other hand, migrating the heterogeneous data to a single database and schema does not work. Data conversion and loading is a very costly and time-consuming task, which is difficult to justify, and it may involve the integration of disparate data (e.g., integration of structured data with text, web pages, semi-structured data, time series). Besides, no DBMS offers high performance in all kinds of data, i.e., one size does not fit all [4].\n\nTherefore, a middleware that provides a seamless interface with an independent data model and (perhaps) data schemes is required to access heterogeneous data stores [4]. A Multidatabase System (MDBS) (or federated data system) provides a software layer that runs on top of individual autonomous data systems (or data stores) that share portions of their data. The MDBS allows users to access the various databases in an integrated way. A polystore system, a kind of MDBS, provides integrated access to several data stores, such as NoSQL, RDBMS, or HDFS, sometimes through a data processing framework [5]. Nevertheless, there is still a lack of abstraction and query language to access heterogeneous data stores in an integrated way [4].\n\nTo answer our research question, we propose a federated data system architecture that not only encapsulates heterogeneous data sources but also uses provenance for data linkage, i.e., we create the explicit links by collecting the provenance of the workflow activities execution. Provenance contains information about the process and data used to derive the data product. We use causality as the kind of provenance information, which is the dependency relationships among data products and the processes that generate them, such as data-process dependencies and data dependencies [6]. So, the architecture provides an abstract layer to users to formulate queries based on a global conceptual schema, and, to be able to process the user query, it supports the creation of data mappings and record linkage transparent to service consumers. Its features are for: (i) Creation of global conceptual schema (the domain schema); (ii) Creation of local conceptual schemas for each external heterogeneous data store; (iii) Creation of mappings between global and local conceptual schemas; (iv) Creation of workflows’ provenance schema; (v) Instrumentation of the applications that run the workflows; (vi) Capture of provenance during workflows execution; (vii) Processing of user queries.\n\nWe demonstrate the proposed architecture through its implementation as a RESTful web service in a microservice architecture [7]. We devise models to represent the global conceptual schema, local conceptual schemas, and mappings among them besides provenance schema and execution. This information is stored in a Knowledge Graph created using Hyperknowledge (HK), a hybrid conceptual model able to handle the multitude of media content and the meaning behind this data [8]. In particular, we are using the context element of HK to encapsulate and modularize the models and ingested data.\n\nWe evaluate the architecture implementation in a scenario that simulates a real case in Oil & Gas industry depicted previously in this section. The evaluation considered query complexity from the user and system perspectives. For the former, we analyzed the query components (like keywords, involved entities), and for the latter, we analyzed query execution time. We analyzed the architecture through comparing it against PostgreSQL FDW (Foreign Data Wrapper). PostgreSQL is a widely used commercial open-source database management system and FDW is a module that allows access to external data stores using SQL language and wrappers. Our evaluation results demonstrated that while the query is more than two times less complex than the same written in SQL, the overhead created in query processing time is not greater than 30%. It indicates the applicability and utility of the architecture; although further investigations and improvements are required in query processing time.\n\nThe remainder of this work is divided as follows. Section 2 presents the background and justify our choices. Section 3 presents the proposed architecture. Section 4 presents the proposal implementation and its evaluation. Section 5 presents the related work. Section 6 presents the conclusion and proposals of future work.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bibx40",
+      "text": "[Souza et al., 2019] Souza, R., Azevedo, L. G., Thiago, R., Soares, E., Nery, M., Netto, M. A., Vital, E., Cerqueira, R., Valduriez, P., and Mattoso, M. (2019). Efficient runtime capture of multiworkflow data using provenance. In 2019 15th International Conference on eScience (eScience) , pages 359–368. IEEE. DOI: 10.1109/eScience.2019.00047."
+    },
+    {
+      "n": 2,
+      "id": "bib.bibx12",
+      "text": "[Ghemawat et al., 2003] Ghemawat, S., Gobioff, H., and Leung, S.-T. (2003). The google file system. In Proceedings of the nineteenth ACM symposium on Operating systems principles , pages 29–43. DOI: 10.1145/945445.945450."
+    },
+    {
+      "n": 3,
+      "id": "bib.bibx2",
+      "text": "[Azevedo et al., 2020] Azevedo, L. G., Soares, E. F. d. S., Souza, R., and Moreno, M. F. (2020). Modern federated database systems: An overview. In 22nd International Conference in Enterprise Information Systems (ICEIS) , pages 276–283. European Association of Geoscientists & Engineers. DOI: 10.5220/0009795402760283."
+    },
+    {
+      "n": 4,
+      "id": "bib.bibx41",
+      "text": "[Stonebraker, 2015] Stonebraker, M. (2015). The case for polystore. https://wp.sigmod.org/?p=1629 ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bibx31",
+      "text": "[Özsu and Valduriez, 2020] Özsu, M. T. and Valduriez, P. (2020). Principles of distributed database systems . Springer, 4th edition. DOI: 10.1007/978-3-030-26253-2."
+    },
+    {
+      "n": 6,
+      "id": "bib.bibx7",
+      "text": "[Davidson and Freire, 2008] Davidson, S. B. and Freire, J. (2008). Provenance and scientific workflows: challenges and opportunities. In Proceedings of the 2008 ACM SIGMOD international conference on Management of data , pages 1345–1350. DOI: 10.1145/1376616.1376772."
+    },
+    {
+      "n": 7,
+      "id": "bib.bibx36",
+      "text": "[Richardson and Ruby, 2008] Richardson, L. and Ruby, S. (2008). RESTful web services . O’Reilly Media, Inc."
+    },
+    {
+      "n": 8,
+      "id": "bib.bibx27",
+      "text": "[Moreno et al., 2017] Moreno, M. F., Brandao, R., and Cerqueira, R. (2017). Extending hypermedia conceptual models to support hyperknowledge specifications. International Journal of Semantic Computing , 11(01):43–64. DOI: 10.1142/S1793351X17400037."
+    }
+  ]
+}

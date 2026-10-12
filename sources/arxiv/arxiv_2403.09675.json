@@ -1,0 +1,149 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.09675",
+  "title": "Open-Universe Indoor Scene Generation using LLM Program Synthesis and Uncurated Object Databases",
+  "authors": "Rio Aguina-Kang, Maxim Gumin, Do Heon Han, Stewart Morris, Seung Jean Yoo, Aditya Ganeshan, R. Kenny Jones, Qiuhong Anna Wei, Kailiang Fu, Daniel Ritchie",
+  "year": "2024",
+  "categories": [
+    "cs.CV",
+    "cs.GR"
+  ],
+  "url": "https://arxiv.org/abs/2403.09675",
+  "html_url": "https://arxiv.org/html/2403.09675",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1090,
+  "text": "Many people spend a significant portion of their lives indoors: in their homes, workplaces, social gathering spaces, etc. Unsurprisingly, indoor environments also feature heavily in virtual depictions of the real world: in games, extended reality experiences, and architectural visualizations. Such virtual scenes have real-world uses, as well. For example, there are now a variety of free-to-use interior design tools online which allow users to explore virtual re-designs of their own real spaces [1,2,3]. In addition, furniture and home product retailers are increasingly using renderings of virtual scenes to stage and advertise their products, as the process of doing so is easier, less expensive, and more adaptable to different regions of the world than taking physical photographs [4]. Finally, virtual indoor scenes have become a critical data source for training autonomous embodied agents to perceive and navigate within typical indoor environments [5,6].\n\nGiven the importance of virtual indoor scenes to the above applications, computational design tools which ease their creation would be valuable. Generative models, i.e. systems which can sample novel scenes from a distribution of interest, are a particularly promising technology for this purpose. Such models can be used to suggest possible placements for new objects in a scene [7], suggest completions for partial scene designs [8], or even synthesize entirely new scenes from whole cloth [9,10,11]. These capabilities can be used to build tools for interactive design or for the automated creation of large-scale virtual worlds.\n\nThe prevailing methodology for building generative models of indoor scenes is to train machine learning models on datasets of existing 3D room layouts. It is time-consuming and expensive to produce such datasets at the scale required by modern machine learning methods; as such, only a handful of these datasets exist [12,13]. These existing datasets contain room labeled from a finite set of room types (e.g. bedrooms, living rooms, offices), and each room is populated with objects from a curated set of 3D object models belonging to a small finite set of object categories (e.g. tables, chairs, beds). We can think of generative models trained on these datasets as being closed-universe: they know up-front the small, finite set of object and room types that they will ever have to produce.\n\nCould one create an open-universe generative model which can synthesize any type of indoor scene containing whatever types of objects are needed by that scene? It has only recently become possible to contemplate this question with the development of so-called “foundation models”: large machine learning models pre-trained on enormous datasets of text and/or images [14,15,16,17]. For example, prior work has shown how to use pre-trained text-to-image generative models to synthesize 3D content which satisfies an arbitrary text prompt [18,19,20,21]. While these systems are compelling, they produce output in the form of a single unstructured mesh or density/radiance field; these representations frequently exhibit artifacts and do not easily support editing a scene by moving, swapping, or deleting objects. In contrast, most prior methods for indoor scene synthesis produce a layout of individual objects, each of which is represented by a high-quality 3D mesh retrieved from a database.\n\nIn this paper, we present an open-universe generative model of 3D indoor scenes which produces such structured object layouts in response to a text prompt (Fig. 1). Building such a system requires solving several subproblems. First, the system must determine the objects that should be in the scene and where they should be located. To solve this problem, we leverage the commonsense world knowledge encoded by a pre-trained large language model (LLM) [14]. Empirically, we find that tasking an LLM with directly specifying the locations of scene objects leads to poor performance, likely due to the mismatch between metric location coordinates and the vast majority of natural language text contained in its training corpus. Instead, we task the LLM with producing a declarative program in a domain-specific language that describes the objects in the scene and a variety of spatial relation constraints between them. Executing these programs produces a constraint satisfaction problem which the system solves using a gradient-based optimizer to find one or more object layouts which satisfy the specified constraints.\n\nOnce the layout of objects is determined, the system must next insert a 3D mesh for each object in the layout. One could consider using text-to-3D generative models to synthesize these meshes [22,23,20], but as mentioned above, these models can exhibit artifacts and do not (yet) produce outputs with comparable quality to human-created 3D meshes. Thus, like prior work on indoor scene synthesis, our system retrieves 3D meshes from a 3D object database. However, unlike prior work, our object retrieval system is designed for the open-universe setting: retrieving from million-scale databases of unlabeled, inconsistently-oriented 3D meshes [24,25]. We develop a ranking and filtering algorithm using a combination of pre-trained models [14,26] to retrieve a 3D mesh which matches the attributes of an object specified in the object layout. We also leverage these models to automatically determine the front-facing direction of each retrieved object, allowing the system to correctly orient each retrieved object as specified in the layout.\n\nWe evaluate our system by using it to generate a large variety of different types of rooms, ranging from common indoor spaces (e.g. “a bedroom”) to rooms designed for specific activities (e.g. “a musician’s practice room”) to outlandish/fantastical scenes (e.g. “a wizard’s lair”). For generating typical indoor rooms, we compare to prior methods for closed-universe scene synthesis which are trained on existing 3D scene datasets. Our system produces scenes which are preferred to those generated by these prior methods in a forced-choice perceptual study. For open-universe scene synthesis, we compare to LayoutGPT, a recently-published method for generating layouts using large language models. Our system also outperforms it in forced choice perceptual study. We also conduct ablation studies on each component of our system to validate our design decisions.\n\nIn summary, our contributions are:\n\n- (i) A DSL for specifying indoor scene layouts through declarative constraints and a gradient-based executor for this DSL capable of realizing a distribution of valid scenes from a single program\n\n- (ii) A robust prompting workflow that leverages LLMs to synthesize programs in our DSL from a high-level natural language description of a scene\n\n- (iii) A pipeline using pretrained vision-language models for retrieving and orienting 3D meshes from a large, unannotated database to fit object specifications from a scene program\n\n- (iv) Protocols for evaluating open-universe indoor synthesis systems, including a benchmark set of input descriptions covering a wide variety of possible rooms.\n\nOur code will be made available as open source upon publication.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib45",
+      "text": "Planner5d (2024) Planner5d. 2024. Planner5d: House Design Software. https://planner5d.com . Accessed: 2024-01-19."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib53",
+      "text": "RoomSketcher (2024) RoomSketcher. 2024. Create Floor Plans and Home Designs Online. http://www.roomsketcher.com . Accessed: 2024-01-19."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib61",
+      "text": "Target (2024) Target. 2024. Home Planner. https://www.target.com/room-planner/home . Accessed: 2024-01-19."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib26",
+      "text": "Hobbs (2024) Jordan Hobbs. 2024. Why IKEA Uses 3D Renders vs. Photography for Their Furniture Catalog. https://www.cadcrowd.com/blog/why-ikea-uses-3d-renders-vs-photography-for-their-furniture-catalog/ . Accessed: 2024-01-19."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib13",
+      "text": "Deitke et al . (2022b) Matt Deitke, Eli VanderBilt, Alvaro Herrasti, Luca Weihs, Kiana Ehsani, Jordi Salvador, Winson Han, Eric Kolve, Aniruddha Kembhavi, and Roozbeh Mottaghi. 2022b. ProcTHOR: Large-Scale Embodied AI Using Procedural Generation. In Advances in Neural Information Processing Systems , S. Koyejo, S. Mohamed, A. Agarwal, D. Belgrave, K. Cho, and A. Oh (Eds.), Vol. 35. Curran Associates, Inc., 5982–5994. https://proceedings.neurips.cc/paper_files/paper/2022/file/27c546ab1e4f1d7d638e6a8dfbad9a07-Paper-Conference.pdf"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib47",
+      "text": "Puig et al . (2023) Xavi Puig, Eric Undersander, Andrew Szot, Mikael Dallaire Cote, Ruslan Partsey, Jimmy Yang, Ruta Desai, Alexander William Clegg, Michal Hlavac, Tiffany Min, Theo Gervet, Vladimir Vondrus, Vincent-Pierre Berges, John Turner, Oleksandr Maksymets, Zsolt Kira, Mrinal Kalakrishnan, Jitendra Malik, Devendra Singh Chaplot, Unnat Jain, Dhruv Batra, Akshara Rai, and Roozbeh Mottaghi. 2023. Habitat 3.0: A Co-Habitat for Humans, Avatars and Robots."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib78",
+      "text": "Zhou et al . (2019) Yang Zhou, Zachary While, and Evangelos Kalogerakis. 2019. SceneGraphNet: Neural Message Passing for 3D Indoor Scene Augmentation. In IEEE Conference on Computer Vision (ICCV) ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib50",
+      "text": "Ritchie et al . (2019) Daniel Ritchie, Kai Wang, and Yu an Lin. 2019. Fast and Flexible Indoor Scene Synthesis via Deep Convolutional Generative Models. In CVPR 2019 ."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib44",
+      "text": "Paschalidou et al . (2021) Despoina Paschalidou, Amlan Kar, Maria Shugrina, Karsten Kreis, Andreas Geiger, and Sanja Fidler. 2021. ATISS: Autoregressive Transformers for Indoor Scene Synthesis. In Advances in Neural Information Processing Systems (NeurIPS) ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib60",
+      "text": "Tang et al . (2023) Jiapeng Tang, Nie Yinyu, Markhasin Lev, Dai Angela, Thies Justus, and Matthias Nießner. 2023. DiffuScene: Scene Graph Denoising Diffusion Probabilistic Model for Generative Indoor Scene Synthesis. In arxiv ."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib21",
+      "text": "Gao et al . (2023b) Lin Gao, Jia-Mu Sun, Kaichun Mo, Yu-Kun Lai, Leonidas J. Guibas, and Jie Yang. 2023b. SceneHGN: Hierarchical Graph Networks for 3D Indoor Scene Generation with Fine-Grained Geometry. IEEE Transactions on Pattern Analysis and Machine Intelligence (2023), 1–18. https://doi.org/10.1109/TPAMI.2023.3237577"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib18",
+      "text": "Fu et al . (2021) Huan Fu, Bowen Cai, Lin Gao, Ling-Xiao Zhang, Jiaming Wang, Cao Li, Qixun Zeng, Chengyue Sun, Rongfei Jia, Binqiang Zhao, et al . 2021. 3d-front: 3d furnished rooms with layouts and semantics. In Proceedings of the IEEE/CVF International Conference on Computer Vision . 10933–10942."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib69",
+      "text": "Yadav et al . (2023) Karmesh Yadav, Ram Ramrakhya, Santhosh Kumar Ramakrishnan, Theo Gervet, John Turner, Aaron Gokaslan, Noah Maestre, Angel Xuan Chang, Dhruv Batra, Manolis Savva, Alexander William Clegg, and Devendra Singh Chaplot. 2023. Habitat-Matterport 3D Semantics Dataset. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) . 4927–4936."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib22",
+      "text": "GPT-4 (2023) OpenAI GPT-4. 2023. GPT-4 Technical Report. arXiv:2303.08774 [cs.CL]"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib49",
+      "text": "Radford et al . (2021) Alec Radford, Jong Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry, Amanda Askell, Pamela Mishkin, Jack Clark, Gretchen Krueger, and Ilya Sutskever. 2021. Learning Transferable Visual Models From Natural Language Supervision. In Proceedings of the 38th International Conference on Machine Learning (Proceedings of Machine Learning Research, Vol. 139) , Marina Meila and Tong Zhang (Eds.). PMLR, 8748–8763."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib51",
+      "text": "Rombach et al . (2021) Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, and Björn Ommer. 2021. High-Resolution Image Synthesis with Latent Diffusion Models. arXiv:2112.10752 [cs.CV]"
+    },
+    {
+      "n": 17,
+      "id": "bib.bib42",
+      "text": "Mizrahi et al . (2023) David Mizrahi, Roman Bachmann, Oguzhan Fatih Kar, Teresa Yeo, Mingfei Gao, Afshin Dehghan, and Amir Zamir. 2023. 4M: Massively Multimodal Masked Modeling. In Thirty-seventh Conference on Neural Information Processing Systems . https://openreview.net/forum?id=TegmlsD8oQ"
+    },
+    {
+      "n": 18,
+      "id": "bib.bib27",
+      "text": "Höllein et al . (2023) Lukas Höllein, Ang Cao, Andrew Owens, Justin Johnson, and Matthias Nießner. 2023. Text2Room: Extracting Textured 3D Meshes from 2D Text-to-Image Models. In Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV) . 7909–7920."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib30",
+      "text": "Jain et al . (2022) Ajay Jain, Ben Mildenhall, Jonathan T. Barron, Pieter Abbeel, and Ben Poole. 2022. Zero-Shot Text-Guided Object Generation with Dream Fields. (2022)."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib46",
+      "text": "Poole et al . (2022) Ben Poole, Ajay Jain, Jonathan T. Barron, and Ben Mildenhall. 2022. DreamFusion: Text-to-3D using 2D Diffusion. arXiv (2022)."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib72",
+      "text": "Yi et al . (2023) Taoran Yi, Jiemin Fang, Junjie Wang, Guanjun Wu, Lingxi Xie, Xiaopeng Zhang, Wenyu Liu, Qi Tian, and Xinggang Wang. 2023. GaussianDreamer: Fast Generation from Text to 3D Gaussians by Bridging 2D and 3D Diffusion Models. arXiv preprint arXiv:2310.08529 (2023)."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib31",
+      "text": "Jun and Nichol (2023) Heewoo Jun and Alex Nichol. 2023. Shap-E: Generating Conditional 3D Implicit Functions. arXiv:2305.02463 [cs.CV]"
+    },
+    {
+      "n": 23,
+      "id": "bib.bib43",
+      "text": "Nichol et al . (2022) Alex Nichol, Heewoo Jun, Prafulla Dhariwal, Pamela Mishkin, and Mark Chen. 2022. Point-E: A System for Generating 3D Point Clouds from Complex Prompts. arXiv:2212.08751 [cs.CV]"
+    },
+    {
+      "n": 24,
+      "id": "bib.bib12",
+      "text": "Deitke et al . (2022a) Matt Deitke, Dustin Schwenk, Jordi Salvador, Luca Weihs, Oscar Michel, Eli VanderBilt, Ludwig Schmidt, Kiana Ehsani, Aniruddha Kembhavi, and Ali Farhadi. 2022a. Objaverse: A Universe of Annotated 3D Objects. arXiv preprint arXiv:2212.08051 (2022)."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib11",
+      "text": "Deitke et al . (2023) Matt Deitke, Ruoshi Liu, Matthew Wallingford, Huong Ngo, Oscar Michel, Aditya Kusupati, Alan Fan, Christian Laforte, Vikram Voleti, Samir Yitzhak Gadre, Eli VanderBilt, Aniruddha Kembhavi, Carl Vondrick, Georgia Gkioxari, Kiana Ehsani, Ludwig Schmidt, and Ali Farhadi. 2023. Objaverse-XL: A Universe of 10M+ 3D Objects. arXiv preprint arXiv:2307.05663 (2023)."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib74",
+      "text": "Zhai et al . (2023a) Xiaohua Zhai, Basil Mustafa, Alexander Kolesnikov, and Lucas Beyer. 2023a. Sigmoid Loss for Language Image Pre-Training. In Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV) . 11975–11986."
+    }
+  ]
+}

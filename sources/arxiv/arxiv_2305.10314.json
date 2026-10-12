@@ -1,0 +1,95 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2305.10314",
+  "title": "LeTI: Learning to Generate from Textual Interactions",
+  "authors": "Xingyao Wang, Hao Peng, Reyhaneh Jabbarvand, Heng Ji",
+  "year": "2024",
+  "categories": [
+    "cs.CL",
+    "cs.AI",
+    "cs.SE"
+  ],
+  "url": "https://arxiv.org/abs/2305.10314",
+  "html_url": "https://arxiv.org/html/2305.10314",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 633,
+  "text": "Large-scale language models have fundamentally shifted the paradigms of natural language processing (NLP). Based on LMs pre-trained on raw text, subsequent fine-tuning stages have proven crucial to enhance their capabilities in solving benchmark NLP tasks and generating texts that align with human preferences. Success has been achieved by fine-tuning with direct training signals that measure whether the model, e.g., classifies the input into the right category [2], answers a question correctly [3,4], summarizes documents well [5,6], and generates outputs that align with human preferences [7,8]. We hypothesize that LMs can harness the much richer training signals from textual interactions with the environment (e.g., a human or a Python interpreter) that not only check the correctness of LM’s outputs but also pinpoint the errors and explain why.\n\nWe propose LETI, a new LM fine-tuning paradigm that aims to explore LMs’ potential to le arn from nuanced t extual i nteractions. We evaluate LETI on code generation tasks, where the LM is supposed to generate code pieces to solve tasks described in natural language. This setting invites a natural and scalable way to acquire automatic interactive textual feedback: the stack traces and error message outputs by established programming language (PL) tools such as a Python interpreter. LETI ’s improvement process naturally mirrors a typical software development cycle: a human developer writes an initial program, executes it, and improves the program based on feedback obtained from the programming environment until a satisfying solution is found (e.g., successfully executed with no error); Furthermore, the human developer learns from mistakes in this process and becomes a (slightly) better developer who can avoid similar mistakes in the future. Similarly to the human development process, we provide empirical evidence that LETI can learn from past mistakes and avoid similar errors in § 3.2.\n\nIn LETI, a base LM pre-trained on both natural language and code is asked to generate a piece of program conditioning on the natural language instruction, which is then tested on a suite of test cases. LETI fine-tunes the model on a concatenation of natural language instruction, LM-generated program, and the textual feedback (e.g., stack traces and error messages) that pinpoints the bug, which is only provided when the generated program fails to solve the task. In addition to textual feedback, we prepend the fine-tuning sequences with a reward token (i.e., binary feedback), which differs for correct (<|good|>) and buggy solutions (<|bad|>), to encourage the LM to generate correct solutions when conditioning on <|good|>. LETI repeats this procedure for multiple rounds. During this iterative process, LETI assumes no instruction-code paired data.\n\nWe find that LETI improves LM’s performance on code generation tasks in MBPP [1] without using any ground-truth code. Specifically, it generates 63.2\\% more syntactically correct and executable code (on the 2B LM) compared to the pre-trained model without any commonly employed post-processing heuristics. When post-processing is applied, LETI (2B) improves performance and eliminates most NameError issues that occur when a variable or function is not defined (from 10% to 1% on the 2B LM) in two iterations. The optimized LM also shows generalized performance improvement on another code generation dataset HumanEval [13] (§ 3.2). Such improvement in in-domain tasks does not come at the cost of the capability of the original LM (e.g., reasoning and chain-of-thought capability [14]) due to LETI ’s auxiliary objective that continuing pre-train (§ 3.4).\n\nWe observe that textual feedback is advantageous in terms of improving the LM compared to baselines that only use binary feedback, as it offers enhanced performance and greater sample efficiency that only requires about half of the gradient steps to reach the same performance for the 2B-scale model (§ 3.3). Furthermore, we find LETI is equally applicable to NLP tasks (e.g., event argument extraction [15]) when they can be formulated as code generation problems (§ 3.5).",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "Austin et al. (2021) Jacob Austin, Augustus Odena, Maxwell Nye, Maarten Bosma, Henryk Michalewski, David Dohan, Ellen Jiang, Carrie J. Cai, Michael Terry, Quoc V. Le, and Charles Sutton. 2021. Program synthesis with large language models. ArXiv , abs/2108.07732."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib10",
+      "text": "Devlin et al. (2019) Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. 2019. Bert: Pre-training of deep bidirectional transformers for language understanding. pages 4171–4186."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib22",
+      "text": "Li et al. (2017) Jiwei Li, Alexander H. Miller, Sumit Chopra, Marc’Aurelio Ranzato, and Jason Weston. 2017. Dialogue learning with human-in-the-loop . In International Conference on Learning Representations ."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib31",
+      "text": "Ramamurthy et al. (2022) Rajkumar Ramamurthy, Prithviraj Ammanabrolu, Kianté Brantley, Jack Hessel, Rafet Sifa, Christian Bauckhage, Hannaneh Hajishirzi, and Yejin Choi. 2022. Is reinforcement learning (not) for natural language processing?: Benchmarks, baselines, and building blocks for natural language policy optimization. ArXiv , abs/2210.01241."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib32",
+      "text": "Stiennon et al. (2020) Nisan Stiennon, Long Ouyang, Jeffrey Wu, Daniel Ziegler, Ryan Lowe, Chelsea Voss, Alec Radford, Dario Amodei, and Paul F Christiano. 2020. Learning to summarize with human feedback. Advances in Neural Information Processing Systems , 33:3008–3021."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib43",
+      "text": "Wu et al. (2021) Jeff Wu, Long Ouyang, Daniel M. Ziegler, Nissan Stiennon, Ryan Lowe, Jan Leike, and Paul Francis Christiano. 2021. Recursively summarizing books with human feedback. ArXiv , abs/2109.10862."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib30",
+      "text": "Ouyang et al. (2022) Long Ouyang, Jeffrey Wu, Xu Jiang, Diogo Almeida, Carroll Wainwright, Pamela Mishkin, Chong Zhang, Sandhini Agarwal, Katarina Slama, Alex Ray, et al. 2022. Training language models to follow instructions with human feedback. Advances in Neural Information Processing Systems , 35:27730–27744."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib20",
+      "text": "Korbak et al. (2023) Tomasz Korbak, Kejian Shi, Angelica Chen, Rasika Bhalerao, Christopher L. Buckley, Jason Phang, Sam Bowman, and Ethan Perez. 2023. Pretraining language models with human preferences. ArXiv , abs/2302.08582."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib2",
+      "text": "Brown et al. (2020) Tom Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared D Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, et al. 2020. Language models are few-shot learners. Advances in neural information processing systems , 33:1877–1901."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib29",
+      "text": "OpenAI (2023) OpenAI. 2023. Gpt-4 technical report. ArXiv , abs/2303.08774."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib8",
+      "text": "Chowdhery et al. (2022) Aakanksha Chowdhery, Sharan Narang, Jacob Devlin, Maarten Bosma, Gaurav Mishra, Adam Roberts, Paul Barham, Hyung Won Chung, Charles Sutton, Sebastian Gehrmann, et al. 2022. Palm: Scaling language modeling with pathways. arXiv preprint arXiv:2204.02311 ."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib35",
+      "text": "Touvron et al. (2023a) Hugo Touvron, Thibaut Lavril, Gautier Izacard, Xavier Martinet, Marie-Anne Lachaux, Timothée Lacroix, Baptiste Rozière, Naman Goyal, Eric Hambro, Faisal Azhar, Aur’elien Rodriguez, Armand Joulin, Edouard Grave, and Guillaume Lample. 2023a. Llama: Open and efficient foundation language models. ArXiv , abs/2302.13971."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib6",
+      "text": "Chen et al. (2021b) Mark Chen, Jerry Tworek, Heewoo Jun, Qiming Yuan, Henrique Ponde de Oliveira Pinto, Jared Kaplan, Harri Edwards, Yuri Burda, Nicholas Joseph, Greg Brockman, et al. 2021b. Evaluating large language models trained on code. arXiv preprint arXiv:2107.03374 ."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib40",
+      "text": "Wei et al. (2022) Jason Wei, Xuezhi Wang, Dale Schuurmans, Maarten Bosma, brian ichter, Fei Xia, Ed H. Chi, Quoc V Le, and Denny Zhou. 2022. Chain of thought prompting elicits reasoning in large language models . In Advances in Neural Information Processing Systems ."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib38",
+      "text": "Wang et al. (2023a) Xingyao Wang, Sha Li, and Heng Ji. 2023a. Code4struct: Code generation for few-shot event structure prediction . In Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), ACL 2023, Toronto, Canada, July 9-14, 2023 , pages 3640–3663. Association for Computational Linguistics."
+    }
+  ]
+}

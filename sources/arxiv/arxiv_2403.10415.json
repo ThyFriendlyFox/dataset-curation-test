@@ -1,0 +1,223 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.10415",
+  "title": "Gradient based Feature Attribution in Explainable AI: A Technical Review",
+  "authors": "Yongjie Wang, Tong Zhang, Xu Guo, Zhiqi Shen",
+  "year": "2024",
+  "categories": [
+    "cs.AI"
+  ],
+  "url": "https://arxiv.org/abs/2403.10415",
+  "html_url": "https://arxiv.org/html/2403.10415",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 888,
+  "text": "Nowadays, we are witnessing a remarkable surge of neural network models across various fields, e.g., computer version [1,2,3], natural language processing [4,5,6], robotics [7,8], and healthcare [9,10]. Due to their opaque decision-making processes, AI models may exhibit biases toward ethnic minorities or make unexpected and potentially catastrophic errors. For example, ProPublica reported that the COMPAS justice system is biased towards African-American defendants by predicting a higher likelihood of their reoffending [11]. [12] [12] observed that the model discriminates between wolves and husky dogs with the existence of snow in the background. Therefore, there is an urgent need to elucidate the inner processes, understand the decision-making mechanisms, and enhance user trust of AI systems.\n\nExplainable AI (XAI) refers to a series of techniques designed to reason and understand model behaviors, provide insights to rectify model errors/biases, and ultimately enable users to accept and trust in model’s prediction. Following the taxonomy by [13] [13], shown as Figure 1, XAI can be categorized into the following aspects: ante-hoc explanation and post-hoc explanation. Ante-hoc explanation strives to develop transparent models that users can directly comprehend without the need for additional explanation tools, e.g., decision tree [14] and decision rule [15]. Post-hoc explanation aims to explain a trained black-box model by exploiting the relationship between input features and model predictions. Post-hoc explanations can be further classified into model explanation [16,17], outcome explanation [12,18], and model inspection [19,20]. Model explanation involves approximating the overall logic of a black-box model using an interpretable and transparent model at a global level. Outcome explanation focuses on exploring the underlying reasons for a specific prediction at a local level. Model inspection aims to offer visual and textual representations to facilitate understanding of the working mechanism of the model.\n\nTwo approaches are commonly employed in outcome explanation: feature attribution (also referred to as feature importance approach) and counterfactual explanation. Feature attribution delves into directly identifying the importance of input features to the model’s output while counterfactual explanation explores minimal and meaningful perturbations in the input space, to answer what changes in input values might affect the model’s prediction. For a more in-depth exploration of the connections between both approaches, we refer readers to [21] [21].\n\n## 1.1. Purpose of This Survey\n\nAs there is no universal and rigorous definition of XAI, a plethora of research related to explainability, interpretability, transparency, and other related concepts fall within the XAI field. A search for the keywords “explainable AI” on Google Scholar yields more than 200,000 results, presenting a formidable challenge to comprehensively elucidate all facets of XAI within a single publication. Although there have been many survey papers or book chapters [22,23,24,25,26,27,13,28,29,30,31] on XAI, most of them give a brief description and demonstrate few early-stage works for a specific subfield of XAI such as gradient based feature attribution. The under-exploration of the specific subfield motivates us to comprehensively overview recent progress on gradient based explanations. Previous surveys aim to help practitioners quickly grasp various facets of XAI, whereas our survey paper delves into algorithmic details of gradient based explanation methods. By doing so, our objective is to assist researchers in applying the appropriate approach in more applications and fostering innovative breakthroughs in the narrow field.\n\nBased on different methodological approaches, feature attribution contains the following branches of research: perturbation based methods [32,33,34], surrogate based methods [12,35], decomposition based methods [36,37,38,39] and gradient-based methods [40,18,41]. However, in this paper, our focus is on gradient-based methods, driven by the following considerations.\n\n- • Instinct of gradients. Gradients quantify how infinitesimal changes in input features impact the model predictions. Therefore, we can leverage gradients and their variants to effectively analyze the influence of feature modifications on the outcomes predicted by the model.\n\n- • Seamless integration for neural networks. Neural networks have gained great popularity and impressive performance across various domains. After model training, gradients can be readily obtained through a backward pass. Therefore, gradient based explanations are straightforward to explain the neural networks without necessitating any changes to the models themselves.\n\n- • Satisfaction of axiomatic properties. Due to the absence of ground truth, feature attribution methods may produce different explanations, leading to challenges in determining which one to trust. Gradient based explanations are intentionally designed to satisfy certain axiomatic principles, such as sensitivity and completeness, ensuring to produce reasonable and desired explanations.\n\n## 1.2. Our Contributions\n\nThe contributions of our survey are summarized as follows:\n\n- • We propose a novel taxonomy that systematically categorizes gradient based feature attribution into four groups. Subsequently, we introduce the gist of research motivation and technique detail for algorithms in each group.\n\n- • We comprehensively overview a series of widely accepted evaluation metrics, including human evaluation and objective metrics, enabling a quantitative and qualitative comparison of the performance of various explanation methods.\n\n- • We summarize both general research challenges in XAI and specific challenges unique to gradient based explanations, which could nourish and build a foundation for potential improvements in future work.\n\n## 1.3. Research outline\n\nIn the rest of this paper, Section 2 introduces philosophy and algorithm details of gradient based feature attribution; Section 3 represents evaluation metrics of gradient based explanations, which is also applicable to other feature attribution methods; Section 4 describes the major concerns and challenges that may motivate further work in gradient based explanations; Section 5 draws the conclusion.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib29",
+      "text": "He et al . (2016) Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. 2016. Deep residual learning for image recognition. In Proceedings of the IEEE conference on computer vision and pattern recognition . 770–778."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib44",
+      "text": "Krizhevsky et al . (2012) Alex Krizhevsky, Ilya Sutskever, and Geoffrey E Hinton. 2012. Imagenet classification with deep convolutional neural networks. In Advances in neural information processing systems . 1097–1105."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib55",
+      "text": "Liu et al . (2022) Ze Liu, Han Hu, Yutong Lin, Zhuliang Yao, Zhenda Xie, Yixuan Wei, Jia Ning, Yue Cao, Zheng Zhang, Li Dong, et al . 2022. Swin transformer v2: Scaling up capacity and resolution. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition . 12009–12019."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib11",
+      "text": "Brown et al . (2020) Tom B Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, et al . 2020. Language models are few-shot learners. arXiv preprint arXiv:2005.14165 (2020)."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib54",
+      "text": "Liu et al . (2019) Yinhan Liu, Myle Ott, Naman Goyal, Jingfei Du, Mandar Joshi, Danqi Chen, Omer Levy, Mike Lewis, Luke Zettlemoyer, and Veselin Stoyanov. 2019. Roberta: A robustly optimized bert pretraining approach. arXiv preprint arXiv:1907.11692 (2019)."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib98",
+      "text": "Zhang et al . (2022) Tong Zhang, Yong Liu, Boyang Li, Zhiwei Zeng, Pengwei Wang, Yuan You, Chunyan Miao, and Lizhen Cui. 2022. History-Aware Hierarchical Transformer for Multi-session Open-domain Dialogue System. In Findings of the Association for Computational Linguistics: EMNLP 2022 , Yoav Goldberg, Zornitsa Kozareva, and Yue Zhang (Eds.). Association for Computational Linguistics, Abu Dhabi, United Arab Emirates, 3395–3407. https://doi.org/10.18653/v1/2022.findings-emnlp.247"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib10",
+      "text": "Bousmalis et al . (2023) Konstantinos Bousmalis, Giulia Vezzani, Dushyant Rao, Coline Devin, Alex X Lee, Maria Bauza, Todor Davchev, Yuxiang Zhou, Agrim Gupta, Akhil Raju, et al . 2023. RoboCat: A Self-Improving Foundation Agent for Robotic Manipulation. arXiv preprint arXiv:2306.11706 (2023)."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib48",
+      "text": "Lenz et al . (2015) Ian Lenz, Honglak Lee, and Ashutosh Saxena. 2015. Deep learning for detecting robotic grasps. The International Journal of Robotics Research 34, 4-5 (2015), 705–724."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib37",
+      "text": "Jumper et al . (2021) John Jumper, Richard Evans, Alexander Pritzel, Tim Green, Michael Figurnov, Olaf Ronneberger, Kathryn Tunyasuvunakool, Russ Bates, Augustin Žídek, Anna Potapenko, et al . 2021. Highly accurate protein structure prediction with AlphaFold. Nature 596, 7873 (2021), 583–589."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib76",
+      "text": "Senior et al . (2020) Andrew W Senior, Richard Evans, John Jumper, James Kirkpatrick, Laurent Sifre, Tim Green, Chongli Qin, Augustin Žídek, Alexander WR Nelson, Alex Bridgland, et al . 2020. Improved protein structure prediction using potentials from deep learning. Nature 577, 7792 (2020), 706–710."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib36",
+      "text": "Jeff Larson and Angwin (2016) Lauren Kirchner Jeff Larson, Surya Mattu and Julia Angwin. 2016. How We Analyzed the COMPAS Recidivism Algorithm. https://www.propublica.org/article/how-we-analyzed-the-compas-recidivism-algorithm"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib71",
+      "text": "Ribeiro et al . (2016) Marco Tulio Ribeiro, Sameer Singh, and Carlos Guestrin. 2016. \" Why should i trust you?\" Explaining the predictions of any classifier. In Proceedings of the 22nd ACM SIGKDD international conference on knowledge discovery and data mining . 1135–1144."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib27",
+      "text": "Guidotti et al . (2018b) Riccardo Guidotti, Anna Monreale, Salvatore Ruggieri, Franco Turini, Fosca Giannotti, and Dino Pedreschi. 2018b. A survey of methods for explaining black box models. ACM computing surveys (CSUR) 51, 5 (2018), 1–42."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib70",
+      "text": "Quinlan (1986) J. Ross Quinlan. 1986. Induction of decision trees. Machine learning 1, 1 (1986), 81–106."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib32",
+      "text": "Holte (1993) Robert C Holte. 1993. Very simple classification rules perform well on most commonly used datasets. Machine learning 11, 1 (1993), 63–90."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib14",
+      "text": "Dhurandhar et al . (2018) Amit Dhurandhar, Karthikeyan Shanmugam, Ronny Luss, and Peder A Olsen. 2018. Improving simple models with confidence profiles. Advances in Neural Information Processing Systems 31 (2018)."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib46",
+      "text": "Lakkaraju et al . (2019) Himabindu Lakkaraju, Ece Kamar, Rich Caruana, and Jure Leskovec. 2019. Faithful and customizable explanations of black box models. In Proceedings of the 2019 AAAI/ACM Conference on AI, Ethics, and Society . 131–138."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib85",
+      "text": "Sundararajan et al . (2017) Mukund Sundararajan, Ankur Taly, and Qiqi Yan. 2017. Axiomatic attribution for deep networks. In Proceedings of the 34th International Conference on Machine Learning-Volume 70 . JMLR. org, 3319–3328."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "Friedman (2001) Jerome H Friedman. 2001. Greedy function approximation: a gradient boosting machine. Annals of statistics (2001), 1189–1232."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib24",
+      "text": "Goldstein et al . (2015) Alex Goldstein, Adam Kapelner, Justin Bleich, and Emil Pitkin. 2015. Peeking inside the black box: Visualizing statistical learning with plots of individual conditional expectation. journal of Computational and Graphical Statistics 24, 1 (2015), 44–65."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib43",
+      "text": "Kommiya Mothilal et al . (2021) Ramaravind Kommiya Mothilal, Divyat Mahajan, Chenhao Tan, and Amit Sharma. 2021. Towards unifying feature attribution and counterfactual explanations: Different means to the same end. In Proceedings of the 2021 AAAI/ACM Conference on AI, Ethics, and Society . 652–663."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib3",
+      "text": "Adadi and Berrada (2018) Amina Adadi and Mohammed Berrada. 2018. Peeking inside the black-box: A survey on Explainable Artificial Intelligence (XAI). IEEE Access 6 (2018), 52138–52160."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib15",
+      "text": "Došilović et al . (2018) Filip Karlo Došilović, Mario Brčić, and Nikica Hlupić. 2018. Explainable artificial intelligence: A survey. In 2018 41st International convention on information and communication technology, electronics and microelectronics (MIPRO) . IEEE, 0210–0215."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib12",
+      "text": "Carvalho et al . (2019) Diogo V Carvalho, Eduardo M Pereira, and Jaime S Cardoso. 2019. Machine learning interpretability: A survey on methods and metrics. Electronics 8, 8 (2019), 832."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib86",
+      "text": "Tjoa and Guan (2019) Erico Tjoa and Cuntai Guan. 2019. A survey on explainable artificial intelligence (XAI): towards medical XAI. arXiv preprint arXiv:1907.07374 (2019)."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib31",
+      "text": "Hohman et al . (2018) Fred Hohman, Minsuk Kahng, Robert Pienta, and Duen Horng Chau. 2018. Visual analytics in deep learning: An interrogative survey for the next frontiers. IEEE transactions on visualization and computer graphics 25, 8 (2018), 2674–2693."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib6",
+      "text": "Arrieta et al . (2020) Alejandro Barredo Arrieta, Natalia Díaz-Rodríguez, Javier Del Ser, Adrien Bennetot, Siham Tabik, Alberto Barbado, Salvador García, Sergio Gil-López, Daniel Molina, Richard Benjamins, et al . 2020. Explainable Artificial Intelligence (XAI): Concepts, taxonomies, opportunities and challenges toward responsible AI. Information Fusion 58 (2020), 82–115."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib22",
+      "text": "Gilpin et al . (2018) Leilani H Gilpin, David Bau, Ben Z Yuan, Ayesha Bajwa, Michael Specter, and Lalana Kagal. 2018. Explaining explanations: An overview of interpretability of machine learning. In 2018 IEEE 5th International Conference on data science and advanced analytics (DSAA) . IEEE, 80–89."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib74",
+      "text": "Samek et al . (2017) Wojciech Samek, Thomas Wiegand, and Klaus-Robert Müller. 2017. Explainable artificial intelligence: Understanding, visualizing and interpreting deep learning models. arXiv preprint arXiv:1708.08296 (2017)."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib52",
+      "text": "Liang et al . (2021) Yu Liang, Siguang Li, Chungang Yan, Maozhen Li, and Changjun Jiang. 2021. Explaining the black-box model: A survey of local interpretation methods for deep neural networks. Neurocomputing 419 (2021), 168–182."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib59",
+      "text": "Molnar (2020) Christoph Molnar. 2020. Interpretable Machine Learning . Lulu. com."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib96",
+      "text": "Zeiler and Fergus (2014) Matthew D Zeiler and Rob Fergus. 2014. Visualizing and understanding convolutional networks. In European conference on computer vision . Springer, 818–833."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib18",
+      "text": "Fong and Vedaldi (2017) Ruth C Fong and Andrea Vedaldi. 2017. Interpretable explanations of black boxes by meaningful perturbation. In Proceedings of the IEEE international conference on computer vision . 3429–3437."
+    },
+    {
+      "n": 34,
+      "id": "bib.bib17",
+      "text": "Fong et al . (2019) Ruth Fong, Mandela Patrick, and Andrea Vedaldi. 2019. Understanding deep networks via extremal perturbations and smooth masks. In Proceedings of the IEEE/CVF international conference on computer vision . 2950–2958."
+    },
+    {
+      "n": 35,
+      "id": "bib.bib26",
+      "text": "Guidotti et al . (2018a) Riccardo Guidotti, Anna Monreale, Salvatore Ruggieri, Dino Pedreschi, Franco Turini, and Fosca Giannotti. 2018a. Local rule-based explanations of black box decision systems. arXiv preprint arXiv:1805.10820 (2018)."
+    },
+    {
+      "n": 36,
+      "id": "bib.bib7",
+      "text": "Bach et al . (2015) Sebastian Bach, Alexander Binder, Grégoire Montavon, Frederick Klauschen, Klaus-Robert Müller, and Wojciech Samek. 2015. On pixel-wise explanations for non-linear classifier decisions by layer-wise relevance propagation. PloS one 10, 7 (2015)."
+    },
+    {
+      "n": 37,
+      "id": "bib.bib9",
+      "text": "Binder et al . (2016) Alexander Binder, Grégoire Montavon, Sebastian Lapuschkin, Klaus-Robert Müller, and Wojciech Samek. 2016. Layer-wise relevance propagation for neural networks with local renormalization layers. In International Conference on Artificial Neural Networks . Springer, 63–71."
+    },
+    {
+      "n": 38,
+      "id": "bib.bib60",
+      "text": "Montavon et al . (2019) Grégoire Montavon, Alexander Binder, Sebastian Lapuschkin, Wojciech Samek, and Klaus-Robert Müller. 2019. Layer-wise relevance propagation: an overview. In Explainable AI: interpreting, explaining and visualizing deep learning . Springer, 193–209."
+    },
+    {
+      "n": 39,
+      "id": "bib.bib61",
+      "text": "Montavon et al . (2017) Grégoire Montavon, Sebastian Lapuschkin, Alexander Binder, Wojciech Samek, and Klaus-Robert Müller. 2017. Explaining nonlinear classification decisions with deep taylor decomposition. Pattern Recognition 65 (2017), 211–222."
+    },
+    {
+      "n": 40,
+      "id": "bib.bib80",
+      "text": "Simonyan et al . (2014) K Simonyan, A Vedaldi, and A Zisserman. 2014. Deep inside convolutional networks: visualising image classification models and saliency maps. In Proceedings of the International Conference on Learning Representations (ICLR) . ICLR."
+    },
+    {
+      "n": 41,
+      "id": "bib.bib82",
+      "text": "Springenberg et al . (2014) Jost Tobias Springenberg, Alexey Dosovitskiy, Thomas Brox, and Martin Riedmiller. 2014. Striving for simplicity: The all convolutional net. arXiv preprint arXiv:1412.6806 (2014)."
+    }
+  ]
+}

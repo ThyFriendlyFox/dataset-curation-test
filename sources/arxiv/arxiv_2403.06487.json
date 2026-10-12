@@ -1,0 +1,180 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.06487",
+  "title": "Multilingual Turn-taking Prediction Using Voice Activity Projection",
+  "authors": "Koji Inoue, Bing'er Jiang, Erik Ekstedt, Tatsuya Kawahara, Gabriel Skantze",
+  "year": "2024",
+  "categories": [
+    "cs.CL",
+    "cs.SD",
+    "eess.AS"
+  ],
+  "url": "https://arxiv.org/abs/2403.06487",
+  "html_url": "https://arxiv.org/html/2403.06487",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "1. Introduction",
+  "word_count": 1112,
+  "text": "Turn-taking is a fundamental aspect of spoken interaction between humans, and consequently an important function to model in spoken dialogue systems [1]. In human-human conversations, the transitioning of the conversational floor is smoothly conducted. It has been shown across various languages that the transition offset is typically very brief, around 100-500 msec [2]. This indicates that humans use various turn-taking signals across multiple modalities, including lexical cues, prosody, gaze, respiratory, and gestures, in order to coordinate [3,4]. In addition, given that the listener also needs some time to articulate a response, there is likely a prediction mechanism involved, where the listener predicts that the speaker’s utterance is about to end [5,6,7].\n\nWhile recent advancements in large language models (LLMs) have made it easier to generate highly sophisticated responses in spoken dialogue systems, turn-taking is still typically handled in a very simplistic manner. In practical spoken dialogue systems, turn-taking is commonly implemented using a simple silence timeout threshold, typically around 1 second, to indicate the end of a turn. Silence, however, is not a very good indicator, as silences within turns (pauses) are typically longer than silences between turns, in human-human interaction [8]. This means that spoken dialogue systems are often plagued by long response delays or frequent interruptions in pauses.\n\nTo address this problem, many proposals have been made for end-of-turn prediction models. These models consider verbal and non-verbal cues (such as linguistic and prosodic features) of preceding user utterances, in order to predict whether the user is just pausing (a hold), or whether the turn is yielded (a shift). In earlier models, feature engineering was common, but it has now become more popular to input time-series data, such as prosodic features and word vector representations (word embeddings), into neural networks like recurrent neural networks (RNNs) [9,10]. More recently, transformer-based models have been proposed, which can take in the raw input text or audio in an end-to-end processing manner [11,12,13,14].\n\nAnother limitation of earlier models has been their sole focus on the binary prediction of turn hold vs. shift. A more comprehensive model of turn-taking should involve more nuanced decisions. When taking the turn, it is, for example, necessary to determine the appropriate waiting time before starting to talk [15,16,12]. There is also a difference in predicting backchannels vs. turn-shifts [17]. As stated above, humans are able to not just react to turn-yielding cues, but they can also predict upcoming turn-shifts. This would clearly also be a desirable property of spoken dialogue systems. Furthermore, there is no established and robust method for handling interruptions and overlaps in conversation, which are commonly observed in human-human conversations. A more dynamic turn-taking prediction model is required to enable spoken dialogue systems to handle turn-taking in a more human-like manner. Crucial for such models is that they do not make turn-taking decisions at specific events, but that they operate in a continuous fashion.\n\nSeveral models have been proposed recently that make more nuanced turn-taking predictions continuously in a time frame manner [9,18]. Among such continuous models, the voice activity projection (VAP) model is used in this study [19]. The VAP model uses multi-layer Transformers and predicts the near future voice activities of dialogue participants by processing the raw audio signals from the two speakers in a dyadic dialogue. Previous work has shown that the VAP model outperforms other models in predicting turn-taking behaviors, including backchannel predictions [19]. In the latest version of this model, cross-attention Transformer layers are added after the self-attention layer, to model the audio from the two speakers separately, as explained in Section 2. Recently, the VAP model has been extended for various purposes including backchannel prediction [20], multi-modal turn-taking prediction [21], and its real-time processing [22].\n\nTo our knowledge, the VAP model has so far only been trained and tested for English [23]. Since it only operates on raw audio, it is technically straightforward to apply it to other languages (even ones it was not trained on). However, it is not clear how much of turn-taking cues are universal. In this paper, we investigate to what extent a model trained on one language can be transferred to other languages, but also whether it is possible to build a multilingual model. This would clearly be more desirable than having separate models trained specifically for different languages. Specifically, we aim to construct a trilingual model for English, Mandarin Chinese, and Japanese. Those languages were partly chosen since they represent three different language families (Germanic, Sino-Tibetan, and Japonic) and therefore should exhibit a certain level of diversity.\n\nPrevious research has analyzed the differences in turn-taking behavior among languages. Typical differences include the timing of turn-taking [2,24]. For example, the turn transition time of Mandarin and Japanese, centering around 0 msec, while English has more overlaps between turns [24]. Furthermore, in the analysis of turn-taking cues, it has been pointed out that the intonation change at the end of preceding utterances is effective regardless of the language [25,26,27,28,29,30]. Specifically, Mandarin shows turn-final pitch lowering for all words in both task-oriented and daily conversations, regardless of the original lexical tone [31,29]. Moreover, there are differences in the use of backchannels (short utterances such as “yeah” and “yes”), which are essential behaviors in turn-taking, and it has been noted that Japanese has the highest frequency, followed by English and then Chinese [32]. In summary, there are both common tendencies and differences in turn-taking behavior among languages, which justifies the importance of the proposed multilingual turn-taking prediction model.\n\nAchieving a multilingual turn-taking prediction model can lead to the realization of a multilingual spoken dialogue system that does not require specifying the input language. To our knowledge, this is the first attempt to achieve a multilingual turn-taking model based on the cross-attention Transformer.\n\nBased on the above, this study sets the following research questions:\n\n- RQ1: Can a VAP model trained on one language be directly applied to another language?\n\n- RQ2: Is it possible to train a single multilingual VAP model that would be on-par with a monolingual model (trained and evaluated on the same language)?\n\n- RQ3: Has the multilingual model learned to identify the language?\n\n- RQ4: How important is pitch for the multilingual model?\n\n- RQ5: What is the effect of the audio encoder on the model’s performance?\n\nThe rest of this paper is organized as follows: First, in Section 2, we explain the VAP model that serves as the basis for this study. In Section 3, we introduce each of three language dialogue datasets used in this study and analyze the differences among the languages. We conduct experiments to answer the research questions mentioned above in Section 4 and conclude the paper in Section 5.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib38",
+      "text": "Skantze (2021) Gabriel Skantze. 2021. Turn-taking in conversational systems and human-robot interaction: A review. Computer Speech & Language , 67:101178."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib39",
+      "text": "Stivers et al. (2009) Tanya Stivers, Nicholas J Enfield, Penelope Brown, Christina Englert, Makoto Hayashi, Trine Heinemann, Gertie Hoymann, Federico Rossano, Jan Peter De Ruiter, Kyung-Eun Yoon, et al. 2009. Universals and cultural variation in turn-taking in conversation. Proceedings of the National Academy of Sciences (PNAS) , 106(26):10587–10592."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib41",
+      "text": "Włodarczak and Heldner (2016) Marcin Włodarczak and Mattias Heldner. 2016. Respiratory turn-taking cues. In INTERSPEECH , pages 1275–1279."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib16",
+      "text": "Kendrick et al. (2023) Kobin H Kendrick, Judith Holler, and Stephen C Levinson. 2023. Turn-taking in human face-to-face interaction is multimodal: Gaze direction and manual gestures aid the coordination of turn transitions. Philosophical Transactions of the Royal Society B , 378(1875):20210473."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib7",
+      "text": "Garrod and Pickering (2015) Simon Garrod and Martin J Pickering. 2015. The use of content and timing to predict turn transitions. Frontiers in psychology , 6(751):1–12."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib22",
+      "text": "Levinson and Torreira (2015) Stephen C. Levinson and Francisco Torreira. 2015. Timing in turn-taking and its implications for processing models of language. Frontiers in Psychology , 6(731):1–17."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib14",
+      "text": "Ishimoto et al. (2017) Yuichi Ishimoto, Takehiro Teraoka, and Mika Enomoto. 2017. End-of-utterance prediction by prosodic features and phrase-dependency structure in spontaneous Japanese speech. In INTERSPEECH , pages 1681–1685."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib10",
+      "text": "Heldner and Edlund (2010) Mattias Heldner and Jens Edlund. 2010. Pauses, gaps and overlaps in conversations. Journal of Phonetics , 38(4):555–568."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib37",
+      "text": "Skantze (2017) Gabriel Skantze. 2017. Towards a general, continuous model of turn-taking in spoken dialogue using LSTM recurrent neural networks. In Annual Meeting of the Special Interest Group on Discourse and Dialogue (SIGdial) , pages 220–230."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib27",
+      "text": "Masumura et al. (2017) Ryo Masumura, Taichi Asami, Hirokazu Masataki, Ryo Ishii, and Ryuichiro Higashinaka. 2017. Online end-of-turn detection from speech based on stacked time-asynchronous sequential networks. In INTERSPEECH , pages 1661–1665."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib4",
+      "text": "Ekstedt and Skantze (2020) Erik Ekstedt and Gabriel Skantze. 2020. TurnGPT: A Transformer-based language model for predicting turn-taking in spoken dialog. In Empirical Methods in Natural Language Processing (EMNLP) , pages 2981–2990."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib36",
+      "text": "Sakuma et al. (2023) Jin Sakuma, Shinya Fujie, and Tetsunori Kobayashi. 2023. Response timing estimation for spoken dialog systems based on syntactic completeness prediction. In Spoken Language Technology Workshop (SLT) , pages 369–374."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib29",
+      "text": "Muromachi and Kano (2023) Toshiki Muromachi and Yoshinobu Kano. 2023. Estimation of Listening Response Timing by Generative Model and Parameter Control of Response Substantialness Using Dynamic-Prompt-Tune. In INTERSPEECH , pages 2638–2642."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib18",
+      "text": "Kurata et al. (2023) Fuma Kurata, Mao Saeki, Shinya Fujie, and Yoichi Matsuyama. 2023. Multimodal turn-taking model using visual cues for end-of-utterance prediction in spoken dialogue systems. In INTERSPEECH , pages 2658–2662."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib33",
+      "text": "Raux and Eskenazi (2012) Antoine Raux and Maxine Eskenazi. 2012. Optimizing the turn-taking behavior of task-oriented spoken dialog systems. ACM Transactions on Speech and Language Processing , 9(1):1–23."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib19",
+      "text": "Lala et al. (2018) Divesh Lala, Koji Inoue, and Tatsuya Kawahara. 2018. Evaluation of real-time deep learning turn-taking models for multiple dialogue scenarios. In International Conference on Multimodal Interaction (ICMI) , pages 78–86."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib21",
+      "text": "Lala et al. (2017) Divesh Lala, Pierrick Milhorat, Koji Inoue, Masanari Ishida, Katsuya Takanashi, and Tatsuya Kawahara. 2017. Attentive listening system with backchanneling, response generation and flexible turn-taking. In Annual Meeting of the Special Interest Group on Discourse and Dialogue (SIGdial) , pages 127–136."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib20",
+      "text": "Lala et al. (2019) Divesh Lala, Koji Inoue, and Tatsuya Kawahara. 2019. Smooth turn-taking by a robot using an online continuous model to generate turn-taking cues. In International Conference on Multimodal Interaction (ICMI) , pages 226–234."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib6",
+      "text": "Ekstedt and Skantze (2022b) Erik Ekstedt and Gabriel Skantze. 2022b. Voice Activity Projection: Self-supervised learning of turn-taking events. In INTERSPEECH , pages 5190–5194."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib24",
+      "text": "Liermann et al. (2023) Wencke Liermann, Yo-Han Park, Yong-Seok Choi, and Kong Lee. 2023. Dialogue act-aided backchannel prediction using multi-task learning. In Empirical Methods in Natural Language Processing (EMNLP) , pages 15073–15079."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib31",
+      "text": "Onishi et al. (2023) Kazuyo Onishi, Hiroki Tanaka, and Satoshi Nakamura. 2023. Multimodal voice activity prediction: Turn-taking events detection in expert-novice conversation. In International Conference on Human-Agent Interaction (HAI) , pages 13–21."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib13",
+      "text": "Inoue et al. (2024) Koji Inoue, Bing’er Jiang, Erik Ekstedt, Tatsuya Kawahara, and Gabriel Skantze. 2024. Real-time and continuous turn-taking prediction using voice activity projection. In International Workshop on Spoken Dialogue Systems Technology (IWSDS) ."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib5",
+      "text": "Ekstedt and Skantze (2022a) Erik Ekstedt and Gabriel Skantze. 2022a. How much does prosody help turn-taking? Investigations using voice activity projection models. In Annual Meeting of the Special Interest Group on Discourse and Dialogue (SIGdial) , pages 541–551."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib2",
+      "text": "Dingemanse and Liesenfeld (2022) Mark Dingemanse and Andreas Liesenfeld. 2022. From text to talk: Harnessing conversational corpora for humane and diversity-aware language technology. In Annual Meeting of the Association for Computational Linguistics (ACL) , pages 5614–5633."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib3",
+      "text": "Duncan (1972) Starkey Duncan. 1972. Some signals and rules for taking speaking turns in conversations. Journal of personality and social psychology , 23(2):283–292."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib26",
+      "text": "Local et al. (1986) John K Local, John Kelly, and William HG Wells. 1986. Towards a phonology of conversation: turn-taking in tyneside english1. Journal of Linguistics , 22(2):411–437."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib17",
+      "text": "Koiso et al. (1998) Hanae Koiso, Yasuo Horiuchi, Syun Tutiya, Akira Ichikawa, and Yasuharu Den. 1998. An analysis of turn-taking and backchannels based on prosodic and syntactic features in Japanese map task dialogs. Language and speech , 41(3-4):295–321."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib40",
+      "text": "Ward and Tsukahara (2000) Nigel Ward and Wataru Tsukahara. 2000. Prosodic features which cue back-channel responses in English and Japanese. Journal of Pragmatics , 32(8):1177–1207."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib23",
+      "text": "Levow (2005) Gina-Anne Levow. 2005. Turn-taking in Mandarin dialogue: Interactions of tone and intonation. In SIGHAN Workshop on Chinese Language Processing (SIGHAN) ."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib9",
+      "text": "Gravano and Hirschberg (2011) Agustín Gravano and Julia Hirschberg. 2011. Turn-taking cues in task-oriented dialogue. Computer Speech & Language , 25(3):601–634."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib15",
+      "text": "Jian and Wu (2011) Hua-Li Jian and Joyce Wu. 2011. Mandarin conversation: Turn-taking cues in exchange structure. In International Congress of Phonetic Sciences (ICPhS) , pages 970–973."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib1",
+      "text": "Clancy et al. (1996) Patricia M Clancy, Sandra A Thompson, Ryoko Suzuki, and Hongyin Tao. 1996. The conversational use of reactive tokens in English, Japanese, and Mandarin. Journal of pragmatics , 26(3):355–387."
+    }
+  ]
+}

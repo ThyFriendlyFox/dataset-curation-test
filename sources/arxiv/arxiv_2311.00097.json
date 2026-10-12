@@ -1,0 +1,138 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2311.00097",
+  "title": "Cocoon: Static Information Flow Control in Rust",
+  "authors": "Ada Lamba, Max Taylor, Vincent Beardsley, Jacob Bambeck, Michael D. Bond, Zhiqiang Lin",
+  "year": "2024",
+  "categories": [
+    "cs.PL"
+  ],
+  "url": "https://arxiv.org/abs/2311.00097",
+  "html_url": "https://arxiv.org/html/2311.00097",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 754,
+  "text": "Confidentiality is a fundamental property of secure computing systems. Confidentiality, or secrecy, is usually achieved through access control, which regulates which entities may access which data, but not what happens to the data after it is accessed, resulting in a large trusted computing base. As a robust alternative to access control, information flow control (IFC) ensures that high-secrecy values cannot flow to (i.e., cannot affect) low-secrecy values [1,2].\n\nIFC is especially valuable as a fine-grained mechanism that protects the flow of data values within applications, ensuring they do not misuse privileges. Consider, for example, a virus checker application with privileges to both read data from the user’s disk and send data to a remote server (to request software updates). However, the virus checker should not be allowed to send the contents of the user’s disk to the remote server—a confidentiality policy that fine-grained IFC can enforce. As a result, the virus checker does not need to be trusted by the user. In general, fine-grained IFC reduces the trusted computing base from the entire application to the relatively few operations that explicitly violate IFC by declassifying secret values.\n\nFine-grained IFC can be supported either dynamically at run time, which incurs run-time costs [3,4,5], or statically at compile time. Static IFC can use whole-program analysis or modular type-based analysis. Whole-program static analysis conservatively models the flow of values through expressions and variables and ensures that high-secrecy values do not flow to low-secrecy sinks [6,7,8,9]. However, whole-program analysis is non-compositional, so it scales poorly and supports incremental deployment poorly. A recent analysis called Flowistry leverages Rust ownership constraints to compute relatively precise function summaries without analyzing the functions’ bodies [10]. In contrast, static type-based analysis uses types to represent the security labels of variables and expressions, and a correctly typed program guarantees IFC [11,12,13,14,15,16,17,18,19,20,21,22]. While type-based analysis allows for modular checking and incremental deployment, existing solutions rely on a modified language and compiler, impeding adoption.\n\nWhy must prior work on type-based analysis modify the language and compiler? Because the language’s type system is not expressive enough to ensure noninterference statically. The key technical challenge is how to allow programs to define and use functions on secret data without permitting unchecked side effects that might violate noninterference. In theory, an effect system for encoding the side effects of a computation would constrain the behaviors of functions on secret data [23]. While effect systems have been implemented in Haskell for type-based IFC [11,12,24], effect systems are not supported by mainstream imperative languages including Java, C, C++, and Rust.\n\n## Contributions\n\nThis paper introduces Cocoon, the first static type-based IFC for a mainstream imperative language. Cocoon is a Rust library for the unmodified Rust language that works with the standard Rust compiler (although Cocoon relies on some Rust features that are not yet part of stable Rust). Cocoon ensures that a program compiles only if it does not leak secrets, except by explicitly declassifying secrets or explicitly using unsafe Rust code. Cocoon provides a rudimentary effect system for noninterference that limits computations’ side effects using a novel approach leveraging Rust features including ownership, traits, and procedural macros.\n\nWe evaluated Cocoon ’s effectiveness and efficiency by retrofitting two popular Rust applications, a Spotify client and the Servo web browser engine, to enforce a confidentiality policy for a single secret value in each program. These case studies demonstrate that Cocoon ’s approach works in real applications and can be incrementally deployed. The evaluation also shows Cocoon does not affect application run time or memory usage, although it can affect compile time if a substantial fraction of the program code handles secret values.\n\nCocoon thus advances the state of the art in fine-grained IFC support by demonstrating a novel approach that requires no language or compiler modifications. The current design has several limitations, including supporting only static secrecy labels and placing restrictions on the programming model (§​ 4.5).\n\nThis paper makes the following contributions:\n\n- • a fine-grained IFC approach that is the first to provide static type-based IFC for a mainstream imperative language without language or compiler modifications;\n\n- • novel support for a rudimentary effect system that captures side effects that could leak secrets;\n\n- • two case studies on real Rust programs that demonstrate that Cocoon works for real programs and adds negligible or nonexistent run-time and compile-time overheads; and\n\n- • a performance evaluation showing that Cocoon has no detectable run-time impact, and its impact on compile time is commensurate with how much code that deals with secret values.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib30",
+      "text": "Rotenberg (1973) Leo J. Rotenberg. 1973. Making Computers Keep Secrets . Ph. D. Dissertation. Massachusetts Institute of Technology, Boston, MA."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib12",
+      "text": "Denning (1976) Dorothy E. Denning. 1976. A Lattice Model of Secure Information Flow. Commun. ACM 19, 5 (may 1976), 236–243. https://doi.org/10.1145/360051.360056"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib5",
+      "text": "Austin and Flanagan (2009) Thomas H. Austin and Cormac Flanagan. 2009. Efficient Purely-Dynamic Information Flow Analysis. In Proceedings of the ACM SIGPLAN Fourth Workshop on Programming Languages and Analysis for Security (Dublin, Ireland) (PLAS ’09) . Association for Computing Machinery, New York, NY, USA, 113–124. https://doi.org/10.1145/1554339.1554353"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib31",
+      "text": "Roy et al . (2009) Indrajit Roy, Donald E. Porter, Michael D. Bond, Kathryn S. McKinley, and Emmett Witchel. 2009. Laminar: practical fine-grained decentralized information flow control. In Proceedings of the 2009 ACM SIGPLAN Conference on Programming Language Design and Implementation, PLDI 2009 , Michael Hind and Amer Diwan (Eds.). ACM, Dublin, Ireland, 63–74. https://doi.org/10.1145/1542476.1542484"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib40",
+      "text": "Xiang and Chong (2021) Jian Xiang and Stephen Chong. 2021. Co-Inflow: Coarse-grained Information Flow Control for Java-like Languages. In 2021 IEEE Symposium on Security and Privacy (SP) . IEEE, San Francisco, CA, USA, 18–35. https://doi.org/10.1109/SP40001.2021.00002"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "Balasubramanian et al . (2017) Abhiram Balasubramanian, Marek S. Baranowski, Anton Burtsev, Aurojit Panda, Zvonimir Rakamari, and Leonid Ryzhyk. 2017. System Programming in Rust: Beyond Safety. SIGOPS Oper. Syst. Rev. 51, 1 (sep 2017), 94–99. https://doi.org/10.1145/3139645.3139660"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib41",
+      "text": "Zanioli et al . (2012) Matteo Zanioli, Pietro Ferrara, and Agostino Cortesi. 2012. SAILS: Static Analysis of Information Leakage with Sample. In Proceedings of the 27th Annual ACM Symposium on Applied Computing (Trento, Italy) (SAC ’12) . Association for Computing Machinery, New York, NY, USA, 1308–1313. https://doi.org/10.1145/2245276.2231983"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib16",
+      "text": "Hedin and Sabelfeld (2012) Daniel Hedin and Andrei Sabelfeld. 2012. A Perspective on Information-Flow Control. In Software Safety and Security - Tools for Analysis and Verification , Tobias Nipkow, Orna Grumberg, and Benedikt Hauptmann (Eds.). NATO Science for Peace and Security Series - D: Information and Communication Security, Vol. 33. IOS Press, Amsterdam, 319–347. https://doi.org/10.3233/978-1-61499-028-4-319"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib15",
+      "text": "Hammer et al . (2006) Christian Hammer, Jens Krinke, and Gregor Snelting. 2006. Information Flow Control for Java Based on Path Conditions in Dependence Graphs. In Proceedings IEEE International Symposium on Secure Software Engineering . IEEE, Arlington, Virginia, USA, 10 pages."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "Crichton et al . (2022) Will Crichton, Marco Patrignani, Maneesh Agrawala, and Pat Hanrahan. 2022. Modular Information Flow through Ownership. In Proceedings of the 43rd ACM SIGPLAN International Conference on Programming Language Design and Implementation (San Diego, CA, USA) (PLDI 2022) . Association for Computing Machinery, New York, NY, USA, 1–14. https://doi.org/10.1145/3519939.3523445"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib32",
+      "text": "Russo (2015) Alejandro Russo. 2015. Functional Pearl: Two Can Keep a Secret, If One of Them Uses Haskell. In Proceedings of the 20th ACM SIGPLAN International Conference on Functional Programming (Vancouver, BC, Canada) (ICFP 2015) . Association for Computing Machinery, New York, NY, USA, 280–288. https://doi.org/10.1145/2784731.2784756"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib14",
+      "text": "Gregersen et al . (2019) Simon Gregersen, Søren Eller Thomsen, and Aslan Askarov. 2019. A Dependently Typed Library for Static Information-Flow Control in Idris. In Principles of Security and Trust , Flemming Nielson and David Sands (Eds.). Springer International Publishing, Prague, Czech Republic, 51–75. https://doi.org/10.1007/978-3-030-17138-4_3"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib33",
+      "text": "Sabelfeld and Myers (2003) A. Sabelfeld and A.C. Myers. 2003. Language-based information-flow security. IEEE Journal on Selected Areas in Communications 21, 1 (2003), 5–19. https://doi.org/10.1109/JSAC.2002.806121"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib24",
+      "text": "Myers (1999) Andrew C. Myers. 1999. JFlow: Practical Mostly-Static Information Flow Control. In Proceedings of the 26th ACM SIGPLAN-SIGACT Symposium on Principles of Programming Languages (San Antonio, Texas, USA) (POPL ’99) . Association for Computing Machinery, New York, NY, USA, 228–241. https://doi.org/10.1145/292540.292561"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib26",
+      "text": "Myers et al . (2006) Andrew C. Myers, Lantian Zheng, Steve Zdancewic, Stephen Chong, and Nathaniel Nystrom. 2006. Jif 3.0: Java information flow. http://www.cs.cornell.edu/jif"
+    },
+    {
+      "n": 16,
+      "id": "bib.bib25",
+      "text": "Myers and Liskov (1997) Andrew C. Myers and Barbara Liskov. 1997. A Decentralized Model for Information Flow Control. In Proceedings of the Sixteenth ACM Symposium on Operating Systems Principles (Saint Malo, France) (SOSP ’97) . Association for Computing Machinery, New York, NY, USA, 129–142. https://doi.org/10.1145/268998.266669"
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "Kozyri et al . (2016) Elisavet Kozyri, Owen Arden, Andrew C. Myers, and Fred B. Schneider. 2016. JRIF: reactive information flow control for Java . Technical Report 1813–41194. Cornell University Computing and Information Science. https://ecommons.cornell.edu/handle/1813/41194"
+    },
+    {
+      "n": 18,
+      "id": "bib.bib9",
+      "text": "Chong (2008) Stephen Nathaniel Chong. 2008. Expressive and Enforceable Information Security Policies . Ph. D. Dissertation. Cornell University. \"http://people.seas.harvard.edu/~chong/pubs/chong_dissertation.pdf\""
+    },
+    {
+      "n": 19,
+      "id": "bib.bib34",
+      "text": "Simonet (2003) Vincent Simonet. 2003. The Flow Caml System: documentation and user’s manual . Technical Report 0282. Institut National de Recherche en Informatique et en Automatique (INRIA). ©INRIA."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib8",
+      "text": "Chapman and Hilton (2004) Roderick Chapman and Adrian Hilton. 2004. Enforcing Security and Safety Models with an Information Flow Analysis Tool. In Proceedings of the 2004 Annual ACM SIGAda International Conference on Ada: The Engineering of Correct and Reliable Software for Real-Time & Distributed Systems Using Ada and Related Technologies (Atlanta, Georgia, USA) (SIGAda ’04) . Association for Computing Machinery, New York, NY, USA, 39–46. https://doi.org/10.1145/1032297.1032305"
+    },
+    {
+      "n": 21,
+      "id": "bib.bib35",
+      "text": "Smith and Volpano (1998) Geoffrey Smith and Dennis Volpano. 1998. Secure Information Flow in a Multi-Threaded Imperative Language. In Proceedings of the 25th ACM SIGPLAN-SIGACT Symposium on Principles of Programming Languages (San Diego, California, USA) (POPL ’98) . Association for Computing Machinery, New York, NY, USA, 355–364. https://doi.org/10.1145/268946.268975"
+    },
+    {
+      "n": 22,
+      "id": "bib.bib39",
+      "text": "Volpano et al . (1996) Dennis Volpano, Cynthia Irvine, and Geoffrey Smith. 1996. A Sound Type System for Secure Flow Analysis. J. Comput. Secur. 4, 2–3 (jan 1996), 167–187."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib28",
+      "text": "Nielson and Nielson (1999) Flemming Nielson and Hanne Riis Nielson. 1999. Type and Effect Systems . Springer Berlin Heidelberg, Berlin, Heidelberg, 114–136. https://doi.org/10.1007/3-540-48092-7_6"
+    },
+    {
+      "n": 24,
+      "id": "bib.bib2",
+      "text": "Abadi et al . (1999) Martín Abadi, Anindya Banerjee, Nevin Heintze, and Jon G. Riecke. 1999. A Core Calculus of Dependency. In Proceedings of the 26th ACM SIGPLAN-SIGACT Symposium on Principles of Programming Languages (San Antonio, Texas, USA) (POPL ’99) . Association for Computing Machinery, New York, NY, USA, 147–160. https://doi.org/10.1145/292540.292555"
+    }
+  ]
+}

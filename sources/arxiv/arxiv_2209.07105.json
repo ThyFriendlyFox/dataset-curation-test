@@ -1,0 +1,119 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2209.07105",
+  "title": "Bridging Implicit and Explicit Geometric Transformation for Single-Image View Synthesis",
+  "authors": "Byeongjun Park, Hyojun Go, Changick Kim",
+  "year": "2024",
+  "categories": [
+    "cs.CV",
+    "cs.AI"
+  ],
+  "url": "https://arxiv.org/abs/2209.07105",
+  "html_url": "https://arxiv.org/html/2209.07105",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 831,
+  "text": "Single-image view synthesis is the task of generating novel view images from a given single image [1,2,3,4,5,6,7,8,9,10]. It can enable the movement of the camera from a photograph and bring an image to 3D, which is significant for various computer vision applications such as image editing and animating. To perform the realistic view synthesis in these applications, we can expect that the novel view image has to consist of existing objects and unseen new objects from the reference viewpoint. Therefore, for synthesizing high-quality novel views, the following two goals should be considered: 1) preserving 3D transformed seen contents of a reference image—represented by the horizontal axis in Fig. 1, and 2) generating semantically compatible pixels for filling the unseen region—illustrated by the vertical axis in Fig. 1. To achieve two goals, explicit and implicit methods have been proposed.\n\nWith the recent success of differentiable geometric transformation methods [11,12], explicit methods [1,5,13,14,2,10] leverage such 3D inductive biases to guide the view synthesis network to preserve 3D transformed contents, and various generative models are applied to complete the unseen regions. Since explicit methods directly learn the pixel correspondence between the reference image and the novel view image, convolutional neural networks are often utilized to extract the discriminative local scene representation. Therefore, they can produce high-quality novel view images in small view changes, where the content of the reference viewpoint still occupies a large portion. However, the global scene representation is not sufficiently trained, resulting in the image quality having been degraded for large view changes due to a lack of ability to generate pixels of the unseen region. To deal with this problem, outpainting with the autoregressive model is exploited to fill unseen regions [8], but generating photo-realistic images remains a challenge for explicit methods.\n\nOn the other side, implicit methods [15,7,9] less enforce 3D inductive biases and let the model learn the required 3D geometry for view synthesis. Based on the powerful autoregressive transformer [16], recent implicit methods [7,9] learn the 3D geometry from reference images and camera parameters by leveraging the global self-attention for all pixels. Implicitly learned 3D geometry allows the model to synthesize diverse and realistic novel view images, but the only use of the global scene representation has degenerated to represent detailed correspondences between the reference image and the novel view image. Due to the lack of discriminative local scene representation and the reduction in 3D inductive biases, implicit methods fail to preserve the reprojected contents.\n\nTo sum up, previous single-image view synthesis methods suffer from a trade-off between two objectives: 1) preserve seen contents and 2) generate semantically compatible unseen regions. Figure 1 highlights the trade-off that explicit methods well preserve seen contents while sacrificing the generation of unseen regions and vice versa for implicit methods. We term this trade-off the seesaw problem and advocate for a synergistic approach that combines the strengths of both explicit and implicit methods. Moreover, recent methods often depend on autoregressive models, which generate individual pixels sequentially. This sequential generation hampers view synthesis speed, impeding real-time image animation. Therefore, we refocus on an efficient non-autoregressive model for single-image view synthesis.\n\nIn this paper, we present a non-autoregressive framework for alleviating the seesaw problem. To this end, we aim to design the architecture that encodes both global and local scene representation and the loss function that bridges implicit and explicit geometric transformations. Specifically, our encoder is built on recent transformer architectures for point cloud representations [17,18], allowing the network to consider the three-dimensional camera movement by encoding the 3D spatial locations of each point. We also design two parallel renderers that explicitly or implicitly learn geometric transformations from point cloud representations. To bridge explicit and implicit transformations, we propose a novel loss function that motivates explicit features to improve seen pixels of implicit features and implicit features to improve unseen pixels of explicit features. Interestingly, we observe that the proposed loss makes two renderers embed discriminative features and allows the model to use both renderers in a balanced way. With the proposed architecture and the loss function, we can merge the pros of both explicit and implicit methods, alleviating the seesaw problem.\n\nWe validate the effectiveness of our framework with experiments on the indoor dataset RealEstate10K [19], the outdoor dataset ACID [2] and the urban-scene dataset SWORD [20]. We summarize the following contributions:\n\n- • We design a two-branch attention module for point cloud representation, enabling the network to consider 3D camera movement and represent both detailed semantics and the entire scene context.\n\n- • We design two parallel render blocks that explicitly or implicitly learn geometric transformations and introduce a novel loss function to combine the strengths of two render blocks.\n\n- • Our non-autoregressive framework facilitates real-time applications and is over \\approx 100 times faster than existing autoregressive methods.\n\n- • Experiments on different view changes in indoor and outdoor datasets show that our method alleviates the seesaw problem and performs superior results in preserving seen contents and generating unseen contents.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib6",
+      "text": "X. Chen, J. Song, and O. Hilliges, “Monocular neural image based rendering with continuous view control,” in Proceedings of the IEEE/CVF International Conference on Computer Vision , 2019, pp. 4090–4100."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib31",
+      "text": "A. Liu, R. Tucker, V. Jampani, A. Makadia, N. Snavely, and A. Kanazawa, “Infinite nature: Perpetual view generation of natural scenes from a single image,” in Proceedings of the IEEE/CVF International Conference on Computer Vision , 2021, pp. 14 458–14 467."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib67",
+      "text": "D. Watson, W. Chan, R. M. Brualla, J. Ho, A. Tagliasacchi, and M. Norouzi, “Novel view synthesis with diffusion models,” in The Eleventh International Conference on Learning Representations , 2023. [Online]. Available: https://openreview.net/forum?id=HtoA0oT30jC"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib73",
+      "text": "A. Yu, V. Ye, M. Tancik, and A. Kanazawa, “pixelnerf: Neural radiance fields from one or few images,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2021, pp. 4578–4587."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib68",
+      "text": "O. Wiles, G. Gkioxari, R. Szeliski, and J. Johnson, “Synsin: End-to-end view synthesis from a single image,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2020, pp. 7467–7477."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib22",
+      "text": "R. Hu, N. Ravi, A. C. Berg, and D. Pathak, “Worldsheet: Wrapping the world in a 3d sheet for view synthesis from a single image,” in Proceedings of the IEEE/CVF International Conference on Computer Vision , 2021, pp. 12 528–12 537."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib52",
+      "text": "R. Rombach, P. Esser, and B. Ommer, “Geometry-free view synthesis: Transformers and no 3d priors,” in Proceedings of the IEEE/CVF International Conference on Computer Vision , 2021, pp. 14 356–14 366."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib50",
+      "text": "C. Rockwell, D. F. Fouhey, and J. Johnson, “Pixelsynth: Generating a 3d-consistent experience from a single image,” in Proceedings of the IEEE/CVF International Conference on Computer Vision , 2021, pp. 14 104–14 113."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib49",
+      "text": "X. Ren and X. Wang, “Look outside the room: Synthesizing a consistent long-term 3d scene video from a single image,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 2022."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib29",
+      "text": "Z. Li, Q. Wang, N. Snavely, and A. Kanazawa, “Infinitenature-zero: Learning perpetual view generation of natural scenes from single images,” in European Conference on Computer Vision . Springer, 2022, pp. 515–534."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib2",
+      "text": "W. Bao, W.-S. Lai, C. Ma, X. Zhang, Z. Gao, and M.-H. Yang, “Depth-aware video frame interpolation,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2019, pp. 3703–3712."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib40",
+      "text": "S. Niklaus and F. Liu, “Softmax splatting for video frame interpolation,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2020, pp. 5437–5446."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib21",
+      "text": "Y. Hou, A. Solin, and J. Kannala, “Novel view synthesis via depth-guided skip connections,” in Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision , 2021, pp. 3119–3128."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib77",
+      "text": "T. Zhou, S. Tulsiani, W. Sun, J. Malik, and A. A. Efros, “View synthesis by appearance flow,” in European conference on computer vision . Springer, 2016, pp. 286–301."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib61",
+      "text": "M. Tatarchenko, A. Dosovitskiy, and T. Brox, “Multi-view 3d models from single images with a convolutional network,” in European Conference on Computer Vision . Springer, 2016, pp. 322–337."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib13",
+      "text": "P. Esser, R. Rombach, and B. Ommer, “Taming transformers for high-resolution image synthesis,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2021, pp. 12 873–12 883."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib27",
+      "text": "J. Lee, Y. Lee, J. Kim, A. Kosiorek, S. Choi, and Y. W. Teh, “Set transformer: A framework for attention-based permutation-invariant neural networks,” in International Conference on Machine Learning . PMLR, 2019, pp. 3744–3753."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib43",
+      "text": "C. Park, Y. Jeong, M. Cho, and J. Park, “Fast point transformer,” arXiv preprint arXiv:2112.04702 , 2021."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib76",
+      "text": "T. Zhou, R. Tucker, J. Flynn, G. Fyffe, and N. Snavely, “Stereo magnification: Learning view synthesis using multiplane images,” arXiv preprint arXiv:1805.09817 , 2018."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib25",
+      "text": "T. Khakhulin, D. Korzhenkov, P. Solovev, G. Sterkin, A.-T. Ardelean, and V. Lempitsky, “Stereo magnification with multi-layer images,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2022, pp. 8687–8696."
+    }
+  ]
+}

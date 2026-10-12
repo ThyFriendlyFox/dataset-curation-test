@@ -1,0 +1,145 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2207.03341",
+  "title": "Softmax-free Linear Transformers",
+  "authors": "Jiachen Lu, Junge Zhang, Xiatian Zhu, Jianfeng Feng, Tao Xiang, Li Zhang",
+  "year": "2024",
+  "categories": [
+    "cs.CV",
+    "cs.AI",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2207.03341",
+  "html_url": "https://arxiv.org/html/2207.03341",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 748,
+  "text": "Recently the step change brought by Transformers [11] in natural language processing (NLP) [15,16] seems to have arrived in vision [7,8,17,18]. Indeed, with less inductive bias in its architecture design than Convolution neural networks (CNNs), pure Vision Transformer (ViT) [7] and its variants have shown to be able to outperform CNNs on various vision tasks [19,20]. However, there is a bottleneck in any Transformer based model, namely its quadratic complexity in both computation and memory usage. This is intrinsic to the self-attention mechanism: given a sequence of tokens (e.g., words or image patches) as input, the self-attention module iteratively learns the feature representations by relating one token to all other tokens. This results in a quadratic complexity O(n^{2}) with the token sequence length n in both computation (time) and memory (space) since an n\\times n sized attention matrix needs to be computed and saved during inference. This problem is particularly acute in vision: a 2D image after tokenization will produce a far longer sequence than those in NLP even with a moderate spatial resolution. This quadratic complexity thus prevents a ViT model from modeling images at high spatial resolutions, which are often crucial for visual recognition tasks.\n\nA natural solution is to reduce the complexity of self-attention computation via approximation. Indeed, there have been a number of attempts in NLP [12,14,21,13]. For example, [12] takes a naive approach by shortening the length of Key and Value via learnable projections. Such a coarse approximation would inevitably cause performance degradation. In contrast, [14,22] both leverage the kernel mechanism to approximate softmax normalization to linearize the computation in self-attention. [21] instead adopts a hashing strategy to selectively compute the most similar pairs. Recently, [13] uses Nyström matrix decomposition to reconstruct the full attention matrix with polynomial iteration for approximating the pseudo-inverse of the landmark matrix. Nonetheless, softmax normalization is simply duplicated across the matrix decomposition process, which is theoretically unsound. We empirically found that none of these methods are effective when applied to vision (see Sec. 4.1).\n\nIn this work, we identify that the limitations of existing efficient Transformers are caused by the use of softmax self-attention, and for the first time propose a softmax-free Transformer. More specifically, in all existing Transformers (with or without linearization), a softmax normalization is needed on top of scaled dot-product between token feature vectors [11]. Keeping this softmax operation challenges any subsequent linearization efforts. To overcome this obstacle, we introduce a novel softmax-free self-attention mechanism, named as SOFT, with linear complexity O(n) in both space and time. Specifically, SOFT uses Gaussian kernel to define the similarity (self-attention) function without the need for subsequent softmax normalization. With this softmax-free attention matrix, we further introduce a novel low-rank matrix decomposition algorithm for approximation. The robustness of the approximation is theoretically guaranteed by employing a Newton-Raphson method for reliably computing the Moore-Penrose inverse of the matrix.\n\nWe make the following contributions. (I) We introduce a novel softmax-free Transformer with linear space and time complexity. (II) Our attention matrix approximation is achieved through a novel matrix decomposition algorithm with theoretical guarantee. (III) To evaluate our method for visual recognition tasks, we design a family of generic backbone architectures with varying capacities using SOFT as the core self-attention component. Extensive experiments show that with a linear complexity (Figure 1b), our SOFT models can take in as input much longer image token sequences. As a result, with the same model size, our SOFT outperforms the state-of-the-art CNNs and ViT variants on ImageNet [1] classification in the accuracy/complexity trade-off (Figure 1a).\n\nA preliminary version of this work was presented in NeurIPS 2021 spotlight [23]. In this paper, we have further extended our conference version as follows: (i) We improve the efficiency and robustness in computing Moore-Penrose inverse by using an iterative method in the forward process only while calculating its theoretical gradient only once in the backward propagation. (ii) We analyze the limitations of our preliminary SOFT from a matrix spectral norm perspective, revealing the importance of normalization for enhancing the model’s task generalizability. (iii) We prove that the preliminary SOFT experiences a second-order increase in matrix spectral norm relative to the matrix size, making it fail in dense vision problems. (iv) To address these limitations, we propose a normalized softmax-free self-attention, keeping linear complexity while enhancing performance, supported by both theoretical proof and extensive experiments. (v) The improved SOFT outperforms the state-of-the-art CNNs and ViTs for classification on ImageNet [1], object detection on COCO [24] and semantic segmentation on ADE20K [25].",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib12",
+      "text": "Deng et al. (2009) Deng J, Dong W, Socher R, Li LJ, Li K, Fei-Fei L (2009) Imagenet: A large-scale hierarchical image database. In: IEEE Conference on Computer Vision and Pattern Recognition, pp 248–255"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib19",
+      "text": "He et al. (2016) He K, Zhang X, Ren S, Sun J (2016) Deep residual learning for image recognition. In: IEEE Conference on Computer Vision and Pattern Recognition, pp 770–778"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib11",
+      "text": "Dai et al. (2021) Dai Z, Liu H, Le QV, Tan M (2021) Coatnet: Marrying convolution and attention for all data sizes. In: Advances in Neural Information Processing Systems, vol 34, pp 3965–3977"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib52",
+      "text": "Wang et al. (2021) Wang W, Xie E, Li X, Fan DP, Song K, Liang D, Lu T, Luo P, Shao L (2021) Pyramid vision transformer: A versatile backbone for dense prediction without convolutions. In: IEEE International Conference on Computer Vision, pp 568–578"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib30",
+      "text": "Liu et al. (2021) Liu Z, Lin Y, Cao Y, Hu H, Wei Y, Zhang Z, Lin S, Guo B (2021) Swin transformer: Hierarchical vision transformer using shifted windows. In: Proceedings of the IEEE/CVF international conference on computer vision, pp 10012–10022"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib45",
+      "text": "Touvron et al. (2021a) Touvron H, Cord M, Douze M, Massa F, Sablayrolles A, Jégou H (2021a) Training data-efficient image transformers & distillation through attention. In: International Conference on Machine Learning, PMLR, pp 10347–10357"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib14",
+      "text": "Dosovitskiy et al. (2021) Dosovitskiy A, Beyer L, Kolesnikov A, Weissenborn D, Zhai X, Unterthiner T, Dehghani M, Minderer M, Heigold G, Gelly S, et al. (2021) An image is worth 16x16 words: Transformers for image recognition at scale. In: International Conference on Learning Representations"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib62",
+      "text": "Yuan et al. (2021) Yuan L, Chen Y, Wang T, Yu W, Shi Y, Jiang ZH, Tay FE, Feng J, Yan S (2021) Tokens-to-token vit: Training vision transformers from scratch on imagenet. In: IEEE International Conference on Computer Vision, pp 558–567"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "Chu et al. (2021) Chu X, Tian Z, Wang Y, Zhang B, Ren H, Wei X, Xia H, Shen C (2021) Twins: Revisiting the design of spatial attention in vision transformers. Advances in Neural Information Processing Systems 34:9355–9366"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib69",
+      "text": "Zhao et al. (2020) Zhao H, Jia J, Koltun V (2020) Exploring self-attention for image recognition. In: IEEE Conference on Computer Vision and Pattern Recognition, pp 10076–10085"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib49",
+      "text": "Vaswani et al. (2017) Vaswani A, Shazeer N, Parmar N, Uszkoreit J, Jones L, Gomez AN, Kaiser Ł, Polosukhin I (2017) Attention is all you need. Advances in Neural Information Processing Systems 30"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib51",
+      "text": "Wang et al. (2020) Wang S, Li BZ, Khabsa M, Fang H, Ma H (2020) Linformer: Self-attention with linear complexity. arXiv preprint arXiv:200604768"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib59",
+      "text": "Xiong et al. (2021) Xiong Y, Zeng Z, Chakraborty R, Tan M, Fung G, Li Y, Singh V (2021) Nyströmformer: A nyström-based algorithm for approximating self-attention. In: AAAI Conference on Artificial Intelligence, vol 35, pp 14138–14148"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib8",
+      "text": "Choromanski et al. (2021) Choromanski K, Likhosherstov V, Dohan D, Song X, Gane A, Sarlos T, Hawkins P, Davis J, Mohiuddin A, Kaiser L, et al. (2021) Rethinking attention with performers. In: International Conference on Learning Representations"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib13",
+      "text": "Devlin et al. (2019) Devlin J, Chang MW, Lee K, Toutanova K (2019) Bert: Pre-training of deep bidirectional transformers for language understanding. In: Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, NAACL-HLT, pp 4171–4186"
+    },
+    {
+      "n": 16,
+      "id": "bib.bib4",
+      "text": "Brown et al. (2020) Brown T, Mann B, Ryder N, Subbiah M, Kaplan JD, Dhariwal P, Neelakantan A, Shyam P, Sastry G, Askell A, et al. (2020) Language models are few-shot learners. Advances in Neural Information Processing Systems 33:1877–1901"
+    },
+    {
+      "n": 17,
+      "id": "bib.bib72",
+      "text": "Zhu et al. (2021) Zhu X, Su W, Lu L, Li B, Wang X, Dai J (2021) Deformable detr: Deformable transformers for end-to-end object detection. In: International Conference on Learning Representations"
+    },
+    {
+      "n": 18,
+      "id": "bib.bib70",
+      "text": "Zheng et al. (2021) Zheng S, Lu J, Zhao H, Zhu X, Luo Z, Wang Y, Fu Y, Feng J, Xiang T, Torr PH, et al. (2021) Rethinking semantic segmentation from a sequence-to-sequence perspective with transformers. In: IEEE Conference on Computer Vision and Pattern Recognition, pp 6881–6890"
+    },
+    {
+      "n": 19,
+      "id": "bib.bib15",
+      "text": "d’Ascoli et al. (2021) d’Ascoli S, Touvron H, Leavitt ML, Morcos AS, Biroli G, Sagun L (2021) Convit: Improving vision transformers with soft convolutional inductive biases. In: International Conference on Machine Learning, PMLR, pp 2286–2296"
+    },
+    {
+      "n": 20,
+      "id": "bib.bib23",
+      "text": "Jaegle et al. (2021) Jaegle A, Gimeno F, Brock A, Vinyals O, Zisserman A, Carreira J (2021) Perceiver: General perception with iterative attention. In: International Conference on Machine Learning, PMLR, pp 4651–4664"
+    },
+    {
+      "n": 21,
+      "id": "bib.bib26",
+      "text": "Kitaev et al. (2020) Kitaev N, Kaiser Ł, Levskaya A (2020) Reformer: The efficient transformer. In: International Conference on Learning Representations"
+    },
+    {
+      "n": 22,
+      "id": "bib.bib25",
+      "text": "Katharopoulos et al. (2020) Katharopoulos A, Vyas A, Pappas N, Fleuret F (2020) Transformers are rnns: Fast autoregressive transformers with linear attention. In: International Conference on Machine Learning, PMLR, pp 5156–5165"
+    },
+    {
+      "n": 23,
+      "id": "bib.bib34",
+      "text": "Lu et al. (2021) Lu J, Yao J, Zhang J, Zhu X, Xu H, Gao W, Xu C, Xiang T, Zhang L (2021) Soft: softmax-free transformer with linear complexity. Advances in Neural Information Processing Systems 34:21297–21309"
+    },
+    {
+      "n": 24,
+      "id": "bib.bib28",
+      "text": "Lin et al. (2014) Lin TY, Maire M, Belongie S, Hays J, Perona P, Ramanan D, Dollár P, Zitnick CL (2014) Microsoft coco: Common objects in context. In: European Conference on Computer Vision, Springer, pp 740–755"
+    },
+    {
+      "n": 25,
+      "id": "bib.bib71",
+      "text": "Zhou et al. (2019) Zhou B, Zhao H, Puig X, Xiao T, Fidler S, Barriuso A, Torralba A (2019) Semantic understanding of scenes through the ade20k dataset. International Journal of Computer Vision 127:302–321"
+    }
+  ]
+}

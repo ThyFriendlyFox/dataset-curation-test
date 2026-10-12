@@ -1,0 +1,160 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.12329",
+  "title": "FedFisher: Leveraging Fisher Information for One-Shot Federated Learning",
+  "authors": "Divyansh Jhunjhunwala, Shiqiang Wang, Gauri Joshi",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.DC",
+    "stat.ML"
+  ],
+  "url": "https://arxiv.org/abs/2403.12329",
+  "html_url": "https://arxiv.org/html/2403.12329",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1071,
+  "text": "Data collection and storage are becoming increasingly decentralized, both due to the proliferation of smart devices and privacy concerns stemming from transferring and storing data at a centralized location. Federated Learning (FL) is a framework designed to learn the parameters \\bm{W}\\in\\mathbb{R}^{d} of a model f(\\bm{W},\\cdot) on decentralized data distributed across a network of clients under the supervision of a central server [1,2,3]. Formally, we formulate FL as the following distributed optimization problem:\n\nHere, M is the number of clients, \\mathcal{D}_{i} is the i -th client’s local dataset consisting of input-label pairs \\{({\\bm{x}}_{ij},{\\bm{y}}_{ij})\\}_{j=1}^{n} where {\\bm{x}}\\in\\mathbb{R}^{p} is the input and {\\bm{y}}\\in\\mathbb{R}^{C} is the label, and n=|\\mathcal{D}_{i}| is the dataset size. For simplicity, we consider the case where clients have equal amounts of data; our algorithm and analysis can easily be extended to the case where client objectives are unequally weighted based on their local dataset sizes. The loss function \\ell(\\cdot,\\cdot) penalizes the difference between the prediction of the model f(\\bm{W},{\\bm{x}}) and the true label {\\bm{y}}. We use \\mathcal{D}=\\{\\mathcal{D}_{i}\\}_{i=1}^{M} to denote the collection of data across all clients and N=Mn to denote the total number of data samples across clients.\n\nThe fundamental challenge with learning in federated settings is data heterogeneity across clients [4,2]. In particular, while clients can independently train a model that fits their local data, it is unclear how the server can combine these local models to get a global model that works for all the clients. To tackle this problem, standard FL algorithms such as FedAvg [5] and FedProx [6] resort to an iterative approach requiring multiple rounds of communication between clients and the server in order for the local models to reach a consensus. However, this multi-round approach has several drawbacks. First, clients need to frequently connect with the server to send and receive updates. Second, a client needs to invest computational resources repeatedly to update the global model every time it participates in training. Third, it increases susceptibility to attacks such as data and model poisoning since attackers can continuously modify and update their attacks based on the global model they receive from the server in each round.\n\nTo overcome these drawbacks, a recent line of work has focused on the paradigm of one-shot FL which aims to learn the parameters of the global model in a single round of communication between clients and the server. Existing work for one-shot FL can be broadly split into two categories: (i) knowledge distillation methods and (ii) neuron matching methods. Knowledge distillation methods treat the collection of client models as an ensemble and propose to distill the knowledge from this ensemble into a single global model. To perform the distillation step, some works assume that the server has access to an auxiliary public dataset [7,8,9], which clearly simplifies the problem. Another set of works proposes training generative models such as GANs [10,11] or variational autoencoders [12] to artificially generate data using local models of the clients. This again raises privacy questions, since a sufficiently powerful generative model can simply reconstruct client data [13]. Moreover, both the data generation and distillation steps impose a significant computation cost on the server and require careful hyperparameter tuning [14], which is itself a challenge to implement in one-shot FL.\n\nNeuron matching methods are based on the observation that neural networks (NNs) are permutation invariant, i.e., it is possible to create NNs that differ only in the ordering of weights while having the same output [15,16,17,18,19,20]. Based on this observation, these works propose to first align the weights of the client models according to a common ordering (called matching) and then average the aligned client models. Although this idea has been shown to work well when combining simple models like feedforward NNs, the performance drops considerably for more complex models such as CNNs [21]. Another line of work, termed as model fusion has looked at fusing the capabilities of multiple existing models into a single model [22,23,24,25,26]. While not explicitly designed for one-shot FL, some of these techniques, such as [22,24,25] can be considered as an improvement over vanilla averaging. However, we note that these methods focus mostly on fusing pre-trained models and do not consider the effect of data heterogeneity used in training the models. We defer a more extensive discussion of such methods and other related work to Appendix A. Finally, we note that none of these existing works provide any theoretical guarantees for their proposed methods.\n\nThus, motivated by the limitations of multi-round FL and current approaches for one-shot FL, we ask the following questions: Can we devise a one-shot FL method that is simultaneously communication and computation efficient (at both the server and clients), privacy-preserving, and has good practical performance? Furthermore, can we provide theoretical guarantees for such a method?\n\nIn this work, we take a step towards providing an affirmative answer to both of the questions formulated above. To do so, we use the idea that Equation 1 can alternatively be reformulated as a posterior inference problem, specifically finding the mode of a global posterior over the model parameters [27,28]. While [27] and [28] use this idea to propose a multi-round algorithm, our contribution lies in showing how this reformulation can yield a novel one-shot FL algorithm, which we term as FedFisher. Some highlights of our contribution are as follows.\n\n- • We propose FedFisher and show how the problem of finding the mode of a global posterior can be solved in a one-shot manner, using the local models at clients and some approximation of the Fisher information matrices computed at these local models (Section 2).\n\n- • We theoretically analyze FedFisher for the case of over-parameterized two-layer neural networks. In particular, we show that when we utilize the full Fisher information in FedFisher, the error of our one-shot global model becomes vanishingly small as the width of the neural networks and the amount of local training at the clients increase (Section 3).\n\n- • We propose practical variants of FedFisher using the diagonal and K-FAC approximation, which we term as FedFisher(Diag) and FedFisher(K-FAC), respectively, and highlight the communication and compute efficiency of these variants along with their compatibility with secure aggregation (Section 4).\n\n- • We evaluate FedFisher(Diag) and FedFisher(K-FAC) on a range of one-shot FL tasks using deep neural networks and show that they give a consistent 5-10 % improvement in global model accuracy compared to competing one-shot baselines involving knowledge distillation, neuron matching, or model fusion (Section 5).",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib32",
+      "text": "Kairouz et al. (2021) Peter Kairouz, H Brendan McMahan, Brendan Avent, Aurélien Bellet, Mehdi Bennis, Arjun Nitin Bhagoji, Kallista Bonawitz, Zachary Charles, Graham Cormode, Rachel Cummings, et al. Advances and open problems in federated learning. Foundations and Trends® in Machine Learning , 14(1–2):1–210, 2021."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib42",
+      "text": "Li et al. (2020a) Tian Li, Anit Kumar Sahu, Ameet Talwalkar, and Virginia Smith. Federated learning: Challenges, methods, and future directions. IEEE Signal Processing Magazine , 37(3):50–60, 2020a."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib64",
+      "text": "Yang et al. (2019) Qiang Yang, Yang Liu, Tianjian Chen, and Yongxin Tong. Federated machine learning: Concept and applications. ACM Transactions on Intelligent Systems and Technology (TIST) , 10(2):12, 2019."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib33",
+      "text": "Karimireddy et al. (2020) Sai Praneeth Karimireddy, Satyen Kale, Mehryar Mohri, Sashank Reddi, Sebastian Stich, and Ananda Theertha Suresh. Scaffold: Stochastic controlled averaging for federated learning. In International Conference on Machine Learning , pages 5132–5143. PMLR, 2020."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib49",
+      "text": "McMahan et al. (2017) H. Brendan McMahan, Eider Moore, Daniel Ramage, Seth Hampson, and Blaise Agøura y Arcas. Communication-Efficient Learning of Deep Networks from Decentralized Data. International Conference on Artificial Intelligenece and Statistics (AISTATS) , April 2017. URL https://arxiv.org/abs/1602.05629 ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib43",
+      "text": "Li et al. (2020b) Tian Li, Anit Kumar Sahu, Manzil Zaheer, Maziar Sanjabi, Ameet Talwalkar, and Virginia Smith. Federated optimization for heterogeneous networks. In Proceedings of the 3rd MLSys Conference , January 2020b."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib44",
+      "text": "Lin et al. (2020) Tao Lin, Lingjing Kong, Sebastian U Stich, and Martin Jaggi. Ensemble distillation for robust model fusion in federated learning. Advances in Neural Information Processing Systems , 33:2351–2363, 2020."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib19",
+      "text": "Gong et al. (2021) Xuan Gong, Abhishek Sharma, Srikrishna Karanam, Ziyan Wu, Terrence Chen, David Doermann, and Arun Innanje. Ensemble attention distillation for privacy-preserving federated learning. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 15076–15086, 2021."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib41",
+      "text": "Li et al. (2021) Qinbin Li, Bingsheng He, and Dawn Song. Practical one-shot federated learning for cross-silo setting. In Proceedings of the Thirtieth International Joint Conference on Artificial Intelligence (IJCAI-21) , May 2021."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib68",
+      "text": "Zhang et al. (2022) Jie Zhang, Chen Chen, Bo Li, Lingjuan Lyu, Shuang Wu, Shouhong Ding, Chunhua Shen, and Chao Wu. Dense: Data-free one-shot federated learning. Advances in Neural Information Processing Systems , 35:21414–21428, 2022."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib71",
+      "text": "Zhu et al. (2021) Zhuangdi Zhu, Junyuan Hong, and Jiayu Zhou. Data-free knowledge distillation for heterogeneous federated learning. In International Conference on Machine Learning , pages 12878–12889. PMLR, 2021."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib24",
+      "text": "Heinbaugh et al. (2023) Clare Elizabeth Heinbaugh, Emilio Luz-Ricca, and Huajie Shao. Data-free one-shot federated learning under very high statistical heterogeneity. In The Eleventh International Conference on Learning Representations , 2023."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib25",
+      "text": "Hitaj et al. (2017) Briland Hitaj, Giuseppe Ateniese, and Fernando Perez-Cruz. Deep models under the gan: information leakage from collaborative deep learning. In Proceedings of the 2017 ACM SIGSAC conference on computer and communications security , pages 603–618, 2017."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib36",
+      "text": "Kurach et al. (2019) Karol Kurach, Mario Lučić, Xiaohua Zhai, Marcin Michalski, and Sylvain Gelly. A large-scale study on regularization and normalization in gans. In International Conference on Machine Learning , pages 3581–3590. PMLR, 2019."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib56",
+      "text": "Singh and Jaggi (2020) Sidak Pal Singh and Martin Jaggi. Model fusion via optimal transport. Advances in Neural Information Processing Systems , 33:22045–22055, 2020."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib1",
+      "text": "Ainsworth et al. (2023) Samuel K. Ainsworth, Jonathan Hayase, and Siddhartha S. Srinivasa. Git re-basin: Merging models modulo permutation symmetries. In The Eleventh International Conference on Learning Representations , 2023."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib2",
+      "text": "Akash et al. (2022) Aditya Kumar Akash, Sixu Li, and Nicolás García Trillos. Wasserstein barycenter-based model fusion and linear mode connectivity of neural networks. arXiv preprint arXiv:2210.06671 , 2022."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib45",
+      "text": "Liu et al. (2022) Chang Liu, Chenfei Lou, Runzhong Wang, Alan Yuhan Xi, Li Shen, and Junchi Yan. Deep neural network fusion via graph matching with applications to model ensemble and federated learning. In International Conference on Machine Learning , pages 13857–13869. PMLR, 2022."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib30",
+      "text": "Jordan et al. (2023) Keller Jordan, Hanie Sedghi, Olga Saukh, Rahim Entezari, and Behnam Neyshabur. REPAIR: renormalizing permuted activations for interpolation repair. In The Eleventh International Conference on Learning Representations , 2023."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib16",
+      "text": "Entezari et al. (2022) Rahim Entezari, Hanie Sedghi, Olga Saukh, and Behnam Neyshabur. The role of permutation invariance in linear mode connectivity of neural networks. In The Tenth International Conference on Learning Representations , 2022."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib60",
+      "text": "Wang et al. (2020a) Hongyi Wang, Mikhail Yurochkin, Yuekai Sun, Dimitris S. Papailiopoulos, and Yasaman Khazaeni. Federated learning with matched averaging. In 8th International Conference on Learning Representations , 2020a."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib48",
+      "text": "Matena and Raffel (2022) Michael S Matena and Colin A Raffel. Merging models with fisher-weighted averaging. Advances in Neural Information Processing Systems , 35:17703–17716, 2022."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib10",
+      "text": "Choshen et al. (2022) Leshem Choshen, Elad Venezian, Noam Slonim, and Yoav Katz. Fusing finetuned models for better pretraining. arXiv preprint arXiv:2204.03044 , 2022."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib29",
+      "text": "Jin et al. (2023) Xisen Jin, Xiang Ren, Daniel Preotiuc-Pietro, and Pengxiang Cheng. Dataless knowledge fusion by merging weights of language models. In The Eleventh International Conference on Learning Representations , 2023."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib63",
+      "text": "Yadav et al. (2023) Prateek Yadav, Derek Tam, Leshem Choshen, Colin Raffel, and Mohit Bansal. Resolving interference when merging models. arXiv preprint arXiv:2306.01708 , 2023."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib28",
+      "text": "Ilharco et al. (2023) Gabriel Ilharco, Marco Túlio Ribeiro, Mitchell Wortsman, Ludwig Schmidt, Hannaneh Hajishirzi, and Ali Farhadi. Editing models with task arithmetic. In The Eleventh International Conference on Learning Representations , 2023."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib3",
+      "text": "Al-Shedivat et al. (2021) Maruan Al-Shedivat, Jennifer Gillenwater, Eric P. Xing, and Afshin Rostamizadeh. Federated learning via posterior averaging: A new perspective and practical algorithms. In 9th International Conference on Learning Representations , 2021."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib22",
+      "text": "Guo et al. (2023) Han Guo, Philip Greengard, Hongyi Wang, Andrew Gelman, Yoon Kim, and Eric P. Xing. Federated learning as variational inference: A scalable expectation propagation approach. In The Eleventh International Conference on Learning Representations , 2023."
+    }
+  ]
+}

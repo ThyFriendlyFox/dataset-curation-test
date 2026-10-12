@@ -1,0 +1,118 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.10745",
+  "title": "iDb-RRT: Sampling-based Kinodynamic Motion Planning with Motion Primitives and Trajectory Optimization",
+  "authors": "Joaquim Ortiz-Haro, Wolfgang HÃ¶nig, Valentin N. Hartmann, Marc Toussaint, Ludovic Righetti",
+  "year": "2024",
+  "categories": [
+    "cs.RO"
+  ],
+  "url": "https://arxiv.org/abs/2403.10745",
+  "html_url": "https://arxiv.org/html/2403.10745",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 591,
+  "text": "Kinodynamic motion planning is a fundamental problem in robotics where the goal is to find collision-free trajectories in high-dimensional, continuous, and non-convex spaces, while also considering actuation limits and dynamics of the robot. Over the last two decades, a wide variety of sampling-, search-, and optimization-based methods have been proposed to address (kinodynamic) motion planning problems.\n\nA breakthrough was the introduction of Rapidly-exploring Random Trees (RRT) [1], a sampling-based method that incrementally builds a tree of configurations by expanding nodes towards randomly sampled new configurations. RRT-like algorithms (e.g., [2,3,4,5,6,7]) are highly efficient for geometric planning, i.e., motion planning settings that involve only joint configurations of the system, since in the geometric setting, two configurations can be connected exactly by using linear interpolation.\n\nAlthough RRT-like algorithms can be adapted for kinodynamic motion planning (e.g., [8,9]), their efficiency significantly decreases, as they typically require solving multiple two-point boundary value problems or the propagation of random control inputs. Two-point boundary problems, as they arise for most robotic systems, often do not have an analytic solution, and solving them is computationally expensive, generally requiring the solution of a nonlinear trajectory optimization problem. Propagating random control inputs tends to be uninformative for many systems, as random controls can lead to poor exploration of the state space, particularly in highly nonlinear systems such as quadrotors where random inputs often lead to instability in the system. Further, it is not clear how to perform a bidirectional search, as in RRT-Connect [3], in the kinodynamic setting with the propagation of random inputs.\n\nAlternative approaches for kinodynamic motion planning are optimization-based methods [10,11,12], which scale polynomially instead of exponentially but require an initial guess and may fail to converge; and search-based methods [13,14], which provide strong theoretical guarantees but require a pre-defined discretization of the state or control space. More recently, hybrid methods have been proposed to merge the strengths of the three previous approaches to kinodynamic motion planning [15,16,17,18,19]. Iterative Discontinuity-Bounded A* (iDb-A*) [20] introduces an approach based on A*-search with motion primitives, i.e., short and locally optimal trajectories, that are connected not necessarily exactly, but allowing for a bounded discontinuity between primitives. These discontinuities between the motion primitives are later rectified using trajectory optimization (TO). By iteratively combining optimization and search with an increasing number of motion primitives and a reduced discontinuity bound, this method achieves asymptotically optimal motion planning and outperforms state-of-the-art methods across various robotic systems. A primary limitation of iDb-A* is its inefficiency in finding an initial solution, particularly in large environments, where the time required to find the initial solution remains high.\n\nIn this paper, we combine the strengths of the exploration of RRT with the concept of discontinuities between motion primitives and trajectory optimization. We present iDb-RRT (i terative D iscontinuity- b ounded RRT), a new kinodynamic motion planning algorithm that builds on the ideas of allowing discontinuities in an initial motion from iDb-A*, and integrates the RRT exploration strategy with short motion primitives and trajectory optimization. iDb-RRT samples a random configuration, then expands the configuration that is closest using applicable motion primitives with bounded discontinuity. Once a solution is found, we employ trajectory optimization to correct the discontinuities between motion primitives. By incrementally increasing the number of primitives and reducing the allowed discontinuity, our algorithm achieves probabilistic completeness.\n\nWe analyze both a forward and a bidirectional version of iDb-RRT. In the open-source benchmark Dynobench comprising 30 problems across 8 different systems, iDb-RRT significantly outperforms state-of-the-art methods in initial solution time, especially in complex scenarios requiring long-horizon planning or navigating through narrow passages.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "S. LaValle, “Rapidly-exploring random trees: A new tool for path planning,” Research Report 9811, Iowa State University , 1998."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "S. Karaman and E. Frazzoli, “Sampling-based algorithms for optimal motion planning,” I. J. Robotics Res. , vol. 30, no. 7, 2011."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "J. J. Kuffner and S. M. LaValle, “RRT-connect: An efficient approach to single-query path planning,” in Proc. IEEE Int. Conf. Robot. Autom. , vol. 2, 2000, pp. 995–1001."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "R. Bohlin and L. E. Kavraki, “A randomized approach to robot path planning based on lazy evaluation,” Handbook on Randomized Computing , vol. 9, no. 1, pp. 221–249, 2001."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "J. D. Gammell, S. S. Srinivasa, and T. D. Barfoot, “Informed RRT*: Optimal sampling-based path planning focused via direct sampling of an admissible ellipsoidal heuristic,” in Proc. IEEE/RSJ Int. Conf. Intell. Robots Syst. , 2014, pp. 2997–3004."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "S. Choudhury, J. D. Gammell, T. D. Barfoot, S. S. Srinivasa, and S. Scherer, “Regionally accelerated batch informed trees (RABIT*): A framework to integrate local information into optimal path planning,” in Proc. IEEE Int. Conf. Robot. Autom. , 2016, pp. 4207–4214."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "J. D. Gammell, S. S. Srinivasa, and T. D. Barfoot, “Batch informed trees (BIT*): Sampling-based optimal planning via the heuristically guided search of implicit random geometric graphs,” in Proc. IEEE Int. Conf. Robot. Autom. , 2015, pp. 3067–3074."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "D. J. Webb and J. van den Berg, “Kinodynamic RRT*: Asymptotically optimal motion planning for robots with linear dynamics,” in Proc. IEEE Int. Conf. Robot. Autom. , 2013, pp. 5054–5061."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "L. Chen, I. Mantegh, T. He, and W. Xie, “Fuzzy kinodynamic RRT: a dynamic path planning and obstacle avoidance method,” in Int. Conf. on Unmanned Aircraft Systems (ICUAS) , 2020, pp. 188–195."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "J. Schulman, Y. Duan, J. Ho, A. X. Lee, I. Awwal, H. Bradlow, J. Pan, S. Patil, K. Goldberg, and P. Abbeel, “Motion planning with sequential convex optimization and convex collision checking,” I. J. Robotics Res. , vol. 33, no. 9, pp. 1251–1270, 2014."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "R. Bonalli, A. Cauligi, A. Bylard, and M. Pavone, “GuSTO: Guaranteed sequential trajectory optimization via sequential convex programming,” in Proc. IEEE Int. Conf. Robot. Autom. , 2019, pp. 6741–6747."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "D. Malyuta, T. P. Reynolds, M. Szmuk, T. Lew, R. Bonalli, M. Pavone, and B. Açıkmeşe, “Convex optimization for trajectory generation: A tutorial on generating dynamically feasible trajectories reliably and efficiently,” IEEE Control Systems Magazine , vol. 42, no. 5, 2022."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "M. Pivtoraiko, “Differentially constrained motion planning with state lattice motion primitives,” Ph.D. dissertation, Carnegie Mellon University, 2012."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "M. Pivtoraiko and A. Kelly, “Kinodynamic motion planning with state lattice motion primitives,” in Proc. IEEE Int. Conf. Robot. Autom. , 2011, pp. 2172–2179."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "R. Natarajan, H. Choset, and M. Likhachev, “Interleaving graph search and trajectory optimization for aggressive quadrotor flight,” IEEE Robot. Autom. Lett. , vol. 6, no. 3, pp. 5357–5364, 2021."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "B. Sakcak, L. Bascetta, G. Ferretti, and M. Prandini, “Sampling-based optimal kinodynamic planning with motion primitives,” Auton. Robots , vol. 43, no. 7, pp. 1715–1732, 2019."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "Z. Littlefield and K. E. Bekris, “Efficient and asymptotically optimal kinodynamic motion planning via dominance-informed regions,” in Proc. IEEE/RSJ Int. Conf. Intell. Robots Syst. , 2018, pp. 1–9."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "J. Kamat, J. Ortiz-Haro, M. Toussaint, F. T. Pokorny, and A. Orthey, “BITKOMO: Combining Sampling and Optimization for Fast Convergence in Optimal Motion Planning,” in Proc. IEEE/RSJ Int. Conf. Intell. Robots Syst. , 2022, pp. 4492–4497."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "R. Natarajan, S. Mukherjee, H. Choset, and M. Likhachev, “PINSAT: parallelized interleaving of graph search and trajectory optimization for kinodynamic motion planning,” CoRR , vol. abs/2401.08948, 2024."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "J. O. de Haro, W. Hönig, V. N. Hartmann, and M. Toussaint, “iDb-A*: Iterative search and optimization for optimal kinodynamic motion planning,” CoRR , vol. abs/2311.03553, 2023."
+    }
+  ]
+}

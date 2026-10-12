@@ -1,0 +1,154 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.11870",
+  "title": "IDF-CR: Iterative Diffusion Process for Divide-and-Conquer Cloud Removal in Remote-sensing Images",
+  "authors": "Meilin Wang, Yexing Song, Pengxu Wei, Xiaoyu Xian, Yukai Shi, Liang Lin",
+  "year": "2024",
+  "categories": [
+    "cs.CV",
+    "eess.IV"
+  ],
+  "url": "https://arxiv.org/abs/2403.11870",
+  "html_url": "https://arxiv.org/html/2403.11870",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1192,
+  "text": "Optical remote-sensing images are visual representations capable of encapsulating information about the surface. Optical sensors sensitive to both visible light and infrared radiation gather optical remote-sensing images. These visual representations capture the spectral attributes that characterize the Earth’s surface, facilitating the provision of intricate details of surface features, including mountain ranges, plains, lakes, rivers, and various geomorphic elements. Therefore, they can be used in various applications, including geographic information systems, environmental monitoring, land use planning, agriculture, forestry, urban planning, and natural disaster monitoring. However, the ubiquity of atmospheric clouds poses an inevitable challenge by obscuring portions of the optical remote-sensing image. The difficulty lies in that clouds, as products of climatic conditions, respond to climate change in such complex ways that predicting their trajectory becomes a formidable task. In addition, the international satellite cloud climatology project finds that the global average annual cloud cover is as high as 66% [1]. Consequently, efforts to remove clouds from optical remote-sensing images are emerging as a central avenue for improving the utility of such images.\n\nIn recent years, Convolutional Neural Networks (CNNs) have brought about a paradigm shift. Leveraging their powerful nonlinear representation capabilities, many challenges associated with image processing in various domains have been successfully overcome. For example, tasks such as dehazing [2], super resolution [3,4,5,6] and cloud removal [7,8,9]. In particular, DSen2-CR [10] introduces an effective remote-sensing image reconstruction network based on deep convolutional networks. This method mainly uses residual networks to skillfully capture the mapping from cloudy to cloud-free states. In addition, Generative Adversarial Network (GAN) [11] demonstrates its generative capabilities. It synthesizes data via a generator and then uses a discriminator to determine the true or false of the data, thereby improving the performance of the generator. Spa-GAN [12] uses both GAN and CNNs for cloud removal from optical remote-sensing images. It proposes to assist the GAN in producing cloud-free images by estimating spatial attention. These methods significantly improve the ability to remove clouds from remote-sensing images.\n\nHowever, all of the aforementioned frameworks have inherent limitations. The convolutional operation inherent in CNNs can only capture information at local locations, making them less suitable for capturing and interacting with information over long distances. In contrast to the transformer [13], the attention mechanism is characterized by its ability to capture a wider range of feature information than the convolutional operation. At the same time, the design of the Vision Transformer (ViT) [14] serves to expand the perceptual field of the image. And GAN faces the challenge of the interplay between the generator and the discriminator, which makes it difficult to achieve simultaneous convergence of both the generator and the discriminator losses, often leading to model failure. Notably, generative models find it easier to understand the semantic meaning of discrete vectors as opposed to continuous vectors [15].\n\nRecently, diffusion models [16] have emerged as a new focus in generative research following GAN. Subsequently, many works have tried to improve the efficiency of the diffusion model. It has been successful in several tasks, including image super-resolution [17], segmentation [18] and classification [19], and has consistently demonstrated state-of-the-art (SOTA) performance. A particularly effective variant is the Stable Diffusion Model (LDM) [20]. LDM is designed to transform the image from pixel space to latent space using a frozen Vector Quantised Variational AutoEncoder (VQ-VAE) [15] and is realized by both diffusion and sample phases performed in the latent space. Despite the efficacy of the diffusion model in various domains, a notable absence persists in the realm of a diffusion-based cloud removal network. In light of this, our endeavor is dedicated to utilizing the powerful generative capability of the diffusion model for realistic cloud removal. This innovative design aims to exploit the powerful image-to-image mapping capability in the diffusion model to achieve high-quality cloud removal results.\n\nIn this paper, we provide an iterative diffusion process for the robust cloud removal network, called IDF-CR, tailored for optical remote-sensing images. Inspired by CDC [21], IDF-CR embodies a component divide-and-conquer architecture that includes a pixel space cloud removal (Pixel-CR) module and an iterative diffusion process module as follows. (1) To enhance the effectiveness of cloud removal and achieve superior visual results through the diffusion model, we initiate the process by coarse cloud removal of cloudy images in pixel space. Taking advantage of the ability of the Swin transformer [22] to preserve the long-distance information interaction and the local feature extraction ability, we utilize the Swin transformer as the basic operation in pixel space. At the same time, a cloudy attention module is introduced after the Swin transformer to extract cloud location information for subsequent feature extraction modules. (2) Since the resulting pixel space expression tends to simply remove clouds, it is common for the positions occupied by clouds to yield residual small regions of distorted pixel clusters. This phenomenon leads to visually unsatisfactory results. Simultaneously, owing to the limitations of the GAN-based approaches in globally encapsulating the comprehensive data distribution [23], this results in suboptimal visualization when reconstructing texture details in cloud cover locations. Conversely, diffusion models excel in attaining high-quality mappings from stochastic probability distributions to high-resolution images [24]. Therefore, we advocate using the diffusion model for both detail recovery and cloud removal. The low-quality cloud removal output is transformed from pixel space to latent space via VQ-VAE. The resulting discrete vectors serve as inputs to the diffusion model. Meanwhile, we apply ControlNet [25] to maintain the generation capability of the diffusion model. (3) We introduce an iterative noise refinement (INR) module based on the diffusion model to optimize weights for image detail restoration. This involves constructing a more complicated diffuse discrete vector z_{t} from the UNet predicted noise \\epsilon_{pred}, which allows for iterative noise refinement.\n\nWe present a component divide-and-conquer cloud removal framework and compare the proposed method with the SOTA image cloud removal network Spa-GAN without ground feature prompts, together with our retrained image reconstruction networks DiffBIR and SwinIR. These comprehensive comparisons demonstrate that IDF-CR provides a significant performance leap in the field of single remote-sensing image cloud removal. Furthermore, to verify the effectiveness of our proposed modules, we perform ablation experiments specifically targeting the two-stage network, the cloudy attention, and the INR modules. A comprehensive set of metric results, coupled with visualization analyses, demonstrate the ability of IDF-CR to not only achieve cloud removal but also improve visualization. The primary summary of our contributions to this effort is outlined below:\n\n- 1. We present IDF-CR, a pioneering network that integrates a diffusion model into the cloud removal domain. This innovative architecture exploits component divide-and-conquer cloud removal with the powerful generative capabilities of diffusion models.\n\n- 2. We present cloudy attention and INR modules for feature extraction in pixel space and detail recovery in latent space, respectively. Unlike previous image reconstruction networks, cloudy attention provides explicit location information of clouds to the network, allowing more efficient feature extraction by the Swin transformer. INR is designed to enhance the accuracy and robustness of the diffusion model in predicting noise by constructing more complex latent variables, culminating in visually appealing results.\n\n- 3. Extensive experimental results on both RICE [26] and WHUS2-CRv [27] datasets demonstrate the effectiveness of our proposed method.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "S. Han, J. Wang, and S. Zhang, “Former-cr: A transformer-based thick cloud removal method with optical and sar imagery,” Remote Sensing , vol. 15, no. 5, p. 1196, 2023."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "J. Nie, W. Wei, L. Zhang, J. Yuan, Z. Wang, and H. Li, “Contrastive haze-aware learning for dynamic remote sensing image dehazing,” IEEE Transactions on Geoscience and Remote Sensing , vol. 60, pp. 1–11, 2022."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "Y. Shi, H. Zhong, Z. Yang, X. Yang, and L. Lin, “Ddet: Dual-path dynamic enhancement network for real-world image super-resolution,” IEEE Signal Processing Letters , vol. 27, pp. 481–485, 2020."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "H. Li, J. Qin, Z. Yang, P. Wei, J. Pan, L. Lin, and Y. Shi, “Real-world image super-resolution by exclusionary dual-learning,” IEEE Transactions on Multimedia , 2022."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "Y. Shi, H. Li, S. Zhang, Z. Yang, and X. Wang, “Criteria comparative learning for real-scene image super-resolution,” IEEE Transactions on Circuits and Systems for Video Technology , vol. 32, no. 12, pp. 8476–8485, 2022."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "Y. Song, M. Wang, X. Xian, Z. Yang, Y. Fan, and Y. Shi, “Negvsr: Augmenting negatives for generalized noise modeling in real-world video super-resolution,” arXiv preprint arXiv:2305.14669 , 2023."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "S. Ji, P. Dai, M. Lu, and Y. Zhang, “Simultaneous cloud detection and removal from bitemporal remote sensing images using cascade convolutional neural networks,” IEEE Transactions on Geoscience and Remote Sensing , vol. 59, no. 1, pp. 732–748, 2020."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "K. Enomoto, K. Sakurada, W. Wang, H. Fukui, M. Matsuoka, R. Nakamura, and N. Kawaguchi, “Filmy cloud removal on satellite imagery with multispectral conditional generative adversarial nets,” in Proceedings of the IEEE conference on computer vision and pattern recognition workshops , 2017, pp. 48–56."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "P. Singh and N. Komodakis, “Cloud-gan: Cloud removal for sentinel-2 imagery using a cyclic consistent generative adversarial networks,” in IGARSS 2018-2018 IEEE International Geoscience and Remote Sensing Symposium . IEEE, 2018, pp. 1772–1775."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "A. Meraner, P. Ebel, X. X. Zhu, and M. Schmitt, “Cloud removal in sentinel-2 imagery using a deep residual neural network and sar-optical data fusion,” ISPRS Journal of Photogrammetry and Remote Sensing , vol. 166, pp. 333–346, 2020."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "I. Goodfellow, J. Pouget-Abadie, M. Mirza, B. Xu, D. Warde-Farley, S. Ozair, A. Courville, and Y. Bengio, “Generative adversarial networks,” Communications of the ACM , vol. 63, no. 11, pp. 139–144, 2020."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "H. Pan, “Cloud removal for remote sensing imagery via spatial attention generative adversarial network,” arXiv preprint arXiv:2009.13015 , 2020."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A. N. Gomez, Ł. Kaiser, and I. Polosukhin, “Attention is all you need,” Advances in neural information processing systems , vol. 30, 2017."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "A. Dosovitskiy, L. Beyer, A. Kolesnikov, D. Weissenborn, X. Zhai, T. Unterthiner, M. Dehghani, M. Minderer, G. Heigold, S. Gelly et al. , “An image is worth 16x16 words: Transformers for image recognition at scale,” arXiv preprint arXiv:2010.11929 , 2020."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "A. Van Den Oord, O. Vinyals et al. , “Neural discrete representation learning,” Advances in neural information processing systems , vol. 30, 2017."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "J. Ho, A. Jain, and P. Abbeel, “Denoising diffusion probabilistic models,” Advances in neural information processing systems , vol. 33, pp. 6840–6851, 2020."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "X. Lin, J. He, Z. Chen, Z. Lyu, B. Fei, B. Dai, W. Ouyang, Y. Qiao, and C. Dong, “Diffbir: Towards blind image restoration with generative diffusion prior,” arXiv preprint arXiv:2308.15070 , 2023."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "D. Baranchuk, I. Rubachev, A. Voynov, V. Khrulkov, and A. Babenko, “Label-efficient semantic segmentation with diffusion models,” arXiv preprint arXiv:2112.03126 , 2021."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "R. S. Zimmermann, L. Schott, Y. Song, B. A. Dunn, and D. A. Klindt, “Score-based generative classifiers,” arXiv preprint arXiv:2110.00473 , 2021."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "R. Rombach, A. Blattmann, D. Lorenz, P. Esser, and B. Ommer, “High-resolution image synthesis with latent diffusion models,” in Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , 2022, pp. 10 684–10 695."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "P. Wei, Z. Xie, H. Lu, Z. Zhan, Q. Ye, W. Zuo, and L. Lin, “Component divide-and-conquer for real-world image super-resolution,” in Computer Vision–ECCV 2020: 16th European Conference, Glasgow, UK, August 23–28, 2020, Proceedings, Part VIII 16 . Springer, 2020, pp. 101–117."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib22",
+      "text": "Z. Liu, Y. Lin, Y. Cao, H. Hu, Y. Wei, Z. Zhang, S. Lin, and B. Guo, “Swin transformer: Hierarchical vision transformer using shifted windows,” in Proceedings of the IEEE/CVF international conference on computer vision , 2021, pp. 10 012–10 022."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib23",
+      "text": "L. Metz, B. Poole, D. Pfau, and J. Sohl-Dickstein, “Unrolled generative adversarial networks,” arXiv preprint arXiv:1611.02163 , 2016."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib24",
+      "text": "B. Xia, Y. Zhang, S. Wang, Y. Wang, X. Wu, Y. Tian, W. Yang, and L. Van Gool, “Diffir: Efficient diffusion model for image restoration,” arXiv preprint arXiv:2303.09472 , 2023."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib25",
+      "text": "L. Zhang, A. Rao, and M. Agrawala, “Adding conditional control to text-to-image diffusion models,” in Proceedings of the IEEE/CVF International Conference on Computer Vision , 2023, pp. 3836–3847."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib26",
+      "text": "D. Lin, G. Xu, X. Wang, Y. Wang, X. Sun, and K. Fu, “A remote sensing image dataset for cloud removal,” arXiv preprint arXiv:1901.00600 , 2019."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib27",
+      "text": "J. Li, Y. Zhang, Q. Sheng, Z. Wu, B. Wang, Z. Hu, G. Shen, M. Schmitt, and M. Molinier, “Thin cloud removal fusing full spectral and spatial features for sentinel-2 imagery,” IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing , vol. 15, pp. 8759–8775, 2022."
+    }
+  ]
+}

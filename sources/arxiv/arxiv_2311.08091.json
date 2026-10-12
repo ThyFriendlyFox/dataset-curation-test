@@ -1,0 +1,88 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2311.08091",
+  "title": "Lumiere: Making Optimal BFT for Partial Synchrony Practical",
+  "authors": "Andrew Lewis-Pye, Dahlia Malkhi, Oded Naor, Kartik Nayak",
+  "year": "2024",
+  "categories": [
+    "cs.DC"
+  ],
+  "url": "https://arxiv.org/abs/2311.08091",
+  "html_url": "https://arxiv.org/html/2311.08091",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1068,
+  "text": "State machine replication (SMR) is a central topic in distributed computing and refers to the task of implementing a fault-tolerant service by replicating servers and coordinating client interactions with server replicas [1]. Driven partly by high levels of investment in ‘blockchain’ technology, recent years have seen interest in developing SMR protocols that work efficiently at scale [2]. In concrete terms, this means looking to minimize the latency and the communication complexity per consensus decision as a function of the number of processors (participants) n.\n\nSMR protocols typically aim to achieve Byzantine fault tolerance, i.e., consensus among processors (server replicas) even if a bounded proportion of the processors are Byzantine and behave arbitrarily/maliciously. The partial synchrony model [3] is a common networking model on which many of these protocols are based, and this model can be seen as a practical compromise between the synchronous and asynchronous communication models. This model assumes a point in time called the global stabilisation time (GST) such that any message sent at time t must arrive by time \\max\\{\\text{GST},t\\}+\\Delta. While \\Delta is known, the value of GST is unknown to the protocol. Optimal resiliency in the partial synchrony communication model means tolerating up to f Byzantine processors among n processors, where f is the largest integer less than n/3 [3].\n\nThe view-based paradigm and view synchronization in partial synchrony. Many BFT SMR protocols [4,5,6,7] in the partial synchrony model employ a view-based paradigm. The instructions for such protocols are divided into views, each view having a designated leader to drive progress. A consensus decision is guaranteed to be reached during periods of synchrony whenever honest processors spend a sufficiently long time together in any view with an honest leader. The problem of ensuring that processors synchronize for long enough in the same view is known as the Byzantine View Synchronization (BVS) problem.\n\nHotStuff [5] was the first BFT SMR protocol to decouple the core consensus logic from a “Pacemaker” module that implements BVS, but left the pacemaker implementation unspecified. The core consensus logic in HotStuff requires quadratic communication complexity in the worst case and linear latency, while each view requires only linear complexity and a constant number of rounds. The task of view synchronization therefore becomes the efficiency bottleneck and the key question becomes: Can we design a Byzantine view synchronization protocol with optimal communication complexity and latency?\n\nThe desired communication complexity and latency requirements need some elaboration. Worst-case complexity should be O(n^{2}) to meet the Dolev-Reischuk bound [8]. However, when there are fewer actual faults f_{a}\\leq f, one would hope for the worst-case complexity between every pair of consensus decisions to be a function of f_{a} such that complexity is o(n^{2}) when f_{a}=o(n). Likewise, whereas worst-case latency is O(n\\Delta), one would hope for latency o(n\\Delta) in the face of a small number f_{a} of actual faults. Furthermore, given that the core consensus logic can provide optimistic responsiveness, such a property would be desirable in BVS also. Roughly, this means that the protocol should function at ‘network speed’ if it turns out that the actual number of faults f_{a}\\leq f is 0: if f_{a}=0, the protocol should be live during periods when message delay is less than the given bound \\Delta, and latency should be a function of the actual (unknown) message delay \\delta. This is important because the actual message delay \\delta may be much smaller than \\Delta when the latter value is conservatively set to ensure liveness under a wide range of network conditions. More formally, we can say that a protocol is optimistically responsive if, subsequent to some finite time after GST, the worst-case latency between synchronized views with honest leaders (each of which will produce a consensus decision) is O(\\delta) in the case that f_{a}=0. Generalizing this, a protocol is smoothly optimistically responsive if the corresponding bound is O(\\Delta f_{a}+\\delta) for any value of f_{a}\\leq f.\n\nRecent works have addressed the Byzantine view synchronization problem and achieved some of the above described goals [9,10,11,12,13]. However, all of those works either tolerate only benign failures [9], do not obtain optimal worst-case communication and latency [10], require a large communication complexity and latency even when there are a small number of faults [11,12,13], or require stronger assumptions such as clock synchronization [14]. Lumiere is the first Byzantine view synchronization protocol in the partial synchrony model to achieve all of these properties simultaneously. They key result is the following:\n\nLumiere is a BVS protocol for the partial synchrony model with the following properties:\n\n- (1) Worst-case communication complexity O(n^{2}).\n\n- (2) Worst-case latency O(n\\Delta).\n\n- (3) The protocol is smoothly optimistically responsive.\n\n- (4) Eventual worst case communication complexity O(f_{a}n+n).\n\nAll terms described in Theorem 1.1 are formally defined in Section 2. Table 1 compares the relevant performance measures for state-of-the-art protocols. The comparison is described in more detail in Section 6.\n\nWe emphasize that Lumiere is the first BVS protocol for partial synchrony that satisfies (1) and (2) from the statement of Theorem 1.1 while also satisfying either (3) or (4) (and, in fact, satisfies both of these properties). The basic approach to describing a protocol that is smoothly optimistically responsive while satisfying properties (1) and (2) is to combine techniques from LP22 [11] and Fever [14]. LP22 achieves worst-case communication complexity O(n^{2}) by dividing the instructions into epochs, where each epoch consists of f+1 views. By performing a heavy (\\Theta(n^{2}) communication complexity) synchronization process only once at the beginning of each epoch, one can avoid the need for synchronization within epochs, thereby matching the Dolev-Reischuk bound [8]. LP22 also achieves optimistic responsiveness, but suffers from the issue that even a single faulty leader is then able to achieve \\Theta(n\\Delta) delays. Fever, meanwhile, is a protocol that is optimal for all measures considered in this paper, but which requires synchronized clocks (and so operates in a non-standard model). We show that, through the use of epochs (as in LP22) and by employing Fever within epochs, one can achieve a protocol for the partial synchrony model that simultaneously satisfies properties (1)–(3).\n\nThe most technically complex task is then to modify the protocol so as to also ensure that the eventual worst case communication complexity is O(f_{a}n+n) (property (4)). To do so requires establishing conditions that allow processors to stop carrying out heavy epoch changes once sufficiently synchronized. This involves a number of substantial technical complexities that are discussed in depth in Section 3.5.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib17",
+      "text": "(17) Fred B Schneider. Implementing fault-tolerant services using the state machine approach: A tutorial. ACM Computing Surveys (CSUR) , 22(4):299–319, 1990."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib8",
+      "text": "(8) Shir Cohen, Idit Keidar, and Oded Naor. Byzantine agreement with less communication: Recent advances. ACM SIGACT News , 52(1):71–80, 2021."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib10",
+      "text": "(10) Cynthia Dwork, Nancy Lynch, and Larry Stockmeyer. Consensus in the presence of partial synchrony. J. ACM , 35(2):288–323, apr 1988. doi:10.1145/42282.42283 ."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib6",
+      "text": "(6) Miguel Castro, Barbara Liskov, et al. Practical byzantine fault tolerance. In OsDI , volume 99, pages 173–186, 1999."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib19",
+      "text": "(19) Maofan Yin, Dahlia Malkhi, Michael K Reiter, Guy Golan Gueta, and Ittai Abraham. Hotstuff: Bft consensus with linearity and responsiveness. In Proceedings of the 2019 ACM Symposium on Principles of Distributed Computing , pages 347–356, 2019."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib11",
+      "text": "(11) Ramakrishna Kotla, Lorenzo Alvisi, Mike Dahlin, Allen Clement, and Edmund Wong. Zyzzyva: speculative byzantine fault tolerance. In Proceedings of twenty-first ACM SIGOPS symposium on Operating systems principles , pages 45–58, 2007."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib14",
+      "text": "(14) Dahlia Malkhi and Kartik Nayak. Hotstuff-2: Optimal two-phase responsive bft. Cryptology ePrint Archive , 2023."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib9",
+      "text": "(9) Danny Dolev and Rüdiger Reischuk. Bounds on information exchange for byzantine agreement. Journal of the ACM (JACM) , 32(1):191–204, 1985."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib15",
+      "text": "(15) Oded Naor, Mathieu Baudet, Dahlia Malkhi, and Alexander Spiegelman. Cogsworth: Byzantine View Synchronization. Cryptoeconomic Systems , 1(2), oct 22 2021. https://cryptoeconomicsystems.pubpub.org/pub/naor-cogsworth-synchronization."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib16",
+      "text": "(16) Oded Naor and Idit Keidar. Expected linear round synchronization: The missing link for linear byzantine SMR. In Hagit Attiya, editor, 34th International Symposium on Distributed Computing, DISC 2020, October 12-16, 2020, Virtual Conference , volume 179 of LIPIcs , pages 26:1–26:17. Schloss Dagstuhl - Leibniz-Zentrum für Informatik, 2020. doi:10.4230/LIPIcs.DISC.2020.26 ."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib12",
+      "text": "(12) Andrew Lewis-Pye. Quadratic worst-case message complexity for state machine replication in the partial synchrony model. CoRR , abs/2201.01107, 2022. URL: https://arxiv.org/abs/2201.01107 , arXiv:2201.01107 ."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib7",
+      "text": "(7) Pierre Civit, Muhammad Ayaz Dzulfikar, Seth Gilbert, Vincent Gramoli, Rachid Guerraoui, Jovan Komatovic, and Manuel Vidigueira. Byzantine consensus is Θ \\Theta (n 2 ): The dolev-reischuk bound is tight even in partial synchrony! In Christian Scheideler, editor, 36th International Symposium on Distributed Computing, DISC 2022, October 25-27, 2022, Augusta, Georgia, USA , volume 246 of LIPIcs , pages 14:1–14:21. Schloss Dagstuhl - Leibniz-Zentrum für Informatik, 2022. doi:10.4230/LIPIcs.DISC.2022.14 ."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib3",
+      "text": "(3) Manuel Bravo, Gregory Chockler, and Alexey Gotsman. Liveness and Latency of Byzantine State-Machine Replication. In Christian Scheideler, editor, 36th International Symposium on Distributed Computing (DISC 2022) , volume 246 of Leibniz International Proceedings in Informatics (LIPIcs) , pages 12:1–12:19, Dagstuhl, Germany, 2022. Schloss Dagstuhl – Leibniz-Zentrum für Informatik. URL: https://drops.dagstuhl.de/opus/volltexte/2022/17203 , doi:10.4230/LIPIcs.DISC.2022.12 ."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib13",
+      "text": "(13) Andrew Lewis-Pye and Ittai Abraham. Fever: Optimal responsive view synchronisation. arXiv preprint arXiv:2301.09881 , 2023."
+    }
+  ]
+}

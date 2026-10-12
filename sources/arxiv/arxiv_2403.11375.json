@@ -1,0 +1,90 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.11375",
+  "title": "Path-GPTOmic: A Balanced Multi-modal Learning Framework for Survival Outcome Prediction",
+  "authors": "Hongxiao Wang, Yang Yang, Zhuo Zhao, Pengfei Gu, Nishchal Sapkota, Danny Z. Chen",
+  "year": "2024",
+  "categories": [
+    "cs.CV",
+    "cs.LG",
+    "q-bio.GN"
+  ],
+  "url": "https://arxiv.org/abs/2403.11375",
+  "html_url": "https://arxiv.org/html/2403.11375",
+  "license": "http://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Introduction",
+  "word_count": 617,
+  "text": "Pathology images and genomic assays are two main data sources for predicting the survival outcome of cancer patients. Pathology images contain information on cell mitosis, cell morphology, and the micro-environment. Genomic data from RNA-seq measure the abundance of RNA transcripts, providing critical biological insights into cell identity, cellular activity, stage of development and differentiation, as well as cell functionality [1]. In clinical practice, bulk RNA-seq (average global gene expression among cells) is more cost-effective, and is widely employed for analyzing cancer initiation and progression, as well as predicting survival outcomes [2].\n\nTo jointly utilize these two complementary sources for automatic cancer survival prediction, researchers have developed a series of multi-modality deep learning algorithms. For example, in [3,4], genomic data were processed with self-normalizing networks (SNN) and fused with pathology image embeddings with Kronecker product. Transformer models were employed to capture genotype-phenotype interactions through an attention mechanism [5]. Different modalities were projected into the same latent space to enclose distances between multi-modal embeddings of the same patients [6,7].\n\nHowever, these methods still face two major challenges. First, the biological insight of genomic data cannot be fully explored by SNN or Transformer models with limited training data, and external knowledge on human cells is not utilized to compute more accurate genomic embeddings. Second, researchers found that the dominant modality (the one with better performance) may suppress the training process of the other modality [8,9]. Consequently, the other modality may not generalize well to test data.\n\nIn this paper, we propose a new multi-modal Path-GPTOmic framework, which combines pathology images and genomic data from patient specimen for predicting cancer survival outcomes. To address the first challenge, we seek to learn a smooth latent space for bulk RNA-seq embeddings by incorporating a foundation model, scGPT [1]. This model was originally trained on single-cell RNA-seq data from large human cell atlases [10], and has demonstrated superior performance in cell functionality analysis (e.g., cell type annotation and genetic perturbation prediction). However, in our prior experiments, we observed that directly applying scGPT to bulk RNA-seq improved model performance only marginally for downstream tasks. One possible reason for this is that the direct application maps bulk RNA to an unfair latent space, where distances between embedding vectors do not accurately reflect RNA similarities. To address this issue, we adopt generative model practices [11,12,13] to smooth the latent space with mix-up regulation. Specifically, we append a smoothing module (i.e., a multi-layer-proceptron (MLP) network) after scGPT. Then we train it by simulating bulk RNA-seq with individual single-cell RNA expression [2]. This approach enables us to achieve an interpolatable latent space for gene expression, enhancing generalizability for bulk RNA data.\n\nTo tackle the second challenge, we combine the genomic and image branches of the model and closely monitor the contribution of each modality in training process. We find that genomic branch outperforms and contributes less to the Cox partial likelihood loss [14]. As a result, the genomic branch dominates the training process, causing under-optimization of the image branch. To alleviate this issue in survival outcome prediction, we propose to control the loss optimization process by dynamically adjusting the gradient. Specifically, we assess the contributions of the two branches and appropriately modulate the gradient of the under-optimized image modality.\n\nOur contributions can be summarized in three key aspects. (1) In clinical research, bulk RNA-seq data are more cost-effective and easier to acquire. To our best knowledge, we are the first to extend the single-cell foundation model scGPT for processing bulk RNA-seq data of patient samples. (2) We take pioneering steps to address the training imbalance problem in multi-modal pathology-genomics fusion tasks. (3) We evaluate our new method using two TCGA datasets, and obtain performance improvement compared to the baselines.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "Haotian Cui, Chloe Wang, Hassaan Maan, Kuan Pang, Fengning Luo, and Bo Wang, “scGPT: Towards building a foundation model for single-cell multi-omics using generative AI,” bioRxiv , pp. 2023–04, 2023."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "Xinmin Li and Cun-Yu Wang, “From bulk, single-cell to spatial RNA sequencing,” International Journal of Oral Science , vol. 13, no. 1, pp. 36, 2021."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "Richard J Chen, Ming Y Lu, Jingwen Wang, Drew FK Williamson, Scott J Rodig, Neal I Lindeman, and Faisal Mahmood, “Pathomic fusion: An integrated framework for fusing histopathology and genomic features for cancer diagnosis and prognosis,” IEEE Transactions on Medical Imaging , vol. 41, no. 4, pp. 757–770, 2020."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "Richard J Chen, Ming Y Lu, Drew FK Williamson, Tiffany Y Chen, Jana Lipkova, Zahra Noor, Muhammad Shaban, Maha Shady, Mane Williams, Bumjin Joo, et al., “Pan-cancer integrative histology-genomic analysis via multimodal deep learning,” Cancer Cell , vol. 40, no. 8, pp. 865–878, 2022."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "Richard J Chen, Ming Y Lu, Wei-Hung Weng, Tiffany Y Chen, Drew FK Williamson, Trevor Manz, Maha Shady, and Faisal Mahmood, “Multimodal co-attention Transformer for survival prediction in gigapixel whole slide images,” in Proceedings of the IEEE/CVF International Conference on Computer Vision , 2021, pp. 4015–4025."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "Kexin Ding, Mu Zhou, Dimitris N Metaxas, and Shaoting Zhang, “Pathology-and-genomics multimodal Transformer for survival outcome prediction,” in International Conference on Medical Image Computing and Computer-Assisted Intervention . Springer, 2023, pp. 622–631."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "Anika Cheerla and Olivier Gevaert, “Deep learning with multimodal representation for pancancer prognosis prediction,” Bioinformatics , vol. 35, no. 14, pp. i446–i454, 2019."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "Xiaokang Peng, Yake Wei, Andong Deng, Dong Wang, and Di Hu, “Balanced multimodal learning via on-the-fly gradient modulation,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2022, pp. 8238–8247."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "Ruize Xu, Ruoxuan Feng, Shi-Xiong Zhang, and Di Hu, “MMCosine: Multi-modal cosine loss towards balanced audio-visual fine-grained learning,” in ICASSP 2023-2023 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP) . IEEE, 2023, pp. 1–5."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "Aviv Regev, Sarah A Teichmann, Eric S Lander, Ido Amit, Christophe Benoist, Ewan Birney, Bernd Bodenmiller, Peter J Campbell, Piero Carninci, Menna Clatworthy, et al., “Science forum: The human cell atlas,” eLife , vol. 6, pp. e27041, 2017."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "Yahui Liu, Enver Sangineto, Yajing Chen, Linchao Bao, Haoxian Zhang, Nicu Sebe, Bruno Lepri, and Marco De Nadai, “Smooth image-to-image translations with latent space interpolations,” arXiv preprint arXiv:2210.00841 , 2022."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "Hongxiao Wang, Hao Zheng, Jianxu Chen, Lin Yang, Yizhe Zhang, and Danny Z Chen, “Unlabeled data guided semi-supervised histopathology image segmentation,” in 2020 IEEE International Conference on Bioinformatics and Biomedicine (BIBM) . IEEE, 2020, pp. 815–820."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "Christopher Beckham, Sina Honari, Vikas Verma, Alex M Lamb, Farnoosh Ghadiri, R Devon Hjelm, Yoshua Bengio, and Chris Pal, “On adversarial mixup resynthesis,” Advances in Neural Information Processing Systems , vol. 32, 2019."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "Travers Ching, Xun Zhu, and Lana X Garmire, “Cox-nnet: An artificial neural network method for prognosis prediction of high-throughput omics data,” PLoS Computational Biology , vol. 14, no. 4, pp. e1006076, 2018."
+    }
+  ]
+}

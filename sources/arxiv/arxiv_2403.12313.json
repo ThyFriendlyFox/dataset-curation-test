@@ -1,0 +1,95 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.12313",
+  "title": "Improving LoRA in Privacy-preserving Federated Learning",
+  "authors": "Youbang Sun, Zitao Li, Yaliang Li, Bolin Ding",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.CR",
+    "cs.DC"
+  ],
+  "url": "https://arxiv.org/abs/2403.12313",
+  "html_url": "https://arxiv.org/html/2403.12313",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 622,
+  "text": "Recent years have witnessed tremendous success in the development of large language models (LLMs) [1,2,3,4]. The applications of LLMs range from a versatile chatbot for different writing tasks [5] to multi-modal systems [6,7,8]. Besides the commercialized products based on general-purpose LLMs, people can also build their customized LLMs by utilizing their task-specific data to fine-tune pre-trained LLMs [9]. Since modern LLMs usually contain billions of parameters, fine-tuning on all parameters has prohibitively high computational costs. As a remedy, parameter efficient fine-tuning (PEFT) approaches [10], such as Low-Rank Adaptation (LoRA) [11] have been developed and commonly adapted in many downstream tasks. PEFT methods freeze the majority of parameters in pre-trained LLMs, and perform update on a small subset of parameters. Compared to full model fine-tuning, these approaches usually offer on-par or even better performance while significantly improving computational efficiency.\n\nIn this paper, we focus on LoRA for its good performance and versatility for a wide spectrum of tasks with many variations. However, LoRA still requires sufficient training data to achieve significant improvement over the raw model. The data-limited parties can unite with others and adopt federated learning (FL) [12] as the computation framework to fine-tune the model collaboratively. The parameter-efficient nature of LoRA is welcomed in FL due to its low communication costs and relatively low local computational burdens. Furthermore, if the data parties in FL (usually known as clients in FL) want to provably prevent local data leaking from their shared information in FL, differential privacy (DP) [13] techniques can be further employed to provide privacy guarantees.\n\nWhile there are many existing research results exploring (privacy-preserved) PEFT in the central setting, the exploration on how to conduct (privacy-preserved) LoRA in the FL setting is still a pre-mature. Directly migrating LoRA methods from the central setting and combining it with FedAvg may not achieve the best performance since other sources of interference in the (privacy-preserving) FL setting, such as noisy gradients and non-iid distribution of data in the cross-silo setting, can play important roles in the optimization process. In real-world LLM applications with privacy concerns, such as federated fine-tuning [14] or fine-tuning under differential privacy guarantees [15], the performance of LoRA often suffers deterioration.\n\nContributions. In this paper, we identify three discordances in applying LoRA in the privacy-preserved FL setting. The first is presented as a mismatched term brought by the joint local updates and separate global aggregations on the two sets of low-rank matrices of LoRA. The second discordance is that if we employ DP-SGD as the differentially private optimizer for training, the injected noise can be amplified by the locally “semi-quadratic” nature of LoRA. Lastly, the choice of one hyper-parameter of LoRA, the scaling factor \\alpha, can significantly affect the convergence and performance of the final model, no matter enforcing DP or not.\n\nTo resolve these discordances, we propose our solution named F ederated F reeze A LoRA (FFA-LoRA). FFA-LoRA freezes the non-zero initialized low-rank matrices and only perform update and aggregation on the zero-initialized matrices, only half as many parameters as LoRA. Beside FFA-LoRA ’s obvious effect of saving half of the communication and computational cost in FL, we also provide intuitions on why it can alleviate the three aforementioned discordances. We conduct comprehensive experiments to demonstrate the advantages of FFA-LoRA over LoRA in privacy-preserving FL, across different tasks, hyper-parameters and privacy protection levels.\n\nWe summarize our contributions as follows:\n\n\\bullet We explore the conditions in privacy-preserved FL that are discordant with LoRA, and provide explanations on the potential reasons of this performance degradation.\n\n\\bullet We propose a new method, FFA-LoRA, which tailors LoRA to increase its performance in these undesirable but unavoidable conditions in privacy-preserved FL.\n\n\\bullet We conduct extensive experiments to verify that FFA-LoRA can consistently outperform LoRA.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib38",
+      "text": "Touvron et al. (2023) Hugo Touvron, Thibaut Lavril, Gautier Izacard, Xavier Martinet, Marie-Anne Lachaux, Timothée Lacroix, Baptiste Rozière, Naman Goyal, Eric Hambro, Faisal Azhar, et al. Llama: Open and efficient foundation language models. arXiv preprint arXiv:2302.13971 , 2023."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib34",
+      "text": "OpenAI (2023) OpenAI. Gpt-4 technical report. arXiv , pp. 2303–08774, 2023."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib47",
+      "text": "Zhang et al. (2022a) Susan Zhang, Stephen Roller, Naman Goyal, Mikel Artetxe, Moya Chen, Shuohui Chen, Christopher Dewan, Mona Diab, Xian Li, Xi Victoria Lin, et al. Opt: Open pre-trained transformer language models. arXiv preprint arXiv:2205.01068 , 2022a."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib45",
+      "text": "Zeng et al. (2022) Aohan Zeng, Xiao Liu, Zhengxiao Du, Zihan Wang, Hanyu Lai, Ming Ding, Zhuoyi Yang, Yifan Xu, Wendi Zheng, Xiao Xia, et al. Glm-130b: An open bilingual pre-trained model. In The Eleventh International Conference on Learning Representations , 2022."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib33",
+      "text": "(33) OpenAI. Introducing chatgpt. https://openai.com/blog/chatgpt . Accessed: 2023-09-21."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib11",
+      "text": "Driess et al. (2023) Danny Driess, Fei Xia, Mehdi SM Sajjadi, Corey Lynch, Aakanksha Chowdhery, Brian Ichter, Ayzaan Wahid, Jonathan Tompson, Quan Vuong, Tianhe Yu, et al. Palm-e: An embodied multimodal language model. arXiv preprint arXiv:2303.03378 , 2023."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib40",
+      "text": "Wu et al. (2023) Chenfei Wu, Shengming Yin, Weizhen Qi, Xiaodong Wang, Zecheng Tang, and Nan Duan. Visual chatgpt: Talking, drawing and editing with visual foundation models. arXiv preprint arXiv:2303.04671 , 2023."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib5",
+      "text": "Bommasani et al. (2021) Rishi Bommasani, Drew A Hudson, Ehsan Adeli, Russ Altman, Simran Arora, Sydney von Arx, Michael S Bernstein, Jeannette Bohg, Antoine Bosselut, Emma Brunskill, et al. On the opportunities and risks of foundation models. arXiv preprint arXiv:2108.07258 , 2021."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib16",
+      "text": "Howard & Ruder (2018) Jeremy Howard and Sebastian Ruder. Universal language model fine-tuning for text classification. arXiv preprint arXiv:1801.06146 , 2018."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib9",
+      "text": "Ding et al. (2023) Ning Ding, Yujia Qin, Guang Yang, Fuchao Wei, Zonghan Yang, Yusheng Su, Shengding Hu, Yulin Chen, Chi-Min Chan, Weize Chen, et al. Parameter-efficient fine-tuning of large-scale pre-trained language models. Nature Machine Intelligence , 5(3):220–235, 2023."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib17",
+      "text": "Hu et al. (2021) Edward J Hu, Yelong Shen, Phillip Wallis, Zeyuan Allen-Zhu, Yuanzhi Li, Shean Wang, Lu Wang, and Weizhu Chen. Lora: Low-rank adaptation of large language models. arXiv preprint arXiv:2106.09685 , 2021."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib25",
+      "text": "Li et al. (2020) Tian Li, Anit Kumar Sahu, Ameet Talwalkar, and Virginia Smith. Federated learning: Challenges, methods, and future directions. IEEE signal processing magazine , 37(3):50–60, 2020."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib12",
+      "text": "Dwork et al. (2006) Cynthia Dwork, Frank McSherry, Kobbi Nissim, and Adam Smith. Calibrating noise to sensitivity in private data analysis. In Theory of Cryptography: Third Theory of Cryptography Conference, TCC 2006, New York, NY, USA, March 4-7, 2006. Proceedings 3 , pp. 265–284. Springer, 2006."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib3",
+      "text": "Babakniya et al. (2023) Sara Babakniya, Ahmed Roushdy Elkordy, Yahya H Ezzeldin, Qingfeng Liu, Kee-Bong Song, Mostafa El-Khamy, and Salman Avestimehr. Slora: Federated parameter efficient fine-tuning of language models. arXiv preprint arXiv:2308.06522 , 2023."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib28",
+      "text": "Li et al. (2022) Xuechen Li, Daogao Liu, Tatsunori B Hashimoto, Huseyin A Inan, Janardhan Kulkarni, Yin-Tat Lee, and Abhradeep Guha Thakurta. When does differentially private learning not suffer in high dimensions? Advances in Neural Information Processing Systems , 35:28616–28630, 2022."
+    }
+  ]
+}

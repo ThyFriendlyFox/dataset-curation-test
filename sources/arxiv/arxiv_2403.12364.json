@@ -1,0 +1,118 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.12364",
+  "title": "Class and Region-Adaptive Constraints for Network Calibration",
+  "authors": "Balamurali Murugesan, Julio Silva-Rodriguez, Ismail Ben Ayed, Jose Dolz",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2403.12364",
+  "html_url": "https://arxiv.org/html/2403.12364",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 835,
+  "text": "Despite the remarkable progress achieved by deep neural networks (DNNs), they are susceptible to suffer from miscalibration, leading to overconfident predictions [1,2], even when they are incorrect. This issue becomes especially significant in safety-critical scenarios, such as medical diagnosis or treatment, where producing accurate uncertainty estimates is of paramount importance. An inherent cause of network miscalibration is known to be the implicit bias for low-entropy predictions caused by popular supervised losses, such as the cross-entropy, which encourages large differences between the logit of the ground truth category and the remaining classes [3].\n\nA myriad of approaches have emerged to mitigate network miscalibration, which mainly focus on either post-processing strategies or integrating additional learning objectives during training. The first family of approaches, i.e., post-processing methods, offers a simple alternative for modifying the softmax predictions in a post-hoc fashion by establishing a mapping from raw network outputs to well-calibrated confidences [4,1,5,6,7]. The second category involves incorporating additional regularization during training, typically penalizing low-entropy predictions. For example, [8] introduced an explicit term that maximizes the Shannon entropy of the network predictions during training, which was later extended in [9] by penalizing low-entropy distributions only in incorrect predictions. Furthermore, popular losses for classification, such as Label smoothing [10] or focal loss [11], implicitly integrate an entropy maximization term, which has a favourable effect on calibration [3,12]. More recently, [13,14,15] propose to enforce inequality constraints on the logit space, allowing to control the margin on logit distances, ultimately reducing overconfidence in the predictions. This provided more flexibility than systematically maximizing the entropy of the predictions, as in [3,12], which results in gradients that continually push towards a non-informative solutions. Other works include the integration of pair-wise constraints between classes [16] or augmenting the training dataset by convex combinations of random pairs of images and their associated labels, e.g., MixUp [17]. Nevertheless, even though these works have achieved remarkable progress in addressing miscalibration in both classification [16,1,5,3,12,8,6] and segmentation tasks [4,9,13,15], they disregard neighbour pixel relationships, in terms of classes, which is of significant relevance in semantic image segmentation.\n\nCertainly, one of the factors contributing to the reduced performance of these losses in segmentation tasks arises from the uniform, or near-to-uniform, distribution enforced in the network predictions (whether logit or softmax predictions), which neglects the spatial context [18]. To overcome this issue, and to integrate class-wise information of the surrounding pixels during training, Spatially Varying Label Smoothing (SVLS) [19] introduced a label smoothing strategy that captures the structural uncertainty required in semantic segmentation. More specifically, SVLS uses a Gaussian kernel applied across the one-hot encoded ground truth, leading to class probabilities based on a soft combination of neighboring pixels. As exposed in [18,20], SVLS integrates an implicit penalty on softmax predictions, which enforces a prior based on soft class proportions of surrounding pixels. This strategy, however, lacks a mechanism to control the influence of the constraint over the main objective, potentially hindering the optimization process. To circumvent this limitation, authors presented a simple solution that combines the standard cross-entropy with an explicit penalty, where both the prior and its impact can be easily controlled.\n\nAlthough the work proposed in [18,20] achieves greater calibration performance than existing alternatives, and integrates class-relationships across a pixel and its neighbours, it presents two major limitations: 1) The scalar balancing weight that controls the importance of the penalty is equal for all classes, and for all the regions. This scenario is suboptimal, as it can hamper the network performance when some classes are more challenging to segment, or under-represented. Furthermore, this strategy considers than the weight of the penalty should be the same for a pixel inside the object (likely to have low uncertainty) than for a pixel within the organ boundaries (likely to have high uncertainty). 2) The value of the balancing weight is defined before network optimization, lacking an adaptive strategy during training. For example, as the training evolves, the cross-entropy loss pushes towards lower-entropy predictions, whereas the penalty weight is the same at the beginning and the end of the training.\n\nBased on these findings, we can summarize our contributions as:\n\n- 1. We propose a class and region-wise constraint approach to tackle the miscalibration issue in semantic segmentation models. In particular, we formulate a solution that considers the specificities of each category and different regions by introducing independent class and region-wise penalty weights. This contrasts with the prior work in [18], where a uniform scalar penalty weight is employed, regardless of categories or regions.\n\n- 2. Furthermore, we transfer the constrained problem to its dual unconstrained optimization counterpart by using an Augmented Lagrangian method (ALM). This alleviates the need for manually adjusting each penalty weight and allows, through a series of iterative inner and outer steps, to find the optimal value of each penalty weight, which can be learned in an adaptive manner.\n\n- 3. Comprehensive experiments on two popular segmentation benchmarks, and with two well-known segmentation backbones, demonstrate the superiority of our approach over a set of relevant recent calibration approaches.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib7",
+      "text": "Guo, C., Pleiss, G., Sun, Y., Weinberger, K.Q.: On calibration of modern neural networks. In: ICML (2017)"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib19",
+      "text": "Minderer, et al.: Revisiting the calibration of modern neural networks. In: NeurIPS (2021)"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib20",
+      "text": "Mukhoti, J., Kulharia, V., Sanyal, A., Golodetz, S., Torr, P.H., Dokania, P.K.: Calibrating deep neural networks using focal loss. In: NeurIPS (2020)"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib5",
+      "text": "Ding, Z., Han, X., Liu, P., Niethammer, M.: Local temperature scaling for probability calibration. In: ICCV (2021)"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib8",
+      "text": "Gupta, K., Rahimi, A., Ajanthan, T., Mensink, T., Sminchisescu, C., Hartley, R.: Calibration of neural networks using splines. In: ICLR (2020)"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib34",
+      "text": "Tomani, C., Gruber, S., Erdem, M.E., Cremers, D., Buettner, F.: Post-hoc uncertainty calibration for domain drift scenarios. In: CVPR (2021)"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib35",
+      "text": "Zhang, J., Kailkhura, B., Han, T.: Mix-n-match: Ensemble and compositional methods for uncertainty calibration in deep learning. In: ICML (2020)"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib28",
+      "text": "Pereyra, G., Tucker, G., Chorowski, J., Kaiser, Ł., Hinton, G.: Regularizing neural networks by penalizing confident output distributions. In: ICLR (2017)"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib13",
+      "text": "Larrazabal, A.J., Martínez, C., Dolz, J., Ferrante, E.: Maximum entropy on erroneous predictions: Improving model calibration for medical image segmentation. In: MICCAI. pp. 273–283 (2023)"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib32",
+      "text": "Szegedy, C., Vanhoucke, V., Ioffe, S., Shlens, J., Wojna, Z.: Rethinking the inception architecture for computer vision. In: CVPR (2016)"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib14",
+      "text": "Lin, T.Y., Goyal, P., Girshick, R., He, K., Dollár, P.: Focal loss for dense object detection. In: CVPR (2017)"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib21",
+      "text": "Müller, R., Kornblith, S., Hinton, G.: When does label smoothing help? In: NeurIPS (2019)"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib15",
+      "text": "Liu, B., Ben Ayed, I., Galdran, A., Dolz, J.: The devil is in the margin: Margin-based label smoothing for network calibration. In: CVPR (2022)"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib16",
+      "text": "Liu, B., Rony, J., Galdran, A., Dolz, J., Ben Ayed, I.: Class adaptive network calibration. In: CVPR. pp. 16070–16079 (2023)"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib23",
+      "text": "Murugesan, B., Liu, B., Galdran, A., Ayed, I.B., Dolz, J.: Calibrating segmentation networks with margin-based label smoothing. Medical Image Analysis 87 , 102826 (2023)"
+    },
+    {
+      "n": 16,
+      "id": "bib.bib4",
+      "text": "Cheng, J., Vasconcelos, N.: Calibrating deep neural networks by pairwise constraints. In: CVPR. pp. 13709–13718 (2022)"
+    },
+    {
+      "n": 17,
+      "id": "bib.bib33",
+      "text": "Thulasidasan, S., Chennupati, G., Bilmes, J., Bhattacharya, T., Michalak, S.: On mixup training: Improved calibration and predictive uncertainty for deep neural networks. In: NeurIPS (2019)"
+    },
+    {
+      "n": 18,
+      "id": "bib.bib22",
+      "text": "Murugesan, B., Adiga Vasudeva, S., Liu, B., Lombaert, H., Ben Ayed, I., Dolz, J.: Trust your neighbours: Penalty-based constraints for model calibration. In: MICCAI. pp. 572–581 (2023)"
+    },
+    {
+      "n": 19,
+      "id": "bib.bib10",
+      "text": "Islam, M., Glocker, B.: Spatially varying label smoothing: Capturing uncertainty from expert annotations. In: IPMI. pp. 677–688. Springer (2021)"
+    },
+    {
+      "n": 20,
+      "id": "bib.bib24",
+      "text": "Murugesan, B., Vasudeva, S.A., Liu, B., Lombaert, H., Ayed, I.B., Dolz, J.: Neighbor-aware calibration of segmentation networks with penalty-based constraints. arXiv preprint arXiv:2401.14487 (2024)"
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2211.09353",
+  "title": "SFPDML: Securer and Faster Privacy-Preserving Distributed Machine Learning based on MKTFHE",
+  "authors": "Hongxiao Wang, Zoe L. Jiang, Yanmin Zhao, Siu-Ming Yiu, Peng Yang, Man Chen, Zejiu Tan, Bohan Jin",
+  "year": "2024",
+  "categories": [
+    "cs.CR",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2211.09353",
+  "html_url": "https://arxiv.org/html/2211.09353",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 919,
+  "text": "In the big data era, it is necessary to transform centralized systems into distributed ones in machine learning tasks. However, these distributed systems lead to new challenges, and one of the most pressing is privacy [1,2].\n\nPrivacy computing is a technique that enables data computation without any risk of information leakage. To outsource private computations, fully homomorphic encryption (FHE), a cryptographic tool, is employed. FHE is a unique form of encryption that allows users to perform computations on encrypted data without the need to first decrypt it. FHE can be divided into two categories: single-key fully homomorphic encryption and multi-key fully homomorphic encryption.\n\nSingle-key FHE only allows a server to perform addition and multiplication on data encrypted by the same key. In contrast, multi-key FHE (MKFHE) proposed in [3] enables users to encrypt their own data under their own keys, but during the decryption of MKFHE, all secret keys of all participants are used. It prevents conspiracy between a user and a server to steal the data of other users.\n\nIn recent years, multi-key fully homomorphic encryption over the torus (MKTFHE) has attracted significant attention from researchers, particularly in the areas of evaluation and decryption algorithms. Chen et al. [4] developed a library for implementing MKTFHE, focusing on an evaluation algorithm that takes a NAND gate as input. Subsequently, Jiang et al. [5] expanded the evaluation algorithm to include arithmetic operators such as adders, subtracters, multipliers, and dividers, enabling linear multi-key homomorphic arithmetic evaluation in MKTFHE. However, the inability to evaluate non-linear operations, like the Sigmoid function, restricts the direct application of more complex machine learning schemes such as logistic regression and neural networks.\n\nTo overcome this limitation, we borrow the SecureML [6] idea of replacing the non-linear activation function with a piecewise function (MKTFHE-friendly activation function). During the evaluation of the activation function, operands are transformed into Booleans and evaluated using Boolean operations. However, implementing piecewise functions in the FHE scheme is challenging due to their discontinuous nature and the need for input ciphertext comparisons with each bound. Instead of the online interactive comparison utilized in SecureML, we propose a simpler method: We develop compare quads to select ciphertext ct_{c} and ct_{d} by comparing messages between ciphertext ct_{a} and ct_{b}. This is achieved by subtracting ct_{a} and ct_{b}, extracting the most significant bit (MSB) of the result, and using the MSB to select the appropriate value through homomorphic evaluation of the equation \\mathsf{MSB}\\land ct_{c}+\\lnot\\mathsf{MSB}\\land ct_{d}. Our compare quads supports more complex branching programs and enables the implementation of the SecureML-like piecewise function with only two compare quads.\n\nConcerning the decryption algorithm, Chen et al. [4] provided a naive decryption algorithm for the original MKTFHE, which requires all users’ secret keys as input. In practical scenarios, access to others’ secret keys during decryption should be restricted. To address this issue, Lee et al. [7] proposed a distributed decryption algorithm that separates the decryption process into two sub-algorithms: partial decryption and final decryption. Each user employs their secret key for partial decryption, ensuring that no user has access to others’ secret keys. However, we discover some possible attacks on the distributed decryption algorithm, described in Appendix.8.\n\nWhy the previous decryption is not secure. In brief, the existing MKTFHE scheme leaks information about user u_{i} ’s secret key s_{i} when provided with ciphertext and partial decryption. Suppose an MKTLWE ciphertext ({\\bf a}_{1},\\ldots,{\\bf a}_{k},b), with b=\\frac{1}{4}m-\\sum^{k}_{i=1}\\langle{\\bf a}_{i},{\\bf s}_{i}\\rangle+e, k as the number of users, m as a one-bit message, and e as an error to randomize b. With the partial decryption p_{i}=b+\\langle{\\bf a}_{i},{\\bf s}_{i}\\rangle and ciphertext b, one can obtain \\langle{\\bf a}_{i},{\\bf s}_{i}\\rangle via their subtraction which may leak information about {\\bf s}_{i}. Besides, an external adversary obtaining all partial decryption results can finish the final multi-key encryption results alone by computing \\sum_{i=1}^{k}p_{i}-\\left(k-1\\right)b.\n\nTo address these security concerns, we introduce additive secret sharing to protect partial decryption and facilitate final decryption. Each participant performs partial decryption using their secret key and shares the result with decryption parties. Secret sharing is then employed to complete the final decryption, preventing internal adversaries from accessing others’ secret keys and external adversaries from obtaining partial decryption results. Since only additional operations are involved, decryption parties do not need to interact, making our decryption protocol secure against both internal and external adversaries while maintaining a similar cost to the original algorithm.\n\nFinally, we combine these advancements to propose our Secure and Faster Privacy-Preserving Distributed Machine Learning (SFPDML) scheme, applying it to train and predict logistic regression models and neural networks using the Iris dataset.\n\nOur contributions can be summarized as follows:\n\n- 1. We develop a secure distributed decryption protocol for MKTFHE by introducing a secret sharing scheme, addressing the information leakage problem. We define our security goal for MKTFHE against possible static adversaries, then prove the correctness and analyze the security of our protocol. Experimental results demonstrate acceptable performance for the overall scheme and achieve similar performance to the original algorithm when the number of participants increases.\n\n- 2. We apply our SFPDML scheme to train and evaluate logistic regression and neural network models. We design a homogenizer to modify the bit length of operands, allowing the use of fewer-bit operators to reduce operation time. To implement a new MKTFHE-friendly activation function, we develop compare quads for comparing and selecting input ciphertext. Experimental results show that our function’s efficiency is 10 times higher than using 7-order Taylor polynomials directly, and the accuracy of the trained model is similar to that of high-order polynomial activation function schemes.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib30",
+      "text": "Joost Verbraeken, Matthijs Wolting, Jonathan Katzy, Jeroen Kloppenburg, Tim Verbelen, and Jan S Rellermeyer. A survey on distributed machine learning. ACM Computing Surveys (CSUR) , 53(2):1–33, 2020."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib16",
+      "text": "Qi Jia, Linke Guo, Zhanpeng Jin, and Yuguang Fang. Preserving model privacy for machine learning in distributed systems. IEEE Transactions on Parallel and Distributed Systems , 29(8):1808–1822, 2018."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib22",
+      "text": "Adriana López-Alt, Eran Tromer, and Vinod Vaikuntanathan. On-the-fly multiparty computation on the cloud via multikey fully homomorphic encryption. In Proceedings of the 44th Symposium on Theory of Computing Conference, STOC 2012 , pages 1219–1234, 2012."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib6",
+      "text": "Hao Chen, Ilaria Chillotti, and Yongsoo Song. Multi-key homomorphic encryption from TFHE. In Advances in Cryptology - ASIACRYPT 2019 - 25th International Conference on the Theory and Application of Cryptology and Information Security , volume 11922 of Lecture Notes in Computer Science , pages 446–472, 2019."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib17",
+      "text": "Zoe L Jiang, Jiajing Gu, Hongxiao Wang, Yulin Wu, Junbin Fang, Siu-Ming Yiu, Wenjian Luo, and Xuan Wang. Privacy-preserving distributed machine learning made faster. In Proceedings of the 2023 Secure and Trustworthy Deep Learning Systems Workshop , pages 1–14, 2023."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib24",
+      "text": "Payman Mohassel and Yupeng Zhang. Secureml: A system for scalable privacy-preserving machine learning. In 2017 IEEE symposium on security and privacy (SP) , pages 19–38. IEEE, 2017."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib20",
+      "text": "Hyang-Sook Lee and Jeongeun Park. On the security of multikey homomorphic encryption. In Cryptography and Coding - 17th IMA International Conference, IMACC 2019 , volume 11929 of Lecture Notes in Computer Science , pages 236–251, 2019."
+    }
+  ]
+}

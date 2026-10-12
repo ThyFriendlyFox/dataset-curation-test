@@ -1,0 +1,183 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.12202",
+  "title": "DeCoTR: Enhancing Depth Completion with 2D and 3D Attentions",
+  "authors": "Yunxiao Shi, Manish Kumar Singh, Hong Cai, Fatih Porikli",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2403.12202",
+  "html_url": "https://arxiv.org/html/2403.12202",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 758,
+  "text": "Depth is crucial for 3D perception in various downstream applications, such as autonomous driving, augmented and virtual reality, and robotics [1,2,3,4,5,6,7,8,9,10,11]. However, sensor-based depth measurement is far from perfect. Such measurements often exhibit sparsity, low resolution, noise interference, and incompleteness. Various factors, including environmental conditions, motion, sensor power constraints, and the presence of specular, transparent, wet, or non-reflective surfaces, contribute to these limitations. Consequently, the task of depth completion, aimed at generating dense and accurate depth maps from sparse measurements alongside aligned camera images, has emerged as a pivotal research area [12,13,14,15,16,17,18,19].\n\nThanks to the advances in deep learning, there has been significant progress in depth completion. Earlier papers leverage convolutional neural networks to perform depth completion with image guidance and achieve promising results [13,20,21]. In order to improve accuracy, researchers have studied various spatial propagation methods [22,12,17,16], which performs further iterative processing on top of depth maps and features computed by an initial network. Most existing solutions build on this in the last stage of their depth completion pipeline to improve performance [23,19]. These propagation algorithms, however, focus on 2D feature processing and do not fully exploit the 3D nature of the problem. A few recent papers utilize transformers for depth completion [19,24]. However, they apply transformer operations mainly to improve feature learning on the 2D image plane and fail to achieve acceptable accuracy without employing spatial propagation.\n\nSeveral studies have looked into harnessing 3D representation more comprehensively. For instance, [25,26] construct a point cloud from the input sparse depth, yet coping with extreme sparsity poses challenges in effective feature learning. Another approach, as seen in [18], uplifts 2D features to 3D by using the initial dense depth predicted by a simple convolutional network, but it is impeded by the poor accuracy of the initial network and requires dynamic propagations to attain acceptable accuracy. Very recently, researchers have proposed employing transformers for 3D feature learning in depth completion [27]; however, this work applies transformer layers to extremely sparse points, which is ineffective for learning informative 3D features.\n\nHere, we introduce DeCoTR to perform feature learning in full 3D. It accomplishes this by constructing a dense feature point cloud derived from completed depth values obtained from an initial network and subsequently applying transformer processing to these 3D points. To do this properly, it is essential to have reasonably accurate initial depths. As such, we first enhance a commonly used convolution-based initial depth network, S2D [13], by integrating transformer layers on bottleneck and skip connection features. This upgraded model, termed S2D-TR, achieves significantly improved depth accuracy, on par with state-of-the-art models, without requiring any iterative spatial propagation.\n\nGiven the initial depth map, we uplift 2D features to 3D to form a point cloud, which is subsequently processed by transformer layers, to which we refer as 3D-TR layers. Prior to feeding the points to transformer layers, we normalize them, which regularizes the 3D feature learning and leads to better accuracy. In each 3D-TR layer, we follow standard practice [29,30] to perform neighborhood-based attention, as global attention would be computationally intractable when the number of points is large. To facilitate long-range contextual understanding, we additionally incorporate global attention on lower-scale versions of the point cloud. Finally, 3D features are projected back to the 2D image plane and consumed by a decoder to produce the final depth prediction. As we shall see in the paper, our proposed transformer-based learning in full 3D provides considerably improved accuracy and generalizability for depth completion; see Fig. 1 for a visual example.\n\nIn summary, our main contributions are as follows:\n\n- • We present DeCoTR, a novel transformer-based approach to perform full 3D feature learning for depth completion. This enables high-quality depth estimation without requiring iterative processing steps.\n\n- • In order to properly do this, we upgrade the commonly used initial network S2D, by enhancing its bottleneck and skip connection features using transformers. The resulting model, S2D-TR, performs on-par with SOTA and provides more correct depths to subsequent 3D learning.\n\n- • We devise useful techniques to normalize the uplifted 3D feature point cloud, which improves the model learning. We additionally apply low-resolution global attention to 3D points, which enhances long-range understanding without making computation infeasible.\n\n- • Through extensive evaluations on standard benchmarks, NYU Depth v2 [28] and KITTI [31], we demonstrate the efficacy of DeCoTR and show that it sets the new SOTA, e.g., new best result on NYU Depth v2. Our zero-shot testing on ScanNet [32] and DDAD [33] further showcases the better generalizability of our model as compared to existing methods.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib2",
+      "text": "Chenyi Chen, Ari Seff, Alain Kornhauser, and Jianxiong Xiao. Deepdriving: Learning affordance for direct perception in autonomous driving. In Proceedings of the IEEE international conference on computer vision , pages 2722–2730, 2015."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib1",
+      "text": "Lin Bai, Yiming Zhao, Mahdi Elhousni, and Xinming Huang. Depthnet: Real-time lidar point cloud depth completion for autonomous vehicles. IEEE Access , 8:227825–227833, 2020."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib9",
+      "text": "Catherine Diaz, Michael Walker, Danielle Albers Szafir, and Daniel Szafir. Designing for depth perceptions in augmented reality. In 2017 IEEE international symposium on mixed and augmented reality (ISMAR) , pages 111–122. IEEE, 2017."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib11",
+      "text": "Ruofei Du, Eric Turner, Maksym Dzitsiuk, Luca Prasso, Ivo Duarte, Jason Dourgarian, Joao Afonso, Jose Pascoal, Josh Gladstone, Nuno Cruces, et al. Depthlab: Real-time 3d interaction with depth maps for mobile augmented reality. In Proceedings of the 33rd Annual ACM Symposium on User Interface Software and Technology , pages 829–843, 2020."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib8",
+      "text": "Jorge de Heuvel, Nathan Corral, Benedikt Kreis, Jacobus Conradi, Anne Driemel, and Maren Bennewitz. Learning depth vision-based personalized robot navigation from dynamic demonstrations in virtual reality. In 2023 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS) , pages 6757–6764. IEEE, 2023."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib35",
+      "text": "Yunxiao Shi, Hong Cai, Amin Ansari, and Fatih Porikli. Ega-depth: Efficient guided attention for self-supervised multi-camera depth estimation. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 119–129, 2023."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib51",
+      "text": "Jing Zhu, Yunxiao Shi, Mengwei Ren, and Yi Fang. Mda-net: memorable domain adaptation network for monocular depth estimation. In British Machine Vision Conference 2020 , 2020."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib50",
+      "text": "Jing Zhu, Yunxiao Shi, Mengwei Ren, Yi Fang, Kuo-Chin Lien, and Junli Gu. Structure-attentioned memory network for monocular depth estimation. arXiv preprint arXiv:1909.04594 , 2019."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib33",
+      "text": "Yunxiao Shi, Haoyu Fang, Jing Zhu, and Yi Fang. Pairwise attention encoding for point cloud feature learning. In 2019 International Conference on 3D Vision (3DV) , pages 135–144. IEEE, 2019a."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib43",
+      "text": "Rajeev Yasarla, Hong Cai, Jisoo Jeong, Yunxiao Shi, Risheek Garrepalli, and Fatih Porikli. Mamo: Leveraging memory and attention for monocular video depth estimation. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 8754–8764, 2023."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib34",
+      "text": "Yunxiao Shi, Jing Zhu, Yi Fang, Kuochin Lien, and Junli Gu. Self-supervised learning of depth and ego-motion with differentiable bundle adjustment. arXiv preprint arXiv:1909.13163 , 2019b."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib4",
+      "text": "Xinjing Cheng, Peng Wang, and Ruigang Yang. Depth estimation via affinity learned with convolutional spatial propagation network. In Proceedings of the European conference on computer vision (ECCV) , pages 103–119, 2018."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib27",
+      "text": "Fangchang Ma and Sertac Karaman. Sparse-to-dense: Depth prediction from sparse depth samples and a single image. In 2018 IEEE international conference on robotics and automation (ICRA) , pages 4796–4803. IEEE, 2018."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib5",
+      "text": "Xinjing Cheng, Peng Wang, and Ruigang Yang. Learning depth with convolutional spatial propagation network. IEEE transactions on pattern analysis and machine intelligence , 42(10):2361–2379, 2019."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib41",
+      "text": "Yan Xu, Xinge Zhu, Jianping Shi, Guofeng Zhang, Hujun Bao, and Hongsheng Li. Depth completion from sparse lidar data with depth-normal constraints, 2019."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib24",
+      "text": "Yuankai Lin, Tao Cheng, Qi Zhong, Wending Zhou, and Hua Yang. Dynamic spatial propagation network for depth completion. In Proceedings of the AAAI Conference on Artificial Intelligence , pages 1638–1646, 2022."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib29",
+      "text": "Jinsun Park, Kyungdon Joo, Zhe Hu, Chi-Kuei Liu, and In So Kweon. Non-local spatial propagation network for depth completion. In Computer Vision–ECCV 2020: 16th European Conference, Glasgow, UK, August 23–28, 2020, Proceedings, Part XIII 16 , pages 120–136. Springer, 2020."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib26",
+      "text": "Xin Liu, Xiaofei Shao, Bo Wang, Yali Li, and Shengjin Wang. Graphcspn: Geometry-aware depth completion via dynamic gcns. In European Conference on Computer Vision , pages 90–107. Springer, 2022."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib45",
+      "text": "Youmin Zhang, Xianda Guo, Matteo Poggi, Zheng Zhu, Guan Huang, and Stefano Mattoccia. Completionformer: Depth completion with convolutions and vision transformers. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 18527–18536, 2023."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib3",
+      "text": "Yun Chen, Bin Yang, Ming Liang, and Raquel Urtasun. Learning joint 2d-3d representations for depth completion. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 10023–10032, 2019."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib37",
+      "text": "Jie Tang, Fei-Peng Tian, Wei Feng, Jian Li, and Ping Tan. Learning guided convolutional network for depth completion. IEEE Transactions on Image Processing , 30:1116–1129, 2020."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib25",
+      "text": "Sifei Liu, Shalini De Mello, Jinwei Gu, Guangyu Zhong, Ming-Hsuan Yang, and Jan Kautz. Learning affinity via spatial propagation networks. Advances in Neural Information Processing Systems , 30, 2017."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib17",
+      "text": "Mu Hu, Shuling Wang, Bin Li, Shiyu Ning, Li Fan, and Xiaojin Gong. Penet: Towards precise and efficient image guided depth completion. In 2021 IEEE International Conference on Robotics and Automation (ICRA) , pages 13656–13662. IEEE, 2021."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib32",
+      "text": "Kyeongha Rho, Jinsung Ha, and Youngjung Kim. Guideformer: Transformers for image guided depth completion. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 6250–6259, 2022."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib18",
+      "text": "Lam Huynh, Phong Nguyen, Jiří Matas, Esa Rahtu, and Janne Heikkilä. Boosting monocular depth estimation with lightweight 3d point fusion. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 12767–12776, 2021."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib49",
+      "text": "Wending Zhou, Xu Yan, Yinghong Liao, Yuankai Lin, Jin Huang, Gangming Zhao, Shuguang Cui, and Zhen Li. Bev@ dc: Bird’s-eye view assisted training for depth completion. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 9233–9242, 2023."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib44",
+      "text": "Zhu Yu, Zehua Sheng, Zili Zhou, Lun Luo, Si-Yuan Cao, Hong Gu, Huaqi Zhang, and Hui-Liang Shen. Aggregating feature point cloud for depth completion. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 8732–8743, 2023."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib36",
+      "text": "Nathan Silberman, Derek Hoiem, Pushmeet Kohli, and Rob Fergus. Indoor segmentation and support inference from rgbd images. In Computer Vision–ECCV 2012: 12th European Conference on Computer Vision, Florence, Italy, October 7-13, 2012, Proceedings, Part V 12 , pages 746–760. Springer, 2012."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib46",
+      "text": "Hengshuang Zhao, Li Jiang, Jiaya Jia, Philip HS Torr, and Vladlen Koltun. Point transformer. In Proceedings of the IEEE/CVF international conference on computer vision , pages 16259–16268, 2021a."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib40",
+      "text": "Xiaoyang Wu, Yixing Lao, Li Jiang, Xihui Liu, and Hengshuang Zhao. Point transformer v2: Grouped vector attention and partition-based pooling. Advances in Neural Information Processing Systems , 35:33330–33342, 2022."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib14",
+      "text": "Andreas Geiger, Philip Lenz, Christoph Stiller, and Raquel Urtasun. Vision meets robotics: The kitti dataset. The International Journal of Robotics Research , 32(11):1231–1237, 2013."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib7",
+      "text": "Angela Dai, Angel X Chang, Manolis Savva, Maciej Halber, Thomas Funkhouser, and Matthias Nießner. Scannet: Richly-annotated 3d reconstructions of indoor scenes. In Proceedings of the IEEE conference on computer vision and pattern recognition , pages 5828–5839, 2017."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib15",
+      "text": "Vitor Guizilini, Rares Ambrus, Sudeep Pillai, Allan Raventos, and Adrien Gaidon. 3d packing for self-supervised monocular depth estimation. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 2485–2494, 2020."
+    }
+  ]
+}

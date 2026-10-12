@@ -1,0 +1,54 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.11283",
+  "title": "Pattern-Based Peephole Optimizations with Java JIT Tests",
+  "authors": "Zhiqiang Zang, Aditya Thimmaiah, Milos Gligoric",
+  "year": "2024",
+  "categories": [
+    "cs.SE",
+    "cs.PL"
+  ],
+  "url": "https://arxiv.org/abs/2403.11283",
+  "html_url": "https://arxiv.org/html/2403.11283",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1235,
+  "text": "Peephole optimization [1,2] is an optimization technique performed on a small set of instructions (known as a window), e.g., A + A is transformed to A << 1. Popular compilers such as GCC, LLVM, and Java JIT, include dozens if not hundreds of peephole optimizations [3,4,5].\n\nTraditionally, each peephole optimization is implemented as a compiler pass. Each compiler pass detects windows, i.e., a sequence of instructions that can be optimized, and replaces each window with an equivalent, albeit more efficient, sequence of instructions. These implementations are written in the language in which the compiler is implemented (C/C++ for Java JIT) and they leverage compiler infrastructure to detect instructions of interest. Representation of these instructions inside the compiler infrastructure is substantially different from code written in the programming language itself [6]. This disconnect introduces a burden on compiler developers to perform proper reasoning to detect windows of interest, to do the instruction mapping from high-level code (what developers write) to low-level code, and to document their intention. The process is tedious and error prone.\n\nAlive [6] was an improvement over the traditional approach: a developer writes patterns in a domain specific language (DSL) over the intermediate representation (IR) of the program (LLVM bitcode) which are then translated into compiler passes. The DSL used in Alive is still very much disconnected from code written in the programming language being optimized (C++). This disconnect introduces a steep learning curve and lacks most of common software tools, e.g., an IDE. Alive also focused on C++ intricacies and undefined behavior.\n\nOur insight is that many peephole optimizations can be expressed in the programming language that is being optimized (e.g., Java). We found the motivation in existing tests for Java JIT. Most tests for JIT optimizations in OpenJDK are written in Java and some of the tests contain Java code that follows specific patterns so as to trigger the optimizations under test [7]. Figure 1 shows such a JIT test from OpenJDK, which triggers the peephole optimization that transforms (a - b) + (c - a) into c - b, by returning (a - b) + (c - a) (line 6). Such a pattern expresses, in Java code, the window to be recognized by a specific optimization. We propose to extend this concept to use the patterns not only to write tests but to express the entire optimization, including code before and after the optimization.\n\nWe present JOG, the first framework that enables developers to write optimization patterns in a high-level language (Java). Namely, using JOG, a Java JIT compiler developer writes optimization patterns as Java statements. Patterns are type-checked (by the Java compiler) and automatically translated into compiler passes (by JOG). Additionally, Java tests for the optimizations can be automatically generated from the patterns. Writing patterns in Java for the Java JIT compiler ensures that sequences of statements are meaningful, i.e., windows can indeed appear in programs (which is not necessarily the case when matching intermediate representation or compiler abstractions). Next, writing patterns in Java simplifies the reasoning behind each peephole optimization: what used to be comments documenting an optimization inside the Java JIT compiler for dozens of lines of code, or what used to be a test that describes how to trigger an optimization, becomes a self-documenting pattern. Finally, while writing patterns in JOG, a developer can use software engineering tools available for the language (e.g., IDE, linter). Having patterns in Java also enables future application of program equivalence checkers that work on either Java code or bytecode (which can be easily obtained by compiling JOG patterns).\n\nFurthermore, conciseness of patterns makes it easier to analyze relations between optimizations. JOG automatically detects possible shadow relation between a pair of optimizations where the effect of the shadowed optimization is overridden by another. Consider two optimizations X and Y: X transforms (a - b) + (c - d) into (a + c) - (b + d) and Y transforms (a - b) + (b - c) into a - c, where a, b, c, d are all free variables. Note that any expression matching (a - b) + (b - c) (X) also matches (a - b) + (c - d) (Y), which means X can be applied wherever Y can be applied, so the effect of X will shadow Y if X is always applied before Y in a compiler pass. JOG can automatically report the shadow relations.\n\nUsing JOG, we wrote a total of 162 optimization patterns, including 68 existing optimizations in OpenJDK, 92 new optimizations adapted from LLVM, and twonew optimizations. Most of the patterns that we extracted from OpenJDK were existing tests of the optimizations, or they were hand-written as examples in the comments documenting the C/C++ implementation. Our most complex pattern has only 115 characters in contrast to the 462 characters of its C/C++ counterpart. Our evaluation shows that generating code from patterns using JOG does not reduce the effectiveness of JIT optimizations. We also identified a bug in existing Java JIT as one optimization was unreachable as a consequence of being shadowed by another.\n\nRecently, we have opened a group of eight pull requests (PRs) for OpenJDK (six for new optimizations, one for fixing the aforementioned shadowed optimizations, and one for new JOG generated JIT tests of existing optimizations). Seven of the PRs were already accepted and integrated into the master branch; the remaining PR is under review. We intend on opening PRs on the remaining optimizations in the future.\n\nThe main contributions of this paper include the following:\n\n- • We present JOG, the first framework that allows developers to specify a Java JIT peephole optimization as a pattern written in Java itself, extending the existing approach to writing tests for JIT. The pattern is automatically translated into C/C++ code as a JIT optimization pass, and a Java test for the optimization is generated from the pattern as needed.\n\n- • JIT optimizations written in JOG is easier to read and understand. We translated 68 existing patterns in OpenJDK. The evaluation shows a 63.75 % reduction in characters of code and a 52.67 % reduction in the number of identifiers in code when writing optimizations in JOG relative to existing hand-written code in OpenJDK.\n\n- • Code generated from JOG maintains the effectiveness of JIT optimizations. The evaluation shows that the impact on performance is minimal on replacing existing hand-written code in OpenJDK with JOG generated code for existing patterns. We also wrote 92 new patterns adapted from LLVM. A total of six PRs on the new patterns were opened, of which five PRs have been integrated into the master branch of OpenJDK.\n\n- • We present an algorithm to determine if one optimization shadows another written in patterns using JOG. We ran the algorithm on all the translated patterns to detect shadows between patterns. We opened one PR on removing shadowed patterns that has been integrated into the master branch of OpenJDK.\n\n- • JIT tests generated from JOG complements existing test suites in OpenJDK. We generated tests for existing optimizations in OpenJDK and opened one PR to add 10 new tests for existing untested optimizations in OpenJDK.\n\nWe believe that JOG enables developers to quickly write and evaluate a large number of peephole optimizations by writing patterns in a familiar programming language and very much similar to the way the existing tests for JIT are written. JOG is publicly available at https://github.com/EngineeringSoftware/jog.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib25",
+      "text": "Muchnick (1997) Steven S. Muchnick. 1997. Advanced Compiler Design and Implementation . Morgan Kaufmann Publishers."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib22",
+      "text": "McKeeman (1965) W. M. McKeeman. 1965. Peephole Optimization. Commun. ACM 8, 7 (1965), 443–444. https://doi.org/10.1145/364995.365000"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib4",
+      "text": "Biener and Kulkarni (2022) Richard Biener and Prathamesh Kulkarni. 2022. gcc/match.pd at master - gcc-mirror/gcc . https://github.com/gcc-mirror/gcc/blob/dcb4bd0/gcc/match.pd ."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib18",
+      "text": "LLVM Project (2022) LLVM Project. 2022. llvm-project/llvm/lib/Transforms/InstCombine at main - llvm/llvm-project . https://github.com/llvm/llvm-project/tree/b26e44e/llvm/lib/Transforms/InstCombine/InstCombineAddSub.cpp ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib30",
+      "text": "Oracle and/or its affiliates (2022b) Oracle and/or its affiliates. 2022b. jdk/subnode.cpp at b334d96 - openjdk/jdk - GitHub . https://github.com/openjdk/jdk/blob/b334d96/src/hotspot/share/opto/subnode.cpp#L163 ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib20",
+      "text": "Lopes et al . (2015) Nuno P. Lopes, David Menendez, Santosh Nagarakatte, and John Regehr. 2015. Provably Correct Peephole Optimizations with Alive. In Programming Language Design and Implementation . ACM, 22–32. https://doi.org/10.1145/2737924.2737965"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib29",
+      "text": "Oracle and/or its affiliates (2022a) Oracle and/or its affiliates. 2022a. jdk/AddINodeIdealizationTests.java at master - openjdk/jdk - GitHub . https://github.com/openjdk/jdk/blob/master/test/hotspot/jtreg/compiler/c2/irTests/AddINodeIdealizationTests.java ."
+    }
+  ]
+}

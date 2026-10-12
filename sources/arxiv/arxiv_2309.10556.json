@@ -1,0 +1,98 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2309.10556",
+  "title": "Forgedit: Text Guided Image Editing via Learning and Forgetting",
+  "authors": "Shiwen Zhang, Shuai Xiao, Weilin Huang",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2309.10556",
+  "html_url": "https://arxiv.org/html/2309.10556",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "introduction",
+  "word_count": 779,
+  "text": "Image Editing [1] is a fundamental problem in computer vision. To perform image editing, a guidance condition is often provided to the model to indicate the editing intention. Text condition is the most simple and general form of such editing guidance, in which case the editing task is called text-guided image editing. Such a text describing the content of the desired edited image is usually called target prompt. In this paper, we aim to tackle the task of text-guided image editing, with only an original image and a target prompt provided - which are the minimum requirements of inputs for this task. Text-guided image editing is a general task, including both rigid and non-rigid editing.\n\nThe approaches of text-guided image editing are generally categorized into optimization-based methods and non-optimization ones according to whether fine-tuning process is performed for reconstruction. Recent non-optimization editing methods [2,3,4,5,6,7,8,9] are very efficient. Yet they either struggle on preserving the precise characteristics of original image during complex editing, or suffer from being incapable of performing sophisticated and accurate non-rigid edits. It is undeniable that fine-tuning a diffusion model with the original image is still critical and necessary for precise identity preservation and accurate semantic understanding. However, previous optimization-based methods [10,11,12] suffer from long fine-tuning time, severe overfitting issues or incapablity of performing precise non-rigid editing.\n\nIn this paper, we are going to tackle the aforementioned issues of optimization-based editing methods. We name our text-guided image editing method as Forgedit (similar to forget it), which consists of two stages: fine-tuning and editing.\n\nFor fine-tuning stage, with a generated source prompt from BLIP [13] to describe the original image, we design a vision and language joint optimization framework, which could be regarded as a variant of Imagic [10] by combining the first stage and the second stage of Imagic into one and using BLIP generated caption as source prompt instead of using target prompt as source prompt like what Imagic does. Such simple modifications are the keys to much faster convergence speed and less overfitting than Imagic. With our joint learning of image and source text embedding, the finetuning stage using one image with our Forgedit+Stable Diffusion 1.4 [14] takes 30 seconds on an A100 GPU, compared with 7 minutes with Imagic +Stable Diffusion [10] reported by Imagic paper. This leads to 14x speed up. BLIP generated source prompt also eases overfitting, which we will demonstrate in the ablation study.\n\nFor editing stage, we propose two novel methods, vector projection and forgetting strategy with a finding of a general UNet property. For the first time in the literature of text-guided image editing with Diffusion Models, we propose a novel vector projection mechanism in text embedding space of Diffusion Models, which is capable to seperately control the identity and editing strength by decomposing the target text embedding into identity embedding and editing embedding. We explore the properties of vector projection and compare it with previous vector subtraction method utilized in Imagic to demonstrate its superiority on identity preservation. Finally, we discovered a general property of UNet structure in Diffusion Models, i.e., Unet encoder learns space and structure, Unet decoder learns appearance and identity. With such a property, we could easily tackle the fatal overfitting issues of optimization-based image editing methods in a very effective and efficient manner during sampling process instead of fine-tuning process, by designing a forgetting mechanism according to such a UNet property.\n\nTo sum up, our main contributions are: 1. We present Forgedit, an efficient vision-language joint optimization framework, capable of performing both rigid and non-rigid text-guided image editing, while effectively tackling multiple general challenges on this task. 2. We introduce a novel vector projection mechanism in text embedding space of Diffusion Models, which provides a more controllable alternative for computing the combination of the source text embedding and the target text embedding. This improves Forgedit’s capability for preserving more consistent characteristics of original image than existing methods. 3. We design a novel forgetting strategy based on our observation on the UNet architecture of diffusion models, i.e., Unet encoder learns space and structure, Unet decoder learns appearance and identity. This allows us to effectively tackle the critical overfitting issue on optimization based image editing methods, thus significantly boosting the editing capability of diffusion models.\n\nOur Forgedit can achieve new state-of-the-art results on the challenging benchmark TEdBench [10] (even by using an outdated Stable Diffusion 1.4), surpassing previous SOTA Imagic built on Imagen in terms of both CLIP score [15] and LPIPS score [16]. Our Forgedit is highly flexible, and is readily applicable to other fine-tuning based text-guided image editing methods, with significant performance improvements. We will show more applications for such extensions in the appendix.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib20",
+      "text": "Oh, B.M., Chen, M., Dorsey, J., Durand, F.: Image-based modeling and photo editing. In: SIGGRAPH. pp. 433–442. ACM (2001)"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib3",
+      "text": "Brooks, T., Holynski, A., Efros, A.A.: Instructpix2pix: Learning to follow image editing instructions. In: CVPR (2023)"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib30",
+      "text": "Tumanyan, N., Geyer, M., Bagon, S., Dekel, T.: Plug-and-play diffusion features for text-driven image-to-image translation. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR). pp. 1921–1930 (June 2023)"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib5",
+      "text": "Couairon, G., Verbeek, J., Schwenk, H., Cord, M.: Diffedit: Diffusion-based semantic image editing with mask guidance. In: ICLR. OpenReview.net (2023)"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib32",
+      "text": "Zhang, L., Agrawala, M.: Adding conditional control to text-to-image diffusion models (2023)"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib18",
+      "text": "Meng, C., He, Y., Song, Y., Song, J., Wu, J., Zhu, J.Y., Ermon, S.: Sdedit: Guided image synthesis and editing with stochastic differential equations. In: International Conference on Learning Representations (2021)"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib1",
+      "text": "Avrahami, O., Lischinski, D., Fried, O.: Blended diffusion for text-driven editing of natural images. In: CVPR. pp. 18187–18197. IEEE (2022)"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib4",
+      "text": "Cao, M., Wang, X., Qi, Z., Shan, Y., Qie, X., Zheng, Y.: Masactrl: Tuning-free mutual self-attention control for consistent image synthesis and editing. In: ICCV. pp. 22503–22513. IEEE (2023)"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib31",
+      "text": "Wei, Y., Zhang, Y., Ji, Z., Bai, J., Zhang, L., Zuo, W.: Elite: Encoding visual concepts into textual embeddings for customized text-to-image generation. arXiv preprint arXiv:2302.13848 (2023)"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib14",
+      "text": "Kawar, B., Zada, S., Lang, O., Tov, O., Chang, H., Dekel, T., Mosseri, I., Irani, M.: Imagic: Text-based real image editing with diffusion models. In: CVPR. pp. 6007–6017. IEEE (2023)"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib26",
+      "text": "Ruiz, N., Li, Y., Jampani, V., Pritch, Y., Rubinstein, M., Aberman, K.: Dreambooth: Fine tuning text-to-image diffusion models for subject-driven generation. In: CVPR. pp. 22500–22510. IEEE (2023)"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib34",
+      "text": "Zhang, Z., Han, L., Ghosh, A., Metaxas, D., Ren, J.: Sine: Single image editing with text-to-image diffusion models. arXiv preprint arXiv:2212.04489 (2022)"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib17",
+      "text": "Li, J., Li, D., Xiong, C., Hoi, S.C.H.: Blip: Bootstrapping language-image pre-training for unified vision-language understanding and generation. In: International Conference on Machine Learning (2022)"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib25",
+      "text": "Rombach, R., Blattmann, A., Lorenz, D., Esser, P., Ommer, B.: High-resolution image synthesis with latent diffusion models. 2022 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib8",
+      "text": "Hessel, J., Holtzman, A., Forbes, M., Bras, R.L., Choi, Y.: Clipscore: A reference-free evaluation metric for image captioning. In: EMNLP (1). pp. 7514–7528. Association for Computational Linguistics (2021)"
+    },
+    {
+      "n": 16,
+      "id": "bib.bib33",
+      "text": "Zhang, R., Isola, P., Efros, A.A., Shechtman, E., Wang, O.: The unreasonable effectiveness of deep features as a perceptual metric. 2018 IEEE/CVF Conference on Computer Vision and Pattern Recognition pp. 586–595 (2018)"
+    }
+  ]
+}

@@ -1,0 +1,243 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2402.03704",
+  "title": "WhisperFuzz: White-Box Fuzzing for Detecting and Locating Timing Vulnerabilities in Processors",
+  "authors": "Pallavi Borkar, Chen Chen, Mohamadreza Rostami, Nikhilesh Singh, Rahul Kande, Ahmad-Reza Sadeghi, Chester Rebeiro, Jeyavijayan Rajendran",
+  "year": "2024",
+  "categories": [
+    "cs.CR"
+  ],
+  "url": "https://arxiv.org/abs/2402.03704",
+  "html_url": "https://arxiv.org/html/2402.03704",
+  "license": "http://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Introduction",
+  "word_count": 1090,
+  "text": "The evolution in computer architecture has significantly amplified the complexity of hardware design, especially in modern processors, which are the foundation of today’s computing systems. As technology advances, designers integrate more functionalities into hardware, leading to more intricate architectural and microarchitectural features in processors. However, as the complexity of the design increases, so does the number of design regions to verify and protect. Traditional techniques to verify modern processors cannot scale with the number of (new) hardware vulnerabilities discovered. For example, the number of newly detected hardware common vulnerabilities in the National Vulnerability Database (NVD) increased from three in 2012 to 92 in 2022 [1]. Further, as of 2023, MITRE reported 117 hardware-related vulnerability types, known as Common Weakness Enumerations (CWEs) [2]. These rapidly increasing vulnerabilities threaten the security of the expanding digital landscape across different domains necessitating efficient detection strategies [3,4,5,6,7].\n\nTiming vulnerabilities are of particular concern as they can leak sensitive information, undermining the entire system’s security. Well-known attacks such as Spectre [8], Meltdown [9], Foreshadow [10], LVI [11], RIDL [12], ZombieLoad [13], CrossTalk [14], Zenbleed [15], and Retbleed [16] exploit timing vulnerabilities present in a wide range of commercial processors. Multiple variants of these attacks have been shown to subvert security countermeasures implemented to prevent such attacks. Unlike functional vulnerabilities, timing vulnerabilities can manifest in a logically correct implementation, making them hard to detect. Timing vulnerabilities rely on the difference in execution time of the hardware components to leak sensitive information. These vulnerabilities underscore the need for rigorous security analysis in modern processors. Moreover, unlike software flaws, which can be patched post-deployment, fixing hardware vulnerabilities after manufacturing is difficult, as they are physically ingrained into the Silicon. Therefore, detecting vulnerabilities at the pre-Silicon stage is imperative for secure hardware.\n\nExisting timing vulnerability detection strategies for processors use formal methods or fuzzing. Formal methods, such as theorem proving [17], model checking [18], assertion proving [19], and information-flow tracking [20] explore design spaces exhaustively and prove security assertions about hardware. Thus, detecting timing vulnerabilities using formal methods is a rigorous approach to ensure design security [21,22]. However, these methods are limited by the state explosion problem [18,23,24,25]; exhaustively exploring the complex modern hardware is computationally hard [26,27]. Some approaches aim to handle this scalability issue by modeling hardware at the higher abstraction level and approximating its timing behavior [22]. However, abstracting hardware can lead to over-optimistic results or false positives [27]. Furthermore, these formal approaches require a comprehensive understanding of the designs’ security specifications and manually defining properties, an error-prone process [28].\n\nAlternatively, hardware fuzzing has shown its effectiveness in detecting vulnerabilities in large-scale designs [29,30,31,27,32,33]. Using fuzzing, Google detected the recent vulnerability on AMD Zen2 processors, Zenbleed [15], a speculative execution vulnerability that allows attackers to extract sensitive information through software exploitation [34]. Black-box fuzzing [35,36] and grey-box fuzzing [37] have been applied to detect timing vulnerabilities in processors. They explore the design spaces by generating different combinations of instructions as inputs and use performance counters to identify potential timing vulnerabilities [37,35,36]. While these techniques overcome the scalability issue of formal verification, they suffer from two critical limitations. First, although they successfully find instructions that cause timing vulnerabilities, they rely on confirmation from designers to identify and pinpoint the root cause (locations) [35,36,37]. Second, they lack the adequate coverage metric to capture the timing behaviors of the processor. Designers rely on coverage metrics to obtain the necessary confidence before tape-out [38,39,40]. Therefore, introducing such metrics to evaluate the progress of fuzzing is typical [41]. We will elaborate on these shortcomings in Section 5.\n\nOur Goals and Contributions. We enhance existing fuzzing strategies to address their limitations by integrating static analysis. This allows us to automatically pinpoint the sources of timing vulnerabilities and compute the coverage of timing behaviors in processor designs. Our fuzzer efficiently explores the design space, detecting timing vulnerabilities, while our novel static approach identifies the root causes and provides timing behavior coverage.\n\nLocating the root cause of timing vulnerabilities and computing timing coverage is non-trivial and poses several challenges: (i) expressing the timing behaviors of processor modules formally is complex, as they do not operate in isolation and can influence each other; (ii) finer measurement of module timing behaviors is needed, which is time-consuming for modern processors with numerous modules [42,43]; (iii) tracing vulnerabilities to their root causes within the design space is intricate; and (iv) traditional mutation algorithms used in fuzzers are insufficient for detecting timing vulnerabilities due to their reliance on microarchitectural state transitions.\n\nTo address these challenges, (i) We have developed the Micro-Event Graph, a static program analysis technique that formally expresses module timing behaviors in a processor by extracting microarchitectural state transitions of a design-under-test (DUT) at the register-transfer level (RTL). To efficiently cover the extensive design space, we tailor the technique to generate individual graphs for each RTL module (cf. Section 3.5). (ii) We analyze each RTL module’s simulation trace to measure its timing behaviors precisely. To streamline our analysis efforts, we devise a hierarchical strategy based on the characteristics of timing vulnerabilities to prioritize modules for examination (cf. Section 3.6). (iii) We pinpoint the root causes of detected timing vulnerabilities utilizing static analysis techniques and properties of the Micro-Event Graph, employing a module-wise strategy to navigate the complex design space. (iv) We have adapted traditional hardware fuzzing methods to efficiently explore a DUT’s design spaces and crafted a specialized mutation engine to exploit timing vulnerabilities. Furthermore, we have instrumented graphs into the DUT to monitor module state transitions based on the input (cf. Section 3.8).\n\nIn summary, our contributions are:\n\n- • We present a novel white-box fuzzer with static analysis, WhisperFuzz, for timing vulnerability detection in processors at the RTL. WhisperFuzz extracts and monitors microarchitectural state transitions at RTL and measures the timing behaviors of each RTL module to identify timing vulnerabilities. Hardware fuzzing enables WhisperFuzz to explore the microarchitectural state space efficiently.\n\n- • With static analysis, WhisperFuzz will identify the locations/root causes of timing vulnerabilities. Moreover, WhisperFuzz introduces a timing coverage metric to help designers evaluate the timing behaviors explored.\n\n- • We evaluate the effectiveness of WhisperFuzz on three real-world, open-sourced processors from RISC-V instruction set architecture (ISA) – BOOM [43], Rocket Core [44], and CVA6 [42], which are widely used as benchmarks in the hardware security community.\n\n- • WhisperFuzz finds 12 new timing vulnerabilities across all three benchmarks. Eight of them pose serious security vulnerabilities, according to the RISC-V Zkt contract [45]. WhisperFuzz also pinpoints the locations of all existing and new vulnerabilities.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib5",
+      "text": "National Vulnerability Database. https://nvd.nist.gov/vuln/search , 2023. Last accessed on 09/28/2023."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib41",
+      "text": "MITRE. CWE VIEW: Hardware Design. https://cwe.mitre.org/data/definitions/1194.html , 2019. Last accessed on 09/28/2023."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib45",
+      "text": "O. Oleksenko, M. Guarnieri, et al. Hide and Seek with Spectres: Efficient Discovery of Speculative Information Leaks with Random Testing. pages 1737–1752, 2023."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib44",
+      "text": "O. Oleksenko, C. Fetzer, et al. Revizor: Testing Black-Box CPUs Against Speculation Contracts. ACM International Conference on Architectural Support for Programming Languages and Operating Systems , pages 226–239, 2022."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib21",
+      "text": "G. Dessouky, D. Gens, et al. HardFails: Insights into Software-Exploitable Hardware Bugs. USENIX Security Symposium , pages 213–230, 2019."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib15",
+      "text": "C. Chen, R. Kande, et al. Trusting the Trust Anchor: Towards Detecting Cross-Layer Vulnerabilities with Hardware Fuzzing. pages 1379–1383, 2022."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib13",
+      "text": "R. Bloem, B. Gigerl, et al. Power Contracts: Provably Complete Power Leakage Models for Processors. ACM SIGSAC Conference on Computer and Communications Security , pages 381–395, 2022."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib38",
+      "text": "P. Kocher, J. Horn, et al. Spectre attacks: Exploiting speculative execution. In 40th IEEE Symposium on Security and Privacy (S&P’19) , 2019."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib40",
+      "text": "M. Lipp, M. Schwarz, et al. Meltdown: Reading Kernel Memory from User Space. USENIX Security , 2018."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib61",
+      "text": "J. Van Bulck, M. Minkin, et al. Foreshadow: Extracting the Keys to the Intel SGX Kingdom with Transient Out-of-Order Execution. USENIX Security Symposium , 2018."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib62",
+      "text": "J. Van Bulck, D. Moghimi, et al. LVI: Hijacking Transient Execution through Microarchitectural Load Value Injection. IEEE Symposium on Security and Privacy , 2020."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib63",
+      "text": "S. van Schaik, A. Milburn, et al. RIDL: Rogue in-flight data load. IEEE Symposium on Security and Privacy , 2019."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib54",
+      "text": "M. Schwarz, M. Lipp, et al. ZombieLoad: Cross-privilege-boundary data sampling. ACM SIGSAC Conference on Computer and Communications Security , 2019."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib50",
+      "text": "H. Ragab, A. Milburn, et al. Crosstalk: Speculative Data Leaks Across Cores Are Real. IEEE Symposium on Security and Privacy , 2021."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib4",
+      "text": "Cross-Process Information Leak. https://www.amd.com/en/resources/product-security/bulletin/amd-sb-7008.html , 2023. Last accessed on 09/28/2023."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib68",
+      "text": "J. Wikner and K. Razavi. RETBLEED: Arbitrary speculative code execution with return instructions. USENIX Security Symposium , 2022."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib20",
+      "text": "D. Cyrluk, S. Rajan, et al. Effective Theorem Proving for Hardware Verification. International Conference on Theorem Provers in Circuit Design , 1994."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "E. M. Clarke, T. A. Henzinger, et al. Handbook of Model Checking. 10, 2018."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib70",
+      "text": "H. Witharana, Y. Lyu, et al. A Survey on Assertion-based Hardware Verification. ACM Computing Surveys , 2022."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib33",
+      "text": "W. Hu, A. Ardeshiricham, et al. Hardware Information Flow Tracking. ACM Computing Surveys , 2021."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib22",
+      "text": "M. R. Fadiheh, J. Müller, et al. A Formal Approach for Detecting Vulnerabilities to Transient Execution Attacks in Out-of-Order Processors. ACM/IEEE Design Automation Conference , pages 1–6, 2020."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib59",
+      "text": "C. Trippel, D. Lustig, et al. Checkmate: Automated Synthesis of Hardware Exploits and Security Litmus Tests. IEEE International Symposium on Microarchitecture , 2018."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib10",
+      "text": "C. Baier and J.-P. Katoen. Principles of Model Checking. 2008."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib19",
+      "text": "E. M. Clarke, W. Klieber, et al. Model Checking and the State Explosion Problem. LASER Summer School on Software Engineering , pages 1–30, 2011."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib17",
+      "text": "E. Clarke, O. Grumberg, et al. Progress on the State Explosion Problem in Model Checking. Informatics , pages 176–194, 2001."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib31",
+      "text": "X. Guo, R. G. Dutta, et al. Scalable SoC Trust Verification using Integrated Theorem Proving and Model Checking. pages 124–129, 2016."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib16",
+      "text": "C. Chen, R. Kande, et al. HyPFuzz: Formal-Assisted Processor Fuzzing. USENIX Security Symposium , pages 1361–1378, August 2023."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib46",
+      "text": "M. Orenes-Vera, A. Manocha, et al. AutoSVA: Democratizing Formal Verification of RTL Module Interactions. ACM/IEEE Design Automation Conference , pages 535–540, 2021."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib39",
+      "text": "K. Laeufer, J. Koenig, et al. RFUZZ: Coverage-Directed Fuzz Testing of RTL on FPGAs. IEEE International Conference on Computer-Aided Design , 2018."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib34",
+      "text": "J. Hur, S. Song, et al. DIFUZZRTL: Differential Fuzz Testing to Find CPU Bugs. IEEE Symposium on Security and Privacy , pages 1286–1303, 2021."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib37",
+      "text": "R. Kande, A. Crump, et al. TheHuzz: Instruction Fuzzing of Processors Using Golden-Reference Models for Finding Software-Exploitable Vulnerabilities. USENIX Security Symposium , pages 3219–3236, 2022."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib71",
+      "text": "J. Xu, Y. Liu, et al. MorFuzz: Fuzzing Processor via Runtime Instruction Morphing enhanced Synchronizable Co-simulation. 2023."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib14",
+      "text": "C. Chen, V. Gohil, et al. PSOFuzz: Fuzzing Processors with Particle Swarm Optimization. arXiv preprint arXiv:2307.14480 , 2023."
+    },
+    {
+      "n": 34,
+      "id": "bib.bib47",
+      "text": "T. Ormandy and D. Moghimi. Downfall and Zenbleed: Googlers helping secure the ecosystem. https://security.googleblog.com/2023/08/downfall-and-zenbleed-googlers-helping.html , 2023. Last accessed on 09/28/2023."
+    },
+    {
+      "n": 35,
+      "id": "bib.bib67",
+      "text": "D. Weber, A. Ibrahim, et al. Osiris: Automated Discovery of Microarchitectural Side Channels. 30th USENIX Security Symposium , pages 1–18, 2021."
+    },
+    {
+      "n": 36,
+      "id": "bib.bib35",
+      "text": "A. Ibrahim, H. Nemati, et al. Microarchitectural Leakage Templates and Their Application to Cache-Based Side Channels. ACM SIGSAC Conference on Computer and Communications Security , 2022."
+    },
+    {
+      "n": 37,
+      "id": "bib.bib51",
+      "text": "C. Rajapaksha, L. Delshadtehrani, et al. SIGFuzz: A Framework for Discovering Microarchitectural Timing Side Channels. In 2023 Design, Automation & Test in Europe Conference & Exhibition (DATE) , pages 1–6. IEEE, 2023."
+    },
+    {
+      "n": 38,
+      "id": "bib.bib58",
+      "text": "Synopsys. Accelerating Verification Shift Left with Intelligent Coverage Optimization. https://www.synopsys.com/cgi-bin/verification/dsdla/pdfr1.cgi?file=ico-wp.pdf , 2022. Last accessed on 02/18/2023."
+    },
+    {
+      "n": 39,
+      "id": "bib.bib27",
+      "text": "R. Gopinath, C. Jensen, et al. Code Coverage for Suite Evaluation by Developers. ACM/IEEE International Conference on Software Engineering , pages 72–82, 2014."
+    },
+    {
+      "n": 40,
+      "id": "bib.bib36",
+      "text": "M. Ivanković, G. Petrović, et al. Code Coverage at Google. ACM Joint Meeting on European Software Engineering Conference and Symposium on the Foundations of Software Engineering , pages 955–963, 2019."
+    },
+    {
+      "n": 41,
+      "id": "bib.bib69",
+      "text": "B. Wile, J. Goss, et al. Comprehensive Functional Verification: The Complete Industry Cycle. 2005."
+    },
+    {
+      "n": 42,
+      "id": "bib.bib73",
+      "text": "F. Zaruba and L. Benini. The Cost of Application-Class Processing: Energy and Performance Analysis of a Linux-Ready 1.7-GHz 64-Bit RISC-V Core in 22-nm FDSOI Technology. IEEE Transactions on Very Large Scale Integration Systems , 2019."
+    },
+    {
+      "n": 43,
+      "id": "bib.bib74",
+      "text": "J. Zhao, B. Korpan, et al. SonicBOOM: The 3rd Generation Berkeley Out-of-Order Machine. 4th Workshop on Computer Architecture Research with RISC-V , 2020."
+    },
+    {
+      "n": 44,
+      "id": "bib.bib9",
+      "text": "K. Asanović, R. Avizienis, et al. The Rocket Chip Generator. (UCB/EECS-2016-17), Apr 2016."
+    },
+    {
+      "n": 45,
+      "id": "bib.bib43",
+      "text": "M.-J. O. Saarinen. riscv-zkt-list. https://github.com/rvkrypto/riscv-zkt-list , 2021. Last accessed on 10/16/2023."
+    }
+  ]
+}

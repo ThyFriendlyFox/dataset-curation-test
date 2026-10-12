@@ -1,0 +1,49 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2311.04465",
+  "title": "Solving High Frequency and Multi-Scale PDEs with Gaussian Processes",
+  "authors": "Shikai Fang, Madison Cooley, Da Long, Shibo Li, Robert Kirby, Shandian Zhe",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.CE"
+  ],
+  "url": "https://arxiv.org/abs/2311.04465",
+  "html_url": "https://arxiv.org/html/2311.04465",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 742,
+  "text": "Scientific and engineering problems often demand we solve a set of partial differential equations (PDEs). Recently, machine learning (ML) solvers have attracted much attention. Compared to traditional numerical methods, ML solvers do not require complex mesh designs and sophisticated numerical tricks, are simple to implement, and can solve inverse problems efficiently and conveniently. The most popular ML solver is the physics-informed neural network (PINN) [1]. Consider a PDE of the following general form,\n\nwhere {\\mathcal{F}} is the differential operator, \\Omega is the domain, and \\partial\\Omega is the boundary of the domain. To solve the PDE, the PINN uses a deep neural network (NN) {\\widehat{u}}_{{\\bm{\\theta}}}({\\bf x}) to model the solution u. It samples N_{c} collocation points \\{{\\bf x}_{c}^{j}\\}_{j=1}^{N_{c}} from \\Omega and N_{b} points \\{{\\bf x}_{b}^{j}\\}_{j=1}^{N_{b}} from \\partial\\Omega, and minimizes a loss,\n\nwhere L_{b}({\\bm{\\theta}})=\\frac{1}{N_{b}}\\sum_{j=1}^{N_{b}}\\left({\\widehat{u}}_{{\\bm{\\theta}}}({\\bf x}_{b}^{j})-g({\\bf x}_{b}^{j})\\right)^{2} is the boundary term to fit the boundary condition, and L_{r}({\\bm{\\theta}})=\\frac{1}{N_{c}}\\sum_{j=1}^{N_{c}}\\left({\\mathcal{F}}[{\\widehat{u}}_{{\\bm{\\theta}}}]({\\bf x}_{c}^{j})-f({\\bf x}_{c}^{j})\\right)^{2} is the residual term to fit the equation.\n\nDespite many success stories, the PINN often struggles to solve PDEs with high-frequency and multi-scale components in the solutions. This is consistent with the “spectrum bias” observed in NN training [2]. That is, NNs typically can learn the low-frequency information efficiently but grasping the high-frequency knowledge is much harder. To alleviate this problem, the recent work [3] proposes to construct a set of random Fourier features from zero-mean Gaussian distributions. The random features are then fed into the PINN layers for training (see (2)). While effective, the performance of this method is unstable, and is highly sensitive to the number and scales of the Gaussian variances, which are difficult to choose beforehand.\n\nIn this paper, we resort to an alternative arising ML solver framework, Gaussian processes (GP) [4,5]. We propose GP-HM, a GP solver for High frequency and Multi-scale PDEs. By leveraging the Wiener-Khinchin theorem, we can directly model the solution in the frequency domain and estimate the target frequencies from the covariance function. We then develop an efficient learning algorithm to scale up to massive collocation points, which are critical to capture high frequencies. The major contributions of our work are as follows.\n\n- • Model. To flexibly capture the dominant frequencies, we use a mixture of student t or Gaussian distributions to model the power spectrum of the solution. According to the Wiener-Khinchin theorem, we can derive the GP covariance function via inverse Fourier transform, which contains the component weights and frequency parameters. We show that by estimating the weights in the log domain, it is equivalent to assigning each weight a Jeffreys prior, which induces strong sparsity, automatically removes excessive frequency components, and drives the remaining toward the ground-truth. This way our GP can effectively extract the solution frequencies. Our covariance function derived from the Gaussian mixture power spectrum corresponds to the known spectral mixture kernel. We therefore are the first to realize its rationale and benefit for solving high-frequency and multi-scale PDEs.\n\n- • Algorithm. To enable efficient computation, we place all the collocation points and the boundary (and/or initial) points on a grid, and model the solution values at the grid with the GP finite projection. To obtain the derivative values in the equation, we compute the GP conditional mean via kernel differentiation. Next, we multiply our covariance function at each input dimension to obtain a product covariance. We then derive a Kronecker product form for the covariance and cross-covariance matrices. We use the properties of the Kronecker product and multilinear algebra to restrict the covariance matrix calculation to each input dimension. In this way, we can substantially reduce the cost and handle massive collocation points, without any low rank approximations.\n\n- • Result. We evaluated GP-HM with several benchmark PDEs that have high-frequency and multi-scale solutions. We compared with the standard PINN and several state-of-the-art variants. We compared with spectral methods [6] that linearly combine a set of trigonometric bases to estimate the solution. We also compared with several other traditional numerical solvers. In all the cases, GP-HM consistently achieves relative L_{2} errors at \\sim 10^{-3} or \\sim 10^{-4} or even smaller. By contrast, the competing ML based approaches often failed and gave much larger errors. The visualization of the element-wise prediction error shows that GP-HM also recovers the local solution values much better. We examined the learned frequency parameters, which match the ground-truth. Our ablation study as in Section C of Appendix also shows enough collocation points is critical to the success, implying the importance of our efficient learning method.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib35",
+      "text": "Raissi et al., (2019) Raissi, M., Perdikaris, P., and Karniadakis, G. E. (2019). Physics-informed neural networks: A deep learning framework for solving forward and inverse problems involving nonlinear partial differential equations. Journal of Computational Physics , 378:686–707."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib33",
+      "text": "Rahaman et al., (2019) Rahaman, N., Baratin, A., Arpit, D., Draxler, F., Lin, M., Hamprecht, F., Bengio, Y., and Courville, A. (2019). On the spectral bias of neural networks. In International Conference on Machine Learning , pages 5301–5310. PMLR."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib46",
+      "text": "(46) Wang, S., Wang, H., and Perdikaris, P. (2021b). On the eigenvector bias of fourier feature networks: From regression to solving multi-scale pdes with physics-informed neural networks. Computer Methods in Applied Mechanics and Engineering , 384:113938."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "Chen et al., (2021) Chen, Y., Hosseini, B., Owhadi, H., and Stuart, A. M. (2021). Solving and learning nonlinear PDEs with Gaussian processes. arXiv preprint arXiv:2103.12959 ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib23",
+      "text": "(23) Long, D., Wang, Z., Krishnapriyan, A., Kirby, R., Zhe, S., and Mahoney, M. (2022a). AutoIP: A united framework to integrate physics into Gaussian processes. In International Conference on Machine Learning , pages 14210–14222. PMLR."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib3",
+      "text": "Boyd, (2001) Boyd, J. P. (2001). Chebyshev and Fourier spectral methods . Courier Corporation."
+    }
+  ]
+}

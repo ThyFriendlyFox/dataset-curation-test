@@ -1,0 +1,233 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.12256",
+  "title": "BeRGeR: Byzantine-Robust Geometric Routing",
+  "authors": "Brown Zaz, Mikhail Nesterenko, Gokarna Sharma",
+  "year": "2024",
+  "categories": [
+    "cs.DC"
+  ],
+  "url": "https://arxiv.org/abs/2403.12256",
+  "html_url": "https://arxiv.org/html/2403.12256",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1092,
+  "text": "Geometric, also called geographic, routing uses node locations to transmit a message from the source to the target node. Nodes may either obtain their coordinates from GPS or compute virtual coordinates [1,2,3,4]. Geometric routing has several attractive features. Nodes do not need to store network topology information beyond their immediate neighbors. Moreover, such routing may be stateless as nodes do not have to retain information after forwarding a packet. Compared to flooding-based ad hoc routing algorithms [5,6], geometric routing is resource efficient.\n\nGeometric routing may therefore be used in cases where maintaining more extensive routing information is not practicable. It may operate in environments with high topological volatility such as vehicular networks [7] or large collections of resource-poor devices such as wireless sensor networks [8].\n\nDespite the claim of hostile environment applicability, little research has been done on fortifying geometric routing against faults using geometric routing techniques themselves. In this paper, we address this issue.\n\n## Geometric routing\n\nThe simplest form of geometric routing is greedy. In greedy routing, the packet is forwarded to the neighbor with the closest Euclidean distance to the target. However, greedy routing fails if it reaches a local minimum. A local minimum is a node that does not have an immediate neighbor closer to the target. To recover from a local minimum and guarantee message delivery, packets are sent to traverse faces of a planarized subgraph [9]. Finding a maximum planar subgraph of a general graph is NP-hard [10]. However, for certain graphs, the task may be solved efficiently. A graph is unit-disk if a pair of its nodes u and v are neighbors if and only if the Euclidean distance between them is no more than 1. Such a graph approximates a wireless network. In a unit-disk graph, a connected planar subgraph may be found by local computation at every node using Relative Neighborhood or Gabriel Graph [11,12,13,14].\n\nA sequential geometric routing algorithm, such as the classic GFG/GPSR [11,13], routes a single packet in the greedy mode until a local minimum is encountered. The algorithm then switches to recovery mode, which involves traversing the faces of a planar subgraph of the original communication graph. Specifically, the algorithm traverses the faces that intersect the line segment that connects the source and the target.\n\nAlgorithms such as GFG/GPSR have a problem of face traversal direction choice. A face may potentially be traversed in two directions: clockwise and counter-clockwise. Face traversal may be inefficient if its traversal direction is selected inappropriately: the traversal distance may be long in one direction and short in the other. GOAFR+ [15] finds the shorter traversal direction by reversing it once the packet reaches a pre-determined ellipse containing source and target nodes.\n\nA concurrent geometric routing algorithm CFR [16] sends multiple packets to traverse the faces intersecting the source-target line in both directions in parallel. This naturally selects the shortest face traversal direction.\n\n## Byzantine fault tolerance\n\nA Byzantine node [17,18] may behave arbitrarily. This is the strongest fault that can affect a node in a distributed system. A reputation-based approach [19,20] is considered to deal with Byzantine faults. However, a faulty node may actively resist reputation compromise. Hence, in general, such approaches may only alleviate rather than eliminate the problem. The power of the faults may also be mitigated with cryptography [17,21,22] or randomization [23,24]. Synchrony assumptions may help with fault handling as well [25]: if packet transmission may be delayed only for a finite amount of time, then fault information may be obtained from lack of packet receipt. In a completely asynchronous system, such information is not available.\n\nCryptography may be too expensive for resource poor nodes, the source of true randomness may not be achievable and synchrony may be impossible to guarantee. If none of these primitives are available, the solution requires that the number of correct processes be large enough to overwhelm the faulty ones.\n\nThe complexity of Byzantine fault handling increases if the network is not completely connected. In this case, nodes may not communicate directly; they have to rely on intermediate nodes to forward the packets. Faulty nodes may tamper with such forwarding. To counter such faulty behavior, packets are sent along alternative routes. To enable this, the network should be sufficiently connected. In general topology, message transmission is possible only if the network is 2x+1 -connected [17,26,27], where x is the maximum number of Byzantine faults.\n\nIn this paper, we study Byzantine-robust geometric routing in asynchronous networks. We do not use cryptography, randomization or reputation. Instead, we use distributed geometric routing to bypass the faults.\n\n## Related work\n\nSanchez et al [19] and Pathak et al [20] use both cryptographic and reputation-based approaches to secure geometric routing. Adnan et al [28] propose to secure geometric routing through pairwise key distribution. Boulaiche and Bouallouche [29] use message authentication codes to prevent message tampering. Maurer and Tixeuil [30] consider containing faulty Byzantine nodes in control zones such that messages will be sent there only with the authentication form border nodes. Zahariadis et al [31] propose a reputation-based approach to geometric routing security. Several papers discuss counteracting spurious locations reported by faulty nodes to secure geometric routing [32,33,34]. Recently, the problem of consensus has been explored in the geometric setting [35]. Zaz and Nesterenko [36] consider Byzantine-robust geometric routing but offer no solution to the problem. To the best of our knowledge, no Byzantine-robust asynchronous geometric routing algorithm without cryptography, randomization or reputation has been proposed.\n\nSeveral related problems have been addressed with concurrent geometric routing. We consider unicasting: sending a message from a single source to a single target. Alternatively, in multicasting, the same message is delivered to a set of nodes in the network [37]. Sequential geometric multicasting algorithms [38,39,40] optimize message transmission routes by forwarding the same packet to multiple targets for a part of the route. MCFR [41] concurrently sends packets along all the appropriate faces achieving faster delivery at the expense of a greater number of transmitted packets. Another related problem is geocasting; in this problem, the source needs to deliver messages to every node in a particular target area. There are several sequential geocasting algorithms [11,37,42]. Adamek et al [43] present a concurrent geocasting solution. None of these algorithms consider Byzantine tolerance.\n\n## Our contribution\n\nWe present BeRGeR, an asynchronous unicast concurrent geometric routing algorithm that handles a single Byzantine fault. We assume the source and target nodes are connected by three internally node-disjoint paths that do not intersect the source-target line, formally prove BeRGeR correct under this assumption, and analyze its message complexity.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "Tomasz Imieliński and Julio C Navas. Gps-based geographic addressing, routing, and resource discovery. Communications of the ACM , 42(4):86–92, 1999."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "Young-Bae Ko and Nitin H Vaidya. Geocasting in mobile ad hoc networks: Location-based multicast algorithms. In Mobile Computing Systems and Applications, 1999. Proceedings. WMCSA’99. Second IEEE Workshop on , pages 101–110. IEEE, 1999."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "Young-Bae Ko and Nitin H Vaidya. Location-aided routing (lar) in mobile ad hoc networks. Wireless Networks , 6(4):307–321, 2000."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "Evangelos Kranakis, Harvinder Singh, and Jorge Urrutia. Compass routing on geometric networks. In in Proc. 11 th Canadian Conference on Computational Geometry . Citeseer, 1999."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "David B Johnson and David A Maltz. Dynamic source routing in ad hoc wireless networks. Mobile computing , pages 153–181, 1996."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "Charles Perkins and Elizabeth Royer. Ad-hoc on-demand distance vector routing. In Proceedings WMCSA’99. Second IEEE Workshop on Mobile Computing Systems and Applications , pages 90–100, 1999."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "Georgios Karagiannis, Onur Altintas, Eylem Ekici, Geert Heijenk, Boangoat Jarupan, Kenneth Lin, and Timothy Weil. Vehicular networking: A survey and tutorial on requirements, architectures, challenges, standards and solutions. IEEE Communications Surveys & Tutorials , 13(4):584–616, 2011."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "A. Arora, P. Dutta, S. Bapat, V. Kulathumani, H. Zhang, V. Naik, V. Mittal, H. Cao, M. Gouda, Y. Choi, T. Herman, S. Kulkarni, U. Arumugam, M. Nesterenko, A. Vora, and M. Miyashita. A line in the sand: a wireless sensor networking for target detection, classification, and tracking. Computer Networks, Special Issue on Future Advances in Military Communication and Technology , 46(5):605–634, December 2004."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "Prosenjit Bose, Pat Morin, Ivan Stojmenović, and Jorge Urrutia. Routing with guaranteed delivery in ad hoc wireless networks. Wireless networks , 7(6):609–616, 2001."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "P. C. Liu and R. C. Geldmacher. On the deletion of nonplanar edges of a graph. In Proc. of the 10th Southeastern Conference on Combinatorics, Graph Theory, and Computing , pages 727–738, 1979."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "P. Bose, P. Morin, I. Stojmenovic, and J. Urrutia. Routing with guaranteed delivery in ad hoc wireless networks. The Journal of Mobile Communication, Computation and Information , 7(6):48–55, 2001."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "K Ruben Gabriel and Robert R Sokal. A new statistical approach to geographic variation analysis. Systematic Biology , 18(3):259–278, 1969."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "B. Karp and H.T. Kung. GPSR: Greedy perimeter stateless routing for wireless networks. In Proceedings of the Sixth Annual ACM/IEEE International Conference on Mobille Computing and Networking (MobiCom) , pages 243–254. ACM Press, August 2000."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "Godfried T Toussaint. The relative neighbourhood graph of a finite planar set. Pattern recognition , 12(4):261–268, 1980."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "Fabian Kuhn, Rogert Wattenhofer, Yan Zhang, and Aaron Zollinger. Geometric ad-hoc routing: Of theory and practice. In Proceedings of the twenty-second annual symposium on Principles of distributed computing , pages 63–72, 2003."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "Thomas Clouser, Mark Miyashita, and Mikhail Nesterenko. Concurrent face traversal for efficient geometric routing. Journal of Parallel and Distributed Computing , 72(5):627–636, May 2012."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "Leslie Lamport, Robet Shostak, and Marrshall Pease. The byzantine generals problem. ACM Transactions on Programming Languages and Systems , 4(3):382–401, 1982."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "Marshall Pease, Robert Shostak, and Leslie Lamport. Reaching agreement in the presence of faults. Journal of the ACM (JACM) , 27(2):228–234, 1980."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "Adrián Sánchez-Carmona, Sergi Robles, and Carlos Borrego. Privhab+: A secure geographic routing protocol for dtn. Computer Communications , 78:56–73, 2016."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "Vivek Pathak, Danfeng Yao, and Liviu Iftode. Securing location aware services over vanet using geographical secure path routing. In 2008 IEEE International Conference on Vehicular Electronics and Safety , pages 346–353. IEEE, 2008."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "Danny Dolev and H. Raymond Strong. Authenticated algorithms for byzantine agreement. SIAM Journal on Computing , 12(4):656–666, 1983."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib22",
+      "text": "Jonathan Katz and Chiu-Yuen Koo. On expected constant-round protocols for byzantine agreement. Journal of Computer and System Sciences , 75(2):91–112, 2009."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib23",
+      "text": "Michael Ben-Or. Another advantage of free choice (extended abstract) completely asynchronous agreement protocols. In Proceedings of the second annual ACM symposium on Principles of distributed computing , pages 27–30, 1983."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib24",
+      "text": "Pesech Feldman and Silvio Micali. An optimal probabilistic protocol for synchronous byzantine agreement. SIAM Journal on Computing , 26(4):873–933, 1997."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib25",
+      "text": "Miguel Castro and Barbara Liskov. Practical byzantine fault tolerance. In Proceedings of the Third Symposium on Operating Systems Design and Implementation , OSDI ’99, page 173–186, USA, 1999. USENIX Association."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib26",
+      "text": "Danny Dolev. The byzantine generals strike again. Journal of algorithms , 3(1):14–30, 1982."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib27",
+      "text": "Michael J Fischer, Nancy A Lynch, and Michael Merritt. Easy impossibility proofs for distributed consensus problems. Distributed Computing , 1:26–39, 1986."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib28",
+      "text": "Ali Idarous Adnan, Zurina Mohd Hanapi, Mohamed Othman, and Zuriati Ahmad Zukarnain. A secure region-based geographic routing protocol (srbgr) for wireless sensor networks. PloS one , 12(1):e0170273, 2017."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib29",
+      "text": "Mehdi Boulaiche and Louiza Bouallouche-Medjkoune. Hsecgr: highly secure geographic routing. Journal of Network and Computer Applications , 80:189–199, 2017."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib30",
+      "text": "Alexandre Maurer and Sébastien Tixeuil. Containing byzantine failures with control zones. IEEE Transactions on Parallel and Distributed Systems , 26(2):362–370, 2014."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib31",
+      "text": "Theodore Zahariadis, Panagiotis Trakadas, Helen C Leligou, Sotiris Maniatis, and Panagiotis Karkazis. A novel trust-aware geographical routing scheme for wireless sensor networks. Wireless personal communications , 69:805–826, 2013."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib32",
+      "text": "Mariano García-Otero, Theodore Zahariadis, Federico Alvarez, Helen C Leligou, Adrián Población-Hernández, Panagiotis Karkazis, and Francisco J Casajús-Quirós. Secure geographic routing in ad hoc and wireless sensor networks. EURASIP Journal on Wireless Communications and Networking , 2010:1–12, 2010."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib33",
+      "text": "Tim Leinmüller, Christian Maihöfer, Elmar Schoch, and Frank Kargl. Improved security in geographic ad hoc routing through autonomous position verification. In Proceedings of the 3rd international workshop on Vehicular ad hoc networks , pages 57–66, 2006."
+    },
+    {
+      "n": 34,
+      "id": "bib.bib34",
+      "text": "Adnan Vora and Mikhail Nesterenko. Secure location verification using radio broadcast. IEEE Transactions on Dependable and Secure Computing , 3(4):377–385, 2006."
+    },
+    {
+      "n": 35,
+      "id": "bib.bib35",
+      "text": "Joseph Oglio, Kendric Hood, Gokarna Sharma, and Mikhail Nesterenko. Byzantine geoconsensus. In International Conference on Networked Systems , pages 19–35. Springer, 2021."
+    },
+    {
+      "n": 36,
+      "id": "bib.bib36",
+      "text": "Brown Zaz and Mikhail Nesterenko. Using braids for byzantine resistant geographic routing on polyhedral networks. In Joint Mathematics Meet , San Francisco, USA, Jan 2024."
+    },
+    {
+      "n": 37,
+      "id": "bib.bib37",
+      "text": "Juan A. Sánchez, Pedro M. Ruiz, and Ivan Stojmenovic. GMR: Geographic multicast routing for wireless sensor networks. In 3d IEEE Communication Society Conference on Sensors and Ad Hoc Communications and Networks (SeCon) , pages 20–29. IEEE, September 2006."
+    },
+    {
+      "n": 38,
+      "id": "bib.bib38",
+      "text": "Martin Mauve, Holger Füßler, Jörg Widmer, and Thomas Lang. Position-based multicast routing for mobile ad-hoc networks. Mobile Computing and Communications Review , 7(3):53–55, 2003."
+    },
+    {
+      "n": 39,
+      "id": "bib.bib39",
+      "text": "Shibo Wu and K. Selcuk Candan. GMP: Distributed geographic multicast routing in wireless sensor networks. In 26th IEEE International Conference on Distributed Computing Systems (26th ICDCS’06) , page 49, Lisboa, Portugal, July 2006. IEEE Computer Society."
+    },
+    {
+      "n": 40,
+      "id": "bib.bib40",
+      "text": "Kai Chen and Klara Nahrstedt. Effective location-guided tree construction algorithms for small group multicast in MANET. In Proceedings of the 21st Annual Joint Conference of the IEEE Computer and Communications Society (INFOCOM-02) , volume 3 of Proceedings IEEE INFOCOM 2002 , pages 1180–1189, Piscataway, NJ, USA, June 23–27 2002. IEEE Computer Society."
+    },
+    {
+      "n": 41,
+      "id": "bib.bib41",
+      "text": "Jordan Adamek, Mikhail Nesterenko, James Scott Robinson, and Sébastien Tixeuil. Concurrent geometric multicasting. In Proceedings of the 19th International Conference on Distributed Computing and Networking , pages 1–10, 2018."
+    },
+    {
+      "n": 42,
+      "id": "bib.bib42",
+      "text": "Jie Lian, Kshirasagar Naik, Yunhao Liu, and Lei Chen. Virtual surrounding face geocasting with guaranteed message delivery for ad hoc and sensor networks. In Network Protocols, 2006. ICNP’06. Proceedings of the 2006 14th IEEE International Conference on , pages 198–207. IEEE, 2006."
+    },
+    {
+      "n": 43,
+      "id": "bib.bib43",
+      "text": "Jordan Adamek, Mikhail Nesterenko, James Scott Robinson, and Sébastien Tixeuil. Stateless reliable geocasting. In 2017 IEEE 36th Symposium on Reliable Distributed Systems (SRDS) , pages 44–53. IEEE, 2017."
+    }
+  ]
+}

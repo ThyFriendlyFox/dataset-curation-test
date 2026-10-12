@@ -1,0 +1,143 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.11380",
+  "title": "Boosting Order-Preserving and Transferability for Neural Architecture Search: a Joint Architecture Refined Search and Fine-tuning Approach",
+  "authors": "Beichen Zhang, Xiaoxing Wang, Xiaohan Qin, Junchi Yan",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2403.11380",
+  "html_url": "https://arxiv.org/html/2403.11380",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 989,
+  "text": "Apart from traditional manually designed neural networks e.g. VGG [1] and RESNET [2], Neural Architecture Search (NAS), as an important part of Automated Machine Learning (AutoML), aims to automatically search an optimal architecture in a certain search space.\n\nEarly NAS approaches [3,4,5,6] adopt a time-consuming pipeline by sampling architectures and training their weights separately. To speed up the search procedure, many recent approaches introduce performance estimators for each architecture. Though there exists a performance estimation gap, the search stage focuses more on the relative ranking of architectures rather than true performance.\n\nSome works [7,8,9] propose zero-cost proxies, which only require one forward step or one backward step. Nevertheless, it cannot perform consistently well on diverse tasks [10]. Other works [11,12,13] build up a supernet that contains all candidate operations and connections in the search space. Once a supernet is trained, all architectures can be quickly evaluated by loading the supernet weight.\n\nSince such a supernet-based performance estimator is widely used, the order-preserving ability, i.e. whether the estimated architecture ranking is consistent with true performance ranking, is an important index. In this work, we delve into two aspects of order-preserving ability. One is global order-preserving ability to distinguish good architectures from poor ones in the whole search space. The other is local order-preserving ability to rank top architectures that have good performance. We argue that both the above abilities are important. Poor global order-preserving abilities will lead to unsatisfactory results since it cannot screen out poor architectures. Poor local order-preserving ability will reduce search efficiency.\n\nSome NAS approaches, like DARTS [14] and GDAS [15], introduce an architecture parameter optimized during supernet training. It lets supernet focus on part of the architectures, improving local resolution. However, it can’t ensure global order-preserving ability. Some previous works [16,17,18] have pointed out that an early bias is easily introduced. The search direction may be led wrongly in the early stage.\n\nOther works like SPOS [16] and FairNAS [13] ensure global order-preserving ability. They treat NAS as a two-stage process. First, a single-path supernet is trained by uniform sampling and all architectures’ weights are optimized equally. Then, a searching algorithm like evolutionary algorithm (EA) is applied. This method ensures fairness in the training stage so global order-preserving ability is better. However, the local order-preserving ability still needs to be improved. We select the top-10 architectures during searching and retrain them separately. The Kendall’s tau of the accuracy in supernet and after retrain is only 0.17, which is far from satisfactory. While although the choice blocks are similar, there do exist a non-negligible accuracy gap of 0.8% after retrain. The problem is that weights of different architectures are not fully decoupled due to weight-sharing strategy. Some works [19,20,21,22,23] point out that the phenomenon of multi-model forgetting exists in weight sharing. Uniform sampling strategy avoids early bias and ensures fairness, but may not be precise in local comparison. In fact, the supernet is encouraged to focus on some local superior architectures. Inferior architectures may produce noise and should be neglected.\n\nHowever, ensuring both isn’t straightforward. Uniform sampling isn’t precise enough. Biased sampling is needed to focus on some superior architectures, but it can lead to improper bias and hurt global order-preserving ability.\n\nTo this end, we propose a refined search strategy combining architecture searching with supernet fine-tuning to both achieve high global and local order-preserving ability. To ensure global order-preserving, we first train a supernet by uniform sampling to avoid early bias and ensure fairness. To improve local order-preserving, we add a Supernet Shifting stage during searching. Specifically, we calculate and accumulate the training loss together with evaluation when an architecture is sampled. After each iteration of evolutionary searching, the supernet is updated. Since superior architectures are sampled more frequently in evolutionary searching, our shifted supernet is encouraged to focus on top architectures, thus having better local discernment and better local order-preserving ability. While for inferior architectures, the supernet gradually forgets them. Unlike superior architectures, we don’t care about the fine-grained estimation since they should all be eliminated in searching.\n\nMoreover, our method has better transferability compared to other one-shot NAS methods that have to train a new supernet for a new dataset. In contrast, our method can adopt the original supernet and fine-tune the weight during the search procedure. Plenty of previous work on transfer learning and pre-trained models [24,25] proves that weights can be inherited and only need some small changes for different tasks. This provides a theoretical basis to transfer supernet to different datasets.\n\nOverall, our contributions can be summarized as follows:\n\n1) Comprehensive analysis about order-preserving ability for NAS methods. Many NAS methods adopt proxies to estimate performance to speed up the search process, making order-preserving ability a general metric. In this work, we further define global and local order-preserving ability and verify the dilemma of current NAS method.\n\n2) A stable strategy improving both global and local order-preserving ability. This work introduces supernet shifting, a simple but effective method to improve global and local order-preserving ability. Supernet is self-adaptively revised during searching. Compared with previous method, our method is by design more in line with the essence of NAS in the sense of paying adaptive attention to different architectures, and meanwhile introduces less bias.\n\n3) A flexible and efficient strategy realizing transferring during searching. Our method neatly realizes the transfer of supernet by reusing the feature encoder part of pre-trained supernet. This allows flexible design of decoders to better fit different tasks. Transferring with searching further ensures efficiency. To the best of our knowledge, this is the first time an entire supernet can be transferred.\n\n4) Strong Performance. Experiments in Sec. 4 show the general effectiveness of our method. It improves both global and local order-preserving ability and can obtain dominating architectures. Flops can be reduced by 5M and the accuracy increases by 0.3\\% on ImageNet-1K. For transferability, it can accelerate searching process for ten times compared with SPOS without performance loss.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib27",
+      "text": "Karen Simonyan and Andrew Zisserman. Very deep convolutional networks for large-scale image recognition. In ICLR , 2015."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib13",
+      "text": "Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. Deep residual learning for image recognition. In CVPR , pages 770–778, 2016."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib2",
+      "text": "Bowen Baker, Otkrist Gupta, Nikhil Naik, and Ramesh Raskar. Designing neural network architectures using reinforcement learning. In ICLR , 2017."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib39",
+      "text": "Barret Zoph and Quoc V. Le. Neural architecture search with reinforcement learning. In ICLR , 2017."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib40",
+      "text": "Barret Zoph, Vijay Vasudevan, Jonathon Shlens, and Quoc V. Le. Learning transferable architectures for scalable image recognition. In CVPR , pages 8697–8710, 2018."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib19",
+      "text": "Chenxi Liu, Barret Zoph, Jonathon Shlens, Wei Hua, Li-Jia Li, Li Fei-Fei, Alan L. Yuille, Jonathan Huang, and Kevin Murphy. Progressive neural architecture search. CoRR , abs/1712.00559, 2017."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib30",
+      "text": "Chaoqi Wang, Guodong Zhang, and Roger B. Grosse. Picking winning tickets before training by preserving gradient flow. In ICLR . OpenReview.net, 2020."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib18",
+      "text": "Namhoon Lee, Thalaiyasingam Ajanthan, and Philip H. S. Torr. Snip: single-shot network pruning based on connection sensitivity. In ICLR . OpenReview.net, 2019."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib23",
+      "text": "Joe Mellor, Jack Turner, Amos J. Storkey, and Elliot J. Crowley. Neural architecture search without training. In ICML , pages 7588–7598, 2021."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib1",
+      "text": "Yash Akhauri, Juan Pablo Muñoz, Nilesh Jain, and Ravi Iyer. EZNAS: evolving zero-cost proxies for neural architecture scoring. In NeurIPS , 2022."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib24",
+      "text": "Hieu Pham, Melody Y. Guan, Barret Zoph, Quoc V. Le, and Jeff Dean. Efficient neural architecture search via parameter sharing. In ICML , pages 4092–4101, 2018."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib3",
+      "text": "Gabriel Bender, Pieter-Jan Kindermans, Barret Zoph, Vijay Vasudevan, and Quoc V. Le. Understanding and simplifying one-shot architecture search. In ICML , pages 549–558, 2018."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib6",
+      "text": "Xiangxiang Chu, Bo Zhang, and Ruijun Xu. Fairnas: Rethinking evaluation fairness of weight sharing neural architecture search. In ICCV , pages 12219–12228, 2021."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib20",
+      "text": "Hanxiao Liu, Karen Simonyan, and Yiming Yang. DARTS: differentiable architecture search. In ICLR , 2019."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib9",
+      "text": "Xuanyi Dong and Yi Yang. Searching for a robust neural architecture in four GPU hours. In CVPR , pages 1761–1770, 2019."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib11",
+      "text": "Zichao Guo, Xiangyu Zhang, Haoyuan Mu, Wen Heng, Zechun Liu, Yichen Wei, and Jian Sun. Single path one-shot neural architecture search with uniform sampling. In ECCV , pages 544–560, 2020."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib15",
+      "text": "Weijun Hong, Guilin Li, Weinan Zhang, Ruiming Tang, Yunhe Wang, Zhenguo Li, and Yong Yu. Dropnas: Grouped operation dropout for differentiable architecture search. CoRR , abs/2201.11679, 2022."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib35",
+      "text": "Yu Xue and Jiafeng Qin. Partial connection based on channel attention for differentiable neural architecture search. IEEE Trans. Ind. Informatics , 19(5):6804–6813, 2023."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib12",
+      "text": "Hyeonmin Ha, Ji-Hoon Kim, Semin Park, and Byung-Gon Chun. SUMNAS: supernet with unbiased meta-features for neural architecture search. In ICLR , 2022."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib16",
+      "text": "Shoukang Hu, Ruochen Wang, Lanqing Hong, Zhenguo Li, Cho-Jui Hsieh, and Jiashi Feng. Generalizing few-shot NAS with gradient matching. In ICLR , 2022."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib29",
+      "text": "Xiu Su, Shan You, Mingkai Zheng, Fei Wang, Chen Qian, Changshui Zhang, and Chang Xu. K-shot NAS: learnable weight-sharing for NAS with k-shot supernets. In ICML , pages 9880–9890, 2021."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib33",
+      "text": "Jin Xu, Xu Tan, Kaitao Song, Renqian Luo, Yichong Leng, Tao Qin, Tie-Yan Liu, and Jian Li. Analyzing and mitigating interference in neural architecture search. In ICML , pages 24646–24662, 2022."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib21",
+      "text": "Shun Lu, Yu Hu, Longxing Yang, Zihao Sun, Jilin Mei, Jianchao Tan, and Chengru Song. Pa&da: Jointly sampling path and data for consistent NAS. In CVPR , pages 11940–11949, 2023."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib8",
+      "text": "Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. BERT: pre-training of deep bidirectional transformers for language understanding. In NAACL , pages 4171–4186, 2019."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib14",
+      "text": "Kaiming He, Xinlei Chen, Saining Xie, Yanghao Li, Piotr Dollár, and Ross B. Girshick. Masked autoencoders are scalable vision learners. In CVPR , pages 15979–15988, 2022."
+    }
+  ]
+}

@@ -1,0 +1,74 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2311.12996",
+  "title": "RLIF: Interactive Imitation Learning as Reinforcement Learning",
+  "authors": "Jianlan Luo, Perry Dong, Yuexiang Zhai, Yi Ma, Sergey Levine",
+  "year": "2024",
+  "categories": [
+    "cs.AI",
+    "cs.RO"
+  ],
+  "url": "https://arxiv.org/abs/2311.12996",
+  "html_url": "https://arxiv.org/html/2311.12996",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 795,
+  "text": "Reinforcement learning methods have exhibited great success in domains where well-specified reward functions are available, such as optimal control, games, and aligning large language models (LLMs) with human preferences [1,2,3,4]. However, imitation learning methods are still often preferred in some domains, such as robotics, because they are often more convenient, accessible, and easier to use. An often-cited weakness of naïve behavioral cloning is the compounding distributional shift induced by accumulating errors when deploying a learned policy. Interactive imitation learning methods, like the DAgger family of algorithms [5,6,7,8,9], address this issue by querying expert actions online and retraining the model iteratively in a supervised learning fashion. This performs well in practice, and in theory reduces the quadratic regret of imitation learning methods to be linear in the episode horizon. One particularly practical instantiation of this idea involves a human expert observing a learned policy, and intervening to provide corrections (short demonstrations) when the policy exhibits undesirable behavior [6,10]. However, such interactive imitation learning methods still rely on interventions that are near-optimal, and offer no means to improve over the performance of the expert. Real human demonstrators are rarely optimal, and in domains such as robotics, teleoperation often does not afford the same degree of grace and dexterity as a highly tuned optimal controller. Can we combine the best parts of reinforcement learning and interactive imitation learning, combining the reward-maximizing behavior of RL, which can improve over the best available human behavior, with the accessible assumptions of interactive imitation learning?\n\nThe key insight we leverage in this work is that the decision to intervene during an interactive imitation episode itself can provide a reward signal for reinforcement learning, allowing us to instantiate RL methods that operate under similar but potentially weaker assumptions as interactive imitation methods, learning from human interventions but not assuming that such interventions are optimal. Intuitively, for many problems, it’s easier to detect a mistake than it is to optimally correct it. Imagine an autonomous driving scenario with a safety driver. While the driver could intervene when the car deviates from good driving behavior, such interventions themselves might often be relatively uninformative and suboptimal – for example, if the human driver intervenes right before a collision by slamming on the breaks, simply teaching the policy to slam on the breaks is probably not the best solution, as it would be much better for the policy to learn to avoid the situations that necessitated such an intervention in the first place.\n\nMotivated by this observation, we propose a method that runs RL on data collected from DAgger-style interventions, where a human operator observes the policy’s behavior and intervenes with suboptimal corrections when the policy deviates from optimal behavior. Our method labels the action that leads to an intervention with a negative reward and then uses RL to minimize the occurrence of intervention by maximizing these reward signals. We call our method RLIF: Reinforcement Learning via Intervention Feedback. This offers a convenient mechanism to utilize non-expert interventions: the final performance of the policy would not be bottlenecked by the suboptimality of the intervening expert, but rather the policy would improve to more optimally avoid interventions happening at all. Of course, the particular intervention strategy influences the behavior of such a method, and we require some additional assumptions on when interventions occur. We formalize several such assumptions and evaluate their effect on performance, finding that several reasonable strategies for selecting when to intervene lead to good performance. We also provide a theoretical justification for the proposed method, via both an asymptotic analysis of the suboptimality gap that generalizes the theoretical framework of DAgger [5], and non-asymptotic analysis on learning an {\\epsilon} -optimal policy with finite samples using the intervention rewards.\n\nOur main contribution is a practical RL algorithm that can be used under assumptions that closely resemble interactive imitation learning, without requiring ground truth reward signals. We provide a theoretical analysis that studies under which conditions we expect this method to outperform DAgger-style interactive imitation techniques. Empirically, we evaluate our approach in comparison to DAgger on a variety of challenging continuous control tasks, such as the Adroit dexterous manipulation and Gym locomotion environments [11]. Our empirical results show that our method is on average 2-3x better than best-performing DAgger variants, and this difference is much more pronounced as the suboptimality gap expands. We also demonstrate our method scales to a challenging real-world robotic task involving an actual human providing feedback. Our empirical results are well justified by our theory: suboptimal experts can in principle deteriorate the performance on both imitation learning and RL, but RL is generally more powerful than imitation learning. This is because RL can still recover the optimal policy \\pi^{\\star} with additional samples, while imitation learning methods perform poorly due to the introduced suboptimality.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib22",
+      "text": "Levine et al. (2016) Sergey Levine, Chelsea Finn, Trevor Darrell, and Pieter Abbeel. End-to-end training of deep visuomotor policies. The Journal of Machine Learning Research , 17(1):1334–1373, 2016."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib17",
+      "text": "Kalashnikov et al. (2018) Dmitry Kalashnikov, Alex Irpan, Peter Pastor, Julian Ibarz, Alexander Herzog, Eric Jang, Deirdre Quillen, Ethan Holly, Mrinal Kalakrishnan, Vincent Vanhoucke, et al. Scalable deep reinforcement learning for vision-based robotic manipulation. In Conference on Robot Learning , pp. 651–673, 2018."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib38",
+      "text": "Silver et al. (2017) David Silver, Julian Schrittwieser, Karen Simonyan, Ioannis Antonoglou, Aja Huang, Arthur Guez, Thomas Hubert, Lucas Baker, Matthew Lai, Adrian Bolton, et al. Mastering the game of go without human knowledge. nature , 550(7676):354–359, 2017."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib31",
+      "text": "Ouyang et al. (2022) Long Ouyang, Jeff Wu, Xu Jiang, Diogo Almeida, Carroll L. Wainwright, Pamela Mishkin, Chong Zhang, Sandhini Agarwal, Katarina Slama, Alex Ray, John Schulman, Jacob Hilton, Fraser Kelton, Luke Miller, Maddie Simens, Amanda Askell, Peter Welinder, Paul Christiano, Jan Leike, and Ryan Lowe. Training language models to follow instructions with human feedback, 2022."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib37",
+      "text": "Ross et al. (2011) Stéphane Ross, Geoffrey Gordon, and Drew Bagnell. A reduction of imitation learning and structured prediction to no-regret online learning. In International Conference on Artificial Intelligence and Statistics (AISTATS) , pp. 627–635, 2011."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib18",
+      "text": "Kelly et al. (2018) Michael Kelly, Chelsea Sidrane, K. Driggs-Campbell, and Mykel J. Kochenderfer. Hg-dagger: Interactive imitation learning with human experts. 2019 International Conference on Robotics and Automation (ICRA) , pp. 8077–8083, 2018."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib15",
+      "text": "Hoque et al. (2022) Ryan Hoque, Lawrence Yunliang Chen, Satvik Sharma, K Dharmarajan, Brijen Thananjeyan, P. Abbeel, and Ken Goldberg. Fleet-dagger: Interactive robot fleet learning with scalable human supervision. In Conference on Robot Learning , 2022."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib27",
+      "text": "Menda et al. (2018) Kunal Menda, K. Driggs-Campbell, and Mykel J. Kochenderfer. Ensembledagger: A bayesian approach to safe imitation learning. 2019 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS) , pp. 5041–5048, 2018."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib36",
+      "text": "Ross & Bagnell (2014) Stephane Ross and J. Andrew Bagnell. Reinforcement and imitation learning via interactive no-regret learning. In Advances in Neural Information Processing Systems , 2014."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib40",
+      "text": "Spencer et al. (2020) Jonathan Spencer, Sanjiban Choudhury, Matthew Barnes, Matthew Schmittle, Mung Chiang1, Peter Ramadge1, and Siddhartha Srinivasa2. Learning from interventions: Human-robot interaction as both explicit and implicit feedback. In Proceedings of Robotics: Science and Systems , 2020."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib9",
+      "text": "Fu et al. (2020a) J. Fu, A. Kumar, O. Nachum, G. Tucker, and S. Levine. D4rl: Datasets for deep data-driven reinforcement learning. In arXiv , 2020a. URL https://arxiv.org/pdf/2004.07219 ."
+    }
+  ]
+}

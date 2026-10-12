@@ -1,0 +1,138 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2301.10835",
+  "title": "When Layers Play the Lottery, all Tickets Win at Initialization",
+  "authors": "Artur Jordao, George Correa de Araujo, Helena de Almeida Maia, Helio Pedrini",
+  "year": "2024",
+  "categories": [
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2301.10835",
+  "html_url": "https://arxiv.org/html/2301.10835",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 942,
+  "text": "The Lottery Ticket Hypothesis (LTH) conjectures that (pre-trained) dense networks contain sparse subnetworks capable of obtaining the same accuracy when trained from the original initialization of their dense counterpart [1]. Subnetworks (tickets) that satisfy this property are referred to as winning tickets. Many advances emerge from the LTH, for example, we can reduce the computational cost of learning a dense network by replacing it with a sparse subnetwork during [2,3] or before the course of training [4,5,6]. In the context of adversarial attacks, we can increase the robustness of dense networks by considering their sparse versions [7,8,9].\n\nThe traditional LTH seeks winning tickets by removing (i.e., pruning) weights of a dense network and assigning the survival weights to their original initialization [1] – weight rewinding. Variants of this mechanism propose relaxing the weight-rewinding constraint and enabling subnetworks to inherit weights from different training epochs [10,11] and even from random (re) initialization [12]. Another variant in the traditional LTH is the replacement of weight pruning (unstructured) by filter pruning (structured) [12,11,2]. For example, Prasanna et al. [13] studied the LHN on structured pruning by removing self-attention modules (i.e., heads from multi-head attention layers [14]). One practical drawback of unstructured pruning is that existing deep learning frameworks (e.g., TensorFlow and Pytorch) do not support sparse tensor computations. Hence, in order to obtain performance gains, this family of pruning requires specialized frameworks or hardware (Nvidia A100 GPU) for optimizing sparse computations [15,16,17].\n\nRegardless of the structure, we can categorize LTH according to the phase in which the pruning algorithm picks the subnetworks (tickets): after, during, or before training. The first class trains a dense network and, then, extracts a subnetwork according to an importance criterion (pruning criterion), such steps compose the original LTH [1]. The second prunes a dense network during the course of training, obtaining a subnetwork when the learning phase is over [2,3]. Finally, pruning before training constitutes a relatively recent form of pruning named pruning at initialization [4,6,5]. The idea behind this category is to find subnetworks prior to training, which means picking subnetworks using the randomly initialized parameters (without any update) to guide the pruning algorithm. Many efforts have been put into pruning at initialization as it provides all benefits of sparse subnetworks without spending computational resources to train a dense network (a process required by the other categories).\n\nImportantly, all pruning categories in LTH share the same characteristic: the pruning eliminates small structures such as weights or filters. Outside the context of LTH, previous works have demonstrated notable benefits of removing entire layers instead of small structures. In particular, this type of structured pruning promotes additional performance gains since it reduces the sequential processing (latency) of a network [18,19]. Hence, many studies have focused on removing layers instead of other structures [20,21,19,22]. Unfortunately, none of these efforts have been done in the direction of LTH and pruning at initialization. To bridge this gap, we take a step towards understanding the behavior of LTH when the pruning process removes layers. In this setting, we first verify the existence of winning tickets. Then, we propose a systematic strategy for discovering winning tickets before training, which means finding sparse subnetworks (from layer removal) at initialization that match the predictive ability of their dense equivalent.\n\nContributions. We list the following key contributions. First, we demonstrate the existence of winning tickets – sparse subnetworks that obtain the same accuracy as their dense equivalent – when the pruning process takes into account the removal of layers. From a practical perspective, such a contribution enables winning tickets to be more efficient in terms of memory consumption, inference time (latency) and carbon emission, as removing layers provides superior computational benefits than standard forms of pruning employed in LTH (see Figure 1). Second, we successfully find winning tickets from layer removal at initialization without any training. This contribution plays a role in low-cost and energy-efficient training, as we can replace the learning of a dense network with its sparse version. In contrast to previous LTH studies [10,11], this contribution eliminates the requirement of heavy computational resources for learning the initial (over-parameterized) dense network. Finally, we show that this novel family of subnetworks shares some properties of the standard structured LTH (filter pruning), for example, they emerge early at training. On the other hand, we observe that subnetworks from filter pruning exhibit poor performance when applied to shallow (underparametrized) networks and before training, which is aligned with previous evidence [8]. In other words, tickets from filter pruning hardly become winning tickets. However, our tickets (layer removal) easily win the lottery, raising the question of whether the eliminated structure plays a role in the LTH and pruning at initialization.\n\nAccording to our analysis, winning tickets from layer pruning are accurate and robust to many settings such as the pruning criteria and density, and weight rewinding. When found at initialization, these winning tickets speed up the training time by up to 2\\times and save notable FLOPs and memory consumption. On a specific pruning criterion, all tickets outperform the predictive ability of their dense counterpart – all tickets become winning tickets. Additionally, our winning tickets reduce up to 51\\% of carbon emission during the training phase, an important step towards democratization and sustainability of Artificial Intelligence (AI) – green AI. As suggested by previous works [8,9,3], we also evaluate our winning tickets on adversarial images and out-of-distribution examples using CIFAR-C [23] and CIFAR-10.2 [24] datasets, respectively. On the standard clean training (i.e., without any defense mechanism), tickets from layer pruning achieve higher robustness than their dense equivalent; thus, confirming their suitability for safety-critical applications. For reproducibility purposes, our code is publicly available: https://github.com/arturjordao/LayerLottery.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib9",
+      "text": "Frankle and Carbin [2019] Jonathan Frankle and Michael Carbin. The lottery ticket hypothesis: Finding sparse, trainable neural networks. In International Conference on Learning Representations (ICLR) , 2019."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib41",
+      "text": "You et al. [2020] Haoran You, Chaojian Li, Pengfei Xu, Yonggan Fu, Yue Wang, Xiaohan Chen, Yingyan Lin, Zhangyang Wang, and Richard G. Baraniuk. Drawing early-bird tickets: Toward more efficient training of deep networks. In International Conference on Learning Representations (ICLR) , 2020."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib4",
+      "text": "Chen et al. [2022] Tianlong Chen, Zhenyu Zhang, Pengjun Wang, Santosh Balachandra, Haoyu Ma, Zehao Wang, and Zhangyang Wang. Sparsity winning twice: Better robust generalization from more efficient training. In International Conference on Learning Representations (ICLR) , 2022."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib21",
+      "text": "Lee et al. [2019] Namhoon Lee, Thalaiyasingam Ajanthan, and Philip H. S. Torr. Snip: single-shot network pruning based on connection sensitivity. In International Conference on Learning Representations (ICLR) , 2019."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib40",
+      "text": "Wang et al. [2020] Chaoqi Wang, Guodong Zhang, and Roger B. Grosse. Picking winning tickets before training by preserving gradient flow. In International Conference on Learning Representations (ICLR) , 2020."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib36",
+      "text": "Tanaka et al. [2020] Hidenori Tanaka, Daniel Kunin, Daniel L. Yamins, and Surya Ganguli. Pruning neural networks without any data by iteratively conserving synaptic flow. In Neural Information Processing Systems (NeurIPS) , 2020."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib6",
+      "text": "Diffenderfer et al. [2021] James Diffenderfer, Brian R. Bartoldson, Shreya Chaganti, Jize Zhang, and Bhavya Kailkhura. A winning hand: Compressing deep networks can improve out-of-distribution robustness. In Neural Information Processing Systems (NeurIPS) , 2021."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib26",
+      "text": "Liu et al. [2022] Shiwei Liu, Tianlong Chen, Xiaohan Chen, Li Shen, Decebal Constantin Mocanu, Zhangyang Wang, and Mykola Pechenizkiy. The unreasonable effectiveness of random pruning: Return of the most naive baseline for sparse training. In International Conference on Learning Representations (ICLR) , 2022."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib34",
+      "text": "T et al. [2022] Mukund Varma T, Xuxi Chen, Zhenyu Zhang, Tianlong Chen, Subhashini Venugopalan, and Zhangyang Wang. Sparse winning tickets are data-efficient image recognizers. In Neural Information Processing Systems (NeurIPS) , 2022."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "Frankle et al. [2020] Jonathan Frankle, Gintare Karolina Dziugaite, Daniel M. Roy, and Michael Carbin. Linear mode connectivity and the lottery ticket hypothesis. In International Conference on Machine Learning (ICML) , 2020."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib32",
+      "text": "Renda et al. [2020] Alex Renda, Jonathan Frankle, and Michael Carbin. Comparing rewinding and fine-tuning in neural network pruning. In International Conference on Learning Representations (ICLR) , 2020."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib24",
+      "text": "Liu et al. [2019] Zhuang Liu, Mingjie Sun, Tinghui Zhou, Gao Huang, and Trevor Darrell. Rethinking the value of network pruning. In International Conference on Learning Representations (ICLR) , 2019."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib31",
+      "text": "Prasanna et al. [2020] Sai Prasanna, Anna Rogers, and Anna Rumshisky. When BERT plays the lottery, all tickets are winning. In Conference on Empirical Methods in Natural Language Processing (EMNLP) , 2020."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib37",
+      "text": "Vaswani et al. [2017] Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Lukasz Kaiser, and Illia Polosukhin. Attention is all you need. In Neural Information Processing Systems (NeurIPS) , 2017."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib12",
+      "text": "Han et al. [2016] Song Han, Xingyu Liu, Huizi Mao, Jing Pu, Ardavan Pedram, Mark A. Horowitz, and William J. Dally. EIE: efficient inference engine on compressed deep neural network. In International Symposium on Computer Architecture (ISCA) , 2016."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib29",
+      "text": "Niu et al. [2020] Wei Niu, Xiaolong Ma, Sheng Lin, Shihao Wang, Xuehai Qian, Xue Lin, Yanzhi Wang, and Bin Ren. Patdnn: Achieving real-time DNN execution on mobile devices with pattern-based weight pruning. In Architectural Support for Programming Languages and Operating Systems (ASPLOS) , 2020."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib43",
+      "text": "Zhou et al. [2021] Aojun Zhou, Yukun Ma, Junnan Zhu, Jianbo Liu, Zhijie Zhang, Kun Yuan, Wenxiu Sun, and Hongsheng Li. Learning N: M fine-grained structured sparse neural networks from scratch. In International Conference on Learning Representations (ICLR) , 2021."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib22",
+      "text": "Li et al. [2021] Zhengang Li, Geng Yuan, Wei Niu, Pu Zhao, Yanyu Li, Yuxuan Cai, Xuan Shen, Zheng Zhan, Zhenglun Kong, Qing Jin, Zhiyu Chen, Sijia Liu, Kaiyuan Yang, Bin Ren, Yanzhi Wang, and Xue Lin. NPAS: A compiler-aware framework of unified network pruning and architecture search for beyond real-time mobile acceleration. In Conference on Computer Vision and Pattern Recognition (CVPR) , 2021."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib44",
+      "text": "Zhou et al. [2022] Yao Zhou, Gary G. Yen, and Zhang Yi. Evolutionary shallowing deep neural networks at block levels. IEEE Transactions on Neural Networks and Learning Systems , 2022."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib38",
+      "text": "Veit and Belongie [2020] Andreas Veit and Serge J. Belongie. Convolutional networks with adaptive inference graphs. International Journal of Computer Vision (IJCV) , 128:730–741, 2020."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib8",
+      "text": "Fan et al. [2020] Angela Fan, Edouard Grave, and Armand Joulin. Reducing transformer depth on demand with structured dropout. In International Conference on Learning Representations (ICLR) , 2020."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib42",
+      "text": "Zhang and Liu [2022] Ke Zhang and Guangzhe Liu. Layer pruning for obtaining shallower resnets. IEEE Signal Processing Letters , 2022."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib15",
+      "text": "Hendrycks and Dietterich [2019] Dan Hendrycks and Thomas G. Dietterich. Benchmarking neural network robustness to common corruptions and perturbations. In International Conference on Learning Representations (ICLR) , 2019."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib27",
+      "text": "Lu et al. [2020] Shangyun Lu, Bradley Nott, Aaron Olson, Alberto Todeschini, Hossein Vahabi, Yair Carmon, and Ludwig Schmidt. Harder or different? a closer look at distribution shift in dataset reproduction. In International Conference on Machine Learning (ICML) Workshop on Uncertainty and Robustness in Deep Learning , 2020."
+    }
+  ]
+}

@@ -1,0 +1,183 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2305.17496",
+  "title": "Toward Cost-effective Adaptive Random Testing: An Approximate Nearest Neighbor Approach",
+  "authors": "Rubing Huang, Chenhui Cui, Junlong Lian, Dave Towey, Weifeng Sun, Haibo Chen",
+  "year": "2024",
+  "categories": [
+    "cs.SE"
+  ],
+  "url": "https://arxiv.org/abs/2305.17496",
+  "html_url": "https://arxiv.org/html/2305.17496",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 955,
+  "text": "Software testing is an essential software quality assurance activity in the software development life-cycle [1,2]. Among the many software testing techniques, one fundamental approach is Random Testing (RT) [3], which simply selects test cases in a random manner from the input domain (the set of all possible test inputs). RT is considered popular due to the usual ease of implementation, its efficient generation of random test cases, and its ability to provide quantitative estimation of the reliability of software [4]. RT has been widely applied to different software applications, including: SQL database systems [5,6]; embedded software systems [7]; Java Just-In-Time (JIT) compilers [8]; security assessment [9]; and.NET error detection [10]. As Arcuri et al. [11] have pointed out, RT should be recommended as the first choice for testing many practical software scenarios.\n\nDespite its popularity, though, RT has been criticized for generally adopting little, or none, of the available information to support its test-case generation. Myers et al. [12], for example, described RT as perhaps the “least effective” testing approach. Many approaches have been proposed to enhance RT fault detection, including one of the most popular, Adaptive Random Testing (ART) [13,14]. ART is a family of enhanced RT methods that are motivated by observations of clustering of failure regions (regions of test inputs that can identify software failures) [15,16,17,18,19]. ART aims to achieve an even spread of random test cases over the input domain, which may deliver better test case diversity than RT [20]. Previous studies [14] have shown ART to be more effective than RT, in terms of various evaluation criteria, including: the number of test cases required to detect the first failure (F-measure) [21]; code coverage [22]; and test case distribution [23].\n\nMany different strategies have been adopted for ART, resulting in multiple ART implementations [14], the most well-known and widely used of which is the Select-Test-From-Candidates Strategy (STFCS). STFCS chooses the next test case from a set of random candidates based on some criteria or evaluation of the previously-executed test cases [14]: Each random candidate is compared (in some way) with each previously-executed test case, with the “ best ” candidate being selected as the next test case. Two basic (and popular) STFCS implementations are Fixed-Size-Candidate-Set ART (FSCS) [13] and Restricted Random Testing (RRT) [24]. FSCS-ART chooses one of the candidates as the next test case such that it is farthest away from the already-executed test cases; RRT selects the next test case such that its distance from all previously-executed test cases is greater than a given threshold value. Generating each new test case requires calculation of the distance between each candidate and each executed test case, which represents a high computational overhead, especially when the number of executed test cases becomes large. STFCS involves identifying the nearest neighboring executed test case for each candidate, as part of the decision process to choose the “ best ” one as the next test case. A key part of STFCS, therefore, can be viewed as an instance of finding a Nearest Neighbor (NN) [25].\n\nVarious enhanced ART implementations have been proposed to address the STFCS overhead problem, including forgetting [26], and a precise NN approach [27]. The forgetting approach involves ignoring (“forgetting”) some of the previously-executed test cases to reduce the number of distance computations for each candidate. The precise NN approach, in contrast, often uses a tree-index structure (such as a k -dimensional tree, KD-tree [28]) to speed up the search process. Because forgetting does not use all the information of the already-executed test cases, it can be considered to sacrifice some fault-detection capability. The precise NN approach still needs to precisely identify the nearest neighbor for each candidate, which can still be computationally expensive, especially when the input domain dimensionality is high, or the number of executed test cases is large [25].\n\nIn this paper, we propose an Approximate Nearest Neighbor (ANN) ART approach using the well-known ANN algorithm Locality-Sensitive Hashing (LSH) [33]: We call this LSH-ART. LSH-ART attempts to balance testing effectiveness and efficiency: It makes use of all previously-executed test cases to maintain fault-detection performance, but retrieves the approximate (not exact) nearest neighbor of each candidate, thus reducing the search cost.\n\nTo evaluate our proposed approach, we conducted a series of simulations and empirical studies with more than 30 real-life programs, comparing them with the original ART algorithms and their corresponding enhanced variants. The main contributions and findings of this paper are:\n\n- • To the best of our knowledge, this is the first paper that proposes an LSH-based approach to enhance ART performance.\n\n- • We propose a framework to support LSH-ART, and present two implementations: LSH-FSCS and LSH-RRT.\n\n- • LSH-ART maintains comparable testing effectiveness (including fault-detection effectiveness) to the original ART and its variants, sometimes obtaining better results, especially for high dimensions.\n\n- • LSH-ART has better testing efficiency, generally incurring lower computational costs (including for test-case generation) than the original ART and its variants, especially when the input domain dimensionality is high.\n\n- • LSH-ART is much more cost-effective than the original ART, in all scenarios, and outperforms the variants in most scenarios.\n\nThe rest of this paper is organized as follows: Section II presents some background information. Section III introduces the proposed approach, including a motivating example, the framework, algorithms, and complexity analyses. Section IV explains the experimental set-up to examine the performance of our proposed approach. Section V presents and analyzes the experimental results, and examines some potential threats to validity. Section VI explores the extension of our proposed method from numerical to non-numerical domains. Section VII provides some discussions regarding software failures and faults. Section VIII discusses some related work about ART. Section IX concludes this paper, and identifies some potential future work.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "A. Orso and G. Rothermel, “Software testing: A research travelogue (2000-2014),” in Future of Software Engineering Proceedings (FOSE’14) , 2014, pp. 117–132."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "S. Anand, E. K. Burke, T. Y. Chen, J. Clark, M. B. Cohen, W. Grieskamp, M. Harman, M. J. Harrold, and P. McMinn, “An orchestrated survey of methodologies for automated software test case generation,” Journal of Systems and Software , vol. 86, no. 8, pp. 1978–2001, 2013."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "R. Hamlet, Random Testing . John Wiley & Sons, Ltd, 2002."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "P. G. Frankl, R. G. Hamlet, B. Littlewood, and L. Strigini, “Evaluating testing methods by delivered reliability,” IEEE Transactions on Software Engineering , vol. 24, no. 8, pp. 586–601, 1998."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "D. R. Slutz, “Massive stochastic testing of SQL,” in Proceedings of the 24rd International Conference on Very Large Data Bases (VLDB’98) , 1998, pp. 618–622."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "H. Bati, L. Giakoumakis, S. Herbert, and A. Surna, “A genetic approach for random testing of database systems,” in Proceedings of the 33rd International Conference on Very Large Data Bases (VLDB’07) , 2007, pp. 1243–1251."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "J. Regehr, “Random testing of interrupt-driven software,” in Proceedings of the 5th ACM International Conference on Embedded Software (EMSOFT’05) , 2005, pp. 290–298."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "T. Yoshikawa, K. Shimura, and T. Ozawa, “Random program generator for Java JIT compiler test system,” in Proceedings of the 3rd International Conference on Quality Software (QSIC’03) , 2003, pp. 20–23."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "P. Godefroid, A. Kiezun, and M. Y. Levin, “Grammar-based whitebox fuzzing,” in Proceedings of the 29th ACM SIGPLAN Conference on Programming Language Design and Implementation (PLDI’08) , 2008, pp. 206–215."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "C. Pacheco, S. K. Lahiri, and T. Ball, “Finding errors in .NET with feedback-directed random testing,” in Proceedings of the 17th International Symposium on Software Testing and Analysis (ISSTA’08) , 2008, pp. 87–96."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "A. Arcuri, M. Z. Iqbal, and L. Briand, “Random testing: Theoretical results and practical implications,” IEEE Transactions on Software Engineering , vol. 38, no. 2, pp. 258–277, 2012."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "G. J. Myers, C. Sandler, and T. Badgett, The Art of Software Testing . New York, NY, USA: Wiley, 2011."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "T. Y. Chen, F.-C. Kuo, R. G. Merkel, and T. H. Tse, “Adaptive random testing: The art of test case diversity,” Journal of Systems and Software , vol. 83, no. 1, pp. 60–66, 2010."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "R. Huang, W. Sun, Y. Xu, H. Chen, D. Towey, and X. Xia, “A survey on adaptive random testing,” IEEE Transactions on Software Engineering , vol. 47, no. 10, pp. 2052–2083, 2021."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "L. White and E. Cohen, “A domain strategy for computer program testing,” IEEE Transactions on Software Engineering , vol. 6, no. 3, pp. 247–257, 1980."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "P. E. Ammann and J. C. Knight, “Data diversity: an approach to software fault tolerance,” IEEE Transactions on Computers , vol. 37, no. 4, pp. 418–425, 1988."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "G. B. Finelli, “NASA software failure characterization experiments,” Reliability Engineering and System Safety , vol. 32, no. 1–2, pp. 155–169, 1991."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "P. G. Bishop, “The variation of software survival times for different operational input profiles,” in Prceedings of the 23rd International Symposium on Fault-Tolerant Computing (FTCS’93) , 1993, pp. 98–107."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "C. Schneckenburger and J. Mayer, “Towards the determination of typical failure patterns,” in Proceedings of the 4th International Workshop on Software Quality Assurance (SOQUA’07): in conjunction with 6th Joint Meeting of European Software Engineering Conference and ACM SIGSOFT International Symposium on Foundations of Software Engineering (ESEC/FSE’07) , 2007, pp. 90–93."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "T. Y. Chen, F.-C. Kuo, D. Towey, and Z. Q. Zhou, “A revisit of three studies related to random testing,” Science China Information Sciences , vol. 58, pp. 1–9, 2015."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "T. Y. Chen, F.-C. Kuo, and Z. Q. Zhou, “On favourable conditions for adaptive random testing,” International Journal of Software Engineering and Knowledge Engineering , vol. 17, no. 6, pp. 805–825, 2007."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib22",
+      "text": "T. Y. Chen, F.-C. Kuo, H. Liu, and W. E. Wong, “Code coverage of adaptive random testing,” IEEE Transactions on Reliability , vol. 62, no. 1, pp. 226–237, 2013."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib23",
+      "text": "T. Y. Chen, F.-C. Kuo, and H. Liu, “On test case distributions of adaptive random testing,” in Proceedings of the 9th International Conference on Software Engineering and Knowledge Engineering (SEKE’07) , 2007, pp. 141–144."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib24",
+      "text": "K. P. Chan, T. Y. Chen, and D. Towey, “Restricted random testing: Adaptive random testing by exclusion,” International Journal of Software Engineering and Knowledge Engineering , vol. 16, no. 04, pp. 553–584, 2006."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib25",
+      "text": "G. T. Wilfong, “Nearest neighbor problems,” in Proceedings of the 7th Annual Symposium on Computational Geometry (SCG’91) , 1991, pp. 224–233."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib26",
+      "text": "K. P. Chan, T. Y. Chen, and D. Towey, “Forgetting test cases,” in Proceedings of the IEEE 30th Annual International Computer Software and Applications Conference (COMPSAC’06) , 2006, pp. 485–494."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib27",
+      "text": "C. Mao, X. Zhan, T. H. Tse, and T. Y. Chen, “KDFC-ART: a KD-tree approach to enhancing Fixed-size-Candidate-set Adaptive Random Testing,” IEEE Transactions on Reliability , vol. 68, no. 4, pp. 1444–1469, 2019."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib28",
+      "text": "J. L. Bentley, “Multidimensional binary search trees used for associative searching,” Communications of the ACM , vol. 18, no. 9, pp. 509–517, 1975."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib29",
+      "text": "H. Jagadish, B. C. Ooi, and Q. H. Vu, “BATON: A balanced tree structure for peer-to-peer networks,” in Proceedings of the 31st International Conference on Very Large Data Bases (VLDB’05) , 2005, pp. 661–672."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib30",
+      "text": "M. Bawa, T. Condie, and P. Ganesan, “LSH forest: Self-tuning indexes for similarity search,” in Proceedings of the 14th International Conference on World Wide Web (WWW’05) , 2005, pp. 651–660."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib31",
+      "text": "H.-M. Hu and F. Jiang, “Scalable locality sensitive hashing scheme for dynamic high-dimensional data indexing,” Ruan Jian Xue Bao/Journal of Software , vol. 26, no. S2, pp. 228–238, 2015."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib32",
+      "text": "J. Li, J. Cheng, F. Yang, Y. Huang, Y. Zhao, X. Yan, and R. Zhao, “LoSHa: A general framework for scalable locality sensitive hashing,” in Proceedings of the 40th International ACM SIGIR Conference on Research and Development in Information Retrieval (SIGIR’17) , 2017, pp. 635–644."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib33",
+      "text": "P. Indyk and R. Motwani, “Approximate nearest neighbors: towards removing the curse of dimensionality,” in Proceedings of the 30th Annual ACM Symposium on Theory of Computing (STOC’98) , 1998, pp. 604–613."
+    }
+  ]
+}

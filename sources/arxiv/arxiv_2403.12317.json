@@ -1,0 +1,258 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.12317",
+  "title": "EffiPerception: an Efficient Framework for Various Perception Tasks",
+  "authors": "Xinhao Xiang, Simon DrÃ¤ger, Jiawei Zhang",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2403.12317",
+  "html_url": "https://arxiv.org/html/2403.12317",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1008,
+  "text": "Segmentation and object detection are two significant perception tasks in the fields of computer vision and robotics. With the emergence of deep neural networks [20,21,22,23,24,25], as well as large labeled image datasets [26,27], 2D object detection and instance segmentation systems from RGB images have been significantly improved. For applications related to robotics, such as self-driving cars, grasping, etc., a 2D object detection system is not adequate for their perception tasks. Thus, 3D object detection and segmentation systems have then been developed [28,29,13,30,31]. Compared to the 2D tasks, 3D object detection and semantic segmentation need to collect additional depth information, which could be gained from the Lidar point cloud or other depth-only sensors.\n\nAlthough some of these methods [32,25,13] could reach relatively high detection/segmentation accuracy, they may not take full consideration of inference speed and memory cost. Several methods are proposed to fill these gaps. For example, compact sparse R-CNN [33] speeds up the classic sparse R-CNN [32] and reduces the memory cost by reducing iterative detection heads and simplifying the feature pyramid network. In 3D object detection, using sparse convolutions-based methods [34,35,36] is also a common approach to speed it up.\n\nDespite reaching relatively high performance, these methods mainly focus on a single or small couple of perception tasks. As a result, it could be inherently task/dataset-specific. For example, Sparse convolutions-based methods [34,35,36] have shown high performance on 3D object detection, but it is still a question whether it could also reach the same competitive performance for 2D object detection and segmentation tasks. On the other hand, the compact strategy [33] well-used in sparse R-CNN may not provide the same performance gain in 3D perception tasks. Could there exist a unified framework that is efficient for various perception tasks, under corresponding input extractor and perception head? To develop such a framework, three aspects could be re-investigated.\n\nThe first aspect comes from the input feature extractors. For point cloud data, point-based, voxel-based, and range-based are the three main extraction approaches [37]. Before the extraction, some pre-processing techniques may also be applied, such as the random sampling [38], set abstraction [28], farthest point sampling(FPS) [39], segmentation guided filtering [40], coordinate refinement [41], etc. Different extractors and pre-processing strategy choices could lead to huge differences. For example, increasing the number of context points will gain more representation power but at the cost of increasing memory consumption [28]. Suitable context radius in ball query is another key factor to balance the efficacy and efficiency of detection models [39]. As for image data, besides using the raw RGB pixel data, extra depth information, stereo information, or multi-view input could also contribute to image extraction. Additional information increases the diversity of the input space though at the same time adds more challenges to the following feature learning. In this paper, we designed a unified extractor for each modality called the Efficient Feature Extractors. For image feature extraction, we partition raw RGB images into smaller non-overlapping patches, flatten them, and conduct local learning. For point cloud feature extraction, we adopt voxelization, random sampling, outlier removal, data augmentation, flattening them, and finally conducting local learning. Under these settings, it could capitalize on the strengths of various previous approaches while easing their weaknesses, showing great performance increases with higher inference speed and lower training memory usage.\n\nThe second aspect arises from the following learning layers. Previous approaches rely heavily on their task-driven or task-centered measures, such as adopting data augmentation [42,43,44], or precisely defining its loss function combined with training strategies [45,34]. Take an example, DeepFusion [42] effectively aligns the transformed features from the input image and point cloud. One core technique named InverseAug is for inversing geometric-related augmentations to enable accurate geometric alignment between lidar points and image pixels. While this measure performs excellently on their focusing fusion-based 3D object detection tasks, it may not be generalized for other non-fusion tasks. Therefore, previous works usually adopted different operator and learning layers for camera-only, LiDAR-only, and camera-LiDAR fusion tasks. These tasks, however, have many similarities, suggesting a general unified framework should be a more efficient candidate. To this end, we propose the efficient layers, which are more general layers that could act as the plug-in plug-out model in various perception tasks. Having extracted features from input extractors, the efficient layers further process them, aggregating core learned information while pruning noisy proposals. Being well-compatible with all four perception tasks, it further accelerates the inference speed while cutting training memory usage even more.\n\nThe third aspect is the training framework, such as the optimizing scheme, training strategy, etc. A more efficient training framework would generate a more competitive output in a unified manner. By utilizing an 8-bit optimizer [46] that works on perception tasks, we named it the EffiOptim to reduce training memory consumption while accelerating inference speed without compromising accuracy. Its features of scalability and integration indicate great potential application scenes of training/deploying larger models on resource-constrained devices.\n\nWe conduct experience for various perception tasks under three datasets: COCO [27] for 2D object detection and segmentation; KITTI [47] for 3D object detection; and Semantic-KITTI [48] for point cloud segmentation. By integrating various baselines with our EffiPerception framework, its accuracy-speed performance could always be maintained at a high level, within relatively low memory cost. This leads to a significant boost in the overall performance compared to their raw baselines. In addition, since we focus on improving the common parts among various tasks, the framework shows excellent robust scalability. In summary, our main contributions are as follows:\n\n- • We proposed an efficient framework called EffiPerception to achieve better accuracy-speed performance with relatively low memory cost under several perception tasks.\n\n- • We investigated exploiting common layer patterns learning strategies among tasks, and proposed two generic layers: Sparse Down-Sampling and Global Spatial Aggregation, to increase the framework’s robustness and efficiency.\n\n- • Extensive experiments are conducted on the COCO, KITTI, and semantic-KITTI datasets within four detection and segmentation tasks, showing fascinating accuracy-speed-memory overall performance increase. Its feature of scalability indicates potential application scenes of training/deploying larger models on resource-constrained devices.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib12",
+      "text": "Chen, Z., Duan, Y., Wang, W., He, J., Lu, T., Dai, J., Qiao, Y.: Vision transformer adapter for dense predictions (2023)"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib78",
+      "text": "Sandler, M., Howard, A., Zhu, M., Zhmoginov, A., Chen, L.C.: Mobilenetv2: Inverted residuals and linear bottlenecks (2019)"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib40",
+      "text": "Howard, A., Sandler, M., Chu, G., Chen, L.C., Chen, B., Tan, M., Wang, W., Zhu, Y., Pang, R., Vasudevan, V., Le, Q.V., Adam, H.: Searching for mobilenetv3 (2019)"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib15",
+      "text": "Dai, J., Qi, H., Xiong, Y., Li, Y., Zhang, G., Hu, H., Wei, Y.: Deformable convolutional networks (2017)"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib120",
+      "text": "Zhu, L., Wang, X., Ke, Z., Zhang, W., Lau, R.: Biformer: Vision transformer with bi-level routing attention (2023)"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib63",
+      "text": "Liu, Z., Lin, Y., Cao, Y., Hu, H., Wei, Y., Zhang, Z., Lin, S., Guo, B.: Swin transformer: Hierarchical vision transformer using shifted windows (2021). https://doi.org/10.48550/ARXIV.2103.14030, https://arxiv.org/abs/2103.14030"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib67",
+      "text": "Liu, Z., Mao, H., Wu, C.Y., Feichtenhofer, C., Darrell, T., Xie, S.: A convnet for the 2020s (2022)"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib100",
+      "text": "Wang, W., Xie, E., Li, X., Fan, D.P., Song, K., Liang, D., Lu, T., Luo, P., Shao, L.: Pvt v2: Improved baselines with pyramid vision transformer. Computational Visual Media 8 (3), 415–424 (Mar 2022). https://doi.org/10.1007/s41095-022-0274-8, http://dx.doi.org/10.1007/s41095-022-0274-8"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib31",
+      "text": "He, K., Chen, X., Xie, S., Li, Y., Dollár, P., Girshick, R.: Masked autoencoders are scalable vision learners. In: 2022 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR). pp. 15979–15988 (2022). https://doi.org/10.1109/CVPR52688.2022.01553"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib77",
+      "text": "Salscheider, N.O.: Simultaneous object detection and semantic segmentation (2020)"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib36",
+      "text": "Hekimoglu, A., Friedrich, P., Zimmer, W., Schmidt, M., Marcos-Ramiro, A., Knoll, A.C.: Multi-task consistency for active learning (2023)"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib98",
+      "text": "Wang, J., Chakraborty, R., Yu, S.X.: Spatial transformer for 3d point clouds. IEEE Transactions on Pattern Analysis and Machine Intelligence p. 1–1 (2021). https://doi.org/10.1109/tpami.2021.3070341, http://dx.doi.org/10.1109/TPAMI.2021.3070341"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib81",
+      "text": "Shi, S., Guo, C., Jiang, L., Wang, Z., Shi, J., Wang, X., Li, H.: PV-RCNN: Point-voxel feature set abstraction for 3d object detection. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 10529–10538 (2020)"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib79",
+      "text": "Shen, X., Stamos, I.: 3d object detection and instance segmentation from 3d range and 2d color images. Sensors (Basel, Switzerland) 21 (2021), https://api.semanticscholar.org/CorpusID:231900097"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib110",
+      "text": "Ye, D., Zhou, Z., Chen, W., Xie, Y., Wang, Y., Wang, P., Foroosh, H.: Lidarmultinet: Towards a unified multi-task network for lidar perception (2023)"
+    },
+    {
+      "n": 16,
+      "id": "bib.bib115",
+      "text": "Zhou, D., Fang, J., Song, X., Liu, L., Yin, J., Dai, Y., Li, H., Yang, R.: Joint 3d instance segmentation and object detection for autonomous driving. In: 2020 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR). pp. 1836–1846 (2020). https://doi.org/10.1109/CVPR42600.2020.00191"
+    },
+    {
+      "n": 17,
+      "id": "bib.bib93",
+      "text": "Unal, O., Gool, L.V., Dai, D.: Improving point cloud semantic segmentation by learning 3d object detection (2020)"
+    },
+    {
+      "n": 18,
+      "id": "bib.bib56",
+      "text": "Liang, M., Yang, B., Chen, Y., Hu, R., Urtasun, R.: Multi-task multi-sensor fusion for 3d object detection (2020)"
+    },
+    {
+      "n": 19,
+      "id": "bib.bib122",
+      "text": "Zou, J., Zhu, Z., Ye, Y., Wang, X.: Diffbev: Conditional diffusion model for bird’s eye view perception (2023)"
+    },
+    {
+      "n": 20,
+      "id": "bib.bib76",
+      "text": "Ren, S., He, K., Girshick, R., Sun, J.: Faster r-cnn: Towards real-time object detection with region proposal networks (2015). https://doi.org/10.48550/ARXIV.1506.01497, https://arxiv.org/abs/1506.01497"
+    },
+    {
+      "n": 21,
+      "id": "bib.bib75",
+      "text": "Redmon, J., Divvala, S., Girshick, R., Farhadi, A.: You only look once: Unified, real-time object detection (2015). https://doi.org/10.48550/ARXIV.1506.02640, https://arxiv.org/abs/1506.02640"
+    },
+    {
+      "n": 22,
+      "id": "bib.bib61",
+      "text": "Liu, W., Anguelov, D., Erhan, D., Szegedy, C., Reed, S., Fu, C.Y., Berg, A.C.: SSD: Single Shot MultiBox Detector, p. 21–37. Springer International Publishing (2016). https://doi.org/10.1007/978-3-319-46448-0_2, http://dx.doi.org/10.1007/978-3-319-46448-0_2"
+    },
+    {
+      "n": 23,
+      "id": "bib.bib32",
+      "text": "He, K., Gkioxari, G., Dollár, P., Girshick, R.: Mask r-cnn (2017). https://doi.org/10.48550/ARXIV.1703.06870, https://arxiv.org/abs/1703.06870"
+    },
+    {
+      "n": 24,
+      "id": "bib.bib96",
+      "text": "Wang, C.Y., Bochkovskiy, A., Liao, H.Y.M.: Yolov7: Trainable bag-of-freebies sets new state-of-the-art for real-time object detectors (2022). https://doi.org/10.48550/ARXIV.2207.02696, https://arxiv.org/abs/2207.02696"
+    },
+    {
+      "n": 25,
+      "id": "bib.bib46",
+      "text": "Kirillov, A., Mintun, E., Ravi, N., Mao, H., Rolland, C., Gustafson, L., Xiao, T., Whitehead, S., Berg, A.C., Lo, W.Y., Dollár, P., Girshick, R.: Segment anything. arXiv:2304.02643 (2023)"
+    },
+    {
+      "n": 26,
+      "id": "bib.bib17",
+      "text": "Deng, J., Dong, W., Socher, R., Li, L.J., Li, K., Fei-Fei, L.: Imagenet: A large-scale hierarchical image database. In: 2009 IEEE Conference on Computer Vision and Pattern Recognition. pp. 248–255 (2009). https://doi.org/10.1109/CVPR.2009.5206848"
+    },
+    {
+      "n": 27,
+      "id": "bib.bib57",
+      "text": "Lin, T.Y., Maire, M., Belongie, S., Bourdev, L., Girshick, R., Hays, J., Perona, P., Ramanan, D., Zitnick, C.L., Dollár, P.: Microsoft coco: Common objects in context (2015)"
+    },
+    {
+      "n": 28,
+      "id": "bib.bib73",
+      "text": "Qi, C.R., Su, H., Mo, K., Guibas, L.J.: Pointnet: Deep learning on point sets for 3d classification and segmentation (2016). https://doi.org/10.48550/ARXIV.1612.00593, https://arxiv.org/abs/1612.00593"
+    },
+    {
+      "n": 29,
+      "id": "bib.bib118",
+      "text": "Zhou, Y., Tuzel, O.: Voxelnet: End-to-end learning for point cloud based 3d object detection (2017). https://doi.org/10.48550/ARXIV.1711.06396, https://arxiv.org/abs/1711.06396"
+    },
+    {
+      "n": 30,
+      "id": "bib.bib102",
+      "text": "Wu, H., Wen, C., Li, W., Yang, R., Wang, C.: Transformation-equivariant 3d object detection for autonomous driving. In: AAAI (2023)"
+    },
+    {
+      "n": 31,
+      "id": "bib.bib53",
+      "text": "Li, X., Ma, T., Hou, Y., Shi, B., Yang, Y., Liu, Y., Wu, X., Chen, Q., Li, Y., Qiao, Y., He, L.: Logonet: Towards accurate 3d object detection with local-to-global cross-modal fusion. In: Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR) (2023)"
+    },
+    {
+      "n": 32,
+      "id": "bib.bib87",
+      "text": "Sun, P., Zhang, R., Jiang, Y., Kong, T., Xu, C., Zhan, W., Tomizuka, M., Li, L., Yuan, Z., Wang, C., Luo, P.: Sparse R-CNN: end-to-end object detection with learnable proposals. CoRR abs/2011.12450 (2020), https://arxiv.org/abs/2011.12450"
+    },
+    {
+      "n": 33,
+      "id": "bib.bib35",
+      "text": "He, Z., Ye, X., Li, Y.: Compact sparse r-cnn: Speeding up sparse r-cnn by reducing iterative detection heads and simplifying feature pyramid network. AIP Advances 13 (5) (2023)"
+    },
+    {
+      "n": 34,
+      "id": "bib.bib119",
+      "text": "Zhu, B., Wang, Z., Shi, S., Xu, H., Hong, L., Li, H.: Conquer: Query contrast voxel-detr for 3d object detection (2022). https://doi.org/10.48550/ARXIV.2212.07289, https://arxiv.org/abs/2212.07289"
+    },
+    {
+      "n": 35,
+      "id": "bib.bib23",
+      "text": "Fan, L., Wang, F., Wang, N., Zhang, Z.: Fully sparse 3d object detection (2022)"
+    },
+    {
+      "n": 36,
+      "id": "bib.bib10",
+      "text": "Chen, Y., Li, Y., Zhang, X., Sun, J., Jia, J.: Focal sparse convolutional networks for 3d object detection. In: Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (2022)"
+    },
+    {
+      "n": 37,
+      "id": "bib.bib69",
+      "text": "Mao, J., Shi, S., Wang, X., Li, H.: 3d object detection for autonomous driving: A comprehensive survey (2023)"
+    },
+    {
+      "n": 38,
+      "id": "bib.bib44",
+      "text": "Karlinsky, L., Shtok, J., Alfassy, A., Lichtenstein, M., Harary, S., Schwartz, E., Doveh, S., Sattigeri, P., Feris, R., Bronstein, A., Giryes, R.: Starnet: towards weakly supervised few-shot object detection (2020). https://doi.org/10.48550/ARXIV.2003.06798, https://arxiv.org/abs/2003.06798"
+    },
+    {
+      "n": 39,
+      "id": "bib.bib74",
+      "text": "Qi, C.R., Yi, L., Su, H., Guibas, L.J.: Pointnet++: Deep hierarchical feature learning on point sets in a metric space (2017). https://doi.org/10.48550/ARXIV.1706.02413, https://arxiv.org/abs/1706.02413"
+    },
+    {
+      "n": 40,
+      "id": "bib.bib109",
+      "text": "Yang, Z., Sun, Y., Liu, S., Shen, X., Jia, J.: Ipod: Intensive point-based object detector for point cloud (2018)"
+    },
+    {
+      "n": 41,
+      "id": "bib.bib72",
+      "text": "Pan, X., Xia, Z., Song, S., Li, L.E., Huang, G.: 3d object detection with pointformer (2021)"
+    },
+    {
+      "n": 42,
+      "id": "bib.bib55",
+      "text": "Li, Y., Yu, A.W., Meng, T., Caine, B., Ngiam, J., Peng, D., Shen, J., Wu, B., Lu, Y., Zhou, D., Le, Q.V., Yuille, A., Tan, M.: Deepfusion: Lidar-camera deep fusion for multi-modal 3d object detection (2022). https://doi.org/10.48550/ARXIV.2203.08195, https://arxiv.org/abs/2203.08195"
+    },
+    {
+      "n": 43,
+      "id": "bib.bib97",
+      "text": "Wang, C., Ma, C., Zhu, M., Yang, X.: Pointaugmenting: Cross-modal augmentation for 3d object detection. In: 2021 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR). pp. 11789–11798 (2021). https://doi.org/10.1109/CVPR46437.2021.01162"
+    },
+    {
+      "n": 44,
+      "id": "bib.bib58",
+      "text": "Liu, C., Gao, C., Liu, F., Li, P., Meng, D., Gao, X.: Hierarchical supervision and shuffle data augmentation for 3d semi-supervised object detection (2023)"
+    },
+    {
+      "n": 45,
+      "id": "bib.bib7",
+      "text": "Carion, N., Massa, F., Synnaeve, G., Usunier, N., Kirillov, A., Zagoruyko, S.: End-to-end object detection with transformers (2020). https://doi.org/10.48550/ARXIV.2005.12872, https://arxiv.org/abs/2005.12872"
+    },
+    {
+      "n": 46,
+      "id": "bib.bib18",
+      "text": "Dettmers, T., Lewis, M., Shleifer, S., Zettlemoyer, L.: 8-bit optimizers via block-wise quantization (2022)"
+    },
+    {
+      "n": 47,
+      "id": "bib.bib26",
+      "text": "Geiger, A., Lenz, P., Urtasun, R.: Are we ready for autonomous driving? the KITTI vision benchmark suite. In: 2012 IEEE Conference on Computer Vision and Pattern Recognition. pp. 3354–3361. IEEE (2012)"
+    },
+    {
+      "n": 48,
+      "id": "bib.bib2",
+      "text": "Behley, J., Garbade, M., Milioto, A., Quenzel, J., Behnke, S., Stachniss, C., Gall, J.: Semantickitti: A dataset for semantic scene understanding of lidar sequences (2019)"
+    }
+  ]
+}

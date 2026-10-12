@@ -1,0 +1,214 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2312.02880",
+  "title": "PULSAR: Simultaneous Many-Row Activation for Reliable and High-Performance Computing in Off-the-Shelf DRAM Chips",
+  "authors": "Ismail Emir Yuksel, Yahya Can Tugrul, F. Nisa Bostanci, Abdullah Giray Yaglikci, Ataberk Olgun, Geraldo F. Oliveira, Melina Soysal, Haocong Luo, Juan Gomez Luna, Mohammad Sadrosadati, Onur Mutlu",
+  "year": "2024",
+  "categories": [
+    "cs.AR",
+    "cs.DC"
+  ],
+  "url": "https://arxiv.org/abs/2312.02880",
+  "html_url": "https://arxiv.org/html/2312.02880",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1157,
+  "text": "Data movement between the processor and the main memory is a first-order obstacle against improving performance and energy efficiency in modern systems [1,2]. Many prior works [3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29] propose Processing-using-Memory (PuM) techniques to alleviate data movement bottlenecks, where computation is performed directly within memory arrays (e.g., DRAM) by leveraging the intrinsic analog operating properties of the memory device. PuM significantly reduces data movement, thereby lowering both energy consumption and execution time (i.e., improving system performance). PuM can be enabled in modern systems via 1) various modifications to DRAM chips [21,19,8,24,20,22,17,14,28,30] or 2) violating the timing constraints without the need of any modifications to DRAM chips [31,10,29,32,33].\n\nPrior work proposes PuM techniques that experimentally demonstrates that three sets of PuM operations can be executed in unmodified off-the-shelf DRAM chips: 1) bitwise logic and arithmetic operations based on three-input majority functions, i.e., MAJ3 [10,29], 2) bulk-data copy at DRAM row granularity [10,18,34] (called, RowClone), and 3) generating security primitives (e.g., in-DRAM true random number generation, physical unclonable functions [32,33,31,34]). Unfortunately, these operations suffer from two key problems that significantly limit their applicability.\n\nSuccess Rate. MAJ3 operation is based on a multiple-row activation that connects a bitline to multiple cells by simultaneously activating multiple DRAM rows. We define the success rate the percentage of bitlines that reliably and correctly perform MAJ3 operation. Unfortunately, MAJ3 operations in modern off-the-shelf DRAM chips have low success rate. This is because the multiple-row activation 1) is not officially supported by the DRAM manufacturers as it requires operating beyond manufacturer-recommended timing constraints, and 2) can result in a smaller deviation on the bitline voltage than the reliable sensing margin due to noise and manufacturing process variation. These negative factors lead to preventing all bitlines from reliably and successfully performing a MAJ3 operation. Prior work attempts to improve the success rate of MAJ3 in old-generation DRAM chips (i.e., DDR3) [29]. However, the current off-the-shelf DRAM chips (i.e., DDR4) still suffer from low success rates (e.g., 78.85% on average across DDR4 chips we test) in MAJ3 operations (§ 3.1.1). Consequently, MAJ3 in modern DRAM chips have poor reliability and frequently produce incorrect results.\n\nPerformance. PuM techniques [10,29] in unmodified off-the-shelf DRAM chips are limited in functionality, which significantly hinders their performance. Although these techniques can perform basic operations such as two-operand bitwise AND/OR (e.g., A • B) and RowClone (COPY A \\rightarrow B) [10,34,29], many modern applications would benefit from executing (e.g., data analytics [21,35,36], databases [37,38,39], and graph processing [14,4,11]) more complex operations, such as many-input (i.e., more than two) bitwise AND/OR operations (e.g., A • B • C) and many row initialization (e.g., COPY A \\rightarrow [B, C]). Due to limited functionality, prior works sequentially execute the basic PuM operations to perform complex PuM operations. However, sequentially executing basic operations leads to high latency and low throughput.\n\nIn this paper, we propose PULSAR, a new PuM technique that improves the success rate and performance of PuM operations in unmodified off-the-shelf DRAM chips. We experimentally demonstrate using 120 off-the-shelf DDR4 DRAM chips from two major DRAM manufacturers that a carefully crafted sequence of DRAM commands simultaneously activates many rows (i.e., 32). PULSAR leverages this new observation and demonstrates a proof-of-concept where off-the-shelf DRAM chips can be used to execute PuM operations with much higher success rate and performance than the state-of-the-art [29]. PULSAR overcomes the two key problems of the existing techniques [29,10] by 1) replicating the input data across different DRAM rows to improve the success rate and 2) enabling new PuM operations (e.g., Multi - RowInit, many-input charge-sharing operations, and Bulk-Write) to provide significant performance improvements. Input Replication. PULSAR replicates (i.e., stores multiple copies of) each majority operation’s input on all simultaneously activated rows. During multiple row activation, these multiple copies contribute to charge sharing and thus increase the net deviation in bitline voltage. For example, performing a MAJ3 operation by simultaneously activating six rows that contain two copies of each input results in 44.06% higher net deviation in bitline voltage than activating three rows that store only one copy of each input (§ 5.1). Larger deviation in bitline voltage greatly reduces the effects of electrical noise and process variation on the results of MAJ3 operations. We present the first characterization of the success rate of MAJ3 operations in DDR4 using 120 off-the-shelf DRAM chips. Our results show that PULSAR executes MAJ3 operations with a 97.91 % success rate, which is 24.18 % higher than that of the state-of-the-art technique [29].\n\nNew PuM Primitives. Activating N rows simultaneously (where N is up to 32) in off-the-shelf DRAM chips, enables more complex operations. PULSAR introduces new PuM primitives that perform bulk data operations on multiple (up to N) operands with a single simultaneous activation: Multi - RowInit, many-input charge-sharing operations, and Bulk-Write. The Multi - RowInit primitive allows for the copying of one row into N rows simultaneously. Many input charge-sharing operations enable majority operations with up to N inputs (e.g., MAJ5 and MAJ7). The Bulk-Write operation enables writing to N rows with only one write command. These primitives increase the throughput and reduce the latency of two PuM operations: 1) majority-based computation and 2) cold-boot-attack defense.\n\nMajority-based Computation. To our knowledge, for the first time, we demonstrate a proof-of-concept that off-the-shelf DRAM chips can execute MAJM operations (i.e., MAJ3 + operations) with high reliability. We study the throughput and the latency of majority-based computations in off-the-shelf DRAM chips using arithmetic and logic operations. Our results show that PULSAR improves performance by 121% on average compared to the state-of-the-art technique [29].\n\nCold-Boot-Attack Defense. We propose content destruction for cold boot attacks that leverage the new PuM primitives that PULSAR introduces. Our results show that PULSAR speeds up content destruction in off-the-shelf DRAM chips by 7.75 \\times compared to the FracDRAM [29] -based content destruction technique.\n\nThis paper makes the following key contributions:\n\n- • We demonstrate, through an extensive experimental characterization of 120 modern DRAM chips from two major manufacturers that modern DRAM chips can simultaneously activate up to 32 DRAM rows.\n\n- • We introduce PULSAR, a new PuM technique that leverages simultaneous activation of up to 32 rows. PULSAR improves the success rate and performance of PuM operations in off-the-shelf DRAM chips. PULSAR demonstrates a proof-of-concept that off-the-shelf DRAM chips are able to execute MAJ3 operations with a 97.91 % success rate, which is 24.18 % higher than the state-of-the-art [29].\n\n- • To our knowledge, for the first time, PULSAR demonstrates more than three-inputs MAJ operations with a very high success rate (73.93% for MAJ5 on average across the DRAM modules that we test) and core primitives called Multi - RowInit and Bulk-Write that significantly reduces the latency of many row initialization.\n\n- • We show that PULSAR significantly improves the performance of seven arithmetic and logic operations over the state-of-the-art mechanism [29] by 2.21 \\times and significantly reduce the latency of content destruction for cold boot attack in off-the-shelf-DRAM by 7.55 \\times.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib70",
+      "text": "O. Mutlu, S. Ghose, J. Gómez-Luna, and R. Ausavarungnirun, “Processing Data Where It Makes Sense: Enabling In-Memory Computation,” in Microprocessors and Microsystems , 2019."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib13",
+      "text": "A. Boroumand, S. Ghose, Y. Kim, R. Ausavarungnirun, E. Shiu, R. Thakur, D. Kim, A. Kuusela, A. Knies, P. Ranganathan, and O. Mutlu, “Google Workloads for Consumer Devices: Mitigating Data Movement Bottlenecks,” in ASPLOS , 2018."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib1",
+      "text": "S. Aga, S. Jeloka, A. Subramaniyan, S. Narayanasamy, D. Blaauw, and R. Das, “Compute Caches,” in HPCA , 2017."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib10",
+      "text": "M. Besta, R. Kanakagiri, G. Kwasniewski, R. Ausavarungnirun, J. Beránek, K. Kanellopoulos, K. Janda, Z. Vonarburg-Shmaria, L. Gianinazzi, I. Stefan et al. , “SISA: Set-Centric Instruction Set Architecture for Graph Mining on Processing-in-Memory Systems,” in MICRO , 2021."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib15",
+      "text": "P. Chi, S. Li, C. Xu, T. Zhang, J. Zhao, Y. Liu, Y. Wang, and Y. Xie, “PRIME: A Novel Processing-in-Memory Architecture for Neural Network Computation in ReRAM-Based Main Memory,” in ISCA , 2016."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib18",
+      "text": "Q. Deng, L. Jiang, Y. Zhang, M. Zhang, and J. Yang, “DrAcc: A DRAM Based Accelerator for Accurate CNN Inference,” in DAC , 2018."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib20",
+      "text": "C. Eckert, X. Wang, J. Wang, A. Subramaniyan, R. Iyer, D. Sylvester, D. Blaauw, and R. Das, “Neural Cache: Bit-Serial In-Cache Acceleration of Deep Neural Networks,” in ISCA , 2018."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib83",
+      "text": "J. Park, R. Azizi, G. F. Oliveira, M. Sadrosadati, R. Nadig, D. Novo, J. Gómez-Luna, M. Kim, and O. Mutlu, “Flash-Cosmos: In-Flash Bulk Bitwise Operations Using Inherent Computation Capability of NAND Flash Memory,” in MICRO , 2022."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib23",
+      "text": "D. Fujiki, S. Mahlke, and R. Das, “Duality Cache for Data Parallel Acceleration,” in ISCA , 2019."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib25",
+      "text": "F. Gao, G. Tziantzioulis, and D. Wentzlaff, “ComputeDRAM: In-Memory Compute Using Off-the-Shelf DRAMs,” in MICRO , 2019."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib31",
+      "text": "N. Hajinazar, G. F. Oliveira, S. Gregorio, J. D. Ferreira, N. M. Ghiasi, M. Patel, M. Alser, S. Ghose, J. Gómez-Luna, and O. Mutlu, “SIMDRAM: A Framework for Bit-Serial SIMD Processing Using DRAM,” in ASPLOS , 2021."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib34",
+      "text": "Z. He, L. Yang, S. Angizi, A. S. Rakin, and D. Fan, “Sparse BD-Net: A Multiplication-Less DNN with Sparse Binarized Depth-Wise Separable Convolution,” JETC , vol. 16, no. 2, pp. 1–24, 2020."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib38",
+      "text": "M. Imani, S. Gupta, Y. Kim, and T. Rosing, “FloatPIM: In-Memory Acceleration of Deep Neural Network Training with High Precision,” in ISCA , 2019."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib61",
+      "text": "S. Li, C. Xu, Q. Zou, J. Zhao, Y. Lu, and Y. Xie, “Pinatubo: A Processing-in-Memory Architecture for Bulk Bitwise Operations in Emerging Non-Volatile Memories,” in DAC , 2016."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib60",
+      "text": "S. Li, D. Niu, K. T. Malladi, H. Zheng, B. Brennan, and Y. Xie, “DRISA: A DRAM-Based Reconfigurable In-Situ Accelerator,” in MICRO , 2017."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib81",
+      "text": "G. F. Oliveira, J. Gómez-Luna, S. Ghose, A. Boroumand, and O. Mutlu, “Accelerating Neural Network Inference with Processing-in-DRAM: From the Edge to the Cloud,” IEEE Micro , 2022."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib96",
+      "text": "V. Seshadri, D. Lee, T. Mullins, H. Hassan, A. Boroumand, J. Kim, M. A. Kozuch, O. Mutlu, P. B. Gibbons, and T. C. Mowry, “Buddy-RAM: Improving the Performance and Efficiency of Bulk Bitwise Operations Using DRAM,” arXiv:1611.09988 [cs:AR], 2016."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib98",
+      "text": "V. Seshadri, Y. Kim, C. Fallin, D. Lee, R. Ausavarungnirun, G. Pekhimenko, Y. Luo, O. Mutlu, P. B. Gibbons, M. A. Kozuch, and T. Mowry, “RowClone: Fast and Energy-Efficient In-DRAM Bulk Data Copy and Initialization,” in MICRO , 2013."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib97",
+      "text": "V. Seshadri, K. Hsieh, A. Boroumand, D. Lee, M. A. Kozuch†, O. Mutlu, P. B. Gibbons, and T. C. Mowry, “Fast Bulk Bitwise AND and OR in DRAM,” in CAL , 2015."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib102",
+      "text": "V. Seshadri and O. Mutlu, “The Processing Using Memory Paradigm: In-DRAM Bulk Copy, Initialization, Bitwise AND and OR,” arXiv:1610.09603 [cs.AR], 2016."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib100",
+      "text": "V. Seshadri, D. Lee, T. Mullins, H. Hassan, A. Boroumand, J. Kim, M. A. Kozuch, O. Mutlu, P. B. Gibbons, and T. C. Mowry, “Ambit: In-Memory Accelerator for Bulk Bitwise Operations Using Commodity DRAM Technology,” in MICRO , 2017."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib103",
+      "text": "V. Seshadri and O. Mutlu, “Simple Operations in Memory to Reduce Data Movement,” in Adv. Comput. , 2017."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib99",
+      "text": "V. Seshadri, Y. Kim, C. Fallin, D. Lee, R. Ausavarungnirun, G. Pekhimenko, Y. Luo, O. Mutlu, P. B. Gibbons, M. A. Kozuch, and T. C. Mowry, “RowClone: Accelerating Data Movement and Initialization Using DRAM,” arXiv:1805.03502 [cs.AR], 2018."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib104",
+      "text": "V. Seshadri and O. Mutlu, “In-DRAM Bulk Bitwise Execution Engine,” arXiv:1905.09822 , 2019."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib105",
+      "text": "A. Shafiee, A. Nag, N. Muralimanohar, R. Balasubramonian, J. P. Strachan, M. Hu, R. S. Williams, and V. Srikumar, “ISAAC: A Convolutional Neural Network Accelerator with In-Situ Analog Arithmetic in Crossbars,” in ISCA , 2016."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib107",
+      "text": "L. Song, X. Qian, H. Li, and Y. Chen, “PipeLayer: A Pipelined ReRAM-Based Accelerator for Deep Learning,” in HPCA , 2017."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib108",
+      "text": "L. Song, Y. Zhuo, X. Qian, H. Li, and Y. Chen, “GraphR: Accelerating Graph Processing Using ReRAM,” in HPCA , 2018."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib130",
+      "text": "X. Xin, Y. Zhang, and J. Yang, “ELP2IM: Efficient and Low Power Bitwise Operation Processing in DRAM,” in HPCA , 2020."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib26",
+      "text": "F. Gao, G. Tziantzioulis, and D. Wentzlaff, “Fracdram: Fractional values in off-the-shelf dram,” in 2022 55th IEEE/ACM International Symposium on Microarchitecture (MICRO) , 2022, pp. 885–899."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib7",
+      "text": "S. Angizi and D. Fan, “ReDRAM: A Reconfigurable Processing-in-DRAM Platform for Accelerating Bulk Bit-Wise Operations,” in ICCAD , 2019."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib80",
+      "text": "A. Olgun, M. Patel, A. G. Yağlıkçı, H. Luo, J. S. Kim, N. Bostanci, N. Vijaykumar, O. Ergin, and O. Mutlu, “QUAC-TRNG: High-Throughput True Random Number Generation Using Quadruple Row Activation in Commodity DRAM Chips,” in ISCA , 2021."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib51",
+      "text": "J. S. Kim, M. Patel, H. Hassan, L. Orosa, and O. Mutlu, “D-RaNGe: Using Commodity DRAM Devices to Generate True Random Numbers with Low Latency and High Throughput,” in HPCA , 2019."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib50",
+      "text": "J. S. Kim, M. Patel, H. Hassan, and O. Mutlu, “The DRAM Latency PUF: Quickly Evaluating Physical Unclonable Functions by Exploiting the Latency–Reliability Tradeoff in Modern Commodity DRAM Devices,” in HPCA , 2018."
+    },
+    {
+      "n": 34,
+      "id": "bib.bib78",
+      "text": "A. Olgun, J. G. Luna, K. Kanellopoulos, B. Salami, H. Hassan, O. Ergin, and O. Mutlu, “Pidram: A holistic end-to-end fpga-based framework for processing-in-dram,” ACM Transactions on Architecture and Code Optimization , vol. 20, no. 1, pp. 1–31, 2022."
+    },
+    {
+      "n": 35,
+      "id": "bib.bib45",
+      "text": "S.-W. Jun, M. Liu, S. Lee, J. Hicks, J. Ankcorn, M. King, and S. Xu, “Bluedbm: An appliance for big data analytics,” ACM SIGARCH Computer Architecture News , vol. 43, no. 3S, pp. 1–13, 2015."
+    },
+    {
+      "n": 36,
+      "id": "bib.bib114",
+      "text": "M. Torabzadehkashi, S. Rezaei, A. Heydarigorji, H. Bobarshad, V. Alves, and N. Bagherzadeh, “Catalina: in-storage processing acceleration for scalable big data analytics,” in 2019 27th Euromicro International Conference on Parallel, Distributed and Network-Based Processing (PDP) . IEEE, 2019, pp. 430–437."
+    },
+    {
+      "n": 37,
+      "id": "bib.bib121",
+      "text": "K. Wu, “Fastbit: an efficient indexing technology for accelerating data-intensive science,” in Journal of Physics: Conference Series , vol. 16, no. 1. IOP Publishing, 2005, p. 556."
+    },
+    {
+      "n": 38,
+      "id": "bib.bib123",
+      "text": "M.-C. Wu and A. P. Buchmann, “Encoded bitmap indexing for data warehouses,” in Proceedings 14th International Conference on Data Engineering . IEEE, 1998, pp. 220–230."
+    },
+    {
+      "n": 39,
+      "id": "bib.bib30",
+      "text": "Z. Guz, M. Awasthi, V. Balakrishnan, M. Ghosh, A. Shayesteh, T. Suri, and S. Semiconductor, “Real-time analytics as the killer application for processing-in-memory,” Near Data Processing (WoNDP) , pp. 10–2, 2014."
+    }
+  ]
+}

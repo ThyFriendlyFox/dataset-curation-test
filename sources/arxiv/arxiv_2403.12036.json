@@ -1,0 +1,60 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.12036",
+  "title": "One-Step Image Translation with Text-to-Image Models",
+  "authors": "Gaurav Parmar, Taesung Park, Srinivasa Narasimhan, Jun-Yan Zhu",
+  "year": "2024",
+  "categories": [
+    "cs.CV",
+    "cs.GR",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2403.12036",
+  "html_url": "https://arxiv.org/html/2403.12036",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 583,
+  "text": "Conditional diffusion models [1,2,3,4] have empowered users to generate images based on both spatial conditioning and text prompts, enabling various image synthesis applications that demand precise user controls over scene layout, user sketches, and human poses. Despite their huge success, these models face two primary challenges. First, the iterative nature of diffusion models makes inference slow, limiting real-time applications, such as interactive Sketch2Photo. Second, model training often requires curating large-scale paired datasets, posing significant costs for many applications, while being infeasible for others [5].\n\nIn this work, we introduce a one-step image-to-image translation method applicable to both paired and unpaired settings. Our method achieves visually appealing results comparable to existing conditional diffusion models, while reducing the number of inference steps to 1. More importantly, our method can be trained without image pairs. Our key idea is to efficiently adapt a pre-trained text-conditional one-step diffusion model, such as SD-Turbo [6], to new domains and tasks via adversarial learning objectives.\n\nUnfortunately, directly applying standard diffusion adapters like ControlNet [1] to the one-step setting proved less effective in our experiments. Unlike traditional diffusion models, we observe that the noise map directly influences the output structure in the one-step model. Consequently, feeding both noise maps and input conditioning through additional adapter branches results in conflicting information for the network. Especially for unpaired cases, this strategy leads to the original network being disregarded by the end of training. Moreover, many visual details in the input image are lost during image-to-image translation, due to imperfect reconstruction by the multi-stage pipeline (Encoder-UNet-Decoder) of the SD-Turbo model. This loss of detail is particularly noticeable and crucial when the input is a real image, such as in day-to-night translation.\n\nTo tackle these challenges, we propose a new generator architecture that leverages SD-Turbo weights while preserving the input image structure. First, we feed the conditioning information directly to the noise encoder branch of the UNet. This enables the network to adapt to new controls directly, avoiding conflicts between the noise map and the input control. Second, we consolidate the three separate modules, Encoder, UNet, and Decoder, into a single end-to-end trainable architecture. For this, we employ LoRA [7] to adapt the original network to new controls and domains, reducing overfitting and fine-tuning time. Finally, to preserve the high-frequency details of the input, we incorporate skip connections between the encoder and decoder via zero-conv [1]. Our architecture is versatile, serving as a plug-and-play model for conditional GAN learning objectives such as CycleGAN and pix2pix [5,8]. To our knowledge, our work is the first to achieve one-step image translation with a text-to-image model.\n\nWe primarily focus on the harder unpaired translation tasks, such as converting from day to night and vice versa and adding/removing weather effects to/from images. We show that our model CycleGAN-Turbo significantly outperforms both existing GANs-based and diffusion-based methods in terms of distribution matching and input structure preservation, while achieving greater efficiency than diffusion-based methods. We include an extensive ablation study regarding each design choice of our method.\n\nTo demonstrate the versatility of our architecture, we also perform experiments for paired settings, such as Edge2Image or Sketch2Photo. Our model called pix2pix-Turbo achieves visually comparable results with recent conditional diffusion models, while reducing the number of inference steps to 1. We can generate diverse outputs by interpolating between noise maps used in pre-trained model and our model’s encoder outputs. In summary, our work suggests that one-step pre-trained text-to-image models can serve as a strong and versatile backbone for many downstream image synthesis tasks.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib73",
+      "text": "Zhang, L., Rao, A., Agrawala, M.: Adding conditional control to text-to-image diffusion models. In: IEEE International Conference on Computer Vision (ICCV) (2023)"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib5",
+      "text": "Brooks, T., Holynski, A., Efros, A.A.: Instructpix2pix: Learning to follow image editing instructions. In: IEEE Conference on Computer Vision and Pattern Recognition (CVPR) (2023)"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib48",
+      "text": "Saharia, C., Chan, W., Chang, H., Lee, C., Ho, J., Salimans, T., Fleet, D., Norouzi, M.: Palette: Image-to-image diffusion models. In: ACM SIGGRAPH. pp. 1–10 (2022)"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib38",
+      "text": "Mou, C., Wang, X., Xie, L., Zhang, J., Qi, Z., Shan, Y., Qie, X.: T2i-adapter: Learning adapters to dig out more controllable ability for text-to-image diffusion models. arXiv preprint arXiv:2302.08453 (2023)"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib77",
+      "text": "Zhu, J.Y., Park, T., Isola, P., Efros, A.A.: Unpaired image-to-image translation using cycle-consistent adversarial networks. In: IEEE International Conference on Computer Vision (ICCV) (2017)"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib54",
+      "text": "Sauer, A., Lorenz, D., Blattmann, A., Rombach, R.: Adversarial diffusion distillation. arXiv preprint arXiv:2311.17042 (2023)"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib17",
+      "text": "Hu, E.J., Shen, Y., Wallis, P., Allen-Zhu, Z., Li, Y., Wang, S., Wang, L., Chen, W.: Lora: Low-rank adaptation of large language models. In: International Conference on Learning Representations (ICLR) (2022)"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib19",
+      "text": "Isola, P., Zhu, J.Y., Zhou, T., Efros, A.A.: Image-to-image translation with conditional adversarial networks. In: IEEE Conference on Computer Vision and Pattern Recognition (CVPR) (2017)"
+    }
+  ]
+}

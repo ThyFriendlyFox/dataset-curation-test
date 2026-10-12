@@ -1,0 +1,45 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.10553",
+  "title": "Learning to Watermark LLM-generated Text via Reinforcement Learning",
+  "authors": "Xiaojun Xu, Yuanshun Yao, Yang Liu",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.AI",
+    "cs.CR"
+  ],
+  "url": "https://arxiv.org/abs/2403.10553",
+  "html_url": "https://arxiv.org/html/2403.10553",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 806,
+  "text": "Watermarking LLM (Large Language Model) outputs, i.e., embedding algorithmically detectable signals into LLM-generated text, has recently become a potential solution to track LLM misuse [1,2].\n\nSo far, LLM watermarking methods focus on token-level distortion in the LLM output. This framework has several limitations. (1) Since we still need the watermarked text to be humanly readable, the output distortion induced needs to be minimized. As a result, watermark accuracy might be suboptimal because the watermark signal injected in the output space is constrained by the readability tradeoff. (2) For the same reason, the limited output distortion leads to vulnerability to paraphrasing attacks [3]. (3) The design space of watermark is inflexible – all the practitioners can do is post-processing the generated text from a fixed LLM, which leads to certain problems, e.g. lack of adaptability to newly discovered adversarial attacks. (4) It forbids practitioners from open-sourcing the watermarked LLMs. If they want to do so, they would also have to release the unwatermarked LLM because the watermarks are added post hoc, defeating the original purpose of protecting intellectual property.\n\nIn this work, we ask: Can we watermark LLM texts by directly finetuning the LLM, so that we can enlarge the watermark design space? The watermark in our case is injected by model-level changes, and the resulting LLM outputs carry the signals that can be identified by detection.\n\nIn other words, we include the LLM tuning stage into the watermark pipeline as opposed to the prior methods that only work with a fixed LLM, and thus expand the design space of watermark. Unlike prior works which detectors are simple statistical tests, our detector is a language model that predicts the likelihood of whether a text is watermarked or not. Specifically, we tune the LLM to inject the watermark signal while training a paired detector model that detects the signal. The key insight is: by tuning the LLM to adapt to the detector, we make the detection easier and more accurate.\n\nFigure 1 (right) shows the overview of our reinforcement learning-based watermark framework. We iteratively co-train both the LLM and the detector. In each step, we instruction-tune the LLM to distort its weights and therefore its output distribution. Then, we train the detector to detect the signal from the distorted outputs.\n\nWe choose reinforcement learning [4,5] as the co-training framework for several reasons. (1) We can adapt the reward model as a detector. (2) We can leverage the strong generalizability of the RL algorithm [4] to make sure the finetuned LLM can generate text that is easily detectable by the detector. (3) We still need to preserve the text readability in general, which can be done by RLHF’s utility-preserving objective.\n\nOur approach has several advantages compared to the prior works. (1) Detection Accuracy: Since we tune the LLM to fit the detector, we create more space for the detector because we explicitly ask the LLM to generate text easily detectable to the detector. (2) Robustness: Because we do not aim to rely on low-level (e.g. token-level) output distortion for watermark detection, our watermark can be more robust to adversarial attacks like paraphrasing. (3) Adaptability: Since our framework is data-driven, we can easily iterate the LLM to adapt to new attacks by incorporating adversarially generated text into the training data, in the style of adversarial training. This is not a feature supported by the traditional fixed-model approach. (4) Zero Watermark-Generation Cost: Once the LLM is deployed, we do not need any special operations during text generation to embed watermarks. This zero-cost watermark generation makes our approach appealing when the LLM is deployed to serve at a very large scale. (5) Open-source Feasibility: Since our watermarks are internally embedded into the LLM weights and no special operation is needed in a post-hoc text generation, practitioners can release the watermarked LLM without being forced to release an unwatermarked version.\n\nOur approach has several limitations compared to the fixed-model approaches. (1) The one-time cost during the instruction-tuning stage might make the overall watermark cost higher. (2) We require practitioners to prepare relevant training data for instruction-tuning since ours is a data-driven approach. (3) Our method has a higher detection overhead. The first two limitations can be mitigated if our framework is used together with the standard LLM alignment process. If combined with the alignment, the extra overhead introduced is low – only training an extra reward model (i.e. our detector).\n\nThrough the experiments, we show that our framework achieves near-perfect detection rate and outperforms existing token-level approaches. We observe that our watermark is also robust to small perturbations on the watermarked text. If we encounter large perturbations, we can include the perturbed samples in the training stage, following the style of adversarial training, and achieve high detection rate (AUC over 0.99), showing a strong adaptability of our approach unsupported by the token-level watermarks.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib12",
+      "text": "Kirchenbauer et al. (2023a) Kirchenbauer, J., Geiping, J., Wen, Y., Katz, J., Miers, I., and Goldstein, T. A watermark for large language models. arXiv preprint arXiv:2301.10226 , 2023a."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib15",
+      "text": "Kuditipudi et al. (2023) Kuditipudi, R., Thickstun, J., Hashimoto, T., and Liang, P. Robust distortion-free watermarks for language models. arXiv preprint arXiv:2307.15593 , 2023."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib13",
+      "text": "Kirchenbauer et al. (2023b) Kirchenbauer, J., Geiping, J., Wen, Y., Shu, M., Saifullah, K., Kong, K., Fernando, K., Saha, A., Goldblum, M., and Goldstein, T. On the reliability of watermarks for large language models. arXiv preprint arXiv:2306.04634 , 2023b."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib23",
+      "text": "Ouyang et al. (2022) Ouyang, L., Wu, J., Jiang, X., Almeida, D., Wainwright, C., Mishkin, P., Zhang, C., Agarwal, S., Slama, K., Ray, A., et al. Training language models to follow instructions with human feedback. Advances in Neural Information Processing Systems , 35:27730–27744, 2022."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib2",
+      "text": "Arulkumaran et al. (2017) Arulkumaran, K., Deisenroth, M. P., Brundage, M., and Bharath, A. A. Deep reinforcement learning: A brief survey. IEEE Signal Processing Magazine , 34(6):26–38, 2017."
+    }
+  ]
+}
