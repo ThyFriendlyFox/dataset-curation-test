@@ -1,0 +1,144 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.07292",
+  "title": "Continual All-in-One Adverse Weather Removal with Knowledge Replay on a Unified Network Structure",
+  "authors": "De Cheng, Yanling Ji, Dong Gong, Yan Li, Nannan Wang, Junwei Han, Dingwen Zhang",
+  "year": "2024",
+  "categories": [
+    "cs.CV",
+    "cs.AI"
+  ],
+  "url": "https://arxiv.org/abs/2403.07292",
+  "html_url": "https://arxiv.org/html/2403.07292",
+  "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+  "section": "Introduction",
+  "word_count": 1065,
+  "text": "Various types of adverse weather, for example, haze, rain, and snow, are ubiquitous in photography, which degenerate the imaging quality and thus hinder the other downstream computer vision tasks, e.g., object detection [1], image classification [2], semantic segmentation [3], and many others [4,5]. To address these issues, many single adverse weather removal tasks have been extensively studied in the past decades, including image dehazing [6,7], deraining [8,9,10], and desnowing [11,12].\n\nHowever, most existing methods [13,7,9,14,11,15,16] are specifically designed to handle a single type of degeneration/weather, and they can work only when the specific degeneration type is appointed. This greatly limits the deployment of such methods in real-world scenarios, such as video surveillance and autonomous vehicle systems, which require adverse weather removal methods to handle various complex weather conditions automatically. Although some efforts have been taken to handle multiple degenerations in an “all-in-one” manner [17,18,19] (i.e., using a unified deep model to deal with different types of adverse weather simultaneously), these methods are typically designed based on either of the following two assumptions: 1) All types of adverse weather removal training data need to be finely collected before the model training phase [17,18,19]; 2) In the testing phase, degeneration type is required to utilize the corresponding model component for specific adverse weather removal task [19,17].\n\nUnfortunately, such assumptions prevent existing adverse weather removal models from working in real-world scenarios. Firstly, image degenerations caused by adverse weather are always complex and changing with different weather conditions from days and seasons, and the diverse manifestations of adverse weather conditions make it very challenging to collect adequate training data at one time. The systems running in real-world scenarios require the adverse weather removal method to continually learn from the incrementally collected datasets with various types of degenerations, which thus can accumulate the knowledge toward an all-in-one model. Therefore, the first assumption of static training style with all types of data available simultaneously, will pose a challenge for such all-in-one models and render them susceptible to the challenges of continual learning, resulting in limited applications in complex real-world scenarios. Besides, knowing the type of adverse weather in advance during application is always difficult, which also requires additional model components and computation costs.\n\nTherefore, in this paper, we make an early effort to investigate the continual all-in-one adverse weather removal task towards a setting closer to real-world scenarios, as shown in Fig 1. Such a setting is more realistic than the setting in previous relevant work PIGWM [20], which performs CL only on a single type of degeneration with multiple deraining datasets. While in the newly proposed CL for an all-in-one setting, we study the CL for multiple adverse weather removal tasks including dehazing, deraining, and desnowing. To be specific, we build a benchmark setting with three large datasets under different adverse weather types, i.e., OTS [21], Rain100H [22] and Snow100K [23], to extensively validate the capability of CL approaches of our proposed method and the followings. To achieve the all-in-one process, we design a unified network structure with tailored effective knowledge replay for CL, where the unified structure with shared parameters enables the tasks to directly share knowledge and makes the model easy to use in practice (for example, not requiring degeneration type in testing). Notably, the proposed CL method can train the unified network on different types of input data, which may occur sequentially or alternatively.\n\nDue to the challenging nature of the investigated continual all-in-one adverse weather removal task, we have to face a much severe catastrophic problem, since different types of adverse weather always have their own intrinsic mapping rules, and the differences among them are larger than that among different datasets while within the same type of adverse weather. To tackle such serious catastrophic forgetting issue, we develop a unified network structure with experience replay strategy on a tiny memory buffer [24,25] saving a very small subset of old samples. Unlike standard experience replay with only rehearsal on old samples in memory [24], we design knowledge replay (KR) techniques tailored for image restoration tasks with multiple adverse weather degeneration. Considering that the all-in-one restoration task can be seen as a many-to-one feature mapping problem, the image features from different adverse weather domains (such as, hazy, rain, and snow) need to be first transformed into clean image features and then mapped into clean natural images. As clean image decoding can be shared among different types of adverse weather images, we encourage this part of knowledge among different tasks can be shared and hope the diverse representations for different degeneration can be accumulated with less interference in the mid-level representations. Thus we perform effective KR on the middle-level representations, instead of only at the network prediction level [24,25]. Specifically, we propose to perform the KR on the mid-level features in a shared latent space relying on a learned principal projection with a lower dimension, which tends to preserve principal knowledge of different tasks to replay and accumulate, as shown in Fig. 2. Moreover, we also conduct KR on the memory samples with the network’s predictions (instead of their actual ground truth) as supervision, which preserve the learned knowledge in the network reflected in the network prediction. It makes training smoother and easier in practice, and enables the memory to save samples without the ground-truth.\n\nWe summarize the contributions of this paper as follows:\n\n- • We made the earliest effort to investigate continual learning for the all-in-one adverse weather removal task towards a setting closer to real-world scenarios. Also, we built a benchmark setting for this task, which will be open-sourced to facilitate comparison for subsequent methods on this task.\n\n- • We develop a novel continual learning framework tailored for the all-in-one adverse weather removal task with effective knowledge replay on a unified network structure, which replays the learned knowledge in the network with a principal component projection and an effective knowledge distillation mechanism. This helps to build a practical system to achieve multi-degradation image restoration dynamically.\n\n- • Extensive experimental results demonstrate the effectiveness of the proposed method to deal with this challenging task, which performs competitively to existing dedicated or joint training image restoration methods.\n\nThe rest of this paper is organized as follows. Section II introduces related works. Section III details the proposed method. Section IV shows experimental results to demonstrate the effectiveness of the proposed method. Finally, conclusions are drawn in Section V.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "Z. Zou, K. Chen, Z. Shi, Y. Guo, and J. Ye, “Object detection in 20 years: A survey,” Proceedings of the IEEE , 2023."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "W. Rawat and Z. Wang, “Deep convolutional neural networks for image classification: A comprehensive review,” Neural computation , vol. 29, no. 9, pp. 2352–2449, 2017."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "A. Garcia-Garcia, S. Orts-Escolano, S. Oprea, V. Villena-Martinez, and J. Garcia-Rodriguez, “A review on deep learning techniques applied to semantic segmentation,” arXiv preprint arXiv:1704.06857 , 2017."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "A. M. Hafiz and G. M. Bhat, “A survey on instance segmentation: state of the art,” International journal of multimedia information retrieval , vol. 9, no. 3, pp. 171–189, 2020."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "B. Mildenhall, P. P. Srinivasan, M. Tancik, J. T. Barron, R. Ramamoorthi, and R. Ng, “Nerf: Representing scenes as neural radiance fields for view synthesis,” in ECCV , 2020."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "X. Qin, Z. Wang, Y. Bai, X. Xie, and H. Jia, “Ffa-net: Feature fusion attention network for single image dehazing,” in Proceedings of the AAAI Conference on Artificial Intelligence , vol. 34, no. 07, 2020, pp. 11 908–11 915."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "D. Cheng, Y. Li, D. Zhang, N. Wang, X. Gao, and J. Sun, “Robust single image dehazing based on consistent and contrast-assisted reconstruction,” in Proceedings of the Thirty-First International Joint Conference on Artificial Intelligence, IJCAI-22 . International Joint Conferences on Artificial Intelligence Organization, 7 2022, pp. 848–854."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "D. Ren, W. Zuo, Q. Hu, P. Zhu, and D. Meng, “Progressive image deraining networks: A better and simpler baseline,” in Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , 2019, pp. 3937–3946."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "X. Chen, J. Pan, K. Jiang, Y. Li, Y. Huang, C. Kong, L. Dai, and Z. Fan, “Unpaired deep image deraining using dual contrastive learning,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , June 2022, pp. 2017–2026."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "S. W. Zamir, A. Arora, S. Khan, M. Hayat, F. S. Khan, M.-H. Yang, and L. Shao, “Multi-stage progressive image restoration,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , June 2021, pp. 14 821–14 831."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "W.-T. Chen, H.-Y. Fang, C.-L. Hsieh, C.-C. Tsai, I.-H. Chen, J.-J. Ding, and S.-Y. Kuo, “All snow removed: Single image desnowing algorithm using hierarchical dual-tree complex wavelet representation and contradict channel loss,” in Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV) , October 2021, pp. 4196–4205."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "D.-W. Jaw, S.-C. Huang, and S.-Y. Kuo, “Desnowgan: An efficient single image snow removal framework using cross-resolution lateral connection and gans,” IEEE Transactions on Circuits and Systems for Video Technology , vol. 31, no. 4, pp. 1342–1350, 2020."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "X. Liu, H. Li, and C. Zhu, “Joint contrast enhancement and exposure fusion for real-world image dehazing,” IEEE transactions on multimedia , vol. 24, pp. 3934–3946, 2021."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "J. Shin, H. Park, and J. Paik, “Region-based dehazing via dual-supervised triple-convolutional network,” IEEE Transactions on Multimedia , vol. 24, pp. 245–260, 2021."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "C. Li, C. Guo, J. Guo, P. Han, H. Fu, and R. Cong, “Pdr-net: Perception-inspired single image dehazing network with refinement,” IEEE Transactions on Multimedia , vol. 22, no. 3, pp. 704–716, 2019."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "Q. Yi, J. Li, F. Fang, A. Jiang, and G. Zhang, “Efficient and accurate multi-scale topological network for single image dehazing,” IEEE Transactions on Multimedia , vol. 24, pp. 3114–3128, 2021."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "W.-T. Chen, Z.-K. Huang, C.-C. Tsai, H.-H. Yang, J.-J. Ding, and S.-Y. Kuo, “Learning multiple adverse weather removal via two-stage knowledge learning and multi-contrastive regularization: Toward a unified model,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , June 2022, pp. 17 653–17 662."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "H. Chen, Y. Wang, T. Guo, C. Xu, Y. Deng, Z. Liu, S. Ma, C. Xu, C. Xu, and W. Gao, “Pre-trained image processing transformer,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , June 2021, pp. 12 299–12 310."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "R. Li, R. T. Tan, and L.-F. Cheong, “All in one bad weather removal using architectural search,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , June 2020."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "M. Zhou, J. Xiao, Y. Chang, X. Fu, A. Liu, J. Pan, and Z.-J. Zha, “Image de-raining via continual learning,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , June 2021, pp. 4907–4916."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "B. Li, W. Ren, D. Fu, D. Tao, D. Feng, W. Zeng, and Z. Wang, “Benchmarking single-image dehazing and beyond,” IEEE Transactions on Image Processing , vol. 28, no. 1, pp. 492–505, 2019."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib22",
+      "text": "W. Yang, R. T. Tan, J. Feng, J. Liu, Z. Guo, and S. Yan, “Deep joint rain detection and removal from a single image,” in Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR) , July 2017."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib23",
+      "text": "Y.-F. Liu, D.-W. Jaw, S.-C. Huang, and J.-N. Hwang, “Desnownet: Context-aware deep network for snow removal,” IEEE Transactions on Image Processing , vol. 27, no. 6, pp. 3064–3073, 2018."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib24",
+      "text": "A. Chaudhry, M. Rohrbach, M. Elhoseiny, T. Ajanthan, P. K. Dokania, P. H. Torr, and M. Ranzato, “On tiny episodic memories in continual learning,” arXiv preprint arXiv:1902.10486 , 2019."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib25",
+      "text": "P. Buzzega, M. Boschini, A. Porrello, D. Abati, and S. Calderara, “Dark experience for general continual learning: a strong, simple baseline,” Advances in neural information processing systems , vol. 33, pp. 15 920–15 930, 2020."
+    }
+  ]
+}

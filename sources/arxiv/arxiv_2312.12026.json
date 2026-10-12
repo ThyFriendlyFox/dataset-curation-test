@@ -1,0 +1,148 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2312.12026",
+  "title": "An Approximate Skolem Function Counter",
+  "authors": "Arijit Shaw, Brendan Juba, Kuldeep S. Meel",
+  "year": "2024",
+  "categories": [
+    "cs.LO"
+  ],
+  "url": "https://arxiv.org/abs/2312.12026",
+  "html_url": "https://arxiv.org/html/2312.12026",
+  "license": "http://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Introduction",
+  "word_count": 1168,
+  "text": "Probabilistic inference problems arise throughout AI and are tackled algorithmically by casting them as problems such as model counting [1,2]. In this work, we are interested in approaching inference questions for higher-order objects, specifically Skolem functions: that is, we wish to compute the number of possible Skolem functions for a given specification F(X,Y). Counting Skolem functions is the natural analog of #SAT for Skolem functions, and has been recently explored in the context of counting level-2 solutions for valid Quantified Boolean Formulas (QBFs) [3].\n\nMore precisely, recall that given two sets X=\\{x_{1},\\dots,x_{n}\\} and Y=\\{y_{1},\\dots,y_{m}\\} of variables and a Boolean formula F(X,Y) over X\\cup Y, the problem of Boolean functional synthesis is to compute a vector \\Psi=\\langle\\psi_{1},\\dots,\\psi_{m}\\rangle of Boolean functions \\psi_{i}, often called Skolem functions, such that \\exists YF(X,Y)\\equiv F(X,\\Psi(X)). Informally, given a specification between inputs and outputs, the task is to synthesize a function vector \\Psi that maps each assignment of the inputs to an assignment of the outputs so that the combined assignment meets the specification (whenever such an assignment exists). Skolem synthesis is a fundamental problem in formal methods and has been investigated by theoreticians and practitioners alike over the past few decades. The past few years have witnessed the development of techniques that showcase the promise of scalability in their ability to handle challenging specifications [4,5,6,7,8].\n\nThe scalability of today’s Skolem synthesis engines is reminiscent of the scalability of SAT solvers in the early 2000s. Motivated by the scalability of SAT solvers [9], researchers sought algorithmic frameworks for problems beyond satisfiability, such as MaxSAT [10,11], model counting [1,2], sampling [12], and the like. The development of scalable techniques for these problems also helped usher in new applications, even though the initial investigation had not envisioned many of them. In a similar vein, motivated in part by this development of scalable techniques for functional synthesis, we investigate the Skolem counting problem. We observe in Section 1.2 that algorithms for such tasks also have potential applications in security and the engineering of specifications. Being a natural problem, we will see that our study also naturally leads to deep technical connections between counting functions and counting propositional models and the development of new techniques, which is of independent interest.\n\nCounting Skolem functions indeed raises new technical challenges. The existing techniques developed in the context of propositional model counting either construct (implicitly or explicitly) a representation of the space of all models [13,14,15] or at least enumerate a small number of models [16,17,18,19], which in practice amounts to a few tens to hundreds of models of formulas constrained by random XORs. Such approaches are unlikely to work efficiency in the context of Skolem function counting, where even finding one Skolem function is hard.\n\n## 1.1 Technical Contribution\n\nThe primary contribution of this work is the development of a novel algorithmic framework, called \\mathsf{SkolemFC}, that approximates the Skolem function count with a theoretical guarantee, using only linearly many calls to an approximate model counter and almost-uniform sampler. First, we observe that Skolem function counting can be reduced to an exponential number of model counting calls, serving as a baseline Skolem function counter. The core technical idea of \\mathsf{SkolemFC} is to reduce the problem of approximate Skolem function counting to only linearly many (in m=|Y|) calls to propositional model counters. Of particular note is the observation that \\mathsf{SkolemFC} can provide an approximation to the number of Skolem functions without enumerating even one Skolem function. As approximate model counting and almost-uniform sampling can be done by logarithmically many calls to \\mathsf{SAT} oracle, we show that Skolem function counting can also be reduced to polynomially many calls to a \\mathsf{SAT} oracle.\n\nTo measure the impact of the algorithm, we implement \\mathsf{SkolemFC} and demonstrate its potential over a set of benchmarks arising from prior studies in the context of Skolem function synthesis. Out of 609 instances, \\mathsf{SkolemFC} could solve 375 instances, while a baseline solver could solve only eight instances. For context, the state-of-the-art Skolem function synthesis tool \\mathsf{Manthan} \\mathsf{2} [8] effectively tackled 509 instances from these benchmarks, while its precursor, \\mathsf{Manthan} [20], managed only 356 instances with a timeout of 7200 seconds.\n\n## 1.2 Applications\n\nThis problem arises in several potential application areas.\n\nThe first and primary motivation stems from the observation that specification synthesis [21,22] (i.e., the process of constructing F(X,Y)) and function synthesis form part of the iterative process wherein one iteratively modifies specifications based on the functions that are constructed by the underlying engine. In this context, one helpful measure is to determine the number of possible semantically different functions that satisfy the specification, as often a large number of possible Skolem functions indicates the vagueness of specifications and highlights the need for strengthening the specification. Note that the use of the count is qualitative here, and hence an approximate order of magnitude (log count) suffices.\n\nIn system security and reliability, a classic technique is to generate and use a diverse variety of functionally equivalent implementations of components [23]. Although classically, this is achieved by transformations of the code that preserve the function computed, we may also be interested in producing a variety of functions that satisfy a common specification. Unlike transformations on the code, it is not immediately clear whether a specification even admits a diverse collection of functions – indeed, the function may be uniquely defined. Thus, counting the number of such functions is necessary to assess the potential value of taking this approach, and again a rough order of magnitude estimate suffices. Approximate counting of the functions may also be a useful primitive for realizing such an approach.\n\nA major challenge in the design of counting techniques for SMT [24,25] lies in handling uninterpreted functions [26]. Since Skolem functions capture a restricted but large enough class of uninterpreted functions (namely, the case where a given uninterpreted function is allowed to depend on all X variables), progress in Skolem function counting is needed if we hope to make progress on the general problem of counting of uninterpreted functions in SMT.\n\nAlthough synthesis of Skolem functions remains challenging in general, we note that approximate counting enables a kind of incremental evaluation by using the standard techniques for reducing sampling to counting. More concretely, given a query input, we can estimate the number of functions that produce each output: this is trivial if the range is small (e.g., Boolean), and otherwise, we can introduce random XOR constraints to incrementally specify the output. Once an output is specified for the query point, we may retain these constraints when estimating the number of consistent functions for subsequent queries, thereby obtaining an approximately uniform function conditioned on the answers to the previous queries.\n\n## 1.3 Organization\n\nThe rest of the paper is organized as follows: we discuss related work in Section 2 and present notation and preliminaries in Section 3. We then present the primary technical contribution of our work in Section 4. We present the empirical analysis of the prototype implementation of \\mathsf{SkolemFC} in Section 5. We finally conclude in Section 6.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bibx26",
+      "text": "[GSS21] Carla P Gomes, Ashish Sabharwal, and Bart Selman. Model counting. In Handbook of satisfiability . IOS press, 2021."
+    },
+    {
+      "n": 2,
+      "id": "bib.bibx16",
+      "text": "[CMV21] Supratik Chakraborty, Kuldeep S Meel, and Moshe Y Vardi. Approximate model counting. In Handbook of Satisfiability . 2021."
+    },
+    {
+      "n": 3,
+      "id": "bib.bibx34",
+      "text": "[PMS23] Andreas Plank, Sibylle Möhle, and Martina Seidl. Enumerative level-2 solution counting for quantified boolean formulas (short paper). In Proc. of CP , 2023."
+    },
+    {
+      "n": 4,
+      "id": "bib.bibx29",
+      "text": "[JLH09] Jie-Hong Roland Jiang, Hsuan-Po Lin, and Wei-Lun Hung. Interpolating functions from large boolean relations. In Proc. of ICCAD , 2009."
+    },
+    {
+      "n": 5,
+      "id": "bib.bibx44",
+      "text": "[TV17] Lucas M Tabajara and Moshe Y Vardi. Factored boolean functional synthesis. In Proc. of FMCAD . IEEE, 2017."
+    },
+    {
+      "n": 6,
+      "id": "bib.bibx37",
+      "text": "[RTRS18] Markus N Rabe, Leander Tentrup, Cameron Rasmussen, and Sanjit A Seshia. Understanding and extending incremental determinization for 2QBF. In Proc. of CAV , 2018."
+    },
+    {
+      "n": 7,
+      "id": "bib.bibx1",
+      "text": "[AAC + 19] S Akshay, Jatin Arora, Supratik Chakraborty, S Krishna, Divya Raghunathan, and Shetal Shah. Knowledge compilation for Boolean functional synthesis. In Proc. of FMCAD , 2019."
+    },
+    {
+      "n": 8,
+      "id": "bib.bibx25",
+      "text": "[GSRM21] Priyanka Golia, Friedrich Slivovsky, Subhajit Roy, and Kuldeep S Meel. Engineering an efficient boolean functional synthesis engine. In Proc. of ICCAD , 2021."
+    },
+    {
+      "n": 9,
+      "id": "bib.bibx22",
+      "text": "[FHI + 21] Nils Froleyks, Marijn Heule, Markus Iser, Matti Järvisalo, and Martin Suda. Sat competition 2020. Artificial Intelligence , 2021."
+    },
+    {
+      "n": 10,
+      "id": "bib.bibx2",
+      "text": "[ABL13] Carlos Ansótegui, Maria Luisa Bonet, and Jordi Levy. SAT-based MaxSAT algorithms. Artificial Intelligence , 2013."
+    },
+    {
+      "n": 11,
+      "id": "bib.bibx32",
+      "text": "[LM21] Chu Min Li and Felip Manya. Maxsat, hard and soft constraints. In Handbook of satisfiability . 2021."
+    },
+    {
+      "n": 12,
+      "id": "bib.bibx14",
+      "text": "[CMV14] Supratik Chakraborty, Kuldeep S. Meel, and Moshe Y. Vardi. Balancing scalability and uniformity in sat-witness generator. In Proc. of DAC , 6 2014."
+    },
+    {
+      "n": 13,
+      "id": "bib.bibx43",
+      "text": "[Thu06] Marc Thurley. sharpSAT–counting models with advanced component caching and implicit BCP. In Proc. of SAT , 2006."
+    },
+    {
+      "n": 14,
+      "id": "bib.bibx41",
+      "text": "[SRSM19] Shubham Sharma, Subhajit Roy, Mate Soos, and Kuldeep S Meel. GANAK: A Scalable Probabilistic Exact Model Counter. In Proc. of IJCAI , 2019."
+    },
+    {
+      "n": 15,
+      "id": "bib.bibx21",
+      "text": "[DPV20] Jeffrey M. Dudek, Vu H.N. Phan, and Moshe Y. Vardi. ADDMC: Weighted model counting with algebraic decision diagrams. In Proc. of AAAI , 2020."
+    },
+    {
+      "n": 16,
+      "id": "bib.bibx13",
+      "text": "[CMV13] Supratik Chakraborty, Kuldeep S Meel, and Moshe Y Vardi. A scalable approximate model counter. In Proc. of CP , 2013."
+    },
+    {
+      "n": 17,
+      "id": "bib.bibx15",
+      "text": "[CMV16] Supratik Chakraborty, Kuldeep S Meel, and Moshe Y Vardi. Algorithmic improvements in approximate counting for probabilistic inference: From linear to logarithmic sat calls. In Proc. of IJCAI , 2016."
+    },
+    {
+      "n": 18,
+      "id": "bib.bibx38",
+      "text": "[SM19] Mate Soos and Kuldeep S Meel. BIRD: engineering an efficient CNF-XOR SAT solver and its applications to approximate model counting. In Proc. of AAAI , 2019."
+    },
+    {
+      "n": 19,
+      "id": "bib.bibx45",
+      "text": "[YM23] Jiong Yang and Kuldeep S Meel. Rounding Meets Approximate Model Counting. In Proc. of CAV , 2023."
+    },
+    {
+      "n": 20,
+      "id": "bib.bibx23",
+      "text": "[GRM20] Priyanka Golia, Subhajit Roy, and Kuldeep S Meel. Manthan: A data-driven approach for boolean function synthesis. In Proc. of CAV , 2020."
+    },
+    {
+      "n": 21,
+      "id": "bib.bibx5",
+      "text": "[ADG16] Aws Albarghouthi, Isil Dillig, and Arie Gurfinkel. Maximal specification synthesis. ACM SIGPLAN Notices , 2016."
+    },
+    {
+      "n": 22,
+      "id": "bib.bibx33",
+      "text": "[PFMD21] Sumanth Prabhu, Grigory Fedyukovich, Kumar Madhukar, and Deepak D’Souza. Specification synthesis with constrained horn clauses. In Proc. of PLDI , 2021."
+    },
+    {
+      "n": 23,
+      "id": "bib.bibx8",
+      "text": "[BM15] Benoit Baudry and Martin Monperrus. The multiple facets of software diversity: Recent developments in year 2000 and beyond. ACM Computing Surveys (CSUR) , 2015."
+    },
+    {
+      "n": 24,
+      "id": "bib.bibx10",
+      "text": "[CDM15] Dmitry Chistikov, Rayna Dimitrova, and Rupak Majumdar. Approximate counting in SMT and value estimation for probabilistic programs. In Proc. of TACAS , 2015."
+    },
+    {
+      "n": 25,
+      "id": "bib.bibx12",
+      "text": "[CMMV16] Supratik Chakraborty, Kuldeep Meel, Rakesh Mistry, and Moshe Vardi. Approximate probabilistic inference via word-level counting. In Proc. of AAAI , volume 30, 2016."
+    },
+    {
+      "n": 26,
+      "id": "bib.bibx31",
+      "text": "[KS16] Daniel Kroening and Ofer Strichman. Decision procedures . Springer, 2016."
+    }
+  ]
+}

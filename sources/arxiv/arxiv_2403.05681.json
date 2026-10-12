@@ -1,0 +1,100 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.05681",
+  "title": "DP-TabICL: In-Context Learning with Differentially Private Tabular Data",
+  "authors": "Alycia N. Carey, Karuna Bhaila, Kennedy Edemacu, Xintao Wu",
+  "year": "2024",
+  "categories": [
+    "cs.CR",
+    "cs.AI",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2403.05681",
+  "html_url": "https://arxiv.org/html/2403.05681",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1040,
+  "text": "Large language models (LLMs) have an impressive ability to perform in-context learning (ICL) [1]. Conditioned on natural language prompts containing question-answer pairs (called demonstrations or exemplars), LLMs can execute natural language inference tasks in new domains without having to update the model’s parameters while achieving similar downstream performance as full model fine-tuning [2,3]. The inference tasks can range from simple fact-retrieval [1] to complex reasoning and problem-solving [4] and are adaptable across a wide range of domains. The ease of usage and cost-benefit has motivated several organizations to integrate LLMs into their operations and services to supplement their private data with knowledge from the large corpus of texts that LLMs are trained on.\n\nMoreover, such organizational data are oftentimes stored in relational databases where data points correspond to individual rows in a table/relation. As one of the most widely used formats of data expression and storage, tabular data has also been used for analytic and predictive tasks in machine learning [5]. Recent advances in foundation models and natural language processing (NLP) domains have encouraged researchers to transform or serialize tabular data into natural language formats thus enabling ICL to be performed with tabular data. Authors in [6] empirically verified nine different methods of serializing tabular data into human-readable strings for use in tabular data classification with LLMs such as manual template-based conversions, table-to-text methods using fine-tuned LLMs, and LLM inference-based methods. Their evaluation shows that LLMs can obtain non-trivial performance in classification tasks for multiple serialized tabular datasets with few-shot fine-tuning as well as zero-shot prompting.\n\nThe benefits of integrating tabular data into LLMs, however, do not overshadow the risks associated with the use of data possibly containing private and sensitive information about individuals. Recent research has demonstrated that LLMs can leak information from the large text corpus used to train them and from the smaller pool of domain-specific data used to fine-tune them [7]. Furthermore, in [2], the authors established that data points used within a prompt are highly vulnerable to membership inference attacks (MIAs) and LLMs leak more information through prompting than fine-tuning. Additionally, a malicious adversary may further exploit the memorization ability of LLMs by designing prompts that force the models to disclose information provided in prior demonstrations [8].\n\nMotivated by these concerns, several works focus on mitigating the privacy risks posed by LLMs and suggest approaches based on differential privacy (DP) [9]. For instance, [10] introduced a meta-framework that uses DP stochastic gradient descent (DPSGD) [11] during fine-tuning to protect the privacy of the fine-tuning dataset. Further, methods based on DP model ensembling have also been proposed for preserving the privacy of data in prompts [8,7,12]. These methods, however, assume that LLMs can be trusted with private data and focus on the private release of LLM outputs. Moreover, these methods were empirically verified on text data with NLP tasks such as sentiment analysis and text classification, and may not necessarily adapt well to transformed tabular data that are comparatively more concise.\n\nIn this work, we investigate how well ICL performs when serialized DP-protected tabular data are used as the demonstration examples. We formulate two DP-based frameworks – Local Differentially Private Tabular-based In-Context Learning (LDP-TabICL) and Global Differentially Private Tabular-based In-Context Learning (GDP-TabICL) – to generate demonstration examples for ICL that protect the privacy of the underlying tabular dataset. The general idea of our frameworks are presented in Fig. 1. LDP-TabICL (top left in Fig. 1) utilizes local differential privacy (LDP) to protect the demonstration examples. In LDP, only the users themselves know the true values of their data as they report noisy variants to data aggregator. For LDP-TabICL, we adopt randomized response (RR) [13] to obfuscate user data before collection due to its simplicity, but any LDP frequency oracle [14] may be implemented for privacy-compliant reporting. Since true user data is never disclosed to the server, serialization and prompting can be performed directly with any of the collected perturbed records. However, directly using the noisy records may adversely affect the inference capability of LLMs due to a lack of coherence between the perturbed features and labels. Therefore, we incorporate frequency estimation techniques [15] and reconstruct an approximation of the true feature and label distributions before sampling data for serialization and prompting. Our second framework, GDP-TabICL (bottom left in Fig. 1), utilizes global differential privacy (GDP) to protect the demonstration examples. In GDP, we assume the existence of a trusted curator who collects the users’ original (non-perturbed) data and communicates it to the LLM in a private manner. To create the privatized demonstration examples, GDP-TabICL relies on both Poisson subsampling for privacy amplification and the Laplace mechanism [9] to craft differentially private aggregates that represent the underlying data distribution. To generate the prompts from the permuted individual records (LDP-TabICL) or group statistics (GDP-TabICL), we rely on a manual serialization method (see Section -A4 in Appendix). We note that the focus of this work is on evaluating how ICL performs with DP-protected tabular data, so we use the same serialization method for all evaluations and do not perform any prompt tuning.\n\nWe summarize our main contributions as follows:\n\n- • We propose LDP-TabICL for generating demonstration examples that have formal local DP guarantees for use in tabular data classification via ICL.\n\n- • We additionally propose GDP-TabICL for generating demonstration examples that have formal global DP guarantees for use in tabular data classification via ICL.\n\n- • We empirically verify the performance of LDP-TabICL and GDP-TabICL using two open-source LLMs, Llama-2-13B and Llama-2-7B [16], on eight tabular datasets, and across several ICL and DP settings. We additionally analyze the settings in which LDP-TabICL might be preferable over GDP-TabICL and vice versa.\n\nThe remainder of the work is as follows. In Section II we begin by detailing the current research landscape as it relates to tabular LLMs and differentially private in-context learning. Then, in Section III we introduce the required backgrounds on in-context learning and differential privacy to successfully craft our frameworks of LDP-TabICL and GDP-TabICL in Section IV. After detailing our methods and proving their DP-guarantees in Section IV, we evaluate the ability of LDP-TabICL and GDP-TabICL to produce accurate classifications on tabular data via ICL in Section V. Finally, we offer our concluding remarks in Section VI.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "T. Brown, B. Mann, N. Ryder, M. Subbiah, J. D. Kaplan, P. Dhariwal, A. Neelakantan, P. Shyam, G. Sastry, A. Askell, et al. , “Language models are few-shot learners,” Advances in neural information processing systems , vol. 33, pp. 1877–1901, 2020."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "H. Duan, A. Dziedzic, M. Yaghini, N. Papernot, and F. Boenisch, “On the privacy risk of in-context learning,” in The 61st Annual Meeting Of The Association For Computational Linguistics , 2023."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "Q. Dong, L. Li, D. Dai, C. Zheng, Z. Wu, B. Chang, X. Sun, J. Xu, and Z. Sui, “A survey for in-context learning,” arXiv preprint arXiv:2301.00234 , 2022."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "H. Zhou, A. Nova, H. Larochelle, A. Courville, B. Neyshabur, and H. Sedghi, “Teaching algorithmic reasoning via in-context learning,” 2022."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "V. Borisov, T. Leemann, K. Seßler, J. Haug, M. Pawelczyk, and G. Kasneci, “Deep neural networks and tabular data: A survey,” arXiv preprint arXiv:2110.01889 , 2021."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "S. Hegselmann, A. Buendia, H. Lang, M. Agrawal, X. Jiang, and D. Sontag, “Tabllm: Few-shot classification of tabular data with large language models,” in International Conference on Artificial Intelligence and Statistics , pp. 5549–5581, PMLR, 2023."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "H. Duan, A. Dziedzic, N. Papernot, and F. Boenisch, “Flocks of stochastic parrots: Differentially private prompt learning for large language models,” arXiv preprint arXiv:2305.15594 , 2023."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "X. Tang, R. Shin, H. A. Inan, A. Manoel, F. Mireshghallah, Z. Lin, S. Gopi, J. Kulkarni, and R. Sim, “Privacy-preserving in-context learning with differentially private few-shot generation,” arXiv preprint arXiv:2309.11765 , 2023."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "C. Dwork, A. Roth, et al. , “The algorithmic foundations of differential privacy,” Foundations and Trends® in Theoretical Computer Science , vol. 9, no. 3–4, pp. 211–407, 2014."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "D. Yu, S. Naik, A. Backurs, S. Gopi, H. A. Inan, G. Kamath, J. Kulkarni, Y. T. Lee, A. Manoel, L. Wutschitz, S. Yekhanin, and H. Zhang, “Differentially private fine-tuning of language models,” in The Tenth International Conference on Learning Representations, ICLR , OpenReview.net, 2022."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "M. Abadi, A. Chu, I. Goodfellow, H. B. McMahan, I. Mironov, K. Talwar, and L. Zhang, “Deep learning with differential privacy,” in Proceedings of the 2016 ACM SIGSAC conference on computer and communications security , pp. 308–318, 2016."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "J. Hong, J. T. Wang, C. Zhang, Z. Li, B. Li, and Z. Wang, “Dp-opt: Make large language model your privacy-preserving prompt engineer,” arXiv preprint arXiv:2312.03724 , 2023."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "S. L. Warner, “Randomized response: A survey technique for eliminating evasive answer bias,” JASA , vol. 60, no. 309, pp. 63–69, 1965."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "T. Wang, M. Lopuhaä-Zwakenberg, Z. Li, B. Skoric, and N. Li, “Locally differentially private frequency estimation with consistency,” in 27th Annual Network and Distributed System Security Symposium, NDSS 2020, San Diego, California, USA, February 23-26, 2020 , The Internet Society, 2020."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "Y. Wang, X. Wu, and D. Hu, “Using randomized response for differential privacy preserving data collection.,” in EDBT/ICDT , vol. 1558, pp. 0090–6778, 2016."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "H. Touvron, L. Martin, K. Stone, P. Albert, A. Almahairi, Y. Babaei, N. Bashlykov, S. Batra, P. Bhargava, S. Bhosale, D. Bikel, L. Blecher, C. C. Ferrer, M. Chen, G. Cucurull, D. Esiobu, J. Fernandes, J. Fu, W. Fu, B. Fuller, C. Gao, V. Goswami, N. Goyal, A. Hartshorn, S. Hosseini, R. Hou, H. Inan, M. Kardas, V. Kerkez, M. Khabsa, I. Kloumann, A. Korenev, P. S. Koura, M.-A. Lachaux, T. Lavril, J. Lee, D. Liskovich, Y. Lu, Y. Mao, X. Martinet, T. Mihaylov, P. Mishra, I. Molybog, Y. Nie, A. Poulton, J. Reizenstein, R. Rungta, K. Saladi, A. Schelten, R. Silva, E. M. Smith, R. Subramanian, X. E. Tan, B. Tang, R. Taylor, A. Williams, J. X. Kuan, P. Xu, Z. Yan, I. Zarov, Y. Zhang, A. Fan, M. Kambadur, S. Narang, A. Rodriguez, R. Stojnic, S. Edunov, and T. Scialom, “Llama 2: Open foundation and fine-tuned chat models,” arXiv preprint arXiv:2307.09288 , 2023."
+    }
+  ]
+}

@@ -1,0 +1,99 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.06497",
+  "title": "QuantTune: Optimizing Model Quantization with Adaptive Outlier-Driven Fine Tuning",
+  "authors": "Jiun-Man Chen, Yu-Hsuan Chao, Yu-Jie Wang, Ming-Der Shieh, Chih-Chung Hsu, Wei-Fen Lin",
+  "year": "2024",
+  "categories": [
+    "cs.CV",
+    "cs.MM"
+  ],
+  "url": "https://arxiv.org/abs/2403.06497",
+  "html_url": "https://arxiv.org/html/2403.06497",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 616,
+  "text": "Transformer-based models, including Vision Transformers (ViT) and BERT, have significantly advanced the field of machine learning by setting new performance benchmarks [1,2,3,4,5]. However, their evolution has led to a substantial increase in model complexity, characterized by an exponential rise in the number of parameters [6,7]. This complexity introduces significant computational demands, resulting in considerable memory footprints, elevated power consumption, and increased inference latency. Such requirements pose substantial deployment challenges, especially on resource-constrained platforms such as mobile and IoT devices [8,9,10,11,12].\n\nQuantization emerges as an essential strategy for model compression, aiming to address these challenges by reducing model size and computational demands. Post-training dynamic range quantization is widely adopted, and it incurs substantial accuracy losses in many cases, especially drawing attention to Transformer-based models. A couple of prior research [13,14,15] have mentioned that activation outliers could be the key contributing elements to these losses and propose different methods to alleviate the problem. Our approach, depicted in Figure 1, employs the Activation Observer to calculate the outlier-driven loss, thereby mitigating the effects of outliers and potentially addressing one of the critical challenges observed in current quantization practices.\n\nBuilding on this premise, our analysis, illustrated in Figure 2, confirms the presence of channel-wise outliers in Transformer-based models, including ViT [5], DeiT, Swin [16], BERT, and OPT. However, prior research does not fully elucidate why these outliers lead to a reduction in inference accuracy following post-training quantization (PTQ). It is speculated that the rounding errors from outliers directly contribute to a significant portion of the total quantization errors. Alternatively, outliers may indirectly cause an expansion in the dynamic range of activations, thereby significantly increasing the precision loss for non-outliers. Identifying the fundamental issue is crucial for determining if current state-of-the-art methods can be further improved or if alternative solutions are needed to address these issues. This paper initially focuses on uncovering these fundamental issues and evaluating contemporary approaches to establish our experimental baseline for subsequent optimization.\n\nIn our detailed analysis of the fundamental issue in Section III, we find that the primary concern is the expansive dynamic range caused by outliers. We recommend adopting a partial dynamic range for PTQ to counteract this. Traditional calibration methods are typically labor-intensive, time-consuming, and heavily reliant on specific datasets to determine optimal threshold settings, often failing to achieve the performance of the W32A32 baseline (where \"W\" represents the bit-width for weights, and \"A\" signifies the bit-width for activations), particularly in models like ViT-Base and ViT-Large. In contrast, our proposed method, termed QuantTune, utilizes outlier-driven techniques to manage the dynamic range expansion during fine-tuning, thus improving quantization accuracy and making Transformer-based models more amenable to quantization.\n\nOur work broadens the scope of model quantization by investigating the effects of transitioning from W8A8 to W6A6 low-bit quantization across a variety of models, including ViT, DeiT, Swin, BERT, and OPT. The main contribution of this paper is threefold:\n\n- 1. Model Adaptability: QuantTune demonstrates robust adaptability across a wide range of Transformer architectures, effectively catering to both vision and language models. It is compatible with models having parameter counts ranging from 86 million to 350 million.\n\n- 2. Low PTQ Performance Degradation: Compared to the best calibration method, QuantTune decreases the average accuracy drop by 12.09% at W8A8 quantization and surpasses the best calibration method by reducing accuracy loss by 33.8% at W7A7. Furthermore, it outperforms state-of-the-art methods by reducing the accuracy drop by more than 18.84% across all ViT models.\n\n- 3. Hardware Independence: QuantTune significantly reduces dependency on specific hardware toolchains for calibration, facilitating a quantization optimization process that is more accessible to software developers without specialized hardware. Moreover, it promotes uniform quantization, ensuring seamless compatibility with conventional computing platforms, including CPUs and GPUs.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib43",
+      "text": "Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A.N., Łukasz Kaiser, Polosukhin, I.: Attention is all you need (2017)"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib52",
+      "text": "Zhang, S., Roller, S., Goyal, N., Artetxe, M., Chen, M., Chen, S., Dewan, C., Diab, M., Li, X., Lin, X.V., Mihaylov, T., Ott, M., Shleifer, S., Shuster, K., Simig, D., Koura, P.S., Sridhar, A., Wang, T., Zettlemoyer, L.: Opt: Open pre-trained transformer language models (2022)"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib42",
+      "text": "Touvron, H., Lavril, T., Izacard, G., Martinet, X., Lachaux, M.A., Lacroix, T., Rozière, B., Goyal, N., Hambro, E., Azhar, F., et al.: Llama: Open and efficient foundation language models. arXiv preprint arXiv:2302.13971 (2023)"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib38",
+      "text": "Scao, T.L., Fan, A., Akiki, C., Pavlick, E., Ilić, S., Hesslow, D., Castagné, R., Luccioni, A.S., Yvon, F., Gallé, M., et al.: Bloom: A 176b-parameter open-access multilingual language model. arXiv preprint arXiv:2211.05100 (2022)"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib11",
+      "text": "Dosovitskiy, A., Beyer, L., Kolesnikov, A., Weissenborn, D., Zhai, X., Unterthiner, T., Dehghani, M., Minderer, M., Heigold, G., Gelly, S., Uszkoreit, J., Houlsby, N.: An image is worth 16x16 words: Transformers for image recognition at scale (2020)"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib39",
+      "text": "Sevilla, J., Heim, L., Ho, A., Besiroglu, T., Hobbhahn, M., Villalobos, P.: Compute trends across three eras of machine learning (2022)"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib46",
+      "text": "Wei, J., Tay, Y., Bommasani, R., Raffel, C., Zoph, B., Borgeaud, S., Yogatama, D., Bosma, M., Zhou, D., Metzler, D., Chi, E.H., Hashimoto, T., Vinyals, O., Liang, P., Dean, J., Fedus, W.: Emergent abilities of large language models (2022)"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib17",
+      "text": "Hou, Z., Kung, S.Y.: Multi-dimensional vision transformer compression via dependency guided gaussian process search. In: IEEE/CVF Conference on Computer Vision and Pattern Recognition Workshops (CVPRW) (2022). https://doi.org/10.1109/CVPRW56347.2022.00411"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib41",
+      "text": "Tang, Y., Han, K., Wang, Y., Xu, C., Guo, J., Xu, C., Tao, D.: Patch slimming for efficient vision transformers (2022)"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib15",
+      "text": "Ganesh, P., Chen, Y., Lou, X., Khan, M.A., Yang, Y., Sajjad, H., Nakov, P., Chen, D., Winslett, M.: Compressing large-scale transformer-based models: A case study on bert. Transactions of the Association for Computational Linguistics 9 (2021), anthology ID: 2021.tacl-1.63"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib40",
+      "text": "Tambe, T., Hooper, C., Pentecost, L., Jia, T., Yang, E.Y., Donato, M., Sanh, V., Whatmough, P.N., Rush, A.M., Brooks, D., Wei, G.Y.: Edgebert: Sentence-level energy optimizations for latency-aware multi-task nlp inference (2021), arXiv:2011.14279v5"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib28",
+      "text": "Liu, W., Zhou, P., Wang, Z., Zhao, Z., Deng, H., Ju, Q.: Fastbert: a self-distilling bert with adaptive inference time. In: Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics. Association for Computational Linguistics, Online (July 2020), anthology ID: 2020.acl-main.537"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib3",
+      "text": "Bondarenko, Y., Nagel, M., Blankevoort, T.: Understanding and overcoming the challenges of efficient transformer quantization (2021)"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib49",
+      "text": "Xiao, G., Lin, J., Seznec, M., Wu, H., Demouth, J., Han, S.: Smoothquant: Accurate and efficient post-training quantization for large language models (2022)"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib8",
+      "text": "Dettmers, T., Lewis, M., Belkada, Y., Zettlemoyer, L.: Llm.int8(): 8-bit matrix multiplication for transformers at scale (2022)"
+    },
+    {
+      "n": 16,
+      "id": "bib.bib29",
+      "text": "Liu, Z., Lin, Y., Cao, Y., Hu, H., Wei, Y., Zhang, Z., Lin, S., Guo, B.: Swin transformer: Hierarchical vision transformer using shifted windows (2021)"
+    }
+  ]
+}

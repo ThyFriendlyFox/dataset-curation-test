@@ -1,0 +1,129 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2108.00138",
+  "title": "Learning to Control DC Motor for Micromobility in Real Time with Reinforcement Learning",
+  "authors": "Bibek Poudel, Thomas Watson, Weizi Li",
+  "year": "2022",
+  "categories": [
+    "cs.LG",
+    "cs.RO"
+  ],
+  "url": "https://arxiv.org/abs/2108.00138",
+  "html_url": "https://arxiv.org/html/2108.00138",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 941,
+  "text": "While significant progress has been made in developing full-size autonomous vehicles, autonomous micromobility, including golf carts [1], scooters [2,3], and bikes [4,5], has also seen a rise [6]. A key component to enable these micro-transport vehicles is the Direct Current (DC) motor. In this work, we focus on the control of DC motors for steering via reinforcement learning (RL) in real time.\n\nRL has seen many successes over the past decade on various applications such as games [7,8], robotics [9], natural language processing [10], and intelligent transportation systems [11,12]. However, in order to learn an effective policy, most RL applications to date require an offline virtual environment for collecting a large number of experiences much faster than real-time. This phenomenon is pronounced when we combine the use of deep neural networks and RL since insufficient data points will not fit a deep neural network properly and enable it to generalize well. The learning task is further complicated if a physical system is involved: 1) the system may contain a continuous state space; 2) we may lack a precise mathematical model to describe the system dynamics; 3) the system is likely to experience both internal uncertainties (noise, inertia, control oscillation) and external perturbations (friction, timing restraints); and 4) due to the reasons 1)–3), the success of policy transfer from the virtual environment to real-world is not guaranteed.\n\nIn this work, we experiment with the original idea of RL, where an effective policy is learned, tested, and improved in real-time on a physical system. The system dynamics are continuous and non-linear. No knowledge is assumed of the system internal factors and external environment perturbations. Specifically, we consider position/angle control of a DC motor attached to a golf cart steering wheel: given a target steering position, we learn how to apply a sequence of voltages to reach that position as fast as possible. The system dynamics are non-linear due to many factors, including temperature’s influence on the resistance and impedance of the motor coil, electromagnetic effects (cogging torque, eddy current), and the presence of dead-zones (minimum voltage required in either polarity to rotate the motor) caused by friction and variable load [13,14]. The difficulty in mathematically modeling the co-occurrence of these time-varying and interdependent factors significantly complicates the control task.\n\nTraditional position control approaches for a DC motor range from a simple Bang-bang controller [15] to more sophisticated methods such as Proportional Integral Derivative (PID) controller [16] and Model Predictive Controller (MPC) [17]. To reach the desired position, a Bang-bang controller applies a maximum voltage in one polarity until a switching point, then applies maximum voltage in the opposite polarity. However, during this process, the motor will experience oscillation and overshoot errors due to inertia, thus fails the task. On the other hand, a PID controller requires an expert to tune control parameters, which could be labor-intensive. MPC, which can anticipate future events before exerting a control signal, has emerged as a substitute of the PID controller (which lacks predictive capabilities). However, MPC requires a dynamic model of the system, which is unavailable to us. Recently, supervised learning with neural networks has been proposed to solve control tasks [18], yet they usually rely on a static dataset from limited explorations of the state space, hence do not encompass a wide range of sources of non-linearities and uncertainties that present in our physical system.\n\nAs an alternative, model-free RL [19], a data-driven approach that aims to learn a control policy based directly on reward feedback from the controller’s interactions with the system, is more promising for our task. One such algorithm is Neural fitted Q (NFQ) [20], where a state-action Q-value estimator is iteratively improved using transitions collected from the physical system itself. NFQ has been used to learn control policies for a cart-pole system [20], a soccer playing robot [21], and a real car [22]. However, learning to automatically control a DC motor position in real-time without system knowledge or manual interference is a challenging control task itself. In this work, the approach to learning a control strategy is data-driven and can be applied to learn a control policy in any environment, i.e., under specific uncertainties and non-linearities of numerous applications of DC motors in industrial, household, and robotic processes.\n\nIn addition to real-world experiments, we build a simulator using the collected data from the physical system. The purpose of simulations is to 1) prevent damage to the hardware from acceleration and jerk induced by an imperfect policy; and 2) experiment with a wide range of hyperparameters and learning strategies associated with NFQ—a study that is largely omitted from previous literature. Furthermore, operating a golf cart in the real world could be physically dangerous under a sub-optimal policy and amongst people. Although the simulated environment is built from real-world data, transitions made in the simulation are not equivalent to retrieving them from stored memory: every episode starts from a randomly initialized position (hence a randomly initialized state) which may not always have an exact match in simulation due to approximation errors.\n\nAs a result, starting without prior knowledge and relying solely on real-world interactions, we successfully learned a control policy in 10 minutes and 35 seconds in hardware. Some of the strategies and parameters used to learn in hardware are determined from a simulator. In addition, using the results of experiments in the simulator (number of neural network parameters =91, hint-to-goal size =2\\%, linearly decaying exploration strategy, neural network reset frequency = every 50 episodes, and exponentially increased curriculum learning for position initialization), we also successfully learned a control policy in simulation under one minute and 53 seconds (on average) using an off-the-shelf laptop.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "L. Hardesty, “Self-driving golf carts,” https://news.mit.edu/2015/autonomous-self-driving-golf-carts-0901 , 2015."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "——, “Driverless-vehicle options now include scooters,” https://news.mit.edu/2016/driverless-scooters-1107 , 2016."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "M. McFarland, “Self-driving scooters are coming to city sidewalks,” https://www.cnn.com/2019/10/15/tech/self-driving-scooters-bikes/index.html , 2019."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "D. Silverberg, “Mit is pioneering an ‘autonomous bicycle’ and it’s not just for lazy cyclists,” www.vice.com/en/article/qvwxev/mit-is-pioneering-an-autonomous-bicycle-and-its-not-just-for-lazy]\\-cyclists , 2018."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "L. Lin, W. Li, and S. Peeta, “Predicting station-level bike-sharing demands using graph convolutional neural network,” in Transportation Research Board 98th Annual Meeting (TRB) , 2019."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "J. Price, D. Blackshear, W. Blount, and L. Sandt, “Micromobility: A travel mode innovation,” https://highways.dot.gov/public-roads/spring-2021/micromobility-travel-mode-innovation , 2021."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "V. Mnih, K. Kavukcuoglu, D. Silver, A. Graves, I. Antonoglou, D. Wierstra, and M. Riedmiller, “Playing atari with deep reinforcement learning,” arXiv preprint arXiv:1312.5602 , 2013."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "D. Silver, A. Huang, C. J. Maddison, A. Guez, L. Sifre, G. Van Den Driessche, J. Schrittwieser, I. Antonoglou, V. Panneershelvam, M. Lanctot et al. , “Mastering the game of go with deep neural networks and tree search,” nature , vol. 529, no. 7587, pp. 484–489, 2016."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "S. Levine, C. Finn, T. Darrell, and P. Abbeel, “End-to-end training of deep visuomotor policies,” The Journal of Machine Learning Research , vol. 17, no. 1, pp. 1334–1373, 2016."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "D. Bahdanau, P. Brakel, K. Xu, A. Goyal, R. Lowe, J. Pineau, A. Courville, and Y. Bengio, “An actor-critic algorithm for sequence prediction,” arXiv preprint arXiv:1607.07086 , 2016."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "S. El-Tantawy, B. Abdulhai, and H. Abdelgawad, “Multiagent reinforcement learning for integrated network of adaptive traffic signal controllers (marlin-atsc): methodology and large-scale application on downtown toronto,” IEEE Transactions on Intelligent Transportation Systems , vol. 14, no. 3, pp. 1140–1150, 2013."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "C. Wu, A. R. Kreidieh, K. Parvate, E. Vinitsky, and A. M. Bayen, “Flow: A modular learning framework for mixed autonomy traffic,” IEEE Transactions on Robotics , 2021."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "S. Buechner, V. Schreiber, A. Amthor, C. Ament, and M. Eichhorn, “Nonlinear modeling and identification of a dc-motor with friction and cogging,” in IECON 2013-39th Annual Conference of the IEEE Industrial Electronics Society . IEEE, 2013, pp. 3621–3627."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "T. Kara and I. Eker, “Nonlinear modeling and identification of a dc motor for bidirectional operation with real time experiments,” Energy Conversion and Management , vol. 45, no. 7-8, pp. 1087–1106, 2004."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "R. Bellman, I. Glicksberg, and O. Gross, “On the “bang-bang” control problem,” Quarterly of Applied Mathematics , vol. 14, no. 1, pp. 11–18, 1956."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "J. H. Aylor, R. L. Ramey, and G. Cook, “Design and application of a microprocessor pid predictor controller,” IEEE Transactions on Industrial Electronics and Control Instrumentation , no. 3, pp. 133–137, 1980."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "S. J. Qin and T. A. Badgwell, “A survey of industrial model predictive control technology,” Control engineering practice , vol. 11, no. 7, pp. 733–764, 2003."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "S. Ross, G. Gordon, and D. Bagnell, “A reduction of imitation learning and structured prediction to no-regret online learning,” in Proceedings of the Fourteenth International Conference on Artificial Intelligence and Statistics , 2011, pp. 627–635."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "R. S. Sutton and A. G. Barto, Reinforcement learning: An introduction , 2018."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "M. Riedmiller, “Neural reinforcement learning to swing-up and balance a real pole,” in 2005 IEEE International Conference on Systems, Man and Cybernetics , vol. 4. IEEE, 2005, pp. 3191–3196."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "R. Hafner and M. Riedmiller, “Neural reinforcement learning controllers for a real robot application,” in Proceedings 2007 IEEE International Conference on Robotics and Automation . IEEE, 2007, pp. 2098–2103."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib22",
+      "text": "M. Riedmiller, M. Montemerlo, and H. Dahlkamp, “Learning to drive a real car in 20 minutes,” in 2007 Frontiers in the Convergence of Bioscience and Information Technologies . IEEE, 2007, pp. 645–650."
+    }
+  ]
+}

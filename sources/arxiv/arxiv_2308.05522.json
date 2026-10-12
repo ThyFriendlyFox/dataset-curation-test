@@ -1,0 +1,171 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2308.05522",
+  "title": "Models Matter: The Impact of Single-Step Retrosynthesis on Synthesis Planning",
+  "authors": "Paula Torren-Peraire, Alan Kai Hassen, Samuel Genheden, Jonas Verhoeven, Djork-Arne Clevert, Mike Preuss, Igor Tetko",
+  "year": "2023",
+  "categories": [
+    "cs.AI",
+    "cs.LG",
+    "physics.chem-ph",
+    "q-bio.BM"
+  ],
+  "url": "https://arxiv.org/abs/2308.05522",
+  "html_url": "https://arxiv.org/html/2308.05522",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1019,
+  "text": "The Design-Make-Test-Analyse (DMTA) cycle is commonly used in small molecule drug discovery to explore novel compounds and indications. Over recent years, it has seen massive changes with the introduction of modern machine-learning approaches [1]. Retrosynthesis, a core task in the Make part of the DMTA cycle of modern drug discovery, is a technique commonly used by organic chemists in synthesis planning. A molecule is successively broken down into smaller subunits until easily synthesizable or purchasable compounds are obtained [2,3], where the overall goal is to produce a roadmap for the synthesis of a target compound. With computer-aided retrosynthesis, researchers in both chemistry and machine learning aim to accelerate the development of chemical synthesis by saving time and resources, addressing more complex molecules or producing more efficient and safe routes. These generated routes can be used by medical chemists to create molecules of interest [4], serve as a basis for autonomous chemistry [5], or be incorporated into De Novo Drug Design to assess synthesizability [6].\n\nThe core advance in retrosynthesis has been the realignment with common machine learning approaches [7] which allow users to consider a much larger set of potential synthesis routes. The machine learning field of retrosynthesis prediction is commonly separated into two research fields, referred to as single-step retrosynthesis prediction and multi-step synthesis planning. Where single-step retrosynthesis prediction refers to breaking down a product into a single set of reactants and multi-step synthesis planning refers to the search algorithms used to find synthesis routes leading to purchasable compounds (building blocks).\n\nSpecifically, single-step retrosynthesis prediction is a supervised learning task, developed to predict which reactions are relevant to a target molecule, and the corresponding reactants required to produce this reaction. There are two commonly referenced categories of single-step retrosynthesis models, template-based and template-free [7]. Template-based methods use reaction templates, an abstraction of the reactions in the data, which summarize the underlying pattern of these reactions. There are different approaches to extracting templates, though in all cases these processes aim to represent the atom and bond structures required to perform a reaction [8], where a single template will represent multiple reactions. Template-based methods consider single-step prediction as a classification problem where the task is to predict the appropriate template for the target molecule/product. Examples of template-based methods include NeuralSym [9], the first approach in the field which demonstrated the usefulness of using deep neural networks for retrosynthesis prediction, MHNreact [10], which uses an information retrieval approach to associate products and templates and LocalRetro [11], which uses a graph representation to predict relevant local atom and bond templates for the product.\n\nOn the other hand, template-free approaches commonly treat retrosynthesis prediction as a sequence-to-sequence prediction problem [8], employing methods seen in natural language processing such as language translation tasks. Instead of extracting and predicting the corresponding templates, the approach aims to learn the underlying reactions to directly predict reactants. Product and reactants are typically introduced as Simplified Molecular-Input Line-Entry System (SMILES), a common text-based representation of chemical entities. Examples of template-free methods include Chemformer [12], a large pretrained transformer model fine-tuned on the retrosynthesis task, and Augmented Transformer [13], a transformer architecture which employs multiple types of augmentation. Other variations of these approaches exist, such as semi-template-based where the molecule is first broken down into subparts then completed to produce chemically viable reactants [14,15,16].\n\nMulti-step synthesis planning focuses on researching novel synthesis route search algorithms using a single-step model to identify retrosynthetic disconnections. The pioneering approach in the field uses Monte Carlo Tree Search (MCTS) to plan the traversal of the search tree at run time guided by a neural network [2]. Alternative route planning algorithms use an oracle function or heuristics to guide the tree search instead of relying on compute-expensive run time planning. Prominent examples of this are Depth-First Proof-Number (DFPN) [17], which combines classical DFPN with a neural heuristic, Retro*, which combines A* pathfinding with a neural heuristic [18], or RetroGraph, which applies a holistic graph-based approach [19]. Other approaches incorporate reaction feasibility into the tree search [20] or use synthesizability heuristics in combination with a forward synthesis model [21,22]. Finally, self-play approaches, motivated by their success in Go [23], learn to guide the tree search by leveraging information gathered from prior runs of synthesis planning [24,25,26].\n\nSingle-step retrosynthesis prediction and multi-step synthesis planning are inherently intertwined where the single-step method defines the maximum searchable reaction network, and the search algorithm tries to efficiently traverse this network by repeatedly applying the chemical information that is stored in the single-step model. However, this connection is not reflected in contemporary research.\n\nCurrently, single-step methods are benchmarked by predicting a single retrosynthetic step from a product to reactants. The common benchmark data for these methods, USPTO-50k [27,28], consists of around 50k reactions and only has a limited diversity of 10 reaction classes. These methods are typically only tested on reactant prediction and not within multi-step search algorithms, therefore their usability for synthesis planning is not assessed. Similarly, multi-step search algorithms benchmark the route-finding capabilities of their method using a single single-step model, often based on the template-based NeuralSym model [2,26,19,17,18], and evaluate the success rate of finding potential synthesis routes for molecules of interest. However, the approach of using only one single-step model does not consider the impact of alternative single-step models, a vital aspect of the search, as the route planning algorithm uses the reaction information stored in the single-step model to find synthesis routes and create alternate reaction pathways within the reaction network.\n\nThe current question remains whether state-of-the-art single-step retrosynthesis methods are transferable to the multi-step synthesis planning domain, and their impact on multi-step synthesis planning [29,30]. In this work, we address the transfer between single-step and multi-step methods by incorporating different state-of-the-art single-step models within a common multi-step search algorithm to analyze the use of these models for multi-step synthesis planning. We explore the effect on performance, analyzing the relationship between contemporary single-step and multi-step performance metrics using both public and proprietary datasets of varying size and diversity. Moreover, we also focus on vital aspects such as model suitability and chemical validity of the predicted routes.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "R. S. K. Vijayan, J. Kihlberg, J. B. Cross, and V. Poongavanam, “Enhancing preclinical drug discovery with artificial intelligence,” Drug Discovery Today , vol. 27, no. 4, pp. 967–984, 2022. [Online]. Available: https://www.sciencedirect.com/science/article/pii/S1359644621005043"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "M. H. S. Segler, M. Preuss, and M. P. Waller, “Planning chemical syntheses with deep neural networks and symbolic AI,” Nature , vol. 555, no. 7698, pp. 604–610, 2018. [Online]. Available: http://dx.doi.org/10.1038/nature25978"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "E. J. Corey and X.-M. Cheng, The logic of chemical synthesis . New York: John Wiley & Sons, Ltd, 1989."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "C. W. Coley, W. H. Green, and K. F. Jensen, “Machine Learning in Computer-Aided Synthesis Planning,” Accounts of Chemical Research , vol. 51, no. 5, pp. 1281–1289, 2018, publisher: American Chemical Society. [Online]. Available: https://doi.org/10.1021/acs.accounts.8b00087"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "C. W. Coley, D. A. Thomas, J. A. Lummiss, J. N. Jaworski, C. P. Breen, V. Schultz, T. Hart, J. S. Fishman, L. Rogers, H. Gao, R. W. Hicklin, P. P. Plehiers, J. Byington, J. S. Piotti, W. H. Green, A. John Hart, T. F. Jamison, and K. F. Jensen, “A robotic platform for flow synthesis of organic compounds informed by AI planning,” Science , vol. 365, no. 6453, p. eaax1566, 2019. [Online]. Available: https://www.science.org/doi/abs/10.1126/science.aax1566"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "F. Miljković, R. Rodríguez-Pérez, and J. Bajorath, “Impact of Artificial Intelligence on Compound Discovery, Design, and Synthesis,” ACS Omega , vol. 6, no. 49, pp. 33 293–33 299, 2021, publisher: American Chemical Society. [Online]. Available: https://doi.org/10.1021/acsomega.1c05512"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "P. Schwaller, A. C. Vaucher, R. Laplaza, C. Bunne, A. Krause, C. Corminboeuf, and T. Laino, “Machine intelligence for chemical reaction space,” WIREs Computational Molecular Science , vol. 12, no. 5, p. e1604, 2022. [Online]. Available: https://onlinelibrary.wiley.com/doi/abs/10.1002/wcms.1604"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "Z. Zhong, J. Song, Z. Feng, T. Liu, L. Jia, S. Yao, T. Hou, and M. Song, “Recent advances in artificial intelligence for retrosynthesis,” 2023. [Online]. Available: http://arxiv.org/abs/2301.05864"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "M. H. Segler and M. P. Waller, “Neural-Symbolic Machine Learning for Retrosynthesis and Reaction Prediction,” Chemistry - A European Journal , vol. 23, no. 25, pp. 5966–5971, 2017. [Online]. Available: https://chemistry-europe.onlinelibrary.wiley.com/doi/abs/10.1002/chem.201605499"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "P. Seidl, P. Renz, N. Dyubankova, P. Neves, J. Verhoeven, J. K. Wegner, M. Segler, S. Hochreiter, and G. Klambauer, “Improving Few- and Zero-Shot Reaction Template Prediction Using Modern Hopfield Networks,” Journal of Chemical Information and Modeling , vol. 62, no. 9, pp. 2111–2120, 2022, publisher: American Chemical Society. [Online]. Available: https://doi.org/10.1021/acs.jcim.1c01065"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "S. Chen and Y. Jung, “Deep Retrosynthetic Reaction Prediction using Local Reactivity and Global Attention,” JACS Au , vol. 1, no. 10, pp. 1612–1620, 2021, publisher: American Chemical Society. [Online]. Available: https://doi.org/10.1021/jacsau.1c00246"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "R. Irwin, S. Dimitriadis, J. He, and E. J. Bjerrum, “Chemformer: a pre-trained transformer for computational chemistry,” Machine Learning: Science and Technology , vol. 3, no. 1, p. 015022, 2022, publisher: IOP Publishing. [Online]. Available: https://doi.org/10.1088/2632-2153/ac3ffb"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "I. V. Tetko, P. Karpov, R. Van Deursen, and G. Godin, “State-of-the-art augmented NLP transformer models for direct and single-step retrosynthesis,” Nature Communications , vol. 11, no. 1, p. 5575, 2020. [Online]. Available: https://doi.org/10.1038/s41467-020-19266-y"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "V. R. Somnath, C. Bunne, C. W. Coley, A. Krause, and R. Barzilay, “Learning Graph Models for Retrosynthesis Prediction,” in Advances in Neural Information Processing Systems , A. Beygelzimer, Y. Dauphin, P. Liang, and J. Wortman Vaughan, Eds., 2021. [Online]. Available: https://openreview.net/forum?id=SnONpXZ_uQ_"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "C. Shi, M. Xu, H. Guo, M. Zhang, and J. Tang, “A Graph to Graphs Framework for Retrosynthesis Prediction,” in Proceedings of the 37th International Conference on Machine Learning , ser. Proceedings of Machine Learning Research, H. D. III and A. Singh, Eds., vol. 119. PMLR, 2020, pp. 8818–8827. [Online]. Available: https://proceedings.mlr.press/v119/shi20d.html"
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "X. Wang, Y. Li, J. Qiu, G. Chen, H. Liu, B. Liao, C.-Y. Hsieh, and X. Yao, “RetroPrime: A Diverse, plausible and Transformer-based method for Single-Step retrosynthesis predictions,” Chemical Engineering Journal , vol. 420, p. 129845, 2021. [Online]. Available: https://www.sciencedirect.com/science/article/pii/S1385894721014303"
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "A. Kishimoto, B. Buesser, B. Chen, and A. Botea, “Depth-First Proof-Number Search with Heuristic Edge Cost and Application to Chemical Synthesis Planning,” in Advances in Neural Information Processing Systems , H. Wallach, H. Larochelle, A. Beygelzimer, F. Alche-Buc, E. Fox, and R. Garnett, Eds., vol. 32. Curran Associates, Inc., 2019. [Online]. Available: https://proceedings.neurips.cc/paper/2019/file/4fc28b7093b135c21c7183ac07e928a6-Paper.pdf"
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "B. Chen, C. Li, H. Dai, and L. Song, “Retro*: Learning Retrosynthetic Planning with Neural Guided A* Search,” in Proceedings of the 37th International Conference on Machine Learning , ser. Proceedings of Machine Learning Research, H. D. III and A. Singh, Eds., vol. 119. PMLR, 2020, pp. 1608–1616. [Online]. Available: https://proceedings.mlr.press/v119/chen20k.html"
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "S. Xie, R. Yan, P. Han, Y. Xia, L. Wu, C. Guo, B. Yang, and T. Qin, “RetroGraph: Retrosynthetic Planning with Graph Search,” in Proceedings of the 28th ACM SIGKDD Conference on Knowledge Discovery and Data Mining , ser. KDD ’22. Washington DC, USA: Association for Computing Machinery, 2022, pp. 2120–2129. [Online]. Available: https://doi.org/10.1145/3534678.3539446"
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "K. Lin, Y. Xu, J. Pei, and L. Lai, “Automatic retrosynthetic route planning using template-free models,” Chem. Sci. , vol. 11, no. 12, pp. 3355–3364, 2020, publisher: The Royal Society of Chemistry. [Online]. Available: http://dx.doi.org/10.1039/C9SC03666K"
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "P. Schwaller, R. Petraglia, V. Zullo, V. H. Nair, R. A. Haeuselmann, R. Pisoni, C. Bekas, A. Iuliano, and T. Laino, “Predicting retrosynthetic pathways using transformer-based models and a hyper-graph exploration strategy,” Chem. Sci. , vol. 11, no. 12, pp. 3316–3325, 2020, publisher: The Royal Society of Chemistry. [Online]. Available: http://dx.doi.org/10.1039/C9SC05704H"
+    },
+    {
+      "n": 22,
+      "id": "bib.bib22",
+      "text": "D. Kreutter and J.-L. Reymond, “Multistep retrosynthesis combining a disconnection aware triple transformer loop with a route penalty score guided tree search,” 2023. [Online]. Available: https://doi.org/10.26434/chemrxiv-2022-8khth-v2"
+    },
+    {
+      "n": 23,
+      "id": "bib.bib23",
+      "text": "D. Silver, J. Schrittwieser, K. Simonyan, I. Antonoglou, A. Huang, A. Guez, T. Hubert, L. Baker, M. Lai, A. Bolton, Y. Chen, T. Lillicrap, F. Hui, L. Sifre, G. Van Den Driessche, T. Graepel, and D. Hassabis, “Mastering the game of Go without human knowledge,” Nature , vol. 550, no. 7676, pp. 354–359, 2017. [Online]. Available: https://doi.org/10.1038/nature24270"
+    },
+    {
+      "n": 24,
+      "id": "bib.bib24",
+      "text": "J. S. Schreck, C. W. Coley, and K. J. M. Bishop, “Learning Retrosynthetic Planning through Simulated Experience,” ACS Central Science , vol. 5, no. 6, pp. 970–981, 2019, publisher: American Chemical Society. [Online]. Available: https://doi.org/10.1021/acscentsci.9b00055"
+    },
+    {
+      "n": 25,
+      "id": "bib.bib25",
+      "text": "Y. Yu, Y. Wei, K. Kuang, Z. Huang, H. Yao, and F. Wu, “GRASP: Navigating Retrosynthetic Planning with Goal-driven Policy,” in Advances in neural information processing systems , S. Koyejo, S. Mohamed, A. Agarwal, D. Belgrave, K. Cho, and A. Oh, Eds., vol. 35. Curran Associates, Inc., 2022, pp. 10 257–10 268. [Online]. Available: https://proceedings.neurips.cc/paper_files/paper/2022/hash/42beaab8aa8da1c77581609a61eced93-Abstract-Conference.html"
+    },
+    {
+      "n": 26,
+      "id": "bib.bib26",
+      "text": "G. Liu, D. Xue, S. Xie, Y. Xia, A. Tripp, K. Maziarz, M. Segler, T. Qin, Z. Zhang, and T.-Y. Liu, “Retrosynthetic Planning with Dual Value Networks,” 2023. [Online]. Available: http://arxiv.org/abs/2301.13755"
+    },
+    {
+      "n": 27,
+      "id": "bib.bib27",
+      "text": "D. M. Lowe, “Extraction of chemical structures and reactions from the literature,” Thesis, 2012."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib28",
+      "text": "N. Schneider, N. Stiefl, and G. A. Landrum, “What’s What: The (Nearly) Definitive Guide to Reaction Role Assignment,” Journal of Chemical Information and Modeling , vol. 56, no. 12, pp. 2336–2346, 2016, publisher: American Chemical Society. [Online]. Available: https://doi.org/10.1021/acs.jcim.6b00564"
+    },
+    {
+      "n": 29,
+      "id": "bib.bib29",
+      "text": "H. Tu, S. Shorewala, T. Ma, and V. Thost, “Retrosynthesis Prediction Revisited,” in NeurIPS 2022 AI for Science: Progress and Promises , 2022. [Online]. Available: https://openreview.net/forum?id=kLzFuf4GoC-"
+    },
+    {
+      "n": 30,
+      "id": "bib.bib30",
+      "text": "A. K. Hassen, P. Torren-Peraire, S. Genheden, J. Verhoeven, M. Preuss, and I. V. Tetko, “Mind the retrosynthesis gap: Bridging the divide between single-step and multi-step retrosynthesis prediction,” in NeurIPS 2022 AI for Science: Progress and Promises , 2022. [Online]. Available: https://openreview.net/forum?id=LjdtY0hM7tf"
+    }
+  ]
+}

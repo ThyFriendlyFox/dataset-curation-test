@@ -1,0 +1,83 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2310.02110",
+  "title": "Sieve: Multimodal Dataset Pruning Using Image Captioning Models",
+  "authors": "Anas Mahmoud, Mostafa Elhoushi, Amro Abbas, Yu Yang, Newsha Ardalani, Hugh Leather, Ari Morcos",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2310.02110",
+  "html_url": "https://arxiv.org/html/2310.02110",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 642,
+  "text": "Contrastive Language-Image Pre-training (CLIP) [1] models have shown great success in solving zero-shot image classification and multimodal retrieval tasks. In addition, many foundational Vision-Language Models (VLMs) use pretrained CLIP encoders to condition image generation on CLIP text embeddings [2] in retrieval augmented vision-language models [3,4], and to align modalities including audio, depth, and thermal with language through CLIP image embeddings [5]. Therefore, the quality of CLIP representations can influence the performance of many VLMs.\n\nTo pretrain CLIP, billions of image-text pairs are collected using common crawl. The raw data is highly diverse but contains many noisy image-text pairs, including low quality images, low quality alternative text (alt-text), and misaligned image-text pairs. Pretraining CLIP models on noisy data can have adverse effects on the learned representations, thus leading to poor performance on downstream tasks [6].\n\nTo address this challenge, researchers have developed data pruning methods to remove low quality image-text pairs. Heuristics that filter out image-text pairs based on image dimensions, aspect ratio, alt-text length, and complexity are commonly used [7,8] to reduce noise, but can also limit the diversity of the dataset [9]. Methods that use images or class names from datasets, like ImageNet, to sample semantically similar image-text pairs can lead to higher accuracy on downstream tasks [10], but limit the diversity of the selected samples as they sample image-text pairs close to a specific dataset.\n\nOne of the most effective pruning methods, CLIPScore [11,7], computes the cosine similarity between image and text embeddings using a pretrained CLIP model. This score is then used to rank the alignment of image-text pairs. However, as shown in Figure 1, using CLIPScore can lead to false positives – samples that are poorly aligned but have high CLIPScore (i.e., bad samples) due to spurious correlations learned by the pretrained CLIP model [12]. In addition, using CLIPScore can lead to false negatives – samples that are aligned but have low CLIPScore (i.e., hard samples) due to the poor discrimination between hard and bad samples. Excluding hard samples and including bad samples can negatively affect the generalization of CLIP image and text encoders.\n\nThe goal of this work is to reduce both false negatives and positives induced by CLIPScore ranking by relying on an image-captioning model pretrained on small, diverse, and well-aligned image-text pairs. As shown in Figure 1, Sieve can reduce false positives or false negatives in different scenarios, such as samples where CLIPScore focuses on geographic or chronological context of an image rather than the content of an image. As depicted in Figure 2, we evaluate the alignment of web-crawled image-text pairs by first, generating multiple captions for each image using nucleus sampling [13], followed by removing phrases that describe the medium (e.g., “an image of”, “a photo of”) rather than visual concepts. Finally, to evaluate semantic similarity between the limited diversity of generated captions and the high diversity of alt-text, we utilize the embedding space of a lightweight sentence transformer pretrained on unlabeled text corpus. The alignment between the generated captions and the alt-text is then used as a proxy for image-text alignment. Our goal is to fuse this alignment signal with CLIPScore to minimize false positives and negatives, leading to a more aligned pretraining dataset. To evaluate the effectiveness of our proposed pruning method, we utilize the DataComp [8] benchmark, which fixes the pretraining hyperparameters of CLIP and provides multiple candidate pools of noisy image-text data for pretraining CLIP models. The goal is to select a subset of noisy image-text data that leads to the best performance on 38 downstream tasks. Using image-captioning model alignment scores fused with CLIPScore, we surpass CLIPScore filtering by 2.6% and 1.7% on the average of 38 downstream tasks on medium and large scale pool respectively. In addition, on multimodal retrieval tasks, our approach leads to an improvement of 2.7% and 4.5% on medium and large scale respectively.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib32",
+      "text": "Alec Radford, Jong Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry, Amanda Askell, Pamela Mishkin, Jack Clark, et al. Learning transferable visual models from natural language supervision. In International conference on machine learning , pages 8748–8763. PMLR, 2021."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib33",
+      "text": "Aditya Ramesh, Prafulla Dhariwal, Alex Nichol, Casey Chu, and Mark Chen. Hierarchical text-conditional image generation with clip latents. arXiv preprint arXiv:2204.06125 , 1(2):3, 2022."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib13",
+      "text": "Ziniu Hu, Ahmet Iscen, Chen Sun, Zirui Wang, Kai-Wei Chang, Yizhou Sun, Cordelia Schmid, David A Ross, and Alireza Fathi. Reveal: Retrieval-augmented visual-language pre-training with multi-source multimodal knowledge memory. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 23369–23379, 2023."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib42",
+      "text": "Michihiro Yasunaga, Armen Aghajanyan, Weijia Shi, Richard James, Jure Leskovec, Percy Liang, Mike Lewis, Luke Zettlemoyer, and Wen-tau Yih. Retrieval-augmented multimodal language modeling. 2023."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib10",
+      "text": "Rohit Girdhar, Alaaeldin El-Nouby, Zhuang Liu, Mannat Singh, Kalyan Vasudev Alwala, Armand Joulin, and Ishan Misra. Imagebind: One embedding space to bind them all. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 15180–15190, 2023."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib1",
+      "text": "Amro Abbas, Kushal Tirumala, Dániel Simig, Surya Ganguli, and Ari S. Morcos. Semdedup: Data-efficient learning at web-scale through semantic deduplication, 2023."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib36",
+      "text": "Christoph Schuhmann, Richard Vencu, Romain Beaumont, Robert Kaczmarczyk, Clayton Mullis, Aarush Katta, Theo Coombes, Jenia Jitsev, and Aran Komatsuzaki. Laion-400m: Open dataset of clip-filtered 400 million image-text pairs. arXiv preprint arXiv:2111.02114 , 2021."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib9",
+      "text": "Samir Yitzhak Gadre, Gabriel Ilharco, Alex Fang, Jonathan Hayase, Georgios Smyrnis, Thao Nguyen, Ryan Marten, Mitchell Wortsman, Dhruba Ghosh, Jieyu Zhang, et al. Datacomp: In search of the next generation of multimodal datasets. arXiv preprint arXiv:2304.14108 , 2023."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib26",
+      "text": "Thao Nguyen, Samir Yitzhak Gadre, Gabriel Ilharco, Sewoong Oh, and Ludwig Schmidt. Improving multimodal datasets with image captioning. arXiv preprint arXiv:2307.10350 , 2023."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib40",
+      "text": "Hu Xu, Saining Xie, Po-Yao Huang, Licheng Yu, Russell Howes, Gargi Ghosh, Luke Zettlemoyer, and Christoph Feichtenhofer. Cit: Curation in training for effective vision-language data. 2023."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "Jack Hessel, Ari Holtzman, Maxwell Forbes, Ronan Le Bras, and Yejin Choi. Clipscore: A reference-free evaluation metric for image captioning. arXiv preprint arXiv:2104.08718 , 2021."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib41",
+      "text": "Yu Yang, Besmira Nushi, Hamid Palangi, and Baharan Mirzasoleiman. Mitigating spurious correlations in multi-modal models during fine-tuning. In Proceedings of the 40th International Conference on Machine Learning , pages 39365–39379. PMLR, 2023."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib12",
+      "text": "Ari Holtzman, Jan Buys, Li Du, Maxwell Forbes, and Yejin Choi. The curious case of neural text degeneration. In ICLR . OpenReview.net, 2020."
+    }
+  ]
+}

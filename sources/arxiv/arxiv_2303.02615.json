@@ -1,0 +1,168 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2303.02615",
+  "title": "Estimating Extreme 3D Image Rotation with Transformer Cross-Attention",
+  "authors": "Shay Dekel, Yosi Keller, Martin Cadik",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2303.02615",
+  "html_url": "https://arxiv.org/html/2303.02615",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 661,
+  "text": "Estimating the relative pose between a pair of images is a crucial task in computer vision, which is used in various applications such as indoor navigation, augmented reality, autonomous driving, 3D reconstruction [1,2], camera localization [3,4,5], simultaneous localization and mapping [6,7], and novel view synthesis [8,9]. The current approach to image registration involves extracting features, matching them, and establishing correspondence between them. However, this approach is ineffective for input pairs with little or no overlap, making it difficult to establish sufficient feature correspondences for matching, such as in the images shown in Fig. 1.\n\nNumerous applications [10,11,12] necessitate precise estimation of inter-image rotations. The prevalent approach for extreme 3D rotation estimation between images with limited or no overlap, as in Fig. 1, relates to the seminal work of Coughlan and Yuille [13]. They introduced a technique premised on linear structures within an image, primarily arising from three mutually orthogonal directions - one vertical (building walls) and two horizontal (ground pavements, roads, etc.). Similarly, ”Single View Metrology” by Criminisi et al. [14] and extensions [15,16,17] utilize parallel image lines and corresponding vanishing points [18] for camera calibration. Furthermore, relative camera rotation can be estimated via illumination cues [19], by analyzing lighting and shadow directions.\n\nIn this work, we propose a deep-learning approach for estimating significant, extreme inter-image rotations. Unlike classical formulations [13,14] that explicitly detect hand-crafted cues such as lines, shadows, and vanishing points, our method directly regresses the relative rotation from input images through a deep neural network. Inspired by recent successful applications of Transformers [20] in computer vision tasks including object detection [21] and image recognition [22], we adapt Transformers for multiple tasks within the proposed pipeline shown in Fig. 2, expanding beyond previous applications of Transformers.\n\nFirst, we apply Transformers-Decoders to improve the input image embeddings by distilling inter-image information between the images by cross-decoding, where each embedding uses the other’s embedding as a query. This better encodes images with respect to each other. Second, a Transformer-Encoder computes a stacked multihead attention to encode cross-attention between the latent representations of image pairs. Thus, it improves on the 4D correlation volume (4DCV) used in prior works [23,24,25,26,27], where 4DCVs were calculated by inner products. Instead of a single layer of N^{2} inner products as in 4DCV, the proposed Transformer-Encoder-based approach leverages multi-head attention’s advanced architecture to better encode interactions between activation map entries. Third, we further improve the cross-attention encoding using a cascade of two decoders and a learnt rotation query, to jointly refine the cross-attention encoding and the rotation query. The proposed scheme is a general-purpose attention-based architecture for estimating attributes related to two input images such as optical flow, registration, relative pose regression, etc. This work was motivated by extreme rotation estimation, and we reserve other applications for future work, as those will require additional task-specific modifications.\n\nInterestingly, the attention maps computed by our scheme, shown in Section 3.2, show that the Transformer-Encoder assigns high attention scores to image regions containing rotation-informative image cues, emphasizing vertical and horizontal lines. We also observe that the proposed approach can predict the rotation of non-overlapping image pairs with state-of-the-art (SOTA) accuracy. Our framework is end-to-end trainable and optimizes a regression loss. It is evaluated on three dataset benchmarks: StreetLearn [28], SUN360 [29] and InteriorNet [30], with different overlap classes in indoor and outdoor locations and under varying illumination. The experimental results in Section 4 show our model to provide state-of-the-art (SOTA) accuracy.\n\nIn summary, our contributions are as follows.\n\n- • We propose a novel scheme for estimating extreme rotations, including scenarios with minimal image overlap.\n\n- • Image embeddings are enhanced via cross-decoding, distilling inter-image information.\n\n- • A Transformer-Encoder cross-attention mechanism is proposed to encode the latent space interactions between image pairs.\n\n- • A decoder-decoder module infers relative rotation from the cross-attention encoding by learning and applying quaternionic rotation queries.\n\n- • Quantitative evaluations demonstrate favorable performance compared to state-of-the-art rotation estimation techniques on indoor and outdoor datasets.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib44",
+      "text": "Johannes L Schonberger and Jan-Michael Frahm. Structure-from-motion revisited. In IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 2016."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib40",
+      "text": "Onur Ozyesil, Vladislav Voroninski, Ronen Basri, and Amit Singer. A survey of structure from motion. arXiv preprint arXiv:1701.08493 , 2017."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib5",
+      "text": "Eric Brachmann, Alexander Krull, Sebastian Nowozin, Jamie Shotton, Frank Michel, Stefan Gumhold, and Carsten Rother. Dsac-differentiable ransac for camera localization. In IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 6684–6692, 2017."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib45",
+      "text": "Johannes L Schönberger, Marc Pollefeys, Andreas Geiger, and Torsten Sattler. Semantic visual localization. In IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 6896–6906, 2018."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib47",
+      "text": "Yoli Shavit and Yosi Keller. Camera pose auto-encoders for improving pose regression. In European Conference on Computer Vision (ECCV) , pages 140–157, Cham, 2022. Springer Nature Switzerland."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib12",
+      "text": "Andrew J Davison, Ian D Reid, Nicholas D Molton, and Olivier Stasse. Monoslam: Real-time single camera slam. IEEE Transactions on Pattern Analysis and Machine Intelligence , 29(6):1052–1067, 2007."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib38",
+      "text": "Raul Mur-Artal, Jose Maria Martinez Montiel, and Juan D Tardos. Orb-slam: a versatile and accurate monocular slam system. IEEE Transactions on Robotics , 31(5):1147–1163, 2015."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib35",
+      "text": "Ben Mildenhall, Pratul P. Srinivasan, Matthew Tancik, Jonathan T. Barron, Ravi Ramamoorthi, and Ren Ng. Nerf: Representing scenes as neural radiance fields for view synthesis. In European Conference on Computer Vision (ECCV) , 2020."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib42",
+      "text": "Gernot Riegler and Vladlen Koltun. Free view synthesis. In European Conference on Computer Vision (ECCV) , 2020."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib49",
+      "text": "Dekel (Basha) T., Moses Y., and Avidan S. Photo sequencing. International Journal of Computer Vision , 110(3):275 – 289, 2014. Cited by: 8."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib32",
+      "text": "Chenxi Liu, Alex Schwing, Kaustav Kundu, Raquel Urtasun, and Sanja Fidler. Rent3d: Floor-plan priors for monocular layout estimation. In IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 2015."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib1",
+      "text": "Hadar Averbuch-Elor and Daniel Cohen-Or. Ringit: Ring-ordering casual photos of a temporal event. ACM Trans. Graph. , 34(3), 2015."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib10",
+      "text": "J.M. Coughlan and A.L. Yuille. Manhattan world: compass direction from a single image by bayesian inference. In IEEE International Conference on Computer Vision (ICCV) , volume 2, pages 941–947 vol.2, 1999."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib11",
+      "text": "Antonio Criminisi, Ian Reid, and Andrew Zisserman. Single view metrology. In IEEE International Conference on Computer Vision (ICCV) , pages 434–441. IEEE Computer Society, 1999."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib61",
+      "text": "Rui Zhu, Xingyi Yang, Yannick Hold-Geoffroy, Federico Perazzi, Jonathan Eisenmann, Kalyan Sunkavalli, and Manmohan Chandraker. Single view metrology in the wild. In Andrea Vedaldi, Horst Bischof, Thomas Brox, and Jan-Michael Frahm, editors, European Conference on Computer Vision (ECCV) , pages 316–333, Cham, 2020. Springer International Publishing."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib26",
+      "text": "Jinwoo Lee, Minhyuk Sung, Hyunjoon Lee, and Junho Kim. Neural geometric parser for single image camera calibration. In Andrea Vedaldi, Horst Bischof, Thomas Brox, and Jan-Michael Frahm, editors, European Conference on Computer Vision (ECCV) , pages 541–557, Cham, 2020. Springer International Publishing."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib41",
+      "text": "Yiming Qian and James H. Elder. A reliable online method for joint estimation of focal length and camera rotation. In European Conference on Computer Vision (ECCV) , page 249–265, Berlin, Heidelberg, 2022. Springer-Verlag."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib19",
+      "text": "R. I. Hartley and A. Zisserman. Multiple View Geometry in Computer Vision . Cambridge University Press, ISBN: 0521540518, second edition, 2004."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib2",
+      "text": "Alexandru O. Balan, Michael J. Black, Horst Haussecker, and Leonid Sigal. Shining a light on human pose: On shadows, shading and the estimation of pose and shape. In IEEE International Conference on Computer Vision (ICCV) , pages 1–8, 2007."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib53",
+      "text": "Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N Gomez, ukasz Kaiser, and Illia Polosukhin. Attention is all you need. In I. Guyon, U. Von Luxburg, S. Bengio, H. Wallach, R. Fergus, S. Vishwanathan, and R. Garnett, editors, Advances in Neural Information Processing Systems (NIPS) , volume 30. Curran Associates, Inc., 2017."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib8",
+      "text": "Nicolas Carion, Francisco Massa, Gabriel Synnaeve, Nicolas Usunier, Alexander Kirillov, and Sergey Zagoruyko. End-to-end object detection with transformers. In Andrea Vedaldi, Horst Bischof, Thomas Brox, and Jan-Michael Frahm, editors, European Conference on Computer Vision (ECCV) , pages 213–229, Cham, 2020. Springer International Publishing."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib24",
+      "text": "Alexander Kolesnikov, Alexey Dosovitskiy, Dirk Weissenborn, Georg Heigold, Jakob Uszkoreit, Lucas Beyer, Matthias Minderer, Mostafa Dehghani, Neil Houlsby, Sylvain Gelly, Thomas Unterthiner, and Xiaohua Zhai. An image is worth 16x16 words: Transformers for image recognition at scale. In International Conference on Learning Representations , 2021."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib51",
+      "text": "Zachary Teed and Jia Deng. Raft: Recurrent all-pairs field transforms for optical flow. In European Conference on Computer Vision (ECCV) , page 402–419, Berlin, Heidelberg, 2020. Springer-Verlag."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib39",
+      "text": "Guang-Yu Nie, Ming-Ming Cheng, Yun Liu, Zhengfa Liang, Deng-Ping Fan, Yue Liu, and Yongtian Wang. Multi-level context ultra-aggregation for stereo matching. In IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 3283–3291, 2019."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib30",
+      "text": "Zhengfa Liang, Yulan Guo, Yiliu Feng, Wei Chen, Linbo Qiao, Li Zhou, Jianfeng Zhang, and Hengzhu Liu. Stereo matching using multi-level cost volume and multi-scale feature constancy. IEEE Transactions on Pattern Analysis and Machine Intelligence , 2019."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib21",
+      "text": "Di Jia, Kai Wang, ShunLi Luo, TianYu Liu, and Ying Liu. Braft: Recurrent all-pairs field transforms for optical flow based on correlation blocks. IEEE Signal Processing Letters , 28:1575–1579, 2021."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib15",
+      "text": "Alexey Dosovitskiy, Philipp Fischer, Eddy Ilg, Philip Hausser, Caner Hazirbas, Vladimir Golkov, Patrick Van Der Smagt, Daniel Cremers, and Thomas Brox. Flownet: Learning optical flow with convolutional networks. In IEEE International Conference on Computer Vision (ICCV) , pages 2758–2766, 2015."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib36",
+      "text": "Piotr Mirowski, Andras Banki-Horvath, Keith Anderson, Denis Teplyashin, Karl Moritz Hermann, Mateusz Malinowski, Matthew Koichi Grimes, Karen Simonyan, Koray Kavukcuoglu, Andrew Zisserman, et al. The StreetLearn environment and dataset. arXiv preprint arXiv:1903.01292 , 2019."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib54",
+      "text": "Jianxiong Xiao, Krista A Ehinger, Aude Oliva, and Antonio Torralba. Recognizing scene viewpoint using panoramic place representation. In IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 2695–2702. IEEE, 2012."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib29",
+      "text": "Wenbin Li, Sajad Saeedi, John McCormac, Ronald Clark, Dimos Tzoumanikas, Qing Ye, Yuzhong Huang, Rui Tang, and Stefan Leutenegger. Interiornet: Mega-scale multi-sensor photo-realistic indoor scenes dataset. In British Machine Vision Conference , 2018."
+    }
+  ]
+}

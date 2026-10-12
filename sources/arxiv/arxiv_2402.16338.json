@@ -1,0 +1,108 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2402.16338",
+  "title": "BLO-SAM: Bi-level Optimization Based Overfitting-Preventing Finetuning of SAM",
+  "authors": "Li Zhang, Youwei Liang, Ruiyi Zhang, Amirhosein Javadi, Pengtao Xie",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2402.16338",
+  "html_url": "https://arxiv.org/html/2402.16338",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 955,
+  "text": "Semantic segmentation is a critical task in computer vision, which aims to assign each pixel with a semantic class (object classes such as dog and cat, or scene categories such as sky and ocean) [1]. Deep learning has demonstrated great success in advancing the performance of semantic segmentation [2]. This progress has been further propelled by the emergence of foundation models (FMs) [3], a.k.a. large pretrained models, which have demonstrated unprecedented prevalence across diverse tasks, including vision [4,5], language [6,7,8], and multi-modality [9,10]. Building on a data engine using 11 million image-mask pairs, the Segment Anything Model (SAM) [11] emerges as a noteworthy segmentation foundation model, and demonstrates strong capabilities in segmenting diverse natural images. As a novel promptable segmentation model, SAM distinguishes itself by yielding desired segmentation masks when provided with appropriate points or bounding boxes as prompts (detailed descriptions about SAM can be found in Appendix B).\n\nDespite its strong performance in producing accurate segmentation masks based on prompts, SAM faces a notable limitation - it cannot autonomously segment specific objects, as it requires points or bounding boxes as manual prompts. For example, if we would like to segment lungs from a chest X-ray image, we need to provide at least one point on the lung region or bounding boxes enclosing the lungs to indicate that the objects aimed to segment are the lungs. Another significant challenge of applying SAM for downstream segmentation tasks arises from the distribution discrepancy between the pretraining data of SAM and the data in downstream tasks. On tasks where the data distribution deviates from the pretraining data, SAM struggles to segment the desired objects accurately even with proper prompts [12,13].\n\nTo address the distribution discrepancy issue, Med-SA [14] utilizes Adapter [15] to finetune SAM’s image encoder and mask decoder in downstream tasks, resulting in superior performance over several SOTA segmentation methods on various medical datasets. Nevertheless, Med-SA still needs prompts manually provided by humans or generated from an initial segmentation mask, during both training and inference phases, making it less practical in real-world applications. To address both challenges (i.e., distribution discrepancy and the need for manual prompts), SAMed [16] finetunes SAM with a default prompt (i.e., a learnable vector) instead of manual prompts, directly outputting multiple segmentation masks for all the classes. However, the above methods still have limitations. They bear a risk of overfitting when labeled data are very limited in downstream tasks. For example, in medical domains, images with labeled segmentation masks are often scarce, either due to the limited number of input images (e.g., for privacy concerns) or the difficulty of obtaining segmentation masks (e.g., requiring domain experts to annotate, which is time-consuming and expensive). Finetuning large foundation models like SAM on these label-scarce settings often leads to overfitting to training data and poor generalization to test images. As demonstrated in our experiments (see Fig. 2), SAMed and Med-SA suffer from severe overfitting and low test performance.\n\nIn response to the above challenges, we introduce BLO-SAM, a finetuning method for SAM that addresses the overfitting issue based on bi-level optimization (BLO). BLO-SAM combats overfitting by updating two separate sets of learnable parameters on two splits of the training data. Illustrated in Fig. 1 (a), BLO-SAM involves two sets of parameters: i) segmentation model’s weight parameters, including LoRA layers [17], transposed convolutions, and MLP heads, and ii) the prompt embedding. These parameters undergo optimization through two levels of nested optimization problems, as shown in Fig. 1 (b). In the lower level, we iteratively train segmentation model weights by minimizing a finetuning loss on a designated subset of the training dataset while keeping the learnable prompt embedding fixed. Following this finetuning, we transition to the upper level to validate the model’s effectiveness on the remaining subset of the training data. The prompt embedding is then updated by minimizing the validation loss. By segregating the learning processes for different learnable parameters onto distinct data subsets within two optimization problems, our method effectively mitigates the risk of overfitting to a single dataset, enhancing the model’s generalization on test examples.\n\nBLO-SAM’s mechanism of combating overfitting is inspired by the well-established practice of hyper-parameter tuning [18]. Typically, a model’s weight parameters (such as weights and biases in a neural network) are trained on a training dataset, while the hyper-parameters (like the number of layers in a neural network) are tuned on a separate validation set, which prevents overfitting the training data. If hyper-parameters were also tuned on the training set, it would lead to significant overfitting. Similarly, in the context of SAM, prompt embeddings can be regarded as a form of ‘hyper-parameters’. Overfitting arises when these embeddings, along with the segmentation model weights, are optimized together by minimizing a loss function on a single dataset, as SAMed do. Our BLO-SAM follows the correct way of ‘hyper-parameter tuning’: it optimizes the ‘hyper-parameters’ - the prompt embedding - on a ‘validation set’ - a subset of the training data, while training the segmentation model weights on the other subset.\n\nOur work makes two key contributions:\n\n- • We propose BLO-SAM, an overfitting-resilient approach for finetuning SAM with only a few training examples. We propose to learn the prompt embedding and model parameters of SAM on two distinct sub-datasets in a BLO framework, effectively combating overfitting in ultra-low data regimes. Furthermore, our method enables fully automated segmentation without the need for manual prompts during inference and training. This substantially enhances the practical applicability of SAM in real-world scenarios.\n\n- • Our extensive experiments on six datasets from general domains and medical domains demonstrate the strong effectiveness of BLO-SAM with less than 10 training examples. Our method significantly outperforms vanilla SAM, SAM-based models, few-shot semantic segmentation methods, and popular segmentation models, without requiring manual prompts.",
+  "references": [
+    {
+      "n": 1,
+      "id": "biba.bib38",
+      "text": "Mo et al. (2022) Mo, Y., Wu, Y., Yang, X., Liu, F., and Liao, Y. Review the state-of-the-art technologies of semantic segmentation based on deep learning. Neurocomputing , 493:626–646, 2022."
+    },
+    {
+      "n": 2,
+      "id": "biba.bib27",
+      "text": "Lateef & Ruichek (2019) Lateef, F. and Ruichek, Y. Survey on semantic segmentation using deep learning techniques. Neurocomputing , 338:321–348, 2019."
+    },
+    {
+      "n": 3,
+      "id": "biba.bib2",
+      "text": "Bommasani et al. (2021) Bommasani, R., Hudson, D. A., Adeli, E., Altman, R., Arora, S., von Arx, S., Bernstein, M. S., Bohg, J., Bosselut, A., Brunskill, E., et al. On the opportunities and risks of foundation models. arXiv preprint arXiv:2108.07258 , 2021."
+    },
+    {
+      "n": 4,
+      "id": "biba.bib42",
+      "text": "Radford et al. (2021) Radford, A., Kim, J. W., Hallacy, C., Ramesh, A., Goh, G., Agarwal, S., Sastry, G., Askell, A., Mishkin, P., Clark, J., et al. Learning transferable visual models from natural language supervision. In International conference on machine learning , pp. 8748–8763. PMLR, 2021."
+    },
+    {
+      "n": 5,
+      "id": "biba.bib39",
+      "text": "Moor et al. (2023) Moor, M., Banerjee, O., Abad, Z. S. H., Krumholz, H. M., Leskovec, J., Topol, E. J., and Rajpurkar, P. Foundation models for generalist medical artificial intelligence. Nature , 616(7956):259–265, 2023."
+    },
+    {
+      "n": 6,
+      "id": "biba.bib3",
+      "text": "Brown et al. (2020) Brown, T., Mann, B., Ryder, N., Subbiah, M., Kaplan, J. D., Dhariwal, P., Neelakantan, A., Shyam, P., Sastry, G., Askell, A., et al. Language models are few-shot learners. Advances in neural information processing systems , 33:1877–1901, 2020."
+    },
+    {
+      "n": 7,
+      "id": "biba.bib49",
+      "text": "Touvron et al. (2023a) Touvron, H., Lavril, T., Izacard, G., Martinet, X., Lachaux, M.-A., Lacroix, T., Rozière, B., Goyal, N., Hambro, E., Azhar, F., et al. Llama: Open and efficient foundation language models. arXiv preprint arXiv:2302.13971 , 2023a."
+    },
+    {
+      "n": 8,
+      "id": "biba.bib50",
+      "text": "Touvron et al. (2023b) Touvron, H., Martin, L., Stone, K. R., Albert, P., Almahairi, A., Babaei, Y., Bashlykov, N., Batra, S., Bhargava, P., Bhosale, S., Bikel, D. M., Blecher, L., Ferrer, C. C., Chen, M., Cucurull, G., Esiobu, D., Fernandes, J., Fu, J., Fu, W., Fuller, B., Gao, C., Goswami, V., Goyal, N., Hartshorn, A. S., Hosseini, S., Hou, R., Inan, H., Kardas, M., Kerkez, V., Khabsa, M., Kloumann, I. M., Korenev, A. V., Koura, P. S., Lachaux, M.-A., Lavril, T., Lee, J., Liskovich, D., Lu, Y., Mao, Y., Martinet, X., Mihaylov, T., Mishra, P., Molybog, I., Nie, Y., Poulton, A., Reizenstein, J., Rungta, R., Saladi, K., Schelten, A., Silva, R., Smith, E. M., Subramanian, R., Tan, X., Tang, B., Taylor, R., Williams, A., Kuan, J. X., Xu, P., Yan, Z., Zarov, I., Zhang, Y., Fan, A., Kambadur, M., Narang, S., Rodriguez, A., Stojnic, R., Edunov, S., and Scialom, T. Llama 2: Open foundation and fine-tuned chat models. ArXiv , abs/2307.09288, 2023b."
+    },
+    {
+      "n": 9,
+      "id": "biba.bib1",
+      "text": "Alayrac et al. (2022) Alayrac, J.-B., Donahue, J., Luc, P., Miech, A., Barr, I., Hasson, Y., Lenc, K., Mensch, A., Millican, K., Reynolds, M., Ring, R., Rutherford, E., Cabi, S., Han, T., Gong, Z., Samangooei, S., Monteiro, M., Menick, J., Borgeaud, S., Brock, A., Nematzadeh, A., Sharifzadeh, S., Binkowski, M., Barreira, R., Vinyals, O., Zisserman, A., and Simonyan, K. Flamingo: a visual language model for few-shot learning. In Oh, A. H., Agarwal, A., Belgrave, D., and Cho, K. (eds.), Advances in Neural Information Processing Systems , 2022."
+    },
+    {
+      "n": 10,
+      "id": "biba.bib53",
+      "text": "Wang et al. (2022) Wang, Z., Yu, J., Yu, A. W., Dai, Z., Tsvetkov, Y., and Cao, Y. SimVLM: Simple visual language model pretraining with weak supervision. In International Conference on Learning Representations , 2022."
+    },
+    {
+      "n": 11,
+      "id": "biba.bib25",
+      "text": "Kirillov et al. (2023) Kirillov, A., Mintun, E., Ravi, N., Mao, H., Rolland, C., Gustafson, L., Xiao, T., Whitehead, S., Berg, A. C., Lo, W.-Y., et al. Segment anything. arXiv preprint arXiv:2304.02643 , 2023."
+    },
+    {
+      "n": 12,
+      "id": "biba.bib37",
+      "text": "Mazurowski et al. (2023) Mazurowski, M. A., Dong, H., Gu, H., Yang, J., Konz, N., and Zhang, Y. Segment anything model for medical image analysis: an experimental study. Medical Image Analysis , 89:102918, 2023."
+    },
+    {
+      "n": 13,
+      "id": "biba.bib18",
+      "text": "He et al. (2023) He, S., Bao, R., Li, J., Stout, J., Bjornerud, A., Grant, P. E., and Ou, Y. Computer-vision benchmark segment-anything model (sam) in medical images: Accuracy in 12 datasets. arXiv preprint arXiv:2304.09324 , 2023."
+    },
+    {
+      "n": 14,
+      "id": "biba.bib54",
+      "text": "Wu et al. (2023) Wu, J., Fu, R., Fang, H., Liu, Y., Wang, Z., Xu, Y., Jin, Y., and Arbel, T. Medical sam adapter: Adapting segment anything model for medical image segmentation. arXiv preprint arXiv:2304.12620 , 2023."
+    },
+    {
+      "n": 15,
+      "id": "biba.bib21",
+      "text": "Houlsby et al. (2019) Houlsby, N., Giurgiu, A., Jastrzebski, S., Morrone, B., De Laroussilhe, Q., Gesmundo, A., Attariyan, M., and Gelly, S. Parameter-efficient transfer learning for nlp. In International Conference on Machine Learning , pp. 2790–2799. PMLR, 2019."
+    },
+    {
+      "n": 16,
+      "id": "biba.bib57",
+      "text": "Zhang & Liu (2023) Zhang, K. and Liu, D. Customized segment anything model for medical image segmentation. arXiv preprint arXiv:2304.13785 , 2023."
+    },
+    {
+      "n": 17,
+      "id": "biba.bib22",
+      "text": "Hu et al. (2021) Hu, E. J., Shen, Y., Wallis, P., Allen-Zhu, Z., Li, Y., Wang, S., Wang, L., and Chen, W. Lora: Low-rank adaptation of large language models. arXiv preprint arXiv:2106.09685 , 2021."
+    },
+    {
+      "n": 18,
+      "id": "biba.bib14",
+      "text": "Franceschi et al. (2018) Franceschi, L., Frasconi, P., Salzo, S., Grazzi, R., and Pontil, M. Bilevel programming for hyperparameter optimization and meta-learning. In International conference on machine learning , pp. 1568–1577. PMLR, 2018."
+    }
+  ]
+}

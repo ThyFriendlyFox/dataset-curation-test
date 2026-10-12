@@ -1,0 +1,119 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2303.10139",
+  "title": "Distill n' Explain: explaining graph neural networks using simple surrogates",
+  "authors": "Tamara Pereira, Erik Nascimento, Lucas E. Resck, Diego Mesquita, Amauri Souza",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.AI"
+  ],
+  "url": "https://arxiv.org/abs/2303.10139",
+  "html_url": "https://arxiv.org/html/2303.10139",
+  "license": "http://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Introduction",
+  "word_count": 627,
+  "text": "Graph neural networks (GNNs) [1,2] have become the pillars of representation learning on graphs. Typical GNNs resort to message passing on input graphs to extract meaningful node/graph representations for the task at hand. Despite the success of GNNs in many domains [3,4,5,6], their architectural design often results in models with limited interpretability. This naturally makes it hard to diagnose scenarios in which GNNs are fooled by confounding effects or align poorly with expert knowledge.\n\nTo mitigate this lack of interpretability, a popular strategy is to use post-hoc explanation methods [7,8,9,10,11]. The idea is to increase model transparency by highlighting input/model elements that are particularly important for predictions, helping users to understand what is happening under the hood.\n\nThere has been a recent outbreak of methods for explaining GNNs [12]. Although GNN explanations can come in different flavors [13,14,15,16,17], they usually take the form of (minimal) substructures of input graphs that are highly influential to the prediction we want to explain. The seminal work of [13] proposes learning a soft mask to weigh graph edges. To find meaningful masks, GNNExplainer maximizes the mutual information between the GNN predictions given the original graph and the masked one. To alleviate the burden of optimizing again whenever we want to explain a different node, [18] propose using node embeddings to parameterize the masks, i.e., amortizing the inference. Nonetheless, GNNExplainer and PGExplainer impose strong assumptions on our access to the GNN we are trying to explain. The former assumes we are able to back-propagate through the GNN. The latter further assumes that we can access hidden activations of the GNN. [19] relieve these assumptions by approximating the local behavior of the GNN with a probabilistic graphical model (PGM) over components, which can be used to rank the relevance of nodes and edges. On the other hand, getting explanations from PGMExplainer involves learning the structure of a PGM, and may not scale well.\n\nIn this work, we adopt the same black-box setting of [19] but severely cut down on computational cost by extracting explanations from a global surrogate model. In particular, we propose Distill n’ Explain (DnX). DnX uses knowledge distillation to learn a simple GNN \\Psi, e.g. simple graph convolution [20], that mimics the behavior of the GNN \\Phi we want to explain. Then, it solves a simple convex program to find a mask that weighs the influence of each node in the output of \\Psi. We also propose FastDnX, a variant of DnX that leverages the linear nature of our surrogate to speed up the explanation procedure. Notably, we only require evaluations of \\Phi to learn the surrogate \\Psi and, after \\Psi is fixed, we can use it to explain any node-level prediction. To back up the intuition that explaining a surrogate instead of the original GNN is a sensible idea, we provide a theoretical result linking the distillation quality to the faithfulness of our explanations.\n\nExperiments on eight popular node classification benchmarks show that DnX and FastDnX often outperform GNN-, PG-, and PGM-Explainers. We also demonstrate that both DnX and FastDnX are much faster than the competitors. Remarkably, FastDnX presents a speedup of up to 65K\\times over GNNExplainer. Finally, we discuss the limitations of current benchmarks and show that explainers capable of leveraging simple inductive biases can ace them.\n\nOur contributions are three-fold:\n\n- 1. we propose a new framework for GNN explanations that treats GNNs as black-box functions and hinges on explaining a simple surrogate model obtained through knowledge distillation;\n\n- 2. we provide theoretical bounds on the quality of explanations based on these surrogates, linking the error in the distillation procedure to the faithfulness of the explanation;\n\n- 3. we carry out extensive experiments, showing that our methods outperform the prior art while running orders of magnitude faster.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib14",
+      "text": "Gori et al. (2005) M. Gori, G. Monfardini, and F. Scarselli. A new model for learning in graph domains. In IEEE International Joint Conference on Neural Networks (IJCNN) , 2005."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib43",
+      "text": "Scarselli et al. (2009) F. Scarselli, M. Gori, A. C. Tsoi, M. Hagenbuchner, and G. Monfardini. The graph neural network model. IEEE Transactions on Neural Networks , 20(1), 2009."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib45",
+      "text": "Stokes et al. (2020) J. M. Stokes, K. Yang, K. Swanson, W. Jin, A. Cubillos-Ruiz, N. M. Donghia, C. R. MacNair, S. French, L. A. Carfrae, Z. Bloom-Ackermann, V. M. Tran, A. Chiappino-Pepe, A. H. Badran, I. W. Andrews, E. J. Chory, G. M. Church, E. D. Brown, T. S. Jaakkola, R. Barzilay, and J. J. Collins. A deep learning approach to antibiotic discovery. Cell , 180(4), 2020."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib13",
+      "text": "Gilmer et al. (2017) J. Gilmer, S. S. Schoenholz, P. F. Riley, O. Vinyals, and G. E. Dahl. Neural message passing for quantum chemistry. In International Conference on Machine Learning (ICML) , 2017."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib53",
+      "text": "Ying et al. (2018) R. Ying, R. He, K. Chen, P. Eksombatchai, W. L. Hamilton, and J. Leskovec. Graph convolutional neural networks for web-scale recommender systems. In International Conference on Knowledge Discovery & Data Mining (KDD) , 2018."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib42",
+      "text": "Sanchez-Gonzalez et al. (2020) A. Sanchez-Gonzalez, J. Godwin, T. Pfaff, R. Ying, J. Leskovec, and P. Battaglia. Learning to simulate complex physics with graph networks. In International Conference on Machine Learning (ICML) , 2020."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib39",
+      "text": "Ribeiro et al. (2016) M. T. Ribeiro, S. Singh, and C. Guestrin. ”Why should I trust you?”: Explaining the predictions of any classifier. In International Conference on Knowledge Discovery and Data Mining (KDD) , 2016."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib33",
+      "text": "Lundberg and Lee (2017) S. M. Lundberg and S.-I. Lee. A unified approach to interpreting model predictions. In Advances in Neural Information Processing Systems (NeurIPS) , 2017."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib44",
+      "text": "Slack et al. (2021) D. Slack, A. Hilgard, S. Singh, and H. Lakkaraju. Reliable post hoc explanations: Modeling uncertainty in explainability. In Advances in Neural Information Processing Systems (NeurIPS) , 2021."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib16",
+      "text": "Han et al. (2022) T. Han, S. Srinivas, and H. Lakkaraju. Which explanation should i choose? a function approximation perspective to characterizing post hoc explanations. Advances in Neural Information Processing Systems (NeurIPS) , 2022."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib20",
+      "text": "Huang et al. (2022) Q. Huang, M. Yamada, Y. Tian, D. Singh, and Y. Chang. Graphlime: Local interpretable model explanations for graph neural networks. IEEE Transactions on Knowledge and Data Engineering , 2022."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib57",
+      "text": "Yuan et al. (2022) H. Yuan, H. Yu, S. Gui, and S. Ji. Explainability in graph neural networks: A taxonomic survey. IEEE transactions on pattern analysis and machine intelligence , 2022."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib54",
+      "text": "Ying et al. (2019) Z. Ying, D. Bourgeois, J. You, M. Zitnik, and J Leskovec. Gnnexplainer: Generating explanations for graph neural networks. In H. Wallach, H. Larochelle, A. Beygelzimer, F. d'Alché-Buc, E. Fox, and R. Garnett, editors, Advances in Neural Information Processing Systems (NeurIPS) , 2019."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib56",
+      "text": "Yuan et al. (2021) H. Yuan, H. Yu, J. Wang, K. Li, and S. Ji. On explainability of graph neural networks via subgraph explorations. In International Conference on Machine Learning (ICML) , 2021."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib49",
+      "text": "Wang et al. (2021) X. Wang, Y. Wu, A. Zhang, X. He, and T. Chua. Towards multi-grained explainability for graph neural networks. In Advances in Neural Information Processing Systems (NeurIPS) , 2021."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib32",
+      "text": "Lucic et al. (2022) A. Lucic, M. Ter Hoeve, G. Tolomei, M. De Rijke, and F. Silvestri. Cf-gnnexplainer: Counterfactual explanations for graph neural networks. In International Conference on Artificial Intelligence and Statistics (AISTATS) , 2022."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib55",
+      "text": "Yuan et al. (2020) H. Yuan, J. Tang, X. Hu, and S. Ji. XGNN: Towards model-level explanations of graph neural networks. In International Conference on Knowledge Discovery & Data Mining (KDD) , 2020."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib34",
+      "text": "Luo et al. (2020) D. Luo, W. Cheng, D. Xu, W. Yu, B. Zong, H. Chen, and X. Zhang. Parameterized explainer for graph neural network. In Advances in Neural Information Processing Systems (NeurIPS) , 2020."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib48",
+      "text": "Vu and Thai (2020) M. Vu and M. T. Thai. Pgm-explainer: Probabilistic graphical model explanations for graph neural networks. In Advances in Neural Information Processing Systems (NeurIPS) , 2020."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib50",
+      "text": "Wu et al. (2019) F. Wu, A. Souza, T. Zhang, C. Fifty, T. Yu, and K. Weinberger. Simplifying graph convolutional networks. In International Conference on Machine Learning (ICML) , 2019."
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2211.00635",
+  "title": "Two-stage LLM Fine-tuning with Less Specialization and More Generalization",
+  "authors": "Yihan Wang, Si Si, Daliang Li, Michal Lukasik, Felix Yu, Cho-Jui Hsieh, Inderjit S Dhillon, Sanjiv Kumar",
+  "year": "2024",
+  "categories": [
+    "cs.CL",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2211.00635",
+  "html_url": "https://arxiv.org/html/2211.00635",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 714,
+  "text": "Natural language processing (NLP) has recently been revolutionized by scaling up transformer based large language models (LLMs) together with large-scale pretraining [1,2,3,4,5,6,7,8]. In addition to improved downstream performances, these pretrained LLMs can perform a broad array of unforeseen tasks when provided with a prompt. This in-context learning capability allows users to flexibly re-purpose LLMs for specific tasks with a minimum amount of supervised data, making it extremely convenient for fast prototyping and experimentation, especially in the low data regime.\n\nHowever, even the largest and most advanced LLMs leave a lot to be improved. Grounding and eliminating hallucinations [9], reasoning and logical clarity [10], mathematics [4,11] are just a few examples where LLMs still lag behind the best human performances, or in some cases, the fine-tuned performances of the same model.\n\nThe most common practice to improve a pretrained model is to fine-tune it on a specialized task or several tasks. However, fine-tuning on LLM usually causes over-specialization to the fine-tuning tasks, and harm the model’s pre-existing generalization ability on unseen tasks via in-context learning. As we show later, an mT5 model finetuned on a single task loses its few-shot performance on unseen tasks within one thousand steps of fine-tuning. When faced with hundreds of downstream tasks and even unknown tasks, we expect to have a single fine-tuned model that is both superior on supervised fine-tuned tasks and general unseen tasks. Thus, it becomes very important to develop new techniques for finetuning that prevent over-specialization of these fine-tuned models only to a few tasks.\n\nIn this work, we discover that the loss of general in-context learning abilities during fine-tuning is, to a large extent, caused by format specialization, which makes model overfitting to the specific task format. For example, an mT5 [12] model learns in the output space with only “True” and “False” if we fine-tune it on a binary classification dataset, losing its ability to flexibly generate different output styles according to the in-context prompts of other tasks. We show that format specialization tends to happen at the very beginning of fine-tuning, before the model fully learns the semantic content of the task.\n\nBased on these observations, we propose a simple solution to alleviate format specialization: PROmpt Tuning with MOdel Tuning (ProMoT), which off-loads format learning to a small amount of task-specific parameters that are external to the model. ProMoT is a two-stage fine-tuning process. At the first stage, we freeze the pretrained model and tune a small set of additional parameters, where we find adding soft prompt before the input [13] is a good choice. At the second stage, we freeze the additional parameters and tune the main model. Since format information is learned first, it mostly enters the small set of additional parameters. At inference time, we can decide whether to remove the additional parameters depending on whether the incoming task share the same format as the fine-tuned task.\n\nOur experiments show that ProMoT significantly alleviates specialization during fine-tuning, while boosting generalization on semantically related tasks with different formats. For example, fine-tuning the model only on an NLI binary classification dataset, a mT5 XXL model consistently obtains improved in-context learning performance on summarization compared with the pretrained model, possibly due to improved grounding learned from NLI. See Table 1 for a concrete example. With ProMoT, we can obtain models with both better supervised performance compared to pretrained models and better general in-context learning performance compared to standard finetuning.\n\nTo summarize, our contributions are 4-fold:\n\n- • We show empirically that general in-context learning capabilities decrease during single-task fine-tuning for T5 models. We identify format specialization as one of the important causes which mostly happens at the beginning of fine-tuning.\n\n- • We propose a novel 2-stage fine-tuning framework: PROmpt Tuning with MOdel Tuning (ProMoT) to reduce format specialization during fine-tuning.\n\n- • Experiments on 10+ NLP tasks show that ProMoT significantly reduces specialization of fine-tuned models compared to standard fine-tuning, while reaching similar supervised performance. The reduction in specialization opens up opportunities to enhance generalization across very dissimilar tasks when they share some semantic aspects.\n\n- • ProMoT can be combined with many existing fine-tuning and parameter-efficient fine-tuning methods. We show examples where ProMoT is combined with multi-task fine-tuning and fine-tuning with 1-shot prompts to further boost the generalization on unseen tasks.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib39",
+      "text": "Vaswani et al. (2017) Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N Gomez, Ł ukasz Kaiser, and Illia Polosukhin. Attention is all you need. In I. Guyon, U. Von Luxburg, S. Bengio, H. Wallach, R. Fergus, S. Vishwanathan, and R. Garnett (eds.), Advances in NeurIPS , 2017. URL https://proceedings.neurips.cc/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib12",
+      "text": "Devlin et al. (2019) Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. BERT: Pre-training of deep bidirectional transformers for language understanding. In Proceedings of NAACL , pp. 4171–4186, 2019. URL https://aclanthology.org/N19-1423 ."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib33",
+      "text": "Raffel et al. (2020a) Colin Raffel, Noam Shazeer, Adam Roberts, Katherine Lee, Sharan Narang, Michael Matena, Yanqi Zhou, Wei Li, and Peter J. Liu. Exploring the limits of transfer learning with a unified text-to-text transformer. JMLR , 21(140):1–67, 2020a. URL http://jmlr.org/papers/v21/20-074.html ."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib6",
+      "text": "Brown et al. (2020) Tom Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared D Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, Sandhini Agarwal, Ariel Herbert-Voss, Gretchen Krueger, Tom Henighan, Rewon Child, Aditya Ramesh, Daniel Ziegler, Jeffrey Wu, Clemens Winter, Chris Hesse, Mark Chen, Eric Sigler, Mateusz Litwin, Scott Gray, Benjamin Chess, Jack Clark, Christopher Berner, Sam McCandlish, Alec Radford, Ilya Sutskever, and Dario Amodei. Language models are few-shot learners. In H. Larochelle, M. Ranzato, R. Hadsell, M.F. Balcan, and H. Lin (eds.), Advances in NeurIPS , volume 33, pp. 1877–1901. Curran Associates, Inc., 2020. URL https://proceedings.neurips.cc/paper/2020/file/1457c0d6bfcb4967418bfb8ac142f64a-Paper.pdf ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib32",
+      "text": "Rae et al. (2021) Jack W. Rae, Sebastian Borgeaud, Trevor Cai, Katie Millican, Jordan Hoffmann, Francis Song, John Aslanides, Sarah Henderson, Roman Ring, Susannah Young, Eliza Rutherford, Tom Hennigan, Jacob Menick, Albin Cassirer, Richard Powell, George van den Driessche, Lisa Anne Hendricks, Maribeth Rauh, Po-Sen Huang, Amelia Glaese, Johannes Welbl, Sumanth Dathathri, Saffron Huang, Jonathan Uesato, John Mellor, Irina Higgins, Antonia Creswell, Nat McAleese, Amy Wu, Erich Elsen, Siddhant Jayakumar, Elena Buchatskaya, David Budden, Esme Sutherland, Karen Simonyan, Michela Paganini, Laurent Sifre, Lena Martens, Xiang Lorraine Li, Adhiguna Kuncoro, Aida Nematzadeh, Elena Gribovskaya, Domenic Donato, Angeliki Lazaridou, Arthur Mensch, Jean-Baptiste Lespiau, Maria Tsimpoukelli, Nikolai Grigorev, Doug Fritz, Thibault Sottiaux, Mantas Pajarskas, Toby Pohlen, Zhitao Gong, Daniel Toyama, Cyprien de Masson d’Autume, Yujia Li, Tayfun Terzi, Vladimir Mikulik, Igor Babuschkin, Aidan Clark, Diego de Las Casas, Aurelia Guy, Chris Jones, James Bradbury, Matthew Johnson, Blake Hechtman, Laura Weidinger, Iason Gabriel, William Isaac, Ed Lockhart, Simon Osindero, Laura Rimell, Chris Dyer, Oriol Vinyals, Kareem Ayoub, Jeff Stanway, Lorrayne Bennett, Demis Hassabis, Koray Kavukcuoglu, and Geoffrey Irving. Scaling language models: Methods, analysis & insights from training gopher, 2021. URL https://arxiv.org/abs/2112.11446 ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib8",
+      "text": "Chowdhery et al. (2022) Aakanksha Chowdhery, Sharan Narang, Jacob Devlin, Maarten Bosma, Gaurav Mishra, Adam Roberts, Paul Barham, Hyung Won Chung, Charles Sutton, Sebastian Gehrmann, Parker Schuh, Kensen Shi, Sasha Tsvyashchenko, Joshua Maynez, Abhishek Rao, Parker Barnes, Yi Tay, Noam Shazeer, Vinodkumar Prabhakaran, Emily Reif, Nan Du, Ben Hutchinson, Reiner Pope, James Bradbury, Jacob Austin, Michael Isard, Guy Gur-Ari, Pengcheng Yin, Toju Duke, Anselm Levskaya, Sanjay Ghemawat, Sunipa Dev, Henryk Michalewski, Xavier Garcia, Vedant Misra, Kevin Robinson, Liam Fedus, Denny Zhou, Daphne Ippolito, David Luan, Hyeontaek Lim, Barret Zoph, Alexander Spiridonov, Ryan Sepassi, David Dohan, Shivani Agrawal, Mark Omernick, Andrew M. Dai, Thanumalayan Sankaranarayana Pillai, Marie Pellat, Aitor Lewkowycz, Erica Moreira, Rewon Child, Oleksandr Polozov, Katherine Lee, Zongwei Zhou, Xuezhi Wang, Brennan Saeta, Mark Diaz, Orhan Firat, Michele Catasta, Jason Wei, Kathy Meier-Hellstern, Douglas Eck, Jeff Dean, Slav Petrov, and Noah Fiedel. Palm: Scaling language modeling with pathways, 2022. URL https://arxiv.org/abs/2204.02311 ."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib36",
+      "text": "Smith et al. (2022) Shaden Smith, Mostofa Patwary, Brandon Norick, Patrick LeGresley, Samyam Rajbhandari, Jared Casper, Zhun Liu, Shrimai Prabhumoye, George Zerveas, Vijay Korthikanti, Elton Zhang, Rewon Child, Reza Yazdani Aminabadi, Julie Bernauer, Xia Song, Mohammad Shoeybi, Yuxiong He, Michael Houston, Saurabh Tiwary, and Bryan Catanzaro. Using deepspeed and megatron to train megatron-turing nlg 530b, a large-scale generative language model, 2022. URL https://arxiv.org/abs/2201.11990 ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib38",
+      "text": "Touvron et al. (2023) Hugo Touvron, Thibaut Lavril, Gautier Izacard, Xavier Martinet, Marie-Anne Lachaux, Timothée Lacroix, Baptiste Rozière, Naman Goyal, Eric Hambro, Faisal Azhar, et al. Llama: Open and efficient foundation language models. arXiv preprint arXiv:2302.13971 , 2023."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib23",
+      "text": "Maynez et al. (2020) Joshua Maynez, Shashi Narayan, Bernd Bohnet, and Ryan McDonald. On faithfulness and factuality in abstractive summarization. In Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics , pp. 1906–1919, Online, July 2020. Association for Computational Linguistics. doi: 10.18653/v1/2020.acl-main.173 . URL https://aclanthology.org/2020.acl-main.173 ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "Creswell & Shanahan (2022) Antonia Creswell and Murray Shanahan. Faithful reasoning using large language models, 2022. URL https://arxiv.org/abs/2208.14271 ."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib28",
+      "text": "Noorbakhsh et al. (2021) Kimia Noorbakhsh, Modar Sulaiman, Mahdi Sharifi, Kallol Roy, and Pooyan Jamshidi. Pretrained language models are symbolic mathematics solvers too! arXiv preprint arXiv:2110.03501 , 2021."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib43",
+      "text": "Xue et al. (2020) Linting Xue, Noah Constant, Adam Roberts, Mihir Kale, Rami Al-Rfou, Aditya Siddhant, Aditya Barua, and Colin Raffel. mt5: A massively multilingual pre-trained text-to-text transformer. arXiv preprint arXiv:2010.11934 , 2020."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib20",
+      "text": "Lester et al. (2021) Brian Lester, Rami Al-Rfou, and Noah Constant. The power of scale for parameter-efficient prompt tuning. In Proceedings of the 2021 Conference on Empirical Methods in Natural Language Processing , pp. 3045–3059, Online and Punta Cana, Dominican Republic, November 2021. Association for Computational Linguistics. doi: 10.18653/v1/2021.emnlp-main.243 . URL https://aclanthology.org/2021.emnlp-main.243 ."
+    }
+  ]
+}

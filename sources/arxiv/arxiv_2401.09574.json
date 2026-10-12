@@ -1,0 +1,74 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2401.09574",
+  "title": "Towards Scalable and Robust Model Versioning",
+  "authors": "Wenxin Ding, Arjun Nitin Bhagoji, Ben Y. Zhao, Haitao Zheng",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.CR"
+  ],
+  "url": "https://arxiv.org/abs/2401.09574",
+  "html_url": "https://arxiv.org/html/2401.09574",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1101,
+  "text": "As deep learning models become increasingly prevalent across various industries, the risk of malicious attacks attempting to breach access to these deployed models is growing. When an attacker obtains access to a deployed model, via many methods including server breaches, insider attacks, or model inversion attacks, they can craft white-box adversarial attacks to manipulate the model’s classification results. As the classification results lose their reliability, the deployed ML service becomes obsolete and needs to be replaced or removed. For example, in the medical field, image classification faces real-world attacks that aid insurance fraud. Some physicians engage in overprescribing medications and misdiagnosing conditions, prompting insurance companies to employ image classification for diagnosis verification. Adversarial attacks against these models are well-documented and raise significant concerns [1,2]. Another example is classifiers for image content moderation on discussion boards and online platforms, which are frequently attacked by bad actors seeking to bypass content moderation with prohibited content [3,4].\n\nUnfortunately, replacing a breached model is a challenging task. This is because, building powerful deep learning models often involves acquiring and curating high quality training datasets, a process that incurs significant investment in time and capital, and can be difficult or impractical to repeat. For example, a model identifying diseases like rare skin lesions may take years to collect the training data, involving curation by specialists and de-identification to comply with privacy regulations [5]. Similarly, training data for content moderation models is often extremely sensitive and difficult to procure, e.g. images of extreme violence or abuse of minors. Obtaining and labeling these challenging images require manual inspection and careful supervision.\n\nThese observations motivate us to investigate how model owners can protect themselves against model losses without the necessity of acquiring new training data. Ideally, they would like to train multiple versions of the target model from the same training set, deploy one version at a time and replace a leaked version with a new one. At the time of its deployment, each new version i of the model should resist adversarial attacks as if it were the sole model version that had been deployed. That is, when attempting to attack model i, an attacker would gain minimal or no advantage by obtaining white-box access to any or all previous model versions \\{j\\;|\\;j<i\\}. The longer the model sequence supports this sequential (or compound) robustness, the stronger the protection against repeated model leakages. We refer to this problem as scalable and robust model versioning.\n\nUnfortunately, solving this problem is difficult because of two significant challenges. First is the well known phenomenon of attack transferability: adversarial attacks generated on one model often succeed on similar models trained on the same task, even when they use different architectures [6,7]. To date, few if any techniques provide the ability to generate multiple (>3) models on the same task with low attack transferability between them, while maintaining normal classification accuracy. Second, our problem must address a novel but natural evolution of the white-box attack, a sequential, compound transferability attack. As each leaked model is retired, an attacker with no white-box access to the new version i, can still utilize their white-box access to prior versions (1 to i-1) to orchestrate a strong attack against version i. This new requirement and the need to sequentially deploy/replace models make our problem distinct from existing works (e.g., constructing robust ensembles [8,9,10]), creating a new, open challenge.\n\nTo tackle these challenges, our work introduces a principled approach for generating a sequence of robust model versions from a single training dataset using a single model architecture. Our method automatically curates and incorporates parameterized hidden data into the model training data, forcing the model to learn task-irrelevant features that are distinctly defined by the selected hidden data. More specifically, given an original task, we curate synthetic data that are drawn from some hidden distributions irrelevant to the task, and augment the task’s original training data with the new hidden data. Thus, the training data of a class now includes both its original training data and new data drawn from a chosen hidden distribution. Using the combined data, we train a model version from scratch. And by varying the choices of hidden distributions, we can produce different model versions.\n\nOur hypothesis is that the above process, if well-designed, can produce a diverse set of model versions. These model versions would not only effectively accomplish the primary task but also exhibit distinct attack properties, because they are trained on varying hidden distributions that naturally introduce diverse non-robust features into each model. Leveraging this variability, the model trainer can carefully select, organize and continuously deploy a sequence of model versions to withstand compound transferability attacks over time.\n\nWe validate this hypothesis by first performing theoretical analysis in a simplified setting. Our formal proof demonstrates that optimizing the selection of hidden distributions significantly reduces the transferability of compound attacks against subsequent model versions. Additionally, effective hidden distributions are characterized by a single point in the feature space, facilitating the parameterization process for efficient optimization. Together, these analytical findings demonstrate the importance and viability of optimizing the choices of hidden distributions when constructing the model sequence. This stands in contrast to an earlier work [11] that employed randomly selected hidden data without any optimization.\n\nBuilding on our analytical results, we develop a practical, greedy search-based algorithm for constructing hidden distribution-based model versions for deep neural network (DNN) classifiers. We implement and evaluate our method using three image classification tasks that encompass different image categories (objects, medical images, and faces) and varying number of classes (7 to 1283). Our design significantly outperforms alternative methods for model versioning, including [11] and those designed to produce “orthogonal” models.\n\nSummary of Contributions. To the best of our knowledge, our work is the first to provide a principled investigation of scalable and robust model versioning – a crucial task for safeguarding DNN services beyond their initial deployment. Our work makes three key contributions:\n\n- • We formally define the process of hidden distribution-based training as a solution for model versioning (§ III and § IV);\n\n- • We analytically demonstrate the critical impact of hidden distributions on model versioning and develop a practical algorithm for systematically selecting hidden distributions to construct robust model versions (§ V and § VI).\n\n- • We evaluate our design by building a sequence of model versions for three image classification tasks. These models achieve significantly higher robustness against attacks compared to existing methods (§ VII).\n\nFinally, we discuss the limitations of our work and potential future directions. We hope that our work can inspire further research efforts in this critical yet underexplored area.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "S. G. Finlayson et al. , “Adversarial attacks on medical machine learning,” Science , no. 6433, 2019."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "X. Ma et al. , “Understanding adversarial attacks on deep learning based medical image analysis systems,” Pattern Recognition , p. 107332, 2021."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "M. B. Rahman, H. A. Mustafa, and M. D. Hossain, “Towards evaluating robustness of violence detection in videos using cross-domain transferability,” Journal of Information Security and Applications , 2023."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "A. N. Bhagoji, W. He, B. Li, and D. Song, “Practical black-box attacks on deep neural networks using efficient query mechanisms,” in Proc. of ECCV , 2018."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "P. Tschandl, C. Rosendahl, and H. Kittler, “The ham10000 dataset, a large collection of multi-source dermatoscopic images of common pigmented skin lesions,” Scientific data , 2018."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "A. Demontis et al. , “Why do adversarial attacks transfer? explaining transferability of evasion and poisoning attacks,” in Proc. of USENIX Security , 2019."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "Y. Liu, X. Chen, C. Liu, and D. Song, “Delving into transferable adversarial examples and black-box attacks,” in Proc. of ICLR , 2017."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "H. Yang et al. , “Dverge: diversifying vulnerabilities for enhanced robust generation of ensembles,” Proc. of NeurIPS , 2020."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "Z. Yang et al. , “Trs: Transferability reduced ensemble via promoting gradient diversity and model smoothness,” Proc. of NeurIPS , 2021."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "H. Dbouk and N. Shanbhag, “Adversarial vulnerability of randomized ensembles,” in Proc. of ICML , 2022."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "S. Shan, W. Ding, E. Wenger, H. Zheng, and B. Y. Zhao, “Post-breach recovery: Protection against white-box adversarial examples for leaked dnn models,” in Proc. of CCS , 2022."
+    }
+  ]
+}

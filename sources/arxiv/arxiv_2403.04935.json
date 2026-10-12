@@ -1,0 +1,58 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.04935",
+  "title": "Evaluation of NoSQL in the Energy Marketplace with GraphQL Optimization",
+  "authors": "Michael Howard",
+  "year": "2024",
+  "categories": [
+    "cs.DB"
+  ],
+  "url": "https://arxiv.org/abs/2403.04935",
+  "html_url": "https://arxiv.org/html/2403.04935",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1067,
+  "text": "The era of internal combustion vehicles is coming to a close. Electric vehicle (EV) sales are on a steady upward trajectory. EV-Volumes [1] report that in 2022, sales increased by 55% over the previous year, while the entire auto industry declined by -0.5% during that same period. A major barrier to the ownership of electric vehicles is range anxiety. Commercial charging facilities are not yet as ubiquitous as gasoline stations, opening up a market for private individuals to assist by sharing their personal charging facilities. In this paper, we detail how the Cloud framework for a peer-to-peer energy marketplace might work to provide users with a means to share and rent their private charging outlets. Components of the framework include the Edge microcontrollers, web server, API, Cloud Functions, Publication-Subscription service, and a message broker. We then dig deep into the database component, which is the main research question.\n\n## I-A Motivations\n\nA critical step in the energy marketplace is to persistently store data objects that represent the Edge charging devices. Users, charging session history, billing details, ratings and reviews, amenities, and tourist information are additionally persisted. The workflows for the marketplace users include registering a new charger device, searching for available devices, and managing a charging session, as seen in Figure 1.\n\nRequirements for persistent data include low read and write latency, the ability to scale horizontally as data grows, the cost, and the ease of evolving the shape of the data. Multiple users may query persistent storage, asking for data objects that contain multiple fields within a given range. Read-operation latency will be critical in this scenario. The user must be able to request a charger within a given latitude and longitude radius and may need to include the maximum distance to a restroom, the minimum user rating, the type of charger, etc. The query engine must be able to process these patterns of field conditionals. If it can process only a subset, the resulting data reduction must be efficient enough so that the user response is not noticeably delayed.\n\nAnother motivation for investigating database technology is flexibility and scalability. The energy marketplace will grow iteratively, adding features that require additional persistence. A fixed schema or data shape may require a migration (or a new table) of all existing persisted data to match the updated schema prior to adding the new data objects. A flexible schema may reduce the burden on administrators and reduce administration complexity, since new fields can be incrementally stored as the marketplace framework and feature set evolve. Since the number of users participating in the marketplace is also evolving, persistent storage must be able to horizontally scale to accommodate them. For example, an early marketplace pilot may have 50 users within a single geographical zone. An individual Cloud node with failover and redundancy can safely store all required persistent data and support all incoming query requests within the zone. However, as users spread out geographically, storage nodes will need to scale into these new zones. Also, as data and user request volume exceed what can be processed by a single node, storage must partition and scale across a node cluster.\n\nThe high-level goals for the persistent storage for the marketplace are as follows:\n\n- 1. Storage cost.\n\n- 2. Compute cost.\n\n- 3. Query support.\n\n- 4. Query latency.\n\n- 5. Ease of scaling.\n\n- 6. Ease of data-structure evolution.\n\nCost is a significant motivation, driving a design goal of the framework to avoid perpetual, unmanaged compute. The deployment of server-based compute services may increase billing, as the compute resources are dedicated and always available. Additionally, the type of compute and operating system patches must be managed by the developer. A serverless persistent storage model provides a pricing model in which the billing only reflects what is used. Thus, queries and storage contribute directly to billing, but idle time does not.\n\n## I-B Research Question\n\nThe aforementioned requirements for persistent storage raise the question of what will work best to support the energy marketplace. A deep dive investigation is beneficial prior to developing the marketplace framework and leads us to the research question addressed in this paper: Will a serverless, NoSQL, non-relational, document-model database (i.e. Google Firestore [2]) support the query, cost, and flexibility needs for persistent storage in a peer-to-peer energy marketplace? We will endeavor to answer this question through benchmarking latency, estimating costs, and analyzing the architecture. To provide a comparison with a well-established solution, benchmarking and analysis are compared side-by-side against a relational, SQL, and perpetual server provided through Google Cloud SQL [3].\n\n## I-C Context of the Study\n\nMultiple related studies utilize a third-party benchmarking tool such as Yahoo! Cloud Serving Benchmark (YCSB) [4] to establish latency under variable load [5,6,7,8]. In this study, we will focus on a more customized way to measure the response time of the database.\n\nFor both the relational and non-relational databases, we develop client applications that emulate portions of the energy marketplace data flow. Queries running from these clients perform read-and-write operations that characterize latency performance in specific load scenarios. This experimental setup allows the persistent storage component of the marketplace to be developed and tested in isolation.\n\n## I-D Objectives and Contributions\n\nThe objectives of this paper are as follows:\n\n- 1. Characterize query latency for both relational and non-relational databases.\n\n- 2. Evaluate the cost of both solutions.\n\n- 3. Explore the ease of evolving the stored data structure.\n\n- 4. Explore the ease of horizontal scaling.\n\n- 5. Evaluate inserting a GraphQL middleware layer and its effect on client simplicity, latency, safety, and portability.\n\nAchieving these objectives provides a characterization of the strengths and weaknesses of Firestore’s persistent storage solution, both standalone and comparatively against the more established SQL solution. This insight into Firestore’s performance and capabilities contributes a known data storage platform to support the future energy marketplace framework.\n\n## I-E Overview of the Paper\n\nAfter initially introducing the topic, the background of electric vehicle (EV) charging and related research are covered in Section II. Next, we discuss the system architecture of the Firestore and MySQL storage solutions, along with GraphQL, in Section III. Section IV presents the experiments performed against both solutions along with their corresponding experimental data. The discussion of the experimental results, the regression model and future work is detailed in Section V. Finally, we wrap up the paper with the conclusion in Section VI.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib15",
+      "text": "R. Irle. The electric vehicle world sales database, 2023. URL https://www.ev-volumes.com . Accessed: 2023-06-16."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib9",
+      "text": "Google. Firestore, 2023a. URL https://cloud.google.com/sql/firestore . Accessed: 2023-06-19."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib12",
+      "text": "Google. Cloud SQL for MySQL, 2023d. URL https://cloud.google.com/sql/mysql . Accessed: 2023-06-19."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib33",
+      "text": "Yahoo! Yahoo cloud serving benchmark, 2010. URL https://research.yahoo.com/news/yahoo-cloud-serving-benchmark/ . Accessed: 2023-06-19."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib3",
+      "text": "R. Cattell. Scalable SQL and NoSQL data stores. SIGMOD Rec. , 39(4):12–27, May 2011. ISSN 0163-5808. doi: 10.1145/1978915.1978919 . URL https://doi.org/10.1145/1978915.1978919 ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib14",
+      "text": "H. Khazaei et al. How do i choose the right NoSQL solution? a comprehensive theoretical and experimental survey. Big Data and Information Analytics , 1(2):185–216, 2016."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib22",
+      "text": "R. Pandey. Performance benchmarking and comparison of cloud-based databases MongoDB (NoSQL) vs MySQL (relational) using YCSB. Technical report, Technical Report. https://doi. org/10.13140/RG. 2.2. 10789.32484, 2020."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib25",
+      "text": "R. Kesavan et al. Firestore: The NoSQL serverless database for the application developer. In 2023 IEEE 39th International Conference on Data Engineering (ICDE) , pages 3367–3379, 2023."
+    }
+  ]
+}

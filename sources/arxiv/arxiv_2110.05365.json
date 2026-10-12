@@ -1,0 +1,70 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2110.05365",
+  "title": "Intriguing Properties of Input-dependent Randomized Smoothing",
+  "authors": "Peter SÃºkenÃ­k, Aleksei Kuvshinov, Stephan GÃ¼nnemann",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.AI",
+    "stat.ML"
+  ],
+  "url": "https://arxiv.org/abs/2110.05365",
+  "html_url": "https://arxiv.org/html/2110.05365",
+  "license": "http://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Introduction",
+  "word_count": 1029,
+  "text": "Deep neural networks are one of the dominating recently used machine learning methods. They achieve state-of-the-art performance in a variety of applications like computer vision, natural language processing, and many others. The key property that makes neural networks so powerful is their expressivity [1]. However, as a price, they possess a weakness - a vulnerability against adversarial attacks [2,3]. The adversarial attack on a sample x_{0} is a point x_{1} such that the distance d(x_{0},x_{1}) is small, yet the predictions of model f on x_{0} and x_{1} differ. Such examples are often easy to construct, for example by optimizing for a change in prediction f(x) [3]. Even worse, these attacks are present even if the model’s prediction on x is unequivocal.\n\nThis property is highly undesirable because in several sensitive applications, misclassifying a sample just because it does not follow the natural distribution might lead to serious and harmful consequences. A well-known example is a sticker placed on a traffic sign, which could confuse the self-driving car and cause an accident [4]. As a result, the robustness of classifiers against adversarial examples has begun to be a strongly discussed topic. Though many methods claim to provide robust classifiers, just some of them are certifiably robust, i.e. the robustness is mathematically guaranteed. The certifiability turns out to be essential since more sophisticated attacks can break empirical defenses [5].\n\nCurrently, the dominant method to achieve the certifiable robustness is randomized smoothing (RS). This clever idea to get rid of adversarial examples using randomization of input was introduced by [6] and [7] and fully formalized and improved by [8]. Let f be a classifier assigning inputs x\\in\\mathbb{R}^{N} to one of the classes C\\in\\mathcal{C}. Given a random deviation \\epsilon\\sim\\mathcal{N}(0,\\sigma^{2}I), the smoothed classifier g, made of f, is defined as: g(x)=\\argmax_{C}\\mathbb{P}(f(x+\\epsilon)=C), for C\\in\\mathcal{C}. In other words, the smoothed classifier classifies a class that has the highest probability under the sampling of f(x+\\epsilon). Consequently, an adversarial attack x^{\\prime} on f is less dangerous for g, because g does not look directly at x^{\\prime}, but rather at its whole neighborhood, in a weighted manner. This way we can get rid of local artifacts that f possesses – thus the name “smoothing”. It turns out, that g enjoys strong robustness properties against attacks bounded by a specifically computed l_{2} -norm threshold, especially if f is trained under a Gaussian noise augmentation [8].\n\nUnfortunately, since the introduction of the RS, several serious problems were reported to be connected to the technique. [8] mention two of them. First is the usage of lower confidence bounds to estimate the leading class’s probability. With a high probability, this leads to smaller reported certified radiuses in comparison with the true ones. Moreover, it yields a theoretical threshold, which upper-bounds the maximal possible certified radius and causes the “certified accuracy waterfalls”, which significantly decreases the certified accuracy. This problem is particularly pronounced for small levels of the used smoothing variance \\sigma^{2}, which motivates to use larger variance. Second, RS possesses a robustness vs. accuracy trade-off problem. The bigger \\sigma we use as the smoothing variance, the smaller clean accuracy will the smoothed classifier have. This motivates to use rather smaller levels of \\sigma. Third, as pointed out by [9], RS smooths the decision boundary of f in such a way that bounded or convex regions begin to shrink as \\sigma increases, while the unbounded and anti-convex regions expand. This, as the authors empirically demonstrate, creates a imbalance in class-wise accuracies (accuracies computed per each class separately) of g and causes serious fairness issues. Therefore the smaller values of \\sigma are again more preferable. See Appendix A for a detailed discussion.\n\nClearly, the usage of a global, constant \\sigma is suboptimal. For the samples close to the decision boundary, we want to use small \\sigma, so that f and g have similar decision boundaries and the expressivity of f is not lost (where not necessary). On the other hand, far from the decision boundary of f, where the probability of the dominant class is close to 1, we need bigger \\sigma to avoid the severe under-certification (see Appendix A). All together, using a non-constant \\sigma(x) rather than constant \\sigma, a suitable smoothing variance could be used to achieve optimal robustness.\n\nTo support this reasoning, we present a toy example. We train a network on a 2D dataset of a circular shape with the classes being two complementary sectors, one of which is of a very small angle. In Figure 1 we show the difference between constant and input-dependent \\sigma. Using the non-constant \\sigma(x) defined in Equation 1, we obtain an improvement both in terms of the certified radiuses as well as clean accuracy. For more details see Appendix A. Even though there are some works introducing this concept (see Appendix C), most of them lack mathematical reasoning about the correctness of their method or fairness of their comparison, which, as we show, turns out to be critical.\n\nThe main contributions of this work are fourfold. First, we generalize the methodology of [8] for the case of the input-dependent RS (IDRS), obtaining useful and important insights about how to use the Neyman-Pearson lemma in this general case. Second and most importantly, we show that the IDRS suffers from the curse of dimensionality in the sense that the semi-elasticity coefficient r of \\sigma(x) (a positive number such that |\\log(\\sigma(x_{0}))-\\log(\\sigma(x_{1}))|\\leq r\\lVert x_{0}-x_{1}\\rVert\\hskip 2.84526pt\\forall x_{0},x_{1}\\in\\mathbb{R}^{N}) in a high-dimensional setting is restricted to be very small. This means, that even if we wanted to vary \\sigma(x) significantly with varying x, we cannot. The maximal reasonable speed of change of \\sigma(x) turns out to be almost too small to handle, especially in high dimensions. Third, in contrast, we also study the conditions on \\sigma(x) under which it is applicable in high-dimensional regime and prepare a theoretical framework necessary to build an efficient certification algorithm. We are the first to do so for \\sigma(x) functions, which are not locally constant (as in [10]). Finally, we provide a concrete design of the \\sigma(x) function, test it extensively and compare it to the classical RS on the CIFAR10 and MNIST datasets. We discuss to what extent the method treats the issues mentioned above.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib14",
+      "text": "Gühring et al. (2020) Gühring, I., Raslan, M., and Kutyniok, G. Expressivity of deep neural networks. arXiv preprint arXiv:2007.04759 , 2020."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib30",
+      "text": "Szegedy et al. (2013) Szegedy, C., Zaremba, W., Sutskever, I., Bruna, J., Erhan, D., Goodfellow, I., and Fergus, R. Intriguing properties of neural networks. arXiv preprint arXiv:1312.6199 , 2013."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib6",
+      "text": "Biggio et al. (2013) Biggio, B., Corona, I., Maiorca, D., Nelson, B., Šrndić, N., Laskov, P., Giacinto, G., and Roli, F. Evasion attacks against machine learning at test time. In Blockeel, H., Kersting, K., Nijssen, S., and Železný, F. (eds.), Machine Learning and Knowledge Discovery in Databases , pp. 387–402, Berlin, Heidelberg, 2013. Springer Berlin Heidelberg. ISBN 978-3-642-40994-3."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib11",
+      "text": "Eykholt et al. (2018) Eykholt, K., Evtimov, I., Fernandes, E., Li, B., Rahmati, A., Xiao, C., Prakash, A., Kohno, T., and Song, D. Robust physical-world attacks on deep learning visual classification. In Proceedings of the IEEE conference on computer vision and pattern recognition , pp. 1625–1634, 2018."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib7",
+      "text": "Carlini & Wagner (2017) Carlini, N. and Wagner, D. Adversarial examples are not easily detected: Bypassing ten detection methods. In Proceedings of the 10th ACM workshop on artificial intelligence and security , pp. 3–14, 2017."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib21",
+      "text": "Lecuyer et al. (2019) Lecuyer, M., Atlidakis, V., Geambasu, R., Hsu, D., and Jana, S. Certified robustness to adversarial examples with differential privacy. In 2019 IEEE Symposium on Security and Privacy (SP) , pp. 656–672. IEEE, 2019."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib22",
+      "text": "Li et al. (2019) Li, B., Chen, C., Wang, W., and Carin, L. Certified adversarial robustness with additive noise. Advances in Neural Information Processing Systems , 32:9464–9474, 2019."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib9",
+      "text": "Cohen et al. (2019) Cohen, J., Rosenfeld, E., and Kolter, Z. Certified adversarial robustness via randomized smoothing. In International Conference on Machine Learning , pp. 1310–1320. PMLR, 2019."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib25",
+      "text": "Mohapatra et al. (2020a) Mohapatra, J., Ko, C.-Y., Liu, S., Chen, P.-Y., Daniel, L., et al. Rethinking randomized smoothing for adversarial robustness. arXiv preprint arXiv:2003.01249 , 2020a."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib33",
+      "text": "Wang et al. (2021) Wang, L., Zhai, R., He, D., Wang, L., and Jian, L. Pretrain-to-finetune adversarial training via sample-wise randomized smoothing. 2021. URL https://openreview.net/forum?id=Te1aZ2myPIu ."
+    }
+  ]
+}

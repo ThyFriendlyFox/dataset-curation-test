@@ -1,0 +1,93 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.05325",
+  "title": "Fine-tuning a Multiple Instance Learning Feature Extractor with Masked Context Modelling and Knowledge Distillation",
+  "authors": "Juan I. Pisula, Katarzyna Bozek",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2403.05325",
+  "html_url": "https://arxiv.org/html/2403.05325",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 587,
+  "text": "In Digital Pathology, specimen slides are digitised into high resolution Whole Slide Images (WSIs) of several gigapixels. This has led to the popularisation of Multiple Instance Learning (MIL) [1,2] algorithms for automatic WSI classification tasks. In these algorithms, the typical pre-processing step involves tesselating the WSI into smaller image patches, or instances, and computing their feature vector representations using a pre-trained feature extractor neural network. To compute patch representations a popular choice is to use models pre-trained with supervision on ImageNet [3]. Following this step, a MIL model is trained to produce a slide-level prediction using the complete set of instances of the WSI.\n\nAs noted in [4], the common characteristic in image data is that neighboring pixels are highly correlated, and this fact extends to neighboring image patches in histology slides. A cutout of a Breast Carcinoma Hematoxylin and Eosin (HE) slide is shown in Fig. 1(a)), with a highlighted image patch of 220 \\mathrm{\\mu} m or 224 pixels side length at 10\\times magnification level (approximately 1 \\mathrm{\\mu} m/pixel), showing a cluster of cells. HE image patches of these dimensions can capture fine-grained histology features like individual cell nucleus morphology, cell conglomerates, and small functional structures such as glands and blood vessels. These patterns tend to extend for several patches, and coarse-grained features, such as distribution and density of cell populations, arrangement of functional structures, tissue interfaces, overall tissue morphology and architecture, are revealed when examining a broader context. In a MIL pipeline, although a pre-trained feature extractor model can produce useful instance-level representations, it is the downstream MIL classifier that should detect and make sense out of the histological patterns that take more image area than a single patch.\n\nIn this work we propose to improve downstream MIL classification by fine-tuning the feature extractor model, such that representations of neighboring patches are predictive of one another. Drawing inspiration from reconstruction-based algorithms in the Self-Supervised Learning (SSL) literature [5,6,7,8,9,10,11], we propose the Masked Context Modelling (MCM) task: individual image patches from a bigger context window are masked, and the feature extractor model is fine-tuned to predict the missing patches based on the visible ones.\n\nAs described above, the MCM task is challenging as there are multiple biologically plausible ways to fill the missing image patches in the masked context. Additionally, synthesizing such image patches would require an image generation model, such as a Variational Autoencoder [12], a Generative Adversarial Network [13], or a Diffusion Model [14,15]. This image generation task is secondary, as our goal is not to produce realistically looking image patches but to learn useful representations. We propose therefore to predict instead of images, the feature vectors of a larger, pre-trained, teacher network and using them as a proxy of the visual information of the masked images.\n\nThe contributions of this work can be summarised as follows:\n\n- • We introduce the Masked Context Modelling with Knowledge Distillation (MCM+KD) task to fine-tune the feature extractor model used in a MIL pipeline by using a larger pre-trained model as teacher.\n\n- • This task can be trained even for a single epoch, between the feature extractor pre-training stage and the final training of the MIL model, improving downstream performance in two Cancer Subtype Classification tasks and a Lymph Node Metastases Detection task.\n\n- • We show that the fine-tuned student does not learn to copy the teacher’s output. Furthermore, the student model can result in higher downstream performance than the teacher, while having fewer parameters and needing less computation to process input images (Fig. 1(b)).",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib12",
+      "text": "Dietterich, T.G., Lathrop, R.H., Lozano-Pérez, T.: Solving the multiple instance problem with axis-parallel rectangles. Artif. Intell. 89 (1-2), 31–71 (1997)"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib33",
+      "text": "Maron, O., Lozano-Pérez, T.: A framework for multiple-instance learning. In: Jordan, M.I., Kearns, M.J., Solla, S.A. (eds.) NeurIPS. pp. 570–576. The MIT Press (1997)"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib37",
+      "text": "Russakovsky, O., Deng, J., Su, H., Krause, J., Satheesh, S., Ma, S., Huang, Z., Karpathy, A., Khosla, A., Bernstein, M., et al.: Imagenet large scale visual recognition challenge. International journal of computer vision 115 , 211–252 (2015)"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib3",
+      "text": "Burt, P.J., Adelson, E.H.: The laplacian pyramid as a compact image code. In: Readings in computer vision, pp. 671–679. Elsevier (1987)"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib46",
+      "text": "Vincent, P., Larochelle, H., Bengio, Y., Manzagol, P.A.: Extracting and composing robust features with denoising autoencoders. In: Proceedings of the 25th international conference on Machine learning. pp. 1096–1103 (2008)"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib35",
+      "text": "Pathak, D., Krahenbuhl, P., Donahue, J., Darrell, T., Efros, A.A.: Context encoders: Feature learning by inpainting. In: Proceedings of the IEEE conference on computer vision and pattern recognition. pp. 2536–2544 (2016)"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib11",
+      "text": "Devlin, J., Chang, M.W., Lee, K., Toutanova, K.: Bert: Pre-training of deep bidirectional transformers for language understanding. arXiv preprint arXiv:1810.04805 (2018)"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib36",
+      "text": "Radford, A., Narasimhan, K., Salimans, T., Sutskever, I., et al.: Improving language understanding by generative pre-training (2018)"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib48",
+      "text": "Xie, Z., Zhang, Z., Cao, Y., Lin, Y., Bao, J., Yao, Z., Dai, Q., Hu, H.: Simmim: a simple framework for masked image modeling. In: IEEE/CVF Conference on Computer Vision and Pattern Recognition, CVPR 2022, New Orleans, LA, USA, June 18-24, 2022. pp. 9643–9653. IEEE (2022)"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib19",
+      "text": "He, K., Chen, X., Xie, S., Li, Y., Dollár, P., Girshick, R.B.: Masked autoencoders are scalable vision learners. In: IEEE/CVF Conference on Computer Vision and Pattern Recognition, CVPR 2022, New Orleans, LA, USA, June 18-24, 2022. pp. 15979–15988. IEEE (2022)"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib47",
+      "text": "Wang, W., Bao, H., Dong, L., Bjorck, J., Peng, Z., Liu, Q., Aggarwal, K., Mohammed, O.K., Singhal, S., Som, S., Wei, F.: Image as a foreign language: BEIT pretraining for vision and vision-language tasks. In: IEEE/CVF Conference on Computer Vision and Pattern Recognition, CVPR 2023, Vancouver, BC, Canada, June 17-24, 2023. pp. 19175–19186. IEEE (2023)"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib27",
+      "text": "Kingma, D.P., Welling, M.: Auto-encoding variational bayes. arXiv preprint arXiv:1312.6114 (2013)"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib15",
+      "text": "Goodfellow, I., Pouget-Abadie, J., Mirza, M., Xu, B., Warde-Farley, D., Ozair, S., Courville, A., Bengio, Y.: Generative adversarial networks. Communications of the ACM 63 (11), 139–144 (2020)"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib41",
+      "text": "Sohl-Dickstein, J., Weiss, E., Maheswaranathan, N., Ganguli, S.: Deep unsupervised learning using nonequilibrium thermodynamics. In: International conference on machine learning. pp. 2256–2265. PMLR (2015)"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib23",
+      "text": "Ho, J., Jain, A., Abbeel, P.: Denoising diffusion probabilistic models. Advances in neural information processing systems 33 , 6840–6851 (2020)"
+    }
+  ]
+}

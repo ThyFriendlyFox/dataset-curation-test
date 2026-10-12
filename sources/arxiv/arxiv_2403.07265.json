@@ -1,0 +1,163 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.07265",
+  "title": "Self-supervised Contrastive Learning for Implicit Collaborative Filtering",
+  "authors": "Shipeng Song, Bin Liu, Fei Teng, Tianrui Li",
+  "year": "2024",
+  "categories": [
+    "cs.IR"
+  ],
+  "url": "https://arxiv.org/abs/2403.07265",
+  "html_url": "https://arxiv.org/html/2403.07265",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 973,
+  "text": "In the rapidly evolving information age of the Internet, recommendation systems play a crucial role in various domains such as e-commerce, social media, and news reading. However, obtaining accurate user preference rating labels for supervised model training is both expensive and challenging, given the inherent characteristics of recommendation system scenarios. Currently, many state-of-the-art recommendation models leverage self-supervised learning (SSL) techniques [1,2,3,4,5] to design self-supervised tasks for (pre-)training the models to encode user-item feature representations, which are then used for predicting personalized ranking (downstream tasks). For instance, generative self-supervised tasks train recommendation models to reconstruct input data [6,7,8], while contrastive self-supervised tasks train models to encode differences between positive and negative samples [9,10,11,12,13]. These recommendation models trained with self-supervised tasks are also referred to as self-supervised recommendation (SSR) models, representing an important application area of self-supervised learning. SSR fully exploits the inherent relationships in the input data to extract self-supervised signals, which not only reduces the reliance on manually annotated datasets but also helps alleviate issues in traditional recommendation systems such as data sparsity, fake correlations, and adversarial attacks [1,5].\n\nRecommendation algorithms based on contrastive learning (CL) [14,15,16] are the primary form of implementation for self-supervised recommendation [5], significantly advancing the forefront of self-supervised recommendation and driving extensive attention [17,18,19,20]. Among them, the pioneering approach is Bayesian Personalized Ranking (BPR) [9], which draws inspiration from self-supervised learning techniques and automatically labels items as positive or negative based on the presence or absence of interactions. The designed BPR loss is, in fact, a special case of contrastive loss with a negative sample count of 1 and is also referred to as pairwise loss. On the one hand, by optimizing the contrastive loss, the distance between positive examples and anchor points is minimized while maximizing the distance between negative examples and anchor points, thereby optimizing mutual information [14]. On the other hand, optimizing the contrastive loss leads to improvements in ranking metrics such as Area Under the Curve (AUC) and Normalized Discounted Cumulative Gain (NDCG) [9,21]. As BPR is optimized specifically for ranking objectives, it gradually dominates the field of implicit collaborative filtering.\n\nAlthough these methods have demonstrated remarkable generalization capabilities within self-supervised setting, there is a significant gap compared to contrastive recommendation algorithms in a supervised setting [5,22]: the positive and negative sample labels used for preference comparison are \"pseudo-labels\" rather than true preference labels of \"liking\" or \"disliking\". In the context of recommendation systems, the semantics of positive examples are \"liked items,\" while negative examples represent \"disliked items.\" However, users typically express their preferences or interests only through interaction behaviors such as clicks or purchases. On the one hand, these interaction behaviors often lack explicit ratings. Interactions that do not reflect preferences, such as proxy purchases, accidental clicks, or mere views, cannot be distinguished from normal interactions and are all labeled as positive examples [23]. On the other hand, as users only provide positive feedback, it is impossible to observe which items they dislike. Thus, all items that users have not seen are labeled as negative examples, but they are actually unlabeled data [24,25]. Therefore, the datasets used for training recommendation systems often exist in a positive-unlabeled (PU) form, where positive examples are also contaminated with noise. Self-supervised contrastive learning methods, represented by BPR, automatically label interaction data as positive or negative based on the presence or absence of observations, which leads to the issue of pseudo-positive and pseudo-negative examples, adversely affecting the learning of accurate user-item feature representations.\n\nTo address the issue of pseudo-positive examples, previous research has primarily focused on optimizing strategies, with an emphasis on exploring the dynamics of the optimization process to tackle label noise learning problems. The core insight is that neural networks tend to first fit clean data and then fit noisy data [26]. Building upon this finding, DenoiseRec [23] pioneered the introduction of the small loss trick in recommendation systems. The core idea is that samples with higher loss values are more likely to be noise, and a dynamic threshold function is used to truncate the loss values. Empirical observations based on optimizing strategies are primarily focused on losses constructed from individual samples, and it remains uncertain whether they still hold for losses constructed from paired samples, as difficult-to-fit pairs often contribute more to performance improvement in recommendations [27].\n\nRegarding the issue of pseudo-negative examples, previous research has primarily focused on designing negative sampling algorithms based on side information such as social relationships and gender, as well as model information such as scores and ranking positions, to sample negative examples from unlabeled data. Existing negative sampling algorithms can be classified into static negative sampling [9] and dynamic negative sampling [27,28,24,12,25,29], depending on whether the sampling distribution changes with the model’s state. Static negative sampling algorithms adopt fixed sampling distributions, such as uniform sampling or sampling based on item popularity. On the other hand, dynamic negative sampling algorithms adjust the sampling distribution continuously during model training to sample negative examples that are more similar to positive examples in the embedding space, i.e., hard negative samples that are difficult to distinguish. For example, samples with higher scores or higher rankings can be sampled. However, static negative sampling algorithms heavily rely on side information as supervision signals, while dynamic negative sampling introduces higher computational costs and is prone to sampling pseudo-negative examples [29].\n\nBuilding upon the work of BPR, this study proposes a simple and easily implementable self-supervised contrastive learning framework for implicit collaborative filtering. By considering both positive instance feature augmentation and negative instance label enrichment, it comprehensively addresses the issues of pseudo-positive and pseudo-negative examples, aiming to obtain more informative self-supervised signals and learn more accurate user-item feature representations. The proposed method is straightforward and practical, achieving significant improvements in top-k ranking accuracy on four publicly available datasets while maintaining a strict linear time complexity relative to BPR.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib23",
+      "text": "Liu et al . (2021b) Xiao Liu, Fanjin Zhang, Zhenyu Hou, Li Mian, Zhaoyu Wang, Jing Zhang, and Jie Tang. 2021b. Self-supervised learning: Generative or contrastive. IEEE Transactions on Knowledge and Data Engineering (2021)."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib5",
+      "text": "Chen et al . (2020) Ting Chen, Simon Kornblith, Kevin Swersky, Mohammad Norouzi, and Geoffrey E Hinton. 2020. Big self-supervised models are strong semi-supervised learners. Proceedings of the International Conference on Neural Information Processing Systems 33 (2020), 22243–22255."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib13",
+      "text": "Grill et al . (2020) Jean-Bastien Grill, Florian Strub, Florent Altché, Corentin Tallec, Pierre H. Richemond, Elena Buchatskaya, Carl Doersch, Bernardo Avila Pires, Zhaohan Daniel Guo, Mohammad Gheshlaghi Azar, Bilal Piot, Koray Kavukcuoglu, Rémi Munos, and Michal Valko. 2020. Bootstrap Your Own Latent a New Approach to Self-Supervised Learning. In Proceedings of the 34th International Conference on Neural Information Processing Systems . 21271–21284."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib39",
+      "text": "Wu et al . (2023) Lirong Wu, Haitao Lin, Cheng Tan, Zhangyang Gao, and Stan Z. Li. 2023. Self-Supervised Learning on Graphs: Contrastive, Generative, or Predictive. IEEE Transactions on Knowledge and Data Engineering 35, 4 (2023), 4216–4235."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib45",
+      "text": "Yu et al . (2023b) Junliang Yu, Hongzhi Yin, Xin Xia, Tong Chen, Jundong Li, and Zi Huang. 2023b. Self-Supervised Learning for Recommender Systems: A Survey. IEEE Transactions on Knowledge and Data Engineering (2023), 1–20."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib31",
+      "text": "Sun et al . (2019) Fei Sun, Jun Liu, Jian Wu, Changhua Pei, Xiao Lin, Wenwu Ou, and Peng Jiang. 2019. BERT4Rec: Sequential recommendation with bidirectional encoder representations from transformer. In Proceedings of the 28th ACM international conference on information and knowledge management . 1441–1450."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib12",
+      "text": "Geng et al . (2022) Shijie Geng, Shuchang Liu, Zuohui Fu, Yingqiang Ge, and Yongfeng Zhang. 2022. Recommendation as language processing (rlp): A unified pretrain, personalized prompt & predict paradigm (p5). In Proceedings of the 16th ACM Conference on Recommender Systems . 299–315."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib48",
+      "text": "Zhang and Wang (2023) Zizhuo Zhang and Bang Wang. 2023. Prompt Learning for News Recommendation. In Proceedings of the 46th International ACM SIGIR Conference on Research and Development in Information Retrieval . 227–237."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib29",
+      "text": "Rendle et al . (2009) Steffen Rendle, Christoph Freudenthaler, Zeno Gantner, and Lars Schmidt-Thieme. 2009. BPR: Bayesian Personalized Ranking from Implicit Feedback. In UAI 2009, Proceedings of the Twenty-Fifth Conference on Uncertainty in Artificial Intelligence, Montreal, QC, Canada, June 18-21, 2009 . 452–461."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib41",
+      "text": "Xiangnan et al . (2020) He Xiangnan, Deng Kuan, Wang Xiang, Li Yan, Zhang Yongdong, and Wang Meng. 2020. LightGCN: Simplifying and Powering Graph Convolution Network for Recommendation.. In Proceedings of the International ACM SIGIR Conference on Research and Development in Information Retrieval . 10."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib35",
+      "text": "Wang et al . (2019) Xiang Wang, Xiangnan He, Meng Wang, Fuli Feng, and Tat Seng Chua. 2019. Neural Graph Collaborative Filtering. In Proceedings of the International ACM SIGIR Conference on Research and Development in Information Retrieval . 2344–2353."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib9",
+      "text": "Ding et al . (2019) Jingtao Ding, Yuhan Quan, Xiangnan He, Yong Li, and Depeng Jin. 2019. Reinforced Negative Sampling for Recommendation with Exposure Data. In Proceedings of the Twenty-Eighth International Joint Conference on Artificial Intelligence . 2230–2236."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib4",
+      "text": "Cai et al . (2023) Xuheng Cai, Chao Huang, Lianghao Xia, and Xubin Ren. 2023. LightGCL: Simple Yet Effective Graph Contrastive Learning for Recommendation. International Conference on Learning Representations (2023)."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib26",
+      "text": "Oord et al . (2018) Aaron van den Oord, Yazhe Li, and Orio Vinyals. 2018. Representation learning with contrastive predictive coding. arXiv preprint arXiv:1807.03748 (2018)."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib14",
+      "text": "Gutmann and Hyvärinen (2010) Michael Gutmann and Aapo Hyvärinen. 2010. Noise-contrastive estimation: A new estimation principle for unnormalized statistical models. In Proceedings of the thirteenth international conference on artificial intelligence and statistics . 297–304."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib33",
+      "text": "Wang and Isola (2020) Tongzhou Wang and Phillip Isola. 2020. Understanding contrastive representation learning through alignment and uniformity on the hypersphere. In International Conference on Machine Learning . 9929–9939."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib24",
+      "text": "Liu et al . (2021a) Zhuang Liu, Yunpu Ma, Yuanxin Ouyang, and Zhang Xiong. 2021a. Contrastive learning for recommender system. arXiv preprint arXiv:2101.01317 (2021)."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib42",
+      "text": "Yang et al . (2022) Yuhao Yang, Chao Huang, Lianghao Xia, and Chenliang Li. 2022. Knowledge Graph Contrastive Learning for Recommendation. In Proceedings of the 45th International ACM SIGIR Conference on Research and Development in Information Retrieval . 1434–1443."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib27",
+      "text": "Qiu et al . (2022) Ruihong Qiu, Zi Huang, Hongzhi Yin, and Zijian Wang. 2022. Contrastive learning for representation degeneration problem in sequential recommendation. In Proceedings of the fifteenth ACM international conference on web search and data mining . 813–823."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib44",
+      "text": "Yu et al . (2023a) Junliang Yu, Xin Xia, Tong Chen, Lizhen Cui, Nguyen Quoc Viet Hung, and Hongzhi Yin. 2023a. XSimGCL: Towards extremely simple graph contrastive learning for recommendation. IEEE Transactions on Knowledge and Data Engineering (2023)."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib38",
+      "text": "Wu et al . (2022) Jiancan Wu, Xiang Wang, Xingyu Gao, Jiawei Chen, Hongcheng Fu, and Tianyu Qiu andXiangnan He. 2022. On the Effectiveness of Sampled Softmax Loss for Item Recommendation. arXiv preprint arXiv:2201.02327 (2022)."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib7",
+      "text": "Chuang et al . (2020) Ching-Yao Chuang, Joshua Robinson, Yen-Chen Lin, Antonio Torralba, and Stefanie Jegelka. 2020. Debiased Contrastive Learning. In Proceedings of the International Conference on Neural Information Processing Systems . 8765–8775."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib34",
+      "text": "Wang et al . (2021) Wenjie Wang, Fuli Feng, Xiangnan He, Liqiang Nie, and Tat-Seng Chua. 2021. Denoising implicit feedback for recommendation. In Proceedings of the 14th ACM international conference on web search and data mining . 373–381."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib47",
+      "text": "Zhang et al . (2013) Weinan Zhang, Tianqi Chen, Jun Wang, and Yong Yu. 2013. Optimizing Top-n Collaborative Filtering via Dynamic Negative Item Sampling. In Proceedings of the 36th International ACM SIGIR Conference on Research and Development in Information Retrieval . 785–788."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib43",
+      "text": "Yang et al . (2020) Zhen Yang, Ming Ding, Chang Zhou, Hongxia Yang, Jingren Zhou, and Jie Tang. 2020. Understanding negative sampling in graph representation learning. In Proceedings of the 26th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining . 1666–1676."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib46",
+      "text": "Zhang et al . (2021) Chiyuan Zhang, Samy Bengio, Moritz Hardt, Benjamin Recht, and Oriol Vinyals. 2021. Understanding deep learning (still) requires rethinking generalization. Commun. ACM 64, 3 (2021), 107–115."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib28",
+      "text": "Rendle and Freudenthaler (2014) Steffen Rendle and Christoph Freudenthaler. 2014. Improving pairwise learning for item recommendation from implicit feedback. In Proceedings of the 7th ACM international conference on Web Search and Data Mining . 273–282."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib10",
+      "text": "Ding et al . (2020) Jingtao Ding, Yuhan Quan, Quanming Yao, Yong Li, and Depeng Jin. 2020. Simplify and Robustify Negative Sampling for Implicit Collaborative Filtering. In Proceedings of the International Conference on Neural Information Processing Systems ."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib22",
+      "text": "Liu and Wang (2023) Bin Liu and Bang Wang. 2023. Bayesian Negative Sampling for Recommendation. In 2023 IEEE 39th International Conference on Data Engineering (ICDE) . IEEE, 749–761."
+    }
+  ]
+}

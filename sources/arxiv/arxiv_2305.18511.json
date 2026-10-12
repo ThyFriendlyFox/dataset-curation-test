@@ -1,0 +1,189 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2305.18511",
+  "title": "Contextual Bandits with Budgeted Information Reveal",
+  "authors": "Kyra Gan, Esmaeil Keyvanshokooh, Xueqing Liu, Susan Murphy",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "math.OC"
+  ],
+  "url": "https://arxiv.org/abs/2305.18511",
+  "html_url": "https://arxiv.org/html/2305.18511",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "INTRODUCTION",
+  "word_count": 1093,
+  "text": "In digital health, to ensure the effectiveness of treatments, patients are often requested to take actions that have no immediate benefit to them. We refer to these actions as pro-treatment actions. For instance, in personalized addiction treatment, the effectiveness of the treatment may be compromised if patients fail to complete self-reports [1]. Another scenario arises when utilizing commercial sensors or when there is a need to aggregate data across multiple patients. In this case, data collected from the sensor can exclusively be accessed via cloud servers, implying that the data-collecting device, such as wearables and electronic toothbrush, may only be able to communicate with the intervention-delivery device, such as smartphones, through the cloud. To ensure the proper delivery of personalized treatments, patients may need to open a dedicated app on their smartphones, enabling the app to retrieve the latest treatment recommendations from the cloud [2]. When patients neglect pro-treatment actions, clinicians may resort to limited, costly nudges, such as clinician follow-ups to encourage compliance.\n\nWe are interested in answering the following question: given a limited budget for expensive nudges for use when patients fail to take pro-treatment actions, when should these nudges be used? To answer this question, we reformulate the problem by introducing two agents. The first agent functions as a recommender, specifically, a learning agent that uses all the revealed patient information up to the current time to recommend the treatment action for the subsequent time step. The second agent, a revealer, possesses current (or some surrogate of current) and past patient data, often collected by sensors, and determines whether to reveal this information to the recommender, enabling the learning of personalized treatment.\n\nIn the commercial sensor example, the recommendations (smart phone notifications) are often made by a cloud-based reinforcement learning (RL) algorithm. Although the RL algorithm observes all the information up to the current time, these up-to-date recommendations remain hidden to the patient unless they open a dedicated app on their phone (i.e., taking a pro-treatment action). The clinician serves as the revealer, prompting the patient to open the app as a means of revealing information (as depicted in Figure 1, assuming the patient never opens the app on their own). At decision points, the clinician assesses all sensor data and decides whether to contact the patient. If the clinician contacts the patient and the patient opens the mobile application, they receives the most recent recommended notification. Without such actions, the patient receives an “outdated” recommendation based on the information up to the last reveal. Therefore, equivalently, in this problem, the recommender only has access to the history up to the last reveal. However, upon opening the app, the recommender gains access to the entire sensor data history.\n\n## Our Contributions\n\nIn this work, we provide an algorithm for deciding the “optimal” timing for the revealer to take action when the number of actions that it can take is limited. We focus on the special case where the recommender acts 1) as a linear contextual bandit algorithm when the revealer opts to reveal information and 2) as a multi-armed bandit (MAB) algorithm when no additional information is revealed to the recommender (due to the missing context). We show that our problem can be decomposed into two parts: 1) an online primal-dual optimization algorithm addressing the decision of the revealer, and 2) a contextual bandit learning algorithm with delayed feedback modeling the decision of the recommender.\n\nIn the online primal-dual algorithm, we introduce a novel learning constraint and prove that the value of the objective function of our proposed algorithm, Algorithm 1, is at least \\pi_{\\min}(1-1/c) times that of an offline clairvoyant benchmark, where \\pi_{\\min} is a problem dependent constant and 1-1/c is budget dependent constant that approaches 1-1/e as the budget grows. Furthermore, by introducing the novel learning constraint in the primal-dual algorithm, we are able to separate out the effect of delayed feedback in the bandit learning loss (defined in § 2), removing the dependency of the delayed feedback effect on the context dimension. By combining these two parts, we provide the first UCB-based algorithm (Algorithm 2) that achieves a sublinear regret under suitable choice of parameters.\n\n## Related Work\n\nOur work is related to three streams of literature: (i) online optimization algorithms, (ii) contextual bandits under resource constraints, and (iii) contextual bandits with delayed feedback. Studies in (i) typically focus on two arrival settings: stochastic and adversarial. In the stochastic setting, online algorithms either rely on the forecasted arrival pattern using historical data or assume a stochastic arrival pattern [3,4,5,6,7,8,9], while in the adversarial setting, algorithms are robust to possible changes in the arrival pattern [10,11,12,13,14,15,16]. The online primal-dual mechanism is one class of algorithms that leverages the dual program to guide the decisions of the online algorithm [17,13]. In our work, we introduce a new class of online primal-dual mechanisms with a learning component and incorporate it as an online allocation sub-routine in our proposed framework. We evaluate its performance using a competitive ratio, which compares its performance to that of a clairvoyant policy on the worst-case input instance.\n\nStudies in (ii) usually assume that each action consumes a certain amount of resources. Under such resource constraints, previous works have proposed online algorithms for standard MAB [18,19,20], contextual bandit, and other RL methods [21,22,23,24,25,26]. In contrast, in our algorithm, the recommender is required to take an action at each time step regardless of whether it observes the current context. A few works formulate contextual bandit with resource constraints by integrating Thompson sampling (bandit) algorithms with online optimization algorithms [27,14]. In comparison, our work provide the first analysis for UCB-based bandit algorithms, and we incorporate a learning component into the online allocation mechanisms while learning only happens in the bandit part of their algorithms. This additional level of learning helps our algorithms achieve a better performance.\n\nStudies in (iii) include both delayed feedback in MAB [28,29,30] and contextual bandit [31,32,33], where the delay patterns mostly fall into bounded delays or stochastic delays. However, in our problem, the delayed patterns are structured: unless the revealer takes an action, the recommender received no additional information. While applying algorithms from (iii) in our problem setting is feasible, our algorithm offers a significantly stronger theoretical guarantee. The order of our regret bound is tight (optimal) up to a logarithmic factor [34]. Also, the delayed feedback only impacts our regret bound by an additive factor of \\sum_{t=1}^{T}\\beta_{t}, which is of order \\mathcal{O}(\\sqrt{T}). Therefore, unlike [31] and [32], our theoretical result removes the dependency of the delayed feedback effect on the context dimension d.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib11",
+      "text": "Carpenter et al. [2020] Stephanie M Carpenter, Marianne Menictas, Inbal Nahum-Shani, David W Wetter, and Susan A Murphy. Developments in mobile health just-in-time adaptive interventions for addiction science. Current addiction reports , 7:280–290, 2020."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib32",
+      "text": "Trella et al. [2022] Anna L Trella, Kelly W Zhang, Inbal Nahum-Shani, Vivek Shetty, Finale Doshi-Velez, and Susan A Murphy. Designing reinforcement learning algorithms for digital interventions: pre-implementation guidelines. Algorithms , 15(8):255, 2022."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib18",
+      "text": "Goel and Mehta [2008] Gagan Goel and Aranyak Mehta. Online budgeted matching in random input models with applications to adwords. In SODA , volume 8, pages 982–991, 2008."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib21",
+      "text": "Karande et al. [2011] Chinmay Karande, Aranyak Mehta, and Pushkar Tripathi. Online bipartite matching with unknown distributions. In Proceedings of the forty-third annual ACM symposium on Theory of computing , pages 587–596, 2011."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib26",
+      "text": "Mahdian and Yan [2011] Mohammad Mahdian and Qiqi Yan. Online bipartite matching with random arrivals: an approach based on strongly factor-revealing lps. In Proceedings of the forty-third annual ACM symposium on Theory of computing , pages 597–606, 2011."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib36",
+      "text": "Zhalechian et al. [2023] Mohammad Zhalechian, Esmaeil Keyvanshokooh, Cong Shi, and Mark P Van Oyen. Data-driven hospital admission control: A learning approach. Operations Research , 71(6):2111–2129, 2023."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib16",
+      "text": "Feldman et al. [2009] Jon Feldman, Aranyak Mehta, Vahab Mirrokni, and Shan Muthukrishnan. Online stochastic matching: Beating 1-1/e. In 2009 50th Annual IEEE Symposium on Foundations of Computer Science , pages 117–126. IEEE, 2009."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib19",
+      "text": "Jaillet and Lu [2014] Patrick Jaillet and Xin Lu. Online stochastic matching: New algorithms with better bounds. Mathematics of Operations Research , 39(3):624–646, 2014."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib15",
+      "text": "Devanur et al. [2019] Nikhil R Devanur, Kamal Jain, Balasubramanian Sivan, and Christopher A Wilkens. Near optimal online algorithms and fast approximation algorithms for resource allocation problems. Journal of the ACM (JACM) , 66(1):1–41, 2019."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib28",
+      "text": "Mehta et al. [2007] Aranyak Mehta, Amin Saberi, Umesh Vazirani, and Vijay Vazirani. Adwords and generalized online matching. Journal of the ACM (JACM) , 54(5):22–es, 2007."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib8",
+      "text": "Buchbinder et al. [2007] Niv Buchbinder, Kamal Jain, and Joseph Naor. Online primal-dual algorithms for maximizing ad-auctions revenue. In Algorithms–ESA 2007: 15th Annual European Symposium, Eilat, Israel, October 8-10, 2007. Proceedings 15 , pages 253–264. Springer, 2007."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib1",
+      "text": "Aggarwal et al. [2011] Gagan Aggarwal, Gagan Goel, Chinmay Karande, and Aranyak Mehta. Online vertex-weighted bipartite matching and single-bid budgeted allocations. In Proceedings of the twenty-second annual ACM-SIAM symposium on Discrete Algorithms , pages 1253–1264. SIAM, 2011."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib22",
+      "text": "Keyvanshokooh et al. [2021] Esmaeil Keyvanshokooh, Cong Shi, and Mark P Van Oyen. Online advance scheduling with overtime: A primal-dual approach. Manufacturing & Service Operations Management , 23(1):246–266, 2021."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib35",
+      "text": "Zhalechian et al. [2022] Mohammad Zhalechian, Esmaeil Keyvanshokooh, Cong Shi, and Mark P Van Oyen. Online resource allocation with personalized learning. Operations Research , 70(4):2138–2161, 2022."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib14",
+      "text": "Devanur and Jain [2012] Nikhil R Devanur and Kamal Jain. Online matching with concave returns. In Proceedings of the forty-fourth annual ACM symposium on Theory of computing , pages 137–144, 2012."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib25",
+      "text": "Liu et al. [2024] Xueqing Liu, Kyra Gan, Esmaeil Keyvanshokooh, and Susan Murphy. Online uniform risk times sampling: First approximation algorithms, learning augmentation with full confidence interval integration. arXiv preprint arXiv:2402.01995 , 2024."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib9",
+      "text": "Buchbinder et al. [2009] Niv Buchbinder, Joseph Seffi Naor, et al. The design of competitive online algorithms via a primal–dual approach. Foundations and Trends® in Theoretical Computer Science , 3(2–3):93–263, 2009."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib3",
+      "text": "Agrawal and Devanur [2014] Shipra Agrawal and Nikhil R Devanur. Bandits with concave rewards and convex knapsacks. In Proceedings of the fifteenth ACM conference on Economics and computation , pages 989–1006, 2014."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib6",
+      "text": "Badanidiyuru et al. [2018] Ashwinkumar Badanidiyuru, Robert Kleinberg, and Aleksandrs Slivkins. Bandits with knapsacks. Journal of the ACM (JACM) , 65(3):1–55, 2018."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib17",
+      "text": "Ferreira et al. [2018] Kris Johnson Ferreira, David Simchi-Levi, and He Wang. Online network revenue management using thompson sampling. Operations research , 66(6):1586–1602, 2018."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib5",
+      "text": "Badanidiyuru et al. [2014] Ashwinkumar Badanidiyuru, John Langford, and Aleksandrs Slivkins. Resourceful contextual bandits. In Conference on Learning Theory , pages 1109–1134. PMLR, 2014."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib4",
+      "text": "Agrawal et al. [2016] Shipra Agrawal, Nikhil R Devanur, and Lihong Li. An efficient algorithm for contextual bandits with knapsacks, and an extension to concave objectives. In Conference on Learning Theory , pages 4–18. PMLR, 2016."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib2",
+      "text": "Agrawal and Devanur [2016] Shipra Agrawal and Nikhil Devanur. Linear contextual bandits with knapsacks. Advances in Neural Information Processing Systems , 29, 2016."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib34",
+      "text": "Wu et al. [2015] Huasen Wu, Rayadurgam Srikant, Xin Liu, and Chong Jiang. Algorithms with logarithmic or sublinear regret for constrained contextual bandits. Advances in Neural Information Processing Systems , 28, 2015."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib29",
+      "text": "Pacchiano et al. [2021] Aldo Pacchiano, Mohammad Ghavamzadeh, Peter Bartlett, and Heinrich Jiang. Stochastic bandits with linear constraints. In International conference on artificial intelligence and statistics , pages 2827–2835. PMLR, 2021."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib10",
+      "text": "Cao et al. [2023] Junyu Cao, Esmaeil Keyvanshokooh, and Tian Liu. Safe reinforcement learning with contextual information: Theory and application. Available at SSRN 4583667 , 2023."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib12",
+      "text": "Cheung et al. [2022] Wang Chi Cheung, Will Ma, David Simchi-Levi, and Xinshang Wang. Inventory balancing with online learning. Management Science , 68(3):1776–1807, 2022."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib20",
+      "text": "Joulani et al. [2013] Pooria Joulani, Andras Gyorgy, and Csaba Szepesvári. Online learning under delayed feedback. In International Conference on Machine Learning , pages 1453–1461. PMLR, 2013."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib7",
+      "text": "Bistritz et al. [2019] Ilai Bistritz, Zhengyuan Zhou, Xi Chen, Nicholas Bambos, and Jose Blanchet. Online exp3 learning in adversarial bandits with delayed feedback. Advances in neural information processing systems , 32, 2019."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib30",
+      "text": "Pike-Burke et al. [2018] Ciara Pike-Burke, Shipra Agrawal, Csaba Szepesvari, and Steffen Grunewalder. Bandits with delayed, aggregated anonymous feedback. In International Conference on Machine Learning , pages 4105–4113. PMLR, 2018."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib37",
+      "text": "Zhou et al. [2019] Zhengyuan Zhou, Renyuan Xu, and Jose Blanchet. Learning in generalized linear contextual bandits with stochastic delays. Advances in Neural Information Processing Systems , 32, 2019."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib33",
+      "text": "Vernade et al. [2020] Claire Vernade, Alexandra Carpentier, Tor Lattimore, Giovanni Zappella, Beyza Ermis, and Michael Brueckner. Linear bandits with stochastic delayed feedback. In International Conference on Machine Learning , pages 9712–9721. PMLR, 2020."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib23",
+      "text": "Keyvanshokooh et al. [2024] Esmaeil Keyvanshokooh, Mohammad Zhalechian, Cong Shi, Mark P Van Oyen, and Pooyan Kazemian. Contextual learning with online convex optimization: Theory and application to medical decision-making. Forthcoming in Management Science , 2024."
+    },
+    {
+      "n": 34,
+      "id": "bib.bib13",
+      "text": "Chu et al. [2011] Wei Chu, Lihong Li, Lev Reyzin, and Robert Schapire. Contextual bandits with linear payoff functions. In Proceedings of the Fourteenth International Conference on Artificial Intelligence and Statistics , pages 208–214. JMLR Workshop and Conference Proceedings, 2011."
+    }
+  ]
+}

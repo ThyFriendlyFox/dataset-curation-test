@@ -1,0 +1,197 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2310.10486",
+  "title": "ManyQuadrupeds: Learning a Single Locomotion Policy for Diverse Quadruped Robots",
+  "authors": "Milad Shafiee, Guillaume Bellegarda, Auke Ijspeert",
+  "year": "2024",
+  "categories": [
+    "cs.RO",
+    "cs.AI",
+    "cs.LG",
+    "cs.SY",
+    "eess.SY"
+  ],
+  "url": "https://arxiv.org/abs/2310.10486",
+  "html_url": "https://arxiv.org/html/2310.10486",
+  "license": "http://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Introduction and Related Work",
+  "word_count": 951,
+  "text": "The oldest group of vertebrates which have appendages (i.e. fins or legs) are the elasmobranchs (sharks and rays). These vertebrates have followed a separate evolutionary path from mammals for over 420 million years. However, neural circuits controlling elasmobranch fins and mammalian limbs have exhibited remarkable similarities at the molecular, cellular, and behavioral levels [1]. This suggests that the neural substrate responsible for limb control was already present over 420 million years ago, and that the motor control scheme of tetrapods is preserved across various vertebrate species, each with their own unique size, inertia, and morphology [2]. In contrast, in robotics, it is common practice to design and train a new control policy for each new specific robot. In this paper, we demonstrate how employing a biology-inspired motor-control scheme can streamline the training process, enabling the development of a single control policy applicable to quadruped robots with diverse sizes, inertias, morphologies, and degrees of freedom (DoF).\n\n## I-A Central Pattern Generators\n\nQuadruped animal motor control can be described as an intricate interplay between the Central Pattern Generator (CPG, a system of coupled neural oscillators), sensory feedback, and supraspinal drive signals from the brain. In robotics, abstract models of CPGs are commonly used for locomotion pattern generation [3,4,5,6], as well as to investigate biological hypotheses about animal motor control [7,8]. Besides the intrinsic oscillatory behavior of CPGs, several other properties such as robustness and implementation simplicity make CPGs desirable for locomotion control [9].\n\n## I-B Learning Locomotion\n\nDeep Reinforcement Learning (DRL) has emerged as a powerful approach for training robust legged locomotion control policies in simulation, and deploying these sim-to-real on hardware [10,11,12,13,14,15,16,17,18,19,20,21,22,23]. Most of these works view the trained artificial neural network (ANN) as a “brain” which has full authority to directly control the joint movements. These methods involve training custom policies from the ground up for each new quadruped’s unique morphology. As a step towards generalization, Chiappa et al. [24] proposed an attention-based policy network architecture designed to train a policy capable of adapting to variations in body parameters. Recent research aims to eliminate the need for policy retraining by investigating the potential of graph learning [25,26,27,28]. In these approaches, the agent’s morphology is typically considered as a graph, with the graph’s structure mirroring the agent’s physical body. Most of these methods utilize agent-agnostic reinforcement learning combined with transfer learning techniques. While such methods based on graph learning exhibit promise in simulating toy examples, they have yet to be validated in real-world robotic systems [25,26,27]. Additionally, the gaits generated in these simulations often lack a natural sense of locomotion, which could make the transition from simulation to the real world challenging.\n\nFeng et al. [29] introduced a unified policy training approach for learning locomotion through animal motion imitation for a diverse set of quadrupeds, encompassing a range of sizes and masses, yet sharing identical DoFs. This method demonstrated successful simulation-to-reality transfer capabilities; however, it requires a two-week training period on a 16-core CPU, and is limited to robots with the same number of DoFs per leg.\n\n## I-C Contribution\n\nIn this paper, we employ a biology-inspired learning framework to learn a single locomotion policy able to control a diverse range of quadrupeds, encompassing significant variations in size, mass, morphology, and DoFs. Our proposed framework seamlessly integrates Central Pattern Generators and Deep Reinforcement Learning [30,31,32,33], where we use a simple Multi-Layer Perceptron (MLP) to represent higher control centers. This control center orchestrates the precise modulation of the CPG within the spinal cord and adeptly maps the rhythm generation network onto a pattern formation layer. We list below the advantages of the proposed architecture:\n\nGenerality and Versatility: The pattern formation layer, which shapes the feet trajectories in task-space, allows us to train a single locomotion policy for different robots with only a few parameter adjustments specific to each robot. Therefore, the action space does not rely on the number of joints or morphology, and we do not need to include joint information in the observation either. This leads to a constant size for both the action and observation spaces for all four-limb robots, which facilitates training robots with varying morphologies and DoFs with a simple MLP architecture. Mapping feet trajectories to joint positions is accomplished through inverse kinematics (IK). Solving the IK problem for legged robots, which fall under the category of serial manipulators, is a well-established research area. Numerous numerical and analytical methods are readily available for efficiently solving the IK problem for various types of serial limbs, each with different DoFs. By entrusting the task of handling morphology to IK, in contrast to the current state-of-the-art in learning quadrupedal locomotion for various robots [29], our method accommodates diverse morphologies and varying DoFs. Furthermore, we tested the generalization of the framework by excluding three robots with extreme mass and size properties across three different morphologies from the training process, but not for the testing phase. During these tests, we observed a stable gait for the previously unseen robots, even though the policy had not been specifically trained for them.\n\nComputational Efficiency: Additionally, our approach does not necessitate extensive dynamics randomization or motion imitation [29], and it relies on a simple MLP architecture. This architectural simplicity, in addition to training robot policies in parallel on a single GPU in Isaac Gym [34], results in high computational efficiency, enabling us to train a single policy for 16 diverse robots in less than two hours.\n\nRobustness: Furthermore, we achieve stable trotting in sim-to-real quadruped experiments, even with an additional load of 15.0 \\mathrm{k}\\mathrm{g}, equivalent to 125\\% of the A1 robot’s nominal mass. To the best of our knowledge, this accomplishment represents the pinnacle of robustness against additional loads ever achieved on the A1 robot [17,35,30].",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "S. Grillner and A. El Manira, “Current principles of motor control, with special reference to vertebrate locomotion,” Physiological reviews , vol. 100, no. 1, pp. 271–320, 2020."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "S. Grillner, “Evolution: vertebrate limb control over 420 million years,” Current Biology , vol. 28, no. 4, pp. R162–R164, 2018."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "M. Ajallooeian, S. Pouya, A. Sproewitz, and A. J. Ijspeert, “Central pattern generators augmented with virtual model control for quadruped rough terrain locomotion,” in 2013 IEEE International Conference on Robotics and Automation , 2013, pp. 3321–3328."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "S. Aoi, P. Manoonpong, Y. Ambe, F. Matsuno, and F. Wörgötter, “Adaptive control strategies for interlimb coordination in legged robots: a review,” Frontiers in neurorobotics , vol. 11, p. 39, 2017."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "H. Kimura, Y. Fukuoka, and A. H. Cohen, “Adaptive dynamic walking of a quadruped robot on natural ground based on biological concepts,” The International Journal of Robotics Research , vol. 26, no. 5, pp. 475–490, 2007."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "G. Bellegarda, M. Shafiee, M. E. Özberk, and A. Ijspeert, “Quadruped-Frog: Rapid online optimization of continuous quadruped jumping,” in 2024 IEEE International Conference on Robotics and Automation (ICRA) , 2024."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "A. J. Ijspeert, A. Crespi, D. Ryczko, and J.-M. Cabelguen, “From swimming to walking with a salamander robot driven by a spinal cord model,” Science , vol. 315, no. 5817, pp. 1416–1420, 2007."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "R. Thandiackal, K. Melo, L. Paez, J. Herault, T. Kano, K. Akiyama, F. Boyer, D. Ryczko, A. Ishiguro, and A. J. Ijspeert, “Emergence of robust self-organized undulatory swimming based on local hydrodynamic force sensing,” Science Robotics , vol. 6, no. 57, 2021."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "A. J. Ijspeert, “Central pattern generators for locomotion control in animals and robots: A review,” Neural Networks , vol. 21, no. 4, pp. 642–653, 2008, robotics and Neuroscience."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "X. B. Peng, P. Abbeel, S. Levine, and M. van de Panne, “Deepmimic: Example-guided deep reinforcement learning of physics-based character skills,” ACM Transactions on Graphics (TOG) , vol. 37, no. 4, pp. 1–14, 2018."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "A. Iscen, K. Caluwaerts, J. Tan, T. Zhang, E. Coumans, V. Sindhwani, and V. Vanhoucke, “Policies modulating trajectory generators,” in Conference on Robot Learning . PMLR, 2018, pp. 916–926."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "J. Hwangbo, J. Lee, A. Dosovitskiy, D. Bellicoso, V. Tsounis, V. Koltun, and M. Hutter, “Learning agile and dynamic motor skills for legged robots,” Science Robotics , vol. 4, no. 26, 2019."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "J. Lee, J. Hwangbo, L. Wellhausen, V. Koltun, and M. Hutter, “Learning quadrupedal locomotion over challenging terrain,” Science Robotics , vol. 5, no. 47, 2020."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "T. Miki, J. Lee, J. Hwanbo, L. Wellhausen, V. Koltun, and M. Hutter, “Learning robust perceptive locomotion for quadrupedal robots in the wild,” Science Robotics , 2022."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "J. Siekmann, K. Green, J. Warila, A. Fern, and J. Hurst, “Blind bipedal stair traversal via sim-to-real reinforcement learning,” arXiv preprint arXiv:2105.08328 , 2021."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "X. B. Peng, E. Coumans, T. Zhang, T.-W. Lee, J. Tan, and S. Levine, “Learning Agile Robotic Locomotion Skills by Imitating Animals,” in Proceedings of Robotics: Science and Systems , Corvalis, Oregon, USA, July 2020."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "A. Kumar, Z. Fu, D. Pathak, and J. Malik, “Rma: Rapid motor adaptation for legged robots,” arXiv preprint arXiv:2107.04034 , 2021."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "G. Ji, J. Mun, H. Kim, and J. Hwangbo, “Concurrent training of a control policy and a state estimator for dynamic and robust legged locomotion,” IEEE Robotics and Automation Letters , vol. 7, no. 2, pp. 4630–4637, 2022."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "G. B. Margolis, G. Yang, K. Paigwar, T. Chen, and P. Agrawal, “Rapid locomotion via reinforcement learning,” arXiv preprint arXiv:2205.02824 , 2022."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "G. Bellegarda, Y. Chen, Z. Liu, and Q. Nguyen, “Robust high-speed running for quadruped robots via deep reinforcement learning,” in 2022 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS) , 2022, pp. 10 364–10 370."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "Y. Yang, T. Zhang, E. Coumans, J. Tan, and B. Boots, “Fast and efficient locomotion via learned gait transitions,” in Conference on Robot Learning . PMLR, 2022, pp. 773–783."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib22",
+      "text": "Y. Shao, Y. Jin, X. Liu, W. He, H. Wang, and W. Yang, “Learning free gait transition for quadruped robots via phase-guided controller,” IEEE Robotics and Automation Letters , vol. 7, no. 2, pp. 1230–1237, 2022."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib23",
+      "text": "W. Yu, C. Yang, C. McGreavy, E. Triantafyllidis, G. Bellegarda, M. Shafiee, A. J. Ijspeert, and Z. Li, “Identifying important sensory feedback for learning locomotion skills,” Nature Machine Intelligence , vol. 5, no. 8, pp. 919–932, 2023."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib24",
+      "text": "A. S. Chiappa, A. Marin Vargas, and A. Mathis, “Dmap: a distributed morphological attention policy for learning to locomote with a changing body,” Advances in Neural Information Processing Systems , vol. 35, pp. 37 214–37 227, 2022."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib25",
+      "text": "W. Huang, I. Mordatch, and D. Pathak, “One policy to control them all: Shared modular policies for agent-agnostic control,” in International Conference on Machine Learning . PMLR, 2020, pp. 4455–4464."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib26",
+      "text": "V. Kurin, M. Igl, T. Rocktäschel, W. Boehmer, and S. Whiteson, “My body is a cage: the role of morphology in graph-based incompatible control,” arXiv preprint arXiv:2010.01856 , 2020."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib27",
+      "text": "B. Trabucco, M. Phielipp, and G. Berseth, “Anymorph: Learning transferable polices by inferring agent morphology,” in International Conference on Machine Learning . PMLR, 2022, pp. 21 677–21 691."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib28",
+      "text": "J. Whitman, M. Travers, and H. Choset, “Learning modular robot control policies,” IEEE Transactions on Robotics , 2023."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib29",
+      "text": "G. Feng, H. Zhang, Z. Li, X. B. Peng, B. Basireddy, L. Yue, Z. Song, L. Yang, Y. Liu, K. Sreenath, et al. , “Genloco: Generalized locomotion controllers for quadrupedal robots,” in Conference on Robot Learning . PMLR, 2023, pp. 1893–1903."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib30",
+      "text": "G. Bellegarda and A. Ijspeert, “CPG-RL: Learning central pattern generators for quadruped locomotion,” IEEE Robotics and Automation Letters , vol. 7, no. 4, pp. 12 547–12 554, 2022."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib31",
+      "text": "M. Shafiee, G. Bellegarda, and A. Ijspeert, “Puppeteer and marionette: Learning anticipatory quadrupedal locomotion based on interactions of a central pattern generator and supraspinal drive,” in 2023 IEEE International Conference on Robotics and Automation (ICRA) , 2023, pp. 1112–1119."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib32",
+      "text": "M. Shafiee, G. Bellegarda, and A. Ijspeert, “Deeptransition: Viability leads to the emergence of gait transitions in learning anticipatory quadrupedal locomotion skills,” arXiv preprint arXiv:2306.07419 , 2023."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib33",
+      "text": "G. Bellegarda, M. Shafiee, and A. Ijspeert, “Visual CPG-RL: Learning central pattern generators for visually-guided quadruped locomotion,” in 2024 IEEE International Conference on Robotics and Automation (ICRA) , 2024."
+    },
+    {
+      "n": 34,
+      "id": "bib.bib34",
+      "text": "V. Makoviychuk, L. Wawrzyniak, Y. Guo, M. Lu, K. Storey, M. Macklin, D. Hoeller, N. Rudin, A. Allshire, A. Handa, et al. , “Isaac gym: High performance gpu-based physics simulation for robot learning,” arXiv preprint arXiv:2108.10470 , 2021."
+    },
+    {
+      "n": 35,
+      "id": "bib.bib35",
+      "text": "M. Sombolestan, Y. Chen, and Q. Nguyen, “Adaptive force-based control for legged robots,” in 2021 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS) . IEEE, 2021, pp. 7440–7447."
+    }
+  ]
+}

@@ -1,0 +1,98 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.08224",
+  "title": "REPAIR: Rank Correlation and Noisy Pair Half-replacing with Memory for Noisy Correspondence",
+  "authors": "Ruochen Zheng, Jiahao Hong, Changxin Gao, Nong Sang",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2403.08224",
+  "html_url": "https://arxiv.org/html/2403.08224",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 910,
+  "text": "Cross-modal matching, which refers to establishing connections among different modalities, has attracted much attention with the growing presence of multimedia data in daily life. The paradigm of cross-modal matching is to project different modalities onto a unified space where querying and comparison can be performed.\n\nMany existing cross-modal methods [2,3,4,5,6,7,8] have succeeded with deep learning. Most of these methods typically share a fundamental assumption: the data gathered for deep learning training is properly aligned. However, accurately annotating multimodal data demands significant human and financial resources, given the inherent semantic differences between modalities. An alternative option is to use unverified multimodal data directly. For instance, in image-text matching, one can inexpensively collect numerous unreliable image-text pairs from the internet [3,9], many of which are weakly matched or mismatched pairs. This situation, where paired data contains alignment errors, is called noisy correspondence [1]. Under data conditions of noisy correspondence, the performance of current cross-modal matching methods [10,5,11] will witness a substantial drop.\n\nSome methods [1,12,13,14,15] have already noticed this issue and proposed improvements for noisy correspondence. The core of these methods can be summarized as estimating the matching degree (also termed soft correspondence label) of each data pair, which will recast as soft margins to train the cross-modal matching model. However, these methods have the following limitations: (a) the computation of soft correspondence label is not directly based on inter-modal features but is derived from a similarity network, which suggests the risk of cyclical self-reinforcing error accumulation, (b) for low correspondence pairs (noisy subset), current methods simply reduce its soft margin constraint or directly discard it. As shown in Figure 1 (a), methods [1,12] evaluate the soft correspondence based on the network’s prediction results. If the similarity network mistakenly identifies a mismatched pair as a closely matched pair, methods [1] consistently assigns a large soft margin to it, which suggests the noisy pair is likely to be recognized as a matched pair in the following training epoch, leading to cumulative errors. And the negative impact of low soft correspondence pairs on performance is illustrated in Figure 1 (b). There’s a marked decrease in performance when the loss for low correspondence pairs is incorporated, even though these pairs are allocated lower soft margins by current methods. Although Han et al. [13] propose a strategy by discarding these pairs, we argue that such a strategy is suboptimal as it results in losing information.\n\nTo address the aforementioned issues, we propose a general framework for noisy correspondence, named R ank corr E lation and P air h A lf-replacing w I th memo R y (REPAIR), which benefits from employing the memory bank. Following the previous methods [1,14,16], we divide the dataset into noisy and clean subsets, depending on the values of loss. REPAIR maintains a memory bank using features extracted from data pairs in the clean subset, as the majority of pairs within it are matched. To avoid the error accumulation of similarity network, REPAIR utilizes the memory bank to evaluate the soft correspondence label of the target data pairs. The core idea of this evaluation can be summarized as: similar relationships in one modality should mirror those in its connected modality. A straightforward example can clarify this idea: if a target pair (I_{i},T_{i}) is matching, then for another two matched pairs (I_{j},T_{j}) and (I_{m},T_{m}), if the distance between (I_{i},I_{j}) is less than that between (I_{i},I_{m}), then the distance between (T_{i},T_{j}) should be less than (T_{i},T_{m}), otherwise, (I_{i},T_{i}) might not be matched. Taking image-text matching as an instance, the target image computes its distance with the image features in the memory bank to get a group of image distances, and the target text modality operates similarly. Thus, if the target image-text aligns, two groups of distances across image modality and text modality should consistently align in the rank. We use Spearman’s rank correlation to evaluate the correlation between the two groups of distances and then convert it into the soft correspondence label for the target image-text pair.\n\nAs for the noisy subset, REPAIR adopts a noisy pair half-replacing (NPR) strategy to utilize mismatched data pairs more efficiently. Specifically, if the pair is highly likely mismatched, we replace one of the modalities to obtain a new pair assisted by the memory bank. For instance, if we replace the image while preserving the text, we will search the memory bank for a set of candidate texts closely related to the target text, and from the image features corresponding to the candidate texts, select the image feature most aligned with the original text. Finally, the newly obtained pairs will participate in training to maximize data utilization. The highlights of our contributions can be summarized as:\n\n- • In response to the noisy correspondence challenge, we propose a general framework named RAPAIR, which employs a memory bank to maintain a collection of clean pairs, and adopts the rank correlation (RC) strategy based on the memory bank to evaluate the correspondence label of target pairs.\n\n- • For entirely mismatched data pairs, REPAIR proposes the noisy pair half-replacing (NPR) strategy, which selects appropriate feature from the memory bank to substitute the feature of one modality in the target pair, creating a temporary feature pair with higher matching degree for training. NPR prevents performance degradation due to the use of wholly misaligned data and avoids the wastage of simply discarding information.\n\n- • The experiments on three challenging cross-modal datasets, i.e., Flickr30K, MS-COCO, and CC152K, prove the effectiveness of REPAIR.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "Z. Huang, G. Niu, X. Liu, W. Ding, X. Xiao, H. Wu, and X. Peng, “Learning with noisy correspondence for cross-modal matching,” Proc. NeurIPS , vol. 34, pp. 29 406–29 419, 2021."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "F. Faghri, D. J. Fleet, J. R. Kiros, and S. Fidler, “Vse++: Improving visual-semantic embeddings with hard negatives,” arXiv preprint arXiv:1707.05612 , 2017."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "A. Radford, J. W. Kim, C. Hallacy, A. Ramesh, G. Goh, S. Agarwal, G. Sastry, A. Askell, P. Mishkin, J. Clark et al. , “Learning transferable visual models from natural language supervision,” in International conference on machine learning . PMLR, 2021, pp. 8748–8763."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "W. Kim, B. Son, and I. Kim, “Vilt: Vision-and-language transformer without convolution or region supervision,” in International Conference on Machine Learning . PMLR, 2021, pp. 5583–5594."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "H. Diao, Y. Zhang, L. Ma, and H. Lu, “Similarity reasoning and filtration for image-text matching,” in Proc. AAAI , vol. 35, no. 2, 2021, pp. 1218–1226."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "Q. Zhang, Z. Lei, Z. Zhang, and S. Z. Li, “Context-aware attention network for image-text retrieval,” in Proc. Comput. Vis. Pattern Recog. , 2020, pp. 3536–3545."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "Y.-C. Chen, L. Li, L. Yu, A. El Kholy, F. Ahmed, Z. Gan, Y. Cheng, and J. Liu, “Uniter: Universal image-text representation learning,” in Proc. Eur. Conf. Comput. Vis. Springer, 2020, pp. 104–120."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "V. Gabeur, C. Sun, K. Alahari, and C. Schmid, “Multi-modal transformer for video retrieval,” in Proc. Eur. Conf. Comput. Vis. Springer, 2020, pp. 214–229."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "P. Sharma, N. Ding, S. Goodman, and R. Soricut, “Conceptual captions: A cleaned, hypernymed, image alt-text dataset for automatic image captioning,” in Proceedings of the 56th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) , 2018, pp. 2556–2565."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "K.-H. Lee, X. Chen, G. Hua, H. Hu, and X. He, “Stacked cross attention for image-text matching,” in Proc. Eur. Conf. Comput. Vis. , 2018, pp. 201–216."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "J. Chen, H. Hu, H. Wu, Y. Jiang, and C. Wang, “Learning the best pooling strategy for visual semantic embedding,” in Proc. Comput. Vis. Pattern Recog. , 2021, pp. 15 789–15 798."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "Z. Feng, Z. Zeng, C. Guo, Z. Li, and L. Hu, “Learning from noisy correspondence with tri-partition for cross-modal matching,” IEEE Trans. Multimedia , 2023."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "H. Han, K. Miao, Q. Zheng, and M. Luo, “Noisy correspondence learning with meta similarity correction,” in Proc. Comput. Vis. Pattern Recog. , 2023, pp. 7517–7526."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "Y. Qin, D. Peng, X. Peng, X. Wang, and P. Hu, “Deep evidential learning with noisy correspondence for cross-modal retrieval,” 2022, pp. 4948–4956."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "Y. Qin, Y. Sun, D. Peng, J. T. Zhou, X. Peng, and P. Hu, “Cross-modal active complementary learning with self-refining correspondence,” arXiv preprint arXiv:2310.17468 , 2023."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "S. Yang, Z. Xu, K. Wang, Y. You, H. Yao, T. Liu, and M. Xu, “Bicro: Noisy correspondence rectification for multi-modality data via bi-directional cross-modal similarity consistency,” in Proc. Comput. Vis. Pattern Recog. , 2023, pp. 19 883–19 892."
+    }
+  ]
+}

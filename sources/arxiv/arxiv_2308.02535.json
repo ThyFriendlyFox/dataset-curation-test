@@ -1,0 +1,244 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2308.02535",
+  "title": "Learning to Generate Training Datasets for Robust Semantic Segmentation",
+  "authors": "Marwane Hariat, Olivier Laurent, RÃ©mi Kazmierczak, Shihao Zhang, Andrei Bursuc, Angela Yao, Gianni Franchi",
+  "year": "2024",
+  "categories": [
+    "cs.CV",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2308.02535",
+  "html_url": "https://arxiv.org/html/2308.02535",
+  "license": "http://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Introduction",
+  "word_count": 667,
+  "text": "Semantic segmentation is an essential perception task that is commonly used in safety-critical applications such as autonomous driving [1,2] or medical imaging [3,4]. To fulfill safety requirements [5], it is crucial to not only produce accurate segments but also make reliable predictions in the face of perturbations [6], distribution shifts [7,8,9], uncommon situations [10] and out-of-distribution (OOD) objects [11,12]. Modern Deep Neural Networks (DNNs) achieve impressive performance in segmentation tasks [13,14,15,16,17]; however, they struggle to generalize to data samples not seen during training, e.g., image corruptions [18,6], adversarial attacks [19,20], or change of style [21]. In the face of such events, they often produce overconfident probability estimates [22,23,24] even when they are wrong, which can impede the detection of failure modes and thus their adoption in the industry.\n\nTechnically, modern high-capacity DNNs trained with uncertainty and calibration awareness could effectively learn to deal with such situations if they were seen during training. However, such samples from the long tail are extremely numerous, difficult, and expensive to acquire in the real world. In the absence of such data, new data augmentation techniques have been devised towards mitigating this problem: generating perturbations on the input data [25,26], the latent space [27], or the output space [28]. They may slightly relieve this problem by increasing the size of the training set with richer samples. Still, they may not always yield realistic images and are often architecture-dependent or unsuitable for semantic segmentation. Meanwhile, generative models are making steady progress towards the ambitious goal of generating abundant and high-quality data for training data-hungry DNNs [29,30,31,32]. Despite the realism reflected by excellent FID scores [33], training on such synthetic images is non-trivial and less effective than with real images [34,35,36]. Very recent methods based on the latest generative models [37,38] are starting to show encouraging results for image classification. However, such approaches have not shown yet that they can improve the performance and robustness of semantic segmentation models dealing with high-resolution images and complex scenes.\n\nIn this paper, we pave the way for improving the robustness of semantic segmentation models against input perturbations as well as their ability to detect outliers, i.e., objects with no associated labels in the train set. To this end, we propose leveraging the symmetry between label-to-image conditional generative adversarial networks (cGANs) [39,40] and image-to-label models to train robust segmentation networks [41,42]. We argue that it is possible to use label-to-image cGANs at training time to enrich datasets with perturbations and outliers and improve segmentation models. The generated data must be of sufficient quality and diversity to enable the classifier - trained on it - to generalize to new and unseen real-world situations and to prevent overfitting to the specific anomalies of the training set.\n\nA significant difficulty we face is that cGANs are not robust to variations in the input labels. They may generate images with artifacts when given label maps with anomalies, hindering their utility for semantic segmentation training. To address this challenge, we advance Robusta, a novel cGAN architecture that leverages attention layers [43] and sub-networks [44]. Robusta can produce high-quality images even from label maps with corruptions and anomalies. We exploit Robusta synthetic images to construct a dataset for training an observer network [45] to detect anomalies and failures of the segmentation model.\n\nContributions. (1) We propose a new strategy to improve the robustness and OOD detection performance of semantic segmentation models by leveraging the symmetry of label-to-image cGANs and image-to-label segmentation networks: we use cGAN images with outliers to train a robust segmentation model; (2) We design the first framework to evaluate the robustness of label-to-image cGANs against perturbations and uncommon inputs, and we use it to investigate the robustness of multiple cGAN methods against three new dataset generation techniques; (3) We propose Robusta, a new cascaded cGAN with improved robustness compared to state-of-the-art cGANs on the proposed framework. Our approach is expected to enhance the reliability and safety of autonomous driving systems by enabling more accurate OOD and failure detection in real-world situations.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib79",
+      "text": "Jesse Levinson, Jake Askeland, Jan Becker, Jennifer Dolson, David Held, Soeren Kammel, J. Zico Kolter, Dirk Langer, Oliver Pink, Vaughan Pratt, Michael Sokolsky, Ganymed Stanek, David Stavens, Alex Teichman, Moritz Werling, and Sebastian Thrun. Towards fully autonomous driving: Systems and algorithms. In IV , 2011."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib86",
+      "text": "RT McAllister, Yarin Gal, Alex Kendall, Mark Van Der Wilk, Amar Shah, Roberto Cipolla, and Adrian Weller. Concrete problems for autonomous vehicle safety: Advantages of bayesian deep learning. In IJCAI , 2017."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib85",
+      "text": "Kira Maag, Matthias Rottmann, and Hanno Gottschalk. Time-dynamic estimates of the reliability of deep semantic segmentation networks. In ICTAI , 2020."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib90",
+      "text": "Ozan Oktay, Jo Schlemper, Loic Le Folgoc, Matthew Lee, Mattias Heinrich, Kazunari Misawa, Kensaku Mori, Steven McDonagh, Nils Y Hammerla, Bernhard Kainz, et al. Attention u-net: Learning where to look for the pancreas. In MIDL , 2018."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib73",
+      "text": "Alexander Lavin, Ciarán M Gilligan-Lee, Alessya Visnjic, Siddha Ganju, Dava Newman, Sujoy Ganguly, Danny Lange, Atílím Güneş Baydin, Amit Sharma, Adam Gibson, et al. Technology readiness levels for machine learning systems. Nature Communications , 2022."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib55",
+      "text": "Dan Hendrycks and Thomas Dietterich. Benchmarking neural network robustness to common corruptions and perturbations. In ICLR , 2019."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib125",
+      "text": "Maxime Tremblay, Shirsendu Sukanta Halder, Raoul De Charette, and Jean-François Lalonde. Rain rendering for evaluating and improving robustness to bad weather. International Journal of Computer Vision , 2021."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib61",
+      "text": "Xiaowei Hu, Chi-Wing Fu, Lei Zhu, and Pheng-Ann Heng. Depth-attentional features for single-image rain removal. In CVPR , 2019."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib112",
+      "text": "Christos Sakaridis, Dengxin Dai, and Luc Van Gool. Semantic foggy scene understanding with synthetic data. International Journal of Computer Vision , 2018."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib139",
+      "text": "Oliver Zendel, Katrin Honauer, Markus Murschitz, Daniel Steininger, and Gustavo Fernandez Dominguez. Wilddash-creating hazard-aware benchmarks. In ECCV , 2018."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib53",
+      "text": "Dan Hendrycks, Steven Basart, Mantas Mazeika, Mohammadreza Mostajabi, Jacob Steinhardt, and Dawn Song. A benchmark for anomaly segmentation. In arXiv preprint arXiv:1911.11132 , 2019."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib14",
+      "text": "Robin Chan, Krzysztof Lis, Svenja Uhlemeyer, Hermann Blum, Sina Honari, Roland Siegwart, Pascal Fua, Mathieu Salzmann, and Matthias Rottmann. Segmentmeifyoucan: A benchmark for anomaly segmentation. In NeurIPS - Datasets and Benchmarks Track , 2021."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib27",
+      "text": "Clement Farabet, Camille Couprie, Laurent Najman, and Yann LeCun. Learning hierarchical features for scene labeling. TPAMI , 2012."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib106",
+      "text": "Shaoqing Ren, Kaiming He, Ross Girshick, and Jian Sun. Faster r-cnn: Towards real-time object detection with region proposal networks. NeurIPS , 2015."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib49",
+      "text": "Kaiming He, Georgia Gkioxari, Piotr Dollár, and Ross Girshick. Mask r-cnn. In ICCV , 2017."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib3",
+      "text": "Vijay Badrinarayanan, Alex Kendall, and Roberto Cipolla. Segnet: A deep convolutional encoder-decoder architecture for image segmentation. TPAMI , 2017."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib92",
+      "text": "Marin Oršić and Siniša Šegvić. Efficient semantic segmentation with pyramidal fusion. PR , 2021."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib100",
+      "text": "Zachary Pezzementi, Trenton Tabor, Samuel Yim, Jonathan K. Chang, Bill Drozd, David Guttendorf, Michael Wagner, and Philip Koopman. Putting image manipulations in context: Robustness testing for safe perception. In SSRR , 2018."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib120",
+      "text": "Christian Szegedy, Wojciech Zaremba, Ilya Sutskever, Joan Bruna, Dumitru Erhan, Ian Goodfellow, and Rob Fergus. Intriguing properties of neural networks. arXiv preprint arXiv:1312.6199 , 2013."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib26",
+      "text": "Kevin Eykholt, Ivan Evtimov, Earlence Fernandes, Bo Li, Amir Rahmati, Chaowei Xiao, Atul Prakash, Tadayoshi Kohno, and Dawn Song. Robust physical-world attacks on deep learning visual classification. In CVPR , 2018."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib40",
+      "text": "Robert Geirhos, Patricia Rubisch, Claudio Michaelis, Matthias Bethge, Felix A Wichmann, and Wieland Brendel. Imagenet-trained cnns are biased towards texture; increasing shape bias improves accuracy and robustness. arXiv preprint arXiv:1811.12231 , 2018."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib89",
+      "text": "A. Nguyen, J. Yosinski, and J. Clune. Deep neural networks are easily fooled: High confidence predictions for unrecognizable images. In CVPR , 2015."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib47",
+      "text": "Chuan Guo, Geoff Pleiss, Yu Sun, and Kilian Q. Weinberger. On calibration of modern neural networks. In ICML , 2017."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib52",
+      "text": "Matthias Hein, Maksym Andriushchenko, and Julian Bitterwolf. Why relu networks yield high-confidence predictions far away from the training data and how to mitigate the problem. In CVPR , 2019."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib140",
+      "text": "Hongyi Zhang, Moustapha Cisse, Yann N Dauphin, and David Lopez-Paz. mixup: Beyond empirical risk minimization. In ICLR , 2018."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib138",
+      "text": "Sangdoo Yun, Dongyoon Han, Seong Joon Oh, Sanghyuk Chun, Junsuk Choe, and Youngjoon Yoo. Cutmix: Regularization strategy to train strong classifiers with localizable features. In CVPR , 2019."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib25",
+      "text": "Xuefeng Du, Zhaoning Wang, Mu Cai, and Yixuan Li. Vos: Learning what you don’t know by virtual outlier synthesis. ICLR , 2022."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib78",
+      "text": "Kimin Lee, Honglak Lee, Kibok Lee, and Jinwoo Shin. Training confidence-calibrated classifiers for detecting out-of-distribution samples. In ICLR , 2018."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib11",
+      "text": "Andrew Brock, Jeff Donahue, and Karen Simonyan. Large scale gan training for high fidelity natural image synthesis. In ICLR , 2019."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib69",
+      "text": "Tero Karras, Miika Aittala, Samuli Laine, Erik Härkönen, Janne Hellsten, Jaakko Lehtinen, and Timo Aila. Alias-free generative adversarial networks. In NeurIPS , 2021."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib103",
+      "text": "Aditya Ramesh, Mikhail Pavlov, Gabriel Goh, Scott Gray, Chelsea Voss, Alec Radford, Mark Chen, and Ilya Sutskever. Zero-shot text-to-image generation. In ICML , 2021."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib109",
+      "text": "Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, and Björn Ommer. High-resolution image synthesis with latent diffusion models. In CVPR , 2022."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib59",
+      "text": "Martin Heusel, Hubert Ramsauer, Thomas Unterthiner, Bernhard Nessler, and Sepp Hochreiter. Gans trained by a two time-scale update rule converge to a local nash equilibrium. In NeurIPS , 2017."
+    },
+    {
+      "n": 34,
+      "id": "bib.bib8",
+      "text": "Victor Besnier, Himalaya Jain, Andrei Bursuc, Matthieu Cord, and Patrick Pérez. This dataset does not exist: training models from generated images. In ICASSP , 2020."
+    },
+    {
+      "n": 35,
+      "id": "bib.bib104",
+      "text": "Suman Ravuri and Oriol Vinyals. Classification accuracy score for conditional generative models. In NeurIPS , 2019."
+    },
+    {
+      "n": 36,
+      "id": "bib.bib116",
+      "text": "Konstantin Shmelkov, Cordelia Schmid, and Karteek Alahari. How good is my gan? In ECCV , 2018."
+    },
+    {
+      "n": 37,
+      "id": "bib.bib113",
+      "text": "Mert Bulent Sariyildiz, Karteek Alahari, Diane Larlus, and Yannis Kalantidis. Fake it till you make it: Learning (s) from a synthetic imagenet clone. arXiv preprint arXiv:2212.08420 , 2022."
+    },
+    {
+      "n": 38,
+      "id": "bib.bib51",
+      "text": "Ruifei He, Shuyang Sun, Xin Yu, Chuhui Xue, Wenqing Zhang, Philip Torr, Song Bai, and Xiaojuan Qi. Is synthetic data from generative models ready for image recognition? In ICLR , 2023."
+    },
+    {
+      "n": 39,
+      "id": "bib.bib43",
+      "text": "Ian Goodfellow, Jean Pouget-Abadie, Mehdi Mirza, Bing Xu, David Warde-Farley, Sherjil Ozair, Aaron Courville, and Yoshua Bengio. Generative adversarial nets. In NeurIPS , 2014."
+    },
+    {
+      "n": 40,
+      "id": "bib.bib65",
+      "text": "Phillip Isola, Jun-Yan Zhu, Tinghui Zhou, and Alexei A Efros. Image-to-image translation with conditional adversarial networks. In CVPR , 2017."
+    },
+    {
+      "n": 41,
+      "id": "bib.bib82",
+      "text": "Krzysztof Lis, Krishna Nakka, Pascal Fua, and Mathieu Salzmann. Detecting the unexpected via image resynthesis. In ICCV , 2019."
+    },
+    {
+      "n": 42,
+      "id": "bib.bib22",
+      "text": "Giancarlo Di Biase, Hermann Blum, Roland Siegwart, and Cesar Cadena. Pixel-wise anomaly detection in complex driving scenes. In CVPR , 2021."
+    },
+    {
+      "n": 43,
+      "id": "bib.bib127",
+      "text": "Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N Gomez, Łukasz Kaiser, and Illia Polosukhin. Attention is all you need. NeurIPS , 2017."
+    },
+    {
+      "n": 44,
+      "id": "bib.bib131",
+      "text": "Ting-Chun Wang, Ming-Yu Liu, Jun-Yan Zhu, Andrew Tao, Jan Kautz, and Bryan Catanzaro. High-resolution image synthesis and semantic manipulation with conditional gans. In CVPR , 2018."
+    },
+    {
+      "n": 45,
+      "id": "bib.bib7",
+      "text": "Victor Besnier, Andrei Bursuc, David Picard, and Alexandre Briot. Triggering failures: Out-of-distribution detection by learning from local adversarial attacks in semantic segmentation. In ICCV , 2021."
+    }
+  ]
+}

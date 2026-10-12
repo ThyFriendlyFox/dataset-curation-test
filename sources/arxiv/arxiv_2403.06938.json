@@ -1,0 +1,268 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.06938",
+  "title": "TCAM-SSD: A Framework for Search-Based Computing in Solid-State Drives",
+  "authors": "Ryan Wong, Nikita Kim, Kevin Higgs, Sapan Agarwal, Engin Ipek, Saugata Ghose, Ben Feinberg",
+  "year": "2024",
+  "categories": [
+    "cs.AR"
+  ],
+  "url": "https://arxiv.org/abs/2403.06938",
+  "html_url": "https://arxiv.org/html/2403.06938",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1143,
+  "text": "Over the past decade, the amount of data generated and consumed by modern applications has grown exponentially [1]. As one example, the number of photos shared per minute on the Instagram social media application has increased from 3,500 in 2013 to approximately 66,000 in 2022 [2,3]. This growth has been observed in a wide variety of application domains, including machine learning [4], social media [5,6], and business transactions [7], with the average person producing 102\\text{\\,}\\mathrm{MB} of data per minute [8]. As the quantity of data grows, increased pressure is placed on existing memory and storage subsystems, as frequent data movement is needed between these subsystems, the on-chip caches, and the CPU. Unfortunately, this data movement has become a major bottleneck in modern systems, as it consumes large amounts of energy and results in significant performance penalties [9,10,11,12].\n\nTo alleviate the overheads of data movement, architects and system designers have been exploring processing-in-memory (PIM), a broad field of techniques that can perform computation close to or inside memory and storage devices. While early proposals for PIM date back to the 1970s, a recent resurgence of PIM has led to significant innovation in the last decade, with solutions proposed across a diverse range of memory technologies (e.g., SRAM [13,14,15,16], DRAM [17,18,19,20], NAND flash memory [17,21,22], emerging memory technologies [23,24,25,26,27,28,29,30,31,32]). DRAM-based processing-in-memory has formed the basis of several commercial products available today [33,34,35,36,37]. However, efforts to increase DRAM capacity continue to suffer from scaling issues that have plagued DRAM manufacturers over the last 20 years [38,39,40], and recent reports speculate that these scaling issues will worsen in the coming decade [41,42]. These challenges will make it increasingly difficult for main memory capacity to keep up with ever-increasing dataset sizes.\n\nNAND-flash-based solid-state drives (SSDs) provide an opportunity to perform PIM while overcoming main memory scalability issues. Compared to DRAM, NAND flash memory offers significantly higher densities that translate into orders-of-magnitude larger capacity at an approximately 40 \\times cheaper cost-per-bit [43]. However, NAND flash access latencies are significantly higher than their equivalents in DRAM. This makes it more challenging to take near-memory logic originally proposed to sit close to DRAM and implement this logic close to storage. Instead, to overcome the higher latencies, NAND-flash-based PIM can take advantage of processing-using-memory (PUM; a.k.a. in situ computing), where we perform logic directly using memory cells to unlock the potential of million-way parallelism (where, generally, a pair of cells can form a compute unit).\n\nRecent works have explored how to implement PUM in NAND flash memory. Parabit [17] proposes modifications to the latching circuitry used in NAND flash memory to execute bitwise operations between subsequent page-level operations. Flash-Cosmos [21] extends Parabit by proposing intra- and inter- block bitwise operations, a common operation for a variety of applications, including databases and web search. GP3D [22] accelerates graph analytics, specifically by incorporating a PageRank [44] accelerator that leverages the NAND flash array structure to perform analog matrix–vector multiplication. However, despite significant potential for performance and energy improvements, these existing approaches (1) have notable limitations that prevent their widespread use (e.g., the need to perform the same operation across thousands of data elements, modifications within the NAND flash array, domain-specific solutions) and (2) do not examine how to integrate their low-level in-flash primitives with the larger system and application (e.g., data organization across arrays and across chips, retrieving operand results from the array).\n\nTo tackle these issues, we propose TCAM-SSD, a new framework for efficient in-SSD computing. TCAM-SSD builds upon in-memory search [45], a previously-proposed primitive that treats a NAND flash array as a bulk ternary content-addressable memory (TCAM). Conceptually, a TCAM searches across multiple data entries in parallel, by driving the search string value (i.e., the search key) on wires connected across all of the entries. While the IMS work shows how to perform parallel TCAM lookups using a NAND flash array, it does not discuss how to integrate this primitive to perform useful computation for applications, or how the SSD should manage the data and computation alongside I/O requests. TCAM-SSD provides mechanisms that enable the application to (1) effectively retrieve data through searchable data elements, and (2) execute compute operations in the forms of queries. The proposed framework can be further extended to support in-SSD associative computing, enabling a wide range of applications such as databases [46], data mining [47], network routing [48], and image processing [49].\n\nOur goal with TCAM-SSD is to build a full in-SSD computing framework that allows applications to manage data and efficiently make use of IMS. IMS implements the TCAM-based search primitive by modifying the voltages applied to each wordline (i.e., row) in the array, and by storing data along the bitlines of the NAND flash string. TCAM-SSD makes four key changes to a conventional SSD to enable applications to effectively utilize IMS. First, TCAM-SSD seamlessly enables searchable fields within a data region to be stored in the SSD using the column-oriented format required by IMS, while maintaining a complete and coherent copy of the data region in the SSD using the conventional row-oriented format. This allows TCAM-SSD to enable efficient bulk searches across the data region without requiring the programmer to explicitly manage data transposition. Second, TCAM-SSD incorporates an efficient firmware metadata structure for searchable data regions and their results. Third, TCAM-SSD exposes an NVMe 2.0 [50] compliant command interface that applications and/or system drivers can use to perform computing tasks parallelized across many NAND flash arrays. Together, these changes enable the ability to coherently modify searchable data while maintaining the ability to perform standard SSD operations (e.g., read/write). Fourth, TCAM-SSD introduces multiple optimizations that reduce unnecessary data movement between the NAND flash arrays and the SSD firmware processor. TCAM-SSD requires no modifications to the NAND flash arrays, and requires only lightweight changes to the array peripheral circuitry and the SSD firmware.\n\nWhile TCAM-SSD can provide performance and data movement improvements across many application domains, we focus on three examples to demonstrate data structures and semantics that can make use of associative search. We evaluate the benefits of TCAM-SSD over a system with a conventional SSD for these use cases. For transactional databases, TCAM-SSD’s associative search can mitigate the performance penalties of accessing the disk, with a 60.9 % speedup. For database analytics, TCAM-SSD provides an average speedup of 17.7 \\times for a collection of analytical queries. For graph analytics, TCAM-SSD combines associative search with a sparse data structure, providing speedups for larger-than-memory datasets of 14.5 %.\n\nWe make the following contributions in this work:\n\n- • We introduce the first full framework for in-SSD computing using IMS.\n\n- • We modify the SSD firmware to perform associative search operations alongside conventional I/O requests.\n\n- • We provide an NVMe-compatible interface for applications to perform bulk parallel associative search.\n\n- • We explore three use cases to show data structures and application semantics for in-SSD computing.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib138",
+      "text": "Reinsel et al . (2018) D. Reinsel, J. Gantz, and J. Rydning. 2018. Data Age 2025: The Digitization of the World From Edge to Core . Technical Report. IDC."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib173",
+      "text": "Xu et al . (2016) S. Xu, S. Lee, S.-W. Jun, M. Liu, J. Hicks, and Arvind. 2016. BlueCache: A Scalable Distributed Flash-Based Key-Value Store. Proc. VLDB Endow. (Nov. 2016)."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib45",
+      "text": "Domo, Inc. (2022) Domo, Inc. 2022. Data Never Sleeps 10.0. https://www.domo.com/learn/infographic/data-never-sleeps-10 ."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib33",
+      "text": "Chowdhery et al . (2023) A. Chowdhery, S. Narang, J. Devlin, M. Bosma, G. Mishra, A. Roberts, P. Barham, H. W. Chung, C. Sutton, S. Gehrmann, P. Schuh, K. Shi, S. Tsvyashchenko, J. Maynez, A. Rao, P. Barnes, Y. Tay, N. Shazeer, V. Prabhakaran, E. Reif, N. Du, B. Hutchinson, R. Pope, J. Bradbury, J. Austin, M. Isard, G. Gur-Ari, P. Yin, T. Duke, A. Levskaya, S. Ghemawat, S. Dev, H. Michalewski, X. Garcia, V. Misra, K. Robinson, L. Fedus, D. Zhou, D. Ippolito, D. Luan, H. Lim, B. Zoph, A. Spiridonov, R. Sepassi, D. Dohan, S. Agrawal, M. Omernick, A. M. Dai, T. S. Pillai, M. Pellat, A. Lewkowycz, E. Moreira, R. Child, O. Polozov, K. Lee, Z. Zhou, X. Wang, B. Saeta, M. Diaz, O. Firat, M. Catasta, J. Wei, Kathy M.-H., D. Eck, J. Dean, S. Petrov, and N. Fiedel. 2023. PaLM: Scaling Language Modeling With Pathways. JMLR (Aug. 2023)."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib15",
+      "text": "B. Marr (2018) B. Marr. 2018. How Much Data Do We Create Every Day? The Mind-Blowing Stats Everyone Should Read. https://www.forbes.com/sites/bernardmarr/2018/05/21/how-much-data-do-we-create-every-day-the-mind-blowing-stats-everyone-should-read/?sh=667f02260ba9 ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib44",
+      "text": "Domo, Inc. (2014) Domo, Inc. 2014. Data Never Sleeps 2.0. https://www.domo.com/learn/infographic/data-never-sleeps-2 ."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib71",
+      "text": "Im et al . (2018) J.-F. Im, K. Gopalakrishna, S. Subramaniam, M. Shrivastava, A. Tumbde, X. Jiang, J. Dai, S. Lee, N. Pawar, J. Li, and R. Aringunram. 2018. Pinot: Realtime OLAP for 530 Million Users. In SIGMOD ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib46",
+      "text": "Domo, Inc. (2023) Domo, Inc. 2023. Data Never Sleeps 11.0. https://www.domo.com/learn/infographic/data-never-sleeps-11 ."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib125",
+      "text": "Oliveira et al . (2021) G. F. Oliveira, J. Gómez-Luna, L. Orosa, S. Ghose, N. Vijaykumar, I. Fernandez, M. Sadrosadati, and O. Mutlu. 2021. DAMOV: A New Methodology and Benchmark Suite for Evaluating Data Movement Bottlenecks. IEEE Access (2021)."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib119",
+      "text": "Nair et al . (2015) R. Nair, S. F. Antao, C. Bertolli, P. Bose, J. R. Brunheroto, T. Chen, C.-Y. Cher, C. H. A. Costa, J. Doi, C. Evangelinos, B. M. Fleischer, T. W. Fox, D. S. Gallo, L. Grinberg, J. A. Gunnels, A. C. Jacob, P. Jacob, H. M. Jacobson, T. Karkhanis, C. Kim, J. H. Moreno, J. K. O’Brien, M. Ohmacht, Y. Park, D. A. Prener, B. S. Rosenburg, K. D. Ryu, O. Sallenave, M. J. Serrano, P. D. M. Siegl, K. Sugavanam, and Z. Sura. 2015. Active Memory Cube: A Processing-in-Memory Architecture for Exascale Systems. IBM JRD (Mar.–May 2015)."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib54",
+      "text": "Ghose et al . (2019) S. Ghose, A. Boroumand, J. S. Kim, J. Gómez-Luna, and O. Mutlu. 2019. Processing-in-Memory: A Workload-Driven Perspective. IBM JRD (Nov.–Dec. 2019)."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib36",
+      "text": "Dally (2015) B. Dally. 2015. Challenges for Future Computing Systems. Keynote talk at HiPEAC."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib3",
+      "text": "Aga et al . (2017) S. Aga, S. Jeloka, A. Subramaniyan, S. Narayanasamy, D. Blaauw, and R. Das. 2017. Compute Caches. In HPCA ."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib47",
+      "text": "Eckert et al . (2018) C. Eckert, X. Wang, J. Wang, A. Subramaniyan, R. Iyer, D. M . Sylvester, D. T. Blaauw, and R. Das. 2018. Neural Cache: Bit-Serial In-Cache Acceleration of Deep Neural Networks. In ISCA ."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib51",
+      "text": "Fujiki et al . (2019) D. Fujiki, S. Mahlke, and R. Das. 2019. Duality Cache for Data Parallel Acceleration. In ISCA ."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib74",
+      "text": "Jeloka et al . (2016) S. Jeloka, N. B. Akesh, D. Sylvester, and D. Blaauw. 2016. A 28 nm 28\\text{\\,}\\mathrm{nm} Configurable Memory (TCAM/BCAM/SRAM) Using Push-Rule 6T Bit Cell Enabling Logic-in-Memory. In JSSC ."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib53",
+      "text": "Gao et al . (2021) C. Gao, X. Xin, Y. Lu, Y. Zhang, J. Yang, and J. Shu. 2021. ParaBit: Processing Parallel Bitwise Operations in NAND Flash Memory Based SSDs. In MICRO ."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib64",
+      "text": "Hajinazar et al . (2021) N. Hajinazar, G. F. Oliveira, S. Gregorio, J. D. Ferreira, N. M. Ghiasi, M. Patel, M. Alser, S. Ghose, J. Gomez-Luna, and O. Mutlu. 2021. SIMDRAM: A Framework for Bit-Serial SIMD Processing Using DRAM. In ASPLOS ."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib147",
+      "text": "Seshadri et al . (2017) V. Seshadri, D. Lee, T. Mullins, H. Hassan, A. Boroumand, J. Kim, M. A. Kozuch, O. Mutlu, P. B. Gibbons, and T. C. Mowry. 2017. Ambit: In-Memory Accelerator for Bulk Bitwise Operations Using Commodity DRAM Technology. In MICRO ."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib105",
+      "text": "Li et al . (2017) S. Li, D. Niu, K. T. Malladi, H. Zheng, B. Brennan, and Y. Xie. 2017. DRISA: A DRAM-Based Reconfigurable In-Situ Accelerator. In MICRO ."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib128",
+      "text": "Park et al . (2022) J. Park, R. Azizi, G. F. Oliveira, M. Sadrosadati, R. Nadig, D. Novo, J. Gómez-Luna, M. Kim, and O. Mutlu. 2022. Flash-Cosmos: In-Flash Bulk Bitwise Operations Using Inherent Computation Capability of NAND Flash Memory. In MICRO ."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib150",
+      "text": "Shim and Yu (2022) W. Shim and S. Yu. 2022. GP3D: 3D NAND Based In-Memory Graph Processing Accelerator. JETCAS (Jun. 2022)."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib9",
+      "text": "Angizi et al . (2018a) S. Angizi, Z. He, and D. Fan. 2018a. PIMA-Logic: A Novel Processing-in-Memory Architecture for Highly Flexible and Energy-Efficient Logic Computation. In DAC ."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib10",
+      "text": "Angizi et al . (2018b) S. Angizi, Z. He, A. S. Rakin, and D. Fan. 2018b. CMP-PIM: An Energy-Efficient Comparator-Based Processing-in-Memory Neural Network Accelerator. In DAC ."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib11",
+      "text": "Angizi et al . (2019) S. Angizi, J. Sun, W. Zhang, and D. Fan. 2019. AlignS: A Processing-in-Memory Accelerator for DNA Short Read Alignment Leveraging SOT-MRAM. In DAC ."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib12",
+      "text": "Ankit et al . (2019) A. Ankit, I. El Hajj, S. R. Chalamalasetti, G. Ndu, M. Foltin, R. S. Williams, P. Faraboschi, W. m. Hwu, J. P. Strachan, K. Roy, and D. S. Milojicic. 2019. PUMA: A Programmable Ultra-Efficient Memristor-Based Accelerator for Machine Learning Inference. In ASPLOS ."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib32",
+      "text": "Chou et al . (2019) T. Chou, W. Tang, J. Botimer, and Z. Zhang. 2019. CASCADE: Connecting RRAMs to Extend Analog Dataflow in an End-to-End In-Memory Processing Paradigm. In MICRO ."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib52",
+      "text": "Gaillardon et al . (2016) P. Gaillardon, L. Amaru, A. Siemon, E. Linn, R. Waser, A. Chattopadhyay, and G. D. Micheli. 2016. The Programmable Logic-in-Memory (PLiM) Computer. In DATE ."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib62",
+      "text": "Gupta et al . (2018) S. Gupta, M. Imani, and T. Rosing. 2018. FELIX: Fast and Energy-Efficient Logic in Memory. In ICCAD ."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib66",
+      "text": "Hamdioui et al . (2017) S. Hamdioui, S. Kvatinsky, G. Cauwenberghs, L. Xie, N. Wald, S. Joshi, H. M. Elsayed, H. Corporaal, and K. Bertels. 2017. Memristor for Computing: Myth or Reality?. In DATE ."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib72",
+      "text": "Imani et al . (2018) M. Imani, S. Gupta, Y. Kim, and T. Rosing. 2018. FloatPIM: In-Memory Acceleration of Deep Neural Network Training With High Precision. In ISCA ."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib148",
+      "text": "Shafiee et al . (2016) A. Shafiee, A. Nag, N. Muralimanohar, R. Balasubramonian, J. P. Strachan, M. Hu, R. S. Williams, and V. Srikumar. 2016. ISAAC: A Convolutional Neural Network Accelerator With In-Situ Analog Arithmetic in Crossbars. In ISCA ."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib67",
+      "text": "He et al . (2020) M. He, C. Song, I. Kim, C. Jeong, S. Kim, I. Park, M. Thottethodi, and T. N. Vijaykumar. 2020. Newton: A DRAM-Maker’s Accelerator-in-Memory (AiM) Architecture for Machine Learning. In ISCA ."
+    },
+    {
+      "n": 34,
+      "id": "bib.bib98",
+      "text": "Lee et al . (2021) S. Lee, S.-H. Kang, J. Lee, H. Kim, E. Lee, S. Seo, H. Yoon, S. Lee, K. Lim, H. Shin, J. Kim, O Seongil, A. Iyer, D. Wang, K. Sohn, and N. S. Kim. 2021. Hardware Architecture and Software Stack for PIM Based on Commercial DRAM Technology. In ISCA ."
+    },
+    {
+      "n": 35,
+      "id": "bib.bib41",
+      "text": "Devaux (2019) F. Devaux. 2019. The True Processing in Memory Accelerator. In Hot Chips ."
+    },
+    {
+      "n": 36,
+      "id": "bib.bib163",
+      "text": "UPMEM SAS ([n. d.]) UPMEM SAS. [n. d.]. Technology. https://www.upmem.com/technology/ ."
+    },
+    {
+      "n": 37,
+      "id": "bib.bib142",
+      "text": "Samsung Electronics Co., Ltd. ([n. d.]) Samsung Electronics Co., Ltd. [n. d.]. HBM Processing in Memory. https://www.samsung.com/semiconductor/solutions/technology/hbm-processing-in-memory/ ."
+    },
+    {
+      "n": 38,
+      "id": "bib.bib112",
+      "text": "Mandelman et al . (2002) J. A. Mandelman, R. H. Dennard, G. B. Bronner, J. K. DeBrosse, R. Divakaruni, Y. Li, and C. J. Radens. 2002. Challenges and Future Directions for the Scaling of Dynamic Random-Access Memory (DRAM). IBM JRD (Mar. 2002)."
+    },
+    {
+      "n": 39,
+      "id": "bib.bib83",
+      "text": "Kang et al . (2014) U. Kang, H.-S. Yu, C. Park, H. Zheng, J. Halbert, K. Bains, S. Jang, and J. Choi. 2014. Co-Architecting Controllers and DRAM to Enhance DRAM Process Scaling. In The Memory Forum ."
+    },
+    {
+      "n": 40,
+      "id": "bib.bib118",
+      "text": "Mutlu (2013) O. Mutlu. 2013. Memory Scaling: A Systems Architecture Perspective. In IMW ."
+    },
+    {
+      "n": 41,
+      "id": "bib.bib70",
+      "text": "Im et al . (2020) J. Im, J. Bae, C. Chung, Arvind, and S. Lee. 2020. PinK: High-Speed In-Storage Key-Value Store With Bounded Tails. In USENIX ATC ."
+    },
+    {
+      "n": 42,
+      "id": "bib.bib77",
+      "text": "Jones (2020) S. W. Jones. 2020. Economics in the 3D Era. Talk at LithoVision."
+    },
+    {
+      "n": 43,
+      "id": "bib.bib121",
+      "text": "Neumann and Freitag (2020) T. Neumann and M. J. Freitag. 2020. Umbra: A Disk-Based System With In-Memory Performance.. In CIDR ."
+    },
+    {
+      "n": 44,
+      "id": "bib.bib19",
+      "text": "Brin and Page (1998) S. Brin and L. Page. 1998. The Anatomy of a Large-Scale Hypertextual Web Search Engine. Computer Networks and ISDN Systems (Apr. 1998)."
+    },
+    {
+      "n": 45,
+      "id": "bib.bib162",
+      "text": "Tseng et al . (2020) P.-H. Tseng, F.-M. Lee, Y.-H. Lin, L.-Y. Chen, Y.-C. Li, H.-W. Hu, Y.-Y. Wang, C.-C. Hsieh, M.-H. Lee, H.-L. Lung, K.-Y. Hsieh, K.-C. Wang, and C.-Y. Lu. 2020. In-Memory-Searching Architecture Based on 3D-NAND Technology With Ultra-High Parallelism. In IEDM ."
+    },
+    {
+      "n": 46,
+      "id": "bib.bib27",
+      "text": "Caminal et al . (2022) H. Caminal, Y. Chronis, T. Wu, J. M. Patel, and J. F. Martínez. 2022. Accelerating Database Analytic Query Workloads Using an Associative Processor. In ISCA ."
+    },
+    {
+      "n": 47,
+      "id": "bib.bib4",
+      "text": "Agrawal and Srikant (1994) R. Agrawal and R. Srikant. 1994. Fast Algorithms for Mining Association Rules. In VLDB ."
+    },
+    {
+      "n": 48,
+      "id": "bib.bib132",
+      "text": "Pei and Zukowski (1991) T.-B. Pei and C. Zukowski. 1991. VLSI Implementation of Routing Tables: Tries and CAMs. In INFCOM ."
+    },
+    {
+      "n": 49,
+      "id": "bib.bib117",
+      "text": "Meribout et al . (2000) M. Meribout, T. Ogura, and M. Nakanishi. 2000. On Using the CAM Concept for Parametric Curve Extraction. TIP (2000)."
+    },
+    {
+      "n": 50,
+      "id": "bib.bib122",
+      "text": "NVM Express, Inc. (2021a) NVM Express, Inc. 2021a. NVM Express® Base Specification, Revision 2.0a ."
+    }
+  ]
+}

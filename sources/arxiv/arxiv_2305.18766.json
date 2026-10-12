@@ -1,0 +1,140 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2305.18766",
+  "title": "HiFA: High-fidelity Text-to-3D Generation with Advanced Diffusion Guidance",
+  "authors": "Junzhe Zhu, Peiye Zhuang, Sanmi Koyejo",
+  "year": "2024",
+  "categories": [
+    "cs.CV",
+    "cs.AI",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2305.18766",
+  "html_url": "https://arxiv.org/html/2305.18766",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 971,
+  "text": "The task of automatic text-to-3D generation aims to create 3D assets based on a text description and has gained significant attention due to its wide-ranging applications in digital content generation, film-making, and Virtual Reality (VR) [1,2]. Initial efforts in this domain centered on unconditional 3D asset generation, experimenting with various 3D representation modalities presented in explicit formats such as meshes [3,4,5,6], as well as implicit formats such as fields [7,8,9]. Following this, the field has progressed towards conditional 3D generative models, e.g., with text-based guidance [10]. However, these studies have been limited to relatively simple 3D assets, primarily due to the scarcity of large-scale annotated 3D datasets.\n\nThe availability of ample image datasets and the success of text-to-image generation have paved the way for lifting pre-trained text-to-image models to the 3D domain. Specifically, recent studies focus on optimizing a 3D representation for an asset, using pre-trained text-to-image generative models by providing a denoising score for rendered images [11,12,13,14,15,1,16,2,17]. [13] proposed a loss from the distillation of a text-to-image diffusion model. They minimized the Kullback-Leibler (KL) divergence between a family of Gaussian distributions based on the forward diffusion process and the denoising scores acquired from the pre-trained text-to-image diffusion model. The proposed Score Distillation Sampling (SDS) method combined with a NeRF enables 3D asset generation from given text prompts. Subsequent research has improved generation quality through various approaches including the adoption of two-stage optimization frameworks [1,16,17,18], alterations to the original SDS formulation [15,17], and the disentanglement of geometry and appearance [2].\n\nIn this work, we revisit the integration of the SDS approach with NeRFs, aiming to achieve photo-realistic and high-quality text-to-3D generation through a single-stage optimization. In contrast to existing text-to-3D generation work, we distill the score in the text-to-image diffusion model’s latent and image spaces for enhanced supervision. Moreover, we observe that the efficacy of the diffusion prior is limited in previous works [13,1] when timesteps (also referred to as noise levels in denoising score matching) are randomly sampled during optimization. Specifically, we observe that toward the end of the training process, the NeRF becomes almost determined in representing a particular 3D asset. Thus, we find that randomly sampling a large timestep drives the diffusion model to produce a denoised image that is distinct and unrelated to the original input rendering. This yields inconsistent distillation from the diffusion model and compromised optimization of NeRFs. To address this, we introduce a timestep annealing approach where the timestep in the forward diffusion process inversely correlates with the square root of the number of training iterations. Our empirical analysis demonstrates that the proposed timestep annealing approach effectively enhances generation quality. We also show that the square root timestep annealing consistently outperforms other annealing methods, such as linear and cosine ratios.\n\nMoreover, generating a detailed 3D asset through single-stage optimization is challenging. Specifically, explicit 3D representations, such as meshes, struggle to capture intricate topology, such as those with holes. Implicit 3D representations [19,20] may lead to cloudy geometry and flickering textures. For instance, when NeRFs are employed to represent highly detailed 3D geometries like human bodies [21], Moiré patterns are noticable. To this end, prior works [1,17] adopted two-stage optimization techniques. In these approaches, explicit 3D representations, such as Deep Marching Tetrahedra (DMTet) [22], are used to extract textured meshes from the implicit representations in the first stage and are subsequently fine-tuned in the second stage to capture high-quality geometry. However, these mesh representations forfeit the ability to produce detailed appearances such as fur – a tradeoff we wish to avoid. Differently, we aim to maintain the flexibility and photo-realism offered by the NeRF representation while at the same time achieving high-quality text-to-3D generation through a single-stage training.\n\nTo this end, we propose two techniques to advance NeRF optimization. Specifically, to address the cloudy geometry issue in NeRFs, we propose a variance regularization that minimizes the variance of sampled z-coordinates distributed along NeRF rays. We observe that this technique enables NeRFs to more accurately represent crisp geometrical surfaces, thereby effectively mitigating the cloudiness issue. Additionally, we verify that our proposed z-variance regularization outperforms alternative spatial regularization proposed in previous methods [23].\n\nMoreover, texture flickering or shimmer effects often result from inaccuracies in estimating the importance sampling weights across different rendering views. However, existing solutions, such as increasing the number of sampling points along the rays or deploying separate density estimation networks for each coarse and refined stage, come with increased computational demands. Instead, we propose a kernel smoothing technique tailored for coarse-to-fine importance sampling along NeRF rays without an increase in the computational cost. This technique is inspired by the integrated positional encoding for spatial points within a cone, previously proposed to tackle aliasing issues in a single image view [24]. In our case, the goal is to mitigate flickering issues across multiple views. Specifically, we use a kernel to refine the probability density function (PDF) estimated in the coarse sampling stage along a ray, which enables more comprehensive sampling near asset surface regions in the refined stage. This technique notably enhances the fidelity of importance sampling.\n\nWe summarize our technical contributions for two crucial components of text-to-3D generation: (1) 3D representation and (2) optimization, which are outlined below:\n\n- • To achieve photo-realistic and highly-detailed text-to-3D generation, we propose score distillation in both the latent and image space of the pre-trained text-to-image diffusion models. Moreover, we introduce a timestep annealing approach for score distillation from text-to-image diffusion models.\n\n- • To achieve sharp geometry quality through a single-stage training, we present a regularization method applied to the variance of z-coordinates along NeRF rays.\n\n- • To address flickering issues in NeRFs, we propose a kernel smoothing technique that refines the PDF estimation in coarse-to-fine importance sampling.\n\nTaken together, we show how these holistic modifications address existing shortcomings and improve the quality of 3D synthesis.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib18",
+      "text": "Lin et al. (2023) Chen-Hsuan Lin, Jun Gao, Luming Tang, Towaki Takikawa, Xiaohui Zeng, Xun Huang, Karsten Kreis, Sanja Fidler, Ming-Yu Liu, and Tsung-Yi Lin. Magic3d: High-resolution text-to-3d content creation. In CVPR , 2023."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib5",
+      "text": "Chen et al. (2023b) Rui Chen, Yongwei Chen, Ningxin Jiao, and Kui Jia. Fantasia3d: Disentangling geometry and appearance for high-quality text-to-3d content creation. arXiv preprint arXiv:2303.13873 , 2023b."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib1",
+      "text": "Achlioptas et al. (2018) Panos Achlioptas, Olga Diamanti, Ioannis Mitliagkas, and Leonidas Guibas. Learning representations and generative models for 3d point clouds. In ICML , 2018."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib24",
+      "text": "Luo & Hu (2021) Shitong Luo and Wei Hu. Diffusion probabilistic models for 3d point cloud generation. In CVPR , 2021."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib35",
+      "text": "Smith & Meger (2017) Edward J Smith and David Meger. Improved adversarial systems for 3d object generation and reconstruction. In CoRL , 2017."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib40",
+      "text": "Xie et al. (2018) Jianwen Xie, Zilong Zheng, Ruiqi Gao, Wenguan Wang, Song-Chun Zhu, and Ying Nian Wu. Learning descriptor networks for 3d shape synthesis and analysis. In CVPR , 2018."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "Chen & Zhang (2019) Zhiqin Chen and Hao Zhang. Learning implicit fields for generative shape modeling. In CVPR , 2019."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib26",
+      "text": "Mittal et al. (2022) Paritosh Mittal, Yen-Chi Cheng, Maneesh Singh, and Shubham Tulsiani. AutoSDF: Shape priors for 3d completion, reconstruction and generation. In CVPR , 2022."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib44",
+      "text": "Zhuang et al. (2023) Peiye Zhuang, Samira Abnar, Jiatao Gu, Alex Schwing, Joshua M Susskind, and Miguel Ángel Bautista. Diffusion probabilistic fields. In ICLR , 2023."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib8",
+      "text": "Cheng et al. (2023) Yen-Chi Cheng, Hsin-Ying Lee, Sergey Tuyakov, Alex Schwing, and Liangyan Gui. SDFusion: Multimodal 3d shape completion, reconstruction, and generation. CVPR , 2023."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib16",
+      "text": "Khalid et al. (2022) Nasir Mohammad Khalid, Tianhao Xie, Eugene Belilovsky, and Popa Tiberiu. Clip-mesh: Generating textured meshes from text using pretrained image-text models. SIGGRAPH Asia 2022 Conference Papers , December 2022."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib15",
+      "text": "Jain et al. (2022) Ajay Jain, Ben Mildenhall, Jonathan T. Barron, Pieter Abbeel, and Ben Poole. Zero-shot text-guided object generation with dream fields. CVPR , 2022."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib28",
+      "text": "Poole et al. (2022) Ben Poole, Ajay Jain, Jonathan T Barron, and Ben Mildenhall. Dreamfusion: Text-to-3d using 2d diffusion. arXiv preprint arXiv:2209.14988 , 2022."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib41",
+      "text": "Xu et al. (2022) Jiale Xu, Xintao Wang, Weihao Cheng, Yan-Pei Cao, Ying Shan, Xiaohu Qie, and Shenghua Gao. Dream3d: Zero-shot text-to-3d synthesis using 3d shape prior and text-to-image diffusion models. arXiv preprint arXiv:2212.14704 , 2022."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib38",
+      "text": "Wang et al. (2023a) Haochen Wang, Xiaodan Du, Jiahao Li, Raymond A Yeh, and Greg Shakhnarovich. Score jacobian chaining: Lifting pretrained 2d diffusion models for 3d generation. CVPR , 2023a."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib37",
+      "text": "Tang et al. (2023) Junshu Tang, Tengfei Wang, Bo Zhang, Ting Zhang, Ran Yi, Lizhuang Ma, and Dong Chen. Make-it-3d: High-fidelity 3d creation from a single image with diffusion prior. arXiv preprint arXiv:2303.14184 , 2023."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib39",
+      "text": "Wang et al. (2023b) Zhengyi Wang, Cheng Lu, Yikai Wang, Fan Bao, Chongxuan Li, Hang Su, and Jun Zhu. Prolificdreamer: High-fidelity and diverse text-to-3d generation with variational score distillation. NeurIPS , 2023b."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib6",
+      "text": "Chen et al. (2023c) Yiwen Chen, Chi Zhang, Xiaofeng Yang, Zhongang Cai, Gang Yu, Lei Yang, and Guosheng Lin. It3d: Improved text-to-3d generation with explicit view synthesis, 2023c."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib25",
+      "text": "Mildenhall et al. (2020) Ben Mildenhall, Pratul P Srinivasan, Matthew Tancik, Jonathan T Barron, Ravi Ramamoorthi, and Ren Ng. Nerf: Representing scenes as neural radiance fields for view synthesis. ECCV , 2020."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib27",
+      "text": "Müller et al. (2022) Thomas Müller, Alex Evans, Christoph Schied, and Alexander Keller. Instant neural graphics primitives with a multiresolution hash encoding. ACM Trans. Graph. , 2022."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib13",
+      "text": "Hong et al. (2023) Fangzhou Hong, Zhaoxi Chen, Yushi Lan, Liang Pan, and Ziwei Liu. Eva3d: Compositional 3d human generation from 2d image collections. ICLR , 2023."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib34",
+      "text": "Shen et al. (2021) Tianchang Shen, Jun Gao, Kangxue Yin, Ming-Yu Liu, and Sanja Fidler. Deep marching tetrahedra: a hybrid representation for high-resolution 3d shape synthesis. In NeurIPS , 2021."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib3",
+      "text": "Barron et al. (2022) Jonathan T. Barron, Ben Mildenhall, Dor Verbin, Pratul P. Srinivasan, and Peter Hedman. Mip-nerf 360: Unbounded anti-aliased neural radiance fields. CVPR , 2022."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib2",
+      "text": "Barron et al. (2021) Jonathan T Barron, Ben Mildenhall, Matthew Tancik, Peter Hedman, Ricardo Martin-Brualla, and Pratul P Srinivasan. Mip-nerf: A multiscale representation for anti-aliasing neural radiance fields. In ICCV , 2021."
+    }
+  ]
+}

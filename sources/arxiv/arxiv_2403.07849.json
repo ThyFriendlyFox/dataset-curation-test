@@ -1,0 +1,73 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.07849",
+  "title": "Iterative Graph Neural Network Enhancement via Frequent Subgraph Mining of Explanations",
+  "authors": "Harish G. Naik, Jan Polster, Raj Shekhar, TamÃ¡s HorvÃ¡th, GyÃ¶rgy TurÃ¡n",
+  "year": "2024",
+  "categories": [
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2403.07849",
+  "html_url": "https://arxiv.org/html/2403.07849",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1203,
+  "text": "XAI-based model improvement is a relatively recent research direction in XAI. The underlying observation is that explanations, besides providing information to the user about the model’s decision, can also be used to improve the model. A recent survey is given in [1].\n\nIn this paper we consider Graph Neural Networks (GNNs) for node classification within the XAI-based model improvement paradigm. Message-passing GNNs (MPNNs) have limited representational power due to the limitations of the related Weisfeiler-Leman (1-WL) algorithm [4,5]. Two nodes which are indistinguishable by 1-WL are indistinguishable by any MPNN.\n\nExtending the power of MPNN to overcome these limitations is a fundamental challenge. One approach is higher-order variants of WL, which are more expressive, but computationally less tractable [6]. Another approach is to add structural information as node features. For vanilla MPNN node feature vectors are constant. The number of triangles in the 1-hop neighborhood of a node, which cannot be detected by 1-WL, can be such an added feature. In [7], the authors propose adding node features by counting the number of rooted subgraphs that are isomorphic to a given rooted pattern graph. They suggest domain-specific patterns, e.g., cliques for social networks and cycles for molecules. Adding new features by counting the number of rooted homomorphisms is proposed in [2]. Building on these proposals, a general question, formulated in [2], is how to select useful patterns? We refer to this problem as the GNN pattern selection problem. It is noted in [2] that “one important remark is that selecting the best set of features is still a challenging endeavor”. They also point out that the application-dependence of the best set of features adds to the difficulty of the problem.\n\nIn this paper we propose an approach to the GNN pattern selection problem for application-dependent features, i.e., the features are extracted from the data in an automatic way, and not by using some domain-specific pattern set. XAI-based model improvement suggests to use explanations for solving the GNN pattern selection problem. Utilizing that explanations for GNNs are often rooted subgraphs, we propose the Explanation Enhanced Graph Learning (EEGL) approach for iterative enhancement of the predictive performance of GNNs for node classification. EEGL uses frequent connected subgraph mining to identify patterns occuring in many explanation subgraphs for nodes of a given class. These are analyzed further to select the best patterns. Nodes are then annotated with features based on the presence or absence of these patterns in the neighborhood. Starting with vanilla GNN, the process can be iterated.\n\nA few remarks are in order about assumptions underlying the approach and its intended scope of applications. It is assumed that the learning problem is such that 1. there exist explanation subgraphs of reasonable quality and 2. the GNN learning and explanation algorithm to be improved is of reasonable quality. The hypothesis underlying our work, then, is that if assumptions 1. and 2. hold then explanations can be used to construct useful features, and those can be used to improve performance. Assumptions 1. and 2. are not expected to hold in general. On the other hand, assumption 2. is not too restrictive as the goal is to improve a weak learner using weak explanations, a setup which may be of interest in itself. Applications where the assumptions may hold could be in scientific discovery. A scientist could suggest a kind of explanation to the data scientist, who could use EEGL to evaluate, use or correct this suggestion [8].\n\nFor the experimental evaluation of the EEGL approach, one can consider the following questions:\n\nQ1: Can the node-distinguishing power and hence, the predictive performance of GNNs be improved by using frequent subgraph mining of explanations? Do iterations help?\n\nQ2: How does the performance of EEGL-trained GNNs compare to other feature initializations and subgraph-based GNNs?\n\nQ3: What is the effect of the relationship between 1-WL symmetries and label partitions?\n\nSummary of the Experimental Results The objective of the paper is to provide first steps towards answering these questions, focusing on the effect of structural complexity. One should note that our approach is not expected to be applicable in cases when the information provided by the graph is more of a statistical nature, as in social networks. In contrast, motivated by the connections to 1-WL, we consider synthetic and real-world datasets with different relationships between the node classes having the same 1-WL labels and those having the same class labels. From this point of view, datasets studied belong to three categories: (i) The graph has a large number of 1-WL classes, compared to its size (low 1-WL symmetry) and target classes are formed by the union of a family of 1-WL classes, (ii) the graph has a small number of 1-WL classes, compared to its size (high 1-WL symmetry) and all 1-WL classes are formed by the union of a family of target classes, and its special case that (iii) the graph is regular (each node has the same degree) and has therefore only one 1-WL class. We used synthetic datasets for (i) and (ii), and fullerenes for (iii). The following are some of the main conclusions of our experiments.\n\nAnswer to Q1: EEGL was capable of iterative self-improvement from explanations in at most 3 iterations on all learning tasks considered, including those that require a node-distinguishing power beyond that of vanilla GNNs.\n\nAnswer to Q2: We considered three other feature initializations: (1) one-hot encoding of true class labels (regarded as an upper bound on the performance of GNN on the learning task), (2) randomly assigned numerical features [9,10], and (3) “maliciously” selected subgraph features (motivated by the comment of [2] that performance “almost always benefits from any set of additional features”). We also compared EEGL’s predictive performance to that of shaDow-GNN [11], a subgraph-based approach which also generates node representations dynamically. EEGL outperforms (2) and (3) and shaDow-GNN on all datasets, except for one, where shaDow-GNN achieved approximately the same F1-score.\n\nAnswer to Q3: EEGL performed well on datasets of all three types. Its predictive performance was close to 100% on all problems in (i) and (ii). Regarding (iii), EEGL achieved 100% on most and between 86 and 97% on 3 fullerenes, most in the first iteration. It was, however, unable to improve the results on the 3 fullerenes in the subsequent rounds. EEGL achieved already more than 99% in average in one iteration on all problems in category (i) and 97% in category (iii). For the dataset in category (ii), it needed three iterations to achieve 100%.\n\nContributions In summary, the main contribution of this work is a general self-improving framework to overcome the inherent limited representational power of vanilla GNNs. In particular, it (i) applies an XAI-based iterative model improvement method to GNN, (ii) provides an automated, application-dependent solution to the GNN pattern selection problem, (iii) applies frequent connected subgraph mining to XAI, and (iv) gives a detailed study of node classification problems where graph-theoretic structural complexity is relevant.\n\nOutline The rest of the paper is organized as follows. In Sections 2 we overview related work. The EEGL system is presented in Section 3. We report and discuss the experimental results obtained in Section 4. Finally, in Section 5 we conclude and formulate some problems for further research.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib28",
+      "text": "L. Weber, S. Lapuschkin, A. Binder, and W. Samek. Beyond explaining: Opportunities and challenges of XAI-based model improvement. Inf. Fusion , 92:154–176, 2023."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib8",
+      "text": "P. Barceló, F. Geerts, J. Reutter, and M. Ryschkov. Graph Neural Networks with Local Graph Parameters. In M. Ranzato, A. Beygelzimer, Y. Dauphin, P. S. Liang, and J. W. Vaughan, editors, Advances in Neural Information Processing Systems , volume 34, pages 25280–25293. Curran Associates, Inc., 2021."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib18",
+      "text": "T. N. Kipf and M. Welling. Semi-supervised classification with graph convolutional networks. In International Conference on Learning Representations (ICLR) , 2017."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib23",
+      "text": "C. Morris, M. Ritzert, M. Fey, W. L. Hamilton, J. E. Lenssen, G. Rattan, and M. Grohe. Weisfeiler and Leman go neural: Higher-order graph neural networks. In The Thirty-Third AAAI Conference on Artificial Intelligence, AAAI 2019 , pages 4602–4609. AAAI Press, 2019."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib29",
+      "text": "K. Xu, S. Jegelka, W. Hu, and J. Leskovec. How Powerful are Graph Neural Networks? In 7th International Conference on Learning Representations, ICLR 2019 , pages 1–17, 2019."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib11",
+      "text": "V. P. Dwivedi, C. K. Joshi, A. T. Luu, T. Laurent, Y. Bengio, and X. Bresson. Benchmarking graph neural networks. J. Mach. Learn. Res. , 24:43:1–43:48, 2023."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib9",
+      "text": "G. Bouritsas, F. Frasca, S. Zafeiriou, and M. M. Bronstein. Improving graph neural network expressivity via subgraph isomorphism counting. IEEE Trans. Pattern Anal. Mach. Intell. , 45(1):657–668, 2023."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib24",
+      "text": "H. Naik and G. Turán. Explanation from specification. CoRR , abs/2012.07179, 2020."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib1",
+      "text": "R. Abboud, İ. İ. Ceylan, M. Grohe, and T. Lukasiewicz. The surprising power of graph neural networks with random node initialization. In Proceedings of the Thirtieth International Joint Conference on Artificial Intelligence, IJCAI 2021 , pages 2112–2118. ijcai.org, 2021."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "G. Dasoulas, L. D. Santos, K. Scaman, and A. Virmaux. Coloring graph neural networks for node disambiguation. In Proceedings of the Twenty-Ninth International Joint Conference on Artificial Intelligence, IJCAI 2020 , pages 2126–2132. ijcai.org, 2020."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib31",
+      "text": "H. Zeng, M. Zhang, Y. Xia, A. Srivastava, A. Malevich, R. Kannan, V. K. Prasanna, L. Jin, and R. Chen. Decoupling the depth and scope of graph neural networks. In Advances in Neural Information Processing Systems 34: Annual Conference on Neural Information Processing Systems 2021, NeurIPS 2021 , pages 19665–19679, 2021."
+    }
+  ]
+}

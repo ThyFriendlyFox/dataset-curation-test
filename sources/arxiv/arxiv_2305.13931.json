@@ -1,0 +1,68 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2305.13931",
+  "title": "Position Bias Estimation with Item Embedding for Sparse Dataset",
+  "authors": "Shion Ishikawa, Yun Ching Liu, Young-Joo Chung, Yu Hirate",
+  "year": "2024",
+  "categories": [
+    "cs.IR"
+  ],
+  "url": "https://arxiv.org/abs/2305.13931",
+  "html_url": "https://arxiv.org/html/2305.13931",
+  "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+  "section": "Introduction",
+  "word_count": 674,
+  "text": "Learning to Rank (L2R) [1] is a valuable approach to improving ranking performance in search engines, recommender systems [2] [3], and targeted advertisement [4]. Click data from rankings applications is a promising source for enhancing personalized rankings. Unlike explicit feedback, such as user ratings, click data reflects users’ interaction with applications, making it a valuable form of implicit feedback. However, due to its implicit nature, click data contains various biases, including position bias [5]. Position bias implies that the location of content influences its likelihood of being selected by users. To extract reliable signals from users’ implicit feedback, previous research has focused on removing bias, in other words, denoising click data.\n\nClick-Modeling is one approach to addressing the aforementioned issues. For instance, the position-based click model (PBM) [6] represents the probability of a user clicking on an item as the product of two probabilities: the probability of a user examining a specific position (position bias), and the probability of a user clicking on an item after examining it (item-user relevance).\n\nIn this study, we focus on estimating position bias under the PBM approach. While the cascade model [7] has been extensively studied, it assumes a linear order of examining items and may not be applicable in all industrial scenarios where the order of item examination is not linear or follows a specific pattern, such as in the case of carousel ads with navigation buttons. For example, in the case of carousel ads with navigation buttons, when users click the left arrow button, the displayed ads shift to the left, causing users to examine the ads in a right-to-left order. Conversely, if they click the right arrow button, the order of examination will be reversed, with users examining the ads from left to right.\n\nThe accuracy of position bias estimation is critical for the performance of recommender systems, because an inaccurate estimation will directly lead to a biased evaluation of item-user relevance. We have implemented the regression EM algorithm [8] in the production carousel advertisement to estimate position bias from logged click data, without affecting real user traffic. Unfortunately, we discovered that this model didn’t work well for this application due to the training data sparsity in the position bias estimation.\n\nThe regression EM algorithm takes the tuple (item, position) as input data. Ideally, the items should be evenly distributed across all positions with a sufficient number of samples. However, in real-world scenarios, marketers often display advertisements in a fixed pre-determined order, resulting in most items being placed in only a few positions. Moreover, in many cases, we observe one item is consistently placed in a single position. When we have 15 ads in our e-commerce platform, It means that we observe only 6.7\\%(=15/15^{2}) of total combinations in (ad, position) tuples. The position bias estimation suffers from it.\n\nIn this study, we propose a method to address this sparsity issue. Our approach utilizes item similarities to estimate missing values in the (item, position) matrix. Specifically, when the (item X, position 1) entry is missing, we estimate its position using a similar item X^{\\prime}. To achieve this, we employ embedding techniques to create a representation that preserves similarity between items. In our investigation, we discovered that item embeddings for estimating position bias have not been tested extensively with well-known tabular embedding baseline models like Latent Semantic Indexing (LSI) [9] and Variational Autoencoder (VAE) [10]. Therefore, we aim to leverage these two models as an initial proposal in this study.\n\nIn summary, our study makes the following key contributions:\n\n- • We introduce the novel problem of data sparsity in (item, position) pairs for position bias estimation in a real-world scenario.\n\n- • We propose a novel method for estimating position bias using Latent Semantic Indexing and Variational auto-encoder.\n\n- • We conduct extensive experiments on public and internal datasets, which demonstrates that our method, REM with item embedding, estimates position biases more accurately and improves learning-to-rank performance.\n\n- • We find that LSI outperforms VAE in terms of accuracy of position bias estimation and personalized ranking.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib4",
+      "text": "Cao et al . (2007) Zhe Cao, Tao Qin, Tie-Yan Liu, Ming-Feng Tsai, and Hang Li. 2007. Learning to rank: from pairwise approach to listwise approach. In Proceedings of the 24th international conference on Machine learning . 129–136."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib15",
+      "text": "Yuan et al . (2017) Fajie Yuan, Guibing Guo, Joemon M Jose, Long Chen, Haitao Yu, and Weinan Zhang. 2017. Boostfm: Boosted factorization machines for top-n feature-based recommendation. In Proceedings of the 22nd International Conference on Intelligent User Interfaces . 45–54."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib9",
+      "text": "Rendle et al . (2009) Steffen Rendle, Leandro Balby Marinho, Alexandros Nanopoulos, and Lars Schmidt-Thieme. 2009. Learning optimal ranking with tensor factorization for tag recommendation. In Proceedings of the 15th ACM SIGKDD international conference on Knowledge discovery and data mining . 727–736."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib2",
+      "text": "Aharon et al . (2019) Michal Aharon, Oren Somekh, Avi Shahar, Assaf Singer, Baruch Trayvas, Hadas Vogel, and Dobri Dobrev. 2019. Carousel ads optimization in yahoo gemini native. In Proceedings of the 25th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining . 1993–2001."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib6",
+      "text": "Joachims et al . (2017) Thorsten Joachims, Laura Granka, Bing Pan, Helene Hembrooke, and Geri Gay. 2017. Accurately interpreting clickthrough data as implicit feedback. In Acm Sigir Forum , Vol. 51. Acm New York, NY, USA, 4–11."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib10",
+      "text": "Richardson et al . (2007) Matthew Richardson, Ewa Dominowska, and Robert Ragno. 2007. Predicting clicks: estimating the click-through rate for new ads. In Proceedings of the 16th international conference on World Wide Web . 521–530."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib5",
+      "text": "Craswell et al . (2008) Nick Craswell, Onno Zoeter, Michael Taylor, and Bill Ramsey. 2008. An experimental comparison of click position-bias models. In Proceedings of the 2008 international conference on web search and data mining . 87–94."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib14",
+      "text": "Wang et al . (2018) Xuanhui Wang, Nadav Golbandi, Michael Bendersky, Donald Metzler, and Marc Najork. 2018. Position bias estimation for unbiased learning to rank in personal search. In Proceedings of the Eleventh ACM International Conference on Web Search and Data Mining . 610–618."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib11",
+      "text": "Rosario (2000) Barbara Rosario. 2000. Latent semantic indexing: An overview. Techn. rep. INFOSYS 240 (2000), 1–16."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib7",
+      "text": "Kingma et al . (2019) Diederik P Kingma, Max Welling, et al . 2019. An introduction to variational autoencoders. Foundations and Trends® in Machine Learning 12, 4 (2019), 307–392."
+    }
+  ]
+}

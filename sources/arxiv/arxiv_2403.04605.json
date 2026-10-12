@@ -1,0 +1,78 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.04605",
+  "title": "In-n-Out: Calibrating Graph Neural Networks for Link Prediction",
+  "authors": "Erik Nascimento, Diego Mesquita, Samuel Kaski, Amauri H Souza",
+  "year": "2024",
+  "categories": [
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2403.04605",
+  "html_url": "https://arxiv.org/html/2403.04605",
+  "license": "http://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Introduction",
+  "word_count": 562,
+  "text": "Graph neural networks [1,2] are powerful models that often interleave message-passing operators and non-linear activation functions to extract meaningful representations from relational data. These methods have become the de facto models for an array of sensitive tasks, including financial crime detection [3], drug discovery [4], personalized medicine [5], and online advertising [6]. As a consequence, domain experts may rely on GNN predictions to make critical decisions. Given the potential risk behind these decisions, there is a growing concern regarding the poor calibration of GNNs — a noticeable mismatch between confidence estimates and true label probabilities. To address this concern, prior works leverage graph structure to improve upon classical calibration methods, either by refining node-wise logits using a GNN [7], or using attention to aggregate logits from nearby nodes and compute node-wise temperature scales [8]. Since these methods operate on node-level logits, they only apply to node classification. However, to the best of our knowledge, there are no works dedicated to the calibration of GNNs for link prediction.\n\nA natural question ensues: can we use off-the-shelf solutions to calibrate GNNs for link prediction? In principle, there are many methods designed for independently distributed data that we can use to alleviate miscalibration in GNNs — e.g., isotonic regression [9] and temperature scaling [10]. These methods work directly in logit space, e.g., scaling them by a constant or mapping logits intervals to a sequence of increasing values. The downside of these approaches is that the logits are the final bottleneck in a neural network, and a great deal of information (possibly useful for calibration) may be lost along the way.\n\nIn this paper, we propose IN-N-OUT, the first method for post-hoc calibration of GNNs in the context of link prediction. IN-N-OUT is a novel temperature-scaling method that builds on a simple intuition: if a GNN believes an edge does (not) occur, (not) seeing it should not drastically change the information we have on the graph — which is condensed in the GNN embeddings. On the other hand, if the GNN believes an edge does (not) occur, seeing the opposite should significantly change that edge’s embedding. To encapsulate this concept, IN-N-OUT parameterizes the scaling factor as a function of how much an edge embedding changes by possibly observing an edge, modulated by the class predicted by the GNN.\n\nOur experimental campaign, including multiple datasets and GNN models, shows that IN-N-OUT generally outperforms off-the-shelf calibration methods, consistently resulting in smaller expected calibration errors. More specifically, IN-N-OUT outperforms Isotonic Regression [9], Histogram binning [11], Temperature scaling and BBQ [12], producing lower calibration error on 29 out of 35 experiments. We also run an extensive ablation study with 4 GNNs and 8 datasets to validate the intuitions behind our modeling choices.\n\nIn summary, our contributions are:\n\n- 1. We show for the first time that GNNs are usually miscalibrated for link prediction tasks. While this phenomenon also happens for node classification, the calibration curves for link prediction are often more complex, exhibiting a mixed behavior: positive predictions being underconfident, and negative ones being overconfident;\n\n- 2. We propose IN-N-OUT, the first method for calibration of GNNs in the context of link prediction.\n\n- 3. Our experiments on real data show that IN-N-OUT consistently outperforms the existing baselines, which include popular calibration methods for non-relational data. We also perform an ablation study to assess the impact of the model components.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "F. Scarselli, M. Gori, A. C. Tsoi, M. Hagenbuchner, and G. Monfardini, “The graph neural network model,” IEEE Transactions on Neural Networks , 2009."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "M. Gori, G. Monfardini, and F. Scarselli, “A new model for learning in graph domains,” in IEEE International Joint Conference on Neural Networks (IJCNN) , 2005."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "D. Cheng, S. Xiang, C. Shang, Y. Zhang, F. Yang, and L. Zhang, “Spatio-temporal attention-based neural network for credit card fraud detection,” AAAI Conference on Artificial Intelligence , 2020."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "J. M. Stokes, K. Yang, K. Swanson, W. Jin, A. Cubillos-Ruiz, N. M. Donghia, C. R. MacNair, S. French, L. A. Carfrae, Z. Bloom-Ackermann, V. M. Tran, A. Chiappino-Pepe, A. H. Badran, I. W. Andrews, E. J. Chory, G. M. Church, E. D. Brown, T. S. Jaakkola, R. Barzilay, and J. J. Collins, “A deep learning approach to antibiotic discovery,” Cell , vol. 180, no. 4, 2020."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "C. Wu, F. Wu, L. Lyu, T. Qi, Y. Huang, and X. Xie, “A federated graph neural network framework for privacy-preserving personalization,” Nature Communications , 2022."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "Z. Liu, B. Ma, Q. Liu, J. Xu, and B. Zheng, “Heterogeneous graph neural networks for large-scale bid keyword matching,” in ACM International Conference on Information & Knowledge Management (CIKM) , 2021."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "X. Wang, H. Liu, C. Shi, and C. Yang, “Be confident! towards trustworthy graph neural networks via confidence calibration,” Advances in Neural Information Processing Systems , 2021."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "H. H. H. Hsu, Y. Shen, C. Tomani, and D. Cremers, “What makes graph neural networks miscalibrated?” Advances in Neural Information Processing Systems , 2022."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "B. Zadrozny and C. Elkan, “Transforming classifier scores into accurate multiclass probability estimates,” in International Conference on Knowledge Discovery and Data Mining , 2002."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "C. Guo, G. Pleiss, Y. Sun, and K. Q. Weinberger, “On calibration of modern neural networks,” in International conference on machine learning , 2017."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "B. Zadrozny and C. Elkan, “Obtaining calibrated probability estimates from decision trees and naive bayesian classifiers,” in International Conference on Machine Learning , 2001, pp. 609–616."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "M. P. Naeini, G. Cooper, and M. Hauskrecht, “Obtaining well calibrated probabilities using bayesian binning,” in AAAI conference on artificial intelligence , 2015."
+    }
+  ]
+}

@@ -1,0 +1,103 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.07807",
+  "title": "StyleGaussian: Instant 3D Style Transfer with Gaussian Splatting",
+  "authors": "Kunhao Liu, Fangneng Zhan, Muyu Xu, Christian Theobalt, Ling Shao, Shijian Lu",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2403.07807",
+  "html_url": "https://arxiv.org/html/2403.07807",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 658,
+  "text": "The remarkable advancements in radiance fields [1] for 3D reconstruction have unveiled a new dimension for immersive exploration of the 3D world. A radiance field, mapping arbitrary 3D coordinates to color and density values, can be implemented via implicit MLPs [1], explicit voxels [2], or a combination of both [3,4]. However, due to the inherent complexity of these implementation functions, editing a radiance field’s style and appearance is not as straightforward as editing meshes or point clouds. Under the guidance of images [5,6], text [7], or other forms of user input [8], several studies tackle radiance field editing via learning but they necessitate test-time optimization which leads to a time-intensive editing process [6,7]. Alternatively, several studies introduce feed-forward networks to speed up the editing but the speed-up is limited [9] and they also potentially violate multi-view consistency [5].\n\nGiven the cruciality of instant interaction and feedback for a seamless 3D user experience, it’s essential that the 3D style transfer can be achieved instantaneously, without sacrificing real-time rendering and multi-view consistency. Recently, 3D Gaussian Splatting (3DGS) [10] has attracted increasing attention thanks to its swift rendering capabilities, making it possible to achieve instant 3D style transfer. State-of-the-art 3D style transfer techniques involve three typical processes [5]: 1) feature embedding that embeds image VGG [11] features to the reconstructed 3D geometry; 2) style transfer that transforms the embedded features based on a style image; and 3) RGB decoding that decodes the transformed features to RGB. Though 3DGS efficiently renders the RGB (three-dimensional) images, rendering high-dimensional features and embedding them into the reconstructed 3D geometry is both computationally and memory intensive [12,13]. In addition, most existing 3D style transfer techniques adopt 2D CNNs for decoding the stylized features to RGB, but 2D CNNs tend to impair multi-view consistency and further the quality of 3D style transfer [5,14,15].\n\nWe design StyleGaussian, a 3D style transfer pipeline that achieves instant 3D style transfer while preserving strict multi-view consistency. StyleGaussian consists of three steps: embedding, transfer, and decoding. First, we embed image VGG features [11] into reconstructed 3D Gaussians for stylization, necessitating rendering the embedded features and comparing them with the ground truth in learning. To address the challenge of the computationally and memory intensive process of rendering high-dimensional VGG features with 3DGS, we develop an efficient feature rendering strategy that first renders low-dimensional features and then maps the rendered low-dimensional features to high-dimensional features. The strategy reformulates the mapping of 2D features as the mapping in 3D Gaussians, thereby enabling obtaining the high-dimensional VGG features for each Gaussian effectively and efficiently.\n\nWith the acquired VGG features for each Gaussian, we can achieve stylization straightly by aligning their channel-wise mean and variance with those of the style image, akin to AdaIN [16]. We then decode the stylized features back to RGB for 3DGS rendering. However, most existing work decodes the stylized features with a 2D CNN decoder which tends to compromise multi-view consistency [5,14,17,15]. To this end, we design a 3D CNN that employs the K-nearest neighbors (KNN) of each Gaussian as a sliding window and formulates convolution operations to match the sliding window. As the 3D CNN works directly in the 3D space, it preserves strict multi-view consistency and leaves the rendering process of 3D Gaussians unaffected. Thanks to the above two designs, StyleGaussian allows zero-shot 3D style transfer without requiring any optimization for new style images.\n\nThe contributions of this work can be summarized in three major aspects. First, we introduce StyleGaussian, a novel 3D style transfer pipeline that enables instant style transfer (\\sim 10 fps) while preserving real-time rendering and strict multi-view consistency. Second, we design an efficient feature rendering strategy that enables rendering high-dimensional features while learning to embed them into reconstructed 3D Gaussians. Third, we design a KNN-based 3D CNN that adeptly decodes the stylized features of 3D Gaussians to RGB without impairing multi-view consistency. Thorough experiments over multiple benchmarks and applications validate the superiority of our designed StyleGaussian.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib27",
+      "text": "Mildenhall, B., Srinivasan, P.P., Tancik, M., Barron, J.T., Ramamoorthi, R., Ng, R.: Nerf: Representing scenes as neural radiance fields for view synthesis. Communications of the ACM 65 (1), 99–106 (2021)"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib43",
+      "text": "Sun, C., Sun, M., Chen, H.T.: Direct voxel grid optimization: Super-fast convergence for radiance fields reconstruction. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 5459–5469 (2022)"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib5",
+      "text": "Chen, A., Xu, Z., Geiger, A., Yu, J., Su, H.: Tensorf: Tensorial radiance fields. In: European Conference on Computer Vision. pp. 333–350. Springer (2022)"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib30",
+      "text": "Müller, T., Evans, A., Schied, C., Keller, A.: Instant neural graphics primitives with a multiresolution hash encoding. ACM Transactions on Graphics (ToG) 41 (4), 1–15 (2022)"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib24",
+      "text": "Liu, K., Zhan, F., Chen, Y., Zhang, J., Yu, Y., El Saddik, A., Lu, S., Xing, E.P.: Stylerf: Zero-shot 3d style transfer of neural radiance fields. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 8338–8348 (2023)"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib53",
+      "text": "Zhang, K., Kolkin, N., Bi, S., Luan, F., Xu, Z., Shechtman, E., Snavely, N.: Arf: Artistic radiance fields. In: European Conference on Computer Vision. pp. 717–733. Springer (2022)"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib45",
+      "text": "Wang, C., Chai, M., He, M., Chen, D., Liao, J.: Clip-nerf: Text-and-image driven manipulation of neural radiance fields. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 3835–3844 (2022)"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib52",
+      "text": "Yuan, Y.J., Sun, Y.T., Lai, Y.K., Ma, Y., Jia, R., Gao, L.: Nerf-editing: geometry editing of neural radiance fields. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 18353–18364 (2022)"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib7",
+      "text": "Chiang, P.Z., Tsai, M.S., Tseng, H.Y., Lai, W.S., Chiu, W.C.: Stylizing 3d scene via implicit representation and hypernetwork. In: Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision. pp. 1475–1484 (2022)"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib19",
+      "text": "Kerbl, B., Kopanas, G., Leimkühler, T., Drettakis, G.: 3d gaussian splatting for real-time radiance field rendering. ACM Transactions on Graphics 42 (4) (2023)"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib41",
+      "text": "Simonyan, K., Zisserman, A.: Very deep convolutional networks for large-scale image recognition. arXiv preprint arXiv:1409.1556 (2014)"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib38",
+      "text": "Qin, M., Li, W., Zhou, J., Wang, H., Pfister, H.: Langsplat: 3d language gaussian splatting. arXiv preprint arXiv:2312.16084 (2023)"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib56",
+      "text": "Zhou, S., Chang, H., Jiang, S., Fan, Z., Zhu, Z., Xu, D., Chari, P., You, S., Wang, Z., Kadambi, A.: Feature 3dgs: Supercharging 3d gaussian splatting to enable distilled feature fields. arXiv preprint arXiv:2312.03203 (2023)"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib15",
+      "text": "Huang, H.P., Tseng, H.Y., Saini, S., Singh, M., Yang, M.H.: Learning to stylize novel views. In: Proceedings of the IEEE/CVF International Conference on Computer Vision. pp. 13869–13878 (2021)"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib13",
+      "text": "Gu, J., Liu, L., Wang, P., Theobalt, C.: Stylenerf: A style-based 3d-aware generator for high-resolution image synthesis. arXiv preprint arXiv:2110.08985 (2021)"
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "Huang, X., Belongie, S.: Arbitrary style transfer in real-time with adaptive instance normalization. In: Proceedings of the IEEE international conference on computer vision. pp. 1501–1510 (2017)"
+    },
+    {
+      "n": 17,
+      "id": "bib.bib29",
+      "text": "Mu, F., Wang, J., Wu, Y., Li, Y.: 3d photo stylization: Learning to generate stylized novel views from a single image. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 16273–16282 (2022)"
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2312.08488",
+  "title": "A PnP Algorithm for Two-Dimensional Pose Estimation",
+  "authors": "Joshua Wang",
+  "year": "2024",
+  "categories": [
+    "cs.RO",
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2312.08488",
+  "html_url": "https://arxiv.org/html/2312.08488",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 730,
+  "text": "The perspective- n -point (PnP) problem asks us to find the pose of a perspective camera using correspondences between image points and points in world coordinates. We are given n 3D points \\textbf{p}_{i} and their corresponding projections onto the image plane, \\textbf{q}_{i}. We wish to find a rigid transformation matrix R from the camera frame to the world frame such that, for each 1\\leq i\\leq n:\n\nHere, the z_{i} are the depth factors and we use known camera intrinsics to remap the \\textbf{q}_{i} so that they model the normalized perspective camera. This is exactly solvable in the case n=3, giving rise to the class of P3P algorithms as in [1]. P4P and P5P algorithms have also been developed in this vein [2]. However, using all available correspondences is desirable to reduce the impact of noise, in which case the problem is overconstrained and we must settle for an approximate solution. One approach is to minimize the reprojection error, the sum of squared distances between each \\textbf{q}_{i} and the projection of its \\textbf{p}_{i} onto the predicted image plane. This is given by:\n\nNote that this does not necessarily measure the distance in pixels due to our normalization of the \\textbf{q}_{i}. Minimization of the reprojection error is a simple, geometric criterion commonly used in iterative PnP solutions; there are many alternative errors, such as the object-space error of Lu et al. [3]. Non-iterative solutions also exist, such as the EPnP algorithm presented by Lepetit et al., which utilizes four weighted control points to reduce time complexity to O(n) [4], or the OPnP algorithm of Zheng et al. which analytically minimizes an algebraic error by solving a system of polynomial equations [5]. At the time of publication, state-of-the-art PnP solutions were mostly non-iterative polynomial system solvers, but iterative solutions such as Lu et al.’s LHM still remain competitive, and many non-iterative solvers, including [4,5], have an iterative phase at the end to refine the predicted pose (for this purpose, a simple optimization algorithm like Gauss-Newton suffices).\n\nPnP algorithms have excellent accuracy for large numbers of correspondences spread widely in 3D space, but many behave suboptimally when the points are coplanar. Some algorithms such as EPnP include a special case for planar configurations, and assuming coplanarity allows the use of homography-based solvers including the IPPE solver of Collins and Bartoli [6], which take advantage of the problem’s unique structure to achieve higher precision. However, planar configurations present a challege even for specialized solvers because they can produce ambiguity; the images seen from multiple camera positions can be very similar (or even indistinguishable given the presence of noise). The problem worsens at low resolutions and long distances, or when the plane containing the points is almost parallel to the image plane. We illustrate the possible ambiguity with a square fiducial marker, the corners of which are often used for pose estimation:\n\nThis problem is well-known [7,8], and many methods have been proposed to mitigate it. For instance, iterative algorithms can be initialized with the last known pose to improve stability (although this means that they can become persistently stuck in the wrong pose). Some algorithms, such as IPPE, attempt to compute all possible solutions, either selecting the best fit or returning the solutions to the user. The outputs of existing algorithms can be fused with other sensor information as in [9]. However, as robust as these solutions are, they solve only a facet of the deeper issue of imprecision for planar configurations.\n\nThis paper deals with the case of a camera constrained to two-dimensional movement (for instance, mounted to a wheeled robot). Here, PnP algorithms are commonly used to estimate pose from environmental landmarks or fiducials. However, estimating full 3D pose loses valuable information in this situation, as the returned 3D poses must be projected onto the plane of movement. An algorithm which takes the 2D constraint into account in the first place would likely exhibit improved accuracy because it can account for error while remaining in the plane of motion instead of ‘escaping’ into disallowed poses. Performance improvements could also be realized because of the reduction of the search space’s dimensionality. We derive an example of such an algorithm, called 2DPnP, which succeeds in these criteria despite its simplicity. Our algorithm finds an approximate solution using combined geometric and algebraic methods, which it uses as a starting point to iteratively minimize the reprojection error.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "L. Kneip, D. Scaramuzza, and R. Siegwart, “A novel parametrization of the perspective-three-point problem for a direct computation of absolute camera position and orientation,” in CVPR 2011 , pp. 2969–2976, 2011."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "M. Bujnak, Z. Kukelova, and T. Pajdla, “A general solution to the p4p problem for camera with unknown focal length,” in 2008 IEEE Conference on Computer Vision and Pattern Recognition , pp. 1–8, 2008."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "C.-P. Lu, G. Hager, and E. Mjolsness, “Fast and globally convergent pose estimation from video images,” IEEE Transactions on Pattern Analysis and Machine Intelligence , vol. 22, no. 6, pp. 610–622, 2000."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "V. Lepetit, F. Moreno-Noguer, and P. Fua, “Epnp: An accurate o(n) solution to the pnp problem,” International Journal of Computer Vision , vol. 81, 02 2009."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "Y. Zheng, Y. Kuang, S. Sugimoto, K. Åström, and M. Okutomi, “Revisiting the pnp problem: A fast, general and optimal solution,” in 2013 IEEE International Conference on Computer Vision , pp. 2344–2351, 2013."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "T. Collins and A. Bartoli, “Infinitesimal plane-based pose estimation,” International Journal of Computer Vision , vol. 109, pp. 252–286, 2014."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "P.-C. Wu, Y.-H. Tsai, and S.-Y. Chien, “Stable pose tracking from a planar target with an analytical motion model in real-time applications,” 11 2014."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "G. Schweighofer and A. Pinz, “Robust pose estimation from a planar target,” IEEE Transactions on Pattern Analysis and Machine Intelligence , vol. 28, pp. 2024–2030, 2006."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "M. A. Mehralian and M. Soryani, “Ekfpnp: extended kalman filter for camera pose estimation in a sequence of images,” IET Image Processing , vol. 14, no. 15, pp. 3774–3780, 2020."
+    }
+  ]
+}

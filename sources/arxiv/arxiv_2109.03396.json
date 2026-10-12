@@ -1,0 +1,199 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2109.03396",
+  "title": "A Bayesian Learning Algorithm for Unknown Zero-sum Stochastic Games with an Arbitrary Opponent",
+  "authors": "Mehdi Jafarnia-Jahromi, Rahul Jain, Ashutosh Nayyar",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.GT"
+  ],
+  "url": "https://arxiv.org/abs/2109.03396",
+  "html_url": "https://arxiv.org/html/2109.03396",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "INTRODUCTION",
+  "word_count": 1242,
+  "text": "Recent advances in playing the game of Go [1] and Starcraft [2] have proved the capability of self-play in achieving super-human performance in competitive reinforcement learning (competitive RL) [3], a special case of multi-agent RL where each player tries to maximize its own reward. These self-play algorithms are able to learn through repeatedly playing against themselves and update their policy based on the observed trajectory in the absence of human supervision. Despite the empirical success, the theoretical understanding of these algorithms is limited and is significantly more challenging than the single-agent RL due to its multi-agent nature.\n\nSelf-play can be considered as a special case of offline competitive RL where the learning algorithm controls both the agent and the opponent during the learning process [4,5]. In the more general and sophisticated online learning case, the opponent can take arbitrary history-dependent strategies and the agent has no control on the opponent during the learning process [6,7,8].\n\nIn this paper, we consider the online learning setting where the agent learns against an arbitrary opponent who can follow a time-variant history-dependent policy and can switch its policy at any time. We consider infinite-horizon two-player zero-sum stochastic games (SGs) with the average-reward criterion. At each time, both players determine their actions simultaneously upon observing the state. The reward and the probability distribution of the next state is then determined by the chosen actions and the current state. The players’ payoffs sum to zero, i.e., the reward of one player (agent) is exactly the loss of the other player (opponent). The agent’s goal is to maximize its cumulative reward while the opponent tries to minimize the total loss. The problem of designing learning algorithms that can learn against arbitrary opponents is a significant open issue. There is extensive literature on designing and analyzing algorithms that learn against opponents in such a manner that they together converge to an equilibrium of the underlying game. In such cases however, the opponent is not free to choose any learning or non-learning strategy that they want, a significant limitation in their practical use.\n\nWe propose Posterior Sampling Reinforcement Learning algorithm for Zero-sum Stochastic Games (PSRL-ZSG), a learning algorithm that achieves \\widetilde{\\mathcal{O}}(HS\\sqrt{AT}) Bayesian regret bound. Here H is an upper bound on the bias-span, S is the number of states, A is the size of all possible action pairs for both players, T is the horizon, and \\widetilde{\\mathcal{O}} hides logarithmic factors. The best existing result in this setting is achieved by UCSG algorithm [6] which obtains a regret bound of \\widetilde{\\mathcal{O}}(\\sqrt[3]{DS^{2}AT^{2}}) where D\\geq H is the diameter of the SG. As stochastic games generalize Markov Decision Processes (MDPs), our regret bound is optimal (except for logarithmic factors) in T due to the lower bound provided by [9].\n\n## Related Literature\n\nSG was first formulated by [10]. A large body of work focuses on finding the Nash equilibria in SGs with known transition kernel [11,12,13], or learning with a generative model [14,15,16] to simulate the transition for an arbitrary state-action pair. In these cases no exploration is needed.\n\nThere is a long line of research on exploration and regret analysis in single-agent RL (see e.g. [9,17], [18,19,20,21,22,23,24,25,26,27,28] and references therein). Extending these results to the SGs is non-trivial since the actions of the opponent also affect the state transition and can not be controlled by the agent. We review the literature on exploration in SGs and refer the interested reader to [29,30] for an extensive literature review on multi-agent RL in various settings.\n\n## Stochastic Games.\n\nA few recent works use self-play as a method to learn stochastic games [4,5,31,32]. However, self-play requires controlling both the agent and the opponent and cannot be applied in the online setting where the agent plays against an arbitrary opponent. All of these works consider the setting of finite-horizon SG where the interaction of the players and the environment terminates after a fixed number of steps.\n\nIn the online setting where the opponent is arbitrary, [7,33] achieve a regret bound of \\widetilde{\\mathcal{O}}(\\sqrt{T}) in the finite-horizon SGs with linear and general function approximation, respectively. However, in the applications where the interaction between the players and the environment is non-stopping (e.g., stock trading), the infinite-horizon SG is more suitable. Lack of a fixed horizon in this setting makes the problem more challenging. This is since the backward induction, a technique that is widely used in the finite-horizon, is not applicable in the infinite-horizon setting. A recent paper on posterior sampling-based approaches to finite-horizon stochastic games is [34].\n\nIn the infinite-horizon setting, the primary work of [35] who proposed R-max algorithm does not consider regret. A special case of online learning in general-sum games is studied by [36] where the opponent is allowed to switch its stationary policy a limited number of times. They achieve a regret bound of \\widetilde{\\mathcal{O}}({\\ell+\\sqrt{\\ell T}}) via posterior sampling, where \\ell is the number of switches. Their result is not directly comparable to ours because their definition of regret is different. Moreover, they assume the transition kernel is known and the opponent adopts stationary policies. To the best of our knowledge, the only existing algorithm that considers online learning against an arbitrary opponent in the infinite-horizon average-reward SG is UCSG [6].\n\n## Comparison with UCSG [6].\n\nOur work is closely related to UCSG, however clear distinctions exist in the result, the algorithm, and the technical contribution:\n\n- • UCSG achieves a regret bound of \\widetilde{\\mathcal{O}}(\\sqrt[3]{DS^{2}AT^{2}}) under the finite-diameter assumption (i.e., for any two states and every stationary randomized policy of the opponent, there exists a stationary randomized policy for the agent to move from one state to the other in finite expected time). Under the much stronger ergodicity assumption (i.e., for any two states and every stationary randomized policy of the agent and the opponent, it is possible to move from one state to the other in finite expected time), UCSG obtains a regret bound of \\widetilde{\\mathcal{O}}(DS\\sqrt{AT}). Note that the ergodicity assumption greatly alleviates the challenge in exploration. Our algorithm significantly improves this result and achieves a regret bound of \\widetilde{\\mathcal{O}}(HS\\sqrt{AT}) under the finite-diameter assumption.\n\n- • UCSG is an optimism-based algorithm inspired by [9] and requires the complicated maximin extended value iteration. Our algorithm, however, is the first posterior sampling-based algorithm in SGs, leveraging the ideas of [20] in MDPs, and is much simpler both in the algorithm and the analysis. Note that considering randomized policies in SGs (compared to MDPs) brings some challenges in applying the concentration bounds because of the continuous space of randomized policies. However, we handle this by simply using the tower property of conditional expectation which allows us to replace the continuous space of randomized policies with the finite space of actions.\n\n- • From the analysis perspective, under the finite-diameter assumption, UCSG uses a sequence of finite-horizon SGs to approximate the average-reward SG and that leads to the sub-optimal regret bound of \\mathcal{O}(T^{2/3}). Our analysis avoids the finite-horizon approximation by directly using the Bellman equation in the infinite-horizon SG and achieves near-optimal regret bound.\n\nWe note that the main challenge in online learning in a Stochastic Game (SG) is the opponent’s non-stationarity and uncontrollability. [6] developed a technique to replace the opponent’s non-stationary policy with a stationary one in their analysis leading to a very complicated analysis and sub-optimal regret bound. We significantly simplify the analysis and improve the final regret bound with a novel technique in which we replace the opponent’s policy with arbitrary distribution over actions.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib27",
+      "text": "Silver et al. (2017) D. Silver, J. Schrittwieser, K. Simonyan, I. Antonoglou, A. Huang, A. Guez, T. Hubert, L. Baker, M. Lai, A. Bolton, et al. Mastering the game of go without human knowledge. nature , 550(7676):354–359, 2017."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib29",
+      "text": "Vinyals et al. (2019) O. Vinyals, I. Babuschkin, W. M. Czarnecki, M. Mathieu, A. Dudzik, J. Chung, D. H. Choi, R. Powell, T. Ewalds, P. Georgiev, et al. Grandmaster level in starcraft ii using multi-agent reinforcement learning. Nature , 575(7782):350–354, 2019."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib8",
+      "text": "Crandall and Goodrich (2005) J. W. Crandall and M. A. Goodrich. Learning to compete, compromise, and cooperate in repeated general-sum games. In Proceedings of the 22nd international conference on machine learning , pages 161–168, 2005."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib2",
+      "text": "Bai and Jin (2020) Y. Bai and C. Jin. Provable self-play algorithms for competitive reinforcement learning. In International Conference on Machine Learning , pages 551–560. PMLR, 2020."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib3",
+      "text": "Bai et al. (2020) Y. Bai, C. Jin, and T. Yu. Near-optimal reinforcement learning with self-play. In Advances in Neural Information Processing Systems , pages 2159–2170, 2020."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib30",
+      "text": "Wei et al. (2017) C.-Y. Wei, Y.-T. Hong, and C.-J. Lu. Online reinforcement learning in stochastic games. In Advances in Neural Information Processing Systems , pages 4987–4997, 2017."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib34",
+      "text": "Xie et al. (2020) Q. Xie, Y. Chen, Z. Wang, and Z. Yang. Learning zero-sum simultaneous-move markov games using function approximation and correlated equilibrium. In Conference on Learning Theory , pages 3674–3682. PMLR, 2020."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib28",
+      "text": "Tian et al. (2021) Y. Tian, Y. Wang, T. Yu, and S. Sra. Online learning in unknown markov games. In International Conference on Machine Learning , pages 10279–10288. PMLR, 2021."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib16",
+      "text": "Jaksch et al. (2010) T. Jaksch, R. Ortner, and P. Auer. Near-optimal regret bounds for reinforcement learning. Journal of Machine Learning Research , 11(Apr):1563–1600, 2010."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib25",
+      "text": "Shapley (1953) L. S. Shapley. Stochastic games. Proceedings of the national academy of sciences , 39(10):1095–1100, 1953."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib20",
+      "text": "Littman (2001) M. L. Littman. Friend-or-foe q-learning in general-sum games. In ICML , volume 1, pages 322–328, 2001."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib13",
+      "text": "Hu and Wellman (2003) J. Hu and M. P. Wellman. Nash q-learning for general-sum stochastic games. Journal of machine learning research , 4(Nov):1039–1069, 2003."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib12",
+      "text": "Hansen et al. (2013) T. D. Hansen, P. B. Miltersen, and U. Zwick. Strategy iteration is strongly polynomial for 2-player turn-based stochastic games with a constant discount factor. Journal of the ACM (JACM) , 60(1):1–16, 2013."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib17",
+      "text": "Jia et al. (2019) Z. Jia, L. F. Yang, and M. Wang. Feature-based q-learning for two-player stochastic games. arXiv preprint arXiv:1906.00423 , 2019."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib26",
+      "text": "Sidford et al. (2020) A. Sidford, M. Wang, L. Yang, and Y. Ye. Solving discounted stochastic two-player games with near-optimal time and sample complexity. In International Conference on Artificial Intelligence and Statistics , pages 2992–3002. PMLR, 2020."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib37",
+      "text": "Zhang et al. (2020) K. Zhang, S. M. Kakade, T. Başar, and L. F. Yang. Model-based multi-agent rl in zero-sum markov games with near-optimal sample complexity. arXiv preprint arXiv:2007.07461 , 2020."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib23",
+      "text": "Osband et al. (2013) I. Osband, D. Russo, and B. Van Roy. (more) efficient reinforcement learning via posterior sampling. In Advances in Neural Information Processing Systems , pages 3003–3011, 2013."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib11",
+      "text": "Gopalan and Mannor (2015) A. Gopalan and S. Mannor. Thompson sampling for learning parameterized markov decision processes. In Conference on Learning Theory , pages 861–898, 2015."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib1",
+      "text": "Azar et al. (2017) M. G. Azar, I. Osband, and R. Munos. Minimax regret bounds for reinforcement learning. In Proceedings of the 34th International Conference on Machine Learning-Volume 70 , pages 263–272. JMLR. org, 2017."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib24",
+      "text": "Ouyang et al. (2017) Y. Ouyang, M. Gagrani, A. Nayyar, and R. Jain. Learning unknown markov decision processes: A thompson sampling approach. In Advances in Neural Information Processing Systems , pages 1333–1342, 2017."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib18",
+      "text": "Jin et al. (2018) C. Jin, Z. Allen-Zhu, S. Bubeck, and M. I. Jordan. Is Q-learning provably efficient? In Advances in Neural Information Processing Systems , pages 4863–4873, 2018."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib39",
+      "text": "Zhang and Ji (2019) Z. Zhang and X. Ji. Regret minimization for reinforcement learning by evaluating the optimal bias function. In Advances in Neural Information Processing Systems , 2019."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib36",
+      "text": "Zanette and Brunskill (2019) A. Zanette and E. Brunskill. Tighter problem-dependent regret bounds in reinforcement learning without domain knowledge using value function bounds. In International Conference on Machine Learning , 2019."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib31",
+      "text": "Wei et al. (2020) C.-Y. Wei, M. Jafarnia-Jahromi, H. Luo, H. Sharma, and R. Jain. Model-free reinforcement learning in infinite-horizon average-reward markov decision processes. In International conference on machine learning , pages 10170–10180. PMLR, 2020."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib32",
+      "text": "Wei et al. (2021) C.-Y. Wei, M. Jafarnia-Jahromi, H. Luo, and R. Jain. Learning infinite-horizon average-reward mdps with linear function approximation. In International Conference on Artificial Intelligence and Statistics , pages 3007–3015. PMLR, 2021."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib6",
+      "text": "Chen et al. (2021a) L. Chen, M. Jafarnia-Jahromi, R. Jain, and H. Luo. Implicit finite-horizon approximation and efficient optimal algorithms for stochastic shortest path. arXiv preprint arXiv:2106.08377 , 2021a."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib15",
+      "text": "Jafarnia-Jahromi et al. (2021b) M. Jafarnia-Jahromi, R. Jain, and A. Nayyar. Online learning for unknown partially observable mdps. arXiv preprint arXiv:2102.12661 , 2021b."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib14",
+      "text": "Jafarnia-Jahromi et al. (2021a) M. Jafarnia-Jahromi, L. Chen, R. Jain, and H. Luo. Online learning for stochastic shortest path model via posterior sampling. arXiv preprint arXiv:2106.05335 , 2021a."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib38",
+      "text": "Zhang et al. (2021) K. Zhang, Z. Yang, and T. Başar. Multi-agent reinforcement learning: A selective overview of theories and algorithms. Handbook of Reinforcement Learning and Control , pages 321–384, 2021."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib35",
+      "text": "Yang and Wang (2020) Y. Yang and J. Wang. An overview of multi-agent reinforcement learning from game theoretical perspective. arXiv preprint arXiv:2011.00583 , 2020."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib21",
+      "text": "Liu et al. (2021) Q. Liu, T. Yu, Y. Bai, and C. Jin. A sharp analysis of model-based reinforcement learning with self-play. In International Conference on Machine Learning , pages 7001–7010. PMLR, 2021."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib7",
+      "text": "Chen et al. (2021b) Z. Chen, D. Zhou, and Q. Gu. Almost optimal algorithms for two-player markov games with linear function approximation. arXiv preprint arXiv:2102.07404 , 2021b."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib19",
+      "text": "Jin et al. (2021) C. Jin, Q. Liu, and T. Yu. The power of exploiter: Provable multi-agent rl in large state spaces. arXiv preprint arXiv:2106.03352 , 2021."
+    },
+    {
+      "n": 34,
+      "id": "bib.bib40",
+      "text": "Zhou et al. (2020) Y. Zhou, J. Li, and J. Zhu. Posterior sampling for multi-agent reinforcement learning: solving extensive games with imperfect information. In International Conference on Learning Representations , 2020."
+    },
+    {
+      "n": 35,
+      "id": "bib.bib5",
+      "text": "Brafman and Tennenholtz (2002) R. I. Brafman and M. Tennenholtz. R-max-a general polynomial time algorithm for near-optimal reinforcement learning. Journal of Machine Learning Research , 3(Oct):213–231, 2002."
+    },
+    {
+      "n": 36,
+      "id": "bib.bib9",
+      "text": "DiGiovanni and Tewari (2021) A. DiGiovanni and A. Tewari. Thompson sampling for markov games with piecewise stationary opponent policies. In Proceedings of the 37th Annual Conference on Uncertainty in Artificial Intelligence , 2021."
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.05004",
+  "title": "Can't Remember Details in Long Documents? You Need Some R&R",
+  "authors": "Devanshu Agrawal, Shang Gao, Martin Gajek",
+  "year": "2024",
+  "categories": [
+    "cs.CL",
+    "cs.AI",
+    "cs.IR",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2403.05004",
+  "html_url": "https://arxiv.org/html/2403.05004",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 809,
+  "text": "Large language models (LLMs) have taken natural language processing (NLP) by storm and are increasingly being incorporated into user-facing applications. A user interacts with an LLM via “prompting”, where the user writes a free-form prompt that instructs the LLM to perform some task, such as answering a question based on a document included in the prompt. The prompt, however, is usually limited to a context window with a set maximum number of “tokens” (subwords used as the vocabulary of the input language), which poses a challenge for tasks such as question-answering (QA) over very long documents. Thus, there is great interest in the development of LLMs that support longer and longer context—a nontrivial endeavor due to the quadratic complexity of the self-attention mechanism on which LLMs are based.\n\nWe have recently witnessed the release of very long-context LLMs such as GPT-4 Turbo and Claude-2.1 supporting context windows of 128k and 200k tokens respectively. While these LLMs support long contexts, the quality of their responses (e.g., QA accuracy) tends to deteriorate as the input prompt becomes very long. Even at 16k-token context, [1] found that an LLM’s accuracy on document-based QA significantly drops when relevant context is located in the middle of the document, as opposed to the beginning and end—a phenomenon termed the “lost in the middle” effect. There is thus a demand for techniques that can mitigate this loss of performance, thereby improving the efficacy of long-context LLMs. Moreover, as LLMs such as GPT-4 Turbo and Claude-2.1 are proprietary, prompt-based approaches compatible with black-box models are particularly desirable as they can be put into practice immediately.\n\nIn this paper, we propose a prompt-based method called R&R to alieviate the lost-in-the-middle effect in long document-based QA (Fig. 1). R&R, in turn, is a combination of two novel prompt-based methods we call reprompting and in-context retrieval. In reprompting, the instructions to answer the question are repeated nearly verbatim periodically throughout the context document. Our motivation for reprompting is the observation that in the “lost in the middle” experiments [1], the instructions to answer the question appear both before and right after the context document, leading us to wonder: Could QA accuracy, in part, be related to the proximity of relevant context in the document to the task instructions? Our hypothesis is that repeating the task instructions right before each piece of relevant context in the document will improve QA accuracy. Since in practice, however, we do not know the locations of relevant context apriori, we propose to repeat the instructions or “reprompt” uniformly.\n\nIn-context retrieval (ICR) draws inspiration from retrieval-augmented generation (RAG) and recent literature on context abbreviation [2,3]. In ICR, rather than having a long-context LLM answer a question directly, we first prompt the LLM to retrieve some number of passages from the context document that are most relevant to the question. We aggregate the retrieved passages into an abbreviated context document, and then do short-context QA in a second LLM call. Our underlying hypothesis is that passage retrieval is a simpler task than direct QA, as we are able to prioritize recall over precision. R&R is then a two-call method where we reprompt the instructions for retrieval during the first call in ICR. In our experiments, we find R&R to indeed be beneficial and find evidence to support our motivating hypotheses.\n\nWe also evaluate R&R in the setting of limited-context LLMs that must process long documents in chunks. In scenarios where relevant context is concentrated in the document and QA resembles information extraction, a chunkwise approach is likely to provide a strong baseline, thus raising the question: Are long-context LLMs with reprompting really better than limited-context LLMs with chunk-based workarounds? As a strong baseline, we propose “chunked ICR”, where we first partition the context document into chunks and then perform ICR within each chunk in independent short-context LLM calls. We aggregate the retrieved passages across all chunks into an abbreviated document to do the final QA. We expect on extraction-like QA tasks, smaller chunks may facilitate finer retrieval at the cost of more LLM calls, thus introducing an accuracy vs. cost trade-off. We find, however, that our method R&R softens the trade-off by boosting accuracy on larger chunks, often reducing the number of LLM calls and output token usage with little to no drop in accuracy.\n\nOur key contributions are the following: (1) We use GPT-4 Turbo and Claude-2.1 to show that reprompting and ICR each independently improve performance on four long-context QA tasks, and our combined R&R approach improves performance further; (2) we analyze why reprompting works and show that the proximity between instructions and relevant context plays an important role in performance; and (3) we compare long-context QA with chunk-based approaches with shorter context windows and show that R&R can minimize accuracy loss at higher chunk sizes, thereby reducing LLM usage cost in real-world use cases.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib7",
+      "text": "Liu et al. (2023) Nelson F Liu, Kevin Lin, John Hewitt, Ashwin Paranjape, Michele Bevilacqua, Fabio Petroni, and Percy Liang. 2023. Lost in the middle: How language models use long contexts. arXiv preprint arXiv:2307.03172 ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib5",
+      "text": "Lewis et al. (2020) Patrick Lewis, Ethan Perez, Aleksandra Piktus, Fabio Petroni, Vladimir Karpukhin, Naman Goyal, Heinrich Küttler, Mike Lewis, Wen-tau Yih, Tim Rocktäschel, et al. 2020. Retrieval-augmented generation for knowledge-intensive nlp tasks. NeurIPS ."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib17",
+      "text": "Weston and Sukhbaatar (2023) Jason Weston and Sainbayar Sukhbaatar. 2023. System 2 attention (is something you might need too). arXiv preprint arXiv:2311.11829 ."
+    }
+  ]
+}

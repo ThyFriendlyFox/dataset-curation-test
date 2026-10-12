@@ -1,0 +1,110 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.07339",
+  "title": "IM-Unpack: Training and Inference with Arbitrarily Low Precision Integers",
+  "authors": "Zhanpeng Zeng, Karthikeyan Sankaralingam, Vikas Singh",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.CL",
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2403.07339",
+  "html_url": "https://arxiv.org/html/2403.07339",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 703,
+  "text": "Calculating the product of two matrices using GEneral Matrix Multiply (GEMM) is one of the most widely used operations in modern machine learning. Given matrices \\mathbf{A} and \\mathbf{B} of size n\\times d and h\\times d respectively, the output of a GEMM is calculated as\n\nChoosing the appropriate numerical precision or data type (FP32, FP16, or BF16) for GEMM is often important, and hinges on several factors including the specific application, characteristics of the data, model architecture, as well as numerical behavior such as convergence. This choice affects compute and memory efficiency most directly, since a disproportionately large chunk of the compute footprint of a model involves the GEMM operator. A good example is the large improvement in latency and memory achieved via low bit-width GEMM, and made possible due to extensive ongoing work on quantization (to low bit-width data types) and low-precision training [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]. Integer quantization is being actively pursued for inference efficiency, and the use of low bit-width integers is universal to deliver the efficiency gains. However, this strategy often incurs large rounding errors when representing all matrix entries as low bit-width integers, and explains the drop in performance and thereby, a need for error correction techniques [17,6,18]. So how much of the performance degradation is due to (a) rounding to integers versus (b) restricting to low bit-width integers? To answer this question, it appears worthwhile to check whether integer GEMMs will achieve parity without sophisticated techniques (for the inference stage, and more aspirationally, for training) for popular models if we do not restrict to low bit-width integers.\n\nOverview. The starting point of our work is to first experimentally verify that the aforementioned hypothesis – that integer GEMM may work – is true (see § 2). But by itself, this finding offers no value proposition for efficiency. Still, this experiment is useful for the following reason. For a particular class of models (e.g., Transformers), we can easily contrast the corresponding input matrices \\mathbf{A} and \\mathbf{B} between (a) integer GEMM and (b) low bit-width integer GEMM and probe if any meaningful structure can be exploited. While there is a clear difference in the outputs of (a) integer GEMM versus (b) low bit-width integer GEMM, we find that a large majority of entries of \\mathbf{A} and \\mathbf{B} can be well-represented using low bit-width integers – and the difference in the outputs can be entirely attributed to a few heavy hitter entries in \\mathbf{A} and \\mathbf{B}, that cannot be represented using low bit-width integers. Other works have also run into this issue of “outliers” and suggest using high precision [4] or a separate quantization for these entries [10,6]. Driven by the simple observation that we can represent a large integer by a series of smaller integers, our algorithm, Integer Matrix Unpack (IM-Unpack), enables unpacking any integer into a series of low-bit integers. The key outcome is that the calculation can be carried out entirely using low bit-width integer arithmetic and thus unifies the computation needed for heavy hitters and the remaining entries (which were already amenable to low-bit integer arithmetic). Specifically, IM-Unpack unpacks an integer matrix such that all values of the unpacked matrices always stay within the representable range of low bit-width integers (bit-width can be chosen arbitrarily). We obtain the exact result of the original integer GEMM using purely low bit-width integer GEMMs. Since the bit-width of integer arithmetic is independent of the actual range of the original matrices, the construction will greatly simplify the hardware/compiler support by only needing support for one specific bit-width. The overall structure/contributions of this paper is shown in Fig. 1.\n\nNotations. To simplify the presentation, we will narrow the scope of our discussion exclusively to Transformer-based models. We first define notations for all relevant GEMMs. For the linear layer, let the input activation and parameter matrix be \\mathbf{X} and \\mathbf{W}. Let the query, key, value matrices involved in self-attention computation be \\mathbf{Q},\\mathbf{K},\\mathbf{V}. Below, we itemize all GEMMs used in a Transformer model:\n\nwhere \\mathbf{M} is the attention score between \\mathbf{Q} and \\mathbf{K} defined as \\mathbf{M}=\\text{softmax}(\\mathbf{P}) (omitting scaling factors). Now, given the gradient for \\mathbf{Y},\\mathbf{P},\\mathbf{O} denoted as \\nabla_{\\mathbf{Y}},\\nabla_{\\mathbf{P}},\\nabla_{\\mathbf{O}}, the other gradients are calculated via GEMMs as well:\n\nThese notations will help refer to each type of GEMM later.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib2",
+      "text": "Ron Banner, Yury Nahshan, and Daniel Soudry. Post training 4-bit quantization of convolutional networks for rapid-deployment. In H. Wallach, H. Larochelle, A. Beygelzimer, F. d'Alché-Buc, E. Fox, and R. Garnett, editors, Advances in Neural Information Processing Systems , volume 32. Curran Associates, Inc., 2019."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib21",
+      "text": "Markus Nagel, Mart van Baalen, Tijmen Blankevoort, and Max Welling. Data-free quantization through weight equalization and bias correction. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 1325–1334, 2019."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib14",
+      "text": "Sehoon Kim, Amir Gholami, Zhewei Yao, Michael W. Mahoney, and Kurt Keutzer. I-bert: Integer-only bert quantization. In Marina Meila and Tong Zhang, editors, Proceedings of the 38th International Conference on Machine Learning , volume 139 of Proceedings of Machine Learning Research , pages 5506–5518. PMLR, 18–24 Jul 2021."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib6",
+      "text": "Tim Dettmers, Mike Lewis, Younes Belkada, and Luke Zettlemoyer. GPT3.int8(): 8-bit matrix multiplication for transformers at scale. In Alice H. Oh, Alekh Agarwal, Danielle Belgrave, and Kyunghyun Cho, editors, Advances in Neural Information Processing Systems , 2022."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib15",
+      "text": "Zhikai Li and Qingyi Gu. I-vit: Integer-only quantization for efficient vision transformer inference. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 17065–17075, 2023."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib28",
+      "text": "Guangxuan Xiao, Ji Lin, Mickael Seznec, Hao Wu, Julien Demouth, and Song Han. SmoothQuant: Accurate and efficient post-training quantization for large language models. In Proceedings of the 40th International Conference on Machine Learning , 2023."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib20",
+      "text": "Zechun Liu, Barlas Oguz, Changsheng Zhao, Ernie Chang, Pierre Stock, Yashar Mehdad, Yangyang Shi, Raghuraman Krishnamoorthi, and Vikas Chandra. Llm-qat: Data-free quantization aware training for large language models, 2023."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib18",
+      "text": "Shih-yang Liu, Zechun Liu, Xijie Huang, Pingcheng Dong, and Kwang-Ting Cheng. LLM-FP4: 4-bit floating-point quantized transformers. In Houda Bouamor, Juan Pino, and Kalika Bali, editors, Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing , pages 592–605, Singapore, December 2023. Association for Computational Linguistics."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib17",
+      "text": "Yang Lin, Tianyu Zhang, Peiqin Sun, Zheng Li, and Shuchang Zhou. Fq-vit: Post-training quantization for fully quantized vision transformer. In Proceedings of the Thirty-First International Joint Conference on Artificial Intelligence, IJCAI-22 , pages 1173–1179, 2022."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib29",
+      "text": "Zhihang Yuan, Chenhao Xue, Yiqi Chen, Qiang Wu, and Guangyu Sun. Ptq4vit: Post-training quantization framework for vision transformers with twin uniform quantization, 2022."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib8",
+      "text": "Yifu Ding, Haotong Qin, Qinghua Yan, Zhenhua Chai, Junjie Liu, Xiaolin Wei, and Xianglong Liu. Towards accurate post-training quantization for vision transformer. In Proceedings of the 30th ACM International Conference on Multimedia , MM ’22, page 5380–5388, New York, NY, USA, 2022. Association for Computing Machinery."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib16",
+      "text": "Zhikai Li, Junrui Xiao, Lianwei Yang, and Qingyi Gu. Repq-vit: Scale reparameterization for post-training quantization of vision transformers. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 17227–17236, 2023."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib25",
+      "text": "Naigang Wang, Jungwook Choi, Daniel Brand, Chia-Yu Chen, and Kailash Gopalakrishnan. Training deep neural networks with 8-bit floating point numbers. Advances in neural information processing systems , 31, 2018."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib27",
+      "text": "Shuang Wu, Guoqi Li, Feng Chen, and Luping Shi. Training and inference with integers in deep neural networks. In International Conference on Learning Representations , 2018."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib30",
+      "text": "Feng Zhu, Ruihao Gong, Fengwei Yu, Xianglong Liu, Yanfei Wang, Zhelong Li, Xiuqi Yang, and Junjie Yan. Towards unified int8 training for convolutional neural network. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 1969–1979, 2020."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib26",
+      "text": "Mitchell Wortsman, Tim Dettmers, Luke Zettlemoyer, Ari Morcos, Ali Farhadi, and Ludwig Schmidt. Stable and low-precision training for large-scale vision-language models. arXiv preprint arXiv:2304.13013 , 2023."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib11",
+      "text": "Elias Frantar, Saleh Ashkboos, Torsten Hoefler, and Dan Alistarh. OPTQ: Accurate quantization for generative pre-trained transformers. In The Eleventh International Conference on Learning Representations , 2023."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib4",
+      "text": "Jerry Chee, Yaohui Cai, Volodymyr Kuleshov, and Christopher De Sa. QuIP: 2-bit quantization of large language models with guarantees. In Thirty-seventh Conference on Neural Information Processing Systems , 2023."
+    }
+  ]
+}

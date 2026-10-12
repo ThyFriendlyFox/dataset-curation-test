@@ -1,0 +1,119 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2310.17137",
+  "title": "Large-Scale Gaussian Processes via Alternating Projection",
+  "authors": "Kaiwen Wu, Jonathan Wenger, Haydn Jones, Geoff Pleiss, Jacob R. Gardner",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "stat.ML"
+  ],
+  "url": "https://arxiv.org/abs/2310.17137",
+  "html_url": "https://arxiv.org/html/2310.17137",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "INTRODUCTION",
+  "word_count": 517,
+  "text": "Scaling Gaussian process (GP) models to large datasets has been a central research topic in probabilistic machine learning for nearly two decades. The primary challenge is the cubic complexity of computing both the marginal log likelihood (MLL) during training and the predictive distribution at test time. Over the years, this problem has been addressed both from a modeling perspective [1,2,3,4,5,6,7] and from a numerical methods perspective [8,9,10,11,12], and contemporary work even unifies these perspectives to a degree [13,14]. In recent years, numerical methods have increasingly relied on matrix-free iterative methods, which access the kernel matrix through matrix-vector multiplications. These iterations are suitable for GPU acceleration [10] and have shown success on medium to moderately large datasets [11], outperforming modeling-based approaches such as stochastic variational GPs (SVGP) [1].\n\nMost GP training and inference approaches based on iterative methods use classic general-purpose algorithms for matrix solves, such as conjugate gradients (CG) [8,10,11], MINRES [15], or (stochastic) gradient descent [16]. There is reason to believe that such algorithms are suboptimal for modern hardware-accelerated Gaussian processes. For example, CG was purpose-built for sparse linear systems that require high-precision solutions. Neither of these properties applies to GP regression: the necessary solves involve dense covariance matrices, and tasks such as hyperparameter optimization can be performed with extremely coarse-grained solves [11,12]. These characteristics of large-scale dense operations and low precision amenability are in line with existing trends in machine learning [17,18], but ultimately place Gaussian processes at odds with much of the literature on numerical methods.\n\nMuch in the way that deep learning has been revolutionized by purpose-built optimizers that exploit properties of neural networks [19,20], this paper aims to accelerate GPs with a purpose-built method leveraging (coarse-grained) covariance matrix solves on modern hardware. We introduce an iterative method to compute gradients of the marginal log-likelihood (MLL) and the posterior mean, that improves over CG in the following ways: 1) it requires \\mathcal{O}(n) computation per iteration rather than CG’s \\mathcal{O}(n^{2}); 2) it converges rapidly and monotonically in its early stages (but does not necessarily obtain higher precision than CG); and 3) it demonstrates improved numerical stability in floating point arithmetic.\n\n## Contributions.\n\nWe propose an iterative method for Gaussian process training and inference. The method computes the marginal log-likelihood derivative and posterior mean via alternating projection. Each iteration of the algorithm accesses a subblock of the kernel matrix, has linear time and memory complexity, and decreases the residual near-monotonically after every epoch. We prove that the algorithm converges linearly at a rate no slower than gradient descent, despite never operating on the full kernel matrix. Empirically, our method achieves a speed-up of up to 27\\times over CG-based hyperparameter training and of up to 72\\times over CG-based inference on a wide range of datasets. As a demonstration of its scalability and robustness to ill-conditioning, we are able to train Gaussian processes on 4 million data points, the largest dataset reported in the literature to-date without using inducing points or similar modeling approximations—to the best of our knowledge. We find that our method outperforms the stochastic variational Gaussian process by a significant margin at this scale.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib15",
+      "text": "Hensman et al., (2013) Hensman, J., Fusi, N., and Lawrence, N. D. (2013). Gaussian processes for big data. In Conference on Uncertainty in Artificial Intelligence (UAI) ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib16",
+      "text": "Hensman et al., (2015) Hensman, J., Matthews, A., and Ghahramani, Z. (2015). Scalable variational Gaussian process classification. In International Conference on Artificial Intelligence and Statistics (AISTATS) , volume 38, pages 351–360."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib39",
+      "text": "Titsias, (2009) Titsias, M. (2009). Variational learning of inducing variables in sparse Gaussian processes. In International Conference on Artificial Intelligence and Statistics (AISTATS) , volume 5, pages 567–574."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib37",
+      "text": "Snelson and Ghahramani, (2005) Snelson, E. and Ghahramani, Z. (2005). Sparse Gaussian processes using pseudo-inputs. In Advances in Neural Information Processing Systems (NeurIPS) , volume 18."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib35",
+      "text": "Salimbeni et al., (2018) Salimbeni, H., Cheng, C.-A., Boots, B., and Deisenroth, M. (2018). Orthogonally decoupled variational Gaussian processes. In Advances in Neural Information Processing Systems (NeurIPS) , volume 31."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib17",
+      "text": "Jankowiak et al., (2020) Jankowiak, M., Pleiss, G., and Gardner, J. (2020). Parametric Gaussian process regressors. In International Conference on Machine Learning (ICML) , pages 4702–4712."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib18",
+      "text": "Katzfuss and Guinness, (2021) Katzfuss, M. and Guinness, J. (2021). A general framework for Vecchia approximations of Gaussian processes. Statistical Science , 36(1):124–141."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib9",
+      "text": "Cutajar et al., (2016) Cutajar, K., Osborne, M., Cunningham, J., and Filippone, M. (2016). Preconditioning kernel matrices. In International Conference on Machine Learning (ICML) , volume 48 of Proceedings of Machine Learning Research , pages 2529–2538."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib31",
+      "text": "Pleiss et al., (2018) Pleiss, G., Gardner, J., Weinberger, K., and Wilson, A. G. (2018). Constant-time predictive distributions for Gaussian processes. In International Conference on Machine Learning (ICML) , volume 80, pages 4114–4123."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib12",
+      "text": "Gardner et al., (2018) Gardner, J., Pleiss, G., Weinberger, K. Q., Bindel, D., and Wilson, A. G. (2018). GPyTorch: Blackbox matrix-matrix Gaussian process inference with GPU acceleration. In Advances in Neural Information Processing Systems (NeurIPS) , volume 31."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib41",
+      "text": "Wang et al., (2019) Wang, K., Pleiss, G., Gardner, J., Tyree, S., Weinberger, K. Q., and Wilson, A. G. (2019). Exact Gaussian processes on a million data points. In Advances in Neural Information Processing Systems (NeurIPS) , volume 32."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib24",
+      "text": "Maddox et al., (2022) Maddox, W. J., Potapcynski, A., and Wilson, A. G. (2022). Low-precision arithmetic for fast Gaussian processes. In Conference on Uncertainty in Artificial Intelligence (UAI) , volume 180, pages 1306–1316."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib1",
+      "text": "Artemev et al., (2021) Artemev, A., Burt, D. R., and van der Wilk, M. (2021). Tighter bounds on the log marginal likelihood of Gaussian process regression using conjugate gradients. In International Conference on Machine Learning (ICML) , volume 139, pages 362–372."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib44",
+      "text": "(44) Wenger, J., Pleiss, G., Pförtner, M., Hennig, P., and Cunningham, J. P. (2022b). Posterior and computational uncertainty in Gaussian processes. In Advances in Neural Information Processing Systems (NeurIPS) , volume 35, pages 10876–10890."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib32",
+      "text": "Pleiss et al., (2020) Pleiss, G., Jankowiak, M., Eriksson, D., Damle, A., and Gardner, J. (2020). Fast matrix square roots with applications to Gaussian processes and Bayesian optimization. In Advances in Neural Information Processing Systems (NeurIPS) , volume 33, pages 22268–22281."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib22",
+      "text": "Lin et al., (2023) Lin, J. A., Antorán, J., Padhy, S., Janz, D., Hernández-Lobato, J. M., and Terenin, A. (2023). Sampling from Gaussian process posteriors using stochastic gradient descent. In Advances in Neural Information Processing Systems (NeurIPS) ."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib8",
+      "text": "Courbariaux et al., (2015) Courbariaux, M., Bengio, Y., and David, J.-P. (2015). BinaryConnect: Training deep neural networks with binary weights during propagations. In Advances in Neural Information Processing Systems (NeurIPS) , volume 28."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib26",
+      "text": "Micikevicius et al., (2018) Micikevicius, P., Narang, S., Alben, J., Diamos, G., Elsen, E., Garcia, D., Ginsburg, B., Houston, M., Kuchaiev, O., Venkatesh, G., and Wu, H. (2018). Mixed precision training. In International Conference on Learning Representations (ICLR) ."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib21",
+      "text": "Kingma and Ba, (2015) Kingma, D. and Ba, J. (2015). Adam: A method for stochastic optimization. In International Conference on Learning Representations (ICLR) ."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib23",
+      "text": "Loshchilov and Hutter, (2019) Loshchilov, I. and Hutter, F. (2019). Decoupled weight decay regularization. In International Conference on Learning Representations (ICLR) ."
+    }
+  ]
+}

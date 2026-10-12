@@ -1,0 +1,99 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2110.03423",
+  "title": "Efficient GPU implementation of randomized SVD and its applications",
+  "authors": "Åukasz Struski, PaweÅ Morkisz, PrzemysÅaw Spurek, Samuel Rodriguez Bernabeu, Tomasz TrzciÅski",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.PF"
+  ],
+  "url": "https://arxiv.org/abs/2110.03423",
+  "html_url": "https://arxiv.org/html/2110.03423",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 592,
+  "text": "Matrix decomposition is a fundamental operation widely used across numerous real-life applications, including data compression, optimization of machine learning models and dimensionality reduction. The latter application remains especially challenging, given the increasing amount of real-world highly-dimensional data, such as multi-lingual textual corpora or drug discovery databases with complex chemical compounds. Although the original dimensionality of those datasets is high, in practice the data lays on lower-dimensional subspace with a smaller number of parameters. Dimensionaly reduction methods, such as singular value decomposition (SVD) [1], are typically used to find this lower-dimensional subspace in real-life problems ranging from data analysis [2,3], data compression [4,5], statistics and machine learning [6,7] as well as clustering [8]. Despite the ubiquity of SVD, its computational complexity poses a significant problem, especially when dealing with large-scale datasets.\n\nOne of the approaches proposed to address this limitation of SVD is to approximate matrices of low rank using randomization techniques [9,10]. These techniques are well known to give a significant speed-up, yet their practical implementations are often cumbersome and do not leverage recent advancements in the architectural design of contemporary computational hardware, such as Graphical Processing Units (GPUs). For instance, the baseline methods used to solve this task, such as GESVD or Krylov subspace methods [11], do not utilize computational linear algebra to parallelize the operations, and effectively reduce the computational cost of SVD.\n\nIn this work, we present a new approach towards solving randomized SVD problem efficiently by exploiting fast matrix multiplications and random number generators, implemented on contemporary GPUs. More specifically, we rely on the computational linear algebra to decompose randomized SVD into a set of low-level matrix multiplications known as Basic Linear Algebra Subprograms (BLAS) [12]. These subprograms contain BLAS-1 and BLAS-2 operations, which are limited by system bandwidth, and BLAS-3 operations bounded by the arithmetic operation throughput of a machine. The key to achieving high performance matrices operations is the effective translation of the computations into a set of BLAS-3 operations, since those operations can be easily run in parallel on modern hardware architectures such as GPUs. This paper shows that such a solution can be efficiently implemented on the contermporary GPUs and allows for faster processing of large-scale dataset.\n\nTo confirm the efficacy of our method, we extensively evaluate our approach against the state-of-the-art competitors. Figure 1 shows the results of this evaluation which confirms the effectiveness of our implementation and a significant acceleration it obtains relative to state-of-the-art methods. In the presented experiment, we consider two types of methods that calculate the whole spectrum of eigenvalues such as GESVD GPU and LAPACK [13] dgesvd, as well as the methods that calculate only k largest eigenvalues such as LAPACK dsyevr, randomized singular value decomposition (RSVD) [14] and SVDS from package [15]. As a dataset, we take CelebA [16] where we resize the images to different sizes and our approach shows consistent 10x speedup, cf. Section 4.\n\nTo summarize, our contributions can be defined as follows:\n\n- • We introduce a novel approach for speeding up randomized SVD computations based on fast GPU operations: BLAS-2 matrix multiplications and random number generations.\n\n- • We extensively evaluate our method against state-of-the-art approaches and empirically prove its improved efficacy.\n\n- • We make our findings available to the public by releasing our code as part of the official CUDA implementation.\n\nThe remainder of this work is structured in the following manner. Section 2 discusses related works. In Section 3 we introduce our method and in Section 4 we evaluate it against competitors. We conclude this work in Section 5.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "Michael E Wall, Andreas Rechtsteiner, and Luis M Rocha. Singular value decomposition and principal component analysis. In A practical approach to microarray data analysis , pages 91–109. Springer, 2003."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "Steven Ding, Ping Zhang, Eve Ding, Amol Naik, Pengcheng Deng, and Weihua Gui. On the application of pca technique to fault diagnosis. Tsinghua Science and Technology , 15(2):138–144, 2010."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "Mohamed-Faouzi Harkat, Gilles Mourot, and José Ragot. An improved pca scheme for sensor fdi: Application to an air quality monitoring network. Journal of Process Control , 16(6):625–634, 2006."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "R Dony et al. Karhunen-loeve transform. The transform and data compression handbook , 1:1–34, 2001."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "Michael Gastpar, Pier Luigi Dragotti, and Martin Vetterli. The distributed karhunen–loeve transform. IEEE Transactions on Information Theory , 52(12):5177–5196, 2006."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "Weihua Li, H Henry Yue, Sergio Valle-Cervantes, and S Joe Qin. Recursive pca for adaptive process monitoring. Journal of process control , 10(5):471–486, 2000."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "Heiko Hoffmann. Kernel pca for novelty detection. Pattern recognition , 40(3):863–874, 2007."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "Łukasz Struski, Jacek Tabor, and Przemysław Spurek. Lossy compression approach to subspace clustering. Information Sciences , 435:161 – 183, 2018."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "Xu Feng, Wenjian Yu, and Yaohang Li. Faster matrix completion using randomized svd. In 2018 IEEE 30th International Conference on Tools with Artificial Intelligence (ICTAI) , pages 608–615. IEEE, 2018."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "Vicente E Oropeza and Mauricio D Sacchi. A randomized svd for multichannel singular spectrum analysis (mssa) noise attenuation. In SEG Technical Program Expanded Abstracts 2010 , pages 3539–3544. Society of Exploration Geophysicists, 2010."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "Aleksej Nikolajevic Krylov. O cislennom resenii uravnenija, kotorym v techniceskih voprasah opredeljajutsja castoty malyh kolebanii material’nyh sistem. Izv. Akad. Nauk SSSR. Ser. Fiz.-Mat , 4:491–539, 1931."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "Chuck L Lawson, Richard J. Hanson, David R Kincaid, and Fred T. Krogh. Basic linear algebra subprograms for fortran usage. ACM Transactions on Mathematical Software (TOMS) , 5(3):308–323, 1979."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "Edward Anderson, Zhaojun Bai, Christian Bischof, L Susan Blackford, James Demmel, Jack Dongarra, Jeremy Du Croz, Anne Greenbaum, Sven Hammarling, Alan McKenney, et al. LAPACK users’ guide . SIAM, 1999."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "N. Benjamin Erichson. Randomized singular value decomposition. https://CRAN.R-project.org/package=rsvd , 2020."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "Qiu Yixuan, Mei Jiali, Guennebaud Gael, and Niesen Jitse. Solvers for large-scale eigenvalue and svd problems. https://CRAN.R-project.org/package=RSpectra , 2019."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "Ziwei Liu, Ping Luo, Xiaogang Wang, and Xiaoou Tang. Deep learning face attributes in the wild. In Proceedings of International Conference on Computer Vision (ICCV) , December 2015."
+    }
+  ]
+}

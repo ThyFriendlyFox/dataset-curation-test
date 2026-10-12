@@ -1,0 +1,93 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2401.11237",
+  "title": "Closing the Gap between TD Learning and Supervised Learning -- A Generalisation Point of View",
+  "authors": "Raj Ghugare, Matthieu Geist, Glen Berseth, Benjamin Eysenbach",
+  "year": "2024",
+  "categories": [
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2401.11237",
+  "html_url": "https://arxiv.org/html/2401.11237",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 747,
+  "text": "Many recent methods view RL as a purely SL problem of mapping input states and desired goals, to optimal actions [1,2,3]. These methods have gained a lot of attention due to their simplicity and scalability [4]. These methods sample a goal g (or a return r) from the dataset, which was previously encountered after taking an action a from a state s, and then imitate a by treating it as an optimal label for reaching g (or achieving return r) from s. These methods, collectively known as outcome conditional behavioral cloning algorithms (OCBC), achieve excellent results on common benchmarks [3]. However, at a fundamental level, there are some important differences between RL and SL. This paper studies one of those differences: the capability of some RL algorithms to stitch together pieces of experience to solve a task never seen during training. While some papers have claimed that some OCBC approaches already have this stitching property [2], both our theoretical and empirical analyses suggest some important limitations of these prior claims.\n\nThe stitching property [5] is common among RL algorithms that perform dynamic programming (e.g., DQN [6], DDPG [7], TD3 [8], IQL [9]). It is often credited for multiple properties of dynamic programming algorithms like superior data efficiency and off policy reasoning (See Section 4 for detailed discussion). Importantly, we show that stitching also allows for a third property – the ability to infer solutions to a combinatorial number of tasks during test time, like navigating between certain state-goal pairs that never appear together (but do appear separately) during training. An example of stitching is that humans don’t need access to optimal actions to go from an airport to new tourist places; they can use their previous knowledge to navigate to a taxi-stand, which would take them to any location. But, purely supervised approaches to sequential problems like RL, do not explicitly take such temporal relationships into account. Even in other sequential domains like language, a large body of work is dedicated to study the combinatorial generalisation abilities of large language models [10,11,12,13]. Our work shows that combinatorial generalisation is also required to solve tasks in the context of RL.\n\nWe start by formalising stitching as a form of combinatorial generalisation. We observe that when data are collected from a mixture of policies, there can be certain (state, goal) pairs that are never visited in the same trajectory, despite being frequented in separate trajectories. Information from multiple trajectories should be stitched to complete these tasks. Because such tasks (state-goal pairs) are seen separately, but never together, we call the ability of algorithms to perform these tasks as combinatorial generalisation. This connection further motivates an inspiration from SL; if generalisation is the problem, then data augmentation is likely an effective approach [14]. We propose a form of temporal data augmentation for OCBC methods so that they acquire this stitching property and succeed in navigating between unseen (start, goal) pairs or achieving greater returns than the offline dataset. This form of data augmentation involves time, rather than random cropping or shifting colors. Intuitively, temporal data augmentation augments the original goal, with a new goal sampled from a different overlapping trajectory in the offline dataset. This data augmentation scheme does require an estimate of distance between states to detect overlapping trajectories. We demonstrate that this data augmentation is theoretically backed, and empirically endows OCBC algorithms with the stitching property on difficult state-based and image-based tasks.\n\nOur primary contribution is to provide a formal framework for studying stitching as a form of combinatorial generalisation. Because of this connection, we hypothesize that OCBC methods do not perform stitching. Perhaps surprisingly, simply increasing the volume of data does not guarantee this sort of combinatorial generalization. Our empirical results support the theory: we demonstrate that prior RL methods based on SL (DT [2] and RvS [3]) fail to perform stitching, even when trained on abundant quantities of data. Our experiments reveal a subtle consideration with the common D4RL datasets [15]: while these datasets are purported to test for exactly this sort of combinatorial generalization, data analysis reveals that ‘‘unseen’’ (state, goal) pairs do actually appear in the dataset. Thus, our experiments are run on a new variant of these datasets that we constructed for this paper to explicitly test for combinatorial generalization. On 10 different environments, including both state and image based tasks, and goal and return conditioning, adding data augmentation improves the generalisation capabilities of SL approaches by up to a factor of 2.5.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "Juergen Schmidhuber. Reinforcement learning upside down: Don’t predict rewards – just map them to actions, 2020."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "Lili Chen, Kevin Lu, Aravind Rajeswaran, Kimin Lee, Aditya Grover, Misha Laskin, Pieter Abbeel, Aravind Srinivas, and Igor Mordatch. Decision transformer: Reinforcement learning via sequence modeling. Advances in neural information processing systems , 34:15084–15097, 2021."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "Scott Emmons, Benjamin Eysenbach, Ilya Kostrikov, and Sergey Levine. Rvs: What is essential for offline rl via supervised learning? arXiv preprint arXiv:2112.10751 , 2021."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "Kuang-Huei Lee, Ofir Nachum, Mengjiao Yang, Lisa Lee, Daniel Freeman, Winnie Xu, Sergio Guadarrama, Ian Fischer, Eric Jang, Henryk Michalewski, and Igor Mordatch. Multi-game decision transformers, 2022."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "Brian D Ziebart, Andrew L Maas, J Andrew Bagnell, Anind K Dey, et al. Maximum entropy inverse reinforcement learning. In Aaai , volume 8, pages 1433–1438. Chicago, IL, USA, 2008."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "Volodymyr Mnih, Koray Kavukcuoglu, David Silver, Alex Graves, Ioannis Antonoglou, Daan Wierstra, and Martin Riedmiller. Playing atari with deep reinforcement learning. arXiv preprint arXiv:1312.5602 , 2013."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "Timothy P Lillicrap, Jonathan J Hunt, Alexander Pritzel, Nicolas Heess, Tom Erez, Yuval Tassa, David Silver, and Daan Wierstra. Continuous control with deep reinforcement learning. arXiv preprint arXiv:1509.02971 , 2015."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "Scott Fujimoto, Herke Hoof, and David Meger. Addressing function approximation error in actor-critic methods. In International conference on machine learning , pages 1587–1596. PMLR, 2018."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "Ilya Kostrikov, Ashvin Nair, and Sergey Levine. Offline reinforcement learning with implicit q-learning. arXiv preprint arXiv:2110.06169 , 2021."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "Thaddäus Wiedemer, Prasanna Mayilvahanan, Matthias Bethge, and Wieland Brendel. Compositional generalization from first principles, 2023."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "Abulhair Saparov and He He. Language models are greedy reasoners: A systematic formal analysis of chain-of-thought, 2023."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "Yi Zhang, Arturs Backurs, Sébastien Bubeck, Ronen Eldan, Suriya Gunasekar, and Tal Wagner. Unveiling transformers with lego: a synthetic reasoning task, 2023."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "Maxwell Nye, Anders Johan Andreassen, Guy Gur-Ari, Henryk Michalewski, Jacob Austin, David Bieber, David Dohan, Aitor Lewkowycz, Maarten Bosma, David Luan, Charles Sutton, and Augustus Odena. Show your work: Scratchpads for intermediate computation with language models, 2021."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "Luis Perez and Jason Wang. The effectiveness of data augmentation in image classification using deep learning, 2017."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "Justin Fu, Aviral Kumar, Ofir Nachum, George Tucker, and Sergey Levine. D4rl: Datasets for deep data-driven reinforcement learning, 2021."
+    }
+  ]
+}

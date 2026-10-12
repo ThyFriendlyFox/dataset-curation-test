@@ -1,0 +1,79 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.04875",
+  "title": "Aligning GPTRec with Beyond-Accuracy Goals with Reinforcement Learning",
+  "authors": "Aleksandr Petrov, Craig Macdonald",
+  "year": "2024",
+  "categories": [
+    "cs.IR",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2403.04875",
+  "html_url": "https://arxiv.org/html/2403.04875",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 891,
+  "text": "Sequential recommendation models utilise ordered sequences of user-to-item interactions to produce recommendations. State-of-the-art sequential models usually employ a score-and-rank approach to generate recommendations (known as the Top-K strategy [1]). The problem with this method is that items are scored independently, and similar items are likely to have similar scores, limiting the method’s ability to optimise metrics beyond accuracy. For example, many researchers argue that recommendation diversity is one of the key components of good recommender systems [2,3,4]. However, under the Top-K strategy, the models’ outputs are likely to be dominated by similar types of items, compromising the user experience. A recent paper [1] proposed GPTRec model, which uses an alternative Next-K strategy, where recommendations are generated item-by-item. In that case, when the model generates a recommendation in position i, it already knows what items are recommended in position 1..i-1, and may adjust the result accordingly. The main challenge with the Next-K strategy is model training. Indeed, standard supervised learning algorithms do not work well for training a generative model, as they require a source of good recommendations, which isn’t typically available. For example, to train a model to generate diverse and relevant recommendations, we would need a training set of diverse and relevant recommendations for a large number of users. However, to obtain such a set, we would need a recommendation model with at least the same performance as the generative model we intend to train, which we assume is unavailable – indeed, the only available data training data in a typical recommendation scenario is historic user-item interactions. A similar problem exists in the training of language models, in that the available training data is not aligned with the desired task. However, this problem has recently been addressed by the Reinforcement Learning With Human Feedback (RLHF) approach [5]. Inspired by RLHF, we propose a reinforcement learning-based approach, where we sample recommendations from the current version of the recommendation model (\"Actor\"), use a separate model to estimate the quality of produced recommendations (\"Critic\"), and then use the Critic’s output to improve the main recommendation model. This approach can optimise for almost any metric measured on a full recommendation list. In particular, we apply this approach to optimise recommendation diversity and reduce popularity bias.\n\nIn our proposed 2-stage training scheme, at the pre-training stage, the model learns to mimic the teacher model, and at the fine-tuning stage, we align it with beyond-accuracy goals using Reinforcement Learning. We use the pre-training/fine-tuning approach with GPTRec on two datasets, namely MovieLens-1M [6] and Steam-2M (a smaller version of the Steam [7] dataset). Our experiments show that GPTRec in generative mode matches the performance of state-of-the-art BERT4Rec when tuned for accuracy only. However, when the model is tuned for more intricate goals, such as increasing diversity or decreasing popularity bias, GPTRec provides a better tradeoff between accuracy and one of these goals, compared to applying BERT4Rec with greedy re-ranking techniques such as using Maximum Marginal Relevance (MMR) [8] for improving diversity. For example, on Steam-2M, while exhibiting the same amount of diversity (measured by the Intra-List Distance (ILD) [3]), GPTRec achieves 10% higher NDCG@10 than BERT4Rec with MMR.\n\nFollowing [9], for practical reasons, we limit the scope of this paper to datasets with a few thousand items in the catalogue. While we acknowledge the dataset size as a limitation of this research, we argue that there are many industrial applications where the catalogue size does not exceed this size. Examples of such applications include but are not limited to single-brand online shops (e.g. apple.com), news agency websites (it only makes sense to recommend news no older than a few days old), genre recommendation in music (where the system recommends specific genres instead of concrete songs) and many others. In practice, it is hard to train transformer-based models for recommendations with more than a few hundred thousand items due to memory and computational constraints [10]. Moreover, in our case, we have to keep several copies of the model in memory as we use multiple asynchronous processes for training; therefore, we limit the scope of this research to a smaller number of items to be able to experiment quickly on limited hardware; Furthermore, the success of InstructGPT [5], which used a similar reinforcement learning approach to train a model with more than 100 billion parameters allows us to argue that the same approach will work on a much larger scale, but that requires access to a large amount of industry-grade GPUs, which is beyond our available budget.\n\nIn short, we summarise the contributions of this paper as follows: (i) we propose a supervised pre-training/reinforcement fine-tuning approach for training generative recommender models for complex recommendation goals; (ii) we show that when optimised for accuracy only, it can match state-of-the-art transformer-based models, such as BERT4Rec while generating recommendations using the Next-K technique; (iii) we show that GPTRec can be optimised for complex recommendation goals, such as increased diversity and decreased popularity bias, and an optimised version of GPTRec provides a better tradeoff between accuracy and secondary metrics than state-of-the-art BERT4Rec with greedy re-ranking.\n\nThe rest of the paper is organised as follows: Section 2 covers related work on alignment in language models and sequential recommendation models. Section 3 describes the proposed two-stage training process for GPTRec; Sections 4 and 5 contain the experimental evaluation of GPTRec; Section 6 contains final remarks.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib18",
+      "text": "Petrov and Macdonald (2023a) Aleksandr V. Petrov and Craig Macdonald. 2023a. Generative Sequential Recommendation with GPTRec. In Proc. Gen-IR@SIGIR ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib12",
+      "text": "Kunaver and Požrl (2017) Matevž Kunaver and Tomaž Požrl. 2017. Diversity in recommender systems–A survey. Knowledge-based systems 123 (2017), 154–162."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "Antikacioglu et al . (2019) Arda Antikacioglu, Tanvi Bajpai, and R. Ravi. 2019. A New System-Wide Diversity Measure for Recommendations with Efficient Algorithms. SIAM Journal on Mathematics of Data Science 1, 4 (2019), 759–779."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib36",
+      "text": "Zhou et al . (2010) Tao Zhou, Zoltán Kuscsik, Jian-Guo Liu, Matúš Medo, Joseph Rushton Wakeling, and Yi-Cheng Zhang. 2010. Solving the Apparent Diversity-Accuracy Dilemma of Recommender Systems. Proceedings of the National Academy of Sciences 107, 10 (2010), 4511–4515."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib14",
+      "text": "Ouyang et al . (2022) Long Ouyang, Jeff Wu, Xu Jiang, Diogo Almeida, Carroll L. Wainwright, Pamela Mishkin, Chong Zhang, Sandhini Agarwal, Katarina Slama, Alex Ray, John Schulman, Jacob Hilton, Fraser Kelton, Luke Miller, Maddie Simens, Amanda Askell, Peter Welinder, Paul Christiano, Jan Leike, and Ryan Lowe. 2022. Training Language Models to Follow Instructions with Human Feedback. arXiv:2203.02155 [cs]"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib8",
+      "text": "Harper and Konstan (2015) F. Maxwell Harper and Joseph A. Konstan. 2015. The MovieLens Datasets: History and Context. ACM Transactions on Interactive Intelligent Systems (TiiS) 5, 4 (Dec. 2015), 19:1–19:19."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib9",
+      "text": "Kang and McAuley (2018) Wang-Cheng Kang and Julian McAuley. 2018. Self-Attentive Sequential Recommendation. In Proc. ICDM . 197–206."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib6",
+      "text": "Carbonell and Goldstein (1998) Jaime Carbonell and Jade Goldstein. 1998. The Use of MMR, Diversity-Based Reranking for Reordering Documents and Producing Summaries. In Proc. SIGIR . 335–336."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib7",
+      "text": "Deffayet et al . (2023) Romain Deffayet, Thibaut Thonet, Jean-Michel Renders, and Maarten De Rijke. 2023. Generative Slate Recommendation with Reinforcement Learning. In Proc. WSDM . 580–588."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib16",
+      "text": "Petrov and Macdonald (2022a) Aleksandr V. Petrov and Craig Macdonald. 2022a. Effective and Efficient Training for Sequential Recommendation Using Recency Sampling. In Proc. RecSys . 81–91."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib15",
+      "text": "Petrov and Macdonald (2024) Aleksandr Petrov and Craig Macdonald. 2024. RecJPQ: Training Large-Catalogue Sequential Recommenders. In Proc. WSDM ."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib19",
+      "text": "Petrov and Macdonald (2023b) Aleksandr V. Petrov and Craig Macdonald. 2023b. gSASRec: Reducing Overconfidence in Sequential Recommendation Trained with Negative Sampling. In Proc. RecSys . 116–128."
+    }
+  ]
+}

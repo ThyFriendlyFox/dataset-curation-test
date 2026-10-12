@@ -1,0 +1,150 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2310.14554",
+  "title": "Making RL with Preference-based Feedback Efficient via Randomization",
+  "authors": "Runzhe Wu, Wen Sun",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.AI",
+    "cs.HC"
+  ],
+  "url": "https://arxiv.org/abs/2310.14554",
+  "html_url": "https://arxiv.org/html/2310.14554",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 871,
+  "text": "Reinforcement learning from human feedback (RLHF) has been widely used across various domains, including robotics [1,2] and natural language processing [3,4]. Unlike standard RL, RLHF requires the agent to learn from feedback in the format of preferences between pairs of trajectories instead of per-step reward since assigning a dense reward function for each state is challenging in many tasks. For instance, in natural language generation, rating each generated token individually is challenging. Hence, it is more realistic to ask humans to compare two pieces of text and indicate their preference. Recent works have shown that, by integrating preference-based feedback into the training process, we can align models with human intention and enable high-quality human-machine interaction.\n\nDespite the existing empirical applications of RLHF, its theoretical foundation remains far from satisfactory. Empirically, researchers first learn reward models from preference-based feedback and then optimize the reward models via policy gradient-based algorithms such as PPO [5]. Questions such as whether or not the learned reward model is accurate, whether PPO is sufficient for deep exploration, and how to strategically collect more feedback on the fly are often ignored. Theoretically, prior works study the regret bound for RL with preference-based feedback [6,7]. Despite achieving sublinear worst-case regret, these algorithms are computationally intractable even for simplified models such as tabular Markov Decision Processes (MDPs). This means that we cannot easily leverage the algorithmic ideas in prior work to guide or improve how we perform RLHF in practice.\n\nIn addition to maximizing reward, another important metric in RLHF is the query complexity since human feedback is expensive to collect. To illustrate, we note that InstructGPT’s training data comprises a mere 30K instances of human feedback [4], which is significantly fewer than the internet-scale dataset for training the GPT-3 base model. This underscores the challenge of scaling up the size of human feedback datasets. [8,9] also pointed out that extensively querying for feedback puts too much burden on human experts. Empirically, [10] observes that active learning reduces query complexity and improves the learned reward model. In theory, query complexity is mostly studied in the settings of active learning, online learning, and bandits [11,12,13,14,15,16,17], but overlooked in RL.\n\nIn this work, we aim to design new RL algorithms that can learn from preference-based feedback and can be efficient in statistical complexity (i.e., regret), computational complexity, and query complexity. In particular, we strike a near-optimal balance between regret minimization and query complexity minimization. To achieve this goal, our key idea is to use randomization in algorithm design. We summarize our new algorithmic ideas and key contributions as follows.\n\n- 1. For MDPs with linear structure (i.e., linear MDP [18]), we propose the first RL algorithm that achieves sublinear worst-case regret and computational efficiency simultaneously with preference-based feedback. Even when reduced to tabular MDPs, it is still the first to achieve a no-regret guarantee and computational efficiency. Moreover, it has an active learning procedure and attains a near-optimal tradeoff between the regret and the query complexity. Our algorithm adds random Gaussian noises to the learned state-action-wise reward model and the least-squares value iteration (LSVI) procedure. Using random noise instead of the UCB-style technique [19] preserves the Markovian property in the reward model and allows one to use dynamic programming to achieve computation efficiency.\n\n- 2. For function approximation beyond linear, we present a model-based Thompson-sampling (TS) algorithm that forms posterior distributions over the transitions and reward models. Assuming the transition and the reward model class both have small \\ell_{1} -norm eluder dimension – a structural condition introduced in [20] that is more general than the common \\ell_{2} -norm eluder dimension [21], we show that our algorithm again achieves a near-optimal tradeoff between the Bayesian regret and the Bayesian query complexity. Computation-wise, similar to previous TS algorithms for regular RL (e.g., [22]), the primary computation primitives are Bayesian supervised learning oracles for transition and reward learning.\n\n- 3. Our query conditions for both algorithms are based on variance-style uncertainty quantification of the preference induced by the randomness of the reward model. We query for preference feedback only when the uncertainty of the preference on a pair of trajectories is large. Approximately computing the uncertainty can be easily done using i.i.d. random reward models drawn from the reward model distribution, which makes the active query procedure computationally tractable.\n\nOverall, while our main contribution is on the theoretical side, our theoretical investigation provides several new practical insights. For instance, for regret minimization, our algorithms propose to draw a pair of trajectories with one from the latest policy and the other from an older policy instead of drawing two trajectories from the same policy (e.g., [23]), avoiding the situation of drawing two similar trajectories when the policy becomes more and more deterministic. Our theory shows that drawing two trajectories from a combination of new and older policies balances exploration and exploitation better. Another practical insight is the variance-style uncertainty measure for designing the query condition. Compared to more standard active learning procedure that relies on constructing version space and confidence intervals [12,24,15,16,17], our new approach comes with strong theoretical guarantees and is more computationally tractable. It is also amenable to existing implementations of Thompson sampling RL algorithms (e.g., using bootstrapping to approximate the posterior sampling [25,26]).",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib26",
+      "text": "Jain et al. (2013) Ashesh Jain, Brian Wojcik, Thorsten Joachims, and Ashutosh Saxena. Learning trajectory preferences for manipulators via iterative improvement. Advances in neural information processing systems , 26, 2013."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib27",
+      "text": "Jain et al. (2015) Ashesh Jain, Shikhar Sharma, Thorsten Joachims, and Ashutosh Saxena. Learning preferences for manipulation tasks from online coactive feedback. The International Journal of Robotics Research , 34(10):1296–1313, 2015."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib52",
+      "text": "Stiennon et al. (2020) Nisan Stiennon, Long Ouyang, Jeffrey Wu, Daniel Ziegler, Ryan Lowe, Chelsea Voss, Alec Radford, Dario Amodei, and Paul F Christiano. Learning to summarize with human feedback. Advances in Neural Information Processing Systems , 33:3008–3021, 2020."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib42",
+      "text": "Ouyang et al. (2022) Long Ouyang, Jeffrey Wu, Xu Jiang, Diogo Almeida, Carroll Wainwright, Pamela Mishkin, Chong Zhang, Sandhini Agarwal, Katarina Slama, Alex Ray, et al. Training language models to follow instructions with human feedback. Advances in Neural Information Processing Systems , 35:27730–27744, 2022."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib49",
+      "text": "Schulman et al. (2017) John Schulman, Filip Wolski, Prafulla Dhariwal, Alec Radford, and Oleg Klimov. Proximal policy optimization algorithms. arXiv preprint arXiv:1707.06347 , 2017."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib48",
+      "text": "Saha et al. (2023) Aadirupa Saha, Aldo Pacchiano, and Jonathan Lee. Dueling rl: Reinforcement learning with trajectory preferences. In International Conference on Artificial Intelligence and Statistics , pp. 6263–6289. PMLR, 2023."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib14",
+      "text": "Chen et al. (2022) Xiaoyu Chen, Han Zhong, Zhuoran Yang, Zhaoran Wang, and Liwei Wang. Human-in-the-loop: Provably efficient preference-based reinforcement learning with general function approximation. In International Conference on Machine Learning , pp. 3773–3793. PMLR, 2022."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib45",
+      "text": "Ross et al. (2013) Stéphane Ross, Narek Melik-Barkhudarov, Kumar Shaurya Shankar, Andreas Wendel, Debadeepta Dey, J Andrew Bagnell, and Martial Hebert. Learning monocular reactive uav control in cluttered natural environments. In 2013 IEEE international conference on robotics and automation , pp. 1765–1772. IEEE, 2013."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib30",
+      "text": "Laskey et al. (2016) Michael Laskey, Sam Staszak, Wesley Yu-Shu Hsieh, Jeffrey Mahler, Florian T Pokorny, Anca D Dragan, and Ken Goldberg. Shiv: Reducing supervisor burden in dagger using support vectors for efficient learning from demonstrations in high dimensional state spaces. In 2016 IEEE International Conference on Robotics and Automation (ICRA) , pp. 462–469. IEEE, 2016."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib31",
+      "text": "Lightman et al. (2023) Hunter Lightman, Vineet Kosaraju, Yuri Burda, Harrison Edwards, Bowen Baker, Teddy Lee, Jan Leike, John Schulman, Ilya Sutskever, and Karl Cobbe. Let’s verify step by step. In The Twelfth International Conference on Learning Representations , 2023."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib12",
+      "text": "Cesa-Bianchi et al. (2005) Nicolo Cesa-Bianchi, Gábor Lugosi, and Gilles Stoltz. Minimizing regret with label efficient prediction. IEEE Transactions on Information Theory , 51(6):2152–2162, 2005."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib16",
+      "text": "Dekel et al. (2012) Ofer Dekel, Claudio Gentile, and Karthik Sridharan. Selective sampling and active learning from single and multiple experts. The Journal of Machine Learning Research , 13(1):2655–2697, 2012."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib3",
+      "text": "Agarwal (2013) Alekh Agarwal. Selective sampling algorithms for cost-sensitive multiclass prediction. In International Conference on Machine Learning , pp. 1220–1228. PMLR, 2013."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib24",
+      "text": "Hanneke & Yang (2021) Steve Hanneke and Liu Yang. Toward a general theory of online selective sampling: Trading off mistakes and queries. In International Conference on Artificial Intelligence and Statistics , pp. 3997–4005. PMLR, 2021."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib69",
+      "text": "Zhu & Nowak (2022) Yinglun Zhu and Robert Nowak. Efficient active learning with abstention. Advances in Neural Information Processing Systems , 35:35379–35391, 2022."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib50",
+      "text": "Sekhari et al. (2023a) Ayush Sekhari, Karthik Sridharan, Wen Sun, and Runzhe Wu. Contextual bandits and imitation learning with preference-based active queries. Advances in Neural Information Processing Systems , 36, 2023a."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib51",
+      "text": "Sekhari et al. (2023b) Ayush Sekhari, Karthik Sridharan, Wen Sun, and Runzhe Wu. Selective sampling and imitation learning via online regression. Advances in Neural Information Processing Systems , 36, 2023b."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib28",
+      "text": "Jin et al. (2020) Chi Jin, Zhuoran Yang, Zhaoran Wang, and Michael I Jordan. Provably efficient reinforcement learning with linear function approximation. In Conference on Learning Theory , pp. 2137–2143. PMLR, 2020."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib9",
+      "text": "Azar et al. (2017) Mohammad Gheshlaghi Azar, Ian Osband, and Rémi Munos. Minimax regret bounds for reinforcement learning. In International Conference on Machine Learning , pp. 263–272. PMLR, 2017."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib32",
+      "text": "Liu et al. (2022a) Qinghua Liu, Alan Chung, Csaba Szepesvári, and Chi Jin. When is partially observable reinforcement learning not scary? In Conference on Learning Theory , pp. 5175–5220. PMLR, 2022a."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib46",
+      "text": "Russo & Van Roy (2013) Daniel Russo and Benjamin Van Roy. Eluder dimension and the sample complexity of optimistic exploration. Advances in Neural Information Processing Systems , 26, 2013."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib38",
+      "text": "Osband et al. (2013) Ian Osband, Daniel Russo, and Benjamin Van Roy. (more) efficient reinforcement learning via posterior sampling. Advances in Neural Information Processing Systems , 26, 2013."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib15",
+      "text": "Christiano et al. (2017) Paul F Christiano, Jan Leike, Tom Brown, Miljan Martic, Shane Legg, and Dario Amodei. Deep reinforcement learning from human preferences. Advances in neural information processing systems , 30, 2017."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib44",
+      "text": "Puchkin & Zhivotovskiy (2021) Nikita Puchkin and Nikita Zhivotovskiy. Exponential savings in agnostic active learning through abstention. In Conference on Learning Theory , pp. 3806–3832. PMLR, 2021."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib39",
+      "text": "Osband et al. (2016a) Ian Osband, Charles Blundell, Alexander Pritzel, and Benjamin Van Roy. Deep exploration via bootstrapped dqn. Advances in neural information processing systems , 29, 2016a."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib41",
+      "text": "Osband et al. (2023) Ian Osband, Zheng Wen, Seyed Mohammad Asghari, Vikranth Dwaracherla, Morteza Ibrahimi, Xiuyuan Lu, and Benjamin Van Roy. Approximate thompson sampling via epistemic neural networks. In Uncertainty in Artificial Intelligence , pp. 1586–1595. PMLR, 2023."
+    }
+  ]
+}

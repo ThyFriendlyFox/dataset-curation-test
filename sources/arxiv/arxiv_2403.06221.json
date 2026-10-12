@@ -1,0 +1,150 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.06221",
+  "title": "TRAD: Enhancing LLM Agents with Step-Wise Thought Retrieval and Aligned Decision",
+  "authors": "Ruiwen Zhou, Yingxuan Yang, Muning Wen, Ying Wen, Wenhao Wang, Chunling Xi, Guoqiang Xu, Yong Yu, Weinan Zhang",
+  "year": "2024",
+  "categories": [
+    "cs.AI",
+    "cs.CL",
+    "cs.IR"
+  ],
+  "url": "https://arxiv.org/abs/2403.06221",
+  "html_url": "https://arxiv.org/html/2403.06221",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 858,
+  "text": "Large Language Models (LLMs) [2,3] have achieved remarkable success on various tasks like question answering [4], chatbot [5], code synthesis [6], text ranking [7], table-based reasoning [8], and retrieval query expansion [9] due to their wide knowledge and excellent ability of text understanding and generation. Recently, a series of works have attempted to build powerful agents based on LLMs for various sequential decision-making tasks, including text-based games [10], online shopping [11], web navigation [12], and information retrieval [13].\n\nAmong existing LLM agents, some are trained with large-scale expert data by supervised fine-tuning (SFT) [14,15,16], while some are tuning-free and utilize in-context learning (ICL) with few expert demonstration examples [17,18,19,20]. In this paper, we focus the scope on tuning-free ICL methods, as they are highly cost-effective and can seamlessly generalize to different tasks using only a small amount of expert samples. Most existing ICL-based agents are prompted with expert trajectories carefully selected by human [21,17,22], which work well when few expert trajectories are available. However, when we have access to a large dataset of expert trajectories or an expert policy, the automatic and personalized selection of expert trajectories for each task instruction becomes necessary, and can have an essential influence on task performance.\n\nRecently, [20] study the problem of demonstration selection and propose Synapse, which retrieves relevant expert trajectories by task meta-data, and then prompts LLMs with these retrieved trajectories. Synapse performs well on computer control tasks (MiniWob++ [23]) and web navigation tasks (Mind2Web [12]). Nevertheless, retrieving and prompting with complete trajectories can be problematic in the following three aspects.\n\nPlausible examples. Sometimes generalization to data from various domains can be critical. For example, in cross-website and cross-domain subsets of Mind2Web, agents operate on websites unseen in the training set, i.e., memory. In this case, retrieving trajectories with only task meta-data is very likely to provide plausible examples, which share similar task instructions to the current one but require totally different solutions. As shown by experiments in [20], plausible examples provide no more information than random examples and can usually mislead LLM agents to wrong decisions.\n\nContext limit of LLMs. When facing tasks with long horizons and complex observations, prompting with complete trajectories will result in input sequences longer than the allowed length of LLMs. Synapse thus has to reduce the number of trajectory examples or even fail to complete the task directly. Though some long-context LLMs can receive very long prompts, the performance can be harmed due to the issue of long-term forgetting [24].\n\nIrrelevant information in prompts. LLMs are found sensitive to their prompts, and can easily copy their recent input [25,26]. The decision at the current timestep can be related to very few steps in a retrieved trajectory, while other steps do not provide any helpful information. Therefore, irrelevant steps will have unpredictable effects on the decision of LLM agents. As shown by our experiments, they negatively impact the performance most of the time.\n\nTo address the problems of trajectory-wise retrieval and prompting, we delve into step-wise demonstration retrieval and prompting. We discover that, via demonstrating with relevant steps, the input context of the LLM agent can be significantly reduced. Thus, the issue of context limit and irrelevant information can be alleviated. Therefore, the critical part is to retrieve step demonstrations that are truly relevant and helpful. To achieve this, we utilize step-by-step reasoning, i.e. Chain-of-Thought technique [21], to abstract the state at each timestep as retrieval queries and keys. The generated thoughts can involve historical information or future plans, which is more specific with state transitions and helpful in reducing plausible examples.\n\nIn this paper, we propose T hought R etrieval and A ligned D ecision (TRAD), a novel framework that achieves step-wise demonstration retrieval via thought matching and enhances the context for action prediction with temporally neighboring steps and their order information. Our contribution can be summarized in four-folds:\n\n- • We propose a thought retrieval method, where we label thoughts for expert demonstration steps in advance with an LLM, prompt LLM agents to reason at inference time, and achieve step-wise retrieval by a similarity search on thought. To the best of our knowledge, this is the first work that enables the LLM agent with thought retrieval techniques for sequential decision-making.\n\n- • Based on the thought retrieval operation, we further propose an aligned decision method, where we supply the retrieved steps with their temporal neighbors to overcome imperfect thoughts and enhance task-relevant information.\n\n- • We conduct extensive experiments and analysis on Mind2Web [12] tasks and ALFWorld [1], showing that TRAD achieves state-of-the-art (SoTA) performance compared to existing works. TRAD brings a 2.99% improvement over the strongest baseline (93.78% \\rightarrow 96.77%) to the success rate (SR) on ALFWorld. On Mind2Web, TRAD improves element accuracy, step SR, and SR remarkably over the powerful Synapse agent [20] by 2.1%, 1.4%, and 0.5%.\n\n- • We have deployed TRAD to the real-world robotic process automation scenarios of a global business insurance company, where TRAD enables the LLM agent to significantly improve the success rate in a bunch of practical tasks. In average, TRAD raises step SR from 90.2% to 98.1% and SR from 65.0% to 92.5%.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib31",
+      "text": "Shridhar et al . (2021) Mohit Shridhar, Xingdi Yuan, Marc-Alexandre Côté, Yonatan Bisk, Adam Trischler, and Matthew J. Hausknecht. 2021. ALFWorld: Aligning Text and Embodied Environments for Interactive Learning. In Proceedings of 9th International Conference on Learning Representations (ICLR) ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib4",
+      "text": "Brown et al . (2020) Tom B. Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, Sandhini Agarwal, Ariel Herbert-Voss, Gretchen Krueger, Tom Henighan, Rewon Child, Aditya Ramesh, Daniel M. Ziegler, Jeffrey Wu, Clemens Winter, Christopher Hesse, Mark Chen, Eric Sigler, Mateusz Litwin, Scott Gray, Benjamin Chess, Jack Clark, Christopher Berner, Sam McCandlish, Alec Radford, Ilya Sutskever, and Dario Amodei. 2020. Language Models are Few-Shot Learners. In Proceedings of the 34th Advances in Neural Information Processing Systems (NeurIPS) ."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib33",
+      "text": "Touvron et al . (2023) Hugo Touvron, Thibaut Lavril, Gautier Izacard, Xavier Martinet, Marie-Anne Lachaux, Timothée Lacroix, Baptiste Rozière, Naman Goyal, Eric Hambro, Faisal Azhar, Aurelien Rodriguez, Armand Joulin, Edouard Grave, and Guillaume Lample. 2023. LLaMA: Open and Efficient Foundation Language Models. arXiv preprint arXiv:2302.13971 (2023)."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib46",
+      "text": "Zheng et al . (2024a) Huaixiu Steven Zheng, Swaroop Mishra, Xinyun Chen, Heng-Tze Cheng, Ed H. Chi, Quoc V Le, and Denny Zhou. 2024a. Step-Back Prompting Enables Reasoning Via Abstraction in Large Language Models. In Proceedings of The 12th International Conference on Learning Representations (ICLR) ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib21",
+      "text": "Ouyang et al . (2022) Long Ouyang, Jeffrey Wu, Xu Jiang, Diogo Almeida, Carroll Wainwright, Pamela Mishkin, Chong Zhang, Sandhini Agarwal, Katarina Slama, Alex Ray, et al . 2022. Training language models to follow instructions with human feedback. In Proceedings of the 36th Advances in Neural Information Processing Systems (NeurIPS) . 27730–27744."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib25",
+      "text": "Roziere et al . (2023) Baptiste Roziere, Jonas Gehring, Fabian Gloeckle, Sten Sootla, Itai Gat, Xiaoqing Ellen Tan, Yossi Adi, Jingyu Liu, Tal Remez, Jérémy Rapin, et al . 2023. Code llama: Open foundation models for code. arXiv preprint arXiv:2308.12950 (2023)."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib8",
+      "text": "Ferraretto et al . (2023) Fernando Ferraretto, Thiago Laitz, Roberto Lotufo, and Rodrigo Nogueira. 2023. ExaRanker: Synthetic Explanations Improve Neural Rankers. In Proceedings of the 46th International ACM SIGIR Conference on Research and Development in Information Retrieval (SIGIR) . 2409––2414."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib44",
+      "text": "Ye et al . (2023) Yunhu Ye, Binyuan Hui, Min Yang, Binhua Li, Fei Huang, and Yongbin Li. 2023. Large Language Models are Versatile Decomposers: Decomposing Evidence and Questions for Table-based Reasoning. In Proceedings of the 46th International ACM SIGIR Conference on Research and Development in Information Retrieval (SIGIR) . 174–184."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib18",
+      "text": "Mackie et al . (2023) Iain Mackie, Shubham Chatterjee, and Jeffrey Dalton. 2023. Generative Relevance Feedback with Large Language Models. In Proceedings of the 46th International ACM SIGIR Conference on Research and Development in Information Retrieval (SIGIR) . 2026–2031."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib42",
+      "text": "Yao et al . (2023a) Shunyu Yao, Dian Yu, Jeffrey Zhao, Izhak Shafran, Thomas L. Griffiths, Yuan Cao, and Karthik Narasimhan. 2023a. Tree of Thoughts: Deliberate Problem Solving with Large Language Models. In Proceedings of 37th Conference on Neural Information Processing Systems (NeurIPS) ."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib41",
+      "text": "Yao et al . (2022) Shunyu Yao, Howard Chen, John Yang, and Karthik Narasimhan. 2022. WebShop: Towards Scalable Real-World Web Interaction with Grounded Language Agents. In Proceedings of 36th Conference on Neural Information Processing Systems (NeurIPS) ."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib5",
+      "text": "Deng et al . (2023) Xiang Deng, Yu Gu, Boyuan Zheng, Shijie Chen, Samuel Stevens, Boshi Wang, Huan Sun, and Yu Su. 2023. Mind2Web: Towards a Generalist Agent for the Web. In Proceedings of the 37th Advances in Neural Information Processing Systems (NeurIPS) ."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib49",
+      "text": "Zhu et al . (2023) Yutao Zhu, Huaying Yuan, Shuting Wang, Jiongnan Liu, Wenhan Liu, Chenlong Deng, Zhicheng Dou, and Ji-Rong Wen. 2023. Large language models for information retrieval: A survey. arXiv preprint arXiv:2308.07107 (2023)."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib19",
+      "text": "Nakano et al . (2021) Reiichiro Nakano, Jacob Hilton, Suchir Balaji, Jeff Wu, Long Ouyang, Christina Kim, Christopher Hesse, Shantanu Jain, Vineet Kosaraju, William Saunders, et al . 2021. Webgpt: Browser-assisted question-answering with human feedback. arXiv preprint arXiv:2112.09332 (2021)."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib10",
+      "text": "Gur et al . (2023) Izzeddin Gur, Ofir Nachum, Yingjie Miao, Mustafa Safdari, Austin Huang, Aakanksha Chowdhery, Sharan Narang, Noah Fiedel, and Aleksandra Faust. 2023. Understanding HTML with Large Language Models. In Findings of the Association for Computational Linguistics (EMNLP) . 2803–2821."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib9",
+      "text": "Gur et al . (2024) Izzeddin Gur, Hiroki Furuta, Austin Huang, Mustafa Safdari, Yutaka Matsuo, Douglas Eck, and Aleksandra Faust. 2024. A Real-World WebAgent with Planning, Long Context Understanding, and Program Synthesis. In Proceedings of The 12th International Conference on Learning Representations (ICLR) ."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib43",
+      "text": "Yao et al . (2023b) Shunyu Yao, Jeffrey Zhao, Dian Yu, Nan Du, Izhak Shafran, Karthik R. Narasimhan, and Yuan Cao. 2023b. ReAct: Synergizing Reasoning and Acting in Language Models. In Proceedings of The 11th International Conference on Learning Representations (ICLR) ."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib14",
+      "text": "Kim et al . (2023) Geunwoo Kim, Pierre Baldi, and Stephen McAleer. 2023. Language Models can Solve Computer Tasks. In Proceedings of the 37th Advances in Neural Information Processing Systems (NeurIPS) ."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib35",
+      "text": "Wang et al . (2023d) Guanzhi Wang, Yuqi Xie, Yunfan Jiang, Ajay Mandlekar, Chaowei Xiao, Yuke Zhu, Linxi Fan, and Anima Anandkumar. 2023d. Voyager: An open-ended embodied agent with large language models. arXiv preprint arXiv:2305.16291 (2023)."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib47",
+      "text": "Zheng et al . (2024b) Longtao Zheng, Rundong Wang, Xinrun Wang, and Bo An. 2024b. Synapse: Trajectory-as-Exemplar Prompting with Memory for Computer Control. In Proceedings of 12th International Conference on Learning Representations (ICLR) ."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib39",
+      "text": "Wei et al . (2022) Jason Wei, Xuezhi Wang, Dale Schuurmans, Maarten Bosma, Brian Ichter, Fei Xia, Ed H. Chi, Quoc V. Le, and Denny Zhou. 2022. Chain-of-Thought Prompting Elicits Reasoning in Large Language Models. In Proceedings of the 36th Advances in Neural Information Processing Systems (NeurIPS) ."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib29",
+      "text": "Shinn et al . (2023) Noah Shinn, Federico Cassano, Ashwin Gopinath, Karthik R Narasimhan, and Shunyu Yao. 2023. Reflexion: Language agents with verbal reinforcement learning. In Proceedings of the 37th Advances in Neural Information Processing Systems (NeurIPS) ."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib28",
+      "text": "Shi et al . (2017) Tianlin Shi, Andrej Karpathy, Linxi Fan, Jonathan Hernandez, and Percy Liang. 2017. World of Bits: An Open-Domain Platform for Web-Based Agents. In Proceedings of the 34th International Conference on Machine Learning (ICML) , Vol. 70. 3135–3144."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib32",
+      "text": "Team (2023) The LongChat Team. 2023. How Long Can Open-Source LLMs Truly Promise on Context Length? https://lmsys.org/blog/2023-06-29-longchat/"
+    },
+    {
+      "n": 25,
+      "id": "bib.bib23",
+      "text": "Radford et al . (2019) Alec Radford, Jeffrey Wu, Rewon Child, David Luan, Dario Amodei, and Ilya Sutskever. 2019. Language models are unsupervised multitask learners. OpenAI Blog (2019)."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib12",
+      "text": "Holtzman et al . (2020) Ari Holtzman, Jan Buys, Li Du, Maxwell Forbes, and Yejin Choi. 2020. The Curious Case of Neural Text Degeneration. In Proceedings of the 8th International Conference on Learning Representations (ICLR) ."
+    }
+  ]
+}

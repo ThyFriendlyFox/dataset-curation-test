@@ -1,0 +1,104 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.05683",
+  "title": "Efficient Public Health Intervention Planning Using Decomposition-Based Decision-Focused Learning",
+  "authors": "Sanket Shah, Arun Suggala, Milind Tambe, Aparna Taneja",
+  "year": "2024",
+  "categories": [
+    "cs.AI",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2403.05683",
+  "html_url": "https://arxiv.org/html/2403.05683",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 728,
+  "text": "A pervasive challenge faced by public health programs is one of beneficiary retention. To combat the declining engagement of beneficiaries over time, a common strategy has been to use ‘interventions’ (e.g., personalized service calls) to encourage participation and address concerns. This has been employed in a variety of domains such as medication adherence [1], chronic illness management [2], treatment prioritization [3], and mobile health [4]. However, despite their effectiveness, such interventions are expensive and, thus, effectively limited resources. Consequently, optimizing the selection of beneficiaries for these interventions is crucial.\n\nTowards this end, there has been a recent line of research on using Restless Multi-Armed Bandits (RMABs) [5,6,7] to optimize intervention resources in these domains. In the RMAB framework, each beneficiary’s adherence to the program is modeled as a Markov Decision Process (MDP). The goal, then, is to design policies that choose K out of N beneficiaries for health worker intervention in each timestep such that the overall adherence of all beneficiaries is maximized. However, the key technical barrier to using this framework in practice lies in estimating the beneficiaries’ MDP parameters, which are essential for determining these intervention policies. To address this gap, past work relies on predicting these parameters using historical data and beneficiary demographics.\n\nAn essential component of an effective predictive pipeline in the public health domain involves using ‘Decision-Focused Learning’ (DFL) [8,9,10], a way to incorporate intervention planning into the training loop in order to create models that maximize beneficiary adherence directly (cf. predictive accuracy). Both simulated experiments [11,12] and a field study [13] have shown that models trained using DFL outperform those trained using traditional supervised learning pipelines. However, the improved performance of DFL comes at a heavy computational cost—incorporating decision-making into the training pipeline requires solving, evaluating, and differentiating through intervention planning at every training step.\n\nTo reduce the computational overhead of using DFL, the state-of-the-art approach [11] uses the popular Whittle Index heuristic [6] to simplify intervention planning. This heuristic decomposes the task of creating a good policy for all the beneficiaries to one of deciding whether to act on individual beneficiaries in a simplified version of the RMAB problem. However, while this speeds up the planning of a good policy, evaluating the resulting policy requires repeatedly simulating the outcome of the policy. Yet, such evaluation is a crucial aspect of the DFL training pipeline. Indeed, as we show in Section 5, this either results in evaluations with high variance and, as a result, suboptimal learning (for a small number of simulations), or high cost (for a large number of simulations).\n\nInstead, in this paper, we create a decomposition-based DFL approach that extends the ideas from the RMAB planning literature [6,14] to both create and evaluate policies efficiently, without the need for any simulations. Specifically, we begin in Section 4.1 by showing how using the approach from [14] to create decomposed policies leads to budget constraint violations in the DFL setting. Rather, in Section 4.2, we propose an alternative approach and show how optimizing over a richer class of policies allows us to provably estimate the optimal beneficiary parameters in this setting. Finally, in Section 4.3, we show how to efficiently (in O(N) time) incorporate this approach into the DFL pipeline by building on techniques from the DFL literature [15,16].\n\nTo evaluate our approach, we use real-world data from ARMMAN, an Indian NGO, that leverages mobile health (mHealth) technology to promote healthy pregnancies. Specifically, we use secondary data from their mMitra program [17], which has successfully delivered vital preventive care information to 2.9 million women, to build our domain. Notably, DFL [13] has been currently deployed for intervention planning in mMitra and has served around 250,000 beneficiaries so far. Then, in Section 5, we present the results of how our approach does against this existing approach (based on [11]) on both the real-world domain and a synthetic domain.\n\nWe show that our proposed method is up to 500x faster than the currently deployed approach, while also producing better-performing models (Table 1). Practically, this means that models that would take more than a day to train in the past can now be trained in minutes with no loss in quality. All in all, we believe that our contribution will allow more scalable learning for RMABs, and hopefully help ARMMAN and other NGOs move us one step closer to UN Sustainable Development Goal 3.1.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib21",
+      "text": "Mate et al . (2020) Aditya Mate, Jackson Killian, Haifeng Xu, Andrew Perrault, and Milind Tambe. 2020. Collapsing bandits and their application to public health intervention. Advances in Neural Information Processing Systems 33 (2020), 15639–15650."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib18",
+      "text": "Killian et al . (2023) Jackson A Killian, Manish Jain, Yugang Jia, Jonathan Amar, Erich Huang, and Milind Tambe. 2023. Equitable Restless Multi-Armed Bandits: A General Framework Inspired By Digital Health. arXiv preprint arXiv:2308.09726 (2023)."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib8",
+      "text": "Ayer et al . (2019) Turgay Ayer, Can Zhang, Anthony Bonifonte, Anne C Spaulding, and Jagpreet Chhatwal. 2019. Prioritizing hepatitis C treatment in US prisons. Operations Research 67, 3 (2019), 853–873."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib22",
+      "text": "Mate et al . (2022) Aditya Mate, Lovish Madaan, Aparna Taneja, Neha Madhiwalla, Shresth Verma, Gargi Singh, Aparna Hegde, Pradeep Varakantham, and Milind Tambe. 2022. Field study in deploying restless multi-armed bandits: Assisting non-profits in improving maternal and child health. Proceedings of the AAAI Conference on Artificial Intelligence 36 (2022), 12017–12025."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib32",
+      "text": "Whittle (1988) Peter Whittle. 1988. Restless bandits: Activity allocation in a changing world. Journal of applied probability 25, A (1988), 287–298."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib31",
+      "text": "Weber and Weiss (1990) Richard R Weber and Gideon Weiss. 1990. On an index policy for restless bandits. Journal of applied probability 27, 3 (1990), 637–648."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib17",
+      "text": "Jung and Tewari (2019) Young Hun Jung and Ambuj Tewari. 2019. Regret bounds for thompson sampling in episodic restless bandit problems. Advances in Neural Information Processing Systems 32 (2019)."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib12",
+      "text": "Elmachtoub and Grigas (2022) Adam N Elmachtoub and Paul Grigas. 2022. Smart “predict, then optimize”. Management Science 68, 1 (2022), 9–26."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib33",
+      "text": "Wilder et al . (2019) Bryan Wilder, Bistra Dilkina, and Milind Tambe. 2019. Melding the data-decisions pipeline: Decision-focused learning for combinatorial optimization. In Proceedings of the AAAI Conference on Artificial Intelligence , Vol. 33. 1658–1665."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib20",
+      "text": "Mandi et al . (2022) Jayanta Mandi, Vıctor Bucarey, Maxime Mulamba Ke Tchomba, and Tias Guns. 2022. Decision-focused learning: through the lens of learning to rank. In International Conference on Machine Learning . PMLR, 14935–14947."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib30",
+      "text": "Wang et al . (2023) Kai Wang, Shresth Verma, Aditya Mate, Sanket Shah, Aparna Taneja, Neha Madhiwalla, Aparna Hegde, and Milind Tambe. 2023. Scalable decision-focused learning in restless multi-armed bandits with application to maternal and child health. Proceedings of the AAAI Conference on Artificial Intelligence 37 (2023), 12138–12146."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib19",
+      "text": "Killian et al . (2019) Jackson A Killian, Bryan Wilder, Amit Sharma, Vinod Choudhary, Bistra Dilkina, and Milind Tambe. 2019. Learning to prescribe interventions for tuberculosis patients using digital adherence data. In Proceedings of the 25th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining . 2430–2438."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib26",
+      "text": "Verma et al . (2023a) Shresth Verma, Aditya Mate, Kai Wang, Neha Madhiwalla, Aparna Hegde, Aparna Taneja, and Milind Tambe. 2023a. Restless Multi-Armed Bandits for Maternal and Child Health: Results from Decision-Focused Learning. Proceedings of the 2023 International Conference on Autonomous Agents and Multiagent Systems (2023), 1312–1320."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib15",
+      "text": "Hawkins (2003) Jeffrey Thomas Hawkins. 2003. A Langrangian decomposition approach to weakly coupled dynamic optimization problems and its applications . Ph.D. Dissertation. Massachusetts Institute of Technology."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib4",
+      "text": "Amos and Kolter (2017) Brandon Amos and J Zico Kolter. 2017. Optnet: Differentiable optimization as a layer in neural networks. In International Conference on Machine Learning . PMLR, 136–145."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib5",
+      "text": "Amos et al . (2019) Brandon Amos, Vladlen Koltun, and J Zico Kolter. 2019. The limited multi-label projection layer. arXiv preprint arXiv:1906.08707 (2019)."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib7",
+      "text": "ARMMAN (2023b) ARMMAN. 2023b. mMitra . https://www.armman.org/mmitra/"
+    }
+  ]
+}

@@ -1,0 +1,143 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.07221",
+  "title": "LookupFFN: Making Transformers Compute-lite for CPU inference",
+  "authors": "Zhanpeng Zeng, Michael Davies, Pranav Pulijala, Karthikeyan Sankaralingam, Vikas Singh",
+  "year": "2024",
+  "categories": [
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2403.07221",
+  "html_url": "https://arxiv.org/html/2403.07221",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1022,
+  "text": "CPU-based inference in the data-center is growing in importance as evidenced by recent server chip announcements from IBM, Intel, AMD and ARM [1,2,3,4,5] and academic efforts [6,7,8,9]. Some of the technical and business motivations include latency, security, privacy and the fact that modern data-intensive workloads have AI tasks embedded in a pipeline of non-AI tasks. Further, CPUs are a generic platform common across servers and clients faithfully serving the compute needs of businesses, which makes it attractive. And finally – it comes down to the cost of running the full workload. Unfortunately, CPU chips lack the computational intensity of raw-FLOPS compared to GPUs. On the positive side, CPUs provide tremendously large caches in the range of 128MB to 192MB, and even larger [10], which is currently under-utilized. Furthermore, such caches made out of SRAMs are more than an order of magnitude more energy efficient to access compared to DRAMs (DDR, GDDR, or HBM) [11,12], while providing 4\\times access bandwidth increase. In this context, this paper revisits one of the fundamental building blocks of modern deep-learning: the Feed Forward Network (FFN), to examine algorithmic reformulations to make it FLOP-lite and CPU friendly.\n\nFFNs are essential components in almost all deep neural networks, such as convolutional networks [13] or Transformers [14]. They heavily rely on General Matrix Multiply (GEMM), which is extremely compute intensive, especially for large scale models common in the community today. Many alternatives [15,16,17,18,19] have been proposed to reduce the FLOP needs of FFNs. In the context of inference, one may use generic pruning/quantization techniques [20,21,22,23,24], after training has concluded. This strategy is typically agnostic of specific modules in the architecture, and is applied to the entire model. Notice that if module-specific FLOP reduction is accomplished somehow, the full model will still benefit from a scheme like pruning, prior to deployment. Since such an idea would complement any reformulation of FFNs, it is more meaningful to instead focus the discussion on existing ideas that targets FLOP reduction further upstream.\n\nLSH can make FFNs FLOP-lite. One popular line of work shows how to use Locality Sensitive Hashing (LSH), to address the computational bottleneck of feed-forward via adaptive sparsity. For example, Slide [15] uses LSH to retrieve a small subset of units that omit high activation via maximum inner product search (MIPS) and only computes the outputs of these units, resulting in a sparse network. However, LSH poses certain difficulties. Due to the randomness of hash functions, a large number of hash functions are needed to get good MIPS results (see Fig. 1, left). Also, the skewed hash bucket distribution makes LSH-based FFNs harder to parallelize since the computational load of different inputs can be very different (see Fig. 1, right). Considering training, due to the constantly evolving parameters, the hash tables need to be constantly updated to adapt for the changing parameter matrices (rehash) creating a large overhead during training [16].\n\nExtensions/modifications of Slide. The Slide result shows that an approach based on LSH can be effective at reducing the FLOP count in FFNs. Motivated by this observation, the authors in Mongoose [16] proposed strategies for improvements. Specifically, by making the LSH component learnable and introducing a special update scheduler, Mongoose reduces the number of hash functions and the frequency of hash table updates (although the need for rehash is not eliminated). Separately, the skewed bucket distribution still limits the parallelism of LSH. Nonetheless, the similarities with Slide in the use of LSH make Mongoose applicable for FLOP reductions in FFNs. A distinct use of LSH was shown in YOSO [25] for approximating the self-attention matrix. Although a reduction in FLOP count did not motivate that work, the YOSO algorithm [25] specifically adjusts LSH so that the skewness of bucket distribution does not affect the computational load – to enable easy parallelism/efficiency gains. Therefore, YOSO is also potentially applicable for FLOP reductions in FFNs, like Slide/Mongoose. However, a large number of hash functions (and to a lesser extent, rehash) cannot be avoided. In summary, the effectiveness of these ideas for commonly used architectures remains unclear, which we will discuss in more detail later.\n\nThis work and its contributions. Motivated by the aforementioned limitations of LSH-based FFNs, in this paper, we provide a formulation of end-to-end learnable memory lookup for FFNs: LookupFFN. Specifically, we propose to directly view the hash tables as learnable modules. Projections are handled via a specialized module based on the fast Hadamard transform, which may be of independent interest. We show that the skewness of bucket distribution becomes irrelevant in our proposal. Since there are no parameter matrices as in [16,15], rehashing can be completely avoided, and the gradient updates are performed directly on the hash functions and hash tables (during model training). The proposed formulation is differentiable, and no special optimization on the hash modules is needed. In practice, LookupFFN can simply be integrated into common DNN models, optimization flows, and software frameworks.\n\nMain features. Based on measurements and analytical calculations, we estimate 6\\times (or more) reduction in FLOP compared to a vanilla FFN with almost the same accuracy. Even though our formulation requires somewhat large tables (16MB and more), with careful algorithm design, we can make the access pattern somewhat cache-friendly – achieving nearly 80% L1 cache hit rate. In particular, hardware-managed caches work well, avoiding the need for excessive optimization for the software-managed shared-memory of a GPU. In practice, this means that we are able to reduce the energy consumption of 80% of access to SRAMs (14 pico joules or pj per 64-bit access), versus 300 to 450 pj for DRAM-based access. We show that, on contemporary hardware, for inference, we are 2.51 \\times faster than a vanilla FFN. With new technology like 3D caches appearing in CPUs, we expect SRAM based bandwidth to increase even further, making LookupFFN integer factors faster as memory technology and packaging improvements continue. While this formulation has more memory lookups compared to GEMM-based FFN, the majority of the memory lookups are independent of each other. This means LookupFFN heavily relies on high memory throughput but has high tolerance to memory latency – making designing software (and potentially hardware) implementation easier.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib26",
+      "text": "Lichtenau et al. (2022) Lichtenau, C., Buyuktosunoglu, A., Bertran, R., Figuli, P., Jacobi, C., Papandreou, N., Pozidis, H., Saporito, A., Sica, A., and Tzortzatos, E. Ai accelerator on ibm telum processor: Industrial product. In Proceedings of the 49th Annual International Symposium on Computer Architecture , ISCA ’22, pp. 1012–1028, New York, NY, USA, 2022. Association for Computing Machinery. ISBN 9781450386104. doi: 10.1145/3470496.3533042 . URL https://doi.org/10.1145/3470496.3533042 ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib19",
+      "text": "(19) Intel. Intrinsics for intel advanced matrix extensions (intel(r) amx) instructions. intel c++ compiler classic developer guide and reference."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib31",
+      "text": "Nassif et al. (2022) Nassif, N., Munch, A. O., Molnar, C. L., Pasdast, G., Lyer, S. V., Yang, Z., Mendoza, O., Huddart, M., Venkataraman, S., Kandula, S., Marom, R., Kern, A. M., Bowhill, B., Mulvihill, D. R., Nimmagadda, S., Kalidindi, V., Krause, J., Haq, M. M., Sharma, R., and Duda, K. Sapphire rapids: The next-generation intel xeon scalable processor. In 2022 IEEE International Solid- State Circuits Conference (ISSCC) , volume 65, pp. 44–46, 2022. doi: 10.1109/ISSCC42614.2022.9731107 ."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib1",
+      "text": "(1) AMD. Amd zen deep neural network (zendnn). URL https://www.amd.com/en/developer/zendnn.html ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib4",
+      "text": "(4) Bhat, A. Machine learning on - arm servers an update. linaro virtual connect 2021."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib28",
+      "text": "Liu et al. (2019b) Liu, Y., Wang, Y., Yu, R., Li, M., Sharma, V., and Wang, Y. Optimizing cnn model inference on cpus. In Proceedings of the 2019 USENIX Conference on Usenix Annual Technical Conference , USENIX ATC ’19, pp. 1025–1040, USA, 2019b. USENIX Association. ISBN 9781939133038."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib29",
+      "text": "Mittal et al. (2022) Mittal, S., Rajput, P., and Subramoney, S. A survey of deep learning on cpus: Opportunities and co-optimizations. IEEE Transactions on Neural Networks and Learning Systems , 33(10):5095–5115, 2022. doi: 10.1109/TNNLS.2021.3071762 ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib32",
+      "text": "Nori et al. (2021) Nori, A. V., Bera, R., Balachandran, S., Rakshit, J., Omer, O. J., Abuhatzera, A., Kuttanna, B., and Subramoney, S. Reduct: Keep it close, keep it cool! : Efficient scaling of dnn inference on multi-core cpus with near-cache compute. In 2021 ACM/IEEE 48th Annual International Symposium on Computer Architecture (ISCA) , pp. 167–180, 2021. doi: 10.1109/ISCA52012.2021.00022 ."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib46",
+      "text": "Zhang et al. (2019) Zhang, C., Yu, M., Wang, W., and Yan, F. Mark: Exploiting cloud services for cost-effective, slo-aware machine learning inference serving. In Proceedings of the 2019 USENIX Conference on Usenix Annual Technical Conference , USENIX ATC ’19, pp. 1049–1062, USA, 2019. USENIX Association. ISBN 9781939133038."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib5",
+      "text": "Burd et al. (2022) Burd, T., Li, W., Pistole, J., Venkataraman, S., McCabe, M., Johnson, T., Vinh, J., Yiu, T., Wasio, M., Wong, H.-H., Lieu, D., White, J., Munger, B., Lindner, J., Olson, J., Bakke, S., Sniderman, J., Henrion, C., Schreiber, R., Busta, E., Johnson, B., Jackson, T., Miller, A., Miller, R., Pickett, M., Horiuchi, A., Dvorak, J., Balagangadharan, S., Ammikkallingal, S., and Kumar, P. Zen3: The amd 2nd-generation 7nm x86-64 microprocessor core. In 2022 IEEE International Solid- State Circuits Conference (ISSCC) , volume 65, pp. 1–3, 2022. doi: 10.1109/ISSCC42614.2022.9731678 ."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib21",
+      "text": "Jouppi et al. (2021) Jouppi, N. P., Hyun Yoon, D., Ashcraft, M., Gottscho, M., Jablin, T. B., Kurian, G., Laudon, J., Li, S., Ma, P., Ma, X., Norrie, T., Patil, N., Prasad, S., Young, C., Zhou, Z., and Patterson, D. Ten lessons from three generations shaped google’s tpuv4i : Industrial product. In 2021 ACM/IEEE 48th Annual International Symposium on Computer Architecture (ISCA) , pp. 1–14, 2021. doi: 10.1109/ISCA52012.2021.00010 ."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib17",
+      "text": "Horowitz (2014) Horowitz, M. 1.1 computing’s energy problem (and what we can do about it). In 2014 IEEE International Solid-State Circuits Conference Digest of Technical Papers (ISSCC) , pp. 10–14, 2014. doi: 10.1109/ISSCC.2014.6757323 ."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib18",
+      "text": "Howard et al. (2017) Howard, A. G., Zhu, M., Chen, B., Kalenichenko, D., Wang, W., Weyand, T., Andreetto, M., and Adam, H. Mobilenets: Efficient convolutional neural networks for mobile vision applications. arXiv preprint arXiv:1704.04861 , 2017."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib36",
+      "text": "Vaswani et al. (2017) Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., Kaiser, L. u., and Polosukhin, I. Attention is all you need. In Advances in Neural Information Processing Systems (NeurIPS) , 2017."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib8",
+      "text": "Chen et al. (2020) Chen, B., Medini, T., Farwell, J., gobriel, s., Tai, C., and Shrivastava, A. Slide : In defense of smart algorithms over hardware acceleration for large-scale deep learning systems. In Dhillon, I., Papailiopoulos, D., and Sze, V. (eds.), Proceedings of Machine Learning and Systems , volume 2, pp. 291–306, 2020. URL https://proceedings.mlsys.org/paper/2020/file/65b9eea6e1cc6bb9f0cd2a47751a186f-Paper.pdf ."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib9",
+      "text": "Chen et al. (2021) Chen, B., Liu, Z., Peng, B., Xu, Z., Li, J. L., Dao, T., Song, Z., Shrivastava, A., and Re, C. {MONGOOSE}: A learnable {lsh} framework for efficient neural network training. In International Conference on Learning Representations , 2021. URL https://openreview.net/forum?id=wWK7yXkULyh ."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib14",
+      "text": "Fedus et al. (2022) Fedus, W., Zoph, B., and Shazeer, N. Switch transformers: Scaling to trillion parameter models with simple and efficient sparsity. Journal of Machine Learning Research , 23(120):1–39, 2022. URL http://jmlr.org/papers/v23/21-0998.html ."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib47",
+      "text": "Zhang et al. (2018) Zhang, X., Zhou, X., Lin, M., and Sun, J. Shufflenet: An extremely efficient convolutional neural network for mobile devices. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR) , June 2018."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib30",
+      "text": "Moczulski et al. (2016) Moczulski, M., Denil, M., Appleyard, J., and de Freitas, N. ACDC: A structured efficient linear layer. In Bengio, Y. and LeCun, Y. (eds.), 4th International Conference on Learning Representations, ICLR 2016, San Juan, Puerto Rico, May 2-4, 2016, Conference Track Proceedings , 2016. URL http://arxiv.org/abs/1511.05946 ."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib13",
+      "text": "Dong & Yang (2019) Dong, X. and Yang, Y. Network pruning via transformable architecture search. In Wallach, H., Larochelle, H., Beygelzimer, A., d'Alché-Buc, F., Fox, E., and Garnett, R. (eds.), Advances in Neural Information Processing Systems , volume 32. Curran Associates, Inc., 2019. URL https://proceedings.neurips.cc/paper/2019/file/a01a0380ca3c61428c26a231f0e49a09-Paper.pdf ."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib25",
+      "text": "Lee et al. (2019) Lee, N., Ajanthan, T., and Torr, P. SNIP: Single-shot network pruning based on connection sensitivity. In International Conference on Learning Representations , 2019. URL https://openreview.net/forum?id=B1VZqjAcYX ."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib20",
+      "text": "Jacob et al. (2018) Jacob, B., Kligys, S., Chen, B., Zhu, M., Tang, M., Howard, A., Adam, H., and Kalenichenko, D. Quantization and training of neural networks for efficient integer-arithmetic-only inference. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR) , June 2018."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib42",
+      "text": "Zafrir et al. (2019) Zafrir, O., Boudoukh, G., Izsak, P., and Wasserblat, M. Q8bert: Quantized 8bit bert. In 2019 Fifth Workshop on Energy Efficient Machine Learning and Cognitive Computing - NeurIPS Edition (EMC2-NIPS) , pp. 36–39, 2019. doi: 10.1109/EMC2-NIPS53020.2019.00016 ."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib22",
+      "text": "Kim et al. (2021) Kim, S., Gholami, A., Yao, Z., Mahoney, M. W., and Keutzer, K. I-bert: Integer-only bert quantization. In Meila, M. and Zhang, T. (eds.), Proceedings of the 38th International Conference on Machine Learning , volume 139 of Proceedings of Machine Learning Research , pp. 5506–5518. PMLR, 18–24 Jul 2021. URL https://proceedings.mlr.press/v139/kim21d.html ."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib44",
+      "text": "Zeng et al. (2021) Zeng, Z., Xiong, Y., Ravi, S., Acharya, S., Fung, G. M., and Singh, V. You only sample (almost) once: Linear cost self-attention via bernoulli sampling. In International Conference on Machine Learning (ICML) , 2021."
+    }
+  ]
+}

@@ -1,0 +1,224 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2306.07473",
+  "title": "3D molecule generation by denoising voxel grids",
+  "authors": "Pedro O. Pinheiro, Joshua Rackers, Joseph Kleinhenz, Michael Maser, Omar Mahmood, Andrew Martin Watkins, Stephen Ra, Vishnu Sresht, Saeed Saremi",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "q-bio.QM"
+  ],
+  "url": "https://arxiv.org/abs/2306.07473",
+  "html_url": "https://arxiv.org/html/2306.07473",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 832,
+  "text": "Finding novel molecules with desired properties is an important problem in chemistry with applications to many scientific domains. In drug discovery in particular, standard computational approaches perform some sort of local search—by scoring and ranking molecules—around a region of the molecular space (chosen based on some prior domain knowledge). The space of possible drug-like molecules is prohibitively large (it scales exponentially with the molecular size [1,2], estimated to be around 10^{60} [3]), therefore search in this space is very hard. Search-based approaches achieve some successes in practice, but have some severe limitations: we can only explore very small portions of the molecular space (on the order of billions to trillions molecules) and these approaches cannot propose new molecules conditioned on some desiderata.\n\nGenerative models for molecules have been proposed to overcome these limitations and explore the molecular space more efficiently [4]. These approaches often consider one of the following types of molecule representations: (i) one-dimensional sequences such as SMILES [5] or SELFIES [6] (e.g., [7,8,9]), (ii) two-dimensional molecular graphs, where nodes represent atoms or molecular substructures and edges represent bonds between them (e.g., [10,11,12,13]), or (iii) atoms as three-dimensional points in space. Molecules are entities laying on three-dimensional space, therefore 3D representations are arguably the most complete ones—they contain information about atom types, their bonds and the molecular conformation.\n\nRecent generative models consider molecules as a set of points in 3D Euclidean space and apply diffusion models on them [14,15,16,17,18,19]. Point-cloud representations allow us to use equivariant graph neural networks [20,21,22,23,24] —known to be very effective in molecular discriminative tasks—as the diffusion model’s denoising network. However, point-based diffusion approaches have some limitations when it comes to generative modeling. First, the number of atoms in the molecule (i.e., nodes on the 3D graph) to be diffused need to be known beforehand. Second, atom types and their coordinates have very different distributions (categorical and continuous variables, respectively) and are treated separately. Because a score function is undefined on discrete distributions, some workaround is necessary. Finally, graph networks operate only on nodes and edges (single and pairwise iterations, respectively). Therefore, capturing long-range dependencies over multiple atoms (nodes) can become difficult as the number of atoms increases. This is related to the limitations of the message-passing formalism in graph neural networks [25]. Higher-order message passing can alleviate this problem to a degree [26,27], but they come at a significant computational cost and they have been limited to third-order models [28] (see next section for more discussions on the tradeoffs between model expressivity and built-in equivariance).\n\nIn this work we introduce VoxMol, a new score-based method to generate 3D molecules. Similar to [32], and unlike most recent approaches, we represent atoms as continuous (Gaussian-like) densities and molecules as a discretization of 3D space on voxel (i.e., a discrete unit of volume) grids. Voxelized representations allow us to use the same type of denoising architectures used in computer vision. These neural networks—the workhorse behind the success of score-based generative models on images, e.g. [33,34,35] —are very effective and scale very well with data.\n\nWe start by training a neural network to denoise noisy voxelized molecules. Noisy samples are created simply by adding Gaussian noise (with a fixed identity covariance matrix scaled by a large noise level) to each voxel in the molecular grid. This denoising network also parametrizes the score function of the smooth/noisy distribution. Note that in contrast to diffusion models, the noise process we use here does not displace atoms. Then, we leverage the (learned) denoising network and generate molecules in two steps [36]: (i) (walk) sample noisy density grids from the smooth distribution via Langevin Markov chain Monte Carlo (MCMC), and (ii) (jump) recover “clean” molecules by denoising the noisy grid. This sampling scheme, referred to as walk-jump sampling in [36], has been successfully applied before to 2D natural images [37,38] and 1D amino acid sequences [39].\n\nCompared to point-cloud diffusion models, VoxMol is simpler to train, it does not require knowing the number of atoms beforehand, and it does not treat features as different distributions (continuous, categorical and ordinal for coordinates, atom types and formal charge)—we only use the “raw” voxelized molecule. Moreover, due to its expressive network architecture, our method scales better to large, drug-sized molecules. Figure 1 (and Figures 8, 9 on appendix) illustrates voxelized molecules and their corresponding molecular graphs generated by our model, trained on two different datasets. These samples show visually that our model learns valences of atoms and symmetries of molecules.\n\nThe main contributions of this work can be summarized as follows. We present VoxMol, a new score-based method for 3D molecule generation. The proposed method differs from current approaches—usually diffusion models on point clouds—in terms of the data representation, the noise model, the network architecture, and the generative modeling algorithm. We show in experiments that VoxMol performs slightly worse than state of the art on a small dataset (QM9 [40]), while outperforms it (by a large margin) on a challenging, more realistic drug-like molecules dataset (GEOM-drugs [41]).",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib2",
+      "text": "Tobias Fink, Heinz Bruggesser, and Jean-Louis Reymond. Virtual exploration of the small-molecule chemical universe below 160 daltons. Angewandte Chemie International Edition , 2005."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib3",
+      "text": "Jiankun Lyu, Sheng Wang, Trent E Balius, Isha Singh, Anat Levit, Yurii S Moroz, Matthew J O’Meara, Tao Che, Enkhjargal Algaa, Kateryna Tolmachova, et al. Ultra-large library docking for discovering new chemotypes. Nature , 2019."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib4",
+      "text": "Regine S Bohacek, Colin McMartin, and Wayne C Guida. The art and practice of structure-based drug design: a molecular modeling perspective. Medicinal research reviews , 1996."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib5",
+      "text": "Camille Bilodeau, Wengong Jin, Tommi Jaakkola, Regina Barzilay, and Klavs F Jensen. Generative models for molecular discovery: Recent advances and challenges. Computational Molecular Science , 2022."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib6",
+      "text": "David Weininger. Smiles, a chemical language and information system. 1. introduction to methodology and encoding rules. Journal of chemical information and computer sciences , 1988."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib7",
+      "text": "Mario Krenn, Florian Häse, AkshatKumar Nigam, Pascal Friederich, and Alan Aspuru-Guzik. Self-referencing embedded strings (selfies): A 100% robust molecular string representation. Machine Learning: Science and Technology , 2020."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib8",
+      "text": "Marwin HS Segler, Thierry Kogej, Christian Tyrchan, and Mark P Waller. Generating focused molecule libraries for drug discovery with recurrent neural networks. ACS central science , 2018."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib9",
+      "text": "Thomas Blaschke, Marcus Olivecrona, Ola Engkvist, Jürgen Bajorath, and Hongming Chen. Application of generative autoencoder in de novo molecular design. Molecular informatics , 2018."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib10",
+      "text": "Gabriel Lima Guimaraes, Benjamin Sanchez-Lengeling, Carlos Outeiral, Pedro Luis Cunha Farias, and Alán Aspuru-Guzik. Objective-reinforced generative adversarial networks (organ) for sequence generation models. arXiv preprint arXiv:1705.10843 , 2017."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib11",
+      "text": "Wengong Jin, Regina Barzilay, and Tommi Jaakkola. Junction tree variational autoencoder for molecular graph generation. In ICML , 2018."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib12",
+      "text": "Yujia Li, Oriol Vinyals, Chris Dyer, Razvan Pascanu, and Peter Battaglia. Learning deep generative models of graphs. arXiv preprint arXiv:1803.03324 , 2018."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib13",
+      "text": "Jiaxuan You, Rex Ying, Xiang Ren, William L. Hamilton, and Jure Leskovec. Graphrnn: A deep generative model for graphs. In ICML , 2018."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib14",
+      "text": "Omar Mahmood, Elman Mansimov, Richard Bonneau, and Kyunghyun Cho. Masked graph modeling for molecule generation. Nature Communications , 2021."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib15",
+      "text": "Emiel Hoogeboom, Víctor Garcia Satorras, Clément Vignac, and Max Welling. Equivariant diffusion for molecule generation in 3D. In ICML , 2022."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib16",
+      "text": "Minkai Xu, Lantao Yu, Yang Song, Chence Shi, Stefano Ermon, and Jian Tang. Geodiff: A geometric diffusion model for molecular conformation generation. In ICLR , 2022."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib17",
+      "text": "Ilia Igashov, Hannes Stärk, Clement Vignac, Victor Garcia Satorras, Pascal Frossard, Max Welling, Michael M Bronstein, and Bruno Correia. Equivariant 3d-conditional diffusion models for molecular linker design. In NeurIPS, AI for ScienceWorkshop , 2022."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib18",
+      "text": "Arne Schneuing, Yuanqi Du, Charles Harris, Arian Jamasb, Ilia Igashov, Weitao Du, Tom Blundell, Pietro Lió, Carla Gomes, Max Welling, et al. Structure-based drug design with equivariant diffusion models. arXiv preprint arXiv:2210.13695 , 2022."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib19",
+      "text": "Gabriele Corso, Hannes Stärk, Bowen Jing, Regina Barzilay, and Tommi S. Jaakkola. Diffdock: Diffusion steps, twists, and turns for molecular docking. In ICLR , 2023."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib20",
+      "text": "Clement Vignac, Nagham Osman, Laura Toni, and Pascal Frossard. Midi: Mixed graph and 3d denoising diffusion for molecule generation. arXiv preprint arXiv:2302.09048 , 2023."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib21",
+      "text": "Nathaniel Thomas, Tess Smidt, Steven Kearnes, Lusann Yang, Li Li, Kai Kohlhoff, and Patrick Riley. Tensor field networks: Rotation-and translation-equivariant neural networks for 3d point clouds. arXiv preprint arXiv:1802.08219 , 2018."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib22",
+      "text": "Bowen Jing, Stephan Eismann, Patricia Suriana, Raphael JL Townshend, and Ron Dror. Learning from protein structure with geometric vector perceptrons. ICLR , 2021."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib23",
+      "text": "Vıctor Garcia Satorras, Emiel Hoogeboom, and Max Welling. E (n) equivariant graph neural networks. In ICML , 2021."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib24",
+      "text": "Mario Geiger and Tess Smidt. e3nn: Euclidean neural networks. arXiv preprint arXiv:2207.09453 , 2022."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib25",
+      "text": "Yi-Lun Liao and Tess Smidt. Equiformer: Equivariant graph attention transformer for 3d atomistic graphs. ICLR , 2023."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib26",
+      "text": "Keyulu Xu, Weihua Hu, Jure Leskovec, and Stefanie Jegelka. How powerful are graph neural networks? ICLR , 2019."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib27",
+      "text": "Christopher Morris, Martin Ritzert, Matthias Fey, William L Hamilton, Jan Eric Lenssen, Gaurav Rattan, and Martin Grohe. Weisfeiler and leman go neural: Higher-order graph neural networks. In AAAI , 2019."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib28",
+      "text": "Haggai Maron, Heli Ben-Hamu, Hadar Serviansky, and Yaron Lipman. Provably powerful graph networks. Neurips , 32, 2019."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib29",
+      "text": "Ilyes Batatia, David P Kovacs, Gregor Simm, Christoph Ortner, and Gábor Csányi. MACE: Higher order equivariant message passing neural networks for fast and accurate force fields. Neurips , 35:11423–11436, 2022."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib30",
+      "text": "Alexey Dosovitskiy, Lucas Beyer, Alexander Kolesnikov, Dirk Weissenborn, Xiaohua Zhai, Thomas Unterthiner, Mostafa Dehghani, Matthias Minderer, Georg Heigold, Sylvain Gelly, et al. An image is worth 16x16 words: Transformers for image recognition at scale. arXiv preprint arXiv:2010.11929 , 2020."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib31",
+      "text": "Alex Krizhevsky, Ilya Sutskever, and Geoffrey E Hinton. Imagenet classification with deep convolutional neural networks. Advances in neural information processing systems , 25, 2012."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib32",
+      "text": "Nate Gruver, Marc Finzi, Micah Goldblum, and Andrew Gordon Wilson. The Lie derivative for measuring learned equivariance. arXiv preprint arXiv:2210.02984 , 2022."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib33",
+      "text": "Matthew Ragoza, Tomohide Masuda, and David Ryan Koes. Learning a continuous representation of 3d molecular structures with deep generative models. In Neurips, Structural Biology workshop , 2020."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib34",
+      "text": "Jonathan Ho, Ajay Jain, and Pieter Abbeel. Denoising diffusion probabilistic models. In NeurIPS , 2020."
+    },
+    {
+      "n": 34,
+      "id": "bib.bib35",
+      "text": "Prafulla Dhariwal and Alexander Nichol. Diffusion models beat gans on image synthesis. NeurIPS , 2021."
+    },
+    {
+      "n": 35,
+      "id": "bib.bib36",
+      "text": "Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, and Björn Ommer. High-resolution image synthesis with latent diffusion models. In CVPR , 2022."
+    },
+    {
+      "n": 36,
+      "id": "bib.bib1",
+      "text": "Saeed Saremi and Aapo Hyvarinen. Neural empirical Bayes. JMLR , 2019."
+    },
+    {
+      "n": 37,
+      "id": "bib.bib37",
+      "text": "Saeed Saremi and Rupesh Kumar Srivastava. Multimeasurement generative models. ICLR , 2022."
+    },
+    {
+      "n": 38,
+      "id": "bib.bib38",
+      "text": "Saeed Saremi, Rupesh Kumar Srivastava, and Francis Bach. Universal smoothed score functions for generative modeling. arXiv preprint arXiv:2303.11669 , 2023."
+    },
+    {
+      "n": 39,
+      "id": "bib.bib39",
+      "text": "Nathan C Frey, Dan Berenberg, Joseph Kleinhenz, Isidro Hotzel, Julien Lafrance-Vanasse, Ryan Lewis Kelly, Yan Wu, Arvind Rajpal, Stephen Ra, Richard Bonneau, Kyunghyun Cho, Andreas Loukas, Vladimir Gligorijevic, and Saeed Saremi. Learning protein family manifolds with smoothed energy-based models. In ICLR, Workshop on Physics for Machine Learning , 2023."
+    },
+    {
+      "n": 40,
+      "id": "bib.bib40",
+      "text": "Zhenqin Wu, Bharath Ramsundar, Evan N Feinberg, Joseph Gomes, Caleb Geniesse, Aneesh S Pappu, Karl Leswing, and Vijay Pande. Moleculenet: a benchmark for molecular machine learning. Chemical science , 2018."
+    },
+    {
+      "n": 41,
+      "id": "bib.bib41",
+      "text": "Simon Axelrod and Rafael Gomez-Bombarelli. Geom, energy-annotated molecular conformations for property prediction and molecular generation. Scientific Data , 2022."
+    }
+  ]
+}

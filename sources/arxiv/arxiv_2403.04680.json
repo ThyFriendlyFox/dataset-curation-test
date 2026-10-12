@@ -1,0 +1,128 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.04680",
+  "title": "Extensive-Form Game Solving via Blackwell Approachability on Treeplexes",
+  "authors": "Darshan Chakrabarti, Julien Grand-ClÃ©ment, Christian Kroer",
+  "year": "2024",
+  "categories": [
+    "cs.GT"
+  ],
+  "url": "https://arxiv.org/abs/2403.04680",
+  "html_url": "https://arxiv.org/html/2403.04680",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1088,
+  "text": "In this paper, we focus on solving Extensive-Form Games (EFGs), a widely used framework for modeling repeated games with perfect or imperfect information. Finding a Nash equilibrium of a two-player zero-sum EFG can be cast as solving a saddle-point problem of the form\n\nwhere the sets \\mathcal{X},\\mathcal{Y} are two sequence-form polytopes (also referred to as treeplexes) representing the strategies \\bm{x},\\bm{y} of each player, and \\bm{M} is a payoff matrix. EFGs have been successfully used to obtain superhuman performances in several recent poker AI breakthroughs [1,2,3].\n\nMany algorithms have been developed based on (1.1). Since \\mathcal{X} and \\mathcal{Y} are polytopes, (1.1) can be formulated as a linear program [4]. However, because \\mathcal{X} and \\mathcal{Y} themselves have very large dimensions in realistic applications, first-order methods (FOMs) and regret minimization approaches are preferred for large-scale game solving. FOMs such as the Excessive Gap Technique (EGT, [5]) and Mirror Prox [6] instantiated for EFGs [7,8] converge to a Nash equilibrium at a rate of O(1/T), where T is the number of iterations. Regret minimization techniques rely on a folk theorem relating the regrets of the players and the duality gap of the average iterates [9]. For instance, predictive online mirror descent with with the treeplexes \\mathcal{X} and \\mathcal{Y} as decision sets achieves a O(1/T) convergence rate [10].\n\nCounterfactual regret minimization (CFR) [11] is a regret minimizer for the treeplex that runs regret minimizers locally, i.e. directly at the level of the information sets of each player. In particular, CFR +, used in virtually all poker AI milestones [1,12,3], instantiates the CFR framework with a regret minimizer called Regret Matching + (RM +) [1] and guarantees a O(1/\\sqrt{T}) convergence rate. The strong empirical performance of CFR + remains mostly unexplained, since this algorithm does not achieve the fastest theoretical O(1/T) convergence rate. Interestingly, there is a stark contrast between the role of stepsizes in CFR + versus in other algorithms. CFR + may use different stepsizes across different infosets, and the iterates of CFR + do not depend on the values of these stepsizes. We identify this property as infoset stepsize invariance. In contrast, the convergence properties of FOMs depend on the choice of a single stepsize used across the entire treeplex, which may be hard to tune in practice.\n\nRM + arises as an instantiation of Blackwell approachability [13] for the simplex. Blackwell approachability is a versatile framework with connections to online learning [14] and applications in stochastic games [15], calibration [16] and revenue management [17]. Empirically, combining CFR with other local regret minimizers than RM +, e.g. Online Mirror Descent (OMD), does not lead to the strong practical performance as CFR + [18]. This suggests that using a regret minimizer based on Blackwell approachability (RM +) is central to the success of CFR +.\n\nOur goal is to develop Blackwell approachability-based algorithms for treeplexes. Our contributions are as follows.\n\nTreeplex Blackwell approachability. We introduce the first Blackwell approachability-based regret minimizer for treeplexes. Using the self-play framework, we correspondingly get the first framework for solving two-player zero-sum EFGs via Blackwell approachability on treeplexes. Blackwell approachability enables an equivalence between regret minimization over the treeplex \\mathcal{T} and regret minimization over its conic hull {\\sf cone}(\\mathcal{T}), and any existing regret minimizer for {\\sf cone}(\\mathcal{T}) yields a new algorithm for solving EFGs. A crucial advantage of using Blackwell approachability on the treeplex, rather than regret minimization directly on the treeplex, is that it leads to a variety of interesting stepsize properties (e.g. stepsize invariance), which are not achieved by regret minimizers such as OMD on the treeplex. We instantiate our framework with several regret minimizers, leading to different desirable properties.\n\nPTB + (Predictive Treeplex Blackwell +, Algorithm 2) combines our framework with predictive online mirror descent over {\\sf cone}(\\mathcal{T}) and achieves a O(1/\\sqrt{T}) convergence rate. As an instantiation of Blackwell approachability over a cone, PTB + is treeplex stepsize invariant, i.e., its iterates do not change if we rescale all stepsizes by a positive constant. This is a desirable property for practical use, although it is a weaker property than the infoset stepsize invariance of CFR +.\n\nSmooth PTB + (Algorithm 3) is a variant of PTB + ensuring that successive iterates vary smoothly. This stability is a central element of the fastest algorithms for EFGs and we show that Smooth PTB + has a O(1/T) convergence rate. Smooth PTB + is the first EFG-solving algorithm based on Blackwell approachability achieving the state-of-the-art theoretical convergence rate, answering an important open question.\n\nAdaGradTB + (Algorithm 4) combines our framework with AdaGrad [19] as a regret minimizer over {\\sf cone}(\\mathcal{T}). AdaGradTB + adaptively learns different stepsizes for every dimension of the treeplexes and guarantees a O(1/\\sqrt{T}) convergence rate. For completeness, we consider AdamTB +, an adaptive instantiation of our framework based on Adam [20], a widely used algorithm lacking regret guarantees.\n\nThe convergence properties of our algorithms compared to existing methods can be found in Table 1.\n\nNumerical experiments. We provide two comprehensive sets of numerical experiments over benchmark EFGs.\n\nWe first compare the performance of all the algorithms introduced in our paper (Figure 4) and find that PTB + performs the best. This highlights the advantage of treeplex stepsize invariant algorithms (PTB +) over stepsize-dependent algorithms, even ones achieving faster theoretical convergence rate (Smooth PTB +), and over adaptive algorithms learning decreasing stepsizes (AdaGradTB +). AdamTB + diverge on some instances, since Adam is not a regret minimizer.\n\nWe then compare our best method (PTB +) with several existing algorithms for EFGs: CFR +, its predictive variants (PCFR +), and predictive OMD (POMD) (Figure 2). We find that PCFR + outperforms all other algorithms in terms of average-iterate performance. This suggests that infoset stepsize invariance is an important property, moreso than the treeplex stepsize invariance of PTB +. Because of the CFR decomposition, PCFR + can use different stepsizes at different infosets, where the values of the variables may be of very different magnitudes (typically, smaller for infosets appearing deeper in the treeplex), and PCFR + does not require tuning these different stepsizes, which may be impossible for large instances. As part of our main contributions, we identify and distinguish the infoset stepsize invariance and treeplex stepsize invariance properties; based on our empirical experiments, we posit that part of the puzzle behind the strong empirical performances of CFR + and PCFR + can be explained by the infoset stepsize invariance property. We also compare the last-iterate performances, where no algorithms appear to consistently outperform the others. We leave studying the last-iterate convergence as an open question.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib35",
+      "text": "Tammelin et al. [2015] Oskari Tammelin, Neil Burch, Michael Johanson, and Michael Bowling. Solving heads-up limit Texas hold’em. In Twenty-Fourth International Joint Conference on Artificial Intelligence , 2015."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib3",
+      "text": "Brown and Sandholm [2018] Noam Brown and Tuomas Sandholm. Superhuman AI for heads-up no-limit poker: Libratus beats top professionals. Science , 359(6374):418–424, 2018."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib4",
+      "text": "Brown and Sandholm [2019] Noam Brown and Tuomas Sandholm. Superhuman AI for multiplayer poker. Science , 365(6456):885–890, 2019."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib36",
+      "text": "von Stengel [1996] Bernhard von Stengel. Efficient computation of behavior strategies. Games and Economic Behavior , 14(2):220–246, 1996."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib29",
+      "text": "Nesterov [2005] Yurii Nesterov. Excessive gap technique in nonsmooth convex minimization. SIAM Journal on Optimization , 16(1):235–249, 2005."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib28",
+      "text": "Nemirovski [2004] Arkadi Nemirovski. Prox-method with rate of convergence O(1/t) for variational inequalities with Lipschitz continuous monotone operators and smooth convex-concave saddle point problems. SIAM Journal on Optimization , 15(1):229–251, 2004."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib20",
+      "text": "Hoda et al. [2010] Samid Hoda, Andrew Gilpin, Javier Pena, and Tuomas Sandholm. Smoothing techniques for computing Nash equilibria of sequential games. Mathematics of Operations Research , 35(2):494–512, 2010."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib24",
+      "text": "Kroer et al. [2020] Christian Kroer, Kevin Waugh, Fatma Kılınç-Karzan, and Tuomas Sandholm. Faster algorithms for extensive-form game solving via improved smoothing functions. Mathematical Programming , pages 1–33, 2020."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib16",
+      "text": "Freund and Schapire [1999] Yoav Freund and Robert E Schapire. Adaptive game playing using multiplicative weights. Games and Economic Behavior , 29(1-2):79–103, 1999."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib11",
+      "text": "Farina et al. [2019b] Gabriele Farina, Christian Kroer, and Tuomas Sandholm. Optimistic regret minimization for extensive-form games via dilated distance-generating functions. In Advances in Neural Information Processing Systems , pages 5222–5232, 2019b."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib37",
+      "text": "Zinkevich et al. [2007] Martin Zinkevich, Michael Johanson, Michael Bowling, and Carmelo Piccione. Regret minimization in games with incomplete information. In Advances in neural information processing systems , pages 1729–1736, 2007."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib27",
+      "text": "Moravčík et al. [2017] Matej Moravčík, Martin Schmid, Neil Burch, Viliam Lisỳ, Dustin Morrill, Nolan Bard, Trevor Davis, Kevin Waugh, Michael Johanson, and Michael Bowling. Deepstack: Expert-level artificial intelligence in heads-up no-limit poker. Science , 356(6337):508–513, 2017."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib2",
+      "text": "Blackwell [1956] David Blackwell. An analog of the minimax theorem for vector payoffs. Pacific Journal of Mathematics , 6(1):1–8, 1956."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib1",
+      "text": "Abernethy et al. [2011] Jacob Abernethy, Peter L Bartlett, and Elad Hazan. Blackwell approachability and no-regret learning are equivalent. In Proceedings of the 24th Annual Conference on Learning Theory , pages 27–46. JMLR Workshop and Conference Proceedings, 2011."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib26",
+      "text": "Milman [2006] Emanuel Milman. Approachable sets of vector payoffs in stochastic games. Games and Economic Behavior , 56(1):135–147, 2006."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib31",
+      "text": "Perchet [2010] Vianney Perchet. Approachability, Calibration and Regret in Games with Partial Observations . PhD thesis, PhD thesis, Université Pierre et Marie Curie, 2010."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib30",
+      "text": "Niazadeh et al. [2021] Rad Niazadeh, Negin Golrezaei, Joshua R Wang, Fransisca Susan, and Ashwinkumar Badanidiyuru. Online learning via offline greedy algorithms: Applications in market design and optimization. In Proceedings of the 22nd ACM Conference on Economics and Computation , pages 737–738, 2021."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib5",
+      "text": "Brown et al. [2017] Noam Brown, Christian Kroer, and Tuomas Sandholm. Dynamic thresholding and pruning for regret minimization. In Proceedings of the AAAI conference on artificial intelligence , volume 31, 2017."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib9",
+      "text": "Duchi et al. [2011] John Duchi, Elad Hazan, and Yoram Singer. Adaptive subgradient methods for online learning and stochastic optimization. Journal of machine learning research , 12(7), 2011."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib22",
+      "text": "Kingma and Ba [2015] Diederik P. Kingma and Jimmy Ba. Adam: A method for stochastic optimization. In International Conference on Learning Representations, ICLR , 2015."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib13",
+      "text": "Farina et al. [2021b] Gabriele Farina, Christian Kroer, and Tuomas Sandholm. Faster game solving via predictive Blackwell approachability: Connecting regret matching and mirror descent. In Proceedings of the AAAI Conference on Artificial Intelligence . AAAI, 2021b."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib23",
+      "text": "Kroer et al. [2018] Christian Kroer, Gabriele Farina, and Tuomas Sandholm. Solving large sequential games with the excessive gap technique. In Advances in Neural Information Processing Systems , pages 864–874, 2018."
+    }
+  ]
+}

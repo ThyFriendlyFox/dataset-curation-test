@@ -1,0 +1,163 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2311.11106",
+  "title": "ShapeMatcher: Self-Supervised Joint Shape Canonicalization, Segmentation, Retrieval and Deformation",
+  "authors": "Yan Di, Chenyangguang Zhang, Chaowei Wang, Ruida Zhang, Guangyao Zhai, Yanyan Li, Bowen Fu, Xiangyang Ji, Shan Gao",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2311.11106",
+  "html_url": "https://arxiv.org/html/2311.11106",
+  "license": "http://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Introduction",
+  "word_count": 688,
+  "text": "In recent years, there has been a notable surge in research interest focused on generating high-quality 3D models from scans of complex scenes [1,2,3,4,5,6,7]. This technology encourages extensive applications in both artistic creation [8,9], robotics [10,11] and 3D scene perception [12,13]. Existing methods [14,12] typically directly utilize deep neural networks to reconstruct 3D models from imperfect scans. However, the presence of noise and occlusions poses a significant challenge in accurately capturing fine-grained geometric structures. To overcome this, Retrieval and Deformation (\\mathbf{R\\&D}) techniques [15,9,16,8,17,18,19,20] have been developed. These methods generally involve two key steps: first, identifying the most geometrically similar source shape from a pre-curated 3D database; and second, deforming the retrieved shape to achieve precise alignment with the target input. The \\mathbf{R\\&D} approach is particularly effective in producing 3D models enriched with fine details from source shapes.\n\nHowever, existing \\mathbf{R\\&D} methods usually encounter two primary challenges that make them susceptible to noise, occlusion and pose variations, and difficult to be practically utilized. 1) Most \\mathbf{R\\&D} techniques [15,9,16,8,17,18,19,20,21] operate under the assumption that target shapes are aligned in a pre-processed canonical space. Typically, these methods are trained and tested on datasets where shapes have been manually adjusted to this canonical state. However, when these methods are deployed in real-world settings, they necessitate either manual alignment of scanned objects or the use of additional pose estimation networks [22,23,24,25,26]. Such procedures are not only time-intensive and laborious but also prone to yielding inconsistent results. This limitation significantly impedes the direct application of these methods in real-world scenarios. 2) Previous methods [9,8] do not design specially for dealing with partially-observed shapes, making it difficult to handle occluded objects. Although U-RED [21] considers the partial target shapes as input in the \\mathbf{R\\&D} process, it directly encodes the shape as a global embedding, which is not robust when dealing with significant occlusion.\n\nTo address the aforementioned two challenges, in this paper, we present ShapeMatcher, a novel framework that extends traditional \\mathbf{R\\&D} pipeline to joint self-supervised learning of object canonicalization, segmentation, retrieval and deformation. Our core contribution lies in that the four highly-associated processes can be trained simultaneously and supervise each other via constructing several cross-task consistency losses (Fig. 1). Specifically, given a partially-observed object scan in an arbitrary pose, ShapeMatcher processes the objects in four steps. First, we follow [27], which is based on Vector Neurons [28], to extract SE(3)-invariant point-wise features by progressively separating translation and rotation. We further follow [29] to normalize the features to disassociate the object scale. Until here, we successfully obtain affine-invariant point-wise features by disentangling object’s inherent structure with its pose and size. This facilitates the Canonicalization of the observed object based on these intrinsic characteristics (Fig. 2 (B)). Then we predict semantically consistent part segmentation and corresponding part centers by feeding the learned features into our Segmentation module (Fig. 2 (C)). Based on the part segmentation, in the Retrieval module (Fig. 2 (D)), we aggregate features within each part and collect them together as a comprehensive retrieval token of the object. For partial objects, we introduce a region-weighted strategy, which assigns a weight to each part according to the point inside it. Parts with more points are assigned higher weights during retrieval, which is proved to be robust to occlusions. We compare the tokens of the target object with each shape in the pre-constructed database to identify the most geometrically similar (most similar tokens) source shape. In the final Deformation module (Fig. 2 (E)), the retrieved source shape is deformed to tightly match the target object via part center guided neural cage deformation [17].\n\nTo summarize, our main contributions are:\n\n- • We introduce ShapeMatcher, a novel self-supervised framework for joint shape canonicalization, segmentation, retrieval and deformation, handling partial target inputs under arbitrary poses. Extensive experiments on the synthetic and real-world datasets demonstrate that ShapeMatcher surpasses existing state-of-the-art approaches by a large margin.\n\n- • We demonstrate that the four highly-associated tasks: canonicalization, segmentation, retrieval and deformation, can be effectively trained simultaneously and supervise each other via constructing consistencies.\n\n- • We develop the region-weighted retrieval method to mitigate the impact of occlusions in the \\mathbf{R\\&D} process.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib16",
+      "text": "Yan Di, Henrique Morimitsu, Zhiqiang Lou, and Xiangyang Ji. A unified framework for piecewise semantic reconstruction in dynamic scenes via exploiting superpixel relations. In 2020 IEEE International Conference on Robotics and Automation (ICRA) , pages 10737–10743. IEEE, 2020."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib15",
+      "text": "Yan Di, Henrique Morimitsu, Shan Gao, and Xiangyang Ji. Monocular piecewise depth estimation in dynamic scenes by exploiting superpixel relations. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 4363–4372, 2019."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib21",
+      "text": "Georgia Gkioxari, Jitendra Malik, and Justin Johnson. Mesh r-cnn. In Proceedings of the IEEE/CVF international conference on computer vision , pages 9785–9795, 2019."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib6",
+      "text": "Anh-Quan Cao and Raoul de Charette. Monoscene: Monocular 3d semantic scene completion. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 3991–4001, 2022."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib49",
+      "text": "Jiaming Sun, Yiming Xie, Linghao Chen, Xiaowei Zhou, and Hujun Bao. Neuralrecon: Real-time coherent 3d reconstruction from monocular video. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 15598–15607, 2021."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib73",
+      "text": "Zihan Zhu, Songyou Peng, Viktor Larsson, Weiwei Xu, Hujun Bao, Zhaopeng Cui, Martin R Oswald, and Marc Pollefeys. Nice-slam: Neural implicit scalable encoding for slam. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 12786–12796, 2022."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib35",
+      "text": "Jiachen Liu, Pan Ji, Nitin Bansal, Changjiang Cai, Qingan Yan, Xiaolei Huang, and Yi Xu. Planemvs: 3d plane reconstruction from multi-view stereo. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 8665–8675, 2022."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib56",
+      "text": "Mikaela Angelina Uy, Jingwei Huang, Minhyuk Sung, Tolga Birdal, and Leonidas Guibas. Deformation-aware 3d model embedding and retrieval. In Computer Vision–ECCV 2020: 16th European Conference, Glasgow, UK, August 23–28, 2020, Proceedings, Part VII 16 , pages 397–413. Springer, 2020."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib57",
+      "text": "Mikaela Angelina Uy, Vladimir G Kim, Minhyuk Sung, Noam Aigerman, Siddhartha Chaudhuri, and Leonidas J Guibas. Joint learning of 3d shape retrieval and deformation. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 11713–11722, 2021."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib67",
+      "text": "Guangyao Zhai, Dianye Huang, Shun-Cheng Wu, HyunJun Jung, Yan Di, Fabian Manhardt, Federico Tombari, Nassir Navab, and Benjamin Busam. Monograspnet: 6-dof grasping with a single rgb image. In 2023 IEEE International Conference on Robotics and Automation (ICRA) , pages 1708–1714. IEEE, 2023."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib66",
+      "text": "Guangyao Zhai, Xiaoni Cai, Dianye Huang, Yan Di, Fabian Manhardt, Federico Tombari, Nassir Navab, and Benjamin Busam. Sg-bot: Object rearrangement via coarse-to-fine robotic imagination on scene graphs. arXiv preprint arXiv:2309.12188 , 2023."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib41",
+      "text": "Yinyu Nie, Xiaoguang Han, Shihui Guo, Yujian Zheng, Jian Chang, and Jian Jun Zhang. Total3dunderstanding: Joint layout, object pose and mesh reconstruction for indoor scenes from a single image. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 55–64, 2020."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib69",
+      "text": "Cheng Zhang, Zhaopeng Cui, Yinda Zhang, Bing Zeng, Marc Pollefeys, and Shuaicheng Liu. Holistic 3d scene understanding from a single image with implicit representation. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 8833–8842, 2021."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib54",
+      "text": "Maxim Tatarchenko, Stephan R Richter, René Ranftl, Zhuwen Li, Vladlen Koltun, and Thomas Brox. What do single-view 3d reconstruction networks learn? In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 3405–3414, 2019."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib10",
+      "text": "Manuel Dahnert, Angela Dai, Leonidas J Guibas, and Matthias Nießner. Joint embedding of 3d scan and cad objects. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 8749–8758, 2019."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib40",
+      "text": "Liangliang Nan, Ke Xie, and Andrei Sharf. A search-classify approach for cluttered indoor scene understanding. ACM Transactions on Graphics (TOG) , 31(6):1–10, 2012."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib64",
+      "text": "Wang Yifan, Noam Aigerman, Vladimir G Kim, Siddhartha Chaudhuri, and Olga Sorkine-Hornung. Neural cages for detail-preserving 3d deformations. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 75–83, 2020."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib58",
+      "text": "Weiyue Wang, Duygu Ceylan, Radomir Mech, and Ulrich Neumann. 3dn: 3d deformation network. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 1038–1046, 2019."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib28",
+      "text": "Chiyu Jiang, Jingwei Huang, Andrea Tagliasacchi, and Leonidas J Guibas. Shapeflow: Learnable deformation flows among 3d shapes. Advances in Neural Information Processing Systems , 33:9745–9757, 2020."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib46",
+      "text": "Adriana Schulz, Ariel Shamir, Ilya Baran, David IW Levin, Pitchaya Sitthi-Amorn, and Wojciech Matusik. Retrieval on parametric shape collections. ACM Transactions on Graphics (TOG) , 36(1):1–14, 2017."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib17",
+      "text": "Yan Di, Chenyangguang Zhang, Ruida Zhang, Fabian Manhardt, Yongzhi Su, Jason Rambach, Didier Stricker, Xiangyang Ji, and Federico Tombari. U-red: Unsupervised 3d shape retrieval and deformation for partial point clouds. arXiv preprint arXiv:2308.06383 , 2023."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib18",
+      "text": "Yan Di, Ruida Zhang, Zhiqiang Lou, Fabian Manhardt, Xiangyang Ji, Nassir Navab, and Federico Tombari. Gpv-pose: Category-level object pose estimation via geometry-guided point-wise voting. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 6781–6791, 2022."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib71",
+      "text": "Ruida Zhang, Yan Di, Zhiqiang Lou, Fabian Manhardt, Federico Tombari, and Xiangyang Ji. Rbp-pose: Residual bounding box projection for category-level pose estimation. In European Conference on Computer Vision , pages 655–672. Springer, 2022."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib72",
+      "text": "Ruida Zhang, Yan Di, Fabian Manhardt, Federico Tombari, and Xiangyang Ji. Ssp-pose: Symmetry-aware shape prior deformation for direct category-level object pose estimation. In 2022 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS) , pages 7452–7459. IEEE, 2022."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib48",
+      "text": "Yongzhi Su, Yan Di, Guangyao Zhai, Fabian Manhardt, Jason Rambach, Benjamin Busam, Didier Stricker, and Federico Tombari. Opa-3d: Occlusion-aware pixel-wise aggregation for monocular 3d object detection. IEEE Robotics and Automation Letters , 8(3):1327–1334, 2023."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib14",
+      "text": "Yan Di, Fabian Manhardt, Gu Wang, Xiangyang Ji, Nassir Navab, and Federico Tombari. So-pose: Exploiting self-occlusion for direct 6d pose estimation. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 12396–12405, 2021."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib30",
+      "text": "Oren Katzir, Dani Lischinski, and Daniel Cohen-Or. Shape-pose disentanglement using se (3)-equivariant vector neurons. In European Conference on Computer Vision , pages 468–484. Springer, 2022."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib13",
+      "text": "Congyue Deng, Or Litany, Yueqi Duan, Adrien Poulenard, Andrea Tagliasacchi, and Leonidas J Guibas. Vector neurons: A general framework for so (3)-equivariant networks. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 12200–12209, 2021."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib8",
+      "text": "Yunlu Chen, Basura Fernando, Hakan Bilen, Matthias Nießner, and Efstratios Gavves. 3d equivariant graph implicit functions. In European Conference on Computer Vision , pages 485–502. Springer, 2022."
+    }
+  ]
+}

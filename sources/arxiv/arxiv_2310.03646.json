@@ -1,0 +1,124 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2310.03646",
+  "title": "TRAM: Bridging Trust Regions and Sharpness Aware Minimization",
+  "authors": "Tom Sherborne, Naomi Saphra, Pradeep Dasigi, Hao Peng",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.CL"
+  ],
+  "url": "https://arxiv.org/abs/2310.03646",
+  "html_url": "https://arxiv.org/html/2310.03646",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 525,
+  "text": "Neural model training requires navigating over a complex, non-convex loss surface [1] towards a good local minimum. Studying loss surfaces and training dynamics has led to many algorithmic advances [2,3,4] and regularization schemes [5,6] to improve optimization. One such strategy is to exploit an association between generalization and flat minima, defined by [7] as “region[s] in weight space with the property that each weight vector from that region has [a] similar small error”. Intuitively, a flatter, or less sharp [8], minimum will generalize better, as the loss function will be non-increasing under distribution shift. Recent work has developed a family of sharpness-aware minimization (SAM) algorithms targeting flat minima by jointly minimizing a worst-case generalization bound and local parameter sharpness [3,9,10,11].\n\nWhile flat minima methods report widespread improvement over conventional optimizers [12], we argue that they are not fully connected to the modern fine-tuning paradigm, wherein a task-specific model inherits parameters from a pre-trained model instead of being trained from scratch [13,14]. In these settings, focusing on local properties of the loss landscape (e.g., sharpness) may fail by suboptimally exploiting useful generic task-agnostic structures within pre-trained representations. In this work, we propose to combine sharpness-aware minimization with the robust transfer of pre-trained information (in representation space) for fine-tuning scenarios requiring out-of-distribution knowledge for successful adaptation.\n\nExisting methods to improve leveraging pre-trained structure during fine-tuning include trust region regularization [15,16,17] or adversarial perturbation [18,19]. These methods focus on the curvature of the function itself e.g., by encouraging smooth local changes in representations. The intuition is that lower representation curvature during fine-tuning limits a function from catastrophically forgetting [20] useful information from pre-training. This representation smoothing approach contrasts with SAM-style optimization for parameter smoothness. Both perspectives show empirical improvement in downstream tasks [17,21], but a fusion of these strategies is presently under-explored.\n\nTo this end, we propose TRAM: Trust Region Aware Minimization, a fine-tuning algorithm for out-of-distribution generalization combining the success of both sharpness-aware and trust region optimization. TRAM uses a trust region bound to inform the SAM adversarial neighborhood, introducing an awareness of function curvature within optimization for flatter minima. The resulting algorithm yields low-sharpness parameters and improved adaptation of pre-trained models to downstream tasks. To illustrate TRAM’s advantage over strong baselines in retaining generic representations, we focus on distribution transfer challenges within Transformer-based models. Our contributions are:\n\n- • We propose a new optimization algorithm: Trust Region Aware Minimization integrates representation smoothing regularization into sharpness-aware minimization. We propose and contrast multiple variants of TRAM based on differing perspectives on trust region estimation and efficiency trade-offs (Section 3).\n\n- • We highlight that TRAM empirically improves generalization for multiple out-of-distribution adaptation tasks across vision and natural language: cross-dataset adaptation for image classification, cross-domain language modeling and zero-shot cross-lingual transfer (Section 4).\n\n- • We analyze how TRAM limits catastrophic forgetting and optimizes flatter minima to improve fine-tuning. By characterizing major and minor distribution shifts, we identify how TRAM outperforms the trend in anticorrelated generalization scenarios. Our analysis verifies that TRAM optimizes a smoother loss surface for both in-domain and out-of-domain distributions. TRAM also improves representation similarity between seen and unseen distributions to improve cross-domain classification (Section 4).",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib16",
+      "text": "Frankle (2020) Jonathan Frankle. Revisiting \"qualitatively characterizing neural network optimization problems\". ArXiv , abs/2012.06898, 2020. URL https://api.semanticscholar.org/CorpusID:229152287 ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib22",
+      "text": "Izmailov et al. (2018) Pavel Izmailov, Dmitrii Podoprikhin, Timur Garipov, Dmitry Vetrov, and Andrew Gordon Wilson. Averaging weights leads to wider optima and better generalization. In Conference on Uncertainty in Artificial Intelligence , 2018. URL http://arxiv.org/abs/1803.05407 ."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib15",
+      "text": "Foret et al. (2021) Pierre Foret, Ariel Kleiner, Hossein Mobahi, and Behnam Neyshabur. Sharpness-aware minimization for efficiently improving generalization. In International Conference on Learning Representations , 2021. URL https://openreview.net/forum?id=6Tm1mposlrM ."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib6",
+      "text": "Chen et al. (2023) Xiangning Chen, Chen Liang, Da Huang, Esteban Real, Kaiyuan Wang, Yao Liu, Hieu Pham, Xuanyi Dong, Thang Luong, Cho-Jui Hsieh, Yifeng Lu, and Quoc V. Le. Symbolic discovery of optimization algorithms, 2023. URL https://arxiv.org/abs/2302.06675 ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib42",
+      "text": "Srivastava et al. (2014) Nitish Srivastava, Geoffrey Hinton, Alex Krizhevsky, Ilya Sutskever, and Ruslan Salakhutdinov. Dropout: A simple way to prevent neural networks from overfitting. Journal of Machine Learning Research , 15(56):1929–1958, 2014. URL http://jmlr.org/papers/v15/srivastava14a.html ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib21",
+      "text": "Ioffe & Szegedy (2015) Sergey Ioffe and Christian Szegedy. Batch normalization: Accelerating deep network training by reducing internal covariate shift. In Francis Bach and David Blei (eds.), Proceedings of the 32nd International Conference on Machine Learning , volume 37 of Proceedings of Machine Learning Research , pp. 448–456, Lille, France, 07–09 Jul 2015. PMLR. URL https://proceedings.mlr.press/v37/ioffe15.html ."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib20",
+      "text": "Hochreiter & Schmidhuber (1994) Sepp Hochreiter and Jürgen Schmidhuber. Simplifying neural nets by discovering flat minima. In G. Tesauro, D. Touretzky, and T. Leen (eds.), Advances in Neural Information Processing Systems , volume 7. MIT Press, 1994. URL https://proceedings.neurips.cc/paper_files/paper/1994/file/01882513d5fa7c329e940dda99b12147-Paper.pdf ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib26",
+      "text": "Keskar et al. (2017) Nitish Shirish Keskar, Dheevatsa Mudigere, Jorge Nocedal, Mikhail Smelyanskiy, and Ping Tak Peter Tang. On large-batch training for deep learning: Generalization gap and sharp minima. In International Conference on Learning Representations , 2017. URL https://openreview.net/forum?id=H1oyRlYgg ."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib32",
+      "text": "Kwon et al. (2021) Jungmin Kwon, Jeongseop Kim, Hyunseo Park, and In Kwon Choi. Asam: Adaptive sharpness-aware minimization for scale-invariant learning of deep neural networks. In Marina Meila and Tong Zhang (eds.), Proceedings of the 38th International Conference on Machine Learning , volume 139 of Proceedings of Machine Learning Research , pp. 5905–5914. PMLR, 18–24 Jul 2021. URL https://proceedings.mlr.press/v139/kwon21b.html ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib27",
+      "text": "Kim et al. (2022) Minyoung Kim, Da Li, Shell X Hu, and Timothy Hospedales. Fisher SAM: Information geometry and sharpness aware minimisation. In Kamalika Chaudhuri, Stefanie Jegelka, Le Song, Csaba Szepesvari, Gang Niu, and Sivan Sabato (eds.), Proceedings of the 39th International Conference on Machine Learning , volume 162 of Proceedings of Machine Learning Research , pp. 11148–11161. PMLR, 17–23 Jul 2022. URL https://proceedings.mlr.press/v162/kim22f.html ."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib36",
+      "text": "Möllenhoff & Khan (2023) Thomas Möllenhoff and Mohammad Emtiyaz Khan. SAM as an optimal relaxation of bayes. In The Eleventh International Conference on Learning Representations , 2023. URL https://openreview.net/forum?id=k4fevFqSQcX ."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib25",
+      "text": "Kaddour et al. (2022) Jean Kaddour, Linqing Liu, Ricardo Silva, and Matt J Kusner. When do flat minima optimizers work? In S. Koyejo, S. Mohamed, A. Agarwal, D. Belgrave, K. Cho, and A. Oh (eds.), Advances in Neural Information Processing Systems , volume 35, pp. 16577–16595. Curran Associates, Inc., 2022. URL https://proceedings.neurips.cc/paper_files/paper/2022/file/69b5534586d6c035a96b49c86dbeece8-Paper-Conference.pdf ."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib44",
+      "text": "Wang et al. (2019) Alex Wang, Amanpreet Singh, Julian Michael, Felix Hill, Omer Levy, and Samuel R. Bowman. GLUE: A multi-task benchmark and analysis platform for natural language understanding. In International Conference on Learning Representations , 2019. URL https://openreview.net/forum?id=rJ4km2R5t7 ."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib33",
+      "text": "Liang et al. (2020) Yaobo Liang, Nan Duan, Yeyun Gong, Ning Wu, Fenfei Guo, Weizhen Qi, Ming Gong, Linjun Shou, Daxin Jiang, Guihong Cao, Xiaodong Fan, Ruofei Zhang, Rahul Agrawal, Edward Cui, Sining Wei, Taroon Bharti, Ying Qiao, Jiun-Hung Chen, Winnie Wu, Shuguang Liu, Fan Yang, Daniel Campos, Rangan Majumder, and Ming Zhou. XGLUE: A new benchmark dataset for cross-lingual pre-training, understanding and generation. In Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing (EMNLP) , pp. 6008–6018, Online, November 2020. Association for Computational Linguistics. doi: 10.18653/v1/2020.emnlp-main.484 . URL https://aclanthology.org/2020.emnlp-main.484 ."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib41",
+      "text": "Schulman et al. (2015) John Schulman, Sergey Levine, Pieter Abbeel, Michael Jordan, and Philipp Moritz. Trust region policy optimization. In Francis Bach and David Blei (eds.), Proceedings of the 32nd International Conference on Machine Learning , volume 37 of Proceedings of Machine Learning Research , pp. 1889–1897, Lille, France, 07–09 Jul 2015. PMLR. URL https://proceedings.mlr.press/v37/schulman15.html ."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib23",
+      "text": "Jiang et al. (2020) Haoming Jiang, Pengcheng He, Weizhu Chen, Xiaodong Liu, Jianfeng Gao, and Tuo Zhao. SMART: Robust and efficient fine-tuning for pre-trained natural language models through principled regularized optimization. In Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics , pp. 2177–2190, Online, July 2020. Association for Computational Linguistics. doi: 10.18653/v1/2020.acl-main.197 . URL https://aclanthology.org/2020.acl-main.197 ."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib1",
+      "text": "Aghajanyan et al. (2021) Armen Aghajanyan, Akshat Shrivastava, Anchit Gupta, Naman Goyal, Luke Zettlemoyer, and Sonal Gupta. Better fine-tuning by reducing representational collapse. In International Conference on Learning Representations , 2021. URL https://openreview.net/forum?id=OQ08SN70M1V ."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib47",
+      "text": "Zhu et al. (2020) Chen Zhu, Yu Cheng, Zhe Gan, Siqi Sun, Tom Goldstein, and Jingjing Liu. Freelb: Enhanced adversarial training for natural language understanding. In International Conference on Learning Representations , 2020. URL https://openreview.net/forum?id=BygzbyHFvB ."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "He et al. (2021) Pengcheng He, Xiaodong Liu, Jianfeng Gao, and Weizhu Chen. {DEBERTA}: {DECODING}-{enhanced} {bert} {with} {disentangled} {attention}. In International Conference on Learning Representations , 2021. URL https://openreview.net/forum?id=XPZIaotutsD ."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib17",
+      "text": "French (1999) Robert M. French. Catastrophic forgetting in connectionist networks. Trends in Cognitive Sciences , 3(4):128–135, 1999. ISSN 1364-6613. doi: https://doi.org/10.1016/S1364-6613(99)01294-2 . URL https://www.sciencedirect.com/science/article/pii/S1364661399012942 ."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib5",
+      "text": "Bahri et al. (2022) Dara Bahri, Hossein Mobahi, and Yi Tay. Sharpness-aware minimization improves language model generalization. In Proceedings of the 60th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) , pp. 7360–7371, Dublin, Ireland, May 2022. Association for Computational Linguistics. doi: 10.18653/v1/2022.acl-long.508 . URL https://aclanthology.org/2022.acl-long.508 ."
+    }
+  ]
+}

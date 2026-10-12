@@ -1,0 +1,139 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2305.03053",
+  "title": "ZipIt! Merging Models from Different Tasks without Training",
+  "authors": "George Stoica, Daniel Bolya, Jakob Bjorner, Pratik Ramesh, Taylor Hearn, Judy Hoffman",
+  "year": "2024",
+  "categories": [
+    "cs.CV",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2305.03053",
+  "html_url": "https://arxiv.org/html/2305.03053",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 624,
+  "text": "Ever since AlexNet [1] popularized deep learning in computer vision, the field has thrived under the reign of massive models with an ever increasing number of parameters. Many vision problems once considered difficult or impossible are now benchmark tasks: classification with tens of thousands of classes [2,3,4], fast instance segmentation [5,6], realistic image generation [7,8,9], and more.\n\nThere are an abundance of independent, carefully tuned models out there for many tasks. However, if we want to expand an existing model’s capabilities, we run into many potential issues. If we try training the model on an additional task, we face catastrophic forgetting [10,11,12]. If we evaluate the same model on different data without adaptation, we often find it doesn’t generalize to out of domain samples [13,14,15]. We can try so called “intervention” strategies [15,12] to mitigate these effects, but these often require further training which can be expensive [16,17,18]. Instead, it would be nice if we could expand a model’s capacity to solve new tasks by simply “zipping” it with other models trained on those tasks without additional training.\n\nCombining multiple models into one has recently started to gain traction in the vision community. Model Soups [19] can add multiple models finetuned from the same pretrained initialization to improve accuracy and robustness. Git Re-Basin [20] generalizes further to models trained on the same data but with different initializations, though with a significant accuracy drop. REPAIR [21] improves on Git Re-Basin by adding new parameters and adjusting model batch norms where applicable. However, all of these methods only combine models trained on the same task. In this paper, we take this line of work to a logical extreme: merging differently initialized models trained on completely separate tasks (see Fig. 1 ab). We show that this is an incredibly difficult problem for prior work and employ two simple strategies to make it feasible.\n\nFirst, we note that prior work focuses on permuting one model to the other when merging them. This creates a 1-1 mapping between the two models, inherently assuming that most features across them are correlated. Since this isn’t necessarily the case for models trained on different tasks, we cannot rely on permutation alone. Instead, we generalize model merging to support “zipping” any combination of correlated features within and across each model. We find that on some tasks, this alone improves accuracy by up to 20% vs. permutation-based approaches. Moreover, we prove that merging within models can yield a better result in the theoretical setting of [22].\n\nSecond, existing methods merge the entire network. While this might work for extremely similar models trained in the same setting, the features of models trained on disjoint tasks become less correlated over the course of the network [23]. To solve this, we introduce partial zipping, where we only “zip” up to a specified layer. Afterward, we feed the merged model’s outputs to the remaining unmerged layers of the original networks, creating a multi-head model. Depending on task difficulty, this can improve accuracy by over 15% while still keeping most layers merged.\n\nIncorporating both of these strategies, we introduce ZipIt! (Fig. 1 c), a general method for “zipping” any number of models trained on different tasks into a single multitask model without retraining. By deriving a general graph-based algorithm for merging and unmerging (Sec. 4), we can zip models of the same architecture together, merge features within each model, and partially zip them to create a multi-task model. We validate our approach by merging models trained on entirely disjoint sets of CIFAR [24] and ImageNet [2] categories, as well as merging several models trained on completely independent datasets into one, significantly outperforming prior work (Sec. 5). Finally, we ablate and analyze our method’s capabilities on these scenarios (Sec. 6).",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib41",
+      "text": "Krizhevsky et al. (2017) Alex Krizhevsky, Ilya Sutskever, and Geoffrey E Hinton. Imagenet classification with deep convolutional neural networks. Communications of the ACM , 2017."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib14",
+      "text": "Deng et al. (2009) Jia Deng, Wei Dong, Richard Socher, Li-Jia Li, Kai Li, and Li Fei-Fei. Imagenet: A large-scale hierarchical image database. In CVPR , 2009."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib70",
+      "text": "Zhou et al. (2017) Bolei Zhou, Hang Zhao, Xavier Puig, Sanja Fidler, Adela Barriuso, and Antonio Torralba. Scene parsing through ade20k dataset. In CVPR , 2017."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib23",
+      "text": "Gemmeke et al. (2017) Jort F Gemmeke, Daniel PW Ellis, Dylan Freedman, Aren Jansen, Wade Lawrence, R Channing Moore, Manoj Plakal, and Marvin Ritter. Audio set: An ontology and human-labeled dataset for audio events. In ICASSP , 2017."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib28",
+      "text": "He et al. (2017) Kaiming He, Georgia Gkioxari, Piotr Dollár, and Ross Girshick. Mask r-cnn. In ICCV , 2017."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "Bolya et al. (2019) Daniel Bolya, Chong Zhou, Fanyi Xiao, and Yong Jae Lee. Yolact: Real-time instance segmentation. In ICCV , 2019."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib36",
+      "text": "Karras et al. (2018) Tero Karras, Samuli Laine, and Timo Aila. A style-based generator architecture for generative adversarial networks. In CVPR , 2018."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib30",
+      "text": "Ho et al. (2020) Jonathan Ho, Ajay Jain, and Pieter Abbeel. Denoising diffusion probabilistic models. NeurIPS , 2020."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib53",
+      "text": "Rombach et al. (2022) Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, and Björn Ommer. High-resolution image synthesis with latent diffusion models. In CVPR , 2022."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib38",
+      "text": "Kirkpatrick et al. (2017) James Kirkpatrick, Razvan Pascanu, Neil Rabinowitz, Joel Veness, Guillaume Desjardins, Andrei A Rusu, Kieran Milan, John Quan, Tiago Ramalho, Agnieszka Grabska-Barwinska, et al. Overcoming catastrophic forgetting in neural networks. PNAS , 2017."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib43",
+      "text": "Li & Hoiem (2017) Zhizhong Li and Derek Hoiem. Learning without forgetting. TPAMI , 2017."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "De Lange et al. (2021) Matthias De Lange, Rahaf Aljundi, Marc Masana, Sarah Parisot, Xu Jia, Aleš Leonardis, Gregory Slabaugh, and Tinne Tuytelaars. A continual learning survey: Defying forgetting in classification tasks. TPAMI , 2021."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib5",
+      "text": "Blanchard et al. (2011) Gilles Blanchard, Gyemin Lee, and Clayton Scott. Generalizing from several related classification tasks to a new unlabeled sample. In NeurIPS , 2011."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib47",
+      "text": "Muandet et al. (2013) Krikamol Muandet, David Balduzzi, and Bernhard Schölkopf. Domain generalization via invariant feature representation. In ICML , 2013."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib62",
+      "text": "Wang et al. (2022) Jindong Wang, Cuiling Lan, Chang Liu, Yidong Ouyang, Tao Qin, Wang Lu, Yiqiang Chen, Wenjun Zeng, and Philip Yu. Generalizing to unseen domains: A survey on domain generalization. TKDE , 2022."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "Dosovitskiy et al. (2020) Alexey Dosovitskiy, Lucas Beyer, Alexander Kolesnikov, Dirk Weissenborn, Xiaohua Zhai, Thomas Unterthiner, Mostafa Dehghani, Matthias Minderer, Georg Heigold, Sylvain Gelly, et al. An image is worth 16x16 words: Transformers for image recognition at scale. arXiv:2010.11929 , 2020."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib69",
+      "text": "Zhai et al. (2022) Xiaohua Zhai, Alexander Kolesnikov, Neil Houlsby, and Lucas Beyer. Scaling vision transformers. In CVPR , 2022."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib13",
+      "text": "Dehghani et al. (2023) Mostafa Dehghani, Josip Djolonga, Basil Mustafa, Piotr Padlewski, Jonathan Heek, Justin Gilmer, Andreas Steiner, Mathilde Caron, Robert Geirhos, Ibrahim Alabdulmohsin, et al. Scaling vision transformers to 22 billion parameters. arXiv:2302.05442 , 2023."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib64",
+      "text": "Wortsman et al. (2022a) Mitchell Wortsman, Gabriel Ilharco, Samir Ya Gadre, Rebecca Roelofs, Raphael Gontijo-Lopes, Ari S Morcos, Hongseok Namkoong, Ali Farhadi, Yair Carmon, Simon Kornblith, et al. Model soups: averaging weights of multiple fine-tuned models improves accuracy without increasing inference time. In ICML , 2022a."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib2",
+      "text": "Ainsworth et al. (2022) Samuel K Ainsworth, Jonathan Hayase, and Siddhartha Srinivasa. Git re-basin: Merging models modulo permutation symmetries. arXiv:2209.04836 , 2022."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib35",
+      "text": "Jordan et al. (2022) Keller Jordan, Hanie Sedghi, Olga Saukh, Rahim Entezari, and Behnam Neyshabur. Repair: Renormalizing permuted activations for interpolation repair. arXiv:2211.08403 , 2022."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib18",
+      "text": "Entezari et al. (2021) Rahim Entezari, Hanie Sedghi, Olga Saukh, and Behnam Neyshabur. The role of permutation invariance in linear mode connectivity of neural networks. arXiv:2110.06296 , 2021."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib39",
+      "text": "Kornblith et al. (2019) Simon Kornblith, Mohammad Norouzi, Honglak Lee, and Geoffrey Hinton. Similarity of neural network representations revisited. In ICML , 2019."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib40",
+      "text": "Krizhevsky et al. (2009) Alex Krizhevsky, Geoffrey Hinton, et al. Learning multiple layers of features from tiny images. 2009."
+    }
+  ]
+}

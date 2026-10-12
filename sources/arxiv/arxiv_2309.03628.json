@@ -1,0 +1,337 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2309.03628",
+  "title": "OSMOSIS: Enabling Multi-Tenancy in Datacenter SmartNICs",
+  "authors": "Mikhail Khalilov, Marcin Chrapek, Siyuan Shen, Alessandro Vezzu, Thomas Benz, Salvatore Di Girolamo, Timo Schneider, Daniele De Sensi, Luca Benini, Torsten Hoefler",
+  "year": "2024",
+  "categories": [
+    "cs.NI",
+    "cs.DC",
+    "cs.OS",
+    "cs.SY",
+    "eess.SY"
+  ],
+  "url": "https://arxiv.org/abs/2309.03628",
+  "html_url": "https://arxiv.org/html/2309.03628",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 995,
+  "text": "Network data plane design has undergone two decades of exciting research, leading to the achievement of sub-microsecond packet processing host latency [1,2,3,4,5,6,7,8,9,10,11,12]. SmartNICs (sNICs) have further improved processing times by enabling direct in-network packet processing, thereby reducing data movement [13]. sNICs started a trend in datacenter networking acceleration [14,15] similar to the GPU trend in high-performance computing [16].\n\nsNICs enable running kernels on programmable, energy-efficient cores tailored for packet processing and integrated within the host network interface card (NIC) System-on-Chip (SoC). These cores are attached directly (i.e., on-path) to the datacenter Ethernet or InfiniBand link [17,18]. Such a design reduces the latency of some applications since the sNIC can process the packets in the network [19] and reply directly without moving the packets to/from the host OS networking stack [20,21]. This enables the offload and acceleration of several workloads such as distributed learning gradients aggregation [16,22], disaggregation and storage [23,24,25,26,27], Key-Value Stores (KVS) [28,29,30], Remote Procedure Calls (RPCs) [31,32,33,34,35], network protocols and telemetry [36,37,33,34,38,39,40,41].\n\nNetwork resources in a datacenter are multiplexed between tenants through a virtualization layer [42,43,44,45,46]. However, processing user code by sNICs brings a set of considerable resource management issues. As Figure 1 shows, NICs have three resources that must be multiplexed: compute, Direct Memory Access (DMA) bandwidth, and egress bandwidth. The traditional NIC data path only forwards packets to host memory and executes simple operations with a predictable and bounded complexity. Typically, the number of incoming bytes equals the number of outgoing bytes, and NICs do not run any elaborate processing on them. In contrast, sNICs can execute unpredictably complex stateful offloads [47]. For example, heavily used in machine learning [48] Allreduce operates on the payload and is compute-bound, while storage offloading predominantly accesses host memory and is DMA/IO bound. sNICs need to operate on uncoordinated, non-deterministic, and concurrent data streams while meeting Service Level Objective (SLO) policies set by the administrator.\n\nAchieving a fair resource multiplexing for sNICs is challenging. sNICs combine characteristics of an accelerator, such as a GPU, and a traditional NIC. While this provides the aforementioned benefits, the resource management of neither is directly applicable due to the unique sNIC requirements (Section 3). Conventional RDMA NICs (rNICs) have bounded and predictable workloads (e.g., atomics, scatter-gather RDMA reads/writes) and often use link bandwidth allocation as a \"just enough\" mechanism for resource isolation and Quality-of-Service (QoS) measure between tenants. Although rNICs exhibit bounded and foreseeable behavior, achieving fairness is challenging [49] even within their simpler than sNIC context. In contrast, accelerators fall entirely under the governance of the host OS, which oversees all active kernels [50,51]. These accelerators neither generate nor receive events beyond instructions from accelerated applications, setting them apart from sNICs capable of executing arbitrary kernels independently of the host’s involvement.\n\nFurthermore, for sNICs to sustain the sub- nano second packet arrival intervals at fully utilized 400Gbit/s link (Section 3, [52]), resource multiplexing must be conducted fast. On-path sNICs have much stricter compute and buffering constraints than traditional NICs and accelerators due to the packet rate and the three multiplexed resources (compute, DMA, and egress). This issue is even more critical as network rates constantly increase and are expected to exceed Terabit per second by 2025 [53,54,55,56].\n\nA common approach to effectively manage processing at high packet arrival rates involves implementing resource management in hardware [57,58,52]. This is usually accomplished through scheduling policies such as Weighted Round Robin (WRR), which divide link bandwidth among tenants [49,59,60]. However, because sNICs have varying application kernel requirements, incorporating WRR for compute resource allocation can lead to unfairness. For example, as we show in Section 3, if one application (e.g., Allreduce) is compute-bound and takes twice as much compute time as a non-compute-bound application (e.g., KVS), the former will be able to process twice as many bytes. Other recently proposed methods for compute isolation in sNICs are not optimal for all scenarios as they are either non-work conserving [61] or rely on the host CPU as a fallback path [31].\n\nWe tackle these issues by introducing OSMOSIS (O perating S yste m Supp o rt for S treaming I n-Network Proce s sing) (Section 4). OSMOSIS is a lightweight sNIC management layer that supports performance-critical data-plane management in hardware and non-critical management tasks in a flexible software runtime. OSMOSIS is a fair, work-conserving sNIC resource manager that requires minimal hardware footprint and employs expressive yet simple Service Level Objective (SLO) semantics. In OSMOSIS, the sNIC is exposed to the tenant as Single-Root Input/Output Virtualization (SR-IOV) Virtual Function (VF). This allows the administrator to allocate proportionally more compute processing units, egress bandwidth, and DMA bandwidth to VFs associated with high-priority tenants.\n\nWe implement (Section 5) and evaluate (Section 6) OSMOSIS on top of one of the available open-source on-path sNIC architectures, PsPIN [62,63]. PsPIN is based on energy-efficient silicon-proven RISC-V cores. In our setup, PsPIN is the hardware backbone for packet processing using kernels written in C. Our performance evaluation focuses on typical datacenter workloads such as storage IO and in-network Allreduce, and shows that OSMOSIS provides comprehensive support for multi-tenancy without sacrificing performance.\n\nIn summary, we make the following contributions:\n\n- 1. sNIC multi-tenancy: We show typical multi-tenancy sNIC problems and define a set of requirements for high-performance sNICs. These requirements serve as a guideline for developing sNICs that can meet the needs of diverse workloads and tenant environments (Section 3).\n\n- 2. OSMOSIS: We introduce OSMOSIS, a lightweight open-source sNIC resource manager based on fair and work-conserving scheduling policies. OSMOSIS is a minimal hardware footprint solution to the problem of fair and efficient resource sharing in multi-tenant sNICs with diverse application needs (Section 4).\n\n- 3. Evaluation: We implement OSMOSIS in an open-source on-path 400Gbit/s sNIC by extending it with schedulers and a control path prototype (Section 5). We use this implementation to verify and evaluate OSMOSIS. We demonstrate how it solves the defined sNIC problems and handles multi-tenant applications fairly with varying resource requirements while minimizing tail latency (Section 6).",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib47",
+      "text": "Kalia, A., Kaminsky, M., and Andersen, D. G. Design guidelines for high performance RDMA systems. In 2016 USENIX Annual Technical Conference (USENIX ATC 16) (Denver, CO, June 2016), USENIX Association, pp. 437–450."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib37",
+      "text": "Høiland-Jørgensen, T., Brouer, J. D., Borkmann, D., Fastabend, J., Herbert, T., Ahern, D., and Miller, D. The express data path: Fast programmable packet processing in the operating system kernel. In Proceedings of the 14th international conference on emerging networking experiments and technologies (2018), pp. 54–66."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib8",
+      "text": "Belay, A., Prekas, G., Klimovic, A., Grossman, S., Kozyrakis, C., and Bugnion, E. { \\{ IX } \\} : a protected dataplane operating system for high throughput and low latency. In 11th USENIX Symposium on Operating Systems Design and Implementation (OSDI 14) (2014), pp. 49–65."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib74",
+      "text": "Peter, S., Li, J., Zhang, I., Ports, D. R., Woos, D., Krishnamurthy, A., Anderson, T., and Roscoe, T. Arrakis: The operating system is the control plane. ACM Transactions on Computer Systems (TOCS) 33 , 4 (2015), 1–30."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib78",
+      "text": "Prekas, G., Kogias, M., and Bugnion, E. Zygos: Achieving low tail latency for microsecond-scale networked tasks. In Proceedings of the 26th Symposium on Operating Systems Principles (2017), pp. 325–341."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib48",
+      "text": "Kalia, A., Kaminsky, M., and Andersen, D. G. Datacenter rpcs can be general and fast. arXiv preprint arXiv:1806.00680 (2018)."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib46",
+      "text": "Kaffes, K., Chong, T., Humphries, J. T., Belay, A., Mazières, D., and Kozyrakis, C. Shinjuku: Preemptive scheduling for { \\{ μ \\mu second-scale } \\} tail latency. In 16th USENIX Symposium on Networked Systems Design and Implementation (NSDI 19) (2019), pp. 345–360."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib26",
+      "text": "Fried, J., Ruan, Z., Ousterhout, A., and Belay, A. Caladan: Mitigating interference at microsecond timescales. In Proceedings of the 14th USENIX Conference on Operating Systems Design and Implementation (2020), pp. 281–297."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib24",
+      "text": "Farshin, A., Barbette, T., Roozbeh, A., Maguire Jr, G. Q., and Kostić, D. Packetmill: toward per-core 100-gbps networking. In Proceedings of the 26th ACM International Conference on Architectural Support for Programming Languages and Operating Systems (2021), pp. 1–17."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib40",
+      "text": "Ibanez, S., Mallery, A., Arslan, S., Jepsen, T., Shahbaz, M., Kim, C., and McKeown, N. The nanopu: A nanosecond network stack for datacenters. In 15th { \\{ USENIX } \\} Symposium on Operating Systems Design and Implementation ( { \\{ OSDI } \\} 21) (2021), pp. 239–256."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib62",
+      "text": "Miano, S., Sanaee, A., Risso, F., Rétvári, G., and Antichi, G. Domain specific run time optimization for software data planes. In Proceedings of the 27th ACM International Conference on Architectural Support for Programming Languages and Operating Systems (2022), pp. 1148–1164."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib84",
+      "text": "Seyedroudbari, H., Vanavasam, S., and Daglis, A. Turbo: Smartnic-enabled dynamic load balancing of μ \\mu s-scale rpcs. In 2023 IEEE International Symposium on High-Performance Computer Architecture (HPCA) (2023), IEEE, pp. 1045–1058."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib44",
+      "text": "Ivanov, A., Dryden, N., Ben-Nun, T., Li, S., and Hoefler, T. Data movement is all you need: A case study on optimizing transformers. Proceedings of Machine Learning and Systems 3 (2021), 711–732."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib94",
+      "text": "Vahdat, A., and Milojicic, D. The next wave in cloud systems architecture. Computer 54 , 10 (2021), 116–120."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib49",
+      "text": "Katsikas, G. P., Barbette, T., Chiesa, M., Kostić, D., and Maguire Jr, G. Q. What you need to know about (smart) network interface cards. In International Conference on Passive and Active Network Measurement (2021), Springer, pp. 319–336."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib96",
+      "text": "Wang, Z., Huang, H., Zhang, J., Wu, F., and Alonso, G. { \\{ FpgaNIC } \\} : An { \\{ FPGA-based } \\} versatile 100gb { \\{ SmartNIC } \\} for { \\{ GPUs } \\} . In 2022 USENIX Annual Technical Conference (USENIX ATC 22) (2022), pp. 967–986."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib5",
+      "text": "Attig, M., and Brebner, G. 400 gb/s programmable packet parsing on a single fpga. In 2011 ACM/IEEE Seventh Symposium on Architectures for Networking and Communications Systems (2011), IEEE, pp. 12–23."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib56",
+      "text": "Le, Y., Chang, H., Mukherjee, S., Wang, L., Akella, A., Swift, M. M., and Lakshman, T. Uno: Uniflying host and smart nic offload for flexible packet processing. In Proceedings of the 2017 Symposium on Cloud Computing (2017), pp. 506–519."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib60",
+      "text": "Liu, M., Peter, S., Krishnamurthy, A., and Phothilimthana, P. M. E3: Energy-efficient microservices on smartnic-accelerated servers. In USENIX annual technical conference (2019), pp. 363–378."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib33",
+      "text": "Haecki, R., Mysore, R. N., Suresh, L., Zellweger, G., Gan, B., Merrifield, T., Banerjee, S., and Roscoe, T. How to diagnose nanosecond network latencies in rich end-host stacks. In 19th USENIX Symposium on Networked Systems Design and Implementation (NSDI 22) (2022), pp. 861–877."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib1",
+      "text": "Agarwal, S., Agarwal, R., Montazeri, B., Moshref, M., Elmeleegy, K., Rizzo, L., de Kruijf, M. A., Kumar, G., Ratnasamy, S., Culler, D., et al. Understanding host interconnect congestion. In Proceedings of the 21st ACM Workshop on Hot Topics in Networks (2022), pp. 198–204."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib91",
+      "text": "Swamy, T., Rucker, A., Shahbaz, M., Gaur, I., and Olukotun, K. Taurus: a data plane architecture for per-packet ml. In Proceedings of the 27th ACM International Conference on Architectural Support for Programming Languages and Operating Systems (2022), pp. 1099–1114."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib65",
+      "text": "Minturn, D. Nvm express over fabrics. In 11th Annual OpenFabrics International OFS Developers’ Workshop (2015)."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib28",
+      "text": "Gao, P. X., Narayan, A., Karandikar, S., Carreira, J., Han, S., Agarwal, R., Ratnasamy, S., and Shenker, S. Network requirements for resource disaggregation. In 12th USENIX symposium on operating systems design and implementation (OSDI 16) (2016), pp. 249–264."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib64",
+      "text": "Min, J., Liu, M., Chugh, T., Zhao, C., Wei, A., Doh, I. H., and Krishnamurthy, A. Gimbal: enabling multi-tenant storage disaggregation on smartnic jbofs. In Proceedings of the 2021 ACM SIGCOMM 2021 Conference (2021), pp. 106–122."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib51",
+      "text": "Kim, J., Jang, I., Reda, W., Im, J., Canini, M., Kostić, D., Kwon, Y., Peter, S., and Witchel, E. Linefs: Efficient smartnic offload of a distributed file system with pipeline parallelism. In Proceedings of the ACM SIGOPS 28th Symposium on Operating Systems Principles (2021), pp. 756–771."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib32",
+      "text": "Guo, Z., Shan, Y., Luo, X., Huang, Y., and Zhang, Y. Clio: A hardware-software co-designed disaggregated memory system. In Proceedings of the 27th ACM International Conference on Architectural Support for Programming Languages and Operating Systems (2022), pp. 417–433."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib90",
+      "text": "Sun, S., Zhang, R., Yan, M., and Wu, J. Skv: A smartnic-offloaded distributed key-value store. In 2022 IEEE International Conference on Cluster Computing (CLUSTER) (2022), IEEE, pp. 1–11."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib77",
+      "text": "Pourhabibi, A., Sutherland, M., Daglis, A., and Falsafi, B. Cerebros: Evading the rpc tax in datacenters. In MICRO-54: 54th Annual IEEE/ACM International Symposium on Microarchitecture (2021), pp. 407–420."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib102",
+      "text": "Yuan, Y., Huang, J., Sun, Y., Wang, T., Nelson, J., Ports, D. R., Wang, Y., Wang, R., Tai, C., and Kim, N. S. Rambda: Rdma-driven acceleration framework for memory-intensive μ \\mu s-scale datacenter applications. In 2023 IEEE International Symposium on High-Performance Computer Architecture (HPCA) (2023), IEEE, pp. 499–515."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib59",
+      "text": "Liu, M., Cui, T., Schuh, H., Krishnamurthy, A., Peter, S., and Gupta, K. Offloading distributed applications onto smartnics using ipipe. In Proceedings of the ACM Special Interest Group on Data Communication . 2019, pp. 318–333."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib55",
+      "text": "Lazarev, N., Xiang, S., Adit, N., Zhang, Z., and Delimitrou, C. Dagger: efficient and fast rpcs in cloud microservices with near-memory reconfigurable nics. In Proceedings of the 26th ACM International Conference on Architectural Support for Programming Languages and Operating Systems (2021), pp. 36–51."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib100",
+      "text": "Yan, Y., Beldachi, A. F., Nejabati, R., and Simeonidou, D. P4-enabled smart nic: Enabling sliceable and service-driven optical data centres. Journal of Lightwave Technology 38 , 9 (2020), 2688–2694."
+    },
+    {
+      "n": 34,
+      "id": "bib.bib14",
+      "text": "Borromeo, J. C., Kondepu, K., Andriolli, N., and Valcarenghi, L. Fpga-accelerated smartnic for supporting 5g virtualized radio access network. Computer Networks 210 (2022), 108931."
+    },
+    {
+      "n": 35,
+      "id": "bib.bib81",
+      "text": "Rivitti, A., Bifulco, R., Tulumello, A., Bonola, M., and Pontarelli, S. ehdl: Turning ebpf/xdp programs into hardware designs for the nic. In Proceedings of the 28th ACM International Conference on Architectural Support for Programming Languages and Operating Systems, Volume 3 (2023), pp. 208–223."
+    },
+    {
+      "n": 36,
+      "id": "bib.bib101",
+      "text": "Yang, X., Eggert, L., Ott, J., Uhlig, S., Sun, Z., and Antichi, G. Making quic quicker with nic offload. In Proceedings of the Workshop on the Evolution, Performance, and Interoperability of QUIC (2020), pp. 21–27."
+    },
+    {
+      "n": 37,
+      "id": "bib.bib66",
+      "text": "Mogul, J. C. Tcp offload is a dumb idea whose time has come. In HotOS (2003), pp. 25–30."
+    },
+    {
+      "n": 38,
+      "id": "bib.bib22",
+      "text": "Eran, H., Fudim, M., Malka, G., Shalom, G., Cohen, N., Hermony, A., Levi, D., Liss, L., and Silberstein, M. Flexdriver: A network driver for your accelerator. In Proceedings of the 27th ACM International Conference on Architectural Support for Programming Languages and Operating Systems (2022), pp. 1115–1129."
+    },
+    {
+      "n": 39,
+      "id": "bib.bib41",
+      "text": "Ibanez, S., Mallery, A., Arslan, S., Jepsen, T., Shahbaz, M., Kim, C., and McKeown, N. Enabling the reflex plane with the nanopu. arXiv preprint arXiv:2212.06658 (2022)."
+    },
+    {
+      "n": 40,
+      "id": "bib.bib87",
+      "text": "Siracusano, G., Galea, S., Sanvito, D., Malekzadeh, M., Antichi, G., Costa, P., Haddadi, H., and Bifulco, R. Re-architecting traffic analysis with neural network interface cards. In 19th USENIX Symposium on Networked Systems Design and Implementation (NSDI 22) (Renton, WA, Apr. 2022), USENIX Association, pp. 513–533."
+    },
+    {
+      "n": 41,
+      "id": "bib.bib16",
+      "text": "Chang, B., Akella, A., D’Antoni, L., and Subramanian, K. Learned load balancing. In Proceedings of the 24th International Conference on Distributed Computing and Networking (2023), pp. 177–187."
+    },
+    {
+      "n": 42,
+      "id": "bib.bib17",
+      "text": "Dean, J., and Barroso, L. A. The tail at scale. Communications of the ACM 56 , 2 (2013), 74–80."
+    },
+    {
+      "n": 43,
+      "id": "bib.bib68",
+      "text": "Mudigonda, J., Yalagandula, P., Mogul, J., Stiekes, B., and Pouffary, Y. Netlord: a scalable multi-tenant network architecture for virtualized datacenters. ACM SIGCOMM Computer Communication Review 41 , 4 (2011), 62–73."
+    },
+    {
+      "n": 44,
+      "id": "bib.bib12",
+      "text": "Blöcher, M., Wang, L., Eugster, P., and Schmidt, M. Switches for hire: Resource scheduling for data center in-network computing. In Proceedings of the 26th ACM International Conference on Architectural Support for Programming Languages and Operating Systems (2021), pp. 268–285."
+    },
+    {
+      "n": 45,
+      "id": "bib.bib104",
+      "text": "Zhang, Y., Tan, Y., Stephens, B., and Chowdhury, M. Justitia: Software Multi-Tenancy in hardware Kernel-Bypass networks. In 19th USENIX Symposium on Networked Systems Design and Implementation (NSDI 22) (Renton, WA, Apr. 2022), USENIX Association, pp. 1307–1326."
+    },
+    {
+      "n": 46,
+      "id": "bib.bib53",
+      "text": "Kumar, P., Dukkipati, N., Lewis, N., Cui, Y., Wang, Y., Li, C., Valancius, V., Adriaens, J., Gribble, S., Foster, N., et al. Picnic: predictable virtualized nic. In Proceedings of the ACM Special Interest Group on Data Communication . 2019, pp. 351–366."
+    },
+    {
+      "n": 47,
+      "id": "bib.bib76",
+      "text": "Pismenny, B., Eran, H., Yehezkel, A., Liss, L., Morrison, A., and Tsafrir, D. Autonomous nic offloads. In Proceedings of the 26th ACM International Conference on Architectural Support for Programming Languages and Operating Systems (2021), pp. 18–35."
+    },
+    {
+      "n": 48,
+      "id": "bib.bib9",
+      "text": "Ben-Nun, T., and Hoefler, T. Demystifying parallel and distributed deep learning: An in-depth concurrency analysis. ACM Computing Surveys (CSUR) 52 , 4 (2019), 1–43."
+    },
+    {
+      "n": 49,
+      "id": "bib.bib98",
+      "text": "WeiBai, X. J., Xu, Y., Elhaddad, M., Raindel, S., Padhye, J., and Zhuo, A. R. L. D. Understanding rdma microarchitecture resources for performance isolation."
+    },
+    {
+      "n": 50,
+      "id": "bib.bib52",
+      "text": "Korolija, D., Roscoe, T., and Alonso, G. Do os abstractions make sense on fpgas? In Proceedings of the 14th USENIX Conference on Operating Systems Design and Implementation (2020), pp. 991–1010."
+    },
+    {
+      "n": 51,
+      "id": "bib.bib50",
+      "text": "Khawaja, A., Landgraf, J., Prakash, R., Wei, M., Schkufza, E., and Rossbach, C. J. Sharing, protection, and compatibility for reconfigurable fabric with amorphos. In 13th { \\{ USENIX } \\} Symposium on Operating Systems Design and Implementation ( { \\{ OSDI } \\} 18) (2018), pp. 107–127."
+    },
+    {
+      "n": 52,
+      "id": "bib.bib27",
+      "text": "Gao, P., Dalleggio, A., Xu, Y., and Chao, H. J. Gearbox: A hierarchical packet scheduler for approximate weighted fair queuing. In 19th USENIX Symposium on Networked Systems Design and Implementation (NSDI 22) (2022), pp. 551–565."
+    },
+    {
+      "n": 53,
+      "id": "bib.bib15",
+      "text": "Cai, Q., Vuppalapati, M., Hwang, J., Kozyrakis, C., and Agarwal, R. Towards μ \\mu s tail latency and terabit ethernet: disaggregating the host network stack. In Proceedings of the ACM SIGCOMM 2022 Conference (2022), pp. 767–779."
+    },
+    {
+      "n": 54,
+      "id": "bib.bib35",
+      "text": "Hoefler, T., Roweth, D., Underwood, K., Alverson, R., Griswold, M., Tabatabaee, V., Kalkunte, M., Anubolu, S., Shen, S., McLaren, M., et al. Data center ethernet and remote direct memory access: Issues at hyperscale. Computer 56 , 7 (2023), 67–77."
+    },
+    {
+      "n": 55,
+      "id": "bib.bib23",
+      "text": "Ethernet Alliance . Ethernet Roadmap 2022. https://ethernetalliance.org/technology/ethernet-roadmap/ ."
+    },
+    {
+      "n": 56,
+      "id": "bib.bib93",
+      "text": "UltraEthernet Consortium . The New Era Needs a New Network. https://ultraethernet.org ."
+    },
+    {
+      "n": 57,
+      "id": "bib.bib4",
+      "text": "Anderson, T. E., Owicki, S. S., Saxe, J. B., and Thacker, C. P. High-speed switch scheduling for local-area networks. ACM Transactions on Computer Systems (TOCS) 11 , 4 (1993), 319–352."
+    },
+    {
+      "n": 58,
+      "id": "bib.bib2",
+      "text": "Agrawal, A., and Kim, C. Intel tofino2–a 12.9 tbps p4-programmable ethernet switch. In 2020 IEEE Hot Chips 32 Symposium (HCS) (2020), IEEE Computer Society, pp. 1–32."
+    },
+    {
+      "n": 59,
+      "id": "bib.bib19",
+      "text": "Dong, Y., Yang, X., Li, J., Liao, G., Tian, K., and Guan, H. High performance network virtualization with sr-iov. Journal of Parallel and Distributed Computing 72 , 11 (2012), 1471–1480."
+    },
+    {
+      "n": 60,
+      "id": "bib.bib20",
+      "text": "Dong, Y., Yu, Z., and Rose, G. Sr-iov networking in xen: Architecture, design and implementation. In Workshop on I/O virtualization (2008), vol. 2."
+    },
+    {
+      "n": 61,
+      "id": "bib.bib31",
+      "text": "Grant, S., Yelam, A., Bland, M., and Snoeren, A. C. Smartnic performance isolation with fairnic: Programmable networking for the cloud. In Proceedings of the Annual conference of the ACM Special Interest Group on Data Communication on the applications, technologies, architectures, and protocols for computer communication (2020), pp. 681–693."
+    },
+    {
+      "n": 62,
+      "id": "bib.bib34",
+      "text": "Hoefler, T., Di Girolamo, S., Taranov, K., Grant, R. E., and Brightwell, R. spin: High-performance streaming processing in the network. In Proceedings of the International Conference for High Performance Computing, Networking, Storage and Analysis (2017), pp. 1–16."
+    },
+    {
+      "n": 63,
+      "id": "bib.bib18",
+      "text": "Di Girolamo, S., Kurth, A., Calotoiu, A., Benz, T., Schneider, T., Beranek, J., Benini, L., and Hoefler, T. A risc-v in-network accelerator for flexible high-performance low-power packet processing. In 2021 ACM/IEEE 48th Annual International Symposium on Computer Architecture (ISCA) (2021), IEEE, pp. 958–971."
+    }
+  ]
+}

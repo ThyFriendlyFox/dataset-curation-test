@@ -1,0 +1,118 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.06978",
+  "title": "Attention Prompt Tuning: Parameter-efficient Adaptation of Pre-trained Models for Spatiotemporal Modeling",
+  "authors": "Wele Gedara Chaminda Bandara, Vishal M. Patel",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2403.06978",
+  "html_url": "https://arxiv.org/html/2403.06978",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1100,
+  "text": "Video-based action recognition is the task of identifying human activities, including gestures, simple actions, interactions involving humans and objects, from videos [1,2,3,4]. Encoding temporal information is crucial for recognizing different activities [5]. The early action recognition models primarily relied on deep neural networks (DNNs) [5], owing much to the success of convolutional neural networks (CNNs) in encoding the spatiotempoal information. However, with the introduction of Transformer [6] networks in natural language processing (NLP) to model sequences of data with non-local self-attention, their ability to capture spatiotemporal information from videos for downstream applications like action recognition has been explored [5,1], yielding better results compared to their CNN counterparts. The adoption of Transformer networks has been further accelerated by the advancements in efficient self-supervised representation learning approaches for pre-training, such as masked autoencoders (MAEs) [7,8,9].\n\nTransformers [6,10,11] have revolutionized a wide range of fields, including natural language, audio, image, and video processing [12]. They have been applied to various downstream tasks, such as language translation [6], audio classification [13], image classification [10], and action recognition [9,8]. The de facto standard when utilizing transformer backbones for downstream tasks is full fine-tuning, i.e. tuning the backbone and a task-specific head by initializing the backbone with pre-trained weights [9,8,14]. Although full fine-tuning has demonstrated strong performance in most cases, it presents certain disadvantages. These include:\n\n- 1. parameter inefficiency —full fine-tuning can lead to a significant increase in the number of parameters, especially when multiple tasks are involved, as it does not share parameters between tasks;\n\n- 2. large labeled data requirements —full fine-tuning necessitates a substantial volume of labeled data to avoid overfitting and ensure good generalization;\n\n- 3. computational demands —full fine-tuning is computationally intensive and time-consuming, requiring significant computational resources;\n\n- 4. overfitting —there is a risk of overfitting to the new data, particularly if the training data is limited;\n\n- 5. catastrophic forgetting —fine-tuning on a new task may cause the model to forget previously learned knowledge from the pre-training task.\n\nAs a result, alternative methods, including linear probing, adapter tuning [15], and visual prompt tuning (VPT) [16], have been proposed, each with its own set of trade-offs (see Fig. 1). Linear probing involves tuning only a task-specific head while keeping the backbone parameters fixed (frozen). It is highly parameter-efficient and computationally less demanding. However, its performance is usually limited by the fixed nature of the backbone. On the other hand, adapter tuning [15] introduces learnable Multi-Layer Perceptron (MLP) layers in each transformer block, providing a balance between parameter efficiency and model flexibility. It allows for task-specific adaptations without changing the entire backbone and has shown better performance than linear probing. The added adapter layers increase the number of trainable parameters (but far less than full fine-tuning) and FLOPS (hence latency) compared to linear probing. In contrast, VPT [16] adopts tunable prompts that are fed into the model along with the input tokens. These prompts act as task-specific guides, allowing the model to retain the pre-trained knowledge of the backbone while adapting to the new task. VPT is highly flexible, parameter efficient, and has been shown to achieve better performance than linear probing and prompt tuning across a wide variety of downstream tasks specially those involving images [16]. However, we have observed that direct adaptation of VPT for downstream tasks involving videos, such as action recognition, leads to high computation requirements, unstable training, and increased FLOPs during training and inference.\n\nVideos inherently consist of a significantly larger number of tokens compared to images (typically 1568 vs. 196 tokens) [9,8,7]. Consequently, VPT for videos often necessitates appending a substantial number of prompts (approximately 800 prompts) to the input tokens to achieve performance levels comparable to full fine-tuning. However, this approach presents challenges. The large number of appended prompts increases computational complexity (FLOPs) and latency during both training and inference. Elevated latency is particularly concerning for video-based downstream applications, which already demand significant time and computational resources. As such, the increased latency and FLOPs compromise the flexibility and parameter efficiency of visual prompt tuning for videos, highlighting the importance of reducing computational complexity while maintaining parameter efficiency.\n\nIn our experiments we have observed that interactions between video token representations and prompts primarily occur during the multi-head attention (MHA) in the transformer block. This is because both the MLPs and Layer Normalization (LayerNorm) [17] operations before and after the attention mechanism are applied along the embedding dimension separately for each token/prompt. As a result, the layers preceding the MHA serve as fixed reparameterization for the prompts, rendering the computations on prompts following the attention mechanism redundant. This redundancy arises because the current prompts are discarded at the end of each transformer layer, and new prompts are subsequently appended for the following layer. Motivated by this observation, we propose introducing prompts directly into the attention mechanism, thereby reducing redundancy and computational complexity. Our approach, named Attention Prompt Tuning (APT), minimizes extraneous computations, reduces latency, and enhances the effectiveness of visual prompt tuning for video-based tasks.\n\nMoreover, we noted that VPT is highly sensitive to hyperparameter selection, such as learning rate and weight decay [18], and often requires a longer fine-tuning time (approximately twice as long) compared to full fine-tuning. This sensitivity is observed in other fields as well, including natural language processing and image processing [19,20]. Since video fine-tuning generally takes longer than image fine-tuning, accelerating convergence and enhancing robustness to hyperparameter selection are of great interest. Previous works on prompt tuning [19] suggest prompt reparameterization as a solution to these challenges, wherein prompts are processed through a reparameterization network consisting of a small MLP layer. However, adding an MLP layer significantly increases the number of parameters and introduces additional computational cost. To address this, we introduce scaling-based reparameterization as a solution that adds a significantly lower number of parameters while incurring negligible computational cost. In this paper, we explore the benefits and effectiveness of this approach for video-based action recognition.\n\nIn summary, our contributions are as follows:\n\n- 1. We introduce Attention Prompt Tuning (APT) – a parameter-efficient fine-tuning technique specifically designed for video-based action recognition.\n\n- 2. APT innovatively injects learnable prompts directly into the non-local attention mechanisms of Transformers. This significantly enhances parameter efficiency and reduces redundant computations compared to existing methods such as Visual Prompt Tuning (VPT).\n\n- 3. We also introduce a novel prompt reparameterization technique, making the training process less sensitive to hyperparameter selection.\n\n- 4. The effectiveness of our proposed APT is validated on three public action recognition benchmarks: UCF101, HMDB51, and Something-Something-v2. We demonstrate that our method achieves superior action recognition performance while utilizing fewer tunable parameters.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib42",
+      "text": "Elham Shabaninia, Hossein Nezamabadi-pour, and Fatemeh Shafizadegan. Transformers in action recognition: A review on temporal modeling. arXiv preprint arXiv:2302.01921 , 2022."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib19",
+      "text": "Raghav Goyal, Samira Ebrahimi Kahou, Vincent Michalski, Joanna Materzyńska, Susanne Westphal, Heuna Kim, Valentin Haenel, Ingo Fruend, Peter Yianilos, Moritz Mueller-Freitag, Florian Hoppe, Christian Thurau, Ingo Bax, and Roland Memisevic. The ”something something” video database for learning and evaluating visual common sense, 2017. arXiv:1706.04261 [cs]."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib43",
+      "text": "Khurram Soomro, Amir Roshan Zamir, and Mubarak Shah. UCF101: A Dataset of 101 Human Actions Classes From Videos in The Wild, 2012. arXiv:1212.0402 [cs]."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib29",
+      "text": "H Kuehne, H Jhuang, E Garrote, T Poggio, and T Serre. HMDB: A Large Video Database for Human Motion Recognition, 2011."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib58",
+      "text": "Yi Zhu, Xinyu Li, Chunhui Liu, Mohammadreza Zolfaghari, Yuanjun Xiong, Chongruo Wu, Zhi Zhang, Joseph Tighe, R Manmatha, and Mu Li. A comprehensive study of deep video action recognition. arXiv preprint arXiv:2012.06567 , 2020."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib48",
+      "text": "Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Lukasz Kaiser, and Illia Polosukhin. Attention Is All You Need, 2017. arXiv:1706.03762 [cs]."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib39",
+      "text": "Rui Qian, Tianjian Meng, Boqing Gong, Ming-Hsuan Yang, Huisheng Wang, Serge Belongie, and Yin Cui. Spatiotemporal Contrastive Video Representation Learning. In 2021 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 6960–6970, Nashville, TN, USA, 2021. IEEE."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib5",
+      "text": "Wele Gedara Chaminda Bandara, Naman Patel, Ali Gholami, Mehdi Nikkhah, Motilal Agrawal, and Vishal M. Patel. AdaMAE: Adaptive Masking for Efficient Spatiotemporal Learning with Masked Autoencoders. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , Canada, 2022. arXiv:2211.09120 [cs]."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib47",
+      "text": "Zhan Tong, Yibing Song, Jue Wang, and Limin Wang. VideoMAE: Masked Autoencoders are Data-Efficient Learners for Self-Supervised Video Pre-Training. In Advances in Neural Information Processing Systems , 2022. arXiv:2203.12602 [cs]."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib13",
+      "text": "Alexey Dosovitskiy, Lucas Beyer, Alexander Kolesnikov, Dirk Weissenborn, Xiaohua Zhai, Thomas Unterthiner, Mostafa Dehghani, Matthias Minderer, Georg Heigold, Sylvain Gelly, Jakob Uszkoreit, and Neil Houlsby. An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale, 2021. arXiv:2010.11929 [cs]."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib33",
+      "text": "Ze Liu, Yutong Lin, Yue Cao, Han Hu, Yixuan Wei, Zheng Zhang, Stephen Lin, and Baining Guo. Swin transformer: Hierarchical vision transformer using shifted windows. In Proceedings of the IEEE/CVF international conference on computer vision , pages 10012–10022, 2021."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib21",
+      "text": "Kai Han, Yunhe Wang, Hanting Chen, Xinghao Chen, Jianyuan Guo, Zhenhua Liu, Yehui Tang, An Xiao, Chunjing Xu, Yixing Xu, et al. A survey on vision transformer. IEEE transactions on pattern analysis and machine intelligence , 45(1):87–110, 2022."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib18",
+      "text": "Yuan Gong, Cheng-I Lai, Yu-An Chung, and James Glass. Ssast: Self-supervised audio spectrogram transformer. In Proceedings of the AAAI Conference on Artificial Intelligence , pages 10699–10709, 2022."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib16",
+      "text": "Christoph Feichtenhofer, Haoqi Fan, Yanghao Li, and Kaiming He. Masked Autoencoders As Spatiotemporal Learners, 2022. arXiv:2205.09113 [cs]."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib10",
+      "text": "Shoufa Chen, Chongjian Ge, Zhan Tong, Jiangliu Wang, Yibing Song, Jue Wang, and Ping Luo. AdaptFormer: Adapting Vision Transformers for Scalable Visual Recognition, 2022. arXiv:2205.13535 [cs]."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib25",
+      "text": "Menglin Jia, Luming Tang, Bor-Chun Chen, Claire Cardie, Serge Belongie, Bharath Hariharan, and Ser-Nam Lim. Visual Prompt Tuning, 2022. arXiv:2203.12119 [cs]."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib1",
+      "text": "Jimmy Lei Ba, Jamie Ryan Kiros, and Geoffrey E Hinton. Layer normalization. arXiv preprint arXiv:1607.06450 , 2016."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib28",
+      "text": "Anders Krogh and John Hertz. A simple weight decay can improve generalization. Advances in neural information processing systems , 4, 1991."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib32",
+      "text": "Xiao Liu, Kaixuan Ji, Yicheng Fu, Weng Tam, Zhengxiao Du, Zhilin Yang, and Jie Tang. P-Tuning: Prompt Tuning Can Be Comparable to Fine-tuning Across Scales and Tasks. In Proceedings of the 60th Annual Meeting of the Association for Computational Linguistics (Volume 2: Short Papers) , pages 61–68, Dublin, Ireland, 2022. Association for Computational Linguistics."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib31",
+      "text": "Xiang Lisa Li and Percy Liang. Prefix-Tuning: Optimizing Continuous Prompts for Generation, 2021. arXiv:2101.00190 [cs]."
+    }
+  ]
+}

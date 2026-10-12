@@ -1,0 +1,59 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2402.15281",
+  "title": "Neural Implicit Swept Volume Models for Fast Collision Detection",
+  "authors": "Dominik Joho, Jonas Schwinn, Kirill Safronov",
+  "year": "2024",
+  "categories": [
+    "cs.RO",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2402.15281",
+  "html_url": "https://arxiv.org/html/2402.15281",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 664,
+  "text": "Bin picking is a crucial task in logistics and industrial automation processes. Solving this task typically involves several steps, such as object localization, grasp pose selection, and collision-free motion planning [1], [2]. There exist multiple paradigms for finding a collision-free path: for example, one can use a path planer (sampling-based or optimization-based) to construct a single collision-free path. In practice, bin picking applications often follow a different paradigm where a set of paths is first heuristically generated and subsequently checked for collisions until a first collision-free path has been found.\n\nBesides object detection, these collision checks are one of the most time-consuming steps in bin picking applications. Geometric collision detection methods typically discretize the motion along a path into small-enough steps and check the resulting robot configurations against the environment [3,4]. In this paper, we follow a different approach utilizing the so-called swept volume of a robot motion, which is the subset of the workspace that the robot moves through during this motion. An explicit representation of this volume would allow to replace the individual collision checks along a path segment with a single collision check of this swept volume against the environment.\n\nHowever, computing an explicit representation of the swept volume comes with its own drawbacks. It is usually done via voxel grid approximations, or by geometrically approximating the boundary of this volume, e.g., as a triangle mesh [5]. By design the accuracy of these approaches is strongly linked to their computation time, which hinders their application for collision checking in live systems.\n\nWe thus propose an implicit representation based on a deep neural network that learns the function (\\mathbf{x},\\mathbf{q}_{0},\\mathbf{q}_{1})\\mapsto\\delta, where \\mathbf{q}_{0} is the start configuration of the robot, \\mathbf{q}_{1} is the goal configuration, \\mathbf{x}\\in\\mathbb{R}^{3} is the query point in the task space for which we want to perform a collision check, and \\delta is the signed distance of the query point to the resulting swept volume when performing the motion \\mathbf{q}_{0}\\rightarrow\\mathbf{q}_{1}, see also Fig. 1. This approach learns a continuous implicit swept volume model, i.e., it can predict a signed distance for any point in the task space, and is not limited to a fixed resolution of a voxel grid. Further, for a given network the inference time is independent of the length of the motion.\n\nThis approach can be used to check a robot motion against a complete environment represented as a point cloud. Each point \\mathbf{x} of this point cloud becomes one input for the network. Multiple points can be batch processed leveraging parallel computation on GPUs, which allows for favorable computation times compared to geometric collision checkers (GCC). However, a downside of this approach is that the distance computed by a neural network is less reliable when compared to a GCC. Neural networks cannot be guaranteed to extrapolate robustly to data not seen during training [6], [7], [8]. This hinders applications in industrial settings, as trading off accuracy against speed is not acceptable when it comes to safety and potential collisions.\n\nWe therefore propose an algorithm that interleaves our implicit swept volume model with a GCC. As we will show in our experiments, this effectively reduces the number of paths that have to be checked by the GCC and thus also reduces the total time spent to find a collision-free path, even when considering the additional time spent on computing the swept volume distances.\n\nWhile our primary example revolves around a bin picking application, it is worth noting that the same model is also suitable for collision checks in general sampling-based motion planners. Moreover, while our evaluation focuses on a robotic arm, our approach can be broadly applied to any articulated object that allows for swept volume computation.\n\nThe main contributions of this paper are: (a) a novel approach to modeling robot motions as implicit swept volumes parameterized by the start and goal configuration with a neural network, and (b) an algorithm that utilizes these neural swept volumes to speed up collision checking while preserving accuracy guarantees of GCCs.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "K. Kleeberger, R. Bormann, W. Kraus, and M. F. Huber, “ A Survey on Learning-Based Robotic Grasping ,” Current Robotics Reports , vol. 1, pp. 239–249, 12 2020."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "A. ten Pas, M. Gualtieri, K. Saenko, and R. Platt Jr., “ Grasp Pose Detection in Point Clouds ,” Int. Journal of Robotics Research (IJRR) , vol. 36, no. 13–14, pp. 1455–1473, 2017."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "J. Pan and D. Manocha, “ Efficient Configuration Space Construction and Optimization for Motion Planning ,” Engineering , vol. 1, no. 1, pp. 46–57, Mar. 2015."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "D. Coleman, I. A. Șucan, S. Chitta, and N. Correll, “ Reducing the Barrier to Entry of Complex Robotic Software: a MoveIt! Case Study ,” Journal of Software Engineering for Robotics (JOSER) , vol. 5, no. 1, pp. 3–16, Mar. 2014."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "S. Sellán, N. Aigerman, and A. Jacobson, “ Swept Volumes via Spacetime Numerical Continuation ,” ACM Trans. on Graphics , vol. 40, no. 4, pp. 1–11, 2021."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "K. Cao, C. Wei, A. Gaidon, N. Arechiga, and T. Ma, “ Learning Imbalanced Datasets with Label-Distribution-Aware Margin Loss ,” in Advances in Neural Information Processing Systems (NeurIPS) , 2019."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "J. Tan, C. Wang, B. Li, Q. Li, W. Ouyang, C. Yin, and J. Yan, “ Equalization Loss for Long-Tailed Object Recognition ,” in Proc. of the IEEE Conf. on Computer Vision and Pattern Recognition (CVPR) , 2020."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "X. Wang, L. Lian, Z. Miao, Z. Liu, and S. Yu, “ Long-tailed Recognition by Routing Diverse Distribution-Aware Experts ,” in Proc. of the Int. Conf. on Learning Representations (ICLR) , 2021."
+    }
+  ]
+}

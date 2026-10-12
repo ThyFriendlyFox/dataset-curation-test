@@ -1,0 +1,114 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2306.01669",
+  "title": "Enhancing CLIP with CLIP: Exploring Pseudolabeling for Limited-Label Prompt Tuning",
+  "authors": "Cristina Menghini, Andrew Delworth, Stephen H. Bach",
+  "year": "2024",
+  "categories": [
+    "cs.CV",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2306.01669",
+  "html_url": "https://arxiv.org/html/2306.01669",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 950,
+  "text": "Large pre-trained vision-language models (VLMs) [1,2,3] achieve remarkable accuracy without task-specific training but still require adaptation for optimal performance. Prompt-tuning [4,5] is an approach to efficiently enhance VLMs performance on downstream tasks by learning inputs to the model. While learning prompts with a few labeled data can yield significant improvements [6,7], a broader range of learning settings such as semi-supervised, transductive zero-shot, and unsupervised learning are still underexplored. All of these settings share access to unlabeled data, and the versatile zero-shot classification abilities of VLMs make pseudolabeling a natural approach to leveraging it. This paper investigates how the use of out-of-the-box pseudolabels assigned by CLIP can contribute to improving CLIP’s own performance. To this end, we conduct an extensive exploration of learning scenarios by varying prompt modalities, learning paradigms, and training strategies. We present empirical evidence showcasing the effectiveness of iterative prompt-training strategies that leverage CLIP-based pseudolabels, regardless of learning paradigms and prompt modalities, resulting in significant improvements in CLIP’s image classification performance across different settings.\n\nPseudolabels are heuristic labels assigned by a model to unlabeled data, which are leveraged to further train the model [8]. Successful training with pseudolabels relies on two factors: the quality of the labels and how they are used during training. To address the first, conventional methods assign labels to instances with high-confidence predictions [9]. For pseudolabeling using CLIP, Huang et al. propose to select the most confident samples for each class [10], mitigating CLIP’s bias [11] and miscalibration [12] (see Section 3). To assign pseudolabels, we rely on this approach and address the second point by exploring how to make the best use of them. We design a broad space of analysis considering three dimensions: prompt modalities, which are the model inputs we learn; learning paradigms, which define the data we have available; and training strategies, which describe the process used to optimize performance (Figure 1).\n\nResearch on prompt tuning has demonstrated that training strategies used for learning prompts in one modality can be transferred to learning prompts in a different modality. For instance, Visual Prompt Tuning [5] was originally designed to effectively fine-tune large vision models but can be adapted to efficiently fine-tune CLIP using the same training strategy as standard textual prompt tuning [6,13,14]. On the contrary, different learning paradigms with limited labeled data typically require distinct approaches specifically tailored to extract information from the available data [15,16]. However, we observe that this changes by using VLM’s generated pseudolabels. Unlike conventional pseudolabeling approaches that bootstrap off labeled data and are used as semi-supervised learning techniques [9,17,18], VLMs can generate pseudolabels in any learning setting. This offers a significant advantage, expanding the scope of pseudolabeling beyond semi-supervised learning, and making it a promising approach for other settings, such as transductive zero-shot and unsupervised learning. By using CLIP-based pseudolabels as a source of supervision, we can view these settings as optimizing the same loss function, which is simply a weighted sum of the errors on labeled data, if available, and pseudolabeled data. Given that we can express different settings as the same problem, we can propose training strategies, i.e., the way of using pseudolabels, that suit them all.\n\nBy standardizing the training strategies across various prompt modalities and learning settings, we can conduct experiments on different applications of pseudolabels for various combinations of prompt modalities, learning paradigms, and training strategies, as illustrated in Figure 1. To the best of our knowledge, only one potential path has been explored thus far; specifically, fine-tuning textual prompts in an unsupervised learning context using a few pseudolabels [10]. Rather than relying on a fixed set of pseudolabels, we propose iterative training techniques that allow for the ongoing refinement and expansion of the pool of pseudolabeled data used during training. With each iteration, we progressively enhance CLIP’s pseudolabeling ability, allowing us to extend the set of pseudolabeled data while maintaining the high quality of the initial pseudolabels.\n\nWe conduct experiments on six tasks where CLIP has been observed to underperform [1], such as satellite-image classification, flower-species identification, and texture-image recognition, among others. Our findings reveal that iterative approaches effectively fine-tune prompts irrespective of their modality and learning paradigms. Recent studies have identified the “Matthew effect” as a potential issue for semi-supervised models that use pseudolabels [19,11]. This phenomenon causes models to perform well on classes with accurate pseudolabels but poorly on those with inaccurate ones, thereby reinforcing the model’s original bias towards certain classes. Our analysis reveals that using pseudolabels generated by CLIP for prompt-tuning with iterative strategies not only improves CLIP’s overall performance but also corrects its natural bias towards certain classes.\n\nWe summarize the main takeaways of our work:\n\n- • General purpose zero-shot learners used as general purpose pseudolabelers open the opportunity to develop training strategies that leverage pseudolabeled data beyond semi-supervised learning. We point out that different learning paradigms, such as semi-supervised, transductive zero-shot, and unsupervised learning, can be all considered as special cases of a single objective function, by using pseudolabels as a source of supervision.\n\n- • We demonstrate that simple iterative training strategies for refining pseudolabels are highly effective approaches for limited-label prompt tuning. In fact, regardless of the prompt modality and learning setting, these strategies improve CLIP, by on average 19.5 points in semi-supervised learning, 28.4 in transductive zero-shot learning, and 15.2 in unsupervised learning.\n\n- • We show that prompts learned with iterative strategies help mitigate the \"rich get richer, poor get poorer\" effect observed in semi-supervised approaches leveraging pseudolabels. By redistributing the quality of pseudolabels across different classes, we observe a “Robin Hood effect” where the extremely rich classes’ accuracy stays the same or decreases, while poorer classes get richer, leading to a more equitable distribution of per-class accuracy.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib32",
+      "text": "Alec Radford, Jong Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry, Amanda Askell, Pamela Mishkin, Jack Clark, Gretchen Krueger, and Ilya Sutskever. Learning transferable visual models from natural language supervision. In International Conference on Machine Learning , 2021."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib43",
+      "text": "Lu Yuan, Dongdong Chen, Yi-Ling Chen, Noel C. F. Codella, Xiyang Dai, Jianfeng Gao, Houdong Hu, Xuedong Huang, Boxin Li, Chunyuan Li, Ce Liu, Mengchen Liu, Zicheng Liu, Yumao Lu, Yu Shi, Lijuan Wang, Jianfeng Wang, Bin Xiao, Zhen Xiao, Jianwei Yang, Michael Zeng, Luowei Zhou, and Pengchuan Zhang. Florence: A new foundation model for computer vision. ArXiv , abs/2111.11432, 2021."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib17",
+      "text": "Chao Jia, Yinfei Yang, Ye Xia, Yi-Ting Chen, Zarana Parekh, Hieu Pham, Quoc V. Le, Yun-Hsuan Sung, Zhen Li, and Tom Duerig. Scaling up visual and vision-language representation learning with noisy text supervision. In International Conference on Machine Learning , 2021."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib13",
+      "text": "Chunjiang Ge, Rui Huang, Mixue Xie, Zihang Lai, Shiji Song, Shuang Li, and Gao Huang. Domain adaptation via prompt learning. ArXiv , abs/2202.06687, 2022."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib18",
+      "text": "Menglin Jia, Luming Tang, Bor-Chun Chen, Claire Cardie, Serge Belongie, Bharath Hariharan, and Ser-Nam Lim. Visual prompt tuning. In ECCV 2022: 17th European Conference on Computer Vision , 2022."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib48",
+      "text": "Kaiyang Zhou, Jingkang Yang, Chen Change Loy, and Ziwei Liu. Learning to prompt for vision-language models. International Journal of Computer Vision , 2021."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib2",
+      "text": "Hyojin Bahng, Ali Jahanian, Swami Sankaranarayanan, and Phillip Isola. Exploring visual prompts for adapting large-scale models. arXiv preprint arXiv:2203.17274 , 2022."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib20",
+      "text": "Dong-Hyun Lee. Pseudo-label : The simple and efficient semi-supervised learning method for deep neural networks. ICML 2013 Workshop : Challenges in Representation Learning (WREPL) , 2013."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib36",
+      "text": "Kihyuk Sohn, David Berthelot, Nicholas Carlini, Zizhao Zhang, Han Zhang, Colin A Raffel, Ekin Dogus Cubuk, Alexey Kurakin, and Chun-Liang Li. Fixmatch: Simplifying semi-supervised learning with consistency and confidence. In Advances in Neural Information Processing Systems , 2020."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib15",
+      "text": "Hao Huang, Jack Chu, and Fangyun Wei. Unsupervised prompt learning for vision-language models. ArXiv , abs/2204.03649, 2022."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib38",
+      "text": "Xudong Wang, Zhi-Li Wu, Long Lian, and Stella X. Yu. Debiased learning from naturally imbalanced pseudo-labels. 2022 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 2022."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib22",
+      "text": "Will LeVine, Benjamin Pikus, Pranav Vishnu Raja, and Fernando Amat. Enabling calibration in the zero-shot inference of large vision-language models. In ICLR 2023 Workshop on Pitfalls of limited data and computation for Trustworthy ML , 2023."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib34",
+      "text": "Sheng Shen, Shijia Yang, Tianjun Zhang, Bohan Zhai, Joseph E. Gonzalez, Kurt Keutzer, and Trevor Darrell. Multitask vision-language prompt tuning. arXiv preprint arXiv:2211.11720 , 2022."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib44",
+      "text": "Yuhang Zang, Wei Li, Kaiyang Zhou, Chen Huang, and Chen Change Loy. Unified vision and language prompt learning. ArXiv , abs/2210.07225, 2022."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib27",
+      "text": "Shu Manli, Nie Weili, Huang De-An, Yu Zhiding, Goldstein Tom, Anandkumar Anima, and Xiao Chaowei. Test-time prompt tuning for zero-shot generalization in vision-language models. In NeurIPS , 2022."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib12",
+      "text": "Yunhe Gao, Xingjian Shi, Yi Zhu, Hongya Wang, Zhiqiang Tang, Xiong Zhou, Mu Li, and Dimitris N. Metaxas. Visual prompt tuning for test-time domain adaptation. ArXiv , abs/2210.04831, 2022."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib4",
+      "text": "David Berthelot, Nicholas Carlini, Ekin D. Cubuk, Alex Kurakin, Kihyuk Sohn, Han Zhang, and Colin Raffel. Remixmatch: Semi-supervised learning with distribution matching and augmentation anchoring. In International Conference on Learning Representations , 2020."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib40",
+      "text": "Qizhe Xie, Zihang Dai, Eduard Hovy, Thang Luong, and Quoc Le. Unsupervised data augmentation for consistency training. In Advances in Neural Information Processing Systems , 2020."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib49",
+      "text": "Zhaowei Zhu, Tianyi Luo, and Yang Liu. The rich get richer: Disparate impact of semi-supervised learning. In International Conference on Learning Representations , 2022."
+    }
+  ]
+}

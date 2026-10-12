@@ -1,0 +1,68 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.07501",
+  "title": "Detecting Security-Relevant Methods using Multi-label Machine Learning",
+  "authors": "Oshando Johnson, Goran Piskachev, Ranjith Krishnamurthy, Eric Bodden",
+  "year": "2024",
+  "categories": [
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2403.07501",
+  "html_url": "https://arxiv.org/html/2403.07501",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 566,
+  "text": "With the continued rise in the number of reported software vulnerabilities [1] such as those in the 2023 Common Weakness Enumeration (CWE) Top 25 Most Dangerous Software Weaknesses list [2], more and more companies resort to Static Application Security Testing (SAST) tools to detect vulnerabilities. Yet, to be able to detect security vulnerabilities effectively, experts currently need to correctly configure and adapt the SAST tools. One required configuration comprises security-relevant methods (SRM), which are critical points in a program that have an impact on the analysis [3]. SRMs relevant for detecting taint-style vulnerabilities include sources (methods that create data that the analysis should track), sinks (methods at which the analysis might need to raise an alarm), and sanitizers (methods that perform data sanitization).\n\nFor Java, several machine learning (ML) approaches have been proposed to replace the time-consuming and error-prone manual approach of detecting SRMs in large codebases [4,3,5]. One such approach, SWAN, classifies Java methods into sources, sinks and sanitizers as well as seven Common Weakness Enumeration types—with high precision and recall [3]. SWAN-Assist is an IntelliJ IDEA plugin built on top of SWAN that uses active machine learning to detect SRMs [6]. With minimal user effort, the plugin’s semi-automatic approach improves SWAN’s precision.\n\nThe fundamental machine learning problem that SWAN addresses is a multi-label learning problem in which real-world objects that have several semantic meanings [7] are represented by a set of labels [8,9]. Detecting security-relevant methods in Java programs is a multi-label machine learning problem in which one assigns a subset of SRM labels to each method. In the code snippet in Listing 1, three security-relevant methods are invoked. The source method getParameter() creates the taint, the sanitizer encodeForSQL() sanitizes the user data, and executeQuery() is the sink method. In this example, the source and sanitizer methods impact the content of the SQL query that the sink method executes on the database. These methods are therefore relevant for CWE89 SQL injection. A method that writes unsanitized user input to a database and also uses the unsanitized data in a redirect should be labeled as a sink both for SQL injection (CWE89) and Open Redirect (CWE601) vulnerabilities.\n\nAlthough the classification of security-relevant methods is a multi-label problem, SWAN solves it with a binary relevance (BR) approach, which decomposes the machine learning problem into several independent single-label classification problems [7]. This approach fails to exploit the correlation among labels and can therefore produce prediction models that generalize badly [10]. Additionally, in order to use SWAN-Assist’s results to configure a SAST tool, users have to manually extract the SRM information and externally verify if the configuration produces the expected results.\n\nIn this paper, we present Dev-Assist, a holistic IntelliJ IDEA plugin that uses a multi-label machine learning approach that generalizes better in assigning SRM labels to Java methods. The plugin can use labeled SRMs to automatically generate the configuration for SAST tools, integrates a static analysis to detect security vulnerabilities, and shows the analysis results within IntelliJ. We show that the multi-label approach outperforms existing binary relevance classification approaches for detecting SRMs and reduces manual effort when using the detected security-relevant methods.\n\nDev-Assist’s source code, documentation and datasets are available online. We next explain the motivation and requirements for the plugin. Section 3 describes the plugin’s interface, features and back-end. We evaluate our approach in Section 4, and subsequently discuss the limitations and conclusions of our work.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bibx6",
+      "text": "Hackerone (2022) Hackerone “Hacker-Powered Security Report: Industry Insights” Accessed on November 14, 2023, 2022 URL: https://www.hackerone.com/reports/6th-annual-hacker-powered-security-report"
+    },
+    {
+      "n": 2,
+      "id": "bib.bibx5",
+      "text": "Corporation (2023) The Corporation “CWE Top 25 Most Dangerous Software Weaknesses” Accessed on November 14, 2023, 2023 URL: https://cwe.mitre.org/top25/"
+    },
+    {
+      "n": 3,
+      "id": "bib.bibx19",
+      "text": "Piskachev et al. (2019) Goran Piskachev, Lisa Do and Eric Bodden “Codebase-Adaptive Detection of Security-Relevant Methods” In Proceedings of the 28th ACM SIGSOFT International Symposium on Software Testing and Analysis , ISSTA 2019 Beijing, China: Association for Computing Machinery, 2019, pp. 181–191"
+    },
+    {
+      "n": 4,
+      "id": "bib.bibx3",
+      "text": "Arzt et al. (2013) Steven Arzt, Siegfried Rasthofer and Eric Bodden “SuSi: A Tool for the Fully Automated Classification and Categorization of Android Sources and Sinks” In Network and Distributed System Security Symposium 2013 , NDSS’13, 2013"
+    },
+    {
+      "n": 5,
+      "id": "bib.bibx27",
+      "text": "Sas et al. (2018) Darius Sas, Marco Bessi and Francesca. Fontana “Automatic Detection of Sources and Sinks in Arbitrary Java Libraries” In 2018 IEEE 18th International Working Conference on Source Code Analysis and Manipulation (SCAM) , 2018, pp. 103–112"
+    },
+    {
+      "n": 6,
+      "id": "bib.bibx20",
+      "text": "Piskachev et al. (2020) Goran Piskachev, Lisa Do, Oshando Johnson and Eric Bodden “SWANAssist: Semi-Automated Detection of Code-Specific, Security-Relevant Methods” In Proceedings of the 34th IEEE/ACM International Conference on Automated Software Engineering , ASE ’19 San Diego, California: IEEE Press, 2020, pp. 1094–1097 DOI: 10.1109/ASE.2019.00110"
+    },
+    {
+      "n": 7,
+      "id": "bib.bibx34",
+      "text": "Zhang et al. (2018a) Min-Ling Zhang, Yu-Kun Li, Xu-Ying Liu and Xin Geng “Binary relevance for multi-label learning: an overview” In Frontiers of Computer Science 12 Springer, 2018, pp. 191–202"
+    },
+    {
+      "n": 8,
+      "id": "bib.bibx28",
+      "text": "Tsoumakas & Katakis (2007) Grigorios Tsoumakas and Ioannis Katakis “Multi-label classification: An overview” In International Journal of Data Warehousing and Mining (IJDWM) 3.3 IGI Global, 2007, pp. 1–13"
+    },
+    {
+      "n": 9,
+      "id": "bib.bibx35",
+      "text": "Zhang & Zhou (2013) Min-Ling Zhang and Zhi-Hua Zhou “A review on multi-label learning algorithms” In IEEE transactions on knowledge and data engineering 26.8 IEEE, 2013, pp. 1819–1837"
+    },
+    {
+      "n": 10,
+      "id": "bib.bibx33",
+      "text": "Zhang et al. (2018) Min-Ling Zhang, Yu-Kun Li, Xu-Ying Liu and Xin Geng “Binary Relevance for Multi-Label Learning: An Overview” In Front. Comput. Sci. 12.2 Berlin, Heidelberg: Springer-Verlag, 2018, pp. 191–202 DOI: 10.1007/s11704-017-7031-7"
+    }
+  ]
+}

@@ -1,0 +1,128 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.04765",
+  "title": "Efficient LoFTR: Semi-Dense Local Feature Matching with Sparse-Like Speed",
+  "authors": "Yifan Wang, Xingyi He, Sida Peng, Dongli Tan, Xiaowei Zhou",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2403.04765",
+  "html_url": "https://arxiv.org/html/2403.04765",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 684,
+  "text": "Image matching is the cornerstone of many 3D computer vision tasks, which aim to find a set of highly accurate correspondences given an image pair. The established matches between images have broad usages such as reconstructing the 3D world by structure from motion (SfM) [1,2,3,4] or SLAM system [5,6], and visual localization [7,8], etc. Previous methods typically follow a two-stage pipeline: they first detect [9] and describe [10] a set of keypoints on each image, and then establish keypoint correspondences by handcrafted [11] or learning-based matchers [12,13]. These detector-based methods are efficient but suffer from robustly detecting repeatable keypoints across challenging pairs, such as extreme viewpoint changes and texture-poor regions.\n\nRecently, LoFTR [14] introduces a detector-free matching paradigm with transformer to directly establish semi-dense correspondences between two images without detecting keypoints. With the help of the transformer mechanism to capture the global image context and the detector-free design, LoFTR shows a strong capability of matching challenging pairs, especially in texture-poor scenarios. To reduce the computation burden, LoFTR adopts a coarse-to-fine pipeline by first performing dense matching on downsampled coarse features maps, where transformer is applied. Then, the feature locations of coarse matches on one image are fixed, while their subpixel correspondences are searched on the other image by cropping feature patches based on coarse match, performing the feature correlation, and calculating expectation over the correlation patch.\n\nDespite its impressive matching performance, LoFTR suffers from limited efficiency due to the large token size of performing transformer on the entire coarse feature map, which significantly barricades practical large-scale usages such as image retrieval [15] and SfM [2]. A large bunch of LoFTR’s follow-up works [16,17,18,19,20] have attempted to improve its matching accuracy. However, there are rare methods that focus on matching efficiency of detector-free matching. QuadTree Attention [18] incorporates multi-scale transformation with a gradually narrowed attention span to avoid performing attention on large feature maps. This strategy can reduce the computation cost, but it also divides a single coarse attention process into multiple steps, leading to increased latency.\n\nIn this paper, we revisit the design decisions of the detector-free matcher LoFTR, and propose a new matching algorithm that squeezes out redundant computations for significantly better efficiency while further improving the accuracy. As shown in Fig. 1, our approach achieves the best inference speed compared with recent image matching methods while being competitive in terms of accuracy. Our key innovations lie in introducing a token aggregation mechanism for efficient feature transformation and a two-stage correlation layer for correspondence refinement. Specifically, we find that densely performing global attention over the entire coarse feature map as in LoFTR is unnecessary, as the attention information is similar and shared in the local region. Therefore, we devise an aggregated attention mechanism to perform feature transformation on adaptively selected tokens, which is significantly compact and effectively reduces the cost of local feature transformation.\n\nIn addition, we observe that there can be spatial variance in the matching refinement phase of LoFTR, which is caused by the expectation over the entire correlation patch when noisy feature correlation exists. To solve this issue, our approach designs a two-stage correlation layer that first locates pixel-level matches with the accurate mutual-nearest-neighbor matching on fine feature patches, and then further refines matches for subpixel-level by performing the correlation and expectation locally within tiny patches.\n\nExtensive experiments are conducted on multiple tasks, including homography estimation, relative pose recovery, as well as visual localization, to show the efficacy of our method. Our pipeline pushes detector-free matching to unprecedented efficiency, which is \\sim 2.5 times faster than LoFTR and can even surpass the current state-of-the-art efficient sparse matcher LightGlue [13]. Moreover, our framework can achieve comparable or even better matching accuracy compared with competitive detector-free baselines [17,21,22] with considerably higher efficiency.\n\nIn summary, this paper has the following contributions:\n\n- • A new detector-free matching pipeline with multiple improvements based on the comprehensive revisiting of LoFTR, which is significantly more efficient and with better accuracy.\n\n- • A novel aggregated attention network for efficient local feature transformation.\n\n- • A novel two-stage correlation refinement layer for accurate and subpixel-level refined correspondences.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "Sameer Agarwal, Yasutaka Furukawa, Noah Snavely, Ian Simon, Brian Curless, Steven M. Seitz, and Richard Szeliski. Building rome in a day. ICCV , 2009."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib47",
+      "text": "Johannes L. Schönberger and Jan-Michael Frahm. Structure-from-motion revisited. In CVPR , 2016."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib29",
+      "text": "Philipp Lindenberger, Paul-Edouard Sarlin, Viktor Larsson, and Marc Pollefeys. Pixel-perfect structure-from-motion with featuremetric refinement. ICCV , pages 5967–5977, 2021."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib21",
+      "text": "Xingyi He, Jiaming Sun, Yifan Wang, Sida Peng, Qixing Huang, Hujun Bao, and Xiaowei Zhou. Detector-free structure from motion. In CVPR , 2024."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib35",
+      "text": "Raul Mur-Artal, José M. M. Montiel, and Juan D. Tardós. Orb-slam: A versatile and accurate monocular slam system. TR , 31:1147–1163, 2015."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib34",
+      "text": "Raul Mur-Artal and Juan D. Tardós. Orb-slam2: An open-source slam system for monocular, stereo, and rgb-d cameras. TR , 33:1255–1262, 2016."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib42",
+      "text": "Paul-Edouard Sarlin, César Cadena, Roland Y. Siegwart, and Marcin Dymczyk. From coarse to fine: Robust hierarchical localization at large scale. CVPR , pages 12708–12717, 2019."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib44",
+      "text": "Paul-Edouard Sarlin, Ajaykumar Unagar, Måns Larsson, Hugo Germain, Carl Toft, Victor Larsson, Marc Pollefeys, Vincent Lepetit, Lars Hammarstrand, Fredrik Kahl, and Torsten Sattler. Back to the Feature: Learning Robust Camera Localization from Pixels to Pose. In CVPR , 2021."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib41",
+      "text": "Edward Rosten and Tom Drummond. Machine learning for high-speed corner detection. In ECCV , pages 430–443. Springer, 2006."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib53",
+      "text": "Yurun Tian, Bin Fan, and Fuchao Wu. L2-net: Deep learning of discriminative patch descriptor in euclidean space. In CVPR , pages 661–669, 2017."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib31",
+      "text": "G LoweDavid. Distinctive image features from scale-invariant keypoints. IJCV , 2004."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib43",
+      "text": "Paul-Edouard Sarlin, Daniel DeTone, Tomasz Malisiewicz, and Andrew Rabinovich. SuperGlue: Learning feature matching with graph neural networks. In CVPR , 2020."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib30",
+      "text": "Philipp Lindenberger, Paul-Edouard Sarlin, and Marc Pollefeys. LightGlue: Local Feature Matching at Light Speed. In ICCV , 2023."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib50",
+      "text": "Jiaming Sun, Zehong Shen, Yuang Wang, Hujun Bao, and Xiaowei Zhou. Loftr: Detector-free local feature matching with transformers. In CVPR , pages 8922–8931, 2021."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib19",
+      "text": "Stephen Hausler, Sourav Garg, Ming Xu, Michael Milford, and Tobias Fischer. Patch-netvlad: Multi-scale fusion of locally-global descriptors for place recognition. CVPR , pages 14136–14147, 2021."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib59",
+      "text": "Qing Wang, Jiaming Zhang, Kailun Yang, Kunyu Peng, and Rainer Stiefelhagen. Matchformer: Interleaving attention in transformers for feature matching. In ACCV , 2022."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib7",
+      "text": "Hongkai Chen, Zixin Luo, Lei Zhou, Yurun Tian, Mingmin Zhen, Tian Fang, David Mckinnon, Yanghai Tsin, and Long Quan. Aspanformer: Detector-free image matching with adaptive span transformer. In ECCV , pages 20–36. Springer, 2022."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib52",
+      "text": "Shitao Tang, Jiahui Zhang, Siyu Zhu, and Ping Tan. Quadtree attention for vision transformers. ICLR , 2022."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib18",
+      "text": "Khang Truong Giang, Soohwan Song, and Sung-Guk Jo. Topicfm: Robust and interpretable topic-assisted feature matching. In AAAI , 2023."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib36",
+      "text": "Junjie Ni, Yijin Li, Zhaoyang Huang, Hongsheng Li, Hujun Bao, Zhaopeng Cui, and Guofeng Zhang. Pats: Patch area transportation with subdivision for local feature matching. CVPR , pages 17776–17786, 2023."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib14",
+      "text": "Johan Edstedt, Ioannis Athanasiadis, Mårten Wadenbäck, and Michael Felsberg. Dkm: Dense kernelized feature matching for geometry estimation. In CVPR , pages 17765–17775, 2023a."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib15",
+      "text": "Johan Edstedt, Qiyu Sun, Georg Bökman, Mårten Wadenbäck, and Michael Felsberg. Roma: Revisiting robust losses for dense feature matching. arXiv preprint arXiv:2305.15404 , 2023b."
+    }
+  ]
+}

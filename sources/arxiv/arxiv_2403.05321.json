@@ -1,0 +1,95 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.05321",
+  "title": "GAN-based Massive MIMO Channel Model Trained on Measured Data",
+  "authors": "Florian Euchner, Janina Sanzi, Marcus Henninger, Stephan ten Brink",
+  "year": "2024",
+  "categories": [
+    "cs.IT",
+    "eess.SP",
+    "math.IT"
+  ],
+  "url": "https://arxiv.org/abs/2403.05321",
+  "html_url": "https://arxiv.org/html/2403.05321",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1139,
+  "text": "Channel modeling is essential in communications engineering. Fundamental theoretic results are often derived starting from some of the simplest channel models (e.g., memoryless discrete-time and discrete-value channels or AWGN (AWGN) channels) and proposals for practical waveforms and modulation formats are motivated using simple stochastic channel models (e.g., Rician Fading, or Clarke’s model [1]). More involved channel models have been developed for researching practical wireless communication systems, that must be able to withstand various degrees of frequency- and/or time-selective fading, hardware impairments and other effects. One such channel model was proposed by the 3GPP (3GPP) for the frequency range 0.5-100\\,\\mathrm{GHz} in TR (TR) 38.901 [2], which is an example for a so-called GSCM (GSCM). These channel models define a set of stochastic parameters, including information about the distribution of delay spreads or path loss exponents, and guarantee some level of spatial coherence, for example by ensuring the spatial distribution follows some three-dimensional, correlated noise process. While stochastic channel models usually only define the model (e.g., procedures, distributions, parameters), channel simulators like QuaDRiGa (QuaDRiGa) [3] may be used to produce channel realizations, for example in the form of CIR. For even better spatial consistency, raytracing-based channel simulators may be used as channel models [4]. As evidenced by lots of successful, recent research based on stochastic or raytracer-based channel models, these existing solutions work well for the intended purposes. However, in both cases, there is a lot of manual work required to come up with a model: To obtain a stochastic channel model that describes a certain environment for a set of system parameters (e.g., carrier frequency), one first has to obtain channel measurements for the particular environment, to then identify relevant stochastic parameters and to finally extract these parameters from the measurements. The inherent danger in this process is that relevant parameters may be overlooked or that the modeled environment simply does not match the system the model is used for. Aforementioned TR 38.901 channel model is only valid for a limited set of manually selected scenarios of interest, which define environments labeled, for example, “urban macrocell” or “indoor factory”.\n\nRaytracing-based channel models offer more flexibility to the user, but require significantly more effort related to the definition of the 3D model and material properties. What is more, the user of a channel model may not care about specifics of one particular environment, which a raytracing-based channel model offers, but may want to rather evaluate some system on a certain type of environment. While raytracing may be used to model an environment in a faithful, consistent way, stochastic channel models provide more variety and randomness in their channel realizations. Finding a trade-off between faithfulness and randomness is a rather fundamental issue in channel modeling, and the right balance has to be determined depending on the particular application.\n\nThis work analyzes a generative machine learning-based approach, which can automate the procedure of parametrizing a channel model on measurement data. Instead of specifying relevant stochastic parameters manually, the generative channel model should automatically learn the distribution of the measured CSI, based on samples from one or multiple datasets. In particular, we explore the use of a GAN [5] (a WGAN (WGAN) [6] with GP (GP) [7], to be precise) for automated learning of stochastic channel models. The basic structure of such a GAN -based channel model is illustrated in Fig. 1.\n\n## I-A Related Work and Contributions\n\nThe idea of a GAN -based channel model that learns the CSI distribution, first proposed in [8], has gained some attention in the community [9,10,11,12,13]. In [8], the concept of GAN -based channel modeling is introduced on a high level, motivating the idea by showing that a GAN can learn the noise distribution of an AWGN channel. In [9,10,11], a GAN is trained on channel realizations (impulse responses). As an alternative to GAN, [12] investigates the use of diffusion models for channel modeling and [13] compares a GAN -based channel model to a VAE (VAE)-based model and a diffusion model. In all previous research that the authors are familiar with, the generative model is trained on data that was itself produced by another channel model, usually related to aforementioned 3GPP TR 38.901 GSCM.\n\nIn a separate line of work, initiated by [14], various authors have investigated using a conditional GAN to learn the input-output relationship of the channel itself, which is a different type of GAN -based channel model. The distinction between [8] and [14], which is also illustrated in Fig. 2, is the following: In [8], the GAN ’s generator produces channel realizations described by CSI in some representation (e.g., time-domain or frequency-domain), as in Fig. 2(a). On the other hand, in [14], the generator becomes the channel itself: The generator is conditioned on the transmitted signal, and it must attempt to produce a realistic received signal, as in Fig. 2(b), which can be useful e.g. for end-to-end training [15]. We restrict ourselves to the first, linear type of GAN -based channel model as described in [8]. As already outlined in [10], the advantages of generating CSI as an intermediary product are the improved interpretability of the GAN ’s output and the better generalization to arbitrary input signals. Furthermore, it ensures that the learned channel is indeed a LTI (LTI) system, whereas the approach in [14] can learn nonlinear channel models, which is undesirable for modeling physical propagation effects.\n\nThe architecture of our neural network draws inspiration from [9], being based on a WGAN with GP. In contrast to all this previous work, however, we train our GAN -based channel model on real-world data measured with a massive MIMO (MIMO) channel sounder, as opposed to the previous efforts which were trained on another channel model. In addition, we investigate the use of a conditional GAN to generate channel realizations at defined locations, while ensuring some level of spatial consistency.\n\n## I-B Purpose of a GAN-based channel model\n\nThe objective of a channel model depends on the application: A GSCM may generate CSI that follows a certain distribution, a raytracer may be used to predict realistic CSI. The purpose of GAN -based channel models has not been well-defined in existing literature. Therefore, we consider two different applications: Using GAN -based channel models as an alternative to GSCM as a kind of random generator for CSI samples, or using GAN -based channel models as a spatial inter- and extrapolator, that should ideally predict measured CSI at new locations. While the use of a GAN as an inter-/extrapolator has been suggested to us many times in conversations, we would like to remark that a different neural network structure, like an autoencoder, may be better-suited in that case. In the following sections, we will analyze both types of applications and conclude that, in their current form, GAN -based channel models of linear type are not particularly well-suited for either.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "R. H. Clarke, “A statistical theory of mobile-radio reception,” Bell system technical journal , vol. 47, no. 6, pp. 957–1000, 1968."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "ETSI 3rd Generation Partnership Project (3GPP), “Study on channel model for frequencies from 0.5 to 100 GHz (3GPP TR 38.901 version 16.1.0 Release 16),” ETSI, Tech. Rep., 2020."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "F. Burkhardt, S. Jaeckel, E. Eberlein, and R. Prieto-Cerdeira, “QuaDRiGa: a MIMO Channel Model for Land Mobile Satellite,” in The 8th European Conference on Antennas and Propagation (EuCAP 2014) . IEEE, 2014, pp. 1274–1278."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "J. Hoydis et al. , “Sionna RT: Differentiable Ray Tracing for Radio Propagation Modeling,” arXiv preprint , Mar. 2023."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "I. Goodfellow et al. , “Generative Adversarial Nets,” Advances in neural information processing systems , vol. 27, 2014."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "M. Arjovsky, S. Chintala, and L. Bottou, “Wasserstein Generative Adversarial Networks,” in International conference on machine learning . PMLR, 2017, pp. 214–223."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "I. Gulrajani, F. Ahmed, M. Arjovsky, V. Dumoulin, and A. C. Courville, “Improved Training of Wasserstein GANs,” Advances in neural information processing systems , vol. 30, 2017."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "Y. Yang, Y. Li, W. Zhang, F. Qin, P. Zhu, and C.-X. Wang, “Generative-Adversarial-Network-Based Wireless Channel Modeling: Challenges and Opportunities,” IEEE Communications Magazine , vol. 57, 2019."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "H. Xiao, W. Tian, W. Liu, and J. Shen, “ChannelGAN: Deep learning-based channel modeling and generating,” IEEE Wireless Communications Letters , vol. 11, no. 3, pp. 650–654, 2022."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "T. Orekondy, A. Behboodi, and J. B. Soriaga, “MIMO-GAN: Generative MIMO Channel Modeling,” in ICC 2022-IEEE International Conference on Communications , 2022, pp. 5322–5328."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "W. Xie, M. Xiong, Z. Yang, W. Liu, L. Fan, and J. Zou, “Real and fake channel: GAN-based wireless channel modeling and generating,” Physical Communication , p. 102214, 2023."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "U. Sengupta, C. Jao, A. Bernacchia, S. Vakili, and D. Shiu, “Generative Diffusion Models for Radio Wireless Channel Modelling and Sampling,” arXiv preprint arXiv:2308.05583 , 2023."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "J. Juhava, “Wireless channel modeling using generative machine learning models,” Master’s thesis, Aalto University School of Engineering, 2023."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "T. J. O’Shea, T. Roy, and N. West, “Approximating the Void: Learning Stochastic Channel Models from Observation with Variational Generative Adversarial Networks,” in 2019 International Conference on Computing, Networking and Communications (ICNC) . IEEE, 2019."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "S. Dörner, M. Henninger, S. Cammerer, and S. ten Brink, “WGAN-based Autoencoder Training Over-the-air,” in 2020 IEEE 21st International Workshop on Signal Processing Advances in Wireless Communications (SPAWC) . IEEE, 2020, pp. 1–5."
+    }
+  ]
+}

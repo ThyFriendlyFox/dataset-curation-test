@@ -1,0 +1,89 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.08062",
+  "title": "Efficient Fault Tolerance for Pipelined Query Engines via Write-ahead Lineage",
+  "authors": "Ziheng Wang, Alex Aiken",
+  "year": "2024",
+  "categories": [
+    "cs.DC",
+    "cs.DB"
+  ],
+  "url": "https://arxiv.org/abs/2403.08062",
+  "html_url": "https://arxiv.org/html/2403.08062",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 575,
+  "text": "In the past decade, the “data lake” has emerged as a popular paradigm for data management in the cloud. In a data lake, data is stored directly in object storage on a cloud service such as AWS S3, in open formats like CSV and Parquet. Distributed query engines like SparkSQL and Trino read this data and shuffle it across the network to execute SQL queries [1,2,3].\n\nThe first generation of distributed query engines, such as MapReduce and SparkSQL, relied on a bulk synchronous execution model similar to MPI [4,5]. While these frameworks offer flexibility and efficient lineage-based fault tolerance [5], they were originally designed for iterative tasks such as PageRank or machine learning training. When repurposed for data analytics tasks such as join-heavy SQL queries, their stagewise execution model leaves performance on the table by foregoing parallelism across stages commonly exploited in pipelined query engines [6].\n\nThe second generation of distributed query engines were purpose-built for SQL, and often employ a pipelined architecture where multiple stages can execute concurrently [3,7]. In some of these systems, the dependencies between tasks in different stages are statically determined [3]. In other more recent systems, such dependencies are dynamically determined to take advantage of work stealing and cache efficiencies [8,9]. While these engines typically drastically outperform SparkSQL, they either do not support intra-query fault tolerance and re-execute failed queries from the beginning [7,8], or rely on high-overhead approaches such as durably persisting shuffle partitions between stages [10].\n\nFault-tolerant streaming systems, such as Kafka Streams, Apache Flink or StreamScope [11,12,13], are also based on a pipelined architecture and may feature an SQL interface like FlinkSQL. However, their fault tolerance strategies are typically optimized for continuous processing of small fresh inputs, instead of bulk shuffles of large batches of data. As a result, their checkpointing-based fault tolerance strategies impose high overheads during normal execution for batch SQL processing.\n\nIn this paper, we adapt lineage-based fault tolerance to pipelined query engines with dynamic task dependencies. Unlike Spark, where lineage is statically determined and fault recovery is data parallel, we consistently log the lineage after it has been dynamically determined at runtime and use pipelined parallel fault recovery [5,14]. We term this novel fault tolerance strategy write-ahead lineage. We implement this strategy in an open source distributed query engine called Quokka.\n\nWrite-ahead lineage allows Quokka to only persist KB-sized lineage information in normal operation instead of MB-sized shuffle partitions or GB-sized state checkpoints. Restricting tasks to consume only intermediate outputs whose lineage has been persisted limits fault recovery to only tasks scheduled on failed workers, avoiding the expensive globally coordinated rollbacks in checkpointing-based systems. Pipelined parallel recovery further speeds up the fault recovery process, allowing Quokka to achieve similar recovery performance as Spark.\n\nTo the best of our knowledge, Quokka is the only distributed query engine with a dynamic pipelined execution model that supports low-overhead intra-query fault tolerance. We believe write-ahead lineage can also be easily implemented in other pipelined query engines. This paper makes two key contributions:\n\n- • We describe write-ahead lineage, a novel fault tolerance strategy for pipelined query engines with dynamic task dependencies based on consistent lineage logging and parallel replay.\n\n- • We implement a distributed query engine, Quokka. We demonstrate write-ahead lineage allows Quokka to support fault tolerance with low execution overhead and fast fault recovery. On TPC-H, Quokka outperforms SparkSQL by around 2x on up to 32 nodes in normal execution, with competitive fault recovery performance.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "M. Armbrust, R. S. Xin, C. Lian, Y. Huai, D. Liu, J. K. Bradley, X. Meng, T. Kaftan, M. J. Franklin, A. Ghodsi et al. , “Spark sql: Relational data processing in spark,” in Proceedings of the 2015 ACM SIGMOD international conference on management of data , 2015, pp. 1383–1394."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "S. Melnik, A. Gubarev, J. J. Long, G. Romer, S. Shivakumar, M. Tolton, and T. Vassilakis, “Dremel: interactive analysis of web-scale datasets,” Proceedings of the VLDB Endowment , vol. 3, no. 1-2, pp. 330–339, 2010."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "R. Sethi, M. Traverso, D. Sundstrom, D. Phillips, W. Xie, Y. Sun, N. Yegitbasi, H. Jin, E. Hwang, N. Shingte et al. , “Presto: Sql on everything,” in 2019 IEEE 35th International Conference on Data Engineering (ICDE) . IEEE, 2019, pp. 1802–1813."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "J. Dean and S. Ghemawat, “Mapreduce: simplified data processing on large clusters,” Communications of the ACM , vol. 51, no. 1, pp. 107–113, 2008."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "M. Zaharia, R. S. Xin, P. Wendell, T. Das, M. Armbrust, A. Dave, X. Meng, J. Rosen, S. Venkataraman, M. J. Franklin et al. , “Apache spark: a unified engine for big data processing,” Communications of the ACM , vol. 59, no. 11, pp. 56–65, 2016."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "M. Shen, Y. Zhou, and C. Singh, “Magnet: push-based shuffle service for large-scale data processing,” Proceedings of the VLDB Endowment , vol. 13, no. 12, pp. 3382–3395, 2020."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "B. Dageville, T. Cruanes, M. Zukowski, V. Antonov, A. Avanes, J. Bock, J. Claybaugh, D. Engovatov, M. Hentschel, J. Huang et al. , “The snowflake elastic data warehouse,” in Proceedings of the 2016 International Conference on Management of Data , 2016, pp. 215–226."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "N. Armenatzoglou, S. Basu, N. Bhanoori, M. Cai, N. Chainani, K. Chinta, V. Govindaraju, T. J. Green, M. Gupta, S. Hillig et al. , “Amazon redshift re-invented,” in Proceedings of the 2022 International Conference on Management of Data , 2022, pp. 2205–2217."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "V. Leis, P. Boncz, A. Kemper, and T. Neumann, “Morsel-driven parallelism: a numa-aware query evaluation framework for the many-core age,” in Proceedings of the 2014 ACM SIGMOD international conference on Management of data , 2014, pp. 743–754."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "“Trino fault tolerance,” https://github.com/trinodb/trino/wiki/Fault-Tolerant-Execution ."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "J. Kreps, N. Narkhede, J. Rao et al. , “Kafka: A distributed messaging system for log processing,” in Proceedings of the NetDB , vol. 11, 2011, pp. 1–7."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "P. Carbone, A. Katsifodimos, S. Ewen, V. Markl, S. Haridi, and K. Tzoumas, “Apache flink: Stream and batch processing in a single engine,” Bulletin of the IEEE Computer Society Technical Committee on Data Engineering , vol. 36, no. 4, 2015."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "W. Lin, Z. Qian, J. Xu, S. Yang, J. Zhou, and L. Zhou, “ { \\{ StreamScope } \\} : Continuous reliable distributed processing of big data streams,” in 13th USENIX Symposium on Networked Systems Design and Implementation (NSDI 16) , 2016, pp. 439–453."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "M. Zaharia, M. Chowdhury, T. Das, A. Dave, J. Ma, M. McCauly, M. J. Franklin, S. Shenker, and I. Stoica, “Resilient distributed datasets: A { \\{ Fault-Tolerant } \\} abstraction for { \\{ In-Memory } \\} cluster computing,” in 9th USENIX Symposium on Networked Systems Design and Implementation (NSDI 12) , 2012, pp. 15–28."
+    }
+  ]
+}

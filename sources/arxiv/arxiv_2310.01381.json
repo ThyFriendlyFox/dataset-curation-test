@@ -1,0 +1,165 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2310.01381",
+  "title": "DiffAR: Denoising Diffusion Autoregressive Model for Raw Speech Waveform Generation",
+  "authors": "Roi Benita, Michael Elad, Joseph Keshet",
+  "year": "2024",
+  "categories": [
+    "cs.SD",
+    "cs.CL",
+    "eess.AS"
+  ],
+  "url": "https://arxiv.org/abs/2310.01381",
+  "html_url": "https://arxiv.org/html/2310.01381",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 952,
+  "text": "In the last two decades, impressive progress has been made in speech-based research and technologies. With these advancements, speech applications have become highly significant in communication and human-machine interactions. One aspect of this is generating high-quality, naturally-sounding synthetic speech, namely text-to-speech (TTS). In recent years, substantial research has been made to design a deep-learning-based generative audio model. Such an effective model can be used for speech generation, enhancement, denoising, and manipulation of audio signals.\n\nMany neural-based generative models segment the synthesis process into two distinct components: a decoder and a vocoder [1]. The decoder takes a reference signal, like the intended text for synthetic production, and transforms it into acoustic features using intermediate representations, such as mel-spectrograms. The specific function of the decoder varies based on the application, which can be text-to-speech, image-to-speech, or speech-to-speech. The vocoder, on the other hand, receives these acoustic features and generates the associated waveform [2]. Although this two-step approach is widely adopted [3,4,5,6], one potential drawback is that focusing solely on the magnitude information (the spectrogram) might neglect certain natural and human perceptual qualities that can be derived from the phase [7].\n\nBy contrast, end-to-end frameworks generate the waveform using a single model without explicitly producing acoustic features. The models EATS [8], Wave-Tacotron [9], and FastSpeech 2s [3] pioneered efficient end-to-end training methods, but their synthesis quality lags behind two-stage systems. VITS [10] combines normalizing flow [11] with VAE [12] and adversarial training, achieving high-quality speech. YourTTS [13] adopts an architecture similar to VITS and addresses zero-shot multi-speaker and multilingual tasks.\n\nRecently, diffusion models have demonstrated impressive generative capabilities in synthesizing images, videos, and speech. In the context of speech synthesis, Numerous studies have suggested using diffusion models as decoders to generate the Mel-Spectrogram representation from a given text. DiffTTS [14] leveraged the stochastic nature of diffusion models to capture a natural one-to-many relationship, allowing a given text input to be spoken in diverse ways. Grad-TTS [15], ProDiff [16], PriorGrad [17], and DiffGAN-TTS [18] aimed to accelerate the synthesis process. However, it occasionally comes at the cost of audio quality, synthesis stochasticity, or model simplicity. Guided-TTS [19], functioning as a decoder, doesn’t require a transcript of the target speaker, utilizing classifier guidance instead. In contrast, DiffWave [20], WaveGrad [4] and FastDiff [21] are vocoders that generate waveforms by conditioning the diffusion process on corresponding Mel-spectrograms. DiffWave [20] can also learn the manifold of a limited, fixed-length vocabulary (the ten digits), producing consistent word-level pronunciations. It operates on the waveform directly but generates speech with a fixed duration of 1 second, meaning it cannot produce an entire sentence. Last, WaveGrad 2 [22] is an end-to-end model consisting of (i) Tacotron 2 [23] as an encoder for extracting an abstract hidden representation from a given phoneme sequence; and (ii) a decoder, which predicts the raw signal by refining the noisy waveform iteratively.\n\nLarge-scale generative models, such as Voicebox [24] and VALL-E [25], achieve state-of-the-art results by leveraging extensive audio datasets. Voicebox, functioning as an acoustic infilling model, and VALL-E as an end-to-end model which utilizing Codec representation [26], excel in simulating natural phenomena and enabling in-context learning. These models demonstrate robustness to noise and the ability to generalize when trained on thousands hours of speech. However, replicating this success on smaller datasets presents a significant challenge.\n\nParallel to that, the generation of long waveforms can be effectively achieved using an autoregressive (AR) approach. This involves the sequential generation of waveform samples during the inference phase [27,25]. While autoregressive models work well for TTS, their inference is slow due to their sequential nature. On the other hand, non-autoregressive models such as [3,22] struggle to generate extremely long audio clips that correspond to a long text sequence due to the limited GPU memory.\n\nThis work proposes a novel autoregressive diffusion model for generating raw audio waveforms by sequentially producing short overlapping frames. Our model is called DiffAR – Denoising Diffusion Autoregressive Model. It can operate in an unconditional mode, where no text is provided, or in a conditional mode, where text and other linguistic parameters are used as input. Because our model is autoregressive, it can generate signals of an arbitrary duration, unlike DiffWave. This allows the model to preserve coherent temporal dependencies and maintain critical characteristics. DiffAR is an end-to-end model that directly works on the raw waveform without any intermediate representation such as the Mel-spectrogram. By considering both the amplitude and phase components, it can generate a reliable and human-like voice that contains everyday speech phenomena including vocal fry, which refers to a voice quality characterized by irregular glottal opening and low pitch, and often used in American English to mark phrase finality, sociolinguistic factors and affect.\n\nWe are not the first to introduce autoregressive diffusion models. [28] proposed a method for video synthesis, and [29] extended diffusion models to handle ordered structures while aiming to enhance efficiency in the process. Our model focuses on one-dimensional time-sequential data, particularly unlimited-duration high-quality speech generation.\n\nThe contributions of the paper are as follows: (i) An autoregressive denoising diffusion model for high-quality speech synthesis; (ii) This model can generate unlimited waveform durations while preserving the computational resources; and (iii) This model generates human-like voice, including vocal fry, with a high speech quality and variability compared to other state-of-the-art models.\n\nThis paper is organized as follows. In Section 2, we formulate the problem and present our autoregressive approach to the diffusion process for speech synthesis. Our model, DiffAR, can be conditioned on input text, described in Section 3. In Section 4 we detail DiffAR ’s architecture. Next, in Section 5, we present the empirical results, including a comparison to other methods and an ablation study. We conclude the paper in Section 6.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib48",
+      "text": "Zhang et al. (2023) Chenshuang Zhang, Chaoning Zhang, Sheng Zheng, Mengchun Zhang, Maryam Qamar, Sung-Ho Bae, and In So Kweon. Audio diffusion model for speech synthesis: A survey on text to speech and speech enhancement in generative ai. arXiv preprint arXiv:2303.13336 , 2023."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib25",
+      "text": "Kong et al. (2020a) Jungil Kong, Jaehyeon Kim, and Jaekyoung Bae. Hifi-GAN: Generative adversarial networks for efficient and high fidelity speech synthesis. Advances in Neural Information Processing Systems , 33:17022–17033, 2020a."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib38",
+      "text": "Ren et al. (2020) Yi Ren, Chenxu Hu, Xu Tan, Tao Qin, Sheng Zhao, Zhou Zhao, and Tie-Yan Liu. Fastspeech 2: Fast and high-quality end-to-end text to speech. arXiv preprint arXiv:2006.04558 , 2020."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib2",
+      "text": "Chen et al. (2020) Nanxin Chen, Yu Zhang, Heiga Zen, Ron J Weiss, Mohammad Norouzi, and William Chan. Wavegrad: Estimating gradients for waveform generation. arXiv preprint arXiv:2009.00713 , 2020."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib20",
+      "text": "Kim et al. (2020) Jaehyeon Kim, Sungwon Kim, Jungil Kong, and Sungroh Yoon. Glow-TTS: A generative flow for text-to-speech via monotonic alignment search. Advances in Neural Information Processing Systems , 33:8067–8077, 2020."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib42",
+      "text": "Shen et al. (2018) Jonathan Shen, Ruoming Pang, Ron J Weiss, Mike Schuster, Navdeep Jaitly, Zongheng Yang, Zhifeng Chen, Yu Zhang, Yuxuan Wang, Rj Skerrv-Ryan, et al. Natural TTS synthesis by conditioning wavenet on mel spectrogram predictions. In 2018 IEEE international conference on acoustics, speech and signal processing (ICASSP) , pp. 4779–4783. IEEE, 2018."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib34",
+      "text": "Oppenheim & Lim (1981) Alan V Oppenheim and Jae S Lim. The importance of phase in signals. Proceedings of the IEEE , 69(5):529–541, 1981."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib7",
+      "text": "Donahue et al. (2020) Jeff Donahue, Sander Dieleman, Mikołaj Bińkowski, Erich Elsen, and Karen Simonyan. End-to-end adversarial text-to-speech. arXiv preprint arXiv:2006.03575 , 2020."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib47",
+      "text": "Weiss et al. (2021) Ron J Weiss, RJ Skerry-Ryan, Eric Battenberg, Soroosh Mariooryad, and Diederik P Kingma. Wave-tacotron: Spectrogram-free end-to-end text-to-speech synthesis. In ICASSP 2021-2021 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP) , pp. 5679–5683. IEEE, 2021."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib21",
+      "text": "Kim et al. (2021) Jaehyeon Kim, Jungil Kong, and Juhee Son. Conditional variational autoencoder with adversarial learning for end-to-end text-to-speech. In International Conference on Machine Learning , pp. 5530–5540. PMLR, 2021."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib39",
+      "text": "Rezende & Mohamed (2015) Danilo Rezende and Shakir Mohamed. Variational inference with normalizing flows. In International conference on machine learning , pp. 1530–1538. PMLR, 2015."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib22",
+      "text": "Kingma & Welling (2013) Diederik P Kingma and Max Welling. Auto-encoding variational bayes. arXiv preprint arXiv:1312.6114 , 2013."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib1",
+      "text": "Casanova et al. (2022) Edresson Casanova, Julian Weber, Christopher D Shulby, Arnaldo Candido Junior, Eren Gölge, and Moacir A Ponti. Yourtts: Towards zero-shot multi-speaker tts and zero-shot voice conversion for everyone. In International Conference on Machine Learning , pp. 2709–2720. PMLR, 2022."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib17",
+      "text": "Jeong et al. (2021) Myeonghun Jeong, Hyeongju Kim, Sung Jun Cheon, Byoung Jin Choi, and Nam Soo Kim. Diff-TTS: A denoising diffusion model for text-to-speech. arXiv preprint arXiv:2104.01409 , 2021."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib36",
+      "text": "Popov et al. (2021) Vadim Popov, Ivan Vovk, Vladimir Gogoryan, Tasnima Sadekova, and Mikhail Kudinov. Grad-TTS: A diffusion probabilistic model for text-to-speech. In International Conference on Machine Learning , pp. 8599–8608. PMLR, 2021."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib15",
+      "text": "Huang et al. (2022b) Rongjie Huang, Zhou Zhao, Huadai Liu, Jinglin Liu, Chenye Cui, and Yi Ren. Prodiff: Progressive fast diffusion model for high-quality text-to-speech. In Proceedings of the 30th ACM International Conference on Multimedia , pp. 2595–2605, 2022b."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib28",
+      "text": "Lee et al. (2021) Sang-gil Lee, Heeseung Kim, Chaehun Shin, Xu Tan, Chang Liu, Qi Meng, Tao Qin, Wei Chen, Sungroh Yoon, and Tie-Yan Liu. Priorgrad: Improving conditional denoising diffusion models with data-dependent adaptive prior. arXiv preprint arXiv:2106.06406 , 2021."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib29",
+      "text": "Liu et al. (2022) Songxiang Liu, Dan Su, and Dong Yu. Diffgan-tts: High-fidelity and efficient text-to-speech with denoising diffusion gans. arXiv preprint arXiv:2201.11972 , 2022."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "Kim et al. (2022) Heeseung Kim, Sungwon Kim, and Sungroh Yoon. Guided-TTS: A diffusion model for text-to-speech via classifier guidance. In International Conference on Machine Learning , pp. 11119–11133. PMLR, 2022."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib26",
+      "text": "Kong et al. (2020b) Zhifeng Kong, Wei Ping, Jiaji Huang, Kexin Zhao, and Bryan Catanzaro. Diffwave: A versatile diffusion model for audio synthesis. arXiv preprint arXiv:2009.09761 , 2020b."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib14",
+      "text": "Huang et al. (2022a) Rongjie Huang, Max WY Lam, Jun Wang, Dan Su, Dong Yu, Yi Ren, and Zhou Zhao. Fastdiff: A fast conditional diffusion model for high-quality speech synthesis. arXiv preprint arXiv:2204.09934 , 2022a."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib3",
+      "text": "Chen et al. (2021) Nanxin Chen, Yu Zhang, Heiga Zen, Ron J Weiss, Mohammad Norouzi, Najim Dehak, and William Chan. Wavegrad 2: Iterative refinement for text-to-speech synthesis. arXiv preprint arXiv:2106.09660 , 2021."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib8",
+      "text": "Elias et al. (2021) Isaac Elias, Heiga Zen, Jonathan Shen, Yu Zhang, Ye Jia, RJ Skerry-Ryan, and Yonghui Wu. Parallel Tacotron 2: A non-autoregressive neural TTS model with differentiable duration modeling. arXiv preprint arXiv:2103.14574 , 2021."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib27",
+      "text": "Le et al. (2023) Matthew Le, Apoorv Vyas, Bowen Shi, Brian Karrer, Leda Sari, Rashel Moritz, Mary Williamson, Vimal Manohar, Yossi Adi, Jay Mahadeokar, et al. Voicebox: Text-guided multilingual universal speech generation at scale. arXiv preprint arXiv:2306.15687 , 2023."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib46",
+      "text": "Wang et al. (2023) Chengyi Wang, Sanyuan Chen, Yu Wu, Ziqiang Zhang, Long Zhou, Shujie Liu, Zhuo Chen, Yanqing Liu, Huaming Wang, Jinyu Li, et al. Neural codec language models are zero-shot text to speech synthesizers. arXiv preprint arXiv:2301.02111 , 2023."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib5",
+      "text": "Défossez et al. (2022) Alexandre Défossez, Jade Copet, Gabriel Synnaeve, and Yossi Adi. High fidelity neural audio compression. arXiv preprint arXiv:2210.13438 , 2022."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib33",
+      "text": "Oord et al. (2016) Aaron van den Oord, Sander Dieleman, Heiga Zen, Karen Simonyan, Oriol Vinyals, Alex Graves, Nal Kalchbrenner, Andrew Senior, and Koray Kavukcuoglu. Wavenet: A generative model for raw audio. arXiv preprint arXiv:1609.03499 , 2016."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib12",
+      "text": "Ho et al. (2022) Jonathan Ho, Tim Salimans, Alexey Gritsenko, William Chan, Mohammad Norouzi, and David J Fleet. Video diffusion models. arXiv:2204.03458 , 2022."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib13",
+      "text": "Hoogeboom et al. (2021) Emiel Hoogeboom, Alexey A Gritsenko, Jasmijn Bastings, Ben Poole, Rianne van den Berg, and Tim Salimans. Autoregressive diffusion models. arXiv preprint arXiv:2110.02037 , 2021."
+    }
+  ]
+}

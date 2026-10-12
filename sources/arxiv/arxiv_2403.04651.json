@@ -1,0 +1,73 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.04651",
+  "title": "Cedar: A New Language for Expressive, Fast, Safe, and Analyzable Authorization (Extended Version)",
+  "authors": "Joseph W. Cutler, Craig Disselkoen, Aaron Eline, Shaobo He, Kyle Headley, Michael Hicks, Kesha Hietala, Eleftherios Ioannidis, John Kastner, Anwar Mamat, Darin McAdams, Matt McCutchen, Neha Rungta, Emina Torlak, Andrew Wells",
+  "year": "2024",
+  "categories": [
+    "cs.PL"
+  ],
+  "url": "https://arxiv.org/abs/2403.04651",
+  "html_url": "https://arxiv.org/html/2403.04651",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 963,
+  "text": "Authorization is the problem of deciding who has access to what in a multi-user system. Every cloud-based application has to solve this problem, from photo sharing to online banking to health care. A common solution is to embed access control logic in the application code, as shown in the get_list method for TinyTodo (Figure 1), a hypothetical application for managing todo lists.\n\nThis approach has three major drawbacks. First, it is hard to write correct permissions. The logic in get_list denies access if the requester is neither an admin, nor the list’s owner, nor a member of its readers or writers groups. It would be easy to mistakenly drop a not or improperly nest the conditions; such mistakes account for four of the top 25 security weaknesses in 2023 [1]. Second, embedded permissions are hard to understand and audit. An auditor needs to read the application’s code to check access invariants such as a list’s editors can perform all the same actions as the list’s readers. Finally, embedded permissions are hard to maintain. Changing authorization logic means changing the application code, so policy versioning is tantamount to code versioning. Adding crosscutting permissions (e.g., supporting a new user role) requires updates to code in multiple places, which offers more chances for mistakes.\n\nPolicies as code. A better alternative is to externalize access control rules into policies written in a domain-specific authorization language, and delegate decisions to the language’s authorization engine. This approach is called policies as code [2]. With policies as code, lines 2–6 of get_list become a single, unchanging call to the authorization engine, e.g., if not client. is_authorized (…): return ’AccessDenied’. The authorization engine makes a decision by consulting the application’s policies, which are expressed separately from the application code, in a dedicated DSL. This makes access control rules easier to understand, audit, change, version, and share between applications.\n\nBut building a high-quality authorization language is a significant challenge that requires balancing four competing goals. In particular, the language should be expressive, so that application developers can grant access based on user and resource attributes, group membership, and session context [3,4,5]; performant, so that requests are decided quickly; safe, so that policy authoring mistakes are caught or avoided; and analyzable, so that policy analysis tools can reason precisely about important access invariants.\n\nThe first goal is in tension with the other three. A highly expressive language may have constructs that are slow to execute, hard to prove safe, and impossible to analyze precisely. A fast, safe, and analyzable language, in contrast, may be too weak to express common authorization use-cases. To our knowledge (Section 6), no existing language finds the ideal balance of these four goals.\n\nCedar: a novel authorization language. This paper presents Cedar, a new authorization language that is simultaneously expressive, performant, safe, and analyzable. Cedar is used at scale in products and services from Amazon Web Services, and is open source.\n\nCedar’s vocabulary can naturally express who has access to what based on users’ roles and attributes of their environment. Most Cedar operators take constant time, and looping constructs are linear, ensuring fast policy evaluation times. While deciding a request considers all active policies, Cedar is able to quickly slice the full policy set to evaluate only those relevant to the request.\n\nCedar’s design creates a safe foundation for authoring policies. Policies have no side effects, and decisions are indifferent to the order that policies are considered. Cedar policies never authorize an action by default—it must be explicitly permitted. Cedar provides a policy validator, based on a novel type system leveraging singleton types [6] and static capabilities [7], that ensures policy evaluation will never error on a type mismatch, or a bogus attribute or role name.\n\nCedar’s design ensures that its policies are efficiently analyzable by reduction to SMT, so that access invariants can be proved automatically. We define a novel symbolic compiler that translates Cedar policies to SMT, producing a decidable, sound, and complete encoding of their semantics.\n\nImplementation and Evaluation. We have formalized Cedar in Lean [8] and used Lean’s proof assistant to prove the properties mentioned above. We have implemented Cedar in Rust, and used extensive differential random testing to ensure that the implementation matches the model.\n\nWe conduct three sets of experiments to evaluate Cedar’s expressiveness, performance, and analyzability. First, we use Cedar to encode the authorization models for two example applications previously modeled in OpenFGA [9], a recently developed language for specifying relationship-based access control (ReBAC) [5] policies. We can express both of these OpenFGA models with validated Cedar policies. Next, we compare the performance of Cedar, OpenFGA, and Rego [10] —a popular authorization language based on Datalog—on three example applications: the two OpenFGA examples and an additional example described in Section 2. Comparing the performance of these three models on randomly generated inputs, we find that the Cedar authorizer is 28.7 \\times -35.2 \\times faster than OpenFGA and 42.8 \\times -80.8 \\times faster than Rego. We also evaluate the effectiveness of Cedar’s policy slicing, and find that authorization is 10.0 \\times -18.0 \\times faster on average, when using a Cedar templates-based encoding. Finally, we find that Cedar’s type system is powerful enough to validate all policies in our example models, and Cedar’s symbolic compiler reduces analysis questions about these policies into SMT-LIB formulas that take, on average, 75.1 ms to encode and solve.\n\nIn summary, this paper makes the following contributions:\n\n- • Design, implementation, and evaluation of Cedar, a new authorization language that balances expressiveness, safety, performance, and analyzability.\n\n- • A verified validator for Cedar, designed to accept safe policies that are translatable to SMT.\n\n- • A verified symbolic compiler for reducing Cedar to a decidable fragment of SMT.\n\nCedar’s code, documentation, and example apps can be found at https://github.com/cedar-policy/.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib35",
+      "text": "MITRE (2023) MITRE. 2023. CWE Top 25 Most Dangerous Software Weaknesses. https://cwe.mitre.org/top25/archive/2023/2023_top25_list.html ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib55",
+      "text": "Weis (2022) Or Weis. 2022. What is Policy as Code? https://www.permit.io/blog/what-is-policy-as-code ."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib22",
+      "text": "Ferraiolo and Kuhn (1992) David F. Ferraiolo and D. Richard Kuhn. 1992. Role-Based Access Control. In 15th National Computer Security Conference ."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib27",
+      "text": "Hu et al . (2015) Vincent C. Hu, D. Richard Kuhn, David F. Ferraiolo, and Jeffrey Voas. 2015. Attribute-Based Access Control. Computer 48, 2 (2015), 85–88. https://doi.org/10.1109/MC.2015.33"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib44",
+      "text": "Pang et al . (2019) Ruoming Pang, Ramon Caceres, Mike Burrows, Zhifeng Chen, Pratik Dave, Nathan Germer, Alexander Golynski, Kevin Graney, Nina Kang, Lea Kissner, Jeffrey L. Korn, Abhishek Parmar, Christina D. Richards, and Mengzhi Wang. 2019. Zanzibar: Google’s Consistent, Global Authorization System. In 2019 USENIX Annual Technical Conference (USENIX ATC ’19) . Renton, WA."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib2",
+      "text": "Aspinall (1994) David Aspinall. 1994. Subtyping with singleton types. In CSL: International Workshop on Computer Science Logic . 1–15."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib13",
+      "text": "Crary et al . (1999) Karl Crary, David Walker, and Greg Morrisett. 1999. Typed Memory Management in a Calculus of Capabilities. In Proceedings of the 26th ACM SIGPLAN-SIGACT Symposium on Principles of Programming Languages (San Antonio, Texas, USA) (POPL ’99) . Association for Computing Machinery, New York, NY, USA, 262–275. https://doi.org/10.1145/292540.292564"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib36",
+      "text": "Moura and Ullrich (2021) Leonardo de Moura and Sebastian Ullrich. 2021. The Lean 4 Theorem Prover and Programming Language. In Automated Deduction – CADE 28 , André Platzer and Geoff Sutcliffe (Eds.). Springer International Publishing, Cham, 625–635."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib41",
+      "text": "OpenFGA (2023c) OpenFGA 2023c. OpenFGA: Relationship-based access control made fast, scalable, and easy to use. https://openfga.dev/ ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib37",
+      "text": "OPA (2023) OPA 2023. Policy-based control for cloud native environments. https://www.openpolicyagent.org/ ."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib14",
+      "text": "Cutler et al . (2024) Joseph W. Cutler, Craig Disselkoen, Aaron Eline, Shaobo He, Kyle Headley, Michael Hicks, Kesha Hietala, Eleftherios Ioannidis, John Kastner, Anwar Mamat, Darin McAdams, Matt McCutchen, Neha Rungta, Emina Torlak, and Andrew M. Wells. 2024. Cedar: A New Language for Expressive, Fast, Safe, and Analyzable Authorization. Proc. ACM Program. Lang. 8, OOPSLA1 (2024)."
+    }
+  ]
+}

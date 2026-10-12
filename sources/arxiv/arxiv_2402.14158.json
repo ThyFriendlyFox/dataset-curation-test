@@ -1,0 +1,68 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2402.14158",
+  "title": "TOOLVERIFIER: Generalization to New Tools via Self-Verification",
+  "authors": "Dheeraj Mekala, Jason Weston, Jack Lanchantin, Roberta Raileanu, Maria Lomeli, Jingbo Shang, Jane Dwivedi-Yu",
+  "year": "2024",
+  "categories": [
+    "cs.CL"
+  ],
+  "url": "https://arxiv.org/abs/2402.14158",
+  "html_url": "https://arxiv.org/html/2402.14158",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 578,
+  "text": "Incorporating external tools into large language models (LLMs) enhances their real-world applicability [1,2,3]. Many tools exist in the form of APIs [4,5,6,1,7], machine learning models [2,8], and other functions [9]. Nevertheless, the evolving landscape of existing tools and APIs, marked by frequent parameter updates and the daily introduction of new tools, poses a challenge for generalization. LLMs must quickly adapt to these changes and generalize to previously unseen tools without additional fine-tuning or extensive human input.\n\nSeveral recent studies enable tool usage by fine-tuning LLMs on real [1,7,8] or synthetic tools [5], equipping them to effectively utilize tools present in the training data with a high success rate. Currently, the integration of unseen tools into LLMs relies on providing them with few-shot demonstrations that contain examples of user instructions and corresponding tool calls [8,5]. However, these prompting-based approaches still struggle to accurately generate a complete tool call from a set of unseen tools. Moreover, this is often bottlenecked by the context length of the model, particularly when including demonstrations for a large number of tools.\n\nTo address these challenges, we propose ToolVerifier, a self-verification method tailored for tool-use scenarios, capable of discerning between candidate tools and their respective parameters through verification questions. To achieve this, we decompose the tool call generation task into two distinct sub-tasks: (1) tool selection, given a user instruction, the most suitable tool is selected from a library of options, and (2) parameter generation, the appropriate parameters for the selected tool are then generated. Crucially, we propose verification for each sub-task, to both improve sensitivity and to curb error propagation. Figure 1 shows an overview of each sub-task.\n\nIn the tool selection stage, our model must choose one tool among multiple options, given only the description of the tool. This stage forgoes including demonstrations, thereby significantly reducing the required context length and allowing us to select from a larger set of tools. To facilitate learning how to choose the appropriate tool, we curate a high-quality, model-generated, synthetic training dataset containing tools, their descriptions, and user instructions. This dataset comprises 173 synthetic tools with corresponding descriptions, 555 samples in total, each involving reasoning about the tool’s usage. We then use this dataset to fine-tune a Llama-2 70B model [10] to select the correct tool for an instruction given only a set of tool names and their descriptions, allowing the model at test time to select from tools never seen during training. After the tool is selected, parameters are generated for the selected tool call, which is achieved through few-shot prompting with demonstrations corresponding to the chosen tool.\n\nSelf-verification is used at each step to reduce error propagation and enhance overall performance. As shown in Figure 1, for tool selection verification, we extract the top two predictions from the fine-tuned model. A verification question is then generated contrasting the two options via 0-shot prompting, enabling the model to focus on a fine-grained decision where the answer aids in selecting one tool from the top two predictions. The model answers the question, and the context is updated by appending this answer to the user instruction, to guide tool selection. A similar approach is adopted for verifying the parameter generation.\n\nWe evaluate our approach on 4 tasks from the publicly available ToolBench benchmark which tests generalization to 17 unseen real-life APIs. ToolVerifier demonstrates a noteworthy 22% improvement over few-shot prompting baselines. The proposed self-verification mechanism contributes an improvement of 8%, underscoring its pivotal role in boosting overall performance.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib20",
+      "text": "Schick et al. (2023) Timo Schick, Jane Dwivedi-Yu, Roberto Dessi, Roberta Raileanu, Maria Lomeli, Eric Hambro, Luke Zettlemoyer, Nicola Cancedda, and Thomas Scialom. 2023. Toolformer: Language models can teach themselves to use tools . In Thirty-seventh Conference on Neural Information Processing Systems ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib22",
+      "text": "Shen et al. (2023) Yongliang Shen, Kaitao Song, Xu Tan, Dong Sheng Li, Weiming Lu, and Yue Ting Zhuang. 2023. Hugginggpt: Solving ai tasks with chatgpt and its friends in hugging face . ArXiv , abs/2303.17580."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib25",
+      "text": "Song et al. (2023) Yifan Song, Weimin Xiong, Dawei Zhu, Cheng Li, Ke Wang, Ye Tian, and Sujian Li. 2023. Restgpt: Connecting large language models with real-world applications via restful apis. arXiv preprint arXiv:2306.06624 ."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib35",
+      "text": "Xu et al. (2023b) Qiantong Xu, Fenglu Hong, B. Li, Changran Hu, Zhe Chen, and Jian Zhang. 2023b. On the tool manipulation capability of open-source large language models . ArXiv , abs/2305.16504."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib27",
+      "text": "Tang et al. (2023) Qiaoyu Tang, Ziliang Deng, Hongyu Lin, Xianpei Han, Qiao Liang, and Le Sun. 2023. Toolalpaca: Generalized tool learning for language models with 3000 simulated cases . ArXiv , abs/2306.05301."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib8",
+      "text": "Hsieh et al. (2023) Cheng-Yu Hsieh, Si-An Chen, Chun-Liang Li, Yasuhisa Fujii, Alexander Ratner, Chen-Yu Lee, Ranjay Krishna, and Tomas Pfister. 2023. Tool documentation enables zero-shot tool-usage with large language models. arXiv preprint arXiv:2308.00675 ."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib18",
+      "text": "Qin et al. (2023) Yujia Qin, Shi Liang, Yining Ye, Kunlun Zhu, Lan Yan, Ya-Ting Lu, Yankai Lin, Xin Cong, Xiangru Tang, Bill Qian, Sihan Zhao, Runchu Tian, Ruobing Xie, Jie Zhou, Marc H. Gerstein, Dahai Li, Zhiyuan Liu, and Maosong Sun. 2023. Toolllm: Facilitating large language models to master 16000+ real-world apis . ArXiv , abs/2307.16789."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib16",
+      "text": "Patil et al. (2023) Shishir G. Patil, Tianjun Zhang, Xin Wang, and Joseph E. Gonzalez. 2023. Gorilla: Large language model connected with massive apis . ArXiv , abs/2305.15334."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib5",
+      "text": "Gou et al. (2023) Zhibin Gou, Zhihong Shao, Yeyun Gong, Yujiu Yang, Minlie Huang, Nan Duan, Weizhu Chen, et al. 2023. Tora: A tool-integrated reasoning agent for mathematical problem solving. arXiv preprint arXiv:2309.17452 ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib30",
+      "text": "Touvron et al. (2023b) Hugo Touvron, Louis Martin, Kevin Stone, Peter Albert, Amjad Almahairi, Yasmine Babaei, Nikolay Bashlykov, Soumya Batra, Prajjwal Bhargava, Shruti Bhosale, et al. 2023b. Llama 2: Open foundation and fine-tuned chat models. arXiv preprint arXiv:2307.09288 ."
+    }
+  ]
+}

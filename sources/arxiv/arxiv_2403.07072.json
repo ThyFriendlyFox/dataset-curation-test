@@ -1,0 +1,209 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.07072",
+  "title": "Explainable Learning with Gaussian Processes",
+  "authors": "Kurt Butler, Guanchao Feng, Petar M. Djuric",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "eess.SP"
+  ],
+  "url": "https://arxiv.org/abs/2403.07072",
+  "html_url": "https://arxiv.org/html/2403.07072",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1190,
+  "text": "With the widespread adoption of machine learning (ML) methods across academia and industry, there has been an ever increasing desire to explain how complex artificial intelligence (AI) models make predictions [1,2]. The ability to explain AI models, in this sense, is important to promote user trust in AI systems, and to mitigate the misuse of dubious predictions [3]. However, the process of interpreting a model to gain physical insight is often difficult unless the model was intentionally designed to be interpretable [4]. Interpretable models are often transparent in how predictions are made, as is the case for linear models [5] and shallow decision trees [6], or they contain components in their architecture that are designed for interpretability, such as physics-informed neural networks [7]. The sentiment that many ML methods are ‘black boxes’ reflects the inherent difficulty of interpreting complicated, data-driven models like deep neural networks and kernel machines [8,9]. Despite this, the ML paradigm has remained immensely useful, and the exploration of post-hoc explanations for black box models has been a popular subject in recent years, often referred to as explainable artificial intelligence (XAI).\n\nA wide variety of distinct notions of explainability exist in the literature [10]. Many XAI approaches can be described as being either model-specific or model agnostic. Model-specific approaches attempt to formulate explanations by exploiting the known architecture of a ML model. In the context of neural networks, this includes methods that interpret activation weights [11,12], graphs [13], or attention mechanisms [14] to explain how predictions were made. Model-specific approaches also include the use of models that are inherently interpretable, including decision trees [6] and kernel machines with Automatic Relevance Determination (ARD) [15].\n\nIn contrast, model-agnostic approaches seek notions of explainability that can be applied to a wide range of models, with only generic assumptions about the type of data or properties of the model. Explanations of this type might measure the sensitivity of the prediction to perturbations at the input [16,17] or measuring changes in the model prediction after masking or perturbing input features [18,19]. In prediction tasks where images are inputs, a popular tool of this type is that of saliency maps, which are images that visually highlight the relevant features in a prediction [20]. Another class of methods attempt to explain a prediction by showing relevant similar examples that were observed in the training set, sometimes called example-based explanations [21]. Reverse image searching approaches attempt to find similar training examples to a given prediction and have been of particular interest in the field of image diffusion models [22]. Finally, many XAI methods can be understood through the invocation of an approximate, interpretable model, as seen in Local Interpretable Model-agnostic Explanations (LIME) [23] and SHapley Additive exPlanations (SHAP) [24].\n\nMany XAI methods attempt to explain a prediction by associating a numerical score with each input feature. A natural approach to assigning this score is to attempt to measure the contribution of each feature to the output, that is, how much of the resulting prediction do we attribute to each input feature. This approach to explainability, called feature attribution, was popularized by [25], who introduced Shapley values to XAI. Shapley values were proposed by [26] as a method for determining what fraction of the total profit each player is owed in a coalitional game. In the context of XAI, this was reinterpreted to quantify how much each feature contributed to a numerical prediction. Since then, several other feature attribution approaches have been proposed, which we review in the next section.\n\nIn this paper, we will focus on Gaussian process regression (GPR) as a general non-parametric machine learning paradigm and assess the utility of post-hoc explanations for GPR models. This setting is intriguing because (a) interesting theoretical results are obtained from computing the attributions of a GPR model and (b) the resulting form of the GPR result is heavily dependent on the observed data set. Since the GPR paradigm is data-driven, any post-hoc explanation in this setting must be compatible with the lack of explicit structural knowledge in the GPR approach. Acknowledging critiques of post-hoc explanations and the XAI paradigm [9,27,28], we will argue that the attributions can remain useful to characterize aspects of the learned model, as long as the practitioners’ expectations are tempered to be in line with what information can actually be recovered from the attributions.\n\n## 1.1 Related Work\n\nSince our primary notion of explainability in this work is feature attribution, we briefly highlight existing related work in this area. The most well-known approach to feature attribution is that of Shapley values, originally developed from game theoretic principles for econometric applications by [26]. Shapley values benefit from an axiomatic definition that uniquely defines them, but this original formulation is only valid for discrete features [29]. In continuous domains, the original axioms are insufficient to uniquely define the method [30]. Several extensions of the Shapley value to continuous features exist, including Aumann-Shapley [29] and Shapley-Shubik [31]. Other approaches to bring Shapley values to continuous domains have attempted the inclusion/deletion of features [32], or through the invocation of a proxy model that locally explains the original model, including LIME [23] and SHAP [24]. The Integrated Gradients (IG) framework of [33] generalizes the framework of Aumann-Shapley. [34] and [24] considered variations on the IG attribution theory where baselines are given by a distribution of possible baselines.\n\nWhile the majority of research in feature attribution has concentrated on neural models, there are authors who explore Gaussian process (GP) models. [35] proposed a GP-based version of SHAP analysis to provide uncertainty quantification of Shapley values. [36] considered the application of IG attributions to GP models for regression and classification. Previous research has also focused on designing GPR models to be interpretable, typically through kernel design. This can be seen in the work on ARD [15] and additive kernels [37]. [38] considered a GP-based hierarchical model in which predictions are made using conditionally linear models of interpretable features, with the model weights derived from nonlinear functions of other non-interpretable features.\n\n## 1.2 Contributions\n\nThis paper examines several aspects of attribution theory in the context of GP models. We show that the attributions represent a decomposition of the predictive model into a sum of component functions, and this decomposition preserves the differentiability of the original model. When a GP probability distribution is used to model the function space, we show that the attribution functions are also distributed according to GPs.\n\nWe derive exact expressions for the attributions of various common GPR models. The resulting expressions are straightforward to implement and check in code. We also comment on extensions of these results to more sophisticated kernels and GPR models.\n\nUsing the attribution GP, we gain the ability to measure the confidence of each attribution. We demonstrate through experimental data cases where these considerations are relevant to ML practitioners in medicine and industry.\n\nWe also compare the performance of exact attributions to various approximations that have appeared in the literature. These approximations are often asymptotic, and to the knowledge of the authors no experimental work has been done to ascertain how the convergence of these approximate solutions relates to the measured attributions.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib42",
+      "text": "Samek et al. (2021) Wojciech Samek, Grégoire Montavon, Sebastian Lapuschkin, Christopher J Anders, and Klaus-Robert Müller. Explaining deep neural networks and beyond: A review of methods and applications. Proceedings of the IEEE , 109(3):247–278, 2021."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib4",
+      "text": "Angelov et al. (2021) Plamen P Angelov, Eduardo A Soares, Richard Jiang, Nicholas I Arnold, and Peter M Atkinson. Explainable artificial intelligence: an analytical review. Wiley Interdisciplinary Reviews: Data Mining and Knowledge Discovery , 11(5):e1424, 2021."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib24",
+      "text": "Hess and Ditzler (2023) Samuel Hess and Gregory Ditzler. Protoshotxai: Using prototypical few-shot architecture for explainable AI. Journal of Machine Learning Research , 24(325):1–49, 2023. URL http://jmlr.org/papers/v24/21-1261.html ."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib36",
+      "text": "Peng et al. (2022) Xi Peng, Yunfan Li, Ivor W Tsang, Hongyuan Zhu, Jiancheng Lv, and Joey Tianyi Zhou. XAI beyond classification: Interpretable neural clustering. The Journal of Machine Learning Research , 23(1):227–254, 2022."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "Arrieta et al. (2020) Alejandro Barredo Arrieta, Natalia Díaz-Rodríguez, Javier Del Ser, Adrien Bennetot, Siham Tabik, Alberto Barbado, Salvador García, Sergio Gil-López, Daniel Molina, Richard Benjamins, et al. Explainable artificial intelligence (XAI): Concepts, taxonomies, opportunities and challenges toward responsible AI. Information Fusion , 58:82–115, 2020."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib45",
+      "text": "Silva et al. (2020) Andrew Silva, Matthew Gombolay, Taylor Killian, Ivan Jimenez, and Sung-Hyun Son. Optimization methods for interpretable differentiable decision trees applied to reinforcement learning. In International conference on artificial intelligence and statistics , pages 1855–1865. PMLR, 2020."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib25",
+      "text": "Huang and Wang (2022) Bin Huang and Jianhui Wang. Applications of physics-informed neural networks in power systems-a review. IEEE Transactions on Power Systems , 38(1):572–588, 2022."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib62",
+      "text": "Zhang et al. (2018) Hao Zhang, Shinji Nakadai, and Kenji Fukumizu. From black-box to white-box: Interpretable learning with kernel machines. In Machine Learning and Data Mining in Pattern Recognition: 14th International Conference, MLDM 2018, New York, NY, USA, July 15-19, 2018, Proceedings, Part I 14 , pages 213–227. Springer, 2018."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib41",
+      "text": "Rudin (2019) Cynthia Rudin. Stop explaining black box machine learning models for high stakes decisions and use interpretable models instead. Nature Machine Intelligence , 1(5):206–215, 2019."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib26",
+      "text": "Jin et al. (2022) Di Jin, Elena Sergeeva, Wei-Hung Weng, Geeticka Chauhan, and Peter Szolovits. Explainable deep learning in healthcare: A methodological survey from an attribution view. WIREs Mechanisms of Disease , 14(3):e1548, 2022."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib48",
+      "text": "Springenberg et al. (2014) Jost Tobias Springenberg, Alexey Dosovitskiy, Thomas Brox, and Martin Riedmiller. Striving for simplicity: The all convolutional net. arXiv preprint arXiv:1412.6806 , 2014."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib7",
+      "text": "Bach et al. (2015) Sebastian Bach, Alexander Binder, Grégoire Montavon, Frederick Klauschen, Klaus-Robert Müller, and Wojciech Samek. On pixel-wise explanations for non-linear classifier decisions by layer-wise relevance propagation. PLOS One , 10(7):e0130140, 2015."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib60",
+      "text": "Ying et al. (2019) Zhitao Ying, Dylan Bourgeois, Jiaxuan You, Marinka Zitnik, and Jure Leskovec. GNNExplainer: Generating explanations for graph neural networks. Advances in Neural Information Processing Systems , 32, 2019."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib56",
+      "text": "Voita et al. (2019) Elena Voita, David Talbot, Fedor Moiseev, Rico Sennrich, and Ivan Titov. Analyzing multi-head self-attention: Specialized heads do the heavy lifting, the rest can be pruned. In Proceedings of the 57th Annual Meeting of the Association for Computational Linguistics . Association for Computational Linguistics, 2019."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib35",
+      "text": "Neal (1996) Radford M Neal. Bayesian Learning for Neural Networks , volume 118 of Lecture Notes in Statistics . Springer, 1996."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib8",
+      "text": "Baehrens et al. (2010) David Baehrens, Timon Schroeter, Stefan Harmeling, Motoaki Kawanabe, Katja Hansen, and Klaus-Robert Müller. How to explain individual classification decisions. The Journal of Machine Learning Research , 11:1803–1831, 2010."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib46",
+      "text": "Simonyan et al. (2014) Karen Simonyan, Andrea Vedaldi, and Andrew Zisserman. Deep inside convolutional networks: visualising image classification models and saliency maps. In Proceedings of the International Conference on Learning Representations (ICLR) . ICLR, 2014."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib40",
+      "text": "Robnik-Šikonja and Kononenko (2008) Marko Robnik-Šikonja and Igor Kononenko. Explaining classifications for individual instances. IEEE Transactions on Knowledge and Data Engineering , 20(5):589–600, 2008."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib51",
+      "text": "Štrumbelj et al. (2009) Erik Štrumbelj, Igor Kononenko, and M Robnik Šikonja. Explaining instance classifications with interactions of subsets of feature values. Data & Knowledge Engineering , 68(10):886–904, 2009."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib2",
+      "text": "Adebayo et al. (2018) Julius Adebayo, Justin Gilmer, Michael Muelly, Ian Goodfellow, Moritz Hardt, and Been Kim. Sanity checks for saliency maps. Advances in neural information processing systems , 31, 2018."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib55",
+      "text": "van der Waa et al. (2021) Jasper van der Waa, Elisabeth Nieuwburg, Anita Cremers, and Mark Neerincx. Evaluating XAI: A comparison of rule-based and example-based explanations. Artificial Intelligence , 291:103404, 2021."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib9",
+      "text": "Carlini et al. (2023) Nicolas Carlini, Jamie Hayes, Milad Nasr, Matthew Jagielski, Vikash Sehwag, Florian Tramer, Borja Balle, Daphne Ippolito, and Eric Wallace. Extracting training data from diffusion models. In 32nd USENIX Security Symposium (USENIX Security 23) , pages 5253–5270, 2023."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib38",
+      "text": "Ribeiro et al. (2016) Marco Tulio Ribeiro, Sameer Singh, and Carlos Guestrin. Model-agnostic interpretability of machine learning. arXiv preprint arXiv:1606.05386 , 2016."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib31",
+      "text": "Lundberg and Lee (2017) Scott M Lundberg and Su-In Lee. A unified approach to interpreting model predictions. In Advances in Neural Information Processing Systems , volume 30, 2017. URL https://proceedings.neurips.cc/paper_files/paper/2017/file/8a20a8621978632d76c43dfd28b67767-Paper.pdf ."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib50",
+      "text": "Štrumbelj and Kononenko (2014) Erik Štrumbelj and Igor Kononenko. Explaining prediction models and individual predictions with feature contributions. Knowledge and Information Systems , 41(3):647–665, 2014."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib44",
+      "text": "Shapley (1953) Lloyd S Shapley. A value for n-person games. Contributions to the Theory of Games , pages 307–317, 1953."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib18",
+      "text": "Ghassemi et al. (2021) Marzyeh Ghassemi, Luke Oakden-Rayner, and Andrew L Beam. The false hope of current approaches to explainable artificial intelligence in health care. The Lancet Digital Health , 3(11):e745–e750, 2021."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib14",
+      "text": "de Bruijn et al. (2022) Hans de Bruijn, Martijn Warnier, and Marijn Janssen. The perils and pitfalls of explainable AI: Strategies for explaining algorithmic decision-making. Government Information Quarterly , 39(2):101666, 2022."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib6",
+      "text": "Aumann and Shapley (2015) Robert J Aumann and Lloyd S Shapley. Values of Non-Atomic Games . Princeton University Press, 2015."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib53",
+      "text": "Sundararajan and Najmi (2020) Mukund Sundararajan and Amir Najmi. The many Shapley values for model explanation. In International Conference on Machine Learning , pages 9269–9278. PMLR, 2020."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib16",
+      "text": "Friedman and Moulin (1999) Eric Friedman and Herve Moulin. Three methods to share joint costs or surplus. Journal of Economic Theory , 87(2):275–312, 1999."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib21",
+      "text": "Grömping (2007) Ulrike Grömping. Estimators of relative importance in linear regression based on variance decomposition. The American Statistician , 61(2):139–147, 2007."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib54",
+      "text": "Sundararajan et al. (2017) Mukund Sundararajan, Ankur Taly, and Qiqi Yan. Axiomatic attribution for deep networks. In International Conference on Machine Learning , pages 3319–3328. PMLR, 2017."
+    },
+    {
+      "n": 34,
+      "id": "bib.bib52",
+      "text": "Sturmfels et al. (2020) Pascal Sturmfels, Scott Lundberg, and Su-In Lee. Visualizing the impact of feature attribution baselines. Distill , 5(1):e22, 2020. URL https://distill.pub/2020/attribution-baselines/ ."
+    },
+    {
+      "n": 35,
+      "id": "bib.bib10",
+      "text": "Chau et al. (2023) Siu Lun Chau, Krikamol Muandet, and Dino Sejdinovic. Explaining the uncertain: Stochastic Shapley values for Gaussian process models. arXiv preprint arXiv:2305.15167 , 2023."
+    },
+    {
+      "n": 36,
+      "id": "bib.bib43",
+      "text": "Seitz (2022) Sarem Seitz. Gradient-based explanations for Gaussian process regression and classification models. arXiv preprint arXiv:2205.12797 , 2022."
+    },
+    {
+      "n": 37,
+      "id": "bib.bib15",
+      "text": "Duvenaud et al. (2011) David K Duvenaud, Hannes Nickisch, and Carl Rasmussen. Additive Gaussian processes. Advances in Neural Information Processing Systems , 24, 2011."
+    },
+    {
+      "n": 38,
+      "id": "bib.bib61",
+      "text": "Yoshikawa and Iwata (2021) Yuya Yoshikawa and Tomoharu Iwata. Gaussian process regression with interpretable sample-wise feature weights. IEEE Transactions on Neural Networks and Learning Systems , 2021."
+    }
+  ]
+}

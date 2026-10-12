@@ -1,0 +1,235 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2309.17002",
+  "title": "Understanding and Mitigating the Label Noise in Pre-training on Downstream Tasks",
+  "authors": "Hao Chen, Jindong Wang, Ankit Shah, Ran Tao, Hongxin Wei, Xing Xie, Masashi Sugiyama, Bhiksha Raj",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.AI",
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2309.17002",
+  "html_url": "https://arxiv.org/html/2309.17002",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1098,
+  "text": "The transfer learning paradigm of pre-training and fine-tuning (PT-FT) [1] has become the de facto standard in today’s deep learning research and application. Instead of training a neural network from scratch for each individual task, which can be time-consuming, resource-intensive, and less adaptable, the PT-FT paradigm first pre-trains a relatively larger and more general model with huge volumes of datasets, and then transfers this pre-trained model (or the foundation model [2]) to various downstream tasks [3,4,5,6]. For instance, ResNet [7] and Vision Transformers [8] pre-trained on ImageNet [9] and larger but potentially noisy datasets [10,11,12] have been widely adopted in computer vision. The PT-FT paradigm has also become predominant in natural language processing [13,14,15,16,6,17,18] and multi-modality [4,19], where the pre-training is usually on large datasets scraped from the web.\n\nThe generalization and transferability of the pre-trained models are usually not guaranteed to be satisfying on downstream tasks, and the reason can lie in either the pre-training or the fine-tuning. Over the years, there have been tremendous efforts in improving the performance of fine-tuning in various practical downstream scenarios: out-of-distribution generalization [20,21], semi-supervised learning [22,23], imbalanced learning [24,25], noisy label learning [26,27], to name a few. While it is a common belief that scaling up the size of the pre-training data can benefit the downstream performance [28], its distribution also plays an essential role [29,30]. Recently, [31] and [32] found that the quality of the pre-training data is more important for robust generalization compared to the quantity. The bias in pre-training data created by the collection (and annotation) process, e.g., corrupted, poisoned, and false information [33,34], can also impose malicious and unexpected influence to downstream tasks [2].\n\nTake label noise as an example. Training CLIP [4] on LAION-2B [19], which is a billion-scale uncurated image-text pair dataset, can just match the performance of training it on WIT-400M [4], which is heavily cleaned and processed by OpenAI. The label noise in large-scale datasets inevitably exists owing to the data collection process by human annotators and web crawlers. It thus can be difficult to avoid or eliminate in pre-training [12,35,19]. In fact, there are already numerous models pre-trained on large-scale noisy data and have been transferred on downstream tasks, such as Noisy Student [11], BiT [10], and Open CLIP [36]. Not to mention the enormous but noisy raw text [37,32] that has been utilized to pre-train language models such as BERT [13] and GPT [16,6]. As the pre-trained models and datasets have been growing significantly, it has become increasingly important and challenging to understand how the noise in pre-training data affects the performance of pre-trained models on downstream tasks.\n\nThis paper presents the first study on this unexplored problem, demystifying the label noise in pre-training data, understanding its effects on downstream tasks, and then mitigating such (malignant) effects. Notably, there are existing efforts under the name of “noisy label learning” that train a robust model given noisy training data [38,39,40]. Our problem is inherently different since the noisy labels exist in the (usually black-box) pre-training data, and we do not make noise assumptions on the downstream data (while they can be used together as in Section 4.3; more discussion is in Section 5). Due to the increasing size of pre-trained models and datasets, it becomes notoriously difficult to alter the pre-training process or fine-tune the entire models (black-box or cannot be updated due to the large parameter size and the constrained computation). Therefore, given a pre-trained model, we should take special care of the fine-tuning to overcome the influence of noise in pre-training on downstream tasks.\n\nOur study aims to answer the following key questions: 1) Influence: Does the noise in pre-training data have an influence on downstream performance? 2) Analysis: Why does such influence happen? and 3) Mitigation: How to mitigate such influence in a light-weight and black-box fine-tuning process? We present an in-depth analysis to answer the above questions, based on the popular supervised pre-training paradigm.\n\n- • Influence: The label noise in pre-training data has both benevolent and malignant influence on downstream tasks. In Sections 2.1 and 2.2, we conduct realistic experiments with ResNet-50 models [7] fully-supervised and contrastive pre-trainied on synthetic noisy ImageNet-1K and YFCC15M [42] with various noisy ratios (0,5\\%,10\\%,20\\%,30\\%) and then study the generalization performance on the downstream in-domain (ID) and out-of-domain (OOD) tasks. We observe that, on ID tasks, slight noise (up to 5\\% or 10\\%) can benefit generalization performance. In contrast, even 5\\% noise can drastically deteriorate robustness and transferability on OOD tasks, as shown in Figure 1 and Figure 2.\n\n- • Analysis: The label noise in pre-training shapes the feature space significantly of the pre-trained model. In Section 2.3, we conduct empirical analysis from the singular value spectrum on the feature space of the pre-trained models. Noise in pre-training results in the decreasing largest singular value and flatter singular value distribution with a higher dimension span in the feature space. An initial increase in the spanning dimension of the feature space is beneficial to the discriminability on ID tasks. Still, it then becomes detrimental with the further increase, indicating more feature capacities are learned to fit to noise structure. The decrease in the dominant singular values leads to less transferability for OOD tasks [43], as shown in Figure 3.\n\n- • Mitigation: We design a simple black-box fine-tuning algorithm to reshape the pre-trained feature space, reducing the influence of noisy pre-training data and boost the performance of downstream tasks. In Section 3, based on the analysis, we propose three regularization objectives on the singular value spectrum that help affine the feature space. We demonstrate the effectiveness of the proposed method on noisy ResNet-50 models with extensive analysis, as shown in Figure 1. In Section 4, we further validate our method on popular noisy pre-trained models (and APIs) and present superior generalization performance for both vision and language tasks.\n\nBeyond our analysis, we view this research as a novel and complementary topic to the classic noisy label learning setting, termed as Noisy Model Learning (NML). We think the value of this direction is even more significant in the era of large foundation models [2], where the downstream users only have access to the model weights or APIs. It would be of particular interest to explore how to eliminate the malignant influence of noise in pre-training on downstream tasks when adapting these models without full fine-tuning, since it may exist in broader applications such as the detection and segmentation in medical and autonomous driving. We hope that future research on this topic can facilitate a better understanding and application of large foundation models.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib50",
+      "text": "Kornblith et al. (2019) Simon Kornblith, Jonathon Shlens, and Quoc V. Le. Do better imagenet models transfer better? In IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) . IEEE, Jun 2019."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib5",
+      "text": "Bommasani et al. (2021) Rishi Bommasani, Drew A Hudson, Ehsan Adeli, Russ Altman, Simran Arora, Sydney von Arx, Michael S Bernstein, Jeannette Bohg, Antoine Bosselut, Emma Brunskill, et al. On the opportunities and risks of foundation models. arXiv preprint arXiv:2108.07258 , 2021."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib34",
+      "text": "He et al. (2019) Kaiming He, Haoqi Fan, Yuxin Wu, Saining Xie, and Ross Girshick. Momentum contrast for unsupervised visual representation learning. arXiv preprint arXiv:1911.05722 , 2019."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib82",
+      "text": "Radford et al. (2021) Alec Radford, Jong Wook Kim, Chris Hallacy, A. Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry, Amanda Askell, Pamela Mishkin, Jack Clark, Gretchen Krueger, and Ilya Sutskever. Learning transferable visual models from natural language supervision. In ICML , 2021."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib35",
+      "text": "He et al. (2022) Kaiming He, Xinlei Chen, Saining Xie, Yanghao Li, Piotr Dollar, and Ross Girshick. Masked autoencoders are scalable vision learners. 2022 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , Jun 2022."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib8",
+      "text": "Brown et al. (2020) Tom Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared D Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, et al. Language models are few-shot learners. Advances in neural information processing systems , 33:1877–1901, 2020."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib32",
+      "text": "He et al. (2016a) Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. Deep residual learning for image recognition. In CVPR , 2016a."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib23",
+      "text": "Dosovitskiy et al. (2020) Alexey Dosovitskiy, Lucas Beyer, Alexander Kolesnikov, Dirk Weissenborn, Xiaohua Zhai, Thomas Unterthiner, Mostafa Dehghani, Matthias Minderer, Georg Heigold, Sylvain Gelly, et al. An image is worth 16x16 words: Transformers for image recognition at scale. arXiv preprint arXiv:2010.11929 , 2020."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib85",
+      "text": "Russakovsky et al. (2015) Olga Russakovsky, Jia Deng, Hao Su, Jonathan Krause, Sanjeev Satheesh, Sean Ma, Zhiheng Huang, Andrej Karpathy, Aditya Khosla, Michael Bernstein, Alexander C. Berg, and Li Fei-Fei. ImageNet Large Scale Visual Recognition Challenge. International Journal of Computer Vision (IJCV) , 115(3):211–252, 2015."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib49",
+      "text": "Kolesnikov et al. (2020) Alexander Kolesnikov, Lucas Beyer, Xiaohua Zhai, Joan Puigcerver, Jessica Yung, Sylvain Gelly, and Neil Houlsby. Big transfer (bit): General visual representation learning. In Computer Vision–ECCV 2020: 16th European Conference, Glasgow, UK, August 23–28, 2020, Proceedings, Part V 16 , pp. 491–507. Springer, 2020."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib116",
+      "text": "Xie et al. (2020) Qizhe Xie, Minh-Thang Luong, Eduard Hovy, and Quoc V. Le. Self-training with noisy student improves imagenet classification. 2020 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , Jun 2020."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib84",
+      "text": "Ridnik et al. (2021) Tal Ridnik, Emanuel Ben-Baruch, Asaf Noy, and Lihi Zelnik-Manor. Imagenet-21k pretraining for the masses. In Thirty-fifth Conference on Neural Information Processing Systems Datasets and Benchmarks Track (Round 1) , 2021."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib21",
+      "text": "Devlin et al. (2018) Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. Bert: Pre-training of deep bidirectional transformers for language understanding. arXiv preprint arXiv:1810.04805 , 2018."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib63",
+      "text": "Liu et al. (2019) Yinhan Liu, Myle Ott, Naman Goyal, Jingfei Du, Mandar Joshi, Danqi Chen, Omer Levy, Mike Lewis, Luke Zettlemoyer, and Veselin Stoyanov. Roberta: A robustly optimized bert pretraining approach. arXiv preprint arXiv:1907.11692 , 2019."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib80",
+      "text": "Radford et al. (2018) Alec Radford, Karthik Narasimhan, Tim Salimans, Ilya Sutskever, et al. Improving language understanding by generative pre-training. 2018."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib81",
+      "text": "Radford et al. (2019) Alec Radford, Jeffrey Wu, Rewon Child, David Luan, Dario Amodei, Ilya Sutskever, et al. Language models are unsupervised multitask learners. OpenAI blog , 1(8):9, 2019."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib76",
+      "text": "OpenAI (2023) OpenAI. Gpt-4 technical report, 2023."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib94",
+      "text": "Touvron et al. (2023a) Hugo Touvron, Thibaut Lavril, Gautier Izacard, Xavier Martinet, Marie-Anne Lachaux, Timothée Lacroix, Baptiste Rozière, Naman Goyal, Eric Hambro, Faisal Azhar, et al. Llama: Open and efficient foundation language models. arXiv preprint arXiv:2302.13971 , 2023a."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib87",
+      "text": "Schuhmann et al. (2022) Christoph Schuhmann, Romain Beaumont, Richard Vencu, Cade W Gordon, Ross Wightman, Mehdi Cherti, Theo Coombes, Aarush Katta, Clayton Mullis, Mitchell Wortsman, Patrick Schramowski, Srivatsa R Kundurthy, Katherine Crowson, Ludwig Schmidt, Robert Kaczmarczyk, and Jenia Jitsev. LAION-5b: An open large-scale dataset for training next generation image-text models. In Thirty-sixth Conference on Neural Information Processing Systems Datasets and Benchmarks Track , 2022."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib13",
+      "text": "Chen et al. (2021) Mayee Chen, Karan Goel, Nimit S Sohoni, Fait Poms, Kayvon Fatahalian, and Christopher Ré. Mandoline: Model evaluation under distribution shift. In International conference on machine learning , pp. 1617–1629. PMLR, 2021."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib53",
+      "text": "Kumar et al. (2022) Ananya Kumar, Aditi Raghunathan, Robbie Jones, Tengyu Ma, and Percy Liang. Fine-tuning can distort pretrained features and underperform out-of-distribution. arXiv preprint arXiv:2202.10054 , 2022."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib90",
+      "text": "Sohn et al. (2020) Kihyuk Sohn, David Berthelot, Nicholas Carlini, Zizhao Zhang, Han Zhang, Colin A Raffel, Ekin Dogus Cubuk, Alexey Kurakin, and Chun-Liang Li. Fixmatch: Simplifying semi-supervised learning with consistency and confidence. Advances in Neural Information Processing Systems (NeurIPS) , 33, 2020."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib102",
+      "text": "Wang et al. (2022) Yidong Wang, Hao Chen, Yue Fan, Wang Sun, Ran Tao, Wenxin Hou, Renjie Wang, Linyi Yang, Zhi Zhou, Lan-Zhe Guo, Heli Qi, Zhen Wu, Yu-Feng Li, Satoshi Nakamura, Wei Ye, Marios Savvides, Bhiksha Raj, Takahiro Shinozaki, Bernt Schiele, Jindong Wang, Xing Xie, and Yue Zhang. Usb: A unified semi-supervised learning benchmark. In Advances in Neural Information Processing Systems (NeurIPS) , 2022."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib127",
+      "text": "Zhang et al. (2023b) Yifan Zhang, Bingyi Kang, Bryan Hooi, Shuicheng Yan, and Jiashi Feng. Deep long-tailed learning: A survey. IEEE Transactions on Pattern Analysis and Machine Intelligence , 2023b."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib104",
+      "text": "Wang et al. (2023b) Yidong Wang, Zhuohao Yu, Jindong Wang, Qiang Heng, Hao Chen, Wei Ye, Rui Xie, Xing Xie, and Shikun Zhang. Exploring vision-language models for imbalanced learning. International Journal of Computer Vision (IJCV) , 2023b."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib91",
+      "text": "Song et al. (2022) Hwanjun Song, Minseok Kim, Dongmin Park, Yooju Shin, and Jae-Gil Lee. Learning from noisy labels with deep neural networks: A survey. IEEE Transactions on Neural Networks and Learning Systems , pp. 1–19, 2022. ISSN 2162-2388."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib56",
+      "text": "Li et al. (2022) Shikun Li, Xiaobo Xia, Shiming Ge, and Tongliang Liu. Selective-supervised contrastive learning with noisy labels. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pp. 316–325, 2022."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib45",
+      "text": "Kaplan et al. (2020) Jared Kaplan, Sam McCandlish, Tom Henighan, Tom B Brown, Benjamin Chess, Rewon Child, Scott Gray, Alec Radford, Jeffrey Wu, and Dario Amodei. Scaling laws for neural language models. arXiv preprint arXiv:2001.08361 , 2020."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib24",
+      "text": "Entezari et al. (2023) Rahim Entezari, Mitchell Wortsman, Olga Saukh, M Moein Shariatnia, Hanie Sedghi, and Ludwig Schmidt. The role of pre-training data in transfer learning. arXiv preprint arXiv:2302.13602 , 2023."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib125",
+      "text": "Zhang et al. (2023a) Jieyu Zhang, Bohan Wang, Zhengyu Hu, Pang Wei Koh, and Alexander Ratner. On the trade-off of intra-/inter-class diversity for supervised pre-training. arXiv preprint arXiv:2305.12224 , 2023a."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib72",
+      "text": "Nguyen et al. (2022) Thao Nguyen, Gabriel Ilharco, Mitchell Wortsman, Sewoong Oh, and Ludwig Schmidt. Quality not quantity: On the interaction between dataset design and robustness of clip. Advances in Neural Information Processing Systems , 35:21455–21469, 2022."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib54",
+      "text": "Lee et al. (2022) Katherine Lee, Daphne Ippolito, Andrew Nystrom, Chiyuan Zhang, Douglas Eck, Chris Callison-Burch, and Nicholas Carlini. Deduplicating training data makes language models better. In Proceedings of the 60th Annual Meeting of the Association for Computational Linguistics (ACL) , 2022."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib4",
+      "text": "Blodgett & O’Connor (2017) Su Lin Blodgett and Brendan O’Connor. Racial disparity in natural language processing: A case study of social media african-american english. arXiv preprint arXiv:1707.00061 , 2017."
+    },
+    {
+      "n": 34,
+      "id": "bib.bib10",
+      "text": "Chang et al. (2020) Hongyan Chang, Ta Duy Nguyen, Sasi Kumar Murakonda, Ehsan Kazemi, and Reza Shokri. On adversarial bias and the robustness of fair machine learning. arXiv preprint arXiv:2006.08669 , 2020."
+    },
+    {
+      "n": 35,
+      "id": "bib.bib98",
+      "text": "Vasudevan et al. (2022) Vijay Vasudevan, Benjamin Caine, Raphael Gontijo-Lopes, Sara Fridovich-Keil, and Rebecca Roelofs. When does dough become a bagel? analyzing the remaining mistakes on imagenet. arXiv preprint arXiv:2205.04596 , 2022."
+    },
+    {
+      "n": 36,
+      "id": "bib.bib17",
+      "text": "Cherti et al. (2023) Mehdi Cherti, Romain Beaumont, Ross Wightman, Mitchell Wortsman, Gabriel Ilharco, Cade Gordon, Christoph Schuhmann, Ludwig Schmidt, and Jenia Jitsev. Reproducible scaling laws for contrastive language-image learning. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pp. 2818–2829, 2023."
+    },
+    {
+      "n": 37,
+      "id": "bib.bib120",
+      "text": "Yang et al. (2019) Zhilin Yang, Zihang Dai, Yiming Yang, Jaime Carbonell, Russ R Salakhutdinov, and Quoc V Le. Xlnet: Generalized autoregressive pretraining for language understanding. Advances in neural information processing systems , 32, 2019."
+    },
+    {
+      "n": 38,
+      "id": "bib.bib27",
+      "text": "Ghosh et al. (2017) Aritra Ghosh, Himanshu Kumar, and P. Shanti Sastry. Robust loss functions under label noise for deep neural networks. In Proceedings of the AAAI Conference on Artificial Intelligence (AAAI) , 2017."
+    },
+    {
+      "n": 39,
+      "id": "bib.bib55",
+      "text": "Li et al. (2020) Junnan Li, Richard Socher, and Steven C.H. Hoi. Dividemix: Learning with noisy labels as semi-supervised learning. In International Conference on Learning Representations (ICLR) , 2020."
+    },
+    {
+      "n": 40,
+      "id": "bib.bib74",
+      "text": "Northcutt et al. (2021) Curtis G. Northcutt, Lu Jiang, and Isaac L. Chuang. Confident learning: Estimating uncertainty in dataset labels. Journal of Artificial Intelligence Research (JAIR) , 70:1373–1411, 2021."
+    },
+    {
+      "n": 41,
+      "id": "bib.bib95",
+      "text": "Touvron et al. (2023b) Hugo Touvron, Louis Martin, Kevin Stone, Peter Albert, Amjad Almahairi, Yasmine Babaei, Nikolay Bashlykov, Soumya Batra, Prajjwal Bhargava, Shruti Bhosale, et al. Llama 2: Open foundation and fine-tuned chat models. arXiv preprint arXiv:2307.09288 , 2023b."
+    },
+    {
+      "n": 42,
+      "id": "bib.bib93",
+      "text": "Thomee et al. (2016) Bart Thomee, David A. Shamma, Gerald Friedland, Benjamin Elizalde, Karl Ni, Douglas Poland, Damian Borth, and Li-Jia Li. Yfcc100m. Communications of the ACM , 59(2):64–73, Jan 2016. ISSN 1557-7317."
+    },
+    {
+      "n": 43,
+      "id": "bib.bib14",
+      "text": "Chen et al. (2019) Xinyang Chen, Sinan Wang, Mingsheng Long, and Jianmin Wang. Transferability vs. discriminability: Batch spectral penalization for adversarial domain adaptation. In Kamalika Chaudhuri and Ruslan Salakhutdinov (eds.), Proceedings of the 36th International Conference on Machine Learning , volume 97 of Proceedings of Machine Learning Research , pp. 1081–1090. PMLR, 09–15 Jun 2019."
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.06021",
+  "title": "Hierarchical Query Classification in E-commerce Search",
+  "authors": "Bing He, Sreyashi Nag, Limeng Cui, Suhang Wang, Zheng Li, Rahul Goutam, Zhen Li, Haiyang Zhang",
+  "year": "2024",
+  "categories": [
+    "cs.IR",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2403.06021",
+  "html_url": "https://arxiv.org/html/2403.06021",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1189,
+  "text": "Hierarchical query classification is a vital task in the domain of e-commerce and search, playing a crucial role in driving customer obsession [1]. As users interact with online services, they input various queries to search for products, services, or information. Accurately classifying these queries is pivotal in ensuring that users are presented with the most relevant and valuable results. One significant application of the hierarchical query classifier in industry is categorizing sensitive queries that follow a predefined hierarchy in e-commerce. For example, given a query, it can be classified as harmful, adult-oriented, or non-sensitive products (Here, for illustration, we define these categories as parent categories). Furthermore, for harmful products, there are two child categories: self-harm and harm to others. The child categories for the adult-oriented category can be adult products and adult content. Since these queries contain offensive content or pertain to unregulated goods, and different categories need to be handled differently, mis-classification of such queries can lead to unpleasant or even detrimental user experiences, potentially damaging a service’s reputation and user trust. Moreover, presenting inappropriate or restricted content could lead to legal ramifications for the service. Hence, building an accurate hierarchical query classification framework is of paramount importance, not just for user satisfaction, but also for the overall compliance and integrity of the service [2].\n\nVarious machine learning techniques are employed to identify the appropriate hierarchical category for each query [3,1,4], and sense the context and nuances each query presents [5]. However, these algorithms usually require large-scale high-quality annotated data, which is challenging to obtain. Instead, the more practical semi-supervised setting has gained popularity [6,7], where unlabeled queries are used to boost the classification performance. When executed effectively, a well-performing hierarchical query classifier enhances the user experience, fostering a smoother and more productive interaction between users and the service.\n\nHowever, building an accurate hierarchical query classification framework in real-world is non-trivial due to two challenges: (1) severe class imbalance. Take Amazon as an example, sensitive queries are infrequent, accounting for less than 0.05%~0.15% of all queries. Even worse, when training the classification model, only a small initial set of sensitive queries is accessible. This greatly hinders the development of a high-quality classifier. (2) typically short and ambiguous query text in search queries. The average search query is about three words [8], leading to a weaker semantic understanding of queries for correct classification.\n\nTo overcome these two challenges, we propose a semi-supervised machine learning framework utilizing the instance hierarchy and label hierarchy to enhance query representation learning and classification performance. Particularly,\n\n(1) for the class imbalance challenge, we use contrastive learning to learn representations that attend to the minor classes through instance hierarchy. Intuitively, even if the number of queries under a child category can be small, the number of queries under the corresponding parent category is large and these queries are close to each other. To leverage them, we adopt contrastive learning where we create positive pairs from the queries under the same child category while negative pairs from cross-child categories. We formulate it as an intra-class hierarchy in instance hierarchy, and further extend it to the inter-class hierarchy, where we consider positives as queries across child categories and negatives as queries across parent categories, as shown in Figure 1. This instance hierarchy helps capture fine-grained information for model training.\n\n(2) for the ambiguous and short text challenge, we utilize the information from three parts to enhance the understanding of a query — i.e., (i) the neighboring queries that are under the same child category. Motivated by the fact that not all queries are short and ambiguous, especially, some neighboring queries are clear and distinguishable, we can leverage this similarity between neighboring queries by the aforementioned intra-class hierarchical contrastive learning; (ii) the neighboring child categories that share the same parent category. The intuition is that when implicitly aligning the query to different child categories under the same parent category, the model learns the semantics of the query from other queries. This is achieved by adding a hierarchy-aware loss in our classification task; (iii) the text information in the label usually contains useful signals like the semantic meaning that contributes to the downstream classification. Based on this, we first adopt BERT [9] to encode the label text into an embedding vector to capture the contextualized semantic embedding. We concurrently create a “label” graph to take hierarchies/relationships between labels into account and employ the previously generated embedding vectors as node features for downstream graph representation learning. We finally combine the representation vector with the query embedding vector to form the finalized feature vector of a query for the final classification task. Since we use hierarchical label information in this step, we define this process as label hierarchy. Altogether, the designed instance hierarchy and label hierarchy components aim to address the aforementioned challenges for better classification.\n\nIn the real-world e-commerce search, we have one observation that there exist many unlabeled queries that share the typographical similarity to the annotated queries of the same category due to potential typos. These queries, when used as training examples, potentially assist the classifier by improving the robustness against mis-typed queries, as they are typographically close to the queries to augment the dataset. Based on this finding, we deploy the self-training learning stage in our pipeline, i.e., we use the pseudo labels of classified queries to retrain the model. When selecting queries for self-training, inspired by the aforementioned observation, we develop neighborhood-aware sampling to effectively identify high-quality similar queries. We argue that the observation of topographical similarity can be extended to generic semantic similarity. The proposed self-training pipeline can be adapted as well. Besides, we can interpret this observation from the adversarial learning perspective where we adversarially generate similar queries or identify similar queries from our unlabeled queries for model training to improve the robustness of the classifier. Overall, we deploy the self-training in our framework to utilize the crucial unannotated queries for classification performance gain.\n\nTo evaluate the proposed method, we examine it on proprietary Amazon data and public Web of Science and RCV1-V2 datasets using Micro-F1 and Macro-F1 scores. Our proposed method achieves the best performance in most cases across all compared methods and datasets, except for Micro-F1 on Web of Science and RCV1-V2 dataset. However, Micro-F1 is less critical than Macro-F1 in real-world applications since we have an imbalanced class distribution and need to focus on minority classes, which is attended to by Macro-F1. Our result demonstrates the efficacy of our proposed method, especially on the Amazon dataset. Our method is generalizable to solve hierarchical query classification tasks in all domains and paves the path toward the next generation of hierarchy-aware query classification. The main contributions of our work are:\n\n- • We propose a new algorithm that utilizes the instance and label hierarchy through contrastive learning-enhanced representation learning, which allows us to leverage hierarchical information in a fine-grained manner to improve classification performance.\n\n- • We propose a neighborhood-aware sampling technique to selectively choose high-quality unlabeled data points for self-training boost.\n\n- • Extensive experimental results on both proprietary and public datasets demonstrate the superiority of our proposed method in most cases.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib9",
+      "text": "Chuang and Chien (2002) Shui-Lung Chuang and Lee-Feng Chien. 2002. Towards automatic generation of query taxonomy: A hierarchical query clustering approach. In 2002 IEEE International Conference on Data Mining, 2002. Proceedings. IEEE, 75–82."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib32",
+      "text": "Shen et al . (2009) Dou Shen, Ying Li, Xiao Li, and Dengyong Zhou. 2009. Product query classification. In Proceedings of the 18th ACM conference on information and knowledge management . 741–750."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib43",
+      "text": "Zhu et al . (2023) Lvxing Zhu, Kexin Zhang, Hao Chen, Chao Wei, Weiru Zhang, Haihong Tang, and Xiu Li. 2023. HCL4QC: Incorporating Hierarchical Category Structures Into Contrastive Learning for E-commerce Query Classification. In Proceedings of the 32nd ACM International Conference on Information and Knowledge Management . 3647–3656."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib42",
+      "text": "Zhou et al . (2017) Sanduo Zhou, Kefei Cheng, and Lijun Men. 2017. The survey of large-scale query classification. In AIP conference proceedings , Vol. 1834. AIP Publishing."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib39",
+      "text": "Ye et al . (2020) Zhiquan Ye, Yuxia Geng, Jiaoyan Chen, Jingmin Chen, Xiaoxiao Xu, SuHang Zheng, Feng Wang, Jun Zhang, and Huajun Chen. 2020. Zero-shot text classification via reinforced self-training. In Proceedings of the 58th annual meeting of the association for computational linguistics . 3014–3024."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib18",
+      "text": "Kim et al . (2016) Young-Bum Kim, Karl Stratos, and Ruhi Sarikaya. 2016. Scalable semi-supervised query classification using matrix sketching. In Proceedings of the 54th Annual Meeting of the Association for Computational Linguistics (Volume 2: Short Papers) . 8–13."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib4",
+      "text": "Beitzel et al . (2005) Steven M Beitzel, Eric C Jensen, Ophir Frieder, David D Lewis, Abdur Chowdhury, and Aleksander Kolcz. 2005. Improving automatic query classification via semi-supervised learning. In Fifth IEEE International Conference on Data Mining (ICDM’05) . IEEE, 8–pp."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib12",
+      "text": "Fishkin (2017) Rand Fishkin. 2017. The State of Searcher Behavior Revealed Through 23 Remarkable Statistics. https://moz.com/blog/state-of-searcher-behavior-revealed"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib10",
+      "text": "Devlin et al . (2018) Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. 2018. Bert: Pre-training of deep bidirectional transformers for language understanding. arXiv preprint arXiv:1810.04805 (2018)."
+    }
+  ]
+}

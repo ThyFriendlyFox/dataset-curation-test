@@ -1,0 +1,123 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.04602",
+  "title": "Minimum-Time Planar Paths with up to Two Constant Acceleration Inputs and $L_2$ Velocity and Acceleration Constraints",
+  "authors": "Victor M. Baez, Haoran Zhao, Nihal Abdurahiman, Nikhil V. Navkar, Aaron T. Becker",
+  "year": "2024",
+  "categories": [
+    "cs.RO"
+  ],
+  "url": "https://arxiv.org/abs/2403.04602",
+  "html_url": "https://arxiv.org/html/2403.04602",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction and Related Work",
+  "word_count": 1049,
+  "text": "This paper seeks the minimum-time path for a particle with a restricted set of control inputs: the system can apply no more than two constant thrust inputs, each for a disjoint time. Moreover, this thrust is limited and there is a constraint on the maximum velocity. A representative solution is shown in Fig. 1. We were motivated by a desire for simple optimal control parameterizations of hardware systems with constraints on total maximum acceleration and maximum velocity. Many of these problems are currently approximately solved using iterative numeric solvers. However, when formulated using L_{2} bounds, this paper shows there are several problems that provide closed-form solutions, or can be formed as a minimization problem of a single variable. The resulting L_{2} problem is interesting mathematically, and the graphical techniques described in this paper enable an intuitive understanding of the solution. This problem could apply to a class of thrusters on a space vehicle such as an astronaut take-me-home system [1], or to other low-friction environments, such as a hovercraft with a single chemical thruster.\n\nWhile actuator constraints are often expressed using L_{\\infty} norms, payloads often specify acceleration limits in an L_{2} sense, such as the 3-G limit on a space shuttle during launch [2], or an acceleration bound in every direction for translating a cup full of water [3]. Similarly, speed limits on highways refer to an L_{2} speed and not an L_{\\infty} speed. A given L_{2} acceleration constraint a_{m} generates a corresponding L_{\\infty} constraint a_{m}/\\sqrt{2}. This conservative bound can reduce the top acceleration and top speed by almost 30%.\n\nRestricting the number of control inputs can benefit system performance and longevity, for example by avoiding chatter in systems with high amounts of switching [4,5,6]. From a hardware perspective, limiting the number of control switches can improve lifespans. Repeated, alternating stresses are a fundamental concern in mechanical design, particularly when using fatigue-life methods to approximate the lifespan of machine components [7]. Minimizing the number of control switches can facilitate decreasing hardware degradation alongside reducing aggressive actuation by designing jerk profiles to smoothen trajectories [8], [9].\n\nOptimal paths are common in robotics. In 1957, Dubins calculated the shortest planar path for a particle that moved at constant velocity with a constraint on the minimum turning radius [10], which has been widely used for planning for mobile robots. Extending these constraints to acceleration is natural. Carozza, Johnson, and Morgan derive the necessary equations for reaching a goal location (and velocity) in minimum time under an acceleration constraint in their paper [11]. They show that the fastest C^{1,1} path from one point to another in the plane, given initial velocity, final velocity, and a bound on the magnitude of the acceleration a_{m}, in velocity space is a catenary. They applied it to the “Baserunner’s problem” to determine the sequence of acceleration commands that enables a runner with bounded acceleration to run to all four bases on a baseball field. Their numeric process finds a local minimum. They iterate between (a) using prescribed velocities at sequential base positions and optimizing using a multidimensional Newton’s method with finite difference boundary value methods to determine the path and timing at each baseline, and (b) using a gradient descent method to optimize the velocities at each base.\n\nIn general, this is a problem of optimal control with a rich history [12]. Numerous approximations have been used. In [13], a path between two points with prescribed states is found by generating a maximum allowed velocity profile for a curve described by a spline between the points. They find the extremes of their velocity profile using the extremes in the curvature along the spline and hardware limitations on acceleration. Afterwards, the spline’s control points are optimized for time using parametric programming and a lookup table containing pre-calculated paths. Similar work on optimal drone trajectories also used an iterative numeric solver [14]. Since we directly plan using a small set of acceleration commands, our solution eliminates the need for this iterative procedure.\n\n## I-A Problem statement\n\nGiven scalar maximum velocity v_{m} and acceleration a_{m}, initial position \\mathbf{p}_{0}=\\mathbf{p}(0) and velocity \\mathbf{v}_{0}=\\dot{\\mathbf{p}}(0) both in \\mathbb{R}^{2}, and acceleration equal to the control input \\ddot{\\mathbf{p}}(t)=\\mathbf{u}(t), under the constraints that \\|\\mathbf{u}(t)\\|_{2}\\leq a_{m} and \\|\\dot{\\mathbf{p}}(t)\\|_{2}\\leq v_{m}, design a \\mathbf{u}(t) with a restricted number of changes that brings the system to \\mathbf{p}_{G}=\\mathbf{p}(T) and \\mathbf{v}_{G}=\\dot{\\mathbf{p}}(T), both in \\mathbb{R}^{2}, in minimum time T. For notational convenience, distances are in \\mathrm{m}, velocities in \\mathrm{m}, and acceleration in \\mathrm{m}.\n\n## I-B The solution in 1D (L_{\\infty} and L_{2} solutions are equivalent)\n\nExpressions for time-optimal trajectories for joints of a robot manipulator with velocity and acceleration constraints are provided in [15]. This section uses results from [15] to solve the problem in 1D and give context for the remaining sections.\n\nThe trajectories vary depending on the initial and final desired states, so velocity profiles are used in [15] to classify them as either critical, under-critical, or over-critical, depending on whether the distance \\lvert\\textbf{p}_{G}-\\textbf{p}_{0}\\rvert allows for the bound v_{m} to be reached. The critical profile is defined by a critical displacement, \\Delta p_{c} that results in a linear velocity profile from \\textbf{v}_{0} to \\textbf{v}_{G}.\n\nWithout a constraint on velocity, the peak velocity is\n\nwhere s_{p}=\\textrm{Sign}(p_{G}-p_{0}-\\Delta p_{c}), s_{p}\\in\\{-1,0,1\\}, accounts for the direction of the initial acceleration.\n\nThe acceleration control input for the triangular and trapezoidal velocity profiles are\n\nIf v_{p}\\leq v_{m}, then the velocity profile will be triangular and\n\nIf v_{p}>v_{m}, then the velocity profile will be trapezoidal and\n\nThe total time required is T=t_{1}+t_{c}+t_{2}. This procedure must be modified with more than 1DOF, which is more complicated because each DOF must reach the desired position and velocity at the same time. Kroger and Wahl give a L_{\\infty} solution in [16] that first attempts to make each DOF reach the goal velocity and position at the same time as the slowest DOF. This is done by solving for a free intermediate cruising speed, which is the root of a sextic polynomial. Sometimes a solution in this time is impossible, and a search is conducted to find the next smallest candidate synchronization time.\n\nSimilar processes are used for L_{\\infty} controllers with limits on higher derivatives, see [17,18,19,20,21]. We used a related procedure in [21] and provided open-source code to generate smooth multi-DOF L_{\\infty} trajectories with sinusoidal jerk profiles under jerk, acceleration, and velocity constraints.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "K. R. Duda, R. W. Loffi, and P. M. Handley, “System and method for assisted extravehicular activity self-return,” May 2018, US Patent 9,977,427."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "V. Evans, “Newton’s laws, g-forces and the impact on the brain,” The Australasian journal of neuroscience , vol. 30, no. 1, pp. 24–29, 2020."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "M. Laux and A. Zell, “Robot arm motion planning based on geodesics,” in 2021 IEEE International Conference on Robotics and Automation (ICRA) . IEEE, 2021, pp. 7585–7591."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "A. De Marchi, “On the mixed-integer linear-quadratic optimal control with switching cost,” IEEE Control Systems Letters , vol. 3, no. 4, pp. 990–995, 2019."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "F. Bestehorn, C. Hansknecht, C. Kirches, and P. Manns, “Mixed-integer optimal control problems with switching costs: a shortest path approach,” Mathematical Programming , vol. 188, no. 2, pp. 621–652, 2021."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "C. Kirches, E. Kostina, A. Meyer, M. Schlöder, and S. PN, “Numerical solution of optimal control problems with switches, switching costs and jumps,” Optimization Online , vol. 6888, 2018."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "R. G. Budynas, Shigley’s mechanical engineering design , 10th ed., ser. McGraw-Hill series in mechanical engineering. New York, NY: McGraw-Hill Education, 2015."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "S. Lu, J. Zhao, L. Jiang, and H. Liu, “Solving the time-jerk optimal trajectory planning problem of a robot using augmented lagrange constrained particle swarm optimization,” Mathematical Problems in Engineering , vol. 2017, 2017."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "R. Zhao and D. Sidobre, “Trajectory smoothing using jerk bounded shortcuts for service manipulator robots,” in 2015 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS) . IEEE, 2015, pp. 4929–4934."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "L. E. Dubins, “On curves of minimal length with a constraint on average curvature, and with prescribed initial and terminal positions and tangents,” American Journal of mathematics , vol. 79, no. 3, pp. 497–516, 1957."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "D. Carozza, S. Johnson, and F. Morgan, “Baserunner’s optimal path,” The Mathematical Intelligencer , vol. 32, no. 1, pp. 10–15, 2010."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "H. J. Sussmann and J. C. Willems, “300 years of optimal control: from the brachystochrone to the maximum principle,” IEEE Control Systems Magazine , vol. 17, no. 3, pp. 32–44, 1997."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "M. Lepetič, G. Klančar, I. Škrjanc, D. Matko, and B. Potočnik, “Time optimal path planning considering acceleration limits,” Robotics and Autonomous Systems , vol. 45, no. 3, pp. 199–210, 2003. [Online]. Available: https://www.sciencedirect.com/science/article/pii/S0921889003001544"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "M. Hehn, R. Ritz, and R. D’Andrea, “Performance benchmarking of quadrotor systems using time-optimal control,” Autonomous Robots , vol. 33, no. 1-2, pp. 69–88, 2012."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "F. Ramos, M. Gajamohan, N. Huebel, and R. D’Andrea, “Time-optimal online trajectory generator for robotic manipulators,” Eidgenössische Technische Hochschule Zürich, Institute for Dynamic Systems, Tech. Rep., 2013. [Online]. Available: https://roboearth.ethz.ch/wp-content/uploads/2013/02/OMG.pdf"
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "T. Kröger and F. M. Wahl, “Online trajectory generation: Basic concepts for instantaneous reactions to unforeseen events,” IEEE Transactions on Robotics , vol. 26, no. 1, pp. 94–111, 2010."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "H. Liu, X. Lai, and W. Wu, “Time-optimal and jerk-continuous trajectory planning for robot manipulators with kinematic constraints,” Robotics and Computer-Integrated Manufacturing , vol. 29, no. 2, pp. 309–317, 2013."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "A. A. Ata, “Optimal trajectory planning of manipulators: a review,” Journal of Engineering Science and technology , vol. 2, no. 1, pp. 32–54, 2007."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "S. A. Bazaz and B. Tondu, “Minimum time on-line joint trajectory generator based on low order spline method for industrial manipulators,” Robotics and Autonomous Systems , vol. 29, no. 4, pp. 257–268, 1999."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "D. Verscheure, B. Demeulenaere, J. Swevers, J. De Schutter, and M. Diehl, “Time-optimal path tracking for robots: A convex optimization approach,” IEEE Transactions on Automatic Control , vol. 54, no. 10, pp. 2318–2327, 2009."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "H. Zhao, N. Abdurahiman, N. Navkar, J. Leclerc, and A. T. Becker, “Jerk-continuous online trajectory generation for robot manipulator with arbitrary initial state and kinematic constraints,” in 2022 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS) . IEEE, 2022, pp. 5730–5736."
+    }
+  ]
+}

@@ -1,0 +1,88 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.05802",
+  "title": "UniSparse: An Intermediate Language for General Sparse Format Customization",
+  "authors": "Jie Liu, Zhongyuan Zhao, Zijian Ding, Benjamin Brock, Hongbo Rong, Zhiru Zhang",
+  "year": "2024",
+  "categories": [
+    "cs.CL"
+  ],
+  "url": "https://arxiv.org/abs/2403.05802",
+  "html_url": "https://arxiv.org/html/2403.05802",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 995,
+  "text": "As Dennard scaling ended in the mid-2000s and Moore’s Law is approaching its limit, computer engineers are increasingly turning to special-purpose hardware accelerators to meet the ever-growing computational demands of emerging application domains such as graph analytics, machine learning, and robotics. At the same time, there has been an explosion in the amount of data that domain experts have to manage. Notably, much of this big data is sparse in nature. For example, Amazon co-purchase graphs have 400K nodes and a density of 0.002%, and arXiv graph datasets have 100M papers and a density of 0.00002% [1,2]. These evident trends in technology and applications are driving computing systems towards heterogeneity that can process sparse data in an efficient and high-performance manner.\n\nMany important operations (i.e., kernels) of sparse processing are performed on sparse tensors, a generalization of sparse matrices. Sparse tensors are typically represented using specialized data structures that leverage the sparsity of the tensor to reduce storage size and/or memory footprint. These data structures usually store only the non-zero elements (or non-zero blocks) of the tensor, along with their associated coordinates that are encoded in a compressed form as metadata. Various forms of data layouts, such as the structure of arrays (SoA) or array of structures (AoS), can be employed to store the sparse data structure in memory. The data structure and data layout jointly determine a sparse format.\n\nThe metadata can be viewed as a hierarchical tree that captures the multi-dimensional coordinates of the non-zeros in a structured way. In this work, we refer to this tree as the metadata tree and use it as a logical representation of the sparse format. To reconstruct the original coordinates of a non-zero element, multiple indirect memory accesses are required to traverse the metadata tree. Due to the input-dependent and irregular data access patterns that result from this process, sparse workloads are typically memory-bound.\n\nTo efficiently utilize memory bandwidth, reduce memory accesses, and exploit data parallelism to boost the performance of sparse tensor computation, researchers are increasingly using custom sparse formats optimized for particular application domains and/or target hardware architectures. Examples include hybrid formats for GPUs [3,4,5] and banked formats for FPGAs [6,7] and dedicated accelerators [8]. While format customization can significantly improve performance, we recognize two pressing issues: i) productivity – it takes substantial engineering effort to design a custom sparse format and adapt the implementation of related compute operations that must interact with the new format, and ii) permutability – there lacks a unified abstraction that can systematically encode different variants (or permutations) of existing sparse formats to facilitate the exploration of a complex design space, where the search of custom formats needs to account for non-zero distribution patterns of inputs, inherent parallelism of the dominant compute kernels, and the target hardware.\n\nPrior research has attempted to address the productivity challenge by using either manually optimized libraries or automatic compilers. Sparse linear/tensor algebra libraries (e.g., sparse BLAS, Intel MKL, NVIDIA cuSPARSE) provide highly optimized target-specific sparse kernels. While library functions achieve high performance, they only support a limited set of sparse formats. Recent efforts on sparse tensor algebra compilers such as TACO [9,10], COMET [11], and SparseTIR [12] describe tensor dimensions in attributes (e.g., dense or compressed), and generate sparse tensor algebra kernels assisted by predefined code generation templates. This attribute-based format abstraction limits their extensibility to support new custom formats, as the finite combinations of attributes restrict the range of possible data structures, and the fixed code generation templates restrict the possible data layouts. As a result, this abstraction offers programmers no further customization opportunities for the data structures and layouts, and important details about the data structures and layouts necessary for identifying a specific format uniquely may be omitted.\n\nThis work proposes UniSparse, which is the first intermediate language designed for general sparse format customization. UniSparse aims to (1) provide a systematic way of expressing an unlimited number of custom formats, (2) support format customization at both the logical data structure and physical layout level, while taking into account the sparsity patterns of input tensors, compute operations, and hardware targets, and (3) automate code generation for compute operations and conversion with other formats for the newly defined formats. With UniSparse, the metadata tree serves as a logical representation that can be expressed using an index map, a set of query and structural mutation operations, which we call primitives (§ 4.1). An additional set of layout primitives specifies how to partition and traverse the metadata tree, which transforms the tree into physical memory layouts (§ 4.2). The index map and primitives are the essential components of a succinct intermediate language for specifying custom sparse formats, including but not limited to many previously proposed high-performance formats.\n\nCompared to the previous attribute-based approach, the UniSparse language offers a holistic representation of sparse formats using mapping functions and primitives, without presuming dimension-wise composition of separate data structures. The language decouples logical representations of sparse formats from their physical memory layouts, allowing both to be specialized. Empowered by the language, the UniSparse compiler can reason formally about the correspondence between various formats and their underlying layouts, automating both code generation and format conversion. To this end, we develop a data structure and data layout inference algorithm (§ 5.1) that automatically determines the storage format of sparse tensors. Furthermore, we introduce a format conversion algorithm (§ 5.2) that enables the compiler to handle a broad range of source and destination formats, including both conventional and specialized ones. We also provide a general compute kernel generation algorithm (§ 5.3) that supports custom sparse formats.\n\nThe UniSparse compiler is built on top of the MLIR infrastructure [13] (§ 6). We include the compiler as an artifact for evaluation, and in Section 7, we demonstrate its efficacy in customizing formats on multiple hardware platforms, including CPUs, GPUs, FPGAs, and a simulated PIM device [14]. It can also automate the conversion among a variety of sparse formats, resulting in significant productivity improvements.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib20",
+      "text": "Hu et al . (2020) Weihua Hu, Matthias Fey, Marinka Zitnik, Yuxiao Dong, Hongyu Ren, Bowen Liu, Michele Catasta, and Jure Leskovec. 2020. Open Graph Benchmark: Datasets for Machine Learning on Graphs. Advances in Neural Information Processing Systems (2020). https://doi.org/10.5555/3495724.3497579"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib30",
+      "text": "Leskovec and Krevl (2014) Jure Leskovec and Andrej Krevl. 2014. SNAP Datasets: Stanford Large Network Dataset Collection. http://snap.stanford.edu/data . (2014). https://doi.org/10.1145/2898361"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib4",
+      "text": "Bell and Garland (2009) Nathan Bell and Michael Garland. 2009. Implementing sparse matrix-vector multiplication on throughput-oriented processors. Int’l Conf. on High Performance Computing Networking, Storage and Analysis (2009), 1–11. https://doi.org/10.1145/1654059.1654078"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib10",
+      "text": "Choi et al . (2010) Jee W Choi, Amik Singh, and Richard W Vuduc. 2010. Model-driven autotuning of sparse matrix-vector multiply on GPUs. ACM SIGPLAN Notices 45, 5 (2010), 115–126. https://doi.org/10.1145/1837853.1693471"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib19",
+      "text": "Guo et al . (2016) Dahai Guo, William Gropp, and Luke N Olson. 2016. A Hybrid Format for Better Performance of Sparse Matrix-Vector Multiplication on a GPU. The International Journal of High Performance Computing Applications 30, 1 (2016), 103–120. https://doi.org/10.1177/1094342015593156"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib21",
+      "text": "Hu et al . (2021) Yuwei Hu, Yixiao Du, Ecenur Ustun, and Zhiru Zhang. 2021. GraphLily: Accelerating graph linear algebra on HBM-equipped FPGAs. Int’l Conf. on Computer-Aided Design (ICCAD) (2021). https://doi.org/10.1109/ICCAD51958.2021.9643582"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib16",
+      "text": "Fowers et al . (2014) Jeremy Fowers, Kalin Ovtcharov, Karin Strauss, Eric S Chung, and Greg Stitt. 2014. A high memory bandwidth FPGA accelerator for sparse matrix-vector multiplication. IEEE Symp. on Field Programmable Custom Computing Machines (FCCM) (2014). https://doi.org/10.1109/FCCM.2014.23"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib38",
+      "text": "Srivastava et al . (2020) Nitish Srivastava, Hanchen Jin, Jie Liu, David Albonesi, and Zhiru Zhang. 2020. MatRaptor: A sparse-sparse matrix multiplication accelerator based on row-wise product. Int’l Symp. on Microarchitecture (MICRO) (2020). https://doi.org/10.1109/MICRO50266.2020.00068"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib26",
+      "text": "Kjolstad et al . (2017) Fredrik Kjolstad, Shoaib Kamil, Stephen Chou, David Lugato, and Saman Amarasinghe. 2017. The tensor algebra compiler. Proceedings of the ACM on Programming Languages 1, OOPSLA (2017), 1–29. https://doi.org/10.1145/3133901"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib11",
+      "text": "Chou et al . (2018) Stephen Chou, Fredrik Kjolstad, and Saman Amarasinghe. 2018. Format abstraction for sparse tensor algebra compilers. Proceedings of the ACM on Programming Languages 2, OOPSLA (2018), 1–30. https://doi.org/10.1145/3276493"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib39",
+      "text": "Tian et al . (2021) Ruiqin Tian, Luanzheng Guo, Jiajia Li, Bin Ren, and Gokcen Kestor. 2021. A High Performance Sparse Tensor Algebra Compiler in MLIR. (12 2021). https://doi.org/10.1109/LLVMHPC54804.2021.00009"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib40",
+      "text": "Ye et al . (2023) Zihao Ye, Ruihang Lai, Junru Shao, Tianqi Chen, and Luis Ceze. 2023. SparseTIR: Composable Abstractions for Sparse Compilation in Deep Learning. Int’l Conf. on Architectural Support for Programming Languages and Operating Systems (ASPLOS) 3 (2023), 660–678. https://doi.org/10.1145/3582016.3582047"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib29",
+      "text": "Lattner et al . (2020) Chris Lattner, Mehdi Amini, Uday Bondhugula, Albert Cohen, Andy Davis, Jacques Pienaar, River Riddle, Tatiana Shpeisman, Nicolas Vasilache, and Oleksandr Zinenko. 2020. MLIR: A compiler infrastructure for the end of Moore’s law. arXiv preprint arXiv:2002.11054 (2020)."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib15",
+      "text": "Devic et al . (2022) Alexandar Devic, Siddhartha Balakrishna Rai, Anand Sivasubramaniam, Ameen Akel, Sean Eilert, and Justin Eno. 2022. To PIM or not for emerging general purpose processing in DDR memory systems. Int’l Symp. on Computer Architecture (ISCA) (2022). https://doi.org/10.1145/3470496.3527431"
+    }
+  ]
+}

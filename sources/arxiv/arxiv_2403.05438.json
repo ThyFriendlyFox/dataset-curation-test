@@ -1,0 +1,123 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.05438",
+  "title": "VideoElevator: Elevating Video Generation Quality with Versatile Text-to-Image Diffusion Models",
+  "authors": "Yabo Zhang, Yuxiang Wei, Xianhui Lin, Zheng Hui, Peiran Ren, Xuansong Xie, Xiangyang Ji, Wangmeng Zuo",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2403.05438",
+  "html_url": "https://arxiv.org/html/2403.05438",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 660,
+  "text": "Diffusion models [1,2,3] have facilitated the rapid development of generative modeling, and demonstrated tremendous success in multiple modalities [4,5,6,7,8,9,10], especially in image and video synthesis. Nonetheless, exceptional generative capabilities primarily depend on an abundance of high-quality datasets. For example, text-to-image diffusion models (T2I) requires billions of highly aesthetic images to achieve desirable control and quality [5,11,12,13]. However, owing to the difficulty in collection, the publicly available video datasets [14] are far behind in both quantity and quality (i.e., million-level scale and low-quality contents), which greatly limits the text-to-video diffusion models (T2V) [15,16,17,18] in prompt fidelity and frame quality.\n\nRecent studies [8,7,16,15,17,18] promisingly enhance video generation performance through the advances in T2I. They either jointly train a T2V using video and image datasets [8,7], or initialize it with a pre-trained T2I [16,15,17,18]. With the spatial modeling capabilities of T2I, T2V can concentrate more on the learning of temporal dynamics. However, as training progresses, T2V inevitably will be biased towards low visual quality caused by the training videos [14], such as lower resolutions, blurriness, and inconsistent descriptions. Even when integrating with higher-quality personalized T2I, AnimateDiff [15] cannot rectify the bias towards low visual quality in temporal layers. As a result, synthesized videos still suffer from the frame quality degradation issue in comparison to T2I generated images, and sometimes contain visible flickers.\n\nConsidering that low-quality contents accumulate throughout T2V sampling chain, we investigate to rectify it with high-quality T2I at each step. As illustrated in Fig. 2, we explicitly decompose each sampling step into two components: (i) temporal motion refining and (ii) spatial quality elevating. Temporal motion refining encapsulates T2V to produce more temporally-consistent video latent and then inverts the latent to current timestep, so that spatial quality elevating can directly leverage T2I to add realistic details. Compared to conventional T2V sampling, the decomposed sampling potentially raises the bar of synthesized video quality.\n\nWe present VideoElevator, a training-free and plug-and-play approach, as a way of improving video generation performance with decomposed sampling. Given video latent {\\bm{z}}_{t} at timestep t, temporal motion refining encapsulates T2V with a temporal low-pass frequency filter to improve consistency, followed by T2V-based SDEdit [19] to portray natural motion. To obtain noise latent \\tilde{{\\bm{z}}}_{t} required by T2I, it deterministically inverts [20] video latent to preserve motion as much as possible. After that, spatial quality elevating leverages inflated T2I to directly convert \\tilde{{\\bm{z}}}_{t} to less noisy {\\bm{z}}_{t-1}, where the self-attention in T2I is extended into cross-frame attention for appearance consistency. Empirically, applying temporal motion refining in several timesteps is sufficient to ensure temporal consistency, so we omit it in other timesteps for efficiency. To ensure interaction between various T2V and T2I, VideoElevator projects all noise latents to clean latents before being fed into another model. Benefiting from it, VideoElevator supports the combination of various T2V and T2I, as long as their clean latent distributions are shared (i.e., same autoencoders).\n\nEvaluating on extensive video prompts, VideoElevator not only greatly improves the generation quality of T2V with foundational T2I, but also facilitates creative video synthesis with versatile personalized T2I. Firstly, it visibly enhances a wide range of T2V with Stable Diffusion V1.5 or V2.1-base [12], achieving higher frame quality and prompt consistency than their baselines. Secondly, it enables T2V to replicate the diverse styles of personalized T2I more faithfully than AnimateDiff [15], while supporting T2I with significant parameter shifts, e.g., DPO-enhanced T2I [21].\n\nTo summarize, our key contributions are as three-fold:\n\n- • We introduce VideoElevator, a training-free and plug-and-play method, which enhances the quality of synthesized videos with versatile text-to-image diffusion models.\n\n- • To enable cooperation between various T2V and T2I, we present two novel components temporal motion refining and spatial quality elevating, where the former applies encapsulated T2V to improve temporal consistency and the latter harnesses inflated T2I to provide high-quality details.\n\n- • The experiments show that VideoElevator significantly improves the performance of T2V baselines by leveraging versatile T2I, in terms of frame quality, prompt consistency, and aesthetic styles.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib51",
+      "text": "Sohl-Dickstein, J., Weiss, E., Maheswaranathan, N., Ganguli, S.: Deep unsupervised learning using nonequilibrium thermodynamics. In: ICML (2015)"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib18",
+      "text": "Ho, J., Jain, A., Abbeel, P.: Denoising diffusion probabilistic models (2020)"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib53",
+      "text": "Song, Y., Sohl-Dickstein, J., Kingma, D.P., Kumar, A., Ermon, S., Poole, B.: Score-based generative modeling through stochastic differential equations. In: ICLR (2021)"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib41",
+      "text": "Poole, B., Jain, A., Barron, J.T., Mildenhall, B.: Dreamfusion: Text-to-3d using 2d diffusion. arXiv preprint arXiv:2209.14988 (2022)"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib43",
+      "text": "Ramesh, A., Dhariwal, P., Nichol, A., Chu, C., Chen, M.: Hierarchical text-conditional image generation with clip latents. arXiv preprint arXiv:2204.06125 (2022)"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib39",
+      "text": "Nichol, A.Q., Dhariwal, P., Ramesh, A., Shyam, P., Mishkin, P., Mcgrew, B., Sutskever, I., Chen, M.: Glide: Towards photorealistic image generation and editing with text-guided diffusion models. In: ICML (2022)"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib17",
+      "text": "Ho, J., Chan, W., Saharia, C., Whang, J., Gao, R., Gritsenko, A., Kingma, D.P., Poole, B., Norouzi, M., Fleet, D.J., et al.: Imagen video: High definition video generation with diffusion models. arXiv preprint arXiv:2210.02303 (2022)"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib20",
+      "text": "Ho, J., Salimans, T., Gritsenko, A., Chan, W., Norouzi, M., Fleet, D.J.: Video diffusion models (2022)"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib50",
+      "text": "Singer, U., Polyak, A., Hayes, T., Yin, X., An, J., Zhang, S., Hu, Q., Yang, H., Ashual, O., Gafni, O., et al.: Make-a-video: Text-to-video generation without text-video data. In: ICLR (2023)"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib5",
+      "text": "Blattmann, A., Rombach, R., Ling, H., Dockhorn, T., Kim, S.W., Fidler, S., Kreis, K.: Align your latents: High-resolution video synthesis with latent diffusion models. In: CVPR (2023)"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib48",
+      "text": "Saharia, C., Chan, W., Saxena, S., Li, L., Whang, J., Denton, E.L., Ghasemipour, K., Gontijo Lopes, R., Karagol Ayan, B., Salimans, T., et al.: Photorealistic text-to-image diffusion models with deep language understanding (2022)"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib45",
+      "text": "Rombach, R., Blattmann, A., Lorenz, D., Esser, P., Ommer, B.: High-resolution image synthesis with latent diffusion models. In: CVPR (2022)"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib40",
+      "text": "Podell, D., English, Z., Lacey, K., Blattmann, A., Dockhorn, T., Müller, J., Penna, J., Rombach, R.: Sdxl: Improving latent diffusion models for high-resolution image synthesis. arXiv preprint arXiv:2307.01952 (2023)"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib1",
+      "text": "Bain, M., Nagrani, A., Varol, G., Zisserman, A.: Frozen in time: A joint video and image encoder for end-to-end retrieval. In: ICCV (2021)"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib14",
+      "text": "Guo, Y., Yang, C., Rao, A., Wang, Y., Qiao, Y., Lin, D., Dai, B.: Animatediff: Animate your personalized text-to-image diffusion models without specific tuning. arXiv preprint arXiv:2307.04725 (2023)"
+    },
+    {
+      "n": 16,
+      "id": "bib.bib56",
+      "text": "Wang, J., Yuan, H., Chen, D., Zhang, Y., Wang, X., Zhang, S.: Modelscope text-to-video technical report. arXiv preprint arXiv:2308.06571 (2023)"
+    },
+    {
+      "n": 17,
+      "id": "bib.bib58",
+      "text": "Wang, Y., Chen, X., Ma, X., Zhou, S., Huang, Z., Wang, Y., Yang, C., He, Y., Yu, J., Yang, P., et al.: Lavie: High-quality video generation with cascaded latent diffusion models. arXiv preprint arXiv:2309.15103 (2023)"
+    },
+    {
+      "n": 18,
+      "id": "bib.bib65",
+      "text": "Zhang, D.J., Wu, J.Z., Liu, J.W., Zhao, R., Ran, L., Gu, Y., Gao, D., Shou, M.Z.: Show-1: Marrying pixel and latent diffusion models for text-to-video generation. arXiv preprint arXiv:2309.15818 (2023)"
+    },
+    {
+      "n": 19,
+      "id": "bib.bib37",
+      "text": "Meng, C., He, Y., Song, Y., Song, J., Wu, J., Zhu, J.Y., Ermon, S.: Sdedit: Guided image synthesis and editing with stochastic differential equations. arXiv preprint arXiv:2108.01073 (2021)"
+    },
+    {
+      "n": 20,
+      "id": "bib.bib52",
+      "text": "Song, J., Meng, C., Ermon, S.: Denoising diffusion implicit models. In: ICLR (2021)"
+    },
+    {
+      "n": 21,
+      "id": "bib.bib54",
+      "text": "Wallace, B., Dang, M., Rafailov, R., Zhou, L., Lou, A., Purushwalkam, S., Ermon, S., Xiong, C., Joty, S., Naik, N.: Diffusion model alignment using direct preference optimization. arXiv preprint arXiv:2311.12908 (2023)"
+    }
+  ]
+}

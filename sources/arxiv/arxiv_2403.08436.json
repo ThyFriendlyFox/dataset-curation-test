@@ -1,0 +1,68 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.08436",
+  "title": "PFStorer: Personalized Face Restoration and Super-Resolution",
+  "authors": "Tuomas Varanka, Tapani Toivonen, Soumya Tripathy, Guoying Zhao, Erman Acar",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2403.08436",
+  "html_url": "https://arxiv.org/html/2403.08436",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 760,
+  "text": "Face restoration aims to recover HQ (high-quality) face images from degraded observations, such as blur, low-resolution, noise and compression artifacts. In real-world scenarios, the task is even more challenging, due to more complex degradations and variations in illumination and pose.\n\nRestoration of faces is a highly ill-posed problem with multiple solutions to a given LQ (low-quality) input. Compared to natural images humans are very sensitive to subtle differences with facial images. Even small variations in the shape, size or color of eyes, nose, lips, etc., can cause a shift in the identity of the person, see top and middle row of Fig. 2. Furthermore, if we are familiar with identity of a specific person, we are even more prone to spotting subtle differences. We show an example in Fig. 1. A restoration model needs to not only output a realistic image, but also one that is faithful to the identity of the person.\n\nRecent research on face restoration has seen great progress towards higher visual quality results. Many of the techniques exploit a generative prior such as GAN [1,2,3], codebooks [4,5,6] or diffusion models [7,8]. Generative prior methods have been trained under a generative task prior to being modified to restoration models and as a result they are capable of outputting realistic face images. However, often the outputs can be inauthentic as the models lack crucial context about the identity. To combat this, a reference prior has been used [9,10], which uses a HQ reference image of the same identity, leading in theory to high fidelity. However, in practice transferring the identity from a reference image is difficult due to differences in pose, illumination and semantics between the LQ and reference image.\n\nTo alleviate the ill-posedness of the restoration problem we fully exploit the reference images by creating a neural representation of the identity. We propose PFStorer (Personalized Face Restorer) to restore LQ face images while retaining the identity by personalization. Given a few HQ reference images (e.g. 3-5 selfies from a photo gallery) a restoration model is fine-tuned to a personalized restoration model. The reference images can have significantly different illumination, pose, expression and do not have to be aligned with the LQ image. Our goal is to personalize a restoration model such that it is able to restore person specific images while producing realistic images and being faithful to the identity.\n\nAs opposed to personalized generative models that personalize a generative model, we use a base face restoration model as our foundation. The base model is capable of realistic outputs, however the fidelity may suffer due to the ill-posedness of the task. Our strategy is to perform personalized restoration by fine-tuning a base restoration model with a few HQ reference images. However, a naive fine-tuning strategy can destroy the strong existing priors present in the base restoration model. To avoid catastrophic forgetting when performing fine-tuning for personalization, an adapter is used to keep the priors intact. Adapters are trainable blocks that can be used to adapt the flow of a model. By freezing the base model and only training the adapter blocks, existing priors can be preserved. To avoid the rapid change of intermediate outputs caused by adapters a learnable parameter is used. The learnable parameter also controls the amount of injection of personalization for different layers of the network, leading to more fine-grained control.\n\nDuring training, we observe an issue where the model learns to rely too much on the LQ image ignoring the reference images. This is due to the majority of the training samples having low degredation, which can preserve identity information sufficient to restore the face without using the reference images. To alleviate the issue we design a generative regularizer, in which no conditional LQ image is given and the model is forced to generate the identity using only reference images. This approach encourages the model to learn a robust neural representation of the identity, as in generative personalization.\n\nFurthermore, for the base face restoration model we fine-tune a general purpose restoration model on a face dataset to improve its restorative capabilities. During training, instead of resizing all images to a specific size and aligning them, random crops of the face images are used. This has several benefits: 1) The model has access to higher resolution patches. 2) The model is more robust to varying poses. 3) The model is capable of super-resolution through the use of tiling.\n\nWe experiment with our technique using both synthetic and real-world data. The user study confirms that our method is able to improve results over previous methods.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib40",
+      "text": "Xintao Wang, Yu Li, Honglun Zhang, and Ying Shan. Towards real-world blind face restoration with generative facial prior. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 9168–9178, 2021."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib3",
+      "text": "Chaofeng Chen, Xiaoming Li, Lingbo Yang, Xianhui Lin, Lei Zhang, and Kwan-Yee K Wong. Progressive semantic-aware style transformation for blind face restoration. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 11896–11905, 2021."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib8",
+      "text": "Berk Dogan, Shuhang Gu, and Radu Timofte. Exemplar guided face image super-resolution without facial landmarks. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition workshops , pages 0–0, 2019."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib24",
+      "text": "Xiaoming Li, Chaofeng Chen, Shangchen Zhou, Xianhui Lin, Wangmeng Zuo, and Lei Zhang. Blind face restoration via deep multi-scale component dictionaries. In European conference on computer vision , pages 399–415. Springer, 2020a."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib48",
+      "text": "Shangchen Zhou, Kelvin Chan, Chongyi Li, and Chen Change Loy. Towards robust blind face restoration with codebook lookup transformer. Advances in Neural Information Processing Systems , 35:30599–30611, 2022."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib13",
+      "text": "Yuchao Gu, Xintao Wang, Liangbin Xie, Chao Dong, Gen Li, Ying Shan, and Ming-Ming Cheng. Vqfr: Blind face restoration with vector-quantized dictionary and parallel decoder. In European Conference on Computer Vision , pages 126–143. Springer, 2022."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib43",
+      "text": "Zongsheng Yue and Chen Change Loy. Difface: Blind face restoration with diffused error contraction. arXiv preprint arXiv:2212.06512 , 2022."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib41",
+      "text": "Zhixin Wang, Ziying Zhang, Xiaoyun Zhang, Huangjie Zheng, Mingyuan Zhou, Ya Zhang, and Yanfeng Wang. Dr2: Diffusion-based robust degradation remover for blind face restoration. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 1704–1713, 2023b."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib25",
+      "text": "Xiaoming Li, Wenyu Li, Dongwei Ren, Hongzhi Zhang, Meng Wang, and Wangmeng Zuo. Enhanced blind face restoration with multi-exemplar images and adaptive spatial feature fusion. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 2706–2715, 2020b."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib26",
+      "text": "Xiaoming Li, Shiguang Zhang, Shangchen Zhou, Lei Zhang, and Wangmeng Zuo. Learning dual memory dictionaries for blind face restoration. IEEE Transactions on Pattern Analysis and Machine Intelligence , 45(5):5904–5917, 2022."
+    }
+  ]
+}

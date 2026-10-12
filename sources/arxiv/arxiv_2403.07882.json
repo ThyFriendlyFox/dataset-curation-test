@@ -1,0 +1,144 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.07882",
+  "title": "GPU-accelerated Linear Algebra for Coupled Solvers in Industrial CFD Applications with OpenFOAM",
+  "authors": "Stefano Oliani, Ettore Fadiga, Ivan Spisso, Luigi Capone, Federico Piscaglia",
+  "year": "2024",
+  "categories": [
+    "cs.DC",
+    "cs.CE"
+  ],
+  "url": "https://arxiv.org/abs/2403.07882",
+  "html_url": "https://arxiv.org/html/2403.07882",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 960,
+  "text": "The justification for utilizing GPUs in CFD simulations lies in their highly efficient massively parallel technology and impressive performance per watt [1,2,3]. Given the distinctive architectural variances between GPUs and CPUs, the development of specialized algorithms becomes imperative to fully harness the potential performance of GPU hardware [4,5,6,7,8,9]. Given the relatively recent emergence of this field, there remains significant scope for enhancing the acceleration of these solutions.\n\nThere are primarily two approaches to accelerate CFD simulations. The first approach entails a comprehensive overhaul of the CFD code, specifically optimized for exclusive execution on Graphics Processing Units (GPUs). Although this method often yields significant speed improvements, it comes with trade-offs. It typically demands a considerably longer development period and is highly tailored to address a specific problem, referred to as a “full port”. The alternative approach involves adopting a partial-offloading strategy, where only the computationally intensive portions of the code are transferred to the GPU. There are already many examples in which fast GPU simulations have been demonstrated for unstructured finite-volume CFD software using the full or partial offloading strategy [7,8,10,9].\n\nIn CFD software packages, steady-state simulations for external aerodynamics are typically carried out using either pressure-based or density-based solvers. The choice between these solvers depends on the flow speed. While implicit density-based solvers present a coupled structure by nature, pressure-based solvers can be divided into SIMPLE-based and coupled methods. The SIMPLE operation follows a segregated approach, addressing linear systems for individual physical variables like pressure and velocity components, one at a time. While this approach has limited memory requirements, it often results in slow convergence, requiring a substantial number of iterations [11]. When implementing a partial port strategy for SIMPLE-based solvers, a significant portion of the overall solution time is spent transferring data between the host (CPU) and the GPU for each linear solver. Consequently, the overall performance gains from this strategy tend to be limited to around a 2x speedup [7]. To overcome these limitations, the exploration of coupled solvers [12,13,14] emerges as a promising avenue for implementing the partial port strategy on GPUs. Compared to segregated solvers, coupled solvers offer notable advantages, including linear scalability of CPU time with cell count and the capacity to achieve more rapid convergence of residuals, particularly for steady-state flows. Implicit coupled solvers typically combine robustness, stability and a reduced number of nonlinear iterations required for the convergence, especially for steady-state problems. These features result in a significantly improved overall convergence of the solver. This statement is counter-balanced by the increased size of a linear system of algebraic equations that needs to be solved in the coupled solution, as well as the increase in computer storage and computational effort per block solution. Current advancements in computer technology have led to the availability of powerful machines and a strong push towards achieving exascale performance in numerical simulation codes. These developments have significantly altered the trade-off between memory requirements and simulation speed, particularly when dealing with computational meshes that consist of hundreds of millions of computational points.\n\nHistorically, the practical application of coupled solvers on GPUs in large-scale industrial settings faced a significant hurdle due to the traditional constraints on GPU hardware’s memory capacity. The motivation for the current development work lies in the focus on the attention to modern GPU cards, which are characterized by enhanced memory capacity and adeptness in handling the computational demands of industrial workflows [15]. This ongoing effort is therefore centered on the adaptation of existing CFD workflows to fully exploit the capabilities offered by contemporary GPU technology. Open-source tools are proving to be valuable assets for industrial CFD applications. In this context, OpenFOAM [16] is the most widely employed open-source tool for CFD simulations in Academia and Industry [17]. In the author’ knowledge, despite several effort have been made of either density- and pressure-based implicit coupled solvers in OpenFOAM [18,19,12,20], implicit coupled solvers are not available in the official distributions of the software [21,22]. While significant efforts have been made to accelerate linear algebra in SIMPLE-based solvers [7] and to accelerate combustion calculations [23], there are currently no investigations of performance obtained through partial offload strategy on GPUs of coupled solvers in the OpenFOAM framework.\n\nWe present a study on the performance of implicit coupled linear algebra GPU offloading for the ICSFoam library [18]. The study encompasses results obtained from both an implicit compressible density-based solver and an incompressible pressure-based coupled solver. These solvers are applied to two industrial test cases that represent typical scenarios. Specifically, the implicit compressible density-based coupled solver is applied to the NASA CRM in a transonic regime [24], while the pressure-based implicit coupled solver is employed for the external aerodynamics of the DriveAER car [25]. The goal of this work is to assess the acceleration of a GPGPU CFD solver based on the OpenFOAM framework. In this approach, the algebraic solution of the assembled coupled matrix from the discretization of the flow transport problem is offloaded onto multiple GPUs. This strategy is expected to significantly enhance the computational performance of external aerodynamics simulations across various flow speeds.\n\nThe paper is structured as follows: in Sec. 2, we provide a brief overview of the methodology used to assemble coupled matrices for the pressure and density-based algorithms employed in this study. Additionally, we outline the strategy adopted for GPU offloading of linear algebra using the NVIDIA AmgX library [6]. Sec. 3 provides a summary of the hardware and techniques utilized for the performance assessment. In Sec. 4, we present the results for two test cases with industrial relevance. The simulations are initially validated by comparing them to experimental data and other computational fluid dynamics (CFD) solutions. Subsequently, the performance benefits from the presented implementation are discussed. Finally, conclusions from the study are drawn in Sec. 5.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib3",
+      "text": "(3) J.M. Cebri’n, G.D. Guerrero, J.M. García, in 2012 IEEE 26th International Parallel and Distributed Processing Symposium Workshops & PhD Forum (2012), pp. 1014–1022. 10.1109/IPDPSW.2012.124"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib4",
+      "text": "(4) D. Price, M. Clark, e.a. Barsdell, B.R., Optimizing performance-per-watt on GPUs in high performance computing. Comput Sci Res 31 , 185–193 (2016). https://doi.org/10.1007/s00450-015-0300-5"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib5",
+      "text": "(5) A. Krzywaniak, P. Czarnul, J. Proficz, Dynamic gpu power capping with online performance tracing for energy efficient gpu computing using depo tool. Future Generation Computer Systems 145 , 396–414 (2023). https://doi.org/10.1016/j.future.2023.03.041"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib6",
+      "text": "(6) Ansys. Fluent Fluid Simulation Software (2023). https://www.ansys.com/products/fluids/ansys-fluent [Accessed: Dec 2023]"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib7",
+      "text": "(7) SIEMENS. Simcenter STAR-CCM+ CFD software (2023). https://plm.sw.siemens.com/en-US/simcenter/fluids-thermal-simulation/star-ccm/ [Accessed: Dec 2023]"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib8",
+      "text": "(8) M. Naumov, M. Arsaev, P. Castonguay, J. Cohen, J. Demouth, J. Eaton, S. Layton, N. Markovskiy, I. Reguly, N. Sakharnykh, V. Sellappan, R. Strzodka, Amgx: A library for gpu accelerated algebraic multigrid and preconditioned iterative methods. SIAM Journal on Scientific Computing 37 (5), S602–S626 (2015). 10.1137/140980260"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib9",
+      "text": "(9) F. Piscaglia, F. Ghioldi, GPU Acceleration of CFD Simulations in OpenFOAM. Aerospace 10 (9) (2023). 10.3390/aerospace10090792"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib10",
+      "text": "(10) J. Williams, C. Sarofeen, H. Shan, M. Conley, An accelerated iterative linear solver with gpus for cfd calculations of unstructured grids. Procedia Computer Science 80 , 1291–1300 (2016). https://doi.org/10.1016/j.procs.2016.05.504 . International Conference on Computational Science 2016, ICCS 2016, 6-8 June 2016, San Diego, California, USA"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib11",
+      "text": "(11) X. Zhang, X. Guo, Y. Weng, X. Zhang, Y. Lu, Z. Zhao, Hybrid mpi and cuda paralleled finite volume unstructured cfd simulations on a multi-gpu system. Future Generation Computer Systems 139 , 1–16 (2023). https://doi.org/10.1016/j.future.2022.09.005"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib12",
+      "text": "(12) S. Jaiswal, R. Reddy, R. Banerjee, S. Sato, D. Komagata, M. Ando, J. Okada, in 2016 IEEE 23rd International Conference on High Performance Computing Workshops (HiPCW) (2016), pp. 81–89. 10.1109/HiPCW.2016.020"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib13",
+      "text": "(13) J.H. Ferziger, M. Perić, R.L. Street, Computational Methods for Fluid Dynamics , 4th edn. (Springer, 2020)"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib14",
+      "text": "(14) M.B. L. Mangani, M. Darwish, Development of a novel fully coupled solver in openfoam: Steady-state incompressible turbulent flows. Numerical Heat Transfer, Part B: Fundamentals 66 (1), 1–20 (2014). 10.1080/10407790.2014.894448"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib15",
+      "text": "(15) M.D. L. Mangani, F. Moukalled, An openfoam pressure-based coupled cfd solver for turbulent and compressible flows in turbomachinery applications. Numerical Heat Transfer, Part B: Fundamentals 69 (5), 413–431 (2016). 10.1080/10407790.2015.1125212"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib16",
+      "text": "(16) M. Darwish, L. Mangani, F. Moukalled, Implicit boundary conditions for coupled solvers. Computers & Fluids 168 , 54–66 (2018)"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib17",
+      "text": "(17) \"https://www.nvidia.com/it-it/data-center/h100\" . NVIDIA GPU H100 Tensor Core"
+    },
+    {
+      "n": 16,
+      "id": "bib.bib18",
+      "text": "(18) H.G. Weller, G. Tabor, H. Jasak, C. Fureby, A tensorial approach to computational continuum mechanics using object-oriented techniques. Computers in Physics 12 (6), 620–631 (1998)"
+    },
+    {
+      "n": 17,
+      "id": "bib.bib19",
+      "text": "(19) \"https://www.esi-group.com/customer-successes/audi-maximizes...\" . Audi Maximizes the Driving Range and Acoustic Quality of the New e-tron Using ESI Virtual Prototyping Solutions"
+    },
+    {
+      "n": 18,
+      "id": "bib.bib20",
+      "text": "(20) S. Oliani, N. Casari, M. Carnevale, Icsfoam: An openfoam library for implicit coupled simulations of high-speed flows. Computer Physics Communications 286 , 108673 (2023). 10.1016/j.cpc.2023.108673"
+    },
+    {
+      "n": 19,
+      "id": "bib.bib21",
+      "text": "(21) T. Uroić, H. Jasak, Parallelisation of selective algebraic multigrid for block–pressure–velocity system in openfoam. Computer Physics Communications 258 , 107529 (2021). https://doi.org/10.1016/j.cpc.2020.107529"
+    },
+    {
+      "n": 20,
+      "id": "bib.bib22",
+      "text": "(22) M. Darwish, I. Sraj, F. Moukalled, A coupled finite volume solver for the solution of incompressible flows on unstructured grids. Journal of Computational Physics 228 (1), 180–201 (2009). https://doi.org/10.1016/j.jcp.2008.08.027"
+    },
+    {
+      "n": 21,
+      "id": "bib.bib23",
+      "text": "(23) ESI OpenCFD OpenFOAM. http://www.openfoam.com/"
+    },
+    {
+      "n": 22,
+      "id": "bib.bib24",
+      "text": "(24) The OpenFOAM Foundation. http://www.openfoam.org/dev.php"
+    },
+    {
+      "n": 23,
+      "id": "bib.bib25",
+      "text": "(25) F. Ghioldi, F. Piscaglia, Acceleration of supersonic/hypersonic reactive CFD simulations via heterogeneous CPU-GPU supercomputing. Computers & Fluids 266 , 106041 (2023). https://doi.org/10.1016/j.compfluid.2023.106041"
+    },
+    {
+      "n": 24,
+      "id": "bib.bib1",
+      "text": "(1) M.B. Rivers, A. Dittberner, Experimental investigations of the nasa common research model. Journal of Aircraft 51 (4), 1183–1193 (2014). 10.2514/1.C032626"
+    },
+    {
+      "n": 25,
+      "id": "bib.bib2",
+      "text": "(2) D. Wood, M.A. Passmore, A.K. Perry, Experimental Data for the Validation of Numerical Methods - SAE Reference Notchback Model. SAE International Journal of Passenger Cars - Mechanical Systems 7 (1), 145–154 (2014). https://doi.org/10.4271/2014-01-0590"
+    }
+  ]
+}

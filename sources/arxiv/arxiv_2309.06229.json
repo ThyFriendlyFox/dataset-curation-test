@@ -1,0 +1,169 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2309.06229",
+  "title": "PreciseBugCollector: Extensible, Executable and Precise Bug-fix Collection",
+  "authors": "He Ye, Zimin Chen, Claire Le Goues",
+  "year": "2024",
+  "categories": [
+    "cs.SE",
+    "cs.PL"
+  ],
+  "url": "https://arxiv.org/abs/2309.06229",
+  "html_url": "https://arxiv.org/html/2309.06229",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 927,
+  "text": "A precise bug dataset plays a crucial role in various software tasks, including bug detection [1,2], fault localization [3,4,5,6], pattern mining [7,8,9,10], automated program repair for patch generation [11,12,13,14,15,16], and patch assessment [17,18,19,20]. Current bug datasets can be categorized into two main types. The first type involves human curation, resulting in carefully processed but small-scale datasets, such as ManyBugs and IntroClass [21], Defects4J [22] and QuixBugs [23]. All of these datasets contain fewer than 1 000 bugs each. On the other hand, the second type comprises large-scale datasets mined from code repositories, such as ManySStubBs4J [24], which processes commit messages or issues with text processing. However, this approach tends to be imprecise in identifying bugs or classifying their types, relying on simple keyword comparison. Despite this loss of precision, crawling historical bug-fix commits from open-source projects remains a widely used approach to collect training bug-fix data in both academic [25,26] and industry [27,28], due to the ease with which it can construct large-scale datasets.\n\nThere are several key challenges to collecting a truly useful, precise bug dataset:\n\n- • Problem 1 - Data quality and scalability: Manual collection ensures the quality of the dataset but does not scale. Automatic collection with keyword matching on commits is scalable, but imprecise [29].\n\n- • Problem 2 - Language diversity: Most datasets consist only of a single language, limiting their usability and posing a threat to the external validity of software tasks.\n\n- • Problem 3 - Lack of metadata: The most common metadata provided by the dataset per bug is a commit ID or commit message. Important information such as the type of bug, the severity of the bug, and the date of discovery is missing.\n\n- • Problem 4 - Lack of tests: Only a handful of bug datasets provide test cases for the exposed bug. This challenges both bug reproduction, and validating bug fixes beyond the one provided by the developer.\n\nIn this paper, we introduce the PreciseBugCollector, a novel approach to tackle the imprecision problem in bug dataset creation. Our approach offers a curated collection of software defects, providing not only accurate bug type classification but also meta information to describe the bug, including original buggy code, fix code, precise location, error type, and available executable/reproducible test cases. We denote this information as <bug,fix,loc,type,(test)>.\n\nThe PreciseBugCollector is based on two components: bug tracker for general bug collection, and bug injection for project-specific bug generation. The bug tracker focuses on extracting bug-fix commits, leveraging available code repositories (e.g., GitHub, Bitbucket, Gitlab, SVN) and external bug repositories (e.g., OSS-Fuzz, Jira, Apache Bug Report). The code repositories provide the exact source code changes made to address bugs, while the bug repositories offer detailed metadata about each bug. However, simply considering each repository in isolation is incomplete. Code repositories contain source code changes but lack clear bug metadata; bug repositories do not always include information about the exact source code changes. Therefore, we devise a method to merge these two sources, combining the advantages of both.\n\nBug injection automatically generates artificial unseen bugs, each of which is specified by an existing test suite with at least one failing test that exposes the bug. To initiate the bug generation process, we begin with code extracted from various projects, ensuring that all existing tests pass successfully. The code noising tool is then employed to deliberately introduce changes into this code, simulating bug injection. It is essential to acknowledge that not all the injected code is genuinely buggy as some changes might be benign; we use the original passing tests to identify meaningful injected faults. The test failure diagnosis obtained via this validation process precisely identifies the type of bug introduced.\n\nConsidering the challenge objective, we consider bugs from both the bug tracker and bug injection components to be beneficial for industrial settings. The bug tracker ensures that we have access to a diverse range of bug fixes from real-world projects, making the dataset more representative. Bug injection allows us to have project-specific bugs that are difficult to learn from a general dataset, and tailored for industrial settings.\n\nThe two bug tracking sources that we use for the bug tracker are: the National Vulnerability Dataset (NVD) and OSS-Fuzz. NVD is a repository of vulnerability management data represented using the Security Content Automation Protocol (SCAP); it includes databases of security checklist references, software flaws, misconfigurations, product names, and impact metrics. OSS-Fuzz, provided by Google, is an open source continuous fuzzing service. It uses random inputs (fuzzed data) to discover potential vulnerabilities, bugs, or crashes. OSS-Fuzz is specifically designed to identify security vulnerabilities and defects in open-source projects. We implement the bug injector with 16 single-statement injection rules from previous work [30].\n\nIn the end, to date, the PreciseBugCollector collected a total of 1 057 818 bugs from 2 968 open-source projects. We name this dataset PreciseBugs. Out of these, 12 602 bugs are contributed by the bug tracker (NVD and OSS-Fuzz), while 1 045 216 bugs are generated by the bug injector. To our knowledge, this is the largest executable bug dataset with precise bug information compared with related work.\n\nTo sum up, we make the following contributions:\n\n- • We introduce PreciseBugCollector for collecting a precise bug dataset to collect general-wise real-world bug-fix data and project-specific bug-fix data.\n\n- • We present a comprehensive dataset named PreciseBugs, which includes 1 057 818 bugs based on 2 968 open-source projects across more than six programming languages.\n\n- • We make our dataset readily accessible and openly available to the community through the link: https://github.com/SophieHYe/PreciseBugs.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib20",
+      "text": "F. Khomh, S. Vaucher, Y.-G. Guéhéneuc, and H. Sahraoui, “A bayesian approach for the detection of code and design smells,” in 2009 Ninth International Conference on Quality Software , 2009, pp. 305–314."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib21",
+      "text": "X. Xia, D. Lo, E. Shihab, X. Wang, and X. Yang, “Elblocker: Predicting blocking bugs with ensemble imbalance learning,” Information and Software Technology , vol. 61, pp. 93–106, 2015. [Online]. Available: https://www.sciencedirect.com/science/article/pii/S0950584914002602"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib22",
+      "text": "M. Yan, X. Xia, Y. Fan, A. E. Hassan, D. Lo, and S. Li, “Just-in-time defect identification and localization: A two-phase framework,” IEEE Transactions on Software Engineering , vol. 48, no. 1, pp. 82–101, 2022."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib23",
+      "text": "A. Riboira and R. Abreu, “The gzoltar project: A graphical debugger interface,” ser. TAIC PART’10. Berlin, Heidelberg: Springer-Verlag, 2010."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib24",
+      "text": "R. Abreu, P. Zoeteweij, and A. J. van Gemund, “On the accuracy of spectrum-based fault localization,” in Testing: Academic and Industrial Conference Practice and Research Techniques - MUTATION (TAICPART-MUTATION 2007) , 2007, pp. 89–98."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib25",
+      "text": "X. Xia, D. Lo, S. J. Pan, N. Nagappan, and X. Wang, “Hydra: Massively compositional model for cross-project defect prediction,” IEEE Transactions on Software Engineering , vol. 42, no. 10, pp. 977–998, 2016."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib26",
+      "text": "K. Liu, J. Zhang, L. Li, A. Koyuncu, D. Kim, C. Ge, Z. Liu, J. Klein, and T. F. Bissyandé, “Reliable fix patterns inferred from static checkers for automated program repair,” ACM Trans. Softw. Eng. Methodol. , vol. 32, no. 4, may 2023. [Online]. Available: https://doi.org/10.1145/3579637"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib27",
+      "text": "S. H. Tan, H. Yoshida, M. R. Prasad, and A. Roychoudhury, “Anti-patterns in search-based program repair,” in Proceedings of the 2016 24th ACM SIGSOFT International Symposium on Foundations of Software Engineering , ser. FSE 2016, 2016."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib28",
+      "text": "K. Liu, D. Kim, T. F. Bissyandé, S. Yoo, and Y. Le Traon, “Mining fix patterns for findbugs violations,” IEEE Transactions on Software Engineering , vol. 47, no. 1, pp. 165–188, 2021."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib29",
+      "text": "A. Koyuncu, K. Liu, T. F. Bissyandé, D. Kim, J. Klein, M. Monperrus, and Y. Le Traon, “Fixminer: Mining relevant fix patterns for automated program repair,” Empirical Softw. Engg. , vol. 25, no. 3, p. 1980–2024, may 2020. [Online]. Available: https://doi.org/10.1007/s10664-019-09780-z"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib30",
+      "text": "C. Le Goues, T. Nguyen, S. Forrest, and W. Weimer, “Genprog: A generic method for automatic software repair,” Software Engineering, IEEE Transactions on , vol. 38, no. 1, pp. 54–72, 2012."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib31",
+      "text": "A. Koyuncu, K. Liu, T. F. Bissyandé, D. Kim, M. Monperrus, J. Klein, and Y. Le Traon, “Ifixr: Bug report driven program repair,” in Proceedings of the 2019 27th ACM Joint Meeting on European Software Engineering Conference and Symposium on the Foundations of Software Engineering , ser. ESEC/FSE 2019. New York, NY, USA: Association for Computing Machinery, 2019, p. 314–325. [Online]. Available: https://doi.org/10.1145/3338906.3338935"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib32",
+      "text": "N. Jiang, T. Lutellier, and L. Tan, “Cure: Code-aware neural machine translation for automatic program repair,” in Proceedings of the ACM/IEEE 43rd International Conference on Software Engineering , 2021."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib33",
+      "text": "M. Wen, J. Chen, R. Wu, D. Hao, and S.-C. Cheung, “Context-aware patch generation for better automated program repair,” in Proceedings of the 40th International Conference on Software Engineering , ser. ICSE ’18, 2018."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib34",
+      "text": "K. Liu, A. Koyuncu, D. Kim, and T. F. Bissyandé, “TBar: Revisiting template-based automated program repair,” in Proceedings of the 28th ACM SIGSOFT International Symposium on Software Testing and Analysis . ACM, 2019, pp. 31–42."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib35",
+      "text": "H. Ye, M. Martinez, and M. Monperrus, “Neural program repair with execution-based backpropagation,” in Proceedings of the ACM/IEEE 44th International Conference on Software Engineering , 2022."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib36",
+      "text": "H. Tian, Y. Li, W. Pian, A. K. Kaboré, K. Liu, A. Habib, J. Klein, and T. F. Bissyandé, “Predicting patch correctness based on the similarity of failing test cases,” ACM Trans. Softw. Eng. Methodol. , vol. 31, no. 4, aug 2022. [Online]. Available: https://doi.org/10.1145/3511096"
+    },
+    {
+      "n": 18,
+      "id": "bib.bib37",
+      "text": "H. Ye, J. Gu, M. Martinez, T. Durieux, and M. Monperrus, “Automated classification of overfitting patches with statically extracted code features,” IEEE Transactions on Software Engineering , 2021."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib38",
+      "text": "H. Tian, K. Liu, A. K. Kaboré, A. Koyuncu, L. Li, J. Klein, and T. F. Bissyandé, “Evaluating representation learning of code changes for predicting patch correctness in program repair,” in Proceedings of the 35th IEEE/ACM International Conference on Automated Software Engineering . IEEE, 2020, pp. 981–992."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib39",
+      "text": "H. Tian, Y. Li, W. Pian, A. K. Kaboré, K. Liu, J. Klein, and T. F. Bissyande, “Checking patch behaviour against test specification,” ACM Trans. Softw. Eng. Methodol. , 2022."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib2",
+      "text": "C. Le Goues, N. Holtschulte, E. K. Smith, Y. Brun, P. Devanbu, S. Forrest, and W. Weimer, “The ManyBugs and IntroClass benchmarks for automated repair of C programs,” IEEE Transactions on Software Engineering (TSE) , vol. 41, no. 12, pp. 1236–1256, December 2015."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib1",
+      "text": "R. Just, D. Jalali, and M. D. Ernst, “Defects4j: A database of existing faults to enable controlled testing studies for java programs,” in Proceedings of the 2014 International Symposium on Software Testing and Analysis . ACM, 2014, pp. 437–440."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib40",
+      "text": "H. Ye, M. Martinez, T. Durieux, and M. Monperrus, “A comprehensive study of automatic program repair on the quixbugs benchmark,” Journal of Systems and Software , vol. 171, p. 110825, 2021."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib13",
+      "text": "R.-M. Karampatsis and C. Sutton, “How often do single-statement bugs occur? the manysstubs4j dataset.” New York, NY, USA: Association for Computing Machinery, 2020. [Online]. Available: https://doi.org/10.1145/3379597.3387491"
+    },
+    {
+      "n": 25,
+      "id": "bib.bib16",
+      "text": "T. Lutellier, H. V. Pham, L. Pang, Y. Li, M. Wei, and L. Tan, “Coconut: Combining context-aware neural translation models using ensemble for program repair,” ser. ISSTA 2020, 2020."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib41",
+      "text": "Z. Chen, S. J. Kommrusch, M. Tufano, L. Pouchet, D. Poshyvanyk, and M. Monperrus, “Sequencer: Sequence-to-sequence learning for end-to-end program repair,” IEEE Transactions on Software Engineering , 2019."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib42",
+      "text": "J. Bader, A. Scott, M. Pradel, and S. Chandra, “Getafix: Learning to fix bugs automatically,” Proc. ACM Program. Lang. , vol. 3, no. OOPSLA, oct 2019. [Online]. Available: https://doi.org/10.1145/3360585"
+    },
+    {
+      "n": 28,
+      "id": "bib.bib43",
+      "text": "D. Drain, C. Wu, A. Svyatkovskiy, and N. Sundaresan, “Generating bug-fixes using pretrained transformers,” in Proceedings of the 5th ACM SIGPLAN International Symposium on Machine Programming , ser. MAPS 2021. New York, NY, USA: Association for Computing Machinery, 2021, p. 1–8. [Online]. Available: https://doi.org/10.1145/3460945.3464951"
+    },
+    {
+      "n": 29,
+      "id": "bib.bib44",
+      "text": "G. Antoniol, K. Ayari, M. Di Penta, F. Khomh, and Y.-G. Guéhéneuc, “Is it a bug or an enhancement? a text-based approach to classify change requests,” in Proceedings of the 2008 Conference of the Center for Advanced Studies on Collaborative Research: Meeting of Minds , ser. CASCON ’08. New York, NY, USA: Association for Computing Machinery, 2008. [Online]. Available: https://doi.org/10.1145/1463788.1463819"
+    },
+    {
+      "n": 30,
+      "id": "bib.bib45",
+      "text": "H. Ye, M. Martinez, X. Luo, T. Zhang, and M. Monperrus, “Selfapr: Self-supervised program repair with test execution diagnostics,” in 37th IEEE/ACM International Conference on Automated Software Engineering . Association for Computing Machinery, 2022."
+    }
+  ]
+}

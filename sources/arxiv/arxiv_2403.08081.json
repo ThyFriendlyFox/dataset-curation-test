@@ -1,0 +1,111 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.08081",
+  "title": "Mechanics of Next Token Prediction with Self-Attention",
+  "authors": "Yingcong Li, Yixiao Huang, M. Emrullah Ildiz, Ankit Singh Rawat, Samet Oymak",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.AI",
+    "cs.CL",
+    "math.OC"
+  ],
+  "url": "https://arxiv.org/abs/2403.08081",
+  "html_url": "https://arxiv.org/html/2403.08081",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 778,
+  "text": "Language modeling as enabled by Transformer architecture [1] and seemingly simple training objectives such as next-token prediction [2,3] have not only led to breakthroughs in the field of natural language processing (NLP) [4,5,6,7], but rather straightforward adaptations of this symbiosis between Transformers and next-token prediction tasks have also realized remarkable performance in other domains, including vision [8], speech [9], reinforcement learning [10], and even protein design [11,12]. This widespread empirical success is often attributed to the (self-)attention mechanism of Transformers that produces high-quality contextual representations needed to realize excellent prediction performance in a wide range of domains. However, a rigorous understanding of how Transformers can learn such high-quality representations by solving next-token prediction task via natural algorithms such as gradient descent is largely missing from the literature.\n\nThis work aims to bridge this gap between the empirical success and principled understanding of Transformer-based language modeling by shedding light on the optimization landscape and key implicit biases faced by the self-attention mechanism in solving the next-token prediction task. In particular, focusing on a single-layer self-attention model with linear classification head, and solving the next-token prediction task, we consider the following questions:\n\n- • What relationships in the training data are captured by the single-layer self-attention model?\n\n- • How exactly do these relationships dictate the optimization geometry of natural algorithms such as gradient descent?\n\nWe show that the answers to both of these questions are intertwined which we achieve by significantly expanding the recently proposed framework that connects learning with Transformers to the celebrated support vector machines (SVMs) [13,14].\n\nAs illustrated in Figure 1, given training data as a collection of (input sequence, next token) pairs, self-attention model learns to (1) retrieve the high-priority tokens (highlighted with red color) to the last input token; and then (2) build a convex combination of these high-priority tokens. The notion of high-priority is dictated by a directed graph learned from training data. SGD training accomplishes this by learning hard and soft components of the attention weights \\bm{W} to execute (1) and (2) respectively. Concretely, the following theorem dictates the evolution of attention weights during gradient descent.\n\nConsider training a single-layer self-attention model with gradient descent. The combined attention weights \\bm{W}:=\\bm{W}_{K}\\bm{W}_{Q}^{\\top} evolve as\n\nwhere C\\cdot\\bm{W}_{\\text{hard}} is the hard retrieval component selecting the high-priority tokens when C\\to\\infty; and \\bm{W}_{\\text{soft}} is the soft composition component allocating nonzero softmax probabilities over selected tokens.\n\nTo capture the priority order among different tokens as observed in Figure 1, we construct directed graphs among the tokens in the vocabulary, namely token-priority graphs (TPGs). An illustration is provided in Figure 2, where a strongly connected component (SCC, highlighted as dashed black rectangles) in a TPG corresponds to the tokens that are reachable from each other, indicating the absence of a strict priority among those tokens. The hard retrieval component \\bm{W}_{\\text{hard}} captures the topological order of different SCCs (orange arrows) whereas the soft composition component \\bm{W}_{\\text{soft}} captures the relationships of different tokens within each SCC (black arrows). These TPGs will geometrically capture the learning dynamics of self-attention. Specifically, we propose the SVM problem (Graph-SVM), solution of which describes the direction gradient descent converges to. This way, SGD asymptotically enforces the topological order between SCCs i.e. the C\\cdot\\bm{W}_{\\text{hard}} term in Theorem 1 as C\\rightarrow\\infty. In practice, this implies that self-attention model favors suppressing lower priority tokens in favour of sampling higher priority tokens.\n\nA conjecture on the decomposition in Theorem 1 was first proposed in [14]. This decomposition is also related to the implicit bias of logistic regression on non-separable data [15]. Our theory fully formalizes this decomposition under the next-token prediction setting and reveals fundamental connections to graphical structure in data (e.g. through SCCs, TPGs).\n\nOverall, we carefully study the gradient descent and regularization path algorithms for attention-based next-token prediction and make the following contributions:\n\n- 1. We study the optimization landscape of self-attention with log-loss and show that the problem is convex under suitable assumptions. We then establish a global convergence result to fully formalize Theorem 1 in terms of a directional component (Graph-SVM) and a finite component (see Sec 3). Notably, results apply to arbitrary datasets as we don’t require distributional assumptions.\n\n- 2. Our theory reveals insightful connections between continuous and discrete optimization, namely: Self-attention implicitly discovers the strongly-connected components of the TPGs during training.\n\n- 3. Under a general setting, we establish the implicit bias of the solution obtained by vanishing regularization [16,17,18]. This yields a result similar to the gradient descent theory (see Sec 4). We also show that, in general, gradient descent can exhibit local directional convergence rather than global. We characterize these local directions through the SVM solutions of pseudo TPGs (see Sec 5).",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib52",
+      "text": "Vaswani et al. (2017) Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N Gomez, Ł ukasz Kaiser, and Illia Polosukhin. Attention is all you need. In I. Guyon, U. Von Luxburg, S. Bengio, H. Wallach, R. Fergus, S. Vishwanathan, and R. Garnett (eds.), Advances in Neural Information Processing Systems , volume 30. Curran Associates, Inc., 2017. URL https://proceedings.neurips.cc/paper_files/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib41",
+      "text": "Radford et al. (2018) Alec Radford, Karthik Narasimhan, Tim Salimans, Ilya Sutskever, et al. Improving language understanding by generative pre-training. 2018."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib42",
+      "text": "Radford et al. (2019) Alec Radford, Jeffrey Wu, Rewon Child, David Luan, Dario Amodei, Ilya Sutskever, et al. Language models are unsupervised multitask learners. OpenAI blog , 1(8):9, 2019."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib5",
+      "text": "Brown et al. (2020) Tom Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared D Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, Sandhini Agarwal, Ariel Herbert-Voss, Gretchen Krueger, Tom Henighan, Rewon Child, Aditya Ramesh, Daniel Ziegler, Jeffrey Wu, Clemens Winter, Chris Hesse, Mark Chen, Eric Sigler, Mateusz Litwin, Scott Gray, Benjamin Chess, Jack Clark, Christopher Berner, Sam McCandlish, Alec Radford, Ilya Sutskever, and Dario Amodei. Language models are few-shot learners. In H. Larochelle, M. Ranzato, R. Hadsell, M.F. Balcan, and H. Lin (eds.), Advances in Neural Information Processing Systems , volume 33, pp. 1877–1901. Curran Associates, Inc., 2020. URL https://proceedings.neurips.cc/paper_files/paper/2020/file/1457c0d6bfcb4967418bfb8ac142f64a-Paper.pdf ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib10",
+      "text": "Chowdhery et al. (2022) Aakanksha Chowdhery, Sharan Narang, Jacob Devlin, Maarten Bosma, Gaurav Mishra, Adam Roberts, Paul Barham, Hyung Won Chung, Charles Sutton, Sebastian Gehrmann, et al. Palm: Scaling language modeling with pathways. arXiv preprint arXiv:2204.02311 , 2022."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib37",
+      "text": "OpenAI (2023) OpenAI. Gpt-4 technical report. arXiv preprintarXiv:2303.08774 , 2023."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib51",
+      "text": "Touvron et al. (2023) Hugo Touvron, Thibaut Lavril, Gautier Izacard, Xavier Martinet, Marie-Anne Lachaux, Timothée Lacroix, Baptiste Rozière, Naman Goyal, Eric Hambro, Faisal Azhar, et al. Llama: Open and efficient foundation language models. arXiv preprint arXiv:2302.13971 , 2023."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib7",
+      "text": "Chen et al. (2020) Mark Chen, Alec Radford, Rewon Child, Jeffrey Wu, Heewoo Jun, David Luan, and Ilya Sutskever. Generative pretraining from pixels. In Hal Daumé III and Aarti Singh (eds.), Proceedings of the 37th International Conference on Machine Learning , volume 119 of Proceedings of Machine Learning Research , pp. 1691–1703. PMLR, 13–18 Jul 2020. URL https://proceedings.mlr.press/v119/chen20s.html ."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib11",
+      "text": "Chung & Glass (2020) Yu-An Chung and James Glass. Generative pre-training for speech with autoregressive predictive coding. In ICASSP 2020-2020 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP) , pp. 3497–3501. IEEE, 2020."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib6",
+      "text": "Chen et al. (2021) Lili Chen, Kevin Lu, Aravind Rajeswaran, Kimin Lee, Aditya Grover, Misha Laskin, Pieter Abbeel, Aravind Srinivas, and Igor Mordatch. Decision transformer: Reinforcement learning via sequence modeling. In M. Ranzato, A. Beygelzimer, Y. Dauphin, P.S. Liang, and J. Wortman Vaughan (eds.), Advances in Neural Information Processing Systems , volume 34, pp. 15084–15097. Curran Associates, Inc., 2021. URL https://proceedings.neurips.cc/paper_files/paper/2021/file/7f489f642a0ddb10272b5c31057f0663-Paper.pdf ."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib16",
+      "text": "Ferruz et al. (2022) Noelia Ferruz, Steffen Schmidt, and Birte Höcker. Protgpt2 is a deep unsupervised language model for protein design. Nature communications , 13(1):4348, 2022."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib36",
+      "text": "Nijkamp et al. (2022) Erik Nijkamp, Jeffrey Ruffolo, Eli N Weinstein, Nikhil Naik, and Ali Madani. Progen2: exploring the boundaries of protein language models. arXiv preprint arXiv:2206.13517 , 2022."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib48",
+      "text": "Tarzanagh et al. (2023b) Davoud Ataee Tarzanagh, Yingcong Li, Xuechen Zhang, and Samet Oymak. Margin maximization in attention mechanism. arXiv preprint arXiv:2306.13596 , 2023b."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib47",
+      "text": "Tarzanagh et al. (2023a) Davoud Ataee Tarzanagh, Yingcong Li, Christos Thrampoulidis, and Samet Oymak. Transformers as support vector machines. arXiv preprint arXiv:2308.16898 , 2023a."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib24",
+      "text": "Ji & Telgarsky (2019a) Ziwei Ji and Matus Telgarsky. The implicit bias of gradient descent on nonseparable data. In Conference on learning theory , pp. 1772–1798. PMLR, 2019a."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib43",
+      "text": "Rosset et al. (2003) Saharon Rosset, Ji Zhu, and Trevor Hastie. Margin maximizing loss functions. Advances in neural information processing systems , 16, 2003."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib45",
+      "text": "Suggala et al. (2018) Arun Suggala, Adarsh Prasad, and Pradeep K Ravikumar. Connecting optimization and regularization paths. Advances in Neural Information Processing Systems , 31, 2018."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib27",
+      "text": "Ji et al. (2020) Ziwei Ji, Miroslav Dudík, Robert E Schapire, and Matus Telgarsky. Gradient descent follows the regularization path for general losses. In Conference on Learning Theory , pp. 2109–2136. PMLR, 2020."
+    }
+  ]
+}

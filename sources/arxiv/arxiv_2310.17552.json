@@ -1,0 +1,115 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2310.17552",
+  "title": "Model-Based Runtime Monitoring with Interactive Imitation Learning",
+  "authors": "Huihan Liu, Shivin Dass, Roberto MartÃ­n-MartÃ­n, Yuke Zhu",
+  "year": "2023",
+  "categories": [
+    "cs.RO",
+    "cs.AI",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2310.17552",
+  "html_url": "https://arxiv.org/html/2310.17552",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 801,
+  "text": "We have witnessed tremendous progress in learning-based robotics systems in recent years [1,2,3]. Despite exciting showcases in research settings, they continue to struggle with generalization and reliability issues for widespread deployment. To achieve continual model improvement in trustworthy deployments, a burgeoning body of work [4,5] has explored the shift from the conventional “train-then-deploy” paradigm to “learning on the job” with human-robot teams. Particularly, interactive imitation learning (IIL) [6] has advocated a framework where the human supervises the robot’s execution and performs interventions to handle difficult situations, and the robot continually learns from deployment data. Existing IIL approaches typically require humans to continuously monitor the system and provide imminent feedback, incurring prohibitive human workloads in realistic applications. A critical step toward making these methods practical is incorporating a runtime monitoring mechanism, allowing the robots to self-monitor and predict errors during task execution [7].\n\nRuntime monitoring mechanisms have been investigated in two main directions: unsupervised out-of-distribution (OOD) detection and supervised failure detection. Unsupervised out-of-distribution (OOD) detection methods [8,9,10,11] use the data distributions as a proxy to estimate errors. They often struggle to faithfully capture the error patterns and may overlook critical situations [12,13]. More critically, these methods determine whether a failure occurs based on the current system states but cannot identify future failures before they become unavoidable. Supervised approaches train failure detection models from actual failure experiences. Failure detection can be done by classifying normal and failure examples [14,15] or estimating risk Q-values to predict future failures [16,17]. These approaches are more accurate in capturing error patterns and preempting failures. Nonetheless, they heavily rely on explicit failures encountered in the past as supervisory signals. In deployed systems, failures can be catastrophic, and acquiring such failure data hinders the system’s safety and reliability.\n\nTo this end, we introduce a runtime monitoring algorithm as an extension to Sirius [4], our prior work that improves robot autonomy over long-term deployments with humans in the loop. The runtime monitoring algorithm proactively detects system anomalies and preemptive failures in the interactive imitation learning framework of Sirius (see Fig. 1). Our design follows two conceptual ideas: First, it adopts a model-based approach, which trains a predictive model of the environment dynamics for failure prediction. The dynamics model can simulate future policy rollouts and predict upcoming failures. Second, it uses an intervention-informed approach to train its model components over long-term deployments. The algorithm harnesses the inherent structure of human interventions to continually learn an error predictor without having to encounter explicit failures, thus ensuring trustworthy task execution.\n\nOur method performs model-based runtime monitoring with two learnable components: a dynamics model and a failure classifier. We first construct a latent space, where image observations are encoded into feature vectors as the latent states. We train a dynamics model that predicts the next latent state conditioned on the current observation and the action. We also train a policy from the same latent space. The latent state space shared between the dynamics model and the policy allows our method to simulate counterfactual trajectories and predict different action outcomes [18]. We also train a failure classifier that predicts whether a future state leads to failure. With these two components, an error is identified by out-of-distribution (OOD) detection with the dynamics model and failure detection with the dynamics model and the failure classifier. Contrary to prior work [8,16] that uses isolated OOD and failure detection systems, we find it effective to unify them in a single model, enhancing the data efficiency and overall performance of our system.\n\nPrior learning-based error predictors [19,15,16] typically require explicit failures to form training datasets, which are infeasible to collect during safe deployments. Instead, we leverage human interventions to inform the error predictor of the moments when humans perceive the system is at risk of failure. Human interventions offer implicit cues of their judgment on whether the robot’s actions may be incorrect, undesirable, or close to failing [4,16,5]. We train the failure classifier with human interventions and robot rollouts collected from deployments and continuously update it over time. As a result, the failure classifier can dynamically adapt to the policy’s changing behaviors.\n\nWe tested our method on two simulated and two real-world tasks with a human-in-the-loop learning and deployment framework [4,16]. Our method achieves on average 32% higher success rates and 16% more efficient use of human workload utilization than state-of-the-art interactive imitation learning baselines. In summary, our main contributions are as follows:\n\n- • We introduce a model-based runtime monitoring algorithm that proactively solicits human help based on future error preemption;\n\n- • We develop an effective learning method to jointly and continually update our error predictor and policy during human-in-the-loop deployments;\n\n- • We systematically evaluate our method against baselines in simulation and on physical hardware and demonstrate its effectiveness at the system level and in unit tests.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bibx1",
+      "text": "Marcin Andrychowicz et al. “Learning Dexterous In-hand Manipulation” In IJRR 39 , 2018, pp. 20–3"
+    },
+    {
+      "n": 2,
+      "id": "bib.bibx24",
+      "text": "Dmitry Kalashnikov et al. “QT-Opt: Scalable Deep Reinforcement Learning for Vision-based Robotic Manipulation” In CoRL , 2018"
+    },
+    {
+      "n": 3,
+      "id": "bib.bibx4",
+      "text": "Anthony Brohan et al. “RT-1: Robotics Transformer for Real-World Control at Scale”, 2022 arXiv: 2212.06817 [cs.RO]"
+    },
+    {
+      "n": 4,
+      "id": "bib.bibx28",
+      "text": "Huihan Liu et al. “Robot Learning on the Job: Human-in-the-Loop Autonomy and Learning During Deployment” In arXiv preprint arXiv:2211.08416 , 2022"
+    },
+    {
+      "n": 5,
+      "id": "bib.bibx29",
+      "text": "Ajay Mandlekar et al. “Human-in-the-loop imitation learning using remote teleoperation” In arXiv preprint arXiv:2012.06733 , 2020"
+    },
+    {
+      "n": 6,
+      "id": "bib.bibx6",
+      "text": "Carlos Celemin et al. “Interactive Imitation Learning in Robotics: A Survey”, 2022 arXiv: 2211.00600 [cs.RO]"
+    },
+    {
+      "n": 7,
+      "id": "bib.bibx50",
+      "text": "Hansol Yoon and Sriram Sankaranarayanan “Predictive Runtime Monitoring for Mobile Robots using Logic-Based Bayesian Intent Inference” In 2021 IEEE International Conference on Robotics and Automation (ICRA) IEEE, 2021 DOI: 10.1109/icra48506.2021.9561193"
+    },
+    {
+      "n": 8,
+      "id": "bib.bibx34",
+      "text": "Charles Richter and Nicholas Roy “Safe Visual Navigation via Deep Learning and Novelty Detection” In Robotics: Science and Systems , 2017"
+    },
+    {
+      "n": 9,
+      "id": "bib.bibx31",
+      "text": "Kunal Menda, Katherine Driggs-Campbell and Mykel Kochenderfer “EnsembleDagger: A Bayesian approach to safe imitation learning” In 2019 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS) , 2019, pp. 5041–5048 IEEE"
+    },
+    {
+      "n": 10,
+      "id": "bib.bibx45",
+      "text": "Josiah Wong et al. “Error-Aware Imitation Learning from Teleoperation Data for Mobile Manipulation” In Proceedings of the 5th Conference on Robot Learning 164 , Proceedings of Machine Learning Research PMLR, 2022, pp. 1367–1378 URL: https://proceedings.mlr.press/v164/wong22a.html"
+    },
+    {
+      "n": 11,
+      "id": "bib.bibx8",
+      "text": "Shivin Dass et al. “PATO: Policy Assisted TeleOperation for Scalable Robot Data Collection” In arXiv preprint arXiv:2212.04708 , 2022"
+    },
+    {
+      "n": 12,
+      "id": "bib.bibx36",
+      "text": "Mohammadreza Salehi et al. “A Unified Survey on Anomaly, Novelty, Open-Set, and Out-of-Distribution Detection: Solutions and Future Challenges” In CoRR abs/2110.14051 , 2021 arXiv: https://arxiv.org/abs/2110.14051"
+    },
+    {
+      "n": 13,
+      "id": "bib.bibx47",
+      "text": "Zhisheng Xiao, Qing Yan and Yali Amit “Likelihood Regret: An Out-of-Distribution Detection Score For Variational Auto-encoder” In CoRR abs/2003.02977 , 2020 arXiv: https://arxiv.org/abs/2003.02977"
+    },
+    {
+      "n": 14,
+      "id": "bib.bibx12",
+      "text": "Cem Gokmen, Daniel Ho and Mohi Khansari “Asking for Help: Failure Prediction in Behavioral Cloning through Value Approximation” In ArXiv abs/2302.04334 , 2023"
+    },
+    {
+      "n": 15,
+      "id": "bib.bibx48",
+      "text": "Annie Xie, Fahim Tajwar, Archit Sharma and Chelsea Finn “When to Ask for Help: Proactive Interventions in Autonomous Reinforcement Learning”, 2022 arXiv: 2210.10765 [cs.LG]"
+    },
+    {
+      "n": 16,
+      "id": "bib.bibx18",
+      "text": "Ryan Hoque et al. “ThriftyDAgger: Budget-aware novelty and risk gating for interactive imitation learning” In arXiv preprint arXiv:2109.08273 , 2021"
+    },
+    {
+      "n": 17,
+      "id": "bib.bibx19",
+      "text": "Ryan Hoque et al. “Fleet-DAgger: Interactive Robot Fleet Learning with Scalable Human Supervision”, 2022 arXiv: 2206.14349 [cs.RO]"
+    },
+    {
+      "n": 18,
+      "id": "bib.bibx46",
+      "text": "Philipp Wu et al. “Daydreamer: World models for physical robot learning” In Conference on Robot Learning , 2023, pp. 2226–2240 PMLR"
+    },
+    {
+      "n": 19,
+      "id": "bib.bibx11",
+      "text": "Cem Gokmen, Daniel Ho and Mohi Khansari “Asking for Help: Failure Prediction in Behavioral Cloning through Value Approximation” In arXiv preprint arXiv:2302.04334 , 2023"
+    }
+  ]
+}

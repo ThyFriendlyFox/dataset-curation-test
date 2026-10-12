@@ -1,0 +1,108 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.06394",
+  "title": "FSViewFusion: Few-Shots View Generation of Novel Objects",
+  "authors": "Rukhshanda Hussain, Hui Xian Grace Lim, Borchun Chen, Mubarak Shah, Ser Nam Lim",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2403.06394",
+  "html_url": "https://arxiv.org/html/2403.06394",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 827,
+  "text": "Novel view synthesis has always been a fundamental problem in 3D vision, with its applications extending to several engineering problems like video enhancement, virtual reality, 3D content creation, etc. Implicit neural representations as in NeRF [1] and approaches based on it like [2], [3], [4], [5] have demonstrated great success in reconstructing 2D views of a scene given the camera positions for a view. However, these methods even while addressing sparse view reconstructions are often restricted by the need to procure multi-view data for the respective scene to be reconstructed. Recently, denoising based diffusion models [6], [7], [8] have been extensively used in the task of novel view synthesis because of its generalizability. However, these methods [9], [10], [11], often rely on three dimensional priors to condition their generative models, which often require extrinsic and intrinsic camera poses for reliable view reconstructions.\n\nInterestingly, human brain does not require any camera poses to perceive a viewpoint of an object in a real world setting. It can be analogous to a model which has been trained on a vast different instances of data which allows it to provide an estimate of the view. Considering this fact, we question whether pretrained diffusion models trained on a virtually exhaustive amount of data is already capable of understanding the viewpoint of any object through its spatial relations to other objects in background by visual cue alone? In order to answer this, we conduct a simple experiment with text to image personalised models (in our case DreamBooth [12]). Utilizing Dreambooth’s setup is appealing for two reasons. First, DreamBooth produces high fidelity to the subject context given with as few as 3-4 samples of the context. Second, we can still leverage the massive pretraining of the underlying diffusion model to generate new concepts. We generate a few samples of several views of chair with different backgrounds synthetically through in-painting [13] and assign a unique id for each view. We observe that not only does the unique id binds faithfully to the context of view but also it can reliably disentangle the context to a random object distribution in diffusion model’s knowledge space as shown in Figure 1.\n\nMotivated by these findings, we hypothesize that diffusion model are capable of learning high level concepts such as view analogous to the concept of style [14] [15] [16], gender [17] etc in a disentangled manner from the object identity which shares the concept. Therefore, we rethink the problem of novel view synthesis as this: given the knowledge of a few views in the form of 2D images for a single object, a pre-trained diffusion model learns the views as a high level concept, and can transfer the knowledge of the views in generating novel views of a new object. Further, Figure 1 reveals that object pose and camera view are not the same thing that has been ambiguous in the current literature. The camera view of two objects can be the same but their object poses might change altogether.\n\nGiven that we are not provided with any 3D knowledge of the camera/object pose under this setting, we consider for exposition the camera view as a visual concept where we imagine that the camera is placed at some location in a 3D scene focused on the object. Now, we imagine removing this object in the 3D scene, replacing it with a novel object. The camera position remains unchanged while the degree of freedom is that the pose of the novel object can be different. Indeed, leveraging the findings from Dreambooth, it is conceivable to learn the aforementioned view/scene concept as well as the novel object concept separately using a minimal amount of 2D data with no associated pose meta data, which is easy to procure. By combining the two resulting models, we show that the view and scene can now be transferred to the novel object.\n\nOur contributions can be summarized as follows:\n\n- 1. We provide empirical evidence that a view, which describes the spatial relationship of an object with its surrounding in a 3D space, can be treated as a concept to train contextually personalised diffusion models.\n\n- 2. We design a learning strategy which first learns the concept of view, second learns the user specified object and finally merges the two concepts to generate novel views of out-of-distribution images. To avoid catastrophic forgetting, the view, object and the final merged concepts are all learned with LoRA [18].\n\n- 3. Tapping into the few-shots nature of Dreambooth, our method operates under a few-shots constraint, using as few as a single sample of an object to learn a view LoRA and 3-4 samples to learn a novel object LoRA, thereby avoiding extensive pretraining on multi-view data. We call our method FSViewFusion (FS = Few-Shots).\n\n- 4. We provide extensive ablations of FSViewFusion for several uses cases using in the wild images and benchmark our method on widely used DTU dataset for the task of novel view synthesis.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib13",
+      "text": "Mildenhall, B., Srinivasan, P.P., Tancik, M., Barron, J.T., Ramamoorthi, R., Ng, R.: Nerf: Representing scenes as neural radiance fields for view synthesis. Communications of the ACM 65 (1), 99–106 (2021)"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "Barron, J.T., Mildenhall, B., Tancik, M., Hedman, P., Martin-Brualla, R., Srinivasan, P.P.: Mip-nerf: A multiscale representation for anti-aliasing neural radiance fields. In: Proceedings of the IEEE/CVF International Conference on Computer Vision. pp. 5855–5864 (2021)"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib40",
+      "text": "Yu, A., Ye, V., Tancik, M., Kanazawa, A.: pixelnerf: Neural radiance fields from one or few images. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 4578–4587 (2021)"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib6",
+      "text": "Deng, K., Liu, A., Zhu, J.Y., Ramanan, D.: Depth-supervised nerf: Fewer views and faster training for free. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 12882–12891 (2022)"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib15",
+      "text": "Niemeyer, M., Barron, J.T., Mildenhall, B., Sajjadi, M.S., Geiger, A., Radwan, N.: Regnerf: Regularizing neural radiance fields for view synthesis from sparse inputs. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 5480–5490 (2022)"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib8",
+      "text": "Ho, J., Jain, A., Abbeel, P.: Denoising diffusion probabilistic models. Advances in neural information processing systems 33 , 6840–6851 (2020)"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib28",
+      "text": "Song, J., Meng, C., Ermon, S.: Denoising diffusion implicit models. arXiv preprint arXiv:2010.02502 (2020)"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib21",
+      "text": "Rombach, R., Blattmann, A., Lorenz, D., Esser, P., Ommer, B.: High-resolution image synthesis with latent diffusion models. In: Proceedings of the IEEE/CVF conference on computer vision and pattern recognition. pp. 10684–10695 (2022)"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib7",
+      "text": "Gu, J., Trevithick, A., Lin, K.E., Susskind, J.M., Theobalt, C., Liu, L., Ramamoorthi, R.: Nerfdiff: Single-image view synthesis with nerf-guided distillation from 3d-aware diffusion. In: International Conference on Machine Learning. pp. 11808–11826. PMLR (2023)"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib29",
+      "text": "Tseng, H.Y., Li, Q., Kim, C., Alsisan, S., Huang, J.B., Kopf, J.: Consistent view synthesis with pose-guided diffusion models. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 16773–16783 (2023)"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib39",
+      "text": "Ye, J., Wang, P., Li, K., Shi, Y., Wang, H.: Consistent-1-to-3: Consistent image to 3d view synthesis via geometry-aware diffusion models. arXiv preprint arXiv:2310.03020 (2023)"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib22",
+      "text": "Ruiz, N., Li, Y., Jampani, V., Pritch, Y., Rubinstein, M., Aberman, K.: Dreambooth: Fine tuning text-to-image diffusion models for subject-driven generation. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 22500–22510 (2023)"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib41",
+      "text": "Yu, T., Feng, R., Feng, R., Liu, J., Jin, X., Zeng, W., Chen, Z.: Inpaint anything: Segment anything meets image inpainting. arXiv preprint arXiv:2304.06790 (2023)"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib33",
+      "text": "Wang, Z., Wang, X., Xie, L., Qi, Z., Shan, Y., Wang, W., Luo, P.: Styleadapter: A single-pass lora-free model for stylized image generation. arXiv preprint arXiv:2309.01770 (2023)"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib27",
+      "text": "Sohn, K., Jiang, L., Barber, J., Lee, K., Ruiz, N., Krishnan, D., Chang, H., Li, Y., Essa, I., Rubinstein, M., et al.: Styledrop: Text-to-image synthesis of any style. Advances in Neural Information Processing Systems 36 (2024)"
+    },
+    {
+      "n": 16,
+      "id": "bib.bib25",
+      "text": "Shah, V., Ruiz, N., Cole, F., Lu, E., Lazebnik, S., Li, Y., Jampani, V.: Ziplora: Any subject in any style by effectively merging loras. arXiv preprint arXiv:2311.13600 (2023)"
+    },
+    {
+      "n": 17,
+      "id": "bib.bib34",
+      "text": "Wang, Z., Gui, L., Negrea, J., Veitch, V.: Concept algebra for (score-based) text-controlled generative models. Advances in Neural Information Processing Systems 36 (2024)"
+    },
+    {
+      "n": 18,
+      "id": "bib.bib9",
+      "text": "Hu, E.J., Shen, Y., Wallis, P., Allen-Zhu, Z., Li, Y., Wang, S., Wang, L., Chen, W.: Lora: Low-rank adaptation of large language models. arXiv preprint arXiv:2106.09685 (2021)"
+    }
+  ]
+}

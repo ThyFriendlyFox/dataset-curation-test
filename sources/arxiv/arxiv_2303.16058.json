@@ -1,0 +1,183 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2303.16058",
+  "title": "Unmasked Teacher: Towards Training-Efficient Video Foundation Models",
+  "authors": "Kunchang Li, Yali Wang, Yizhuo Li, Yi Wang, Yinan He, Limin Wang, Yu Qiao",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2303.16058",
+  "html_url": "https://arxiv.org/html/2303.16058",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 638,
+  "text": "Video understanding has emerged as a critical skill for artificial intelligence systems to analyze and comprehend videos effectively. The progress in video understanding is currently driven by the Image Foundation Models (IFMs) [5,6,7,3], which are trained from massive datasets and adapted for different downstream tasks [8,9,10,11]. However, IFMs tend to focus more on scenes and objects, disregarding the essential motion patterns and object interactions required for complex video understanding. The true Video Foundation Models (VFMs) are underexplored due to the high computational costs and data scarcity.\n\nWhile building VFMs on well-learned IFMs reduces training costs, it poses significant challenges in transferring knowledge from the image domain to the video domain. Firstly, due to limited video data and a substantial domain gap, video post-pretraining may undermine the generality inherited from IFMs [12]. Moreover, the strong spatial initialization offers a shortcut to perceive videos from scenes in single frames (e.g., “grass” in “horse riding”), which constrains VFMs from learning spatiotemporal relationships to recognize and localize temporal-related actions, such as “opening” and “closing” in Figure 2. Lastly, this paradigm is difficult to scale up as it requires well-prepared IFMs.\n\nThe recent success of VideoMAE [13,14] offers a data-efficient way to learn effective spatiotemporal features from scratch, which handles complex temporal action recognition and detection tasks impressively. Nonetheless, its strong data efficiency and spatiotemporal modeling are traded by long pre-training (e.g., 2400 epochs on 160k videos). Besides, it is not well-suited for video-language tasks since the low-level pixel reconstruction task conflicts with high-level cross-modal alignment [15]. Additionally, the extra decoder that handles masked and unmasked tokens causes high memory costs due to global self-attention, making scaling up this paradigm also challenging.\n\nIn this paper, we present a training-efficient method for temporal-sensitive VFMs by integrating the benefits of previous methods. Rather than directly adapting public IFM, e.g., CLIP [3], we utilize them as U n M asked T eacher (UMT) to train vanilla ViT from scratch. We mask out most of the video tokens with low semantics and only align the unmasked tokens with a linear projection to the corresponding ones from the teacher. This approach not only inherits data efficiency from VideoMAE but also makes the learned video encoder multimodal-friendly (validated in Table 1). Moreover, training with only unmasked tokens without a decoder further saves GPU memory compared to VideoMAE, and the guidance from the teacher’s semantically rich representation leads to faster convergence. Notably, the resulting model can handle both scene-related [16,17] and temporal-related actions [18,19] exceptionally well, while the alignment to CLIP features enables the model to be compatible with cross-modal learning.\n\nTo address various video tasks, we propose a progressive pre-training framework in Figure 2. In Stage 1, we only use video data for masked video modeling, resulting in a model that excels at video-only tasks. In Stage 2, we employ public vision-language data for multi-modality learning. This allows the model to conduct complex video-language tasks, such as video-text retrieval [20,21] and video question answering [22,23]. We use the UMT in both stages, significantly reducing the training sources and speeding up convergence. Thanks to readily-available image and language foundation models [3,24,25,26,27], our simple framework is easily scalable for video foundation models.\n\nWe conduct extensive experiments to verify the effectiveness and efficiency of our approach. As shown in Figure 1, with public sources (data/models) for pre-training, our method achieves state-of-the-art performances on various video tasks, including action recognition [16,28,29,17,18] (90.6% top-1 accuracy on K400), spatiotemporal localization [19] (39.8 mAP on AVA), video-text retrieval [20,30,31,21,32] (58.8 R@1 on MSRVTT) and video question-answering [22,23,33] (47.1% accuracy on MSRVTT). It is worth emphasizing that our method is much more environmentally friendly compared to CoCa [4], which uses 2,048 CloudTPUv4 chips for 5 days. In contrast, our pre-training requires 32 A100(80G) GPUs within 6 days, leading to a remarkable 70 \\times reduction in carbon emissions.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib87",
+      "text": "Shen Yan, Xuehan Xiong, Anurag Arnab, Zhichao Lu, Mi Zhang, Chen Sun, and Cordelia Schmid. Multiview transformers for video recognition. In IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2022."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib77",
+      "text": "Yi Wang, Kunchang Li, Yizhuo Li, Yinan He, Bingkun Huang, Zhiyu Zhao, Hongjie Zhang, Jilan Xu, Yi Liu, Zun Wang, Sen Xing, Guo Chen, Junting Pan, Jiashuo Yu, Yali Wang, Limin Wang, and Yu Qiao. Internvideo: General video foundation models via generative and discriminative learning. ArXiv , abs/2212.03191, 2022."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib61",
+      "text": "Alec Radford, Jong Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry, Amanda Askell, Pamela Mishkin, Jack Clark, Gretchen Krueger, and Ilya Sutskever. Learning transferable visual models from natural language supervision. In International Conference on Machine Learning , 2021."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib92",
+      "text": "Jiahui Yu, Zirui Wang, Vijay Vasudevan, Legg Yeung, Mojtaba Seyedhosseini, and Yonghui Wu. Coca: Contrastive captioners are image-text foundation models. Transactions on Machine Learning Research , 2022."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib23",
+      "text": "Alexey Dosovitskiy, Lucas Beyer, Alexander Kolesnikov, Dirk Weissenborn, Xiaohua Zhai, Thomas Unterthiner, Mostafa Dehghani, Matthias Minderer, Georg Heigold, Sylvain Gelly, Jakob Uszkoreit, and Neil Houlsby. An image is worth 16x16 words: Transformers for image recognition at scale. In International Conference on Learning Representations , 2021."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib32",
+      "text": "Kaiming He, Xinlei Chen, Saining Xie, Yanghao Li, Piotr Doll’ar, and Ross B. Girshick. Masked autoencoders are scalable vision learners. In IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2022."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib6",
+      "text": "Hangbo Bao, Li Dong, Songhao Piao, and Furu Wei. Beit: Bert pre-training of image transformers. In International Conference on Learning Representations , 2021."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib18",
+      "text": "Jia Deng, Wei Dong, Richard Socher, Li-Jia Li, Kai Li, and Li Fei-Fei. Imagenet: A large-scale hierarchical image database. In IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2022."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib101",
+      "text": "Bolei Zhou, Hang Zhao, Xavier Puig, Tete Xiao, Sanja Fidler, Adela Barriuso, and Antonio Torralba. Semantic understanding of scenes through the ade20k dataset. International Journal of Computer Vision , 2019."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib60",
+      "text": "Bryan A Plummer, Liwei Wang, Chris M Cervantes, Juan C Caicedo, Julia Hockenmaier, and Svetlana Lazebnik. Flickr30k entities: Collecting region-to-phrase correspondences for richer image-to-sentence models. In Proceedings of the IEEE international conference on computer vision , 2015."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib72",
+      "text": "Jiahao Wang, Guo Chen, Yifei Huang, Limin Wang, and Tong Lu. Memory-and-anticipation transformer for online action understanding, 2023."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib86",
+      "text": "Hongwei Xue, Yuchong Sun, Bei Liu, Jianlong Fu, Ruihua Song, Houqiang Li, and Jiebo Luo. Clip-vip: Adapting pre-trained image-text model to video-language representation alignment. ArXiv , abs/2209.06430, 2022."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib69",
+      "text": "Zhan Tong, Yibing Song, Jue Wang, and Limin Wang. VideoMAE: Masked autoencoders are data-efficient learners for self-supervised video pre-training. In Neural Information Processing Systems , 2022."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib25",
+      "text": "Christoph Feichtenhofer, Haoqi Fan, Yanghao Li, and Kaiming He. Masked autoencoders as spatiotemporal learners. Advances in neural information processing systems , 2022."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib66",
+      "text": "Fangxun Shu, Biaolong Chen, Yue Liao, Ke Gao, Shuwen Xiao, Wenyu Sun, Xiaobo Li, Yousong Zhu, Jinqiao Wang, and Si Liu. Masked contrastive pre-training for efficient video-text retrieval. ArXiv , abs/2212.00986, 2022."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib37",
+      "text": "Will Kay, João Carreira, Karen Simonyan, Brian Zhang, Chloe Hillier, Sudheendra Vijayanarasimhan, Fabio Viola, Tim Green, Trevor Back, Apostol Natsev, Mustafa Suleyman, and Andrew Zisserman. The kinetics human action video dataset. ArXiv , abs/1705.06950, 2017."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib55",
+      "text": "Mathew Monfort, Bolei Zhou, Sarah Adel Bargal, Alex Andonian, Tom Yan, Kandan Ramakrishnan, Lisa M. Brown, Quanfu Fan, Dan Gutfreund, Carl Vondrick, and Aude Oliva. Moments in time dataset: One million videos for event understanding. IEEE Transactions on Pattern Analysis and Machine Intelligence , 2020."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib30",
+      "text": "Raghav Goyal, Samira Ebrahimi Kahou, Vincent Michalski, Joanna Materzynska, Susanne Westphal, Heuna Kim, Valentin Haenel, Ingo Fründ, Peter Yianilos, Moritz Mueller-Freitag, Florian Hoppe, Christian Thurau, Ingo Bax, and Roland Memisevic. The “something something” video database for learning and evaluating visual common sense. In IEEE International Conference on Computer Vision , 2017."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib31",
+      "text": "Chunhui Gu, Chen Sun, Sudheendra Vijayanarasimhan, Caroline Pantofaru, David A. Ross, George Toderici, Yeqing Li, Susanna Ricco, Rahul Sukthankar, Cordelia Schmid, and Jitendra Malik. Ava: A video dataset of spatio-temporally localized atomic visual actions. IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2017."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib84",
+      "text": "Jun Xu, Tao Mei, Ting Yao, and Yong Rui. Msr-vtt: A large video description dataset for bridging video and language. In Proceedings of the IEEE conference on computer vision and pattern recognition , 2016."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib63",
+      "text": "Anna Rohrbach, Atousa Torabi, Marcus Rohrbach, Niket Tandon, Christopher Joseph Pal, H. Larochelle, Aaron C. Courville, and Bernt Schiele. Movie description. International Journal of Computer Vision , 2016."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib94",
+      "text": "Zhou Yu, Dejing Xu, Jun Yu, Ting Yu, Zhou Zhao, Yueting Zhuang, and Dacheng Tao. Activitynet-qa: A dataset for understanding complex web videos via question answering. In Proceedings of the AAAI Conference on Artificial Intelligence , 2019."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib82",
+      "text": "Dejing Xu, Zhou Zhao, Jun Xiao, Fei Wu, Hanwang Zhang, Xiangnan He, and Yueting Zhuang. Video question answering via gradually refined attention over appearance and motion. In Proceedings of the IEEE international conference on Multimedia , 2017."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib58",
+      "text": "Zhiliang Peng, Li Dong, Hangbo Bao, Qixiang Ye, and Furu Wei. Beit v2: Masked image modeling with vector-quantized visual tokenizers. ArXiv , abs/2208.06366, 2022."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib52",
+      "text": "Jiasen Lu, Dhruv Batra, Devi Parikh, and Stefan Lee. Vilbert: Pretraining task-agnostic visiolinguistic representations for vision-and-language tasks. Advances in neural information processing systems , 2019."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib100",
+      "text": "Susan Zhang, Stephen Roller, Naman Goyal, Mikel Artetxe, Moya Chen, Shuohui Chen, Christopher Dewan, Mona Diab, Xian Li, Xi Victoria Lin, et al. Opt: Open pre-trained transformer language models. ArXiv , abs/2205.01068, 2022."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib16",
+      "text": "Hyung Won Chung, Le Hou, Shayne Longpre, Barret Zoph, Yi Tay, William Fedus, Eric Li, Xuezhi Wang, Mostafa Dehghani, Siddhartha Brahma, et al. Scaling instruction-finetuned language models. arXiv preprint arXiv:2210.11416 , 2022."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib10",
+      "text": "João Carreira, Eric Noland, Andras Banki-Horvath, Chloe Hillier, and Andrew Zisserman. A short note about kinetics-600. ArXiv , abs/1808.01340, 2018."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib11",
+      "text": "João Carreira, Eric Noland, Chloe Hillier, and Andrew Zisserman. A short note on the kinetics-700 human action dataset. ArXiv , abs/1907.06987, 2019."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib1",
+      "text": "Lisa Anne Hendricks, Oliver Wang, Eli Shechtman, Josef Sivic, Trevor Darrell, and Bryan Russell. Localizing moments in video with natural language. In Proceedings of the IEEE international conference on computer vision , 2017."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib38",
+      "text": "Ranjay Krishna, Kenji Hata, Frederic Ren, Li Fei-Fei, and Juan Carlos Niebles. Dense-captioning events in videos. In Proceedings of the IEEE international conference on computer vision , 2017."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib13",
+      "text": "David L. Chen and William B. Dolan. Collecting highly parallel data for paraphrase evaluation. In Annual Meeting of the Association for Computational Linguistics , 2011."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib93",
+      "text": "Youngjae Yu, Jongseok Kim, and Gunhee Kim. A joint sequence fusion model for video question answering and retrieval. In Proceedings of the European Conference on Computer Vision , 2018."
+    }
+  ]
+}

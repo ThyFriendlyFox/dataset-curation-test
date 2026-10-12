@@ -1,0 +1,123 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2308.07757",
+  "title": "A Scalable Formal Verification Methodology for Data-Oblivious Hardware",
+  "authors": "Lucas Deutschmann, Johannes Mueller, Mohammad Rahmani Fadiheh, Dominik Stoffel, Wolfgang Kunz",
+  "year": "2024",
+  "categories": [
+    "cs.CR"
+  ],
+  "url": "https://arxiv.org/abs/2308.07757",
+  "html_url": "https://arxiv.org/html/2308.07757",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 881,
+  "text": "In recent years, the view on hw (hw) as a root-of-trust has been severely damaged. A flood of new security vulnerabilities renewed the focus on microarchitectural side channels. Both sw (sw) and hw communities have proposed numerous countermeasures to these new security gaps. However, to fully meet the stringent demands of security-critical applications, a holistic combination of multiple countermeasures is needed that takes consideration of the entire system stack.\n\nThe most prominent sw paradigm that tries to mitigate microarchitectural timing side channels is known as data-oblivious, or constant-time, programming [1,2,3,4]. It works by the assumption that the timing and the resource usage of certain operations inside a processor are independent of their respective input data. Constant-time programming is an actively studied discipline with many important contributions from the sw community, including open-source libraries [5,6,3], domain-specific languages [7], verification tools [8,9,10,2,11] and dedicated compilers [12,13]. The term ”constant-time” can, however, be misleading, as there is no need for execution times to be constant. A variable operation timing is acceptable, as long as it depends only on public information. For example, in constant-time programming, the program itself is considered public information. With this assumption in mind, consider a Read-After-Write (RAW) hazard in a pipelined processor causing a stall. The resulting change in instruction timing is legal because it is based on the public sequence of instructions, not on its (potentially confidential) operands.\n\nThe data-oblivious subset of a processor’s instruction set is often referred to as the set of oblivious HW primitives. More complex instructions, which could potentially be insecure, are decomposed into these primitives to ensure a data-oblivious behavior. As a simple example, consider a processor which implements a multi-cycle multiplication. A common optimization in a HW multiplier is to check whether one of the operands is zero and, if so, produce the result after a single cycle. This creates a data-dependent timing and a possible side channel if the operand contains confidential information. Instead of issuing a multiplication, constant-time programming would therefore resort to replacing the multiply instruction by a sequence of primitive instructions like add and shift. However, there is no guarantee that even these simple instructions are actually oblivious HW primitives. Wether or not an instruction fulfills the criterion of data-independent timing can vary between the implemented microarchitectures. Yet, there is only little research on how to verify these assumptions at the microarchitectural level [14,15,16,17].\n\nTo make things worse, a recent survey [18] highlighted seven classes of microarchitectural optimizations that all undermine the constant-time paradigm. While exploiting some of these optimizations in commodity processors may seem unrealistic, an attack called Augury [19] demonstrated that this threat is not only a theoretical one. The work shows the security implication of one of these optimizations, namely data memory-dependent prefetchers, as they are present in modern Apple processors. In light of more and more such advanced optimizations being implemented, the question arises as to how we can restore the trust in hw.\n\nTo this end, we propose a novel methodology for proving data-oblivious execution of HW operations using standard formal property checking techniques. For processors, the approach certifies a set of trusted hw primitives for data-oblivious programming. Our results show that even simple instructions like a logical shift might suffer from an unexpected timing variability. We also found a potential, and preventable, timing vulnerability in the extensively verified Ibex RISC-V core [20]. Furthermore, we extend the approach to out-of-order cores, demonstrating its feasibility and scalability with an experiment on the boom (boom) [21].\n\nIn summary, this paper makes the following contributions:\n\n- • Sec. II – We provide a comprehensive overview of related approaches that aim to ensure data-obliviousness building upon an analysis at the HW level.\n\n- • Sec. III – We introduce a definition for data-oblivious execution at the microarchitectural level and formalize it using the notion of a 2-safety property over infinite traces. Since most hw designs are not built for data-obliviousness, we also introduce a weaker notion of input-constrained data-obliviousness for general designs. In order to make these properties verifiable in practice, we present how the definitions over infinite traces can be transformed to inductive properties that span over only a single clock cycle.\n\n- • Sec. IV – We propose a formal verification methodology, called Unique Program Execution Checking for Data-Independent Timing (UPEC-DIT) [17], that can exhaustively detect any violation of data-obliviousness at the hw level. The methodology is based on standard formal property languages, and can therefore be easily integrated into existing formal verification flows. When applied to processor implementations, UPEC-DIT can be used to qualify the instructions of a microarchitectural ISA implementation regarding their data-obliviousness. These data-oblivious instructions constitute HW primitives for countermeasures such as constant-time programming and can therefore serve as a hw root-of-trust for the higher levels of the system stack.\n\n- • Sec. V – We present several optimization techniques, such as black-boxing, proofs over an unrolled model, and cone-of-influence reduction, which can further increase the scalability and usability of the proposed methodology.\n\n- • Sec. VI – We demonstrate the feasibility of our approach through case studies on multiple open-source rtl (rtl) designs. Besides several hw accelerators and in-order processors, our experiments also cover the boom [21], a superscalar RISC-V processor with fp (fp) support, a deep 10-stage pipeline and out-of-order execution.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "B. Coppens, I. Verbauwhede, K. De Bosschere, and B. De Sutter, “Practical mitigations for timing-based side-channel attacks on modern x86 processors,” in 2009 30th IEEE symposium on security and privacy . IEEE, 2009, pp. 45–60."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "S. Cauligi, C. Disselkoen, K. v. Gleissenthall, D. Tullsen, D. Stefan, T. Rezk, and G. Barthe, “Constant-time foundations for the new spectre era,” in Proceedings of the 41st ACM SIGPLAN Conference on Programming Language Design and Implementation , 2020, pp. 913–926."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "“Bearssl,” https://www.bearssl.org/ , 2018."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "“A guide to constant-time crypto,” https://www.chosenplaintext.ca/articles/beginners-guide-constant-time-cryptography.html , 2023."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "M. Andrysco, D. Kohlbrenner, K. Mowery, R. Jhala, S. Lerner, and H. Shacham, “On subnormal floating point and abnormal timing,” in 2015 IEEE Symposium on Security and Privacy , 2015, pp. 623–639."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "L. C. Meier, S. Colombo, M. Thiercelin, and B. Ford, “Constant-time arithmetic for safer cryptography,” Cryptology ePrint Archive, Paper 2021/1121, 2021, https://eprint.iacr.org/2021/1121 ."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "S. Cauligi, G. Soeller, F. Brown, B. Johannesmeyer, Y. Huang, R. Jhala, and D. Stefan, “Fact: A flexible, constant-time programming language,” in 2017 IEEE Cybersecurity Dev. (SecDev) . IEEE, 2017, pp. 69–76."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "J. B. Almeida, M. Barbosa, G. Barthe, F. Dupressoir, and M. Emmi, “Verifying constant-time implementations,” in 25th USENIX Security Symposium (USENIX Security 16) , 2016, pp. 53–70."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "B. Rodrigues, F. M. Quintão Pereira, and D. F. Aranha, “Sparse representation of implicit flows with applications to side-channel detection,” in Proceedings of the 25th International Conference on Compiler Construction , ser. CC 2016. New York, NY, USA: ACM, 2016, p. 110–120."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "O. Reparaz, J. Balasch, and I. Verbauwhede, “Dude, is my code constant time?” in Proceedings of the Conference on Design, Automation and Test in Europe , ser. DATE ’17. Leuven, BEL: European Design and Automation Association, 2017, p. 1701–1706."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "P. Chakraborty, J. Cruz, C. Posada, S. Ray, and S. Bhunia, “Haste: Software security analysis for timing attacks on clear hardware assumption,” IEEE Embedded Systems Letters , vol. 14, no. 2, pp. 71–74, 2022."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "M. Andrysco, A. Nötzli, F. Brown, R. Jhala, and D. Stefan, “Towards verified, constant-time floating point operations,” in Proceedings of the 2018 ACM SIGSAC Conference on Computer and Communications Security , ser. CCS ’18, New York, NY, USA, 2018, p. 1369–1382."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "G. Barthe, S. Blazy, B. Grégoire, R. Hutin, V. Laporte, D. Pichardie, and A. Trieu, “Formal verification of a constant-time preserving c compiler,” Proc. ACM Program. Lang. , vol. 4, no. POPL, dec 2019."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "A. Ardeshiricham, W. Hu, and R. Kastner, “Clepsydra: Modeling timing flows in hardware designs,” in IEEE/ACM International Conference on Computer-Aided Design (ICCAD) . IEEE, 2017, pp. 147–154."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "K. v. Gleissenthall, R. G. Kıcı, D. Stefan, and R. Jhala, “IODINE: Verifying constant-time execution of hardware,” in 28th USENIX Security Symposium (USENIX Security 19) , 2019, pp. 1411–1428."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "K. v. Gleissenthall, R. G. Kıcı, D. Stefan, and R. Jhala, “Solver-aided constant-time hardware verification,” in Proceedings of the 2021 ACM SIGSAC Conference on Computer and Communications Security , ser. CCS ’21. New York, NY, USA: Association for Computing Machinery, 2021, p. 429–444."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "L. Deutschmann, J. Müller, M. R. Fadiheh, D. Stoffel, and W. Kunz, “Towards a formally verified hardware root-of-trust for data-oblivious computing,” in Proceedings of the 59th ACM/IEEE Design Automation Conference , ser. DAC’22, New York, NY, USA, 2022, p. 727–732."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "J. R. S. Vicarte, P. Shome, N. Nayak, C. Trippel, A. Morrison, D. Kohlbrenner, and C. W. Fletcher, “Opening pandora’s box: A systematic study of new ways microarchitecture can leak private data,” in ACM/IEEE 48th Annual International Symposium on Computer Architecture (ISCA) , 2021."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "J. S. Vicarte, M. Flanders, R. Paccagnella, G. Garrett-Grossman, A. Morrison, C. Fletcher, and D. Kohlbrenner, “Augury: Using data memory-dependent prefetchers to leak data at rest,” in 2022 IEEE Symposium on Security and Privacy (SP) . IEEE Comp. Society, 2022, pp. 1518–1518."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "“Ibex risc-v core,” https://github.com/lowRISC/ibex , 2021."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "J. Zhao, B. Korpan, A. Gonzalez, and K. Asanovic, “Sonicboom: The 3rd generation berkeley out-of-order machine,” in Fourth Workshop on Computer Architecture Research with RISC-V , May 2020."
+    }
+  ]
+}

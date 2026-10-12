@@ -1,0 +1,119 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.04871",
+  "title": "ACORN: Performant and Predicate-Agnostic Search Over Vector Embeddings and Structured Data",
+  "authors": "Liana Patel, Peter Kraft, Carlos Guestrin, Matei Zaharia",
+  "year": "2024",
+  "categories": [
+    "cs.IR",
+    "cs.DB"
+  ],
+  "url": "https://arxiv.org/abs/2403.04871",
+  "html_url": "https://arxiv.org/html/2403.04871",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 921,
+  "text": "Due to the representation strength of modern deep learning models, vector embeddings have become a powerful first-class datatype for wide-ranging applications that use retrieval-augmented generation [1,2] or similarity-based search [3,4,5]. As a result, vector databases and indices are seeing increasing adoption in many production use cases. These systems provide an efficient approximate-nearest-neighbor (ANN) search interface over embedded unstructured data e.g., images, text, video, or user profiles.\n\nHowever, many applications must jointly query both unstructured and structured data, requiring ANN search in combination with predicate filtering. For example, customers on an e-commerce site can search for t-shirts similar to a reference image, while filtering on price [6]. Similarly, researchers performing a literature review may search with both natural language queries and filters on publication date, keywords or topics [7]. Likewise, a data scientist working on outlier detection can find misclassified images by retrieving those that look similar to a reference dog but have the label \"cat\" [8,9].\n\nTo leverage diverse data modalities, applications need data management systems that effectively support hybrid search queries, i.e., similarity search with structured predicates. Such systems require (1) query performance, i.e., efficient and accurate search despite variance in workload characteristics, such as selectivity, attribute correlations, and scale, and (2) expressive query semantics: support for diverse query predicates that may not be known a priori (e.g., user-entered keywords, range searches, or regex matching).\n\nUnfortunately, existing systems fall short of these goals. Three commonly used methods are pre-filtering [10,6], post-filtering [11,12,13,6,10], and specialized data structures for low-cardinality predicate sets [14,15,16,17]. Pre-filtering first finds all records in the dataset that pass the query predicate, then performs brute force similarity-search over the filtered vector set. This approach scales poorly, becoming inefficient for medium to high selectivity predicates on large datasets. Alternatively, post-filtering first searches an ANN index, then removes results that fail the query predicate. Since the database vectors closest to the query vector may not pass the predicate, post-filtering methods must typically expand the search scope. This is often expensive, particularly for search predicates with low selectivity or low correlation to the query vector, as we show in Figure 2. Milvus [10], Weaviate [12], AnalyticDB-V [6], and FAISS-IVF [13] build systems using these two core methods, and suffer from their performance limitations.\n\nRecognizing these limitations, recent works construct specialized indices designed for hybrid search workloads with low-cardinality predicate sets consisting of equality predicate operators. For example, Filtered-DiskANN [15] outperforms prior baselines, but restricts the cardinality of the predicate set to about 1,000 and only supports equality predicates. HQANN [16] and NHQ [18] similarly constrain the predicate set to a small number of equality filters and in addition allow only a single structured attributes per dataset entry. These methods are often impractical since many applications have large, or unbounded predicate sets that are unknown a priori. In general, the possible predicate set’s cardinality grows exponentially with each attribute’s cardinality, which itself may be large. Thus, we instead propose a predicate-agnostic index, which can support arbitrary and unbounded predicate sets.\n\nIn this paper, we propose ACORN (ANN Constraint-Optimized Retrieval Network), a novel approach for performant and predicate-agnostic hybrid search that can serve high-cardinality and unbounded predicate sets. We propose two indices: ACORN- \\gamma, designed for high-efficiency search, and ACORN-1, designed for low construction overhead in resource-constrained settings. Both methods modify the hierarchical navigable small world (HNSW) index, a state-of-the-art graph-based index for ANN search, and are easy to implement in existing HNSW libraries.\n\nACORN tackles both the performance limitations of pre- and post- filtering, as well as the semantic limitations of specialized indices. ACORN proposes the idea of predicate subgraph traversal during search. As the name implies, the search strategy traverses the subgraph of the ACORN index induced by the set of nodes that pass the query predicate. ACORN designs the index such that these arbitrary predicate subgraphs approximate an HNSW index. Unlike pre- and post-filtering, this allows ACORN to provide sublinear retrieval times despite variance in correlation between query vectors and predicates, which we find to be a major challenge for existing hybrid search systems. ACORN also serves wide-ranging predicate sets by employing a predicate-agnostic construction that alters HNSW’s algorithm to create a denser graph. Specifically, we introduce a predicate-agnostic neighbor expansion strategy in ACORN- \\gamma based on target predicate selectivity thresholds, which can be estimated empirically with or without knowing the predicate set. In conjunction, we propose a predicate-agnostic compression heuristic to efficiently manage the index space footprint while maintaining efficient search. We also explore the trade-off space between search performance and construction overhead, designing ACORN-1 to approximate ACORN- \\gamma ’s search performance while further reducing the time-to-index (TTI) for resource-constrained settings.\n\nWe systematically evaluate ACORN- \\gamma and ACORN-1 on four datasets: SIFT1M [19], Paper [14], LAION [20], and TripClick [7]. Our evaluation includes both prior benchmark datasets, with simple, low-cardinality predicate sets, which prior specialized indices can serve, as well as more complex datasets with millions of possible predicates, which existing indices cannot to handle. On each, ACORN- \\gamma achieves state-of-the-art hybrid search performance with 2–1000 \\times higher queries per second (QPS) at 0.9 recall compared to prior methods. Specifically, ACORN achieves 2-10 \\times higher QPS on prior benchmarks, over 30 \\times higher QPS on new benchmarks, and over 1,000x higher QPS at scale, on a 25-million-vector dataset. We find that ACORN-1 empirically approximates ACORN- \\gamma, attaining at most 5\\times lower QPS at fixed recall but 9–53 \\times lower TTI compared to ACORN- \\gamma. Our detailed evaluation demonstrates the effectiveness of ACORN’s predicate-subgraph traversal strategy and predicate-agnostic construction techniques.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib4",
+      "text": "lla ([n. d.]) [n. d.]. Q&A over Documents - LlamaIndex 0.8.43. https://gpt-index.readthedocs.io/en/latest/"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib66",
+      "text": "Wolfson (2023) Brie Wolfson. 2023. Building chat langchain. https://blog.langchain.dev/building-chat-langchain-2/"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib19",
+      "text": "Borisyuk et al . (2021) Fedor Borisyuk, Siddarth Malreddy, Jun Mei, Yiqun Liu, Xiaoyi Liu, Piyush Maheshwari, Anthony Bell, and Kaushik Rangadurai. 2021. VisRel: Media Search at Scale. In Proceedings of the 27th ACM SIGKDD Conference on Knowledge Discovery & Data Mining (KDD ’21) . Association for Computing Machinery, New York, NY, USA, 2584–2592. https://doi.org/10.1145/3447548.3467081"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib43",
+      "text": "Liu et al . (2021a) Yiding Liu, Weixue Lu, Suqi Cheng, Daiting Shi, Shuaiqiang Wang, Zhicong Cheng, and Dawei Yin. 2021a. Pre-trained Language Model for Web-scale Retrieval in Baidu Search. In Proceedings of the 27th ACM SIGKDD Conference on Knowledge Discovery & Data Mining (KDD ’21) . Association for Computing Machinery, New York, NY, USA, 3365–3375. https://doi.org/10.1145/3447548.3467149"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib22",
+      "text": "Du et al . (2022) Ming Du, Arnau Ramisa, Amit Kumar K C, Sampath Chanda, Mengjiao Wang, Neelakandan Rajesh, Shasha Li, Yingchuan Hu, Tao Zhou, Nagashri Lakshminarayana, Son Tran, and Doug Gray. 2022. Amazon Shop the Look: A Visual Search System for Fashion and Home. In Proceedings of the 28th ACM SIGKDD Conference on Knowledge Discovery and Data Mining (KDD ’22) . Association for Computing Machinery, New York, NY, USA, 2822–2830. https://doi.org/10.1145/3534678.3539071"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib65",
+      "text": "Wei et al . (2020) Chuangxian Wei, Bin Wu, Sheng Wang, Renjie Lou, Chaoqun Zhan, Feifei Li, and Yuanzhe Cai. 2020. AnalyticDB-V: a hybrid analytical engine towards query fusion for structured and unstructured data. Proceedings of the VLDB Endowment 13, 12 (Aug. 2020), 3152–3165. https://doi.org/10.14778/3415478.3415541"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib55",
+      "text": "Rekabsaz et al . (2021) Navid Rekabsaz, Oleg Lesota, Markus Schedl, Jon Brassey, and Carsten Eickhoff. 2021. TripClick: The Log Files of a Large Health Web Search Engine. In Proceedings of the 44th International ACM SIGIR Conference on Research and Development in Information Retrieval . 2507–2513. https://doi.org/10.1145/3404835.3463242 arXiv:2103.07901 [cs]."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "fas (2023) 2023. visual-layer/fastdup. https://github.com/visual-layer/fastdup"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib3",
+      "text": "lab ([n. d.]) [n. d.]. Pre-label and enrich data with bulk classifications. https://labelbox.ghost.io/blog/pre-label-and-enrich-your-data-with-bulk-classifications/"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib63",
+      "text": "Wang et al . (2021) Jianguo Wang, Xiaomeng Yi, Rentong Guo, Hai Jin, Peng Xu, Shengjun Li, Xiangyu Wang, Xiangzhou Guo, Chengming Li, Xiaohai Xu, Kun Yu, Yuxing Yuan, Yinghao Zou, Jiquan Long, Yudong Cai, Zhenxiang Li, Zhifeng Zhang, Yihua Mo, Jun Gu, Ruiyi Jiang, Yi Wei, and Charles Xie. 2021. Milvus: A Purpose-Built Vector Data Management System. In Proceedings of the 2021 International Conference on Management of Data (SIGMOD ’21) . Association for Computing Machinery, New York, NY, USA, 2614–2627. https://doi.org/10.1145/3448016.3457550"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib68",
+      "text": "Zhang et al . (2023) Qianxi Zhang, Shuotao Xu, Qi Chen, Guoxin Sui, Jiadong Xie, Zhizhen Cai, Yaoqi Chen, Yinxuan He, Yuqing Yang, Fan Yang, Mao Yang, and Lidong Zhou. 2023. {VBASE}: Unifying Online Vector Similarity Search and Relational Queries via Relaxed Monotonicity. 377–395. https://www.usenix.org/conference/osdi23/presentation/zhang-qianxi"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib2",
+      "text": "noa ([n. d.]) [n. d.]. Filtered Vector Search | Weaviate - vector database. https://weaviate.io/developers/weaviate/concepts/prefiltering"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib6",
+      "text": "noa (2023b) 2023b. Faiss. https://github.com/facebookresearch/faiss"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib64",
+      "text": "Wang et al . (2022) Mengzhao Wang, Lingwei Lv, Xiaoliang Xu, Yuxiang Wang, Qiang Yue, and Jiongkang Ni. 2022. Navigable Proximity Graph-Driven Native Hybrid Queries with Structured and Unstructured Constraints. http://arxiv.org/abs/2203.13601 arXiv:2203.13601 [cs]."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib26",
+      "text": "Gollapudi et al . (2023) Siddharth Gollapudi, Neel Karia, Varun Sivashankar, Ravishankar Krishnaswamy, Nikit Begwani, Swapnil Raz, Yiyong Lin, Yin Zhang, Neelam Mahapatro, Premkumar Srinivasan, Amit Singh, and Harsha Vardhan Simhadri. 2023. Filtered-DiskANN: Graph Algorithms for Approximate Nearest Neighbor Search with Filters. In Proceedings of the ACM Web Conference 2023 . ACM, Austin TX USA, 3406–3416. https://doi.org/10.1145/3543507.3583552"
+    },
+    {
+      "n": 16,
+      "id": "bib.bib67",
+      "text": "Wu et al . (2022) Wei Wu, Junlin He, Yu Qiao, Guoheng Fu, Li Liu, and Jin Yu. 2022. HQANN: Efficient and Robust Similarity Search for Hybrid Queries with Structured and Unstructured Constraints. http://arxiv.org/abs/2207.07940 arXiv:2207.07940 [cs]."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib50",
+      "text": "Mohoney et al . (2023) Jason Mohoney, Anil Pacaci, Shihabur Rahman Chowdhury, Ali Mousavi, Ihab F. Ilyas, Umar Farooq Minhas, Jeffrey Pound, and Theodoros Rekatsinas. 2023. High-Throughput Vector Similarity Search in Knowledge Graphs. http://arxiv.org/abs/2304.01926 arXiv:2304.01926 [cs]."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib13",
+      "text": "AshenOn3 (2023) AshenOn3. 2023. NHQ: An Efficient and Robust Framework for Approximate Nearest Neighbor Search with Attribute Constraint. https://github.com/AshenOn3/NHQ original-date: 2021-09-09T08:28:21Z."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib36",
+      "text": "Jégou et al . (2011) Herve Jégou, Matthijs Douze, and Cordelia Schmid. 2011. Product Quantization for Nearest Neighbor Search. IEEE Transactions on Pattern Analysis and Machine Intelligence 33, 1 (Jan. 2011), 117–128. https://doi.org/10.1109/TPAMI.2010.57 Conference Name: IEEE Transactions on Pattern Analysis and Machine Intelligence."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib56",
+      "text": "Schuhmann et al . (2021) Christoph Schuhmann, Richard Vencu, Romain Beaumont, Robert Kaczmarczyk, Clayton Mullis, Aarush Katta, Theo Coombes, Jenia Jitsev, and Aran Komatsuzaki. 2021. LAION-400M: Open Dataset of CLIP-Filtered 400 Million Image-Text Pairs. https://doi.org/10.48550/arXiv.2111.02114 arXiv:2111.02114 [cs]."
+    }
+  ]
+}

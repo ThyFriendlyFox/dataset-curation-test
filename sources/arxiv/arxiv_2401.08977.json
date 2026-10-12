@@ -1,0 +1,179 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2401.08977",
+  "title": "FedLoGe: Joint Local and Generic Federated Learning under Long-tailed Data",
+  "authors": "Zikai Xiao, Zihan Chen, Liyinglan Liu, Yang Feng, Jian Wu, Wanlu Liu, Joey Tianyi Zhou, Howard Hao Yang, Zuozhu Liu",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.AI"
+  ],
+  "url": "https://arxiv.org/abs/2401.08977",
+  "html_url": "https://arxiv.org/html/2401.08977",
+  "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+  "section": "Introduction",
+  "word_count": 1109,
+  "text": "Federated learning (FL) enables collaborative model training across decentralized clients without exposing local private data [1,2]. Recent work further investigates the federated long-tailed learning (Fed-LT) task, where the global data exhibits long-tailed distributions and local clients hold heterogeneous distributions [3,4]. They usually learn a well-trained generic global model, whose performance might degrade when universally applied to all clients with diverse data, degrading its practical applicability. For example, in the realm of smart healthcare, as demonstrated by [5], [6], and [7], the capacity of the global model to deliver high-quality diagnostics is limited, as patient distributions vary across specialized hospitals. Additionally, in cross-institutional financial applications like credit scoring [8] and fraud detection [9], individuals from different regions or age groups may exhibit dissimilar credit patterns.\n\nA high-quality global model with balanced performance could speed up local adaptation and attract new clients, while personalized models aim to provide enhanced local performance by considering local data characteristics. Nevertheless, existing works on Fed-LT have primarily focused on addressing the imbalance in the context of the global long-tailed data [10,11,12], neglecting the tailoring of models to the needs of individual clients, since local data statistics could be diverse and not necessarily long-tailed. Personalized federated learning (pFL) [13], which trains customized local models for a single or a group of clients, offers an alternative solution to prioritize each client’s (or group’s) distinct data statistics and preferences, in which the global generic model is deemed as a bridge for training local personalized models and boosting the local performance with expressive representations [14,15,16]. However, conventional pFL approaches are not supposed to attain a superior global generic model in Fed-LT.\n\nDesigning a framework to simultaneously train global and local models in the presence of Fed-LT remains a critical challenge. Inspired by [17], we find that the generality and transferability of feature extractors are significantly superior to classifiers [18,19]. On the contrary, adjusting the classifier has proven to be quite effective in addressing the imbalance and heterogeneity issues [20,21]. In other words, the feature extractor can serve as the cornerstone to reflect global trends, while adjusting classifiers can induce the model to adaptively achieve superior personalized performance across the server and heterogeneous clients. Consequently, we conceptualize our model learning with two intertwined processes: global representation learning and imbalanced/heterogeneous classifier adaptation. Adopting this viewpoint, we identify two key challenges for personalized Fed-LT:\n\nC1: How to learn effective representations under heterogeneous and imbalanced data?\n\nDue to heterogeneity, each client captures different feature distributions, leading to divergence during model aggregation and inferior global performance. Recent studies show that training with a fixed classifier can reduce divergence among heterogeneous clients to improve performance [22,23]. The fixed classifier serves as a consistent criterion for learning representations across clients over time, rather than being an optimal choice itself. For instance, [24] proposes to initialize the classifier as a simplex equiangular tight frame (ETF) with maximal pairwise angles under imbalanced learning. In general, these fixed classifiers force the feature prototypes to converge to an optimal structure to improve representation learning. However, their effectiveness in resolving Fed-LT regarding both global and local models is not investigated.\n\nWe examine the effectiveness of training with fixed classifiers in Fed-LT from the perspective of neural collapse (NC) [25]. The NC identifies a salient property of the feature space, showing that all within-same-class features tend to collapse to their respective class means. However, as shown in Fig. 1 (a), preliminary experiments benchmarking ETF with CIFAR-100 in Fed-LT suggest that only a few features have relatively large means, while most of the small-mean features are contaminated by severe noise. Such observations are inconsistent with the feature collapse property, and we coin it as feature degeneration. More details of the computation process for the data in Fig. 1 as well as the necessary explanation can be found in Appendix A.2.\n\nTo resolve the feature degeneration for improved representation learning, we propose the Static Sparse Equiangular Tight Frame Classifier (SSE-C) inspired by the sparse coding theories [26,27]. The assumption of SSE-C is that the small-mean degenerated features contribute little to model performance while forcing sparsity on them would help learn more expressive representations. We refer to the small-mean features as negligible features and the large-mean features as dominant features. The SSE-C dynamically prunes the classifier weights of those small-mean noisy features, while holding more expressive dominant features. Probing into weights trained with SSE-C validates our assumption, as shown in Fig. 1 (b) and experiments.\n\nC2: How to conduct effective feature realignment to improve the performance of both the generic and personalized models based on data preferences?\n\nIn Fed-LT, the long-tailed global data distribution and heterogeneous local distributions raise the requirements to learn different global and personalized local models for satisfactory performance. Thus, the feature extractor trained with a fixed classifier needs to be realigned to both global and local models. For the global model, it is necessary to realign the model to improve its performance on global tail classes. For the personalized model, the classifier needs to align features with respective heterogeneous local data preferences.\n\nIn this work, we unify the feature realignment for both the server and clients under the neural collapse framework. The key idea is to align both global and local classifiers based on the weight norm of the classifiers. Previous works show that classifier weight norms are closely correlated with the corresponding class cardinalities [17,28,29]. Further research provides both empirical explanation and theoretical justification that the classifier weight norm is larger for majority classes while smaller for minorities [30,31,32].\n\nWe propose the Global and Local Adaptive Feature realignment (GLA-FR) module to align the backbone trained with SSE-C to the server and clients. In particular, we devise auxiliary classifier heads for the global (\\mathbf{\\psi}) and K local classifiers (\\{\\mathbf{\\phi}_{k}\\}_{k=1}^{K}), which are trained alternately with SSE-C in each epoch, see Algorithm 1. The alignment includes two stages: global alignment and local alignment. The global realignment is simple yet effective, adjusting the weights based on the norms of \\mathbf{\\psi} (Eq. 6) to tackle with global balanced test set. The alignment for personalized models is a bit different, as their data distributions differ greatly from the global distribution. We integrate the global trends with each local client’s preference by adjusting the global classifiers \\mathbf{\\psi} with the norms of local classifier \\mathbf{\\phi}_{k} (Eq. 7).\n\nOur work represents pioneering efforts to achieve a harmonious integration of global and personalized model learning under Fed-LT, thereby facilitating each participating institution in obtaining a model that is more adeptly tailored to its inherent characteristics and preferences. Comprehensive experiments on representative datasets CIFAR-10/100-LT, ImageNet, and iNaturalist demonstrate the outperformance and efficacy of both global generic and local personalized Fed-LT models.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib41",
+      "text": "McMahan et al. (2017) Brendan McMahan, Eider Moore, Daniel Ramage, Seth Hampson, and Blaise Aguera y Arcas. Communication-efficient learning of deep networks from decentralized data. In Artificial intelligence and statistics , pp. 1273–1282. PMLR, 2017."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib26",
+      "text": "Kairouz et al. (2021) Peter Kairouz, H Brendan McMahan, Brendan Avent, Aurélien Bellet, Mehdi Bennis, Arjun Nitin Bhagoji, Kallista Bonawitz, Zachary Charles, Graham Cormode, Rachel Cummings, et al. Advances and open problems in federated learning. Foundations and Trends® in Machine Learning , 14(1–2):1–210, 2021."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib7",
+      "text": "Chen et al. (2022b) Zihan Chen, Songshang Liu, Hualiang Wang, Howard H Yang, Tony QS Quek, and Zuozhu Liu. Towards federated long-tailed learning. arXiv preprint arXiv:2206.14988 , 2022b."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib49",
+      "text": "Shang et al. (2022b) Xinyi Shang, Yang Lu, Gang Huang, and Hanzi Wang. Federated learning on heterogeneous and long-tailed data via classifier re-training with federated features. arXiv preprint arXiv:2204.13399 , 2022b."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib30",
+      "text": "Lee & Shin (2020) Geun Hyeong Lee and Soo-Yong Shin. Federated learning on clinical benchmark data: performance assessment. Journal of medical Internet research , 22(10):e20891, 2020."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "Chen et al. (2022a) Zhen Chen, Chen Yang, Meilu Zhu, Zhe Peng, and Yixuan Yuan. Personalized retrogress-resilient federated learning toward imbalanced medical data. IEEE Transactions on Medical Imaging , 41(12):3663–3674, 2022a."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib18",
+      "text": "Elbatel et al. (2023) Marawan Elbatel, Hualiang Wang, Robert Martí, Huazhu Fu, and Xiaomeng Li. Federated model aggregation via self-supervised priors for highly imbalanced medical image classification. arXiv preprint arXiv:2307.14959 , 2023."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib14",
+      "text": "Dastile et al. (2020) Xolani Dastile, Turgay Celik, and Moshe Potsane. Statistical and machine learning models in credit scoring: A systematic literature survey. Applied Soft Computing , 91:106263, 2020."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib2",
+      "text": "Awoyemi et al. (2017) John O Awoyemi, Adebayo O Adetunmbi, and Samuel A Oluwadare. Credit card fraud detection using machine learning techniques: A comparative analysis. In 2017 international conference on computing networking and informatics (ICCNI) , pp. 1–9. IEEE, 2017."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib64",
+      "text": "Yang et al. (2023a) Wenkai Yang, Deli Chen, Hao Zhao, Fandong Meng, Jie Zhou, and Xu Sun. Integrating local real data with global gradient prototypes for classifier re-balancing in federated long-tailed learning. arXiv preprint arXiv:2301.10394 , 2023a."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib46",
+      "text": "Qian et al. (2023) Pinxin Qian, Yang Lu, and Hanzi Wang. Long-tailed federated learning via aggregated meta mapping. In 2023 IEEE International Conference on Image Processing (ICIP) , pp. 2010–2014. IEEE, 2023."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib62",
+      "text": "Xiao et al. (2023) Zikai Xiao, Zihan Chen, Songshang Liu, Hualiang Wang, YANG FENG, Jin Hao, Joey Tianyi Zhou, Jian Wu, Howard Hao Yang, and Zuozhu Liu. Fed-grab: Federated long-tailed learning with self-adjusting gradient balancer. In Thirty-seventh Conference on Neural Information Processing Systems , 2023."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib53",
+      "text": "Tan et al. (2022) Alysa Ziying Tan, Han Yu, Lizhen Cui, and Qiang Yang. Towards personalized federated learning. IEEE Transactions on Neural Networks and Learning Systems , 2022."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib36",
+      "text": "Li et al. (2021b) Xiaoxiao Li, Meirui Jiang, Xiaofei Zhang, Michael Kamp, and Qi Dou. Fed{bn}: Federated learning on non-{iid} features via local batch normalization. In International Conference on Learning Representations , 2021b. URL https://openreview.net/pdf?id=6YEQUn0QICG ."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib10",
+      "text": "Collins et al. (2021) Liam Collins, Hamed Hassani, Aryan Mokhtari, and Sanjay Shakkottai. Exploiting shared representations for personalized federated learning. In International conference on machine learning , pp. 2089–2099. PMLR, 2021."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib34",
+      "text": "Li et al. (2021a) Tian Li, Shengyuan Hu, Ahmad Beirami, and Virginia Smith. Ditto: Fair and robust federated learning through personalization. In International Conference on Machine Learning , pp. 6357–6368. PMLR, 2021a."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib27",
+      "text": "Kang et al. (2019) Bingyi Kang, Saining Xie, Marcus Rohrbach, Zhicheng Yan, Albert Gordo, Jiashi Feng, and Yannis Kalantidis. Decoupling representation and classifier for long-tailed recognition. arXiv preprint arXiv:1910.09217 , 2019."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib29",
+      "text": "Kim et al. (2022) Donghyun Kim, Kaihong Wang, Stan Sclaroff, and Kate Saenko. A broad study of pre-training for domain generalization and adaptation. In European Conference on Computer Vision , pp. 621–638. Springer, 2022."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib58",
+      "text": "Vasconcelos et al. (2022) Cristina Vasconcelos, Vighnesh Birodkar, and Vincent Dumoulin. Proper reuse of image classification features improves object detection. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pp. 13628–13637, 2022."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib32",
+      "text": "Li et al. (2022a) Mengke Li, Yiu-ming Cheung, and Yang Lu. Long-tailed visual recognition via gaussian clouded logit adjustment. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pp. 6929–6938, 2022a."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib69",
+      "text": "Zhang et al. (2022a) Jie Zhang, Zhiqi Li, Bo Li, Jianghe Xu, Shuang Wu, Shouhong Ding, and Chao Wu. Federated learning with label distribution skew via logits calibration. In International Conference on Machine Learning , pp. 26311–26329. PMLR, 2022a."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib43",
+      "text": "Oh et al. (2022) Jaehoon Oh, SangMook Kim, and Se-Young Yun. FedBABU: Toward enhanced representation for federated image classification. In International Conference on Learning Representations , 2022. URL https://openreview.net/forum?id=HuaYQfggn5u ."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib17",
+      "text": "Dong et al. (2022) Xin Dong, Sai Qian Zhang, Ang Li, and HT Kung. Spherefed: Hyperspherical federated learning. In European Conference on Computer Vision , pp. 165–184. Springer, 2022."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib65",
+      "text": "Yang et al. (2022) Yibo Yang, Shixiang Chen, Xiangtai Li, Liang Xie, Zhouchen Lin, and Dacheng Tao. Inducing neural collapse in imbalanced learning: Do we really need a learnable classifier at the end of deep neural network? Advances in Neural Information Processing Systems , 35:37991–38002, 2022."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib44",
+      "text": "Papyan et al. (2020) Vardan Papyan, XY Han, and David L Donoho. Prevalence of neural collapse during the terminal phase of deep learning training. Proceedings of the National Academy of Sciences , 117(40):24652–24663, 2020."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib21",
+      "text": "Frankle & Carbin (2019) Jonathan Frankle and Michael Carbin. The lottery ticket hypothesis: Finding sparse, trainable neural networks. In International Conference on Learning Representations , 2019. URL https://openreview.net/forum?id=rJl-b3RcF7 ."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib23",
+      "text": "Glorot et al. (2011) Xavier Glorot, Antoine Bordes, and Yoshua Bengio. Deep sparse rectifier neural networks. In Proceedings of the fourteenth international conference on artificial intelligence and statistics , pp. 315–323. JMLR Workshop and Conference Proceedings, 2011."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib54",
+      "text": "Tan et al. (2021) Jingru Tan, Xin Lu, Gang Zhang, Changqing Yin, and Quanquan Li. Equalization loss v2: A new gradient balance approach for long-tailed object detection. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pp. 1685–1694, 2021."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib37",
+      "text": "Li et al. (2020b) Yu Li, Tao Wang, Bingyi Kang, Sheng Tang, Chunfeng Wang, Jintao Li, and Jiashi Feng. Overcoming classifier imbalance for long-tail object detection with balanced group softmax. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pp. 10991–11000, 2020b."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib28",
+      "text": "Kim & Kim (2020) Byungju Kim and Junmo Kim. Adjusting decision boundary for class imbalanced learning. IEEE Access , 8:81674–81685, 2020."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib13",
+      "text": "Dang et al. (2023) Hien Dang, Tan Nguyen, Tho Tran, Hung Tran, and Nhat Ho. Neural collapse in deep linear network: From balanced to imbalanced data. arXiv preprint arXiv:2301.00437 , 2023."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib55",
+      "text": "Thrampoulidis et al. (2022) Christos Thrampoulidis, Ganesh Ramachandra Kini, Vala Vakilian, and Tina Behnia. Imbalance trouble: Revisiting neural-collapse geometry. Advances in Neural Information Processing Systems , 35:27225–27238, 2022."
+    }
+  ]
+}

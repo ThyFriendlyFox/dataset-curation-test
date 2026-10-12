@@ -1,0 +1,119 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2311.03096",
+  "title": "Weight-Sharing Regularization",
+  "authors": "Mehran Shakerinava, Motahareh Sohrabi, Siamak Ravanbakhsh, Simon Lacoste-Julien",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "stat.ML"
+  ],
+  "url": "https://arxiv.org/abs/2311.03096",
+  "html_url": "https://arxiv.org/html/2311.03096",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "INTRODUCTION",
+  "word_count": 1072,
+  "text": "All modern deep learning architectures, from Convolutional Neural Networks (CNNs) [1] to transformers [2], use some form of weight-sharing, e.g., CNNs apply the same weights at different locations of the input image. More generally, requiring a linear function to be symmetric w.r.t. a permutation group induces weight-sharing in its corresponding matrix form [3,4], e.g., symmetry w.r.t. the group of cyclic permutations C_{n} produces a circulant matrix, resulting in circular convolution.\n\nfully connected networks with no structure or weight-sharing are prone to overfitting the dataset. A common technique used in machine learning to avoid overfitting and improve generalization is regularization [5]. Motivated by these facts, we propose weight-sharing regularization. For a weight vector w\\in\\mathbb{R}^{d}, the weight-sharing regularization penalty is defined as\n\nOur goal is to train deep neural networks regularized with \\mathcal{R} (See Fig. 1). By analogy to \\ell_{1} regularization where using a stochastic subgradient method (SGD) performs poorly for compression as it does not yield sufficiently small weights [6], we propose to use instead (stochastic) proximal gradient methods [7] which yield exactly tied weights. The efficient computation of the proximal update will be a central contribution of this paper.\n\nGiven a task-specific loss function \\mathcal{L}(w) we may construct a weight-sharing and \\ell_{1} regularized loss with coefficients \\alpha and \\beta as\n\nThe proximal gradient descent update for l with step-size \\eta is then given by\n\nwhere the proximal mapping is defined as\n\nIt follows from [8] that\n\nTherefore, the main problem lies in computing \\prox_{\\mathcal{R}}.\n\n## 1.1 Contributions\n\nIn this work, we make the following contributions:\n\n- • We provide a new formulation of the proximal mapping of \\mathcal{R} in terms of the solution to an Ordinary Differential Equation (ODE). We give an intuitive interpretation of this ODE in terms of a physical system of interacting particles. This interpretation helps provide an intuitive understanding of algorithms for \\prox_{\\mathcal{R}}.\n\n- • We analyze parallel versions of existing algorithms for \\prox_{\\mathcal{R}} and show that, in the worst case, they provide no speedup compared to the best sequential algorithm. Based on our physical system analogy, we propose a novel parallel algorithm with a depth of O(\\log^{3}d) that provides an exponential speedup for worst-case inputs.\n\n- • In experiments, for the first time we are able to effectively apply weight-sharing regularization at scale in the context of deep neural networks and recover convolution-like filters in Multi-Layer Perceptrons (MLPs), even when pixels have been shuffled.\n\n## 1.2 Related Works\n\nClustered lasso. Regularization with \\mathcal{R} and \\ell_{1} has been studied in a linear regression setting and is known as clustered lasso [9]. Clustered lasso is an instance of generalized lasso [10], where the regularization term is specified via a matrix {\\mathbf{D}} as \\|{\\mathbf{D}}w\\|_{1}. In clustered lasso, {\\mathbf{D}} is a tall matrix with d+{d\\choose 2} rows, where d rows form a diagonal matrix for \\ell_{1}, and each of the rest encodes the subtraction of a unique pair of weights for \\mathcal{R}.\n\nThe proximal mapping of generalized lasso takes a simple form in the dual space and algorithms have been developed to exploit this fact [11]. However, the dimensionality of the dual space is the same as the number of rows in {\\mathbf{D}}, which makes dual methods infeasible for clustered lasso when d is large. We avoid this problem in this work by staying in the primal space.\n\nIsotonic regression. [12] show that the proximal mapping of \\mathcal{R} can be obtained via the isotonic regression problem\n\nOne can therefore use algorithms designed for isotonic regression [13] to compute the proximal mapping of clustered lasso in O(d\\log d) time. Moreover, based on this connection, our proposed algorithm can also be used as a fast parallel solver for isotonic regression. In this work, however, there will be no need to understand isotonic regression. Our physical interpretation provides a complete alternative specification of the problem that is much more intuitive.\n\n[14] propose a parallel algorithm for isotonic regression which we show to be incorrect with a simple counterexample, included in Section C.9.\n\nSymmetry. Our work is also related to a body of work in invariant and equivariant deep learning with finite symmetry groups, as well as prior work on regularization techniques and network compression. In particular, using (soft) weight-sharing for regularization is motivated from two perspectives: symmetry, and minimum description length.\n\nAs shown in [3,4], requiring a linear function to respect a permutation symmetry induces weight-sharing in its corresponding matrix form. The same idea can be expressed using a generalization of convolution to symmetry groups [15]. Identification of weight-sharing patterns can be used for discovering symmetries of the data or task. [16,17] pursue this goal in a meta-learning setting and using bilevel optimization, respectively.\n\nCompression. However, not all weight-sharing patterns correspond to a symmetry transformation. Minimum Description Length (MDL) provides a more general motivation. According to MDL, the best model is the one that has the shortest description of the model itself plus its prediction errors [18]. Assuming a prior over the weights so as to achieve the best compression, MDL leads to regularization. In particular, the soft weight-sharing of [19] is derived from this perspective and motivates follow-up works on network compression [20]. While these works assume a Gaussian mixture prior for the weights, leading to \\ell_{2} regularization, we use sparsity inducing \\ell_{1} regularization to encourage exact weight-sharing. Indeed, assuming \\ell_{0} in Eq. 1, the objective is similar to vector quantization for compression; instead of using dc bits, where c is the number of bits-per-weight, using exact weight-sharing with k distinct weights, one requires only kc+d\\log k bits, leading to significant compression for small k. This observation motivates the regularization of Eq. 1 from the MDL point of view.\n\n## 1.3 Outline\n\nThe required background on optimization and parallel computation for this paper is covered in Appendix A. We begin in Section 2 by studying the subdifferential of \\mathcal{R}. Next, in Section 3, we show that the proximal mapping can be obtained by simulating a physical system of interacting particles. In Section 4, we study and analyze parallel algorithms for computing the proximal mapping of \\mathcal{R}. We introduce a novel low-depth parallel algorithm while showing that previously existing algorithms have high depth. In Section 5, we describe a method for controlling the undesirable bias of \\ell_{1} -relaxation. In Section 6, we apply our algorithm to training weight-sharing regularized deep neural networks with proximal gradient descent on GPU. We discuss limitations and directions for future work in Section 7 and conclude in Section 8.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib13",
+      "text": "LeCun et al. (1989) Yann LeCun, Bernhard Boser, John S Denker, Donnie Henderson, Richard E Howard, Wayne Hubbard, and Lawrence D Jackel. Backpropagation applied to handwritten zip code recognition. Neural computation , 1(4):541–551, 1989."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib23",
+      "text": "Vaswani et al. (2017) Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N Gomez, Łukasz Kaiser, and Illia Polosukhin. Attention is all you need. Advances in neural information processing systems , 30, 2017."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib18",
+      "text": "Shawe-Taylor (1989) John Shawe-Taylor. Building symmetries into feedforward networks. In Artificial Neural Networks, 1989., First IEE International Conference on (Conf. Publ. No. 313) , pp. 158–162. IET, 1989."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib16",
+      "text": "Ravanbakhsh et al. (2017) Siamak Ravanbakhsh, Jeff Schneider, and Barnabas Poczos. Equivariance through parameter-sharing. In International conference on machine learning , pp. 2892–2901. PMLR, 2017."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib9",
+      "text": "Hastie et al. (2001) Trevor Hastie, Robert Tibshirani, and Jerome Friedman. The elements of statistical learning. springer series in statistics. New York, NY, USA , 2001."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib27",
+      "text": "Ziyin & Wang (2023) Liu Ziyin and Zihao Wang. spred: Solving l1 penalty with SGD. In Proceedings of the 40th International Conference on Machine Learning , volume 202, pp. 43407–43422. PMLR, 2023."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib3",
+      "text": "Atchadé et al. (2017) Yves F Atchadé, Gersende Fort, and Eric Moulines. On perturbed proximal gradient algorithms. The Journal of Machine Learning Research , 18(1):310–342, 2017."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib25",
+      "text": "Yu (2013) Yao-Liang Yu. On decomposing the proximal map. In Advances in Neural Information Processing Systems , volume 26, 2013."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib19",
+      "text": "She (2010) Yiyuan She. Sparse regression with exact clustering. Electronic Journal of Statistics , 4:1055 – 1096, 2010."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib21",
+      "text": "Tibshirani & Taylor (2011) Ryan J. Tibshirani and Jonathan Taylor. The solution path of the generalized lasso. The Annals of Statistics , 39(3):1335 – 1371, 2011."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib2",
+      "text": "Arnold & Tibshirani (2016) Taylor B Arnold and Ryan J Tibshirani. Efficient implementations of the generalized lasso dual path algorithm. Journal of Computational and Graphical Statistics , 25(1):1–27, 2016."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib14",
+      "text": "Lin et al. (2019) Meixia Lin, Yong-Jin Liu, Defeng Sun, and Kim-Chuan Toh. Efficient sparse semismooth newton methods for the clustered lasso problem. SIAM Journal on Optimization , 29(3):2026–2052, 2019."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib4",
+      "text": "Best & Chakravarti (1990) Michael J Best and Nilotpal Chakravarti. Active set algorithms for isotonic regression; a unifying framework. Mathematical Programming , 47(1-3):425–439, 1990."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib11",
+      "text": "Kearsley et al. (1996) Anthony J Kearsley, Richard A Tapia, and Michael W Trosset. An approach to parallelizing isotonic regression. In Applied Mathematics and Parallel Computing: Festschrift for Klaus Ritter , pp. 141–147. Springer, 1996."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib7",
+      "text": "Cohen & Welling (2016) Taco Cohen and Max Welling. Group equivariant convolutional networks. In International conference on machine learning , pp. 2990–2999. PMLR, 2016."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib26",
+      "text": "Zhou et al. (2020) Allan Zhou, Tom Knowles, and Chelsea Finn. Meta-learning symmetries by reparameterization. arXiv preprint arXiv:2007.02933 , 2020."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib24",
+      "text": "Yeh et al. (2022) Raymond A Yeh, Yuan-Ting Hu, Mark Hasegawa-Johnson, and Alexander Schwing. Equivariance discovery by learned parameter-sharing. In International Conference on Artificial Intelligence and Statistics , pp. 1527–1545. PMLR, 2022."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib17",
+      "text": "Rissanen et al. (2007) Jorma Rissanen et al. Information and complexity in statistical modeling , volume 152. Springer, 2007."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib10",
+      "text": "Hinton & Van Camp (1993) Geoffrey E Hinton and Drew Van Camp. Keeping the neural networks simple by minimizing the description length of the weights. In Proceedings of the sixth annual conference on Computational learning theory , pp. 5–13, 1993."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib22",
+      "text": "Ullrich et al. (2017) Karen Ullrich, Edward Meeds, and Max Welling. Soft weight-sharing for neural network compression. arXiv preprint arXiv:1702.04008 , 2017."
+    }
+  ]
+}

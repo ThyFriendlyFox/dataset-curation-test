@@ -1,0 +1,83 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.04633",
+  "title": "Message-Observing Sessions",
+  "authors": "Ryan Kavanagh, Brigitte Pientka",
+  "year": "2024",
+  "categories": [
+    "cs.PL"
+  ],
+  "url": "https://arxiv.org/abs/2403.04633",
+  "html_url": "https://arxiv.org/html/2403.04633",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 906,
+  "text": "Session types [1,2,3] allow us to specify and statically verify that processes communicate according to prescribed protocols. Hence, they rule out a wide class of communication-related bugs before executing a given protocol.\n\nA binary session type specifies the communication protocol as seen from the point of view of one of the two participants. From a Curry-Howard perspective, it corresponds to the standard sequent calculus proof system for dual intuitionistic linear logic (see [4,5]), thereby building a logical foundation for specifying and reasoning about concurrent communications. Over the past decade, there have been different approaches to extend it and capture ever richer protocols: value-dependent session types [6,7] allow protocols to vary based on previously transmitted values; label-dependent session types [8] describe different communication behaviour depending on labels being observed on a given channel; manifest sharing [9] allows (binary) session types to capture shared communication channels.\n\nIn this paper, we describe Most, a language for protocols using message-observing session types. A message-observing session type specifies how communication evolves taking into account messages that can be observed on other channels in a process’s environment. This is in contrast to both value and label-dependent session types, where a channel’s type can only depend on messages that the channel previously carried, but not on messages on other channels in the process’s environment. Hence, Most allows us to express global invariants about processes rather than just local invariants.\n\nTo specify session types that vary based on messages on other channels, we extend binary session types with type-level processes. This allows us to capture a wider range of correctness guarantees than is currently possible. To illustrate, we take a closer look at the identity process \\mathsf{id} that provides an implementation for the session type A\\coloneqq\\oplus\\{\\,\\mathsf{left}:\\mathbf{1},\\mathsf{right}:\\mathbf{1}\\,\\}. This session type specifies that communication is a message containing either label \\mathsf{left} or \\mathsf{right}, followed by a message signalling the end of communication. We can implement \\mathsf{id} between channels a and b of type A as follows:\n\nOperationally, this process waits to receive a label on a, selects the corresponding branch, and sends the label over b. It then waits for the channel a to close before closing b. However, the session type for channel a and channel b does not capture this precisely. In particular, the type of b does not rule out the following erroneous implementation that swaps labels:\n\nThe crux of the issue is that the messages we wish to allow on b depend on the messages that we observe on a. In Most, we specify such a protocol for b using type-level processes as follows:\n\nIntuitively, it specifies that the type of b is the unary choice \\oplus\\{\\,\\mathsf{left}:\\mathbf{1}\\,\\} if a label \\mathsf{left} is observed on a, and symmetrically if \\mathsf{right} is observed on a. A message-observing session type is necessarily open: it names the channel whose messages it observes. This is analogous to processes, which contain the channel names on which they communicate. The particular channel a observed by the type of b is determined by the process specification in which it appears. For example, the following concrete syntax specifies \\mathsf{id} by specifying the types of its channels, and it specifies that b ’s type observes a channel a:A used by \\mathsf{id}:\n\nWe will revisit this concrete syntax in section 2.\n\nMost provides a “bottom-up” approach to specifying processes and their composition. We still specify the communication protocol from the point of view of one of the two participants, but take into account the messages observed on other channels in the environment. An alternative to specify multi-channel communication patterns are multiparty session types. Multiparty session types [10] specify interactions between a static number participants using a global type, and project these specifications onto individual participants for typechecking. Despite recent work [11,12], multiparty session types are an inherently closed world or “top-down” approach, where the entire system must be designed before it can be implemented. In contrast, we can compose protocols in Most from the bottom-up, while still being able to capture some of the richer interactions of multiparty session types.\n\nConcretely, we make the following contributions:\n\n- (1) We introduce a message-observing binary session type system, called Most. A message-observing session type specifies how communication evolves taking into account communications that can be observed on other channels in our environment. This is achieved using type-level processes in session types. These type-level processes further restrict the eligible processes and their actions. We motivate this extension through a sequence of examples.\n\n- (2) We give processes and their specifications a semantics using traces with binding, a semantic foundation inspired by nominal sequences [13]. A frequent challenge when we define a trace semantics or ordered semantics for concurrency is that we must account for fresh channel name generation and propagate names involved in higher-order communications. Further, compositionality often requires infinite trace sets or infinite collections of semantic objects, which complicates implementation and obscures the computational content. Instead, we use name binding to quantify over all fresh channel in a manner reminiscent of higher-order abstract syntax, resulting in a more compact presentation. This abstraction allows us to retain compositionality.\n\n- (3) We give a semantically sound typechecking algorithm. Process denotations characterize all possible communication behaviours, while specifications specify the processes traces they allow subject to constraints on ambient communications. Soundness ensures that well-typed processes only exhibit behaviours (traces) permitted by their specifications.\n\nWe see this work as a significant step towards providing more precise guarantees about processes.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bibx23",
+      "text": "Takeuchi et al. (1994) Kaku Takeuchi, Kohei Honda and Makoto Kubo “An Interaction-Based Language and Its Typing System” In PARLE’94 , Lecture Notes in Computer Science 10201 Berlin: Springer-Verlag Berlin Heidelberg, 1994, pp. 398–413 DOI: 10.1007/3-540-58184-7_118"
+    },
+    {
+      "n": 2,
+      "id": "bib.bibx13",
+      "text": "Honda (1993) Kohei Honda “Types for Dyadic Interaction” In CONCUR’93 , Lecture Notes in Computer Science 715 Berlin: Springer-Verlag Berlin Heidelberg, 1993, pp. 509–523 DOI: 10.1007/3-540-57208-2_35"
+    },
+    {
+      "n": 3,
+      "id": "bib.bibx14",
+      "text": "Honda et al. (1998) Kohei Honda, Vasco. Vasconcelos and Makoto Kubo “Language Primitives and Type Discipline for Structured Communication-Based Programming” In Programming Languages and Systems , Lecture Notes in Computer Science 1381 Springer-Verlag Berlin Heidelberg, 1998, pp. 122–138 Joint European Conferences on TheoryPractice of Software, ETAPS’98 DOI: 10.1007/BFb0053567"
+    },
+    {
+      "n": 4,
+      "id": "bib.bibx3",
+      "text": "Caires & Pfenning (2010) Luís Caires and Frank Pfenning “Session Types as Intuitionistic Linear Propositions” In CONCUR 2010 — Concurrency Theory , Lecture Notes in Computer Science 6269 Springer-Verlag Berlin Heidelberg, 2010, pp. 222–236 DOI: 10.1007/978-3-642-15375-4_16"
+    },
+    {
+      "n": 5,
+      "id": "bib.bibx4",
+      "text": "Caires et al. (2016) Luís Caires, Frank Pfenning and Bernardo Toninho “Linear Logic Propositions As Session Types” In Mathematical Structures in Computer Science 26.3 Cambridge University Press, 2016, pp. 367–423 DOI: 10.1017/s0960129514000218"
+    },
+    {
+      "n": 6,
+      "id": "bib.bibx26",
+      "text": "Toninho et al. (2011) Bernardo Toninho, Luís Caires and Frank Pfenning “Dependent Session Types Via Intuitionistic Linear Type Theory” In PPDP’11 New York, New York: Association for Computing Machinery, Inc., 2011, pp. 161–172 DOI: 10.1145/2003476.2003499"
+    },
+    {
+      "n": 7,
+      "id": "bib.bibx27",
+      "text": "Toninho & Yoshida (2018) Bernardo Toninho and Nobuko Yoshida “Depending on Session-Typed Processes” In Foundations of Software Science and Computation Structures , Lecture Notes in Computer Science 10803 Cham, Switzerland: SpringerOpen, 2018, pp. 128–145 European Joint Conferences on TheoryPractice of Software DOI: 10.1007/978-3-319-89366-2_7"
+    },
+    {
+      "n": 8,
+      "id": "bib.bibx25",
+      "text": "Thiemann & Vasconcelos (2019) Peter Thiemann and Vasco. Vasconcelos “Label-Dependent Session Types” In Proceedings of the ACM on Programming Languages 4.POPL , 2019 DOI: 10.1145/3371135"
+    },
+    {
+      "n": 9,
+      "id": "bib.bibx2",
+      "text": "Balzer & Pfenning (2017) Stephanie Balzer and Frank Pfenning “Manifest Sharing With Session Types” In Proceedings of the ACM on Programming Languages 1.ICFP , 2017 DOI: 10.1145/3110281"
+    },
+    {
+      "n": 10,
+      "id": "bib.bibx15",
+      "text": "Honda et al. (2016) Kohei Honda, Nobuko Yoshida and Marco Carbone “Multiparty Asynchronous Session Types” In Journal of the ACM 63.1 , 2016 DOI: 10.1145/2827695"
+    },
+    {
+      "n": 11,
+      "id": "bib.bibx8",
+      "text": "Deniélou & Yoshida (2011) Pierre-Malo Deniélou and Nobuko Yoshida “Dynamic Multirole Session Types” In POPL’11 New York, New York: Association for Computing Machinery, Inc., 2011, pp. 435–446 DOI: 10.1145/1926385.1926435"
+    },
+    {
+      "n": 12,
+      "id": "bib.bibx22",
+      "text": "Stolze et al. (2023) Claude Stolze, Marino Miculan and Pietro Di “Composable Partial Multiparty Session Types for Open Systems” In Software and Systems Modeling 22.2 , 2023, pp. 473–494 DOI: 10.1007/s10270-022-01040-x"
+    },
+    {
+      "n": 13,
+      "id": "bib.bibx12",
+      "text": "Gabbay & Ghica (2012) Murdoch Gabbay and Dan Ghica “Game Semantics in the Nominal Model” In Electronic Notes in Theoretical Computer Science 286 , 2012, pp. 173–189 DOI: 10.1016/j.entcs.2012.08.012"
+    }
+  ]
+}

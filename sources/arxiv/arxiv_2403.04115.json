@@ -1,0 +1,70 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.04115",
+  "title": "DNAct: Diffusion Guided Multi-Task 3D Policy Learning",
+  "authors": "Ge Yan, Yueh-Hua Wu, Xiaolong Wang",
+  "year": "2024",
+  "categories": [
+    "cs.RO",
+    "cs.AI",
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2403.04115",
+  "html_url": "https://arxiv.org/html/2403.04115",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 813,
+  "text": "Learning to perform multi-task robotic manipulation in complex environments is a promising direction for future applications, including household robots. Recent studies have showcased the potential of this approach [1], demonstrating the possibility of training a single model capable of accomplishing multiple tasks. However, there are still significant issues to overcome. (i) To learn a generalizable multi-task policy from scratch, large-scale datasets are required for comprehensive 3D semantic understanding, which poses a challenge for real-world situations where only a small number of demonstrations are present. (ii) To learn a reliable policy that is capable of executing manipulation in complex environments, the ability to identify the multi-modality of trajectories from the given demonstrations is required. For example, considering the case where the demonstrations contain several possible trajectories avoiding cluttered objects in the kitchen to pick up a knife, a policy learning approach without handling the multi-modality may be biased toward one of the modes (trajectories) and fail to generalize to novel objects or arrangements.\n\nTo tackle complex tasks in a more challenging environment (e.g., partial occlusion, various object shapes, and spatial relationship), it is essential to have a comprehensive geometry understanding of the scene. To achieve this, recent work [2] reconstructs a 3D scene representation by rendering with Neural Radiance Fields (NeRFs) [3]. Despite its success in single-task settings like hanging mugs requiring accurate geometry, it requires segmentation of individual objects and lacks semantic understanding of the whole scene, which makes it impractical in more complex environments. On the other hand, to learn the inherent multi-modality in the given demonstrations, previous works [4,5] adopts diffusion models [6,7] to learn an expressive generative policy that possesses the potential to identify different modes, which in turns elevates its success rate. However, in these studies, only relatively simple tasks such as single-task learning are considered. We further observe that in our experiments where the agent is required to perform multi-task manipulation, it is very challenging to leverage diffusion policies to predict accurate action sequences and substantial parameter tuning may be required for more complex tasks. Additionally, the extensive inference time of diffusion models is a significant drawback, preventing their application to real robots and complex tasks that require both accuracy and swift inference.\n\nTo address these challenges, we learn a unified 3D representation by integrating neural rendering pre-training and diffusion training. Specifically, we first pre-train a 3D encoder via neural rendering with NeRF. We not only utilize the neural rendering to synthesize novel views in RGB but also predict the corresponding semantic features from 2D foundation models. From distilling pre-trained 2D foundation models, we learn a generalizable 3D representation with commonsense priors from internet-scale datasets. We show that this pre-training representation equips the policy with out-of-distribution generalization ability.\n\nDiffering from previous work [8], our method presents no requirement for task-specific in-domain data for 3D pre-training. To optimize the model to distinguish multi-modality as well as similarity from the multi-task demonstrations as suggested in Figure 2, we perform diffusion training to supervise the representation. The diffusion training of DNAct involves the optimization of a feature-conditioned noise predictor and the predictor is designed to reconstruct action sequences across different tasks. With the reconstruction process, the model can effectively identify the inherent multi-modality in the trajectories without biasing toward a certain mode. The learned policy is able to achieve a higher success rate not only in the training environments but also in the environments where novel objects and arrangement is present due to the structured and generalizable representation optimized by the diffusion training. Figure 3 summarizes the concept proposed in DNAct. It illustrates that the 3D semantic feature is learned at the pre-training phase by reconstructing RGB and the corresponding 2D semantic features. In addition, the proposed diffusion training further enhances the ability to discriminate various modes arising from different tasks.\n\nOur contributions are summarized below:\n\n- 1. We utilize NeRF for 3D pre-training to learn a unified semantic and geometric representation. By distilling pre-trained 2D foundation models into 3D space, we generate a 3D semantic representation enriched with commonsense priors from large-scale datasets, demonstrating strong out-of-distribution generalization. Unlike other NeRF-based methods [2,9,10], our approach does not require costly, task-specific in-domain datasets of multi-view images and action data for 3D pre-training.\n\n- 2. DNAct employs diffusion training to distinguish features across multi-modal, multi-task demonstrations. It leverages a feature-conditioned noise predictor and a diffusion process to distinguish modalities, enhancing the robustness and generalizability of our representation. The integrated policy network simplifies the learning process, bypassing the extensive denoising phase and stabilizing multi-task learning.\n\n- 3. DNAct achieves a 1.35x improvement in simulation and a 1.33x improvement in real-world robot experiments with only 30% of the parameters required by baseline methods. Remarkably, DNAct surpasses baselines by 1.25x, even when pre-trained on orthogonal tasks unrelated to subsequent training and evaluation. In scenarios with novel objects, our ablation study shows DNAct outperforming baselines by 1.70x.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib44",
+      "text": "Mohit Shridhar, Lucas Manuelli, and Dieter Fox. Perceiver-actor: A multi-task transformer for robotic manipulation. In Conference on Robot Learning , pages 785–799. PMLR, 2023b."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib9",
+      "text": "Danny Driess, Ingmar Schubert, Pete Florence, Yunzhu Li, and Marc Toussaint. Reinforcement learning with neural radiance fields. NeurIPS , 2022."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib28",
+      "text": "Ben Mildenhall, Pratul P Srinivasan, Matthew Tancik, Jonathan T Barron, Ravi Ramamoorthi, and Ren Ng. Nerf: Representing scenes as neural radiance fields for view synthesis. Communications of the ACM , 65(1):99–106, 2021."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib8",
+      "text": "Cheng Chi, Siyuan Feng, Yilun Du, Zhenjia Xu, Eric Cousineau, Benjamin Burchfiel, and Shuran Song. Diffusion policy: Visuomotor policy learning via action diffusion. arXiv preprint arXiv:2303.04137 , 2023."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib51",
+      "text": "Zhendong Wang, Jonathan J Hunt, and Mingyuan Zhou. Diffusion policies as an expressive policy class for offline reinforcement learning. arXiv preprint arXiv:2208.06193 , 2022."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib11",
+      "text": "Jonathan Ho, Ajay Jain, and Pieter Abbeel. Denoising diffusion probabilistic models. Advances in neural information processing systems , 33:6840–6851, 2020."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib46",
+      "text": "Jascha Sohl-Dickstein, Eric Weiss, Niru Maheswaranathan, and Surya Ganguli. Deep unsupervised learning using nonequilibrium thermodynamics. In International conference on machine learning , pages 2256–2265. PMLR, 2015."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib41",
+      "text": "Dongseok Shim, Seungjae Lee, and H Jin Kim. Snerl: Semantic-aware neural radiance fields for reinforcement learning. ICML , 2023."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib57",
+      "text": "Yanjie Ze, Ge Yan, Yueh-Hua Wu, Annabella Macaluso, Yuying Ge, Jianglong Ye, Nicklas Hansen, Li Erran Li, and Xiaolong Wang. Gnfactor: Multi-task real robot learning with generalizable neural feature fields. arXiv preprint arXiv:2308.16891 , 2023b."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib23",
+      "text": "Yunzhu Li, Shuang Li, Vincent Sitzmann, Pulkit Agrawal, and Antonio Torralba. 3d neural scene representations for visuomotor control. In Conference on Robot Learning , pages 112–123. PMLR, 2022b."
+    }
+  ]
+}

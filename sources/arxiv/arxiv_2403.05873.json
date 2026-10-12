@@ -1,0 +1,110 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.05873",
+  "title": "LEGION: Harnessing Pre-trained Language Models for GitHub Topic Recommendations with Distribution-Balance Loss",
+  "authors": "Yen-Trang Dang, Thanh-Le Cong, Phuc-Thanh Nguyen, Anh M. T. Bui, Phuong T. Nguyen, Bach Le, Quyet-Thang Huynh",
+  "year": "2024",
+  "categories": [
+    "cs.SE",
+    "cs.IR",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2403.05873",
+  "html_url": "https://arxiv.org/html/2403.05873",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "INTRODUCTION",
+  "word_count": 1033,
+  "text": "Open-source development has fundamentally transformed the landscape of the software industry, championing principles of collaboration, transparency, and community-driven innovation. The imperative for developers to engage in exploration, sharing, and collaboration within the realm of open-source software (OSS) highlights the significance of a dedicated platform. Among the existing platforms, GitHub stands out as the foremost choice for hosting Git repositories, establishing itself as a cornerstone in the open-source ecosystem. This platform serves as a centralized hub where developers can seamlessly host, review, and manage their code repositories [1,2,3]. To foster discoverability and contribution to related projects, GitHub introduced tags – a pivotal feature in 2017 – allowing developers to tag repositories with relevant topics [4].\n\nTopics convey salient descriptions of a repository, providing insights into various aspects such as the project’s goals, evolving features, and technical details encompassing libraries and frameworks employed [5,6]. Assigning the right topics to a GitHub repository is crucial for enhancing its discoverability among developers. It serves as a bridge between the social and technical aspects of repositories, potentially attracting interested users [7,8,9,10]. On the contrary, an inaccurate assignment of topics compromises the usefulness of the GitHub topics and hinders the seamless recommendation of repositories to potential users.\n\nTo tackle these issues, GitHub introduced Repo-Topix, an information retrieval-based recommender system to suggest suitable topics for each GitHub repository [11]. Following this, new techniques [12,13,14,6] have been proposed to automatically recommend topics for GitHub repositories, leveraging textual data such as README files and descriptions. These approaches model the topic recommendation problem as either multi-class or multi-label classification, employing machine learning models to classify suitable topics for GitHub repositories based on labeled data. More specifically, previous studies encode the textual data of a GitHub repository into numerical vectors using TF-IDF and then employ classification models such as Logistic Regression [14], Multinomial Naïve Bayesian [12] or ZestXML [6] to assign relevant topics to the repository.\n\nWhile current techniques demonstrate encouraging performance, there are aspects that need improvements. Specifically, existing methods mainly depend on TF-IDF for representing the textual data of GitHub repositories. While TF-IDF can capture the statistics of common terms in the textual data, it inherently lacks the ability to capture contextual information or semantic meaning of words. This limitation poses a challenge in understanding the underlying semantics of textual data (Challenge C1) for accurately tagging repositories. To tackle this challenge, a potential solution is to harness Pre-trained Language Models (PTMs), which demonstrated remarkable language understanding capabilities due to their effective training on vast amounts of textual data.\n\nHowever, employing PTMs for GitHub Topic Recommendation proves to be non-trivial. Izadi et al. [14] discovered that DistillBERT [15] is less effective than TF-IDF + LR [14]. We replicated their experiments with four well-known PTMs and found that these models are also less accurate compared to state-of-the-art techniques such as TF-IDF + LR [14] and TF-IDF + ZestXML [6], thus confirming Izadi et al.’s findings. In an in-depth analysis, we attribute this phenomenon to the long-tailed distribution of GitHub topics (Challenge C2), in which a small proportion of topics is associated with a vast number of repositories, while a large number of other topics are assigned to very few repositories [16]. Consequently, PTMs exhibit a bias toward popular topics, preferring highly frequent labels to rare but correct/useful labels. Indeed, in our initial experiments (Table 1), while PTMs perform well in head (i.e., most frequent) topics (appearing in at least 30 repositories) with F1-score around 0.4, their effectiveness significantly drops to nearly zero on the mid and tail topics, i.e., topics with frequencies ranging from 30 to 9 and falling below 9. Consequently, we found that these PTMs perform worse than state-of-the-art baselines on recommending GitHub topics (see Section 5.1).\n\nTo address the aforementioned issues, we introduce Legion (L anguag E Models for GI tHub T O pic Recommendatio N), an approach that effectively fine-tunes PTMs in GitHub Topic recommendation with Distribution-Balanced Loss (DB Loss) [17]. DB Loss tackles long-tailed distribution in multi-label classification problems by integrating re-sampling, re-balanced weighting, and negative tolerant regularization. In particular, it first employs class-aware sampling which samples training examples such that different class has a similar amount of training examples in each epoch. Then, it leverages re-balanced weights to reduce redundant information of label co-occurrence, caused by re-sampling. Finally, it reduces the bias from “easy-to-classify” negative instances by explicitly assigning lower weight to them. Additionally, during the inference stage, we introduce a filter to eliminate low-confident recommendations, thereby enhancing the precision of predictions. In summary, the benefit of Legion is three-fold. First, leveraging PTMs allows Legion to extract the underlying semantics of textual data in GitHub repositories, addressing Challenge C1. Second, DB Loss allows Legion to handle popularity bias caused by the long-tailed distribution of GitHub topics, thereby addressing Challenge C2. Third, the low-confident filter enhances the precision of Legion.\n\nWe evaluated Legion on a dataset of 15,262 repositories crawled from GitHub with 665 unique labels. Evaluation results showed that Legion can improve vanilla PTMs by up to 26% on recommending GitHub topics. Legion also can suggest GitHub topics more precisely and effectively than state-of-the-art topics with an average improvement of 20% and 5% in terms of Precision and F1-score, respectively.\n\nContributions. In summary, we make the following contributions:\n\n- • Investigation. We empirically investigate the impact of long-tailed distribution of GitHub topics on Pre-trained Language Models (PTM). Our experimental results reveal the lack of effectiveness of PTMs fine-tuned with commonly-used Binary Cross Entropy Loss on low frequency GitHub topics with nearly zero F1-scores.\n\n- • Solution. We introduce Legion, a novel recommendation technique that leverages PTM for suggesting relevant topics for GitHub repositories based on their textual data. Our proposed solution incorporates a Distribution-Balanced Loss and a Low-Confident Filter for effective training and precise inference of PTMs.\n\n- • Evaluation. We empirically evaluate the performance of Legion and its effectiveness in enhancing PTMs. Our experiments also show that Legion can significantly improve PTMs, outperforming the best baseline by 20% and 5% over in terms of Precision and F1-score.\n\nData Availability. To support the open science initiative, we publish a replication package including our dataset and trained models [18]. +We also provide an open-source implementation of Legion at\n\nhttps://github.com/RISE-BKAI/LEGION/",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib47",
+      "text": "Tsay et al . (2014) Jason Tsay, Laura Dabbish, and James Herbsleb. 2014. Influence of social and technical factors for evaluating contribution in GitHub. In Proceedings of the 36th International Conference on Software engineering (ICSE) . 356–366."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib8",
+      "text": "Dabbish et al . (2012) Laura Dabbish, Colleen Stuart, Jason Tsay, and Jim Herbsleb. 2012. Social coding in GitHub: transparency and collaboration in an open software repository. In Proceedings of the ACM 2012 conference on computer supported cooperative work . 1277–1286."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib39",
+      "text": "Qiu et al . (2019) Huilian Sophie Qiu, Alexander Nolte, Anita Brown, Alexander Serebrenik, and Bogdan Vasilescu. 2019. Going farther together: The impact of social capital on sustained participation in open source. In 2019 ieee/acm 41st International Conference on Eoftware Engineering (ICSE) . IEEE, 688–699."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib14",
+      "text": "Frendt (2019) Shay Frendt. 2019. Introducing topics. https://github.blog/2017-01-31-introducing-topics/"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib43",
+      "text": "Sharma et al . (2017) Abhishek Sharma, Ferdian Thung, Pavneet Singh Kochhar, Agus Sulistya, and David Lo. 2017. Cataloging github repositories. In Proceedings of the 21st International Conference on Evaluation and Assessment in Software Engineering . 314–319."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib54",
+      "text": "Widyasari et al . (2023) Ratnadira Widyasari, Zhipeng Zhao, Thanh Le Cong, Hong Jin Kang, and David Lo. 2023. Topic Recommendation for GitHub Repositories: How Far Can Extreme Multi-Label Learning Go?. In 2023 IEEE International Conference on Software Analysis, Evolution and Reengineering (SANER) . IEEE, 167–178."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib45",
+      "text": "Treude and Storey (2009) Christoph Treude and Margaret-Anne Storey. 2009. How tagging helps bridge the gap between social and technical aspects in software development. In 2009 IEEE 31st International Conference on Software Engineering . IEEE, 12–22. https://doi.org/10.1109/ICSE.2009.5070504"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib46",
+      "text": "Treude and Storey (2010) Christoph Treude and Margaret-Anne Storey. 2010. Work item tagging: Communicating concerns in collaborative software development. IEEE Transactions on Software Engineering 38, 1 (2010), 19–34."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib57",
+      "text": "Xia et al . (2013) Xin Xia, David Lo, Xinyu Wang, and Bo Zhou. 2013. Tag recommendation in software information sites. In 2013 10th Working Conference on Mining Software Repositories (MSR) . IEEE, 287–296."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib52",
+      "text": "Wang et al . (2018) Shaowei Wang, David Lo, Bogdan Vasilescu, and Alexander Serebrenik. 2018. EnTagRec++: An enhanced tag recommendation system for software information sites. Empirical Software Engineering 23, 2 (2018), 800–832."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib15",
+      "text": "Ganesan (2017) Kavita Ganesan. 2017. Topic suggestions for millions of repositories. https://github.blog/2017-07-31-topics/"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib13",
+      "text": "Di Sipio et al . (2020) Claudio Di Sipio, Riccardo Rubei, Davide Di Ruscio, and Phuong T Nguyen. 2020. A multinomial naïve bayesian (mnb) network to automatically recommend topics for github repositories. In Proceedings of the Evaluation and Assessment in Software Engineering . 71–80."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib12",
+      "text": "Di Rocco et al . (2022) Juri Di Rocco, Davide Di Ruscio, Claudio Di Sipio, Phuong T Nguyen, and Riccardo Rubei. 2022. HybridRec: A recommender system for tagging GitHub repositories. Applied Intelligence (2022), 1–23."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib24",
+      "text": "Izadi et al . (2021) Maliheh Izadi, Abbas Heydarnoori, and Georgios Gousios. 2021. Topic recommendation for software repositories using multi-label classification algorithms. Empirical Software Engineering 26, 5 (2021), 1–33. https://doi.org/10.1007/s10664-021-09976-2"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib42",
+      "text": "Sanh et al . (2019) Victor Sanh, Lysandre Debut, Julien Chaumond, and Thomas Wolf. 2019. DistilBERT, a distilled version of BERT: smaller, faster, cheaper and lighter. arXiv preprint arXiv:1910.01108 (2019)."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib60",
+      "text": "Zhou et al . (2023a) Xin Zhou, Kisub Kim, Bowen Xu, Jiakun Liu, DongGyun Han, and David Lo. 2023a. The Devil is in the Tails: How Long-Tailed Code Distributions Impact Large Language Models. arXiv preprint arXiv:2309.03567 (2023)."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib56",
+      "text": "Wu et al . (2020) Tong Wu, Qingqiu Huang, Ziwei Liu, Yu Wang, and Dahua Lin. 2020. Distribution-balanced loss for multi-label classification in long-tailed datasets. In Computer Vision–ECCV 2020: 16th European Conference, Glasgow, UK, August 23–28, 2020, Proceedings, Part IV 16 . Springer, 162–178."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib9",
+      "text": "Dang et al . (2023) Yen-Trang Dang, Thanh Le-Cong, Phuc-Thanh Nguyen, Anh M. T. Bui, Phuong T. Nguyen, Bach Le, and Quyet-Thang Huynh. 2023. Artifacts: LEGION: Harnessing Pre-trained Language Models for GitHub Topic Recommendations with Distribution-Balance Loss. Figshare. https://figshare.com/s/6e01956fbfcd9b7ca6de"
+    }
+  ]
+}

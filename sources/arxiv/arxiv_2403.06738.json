@@ -1,0 +1,163 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.06738",
+  "title": "V3D: Video Diffusion Models are Effective 3D Generators",
+  "authors": "Zilong Chen, Yikai Wang, Feng Wang, Zhengyi Wang, Huaping Liu",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2403.06738",
+  "html_url": "https://arxiv.org/html/2403.06738",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 746,
+  "text": "With the advancement of diffusion-based image generation, automatic 3D generation has also made remarkable progress recently. Approaches based on Score Distillation Sampling [1] have achieved tremendous success in the field of 3D generation by extracting priors directly from text-to-image diffusion models [2,3,4,5,6]. However, such optimization-based methods are relatively slow and suffer from mode collapse [7,2] and the Janus problem [8,9].\n\nSubsequent efforts have proposed various alternative pathways to address these issues, mainly including directly mapping images into 3D representations [10,11,12,13,14,15] (such as Triplane NeRF [16] or 3DGS [17]), or first generating consistent multi-view images then conducting 3D reconstruction to obtain the underlying 3D model [18,19,20]. With the increase in 3D data size and model capacity, these methods have reduced the generation time from hours to minutes. However, the training process of these models still exhibits certain limitations; Methods that directly map to 3D representations require training on 3D datasets, making it impractical to leverage higher-quality image data and large-scale pre-trained image diffusion models. Meanwhile, approaches based on multi-view generation face difficulties in directly generating a sufficient number of images for reconstruction due to the requirement of memory-consuming cross-attention or intermediate 3D structure to ensure consistency across views.\n\nRecently, video diffusion models have attracted significant attention due to their remarkable ability to generate intricate scenes and complex dynamics with great spatio-temporal consistency [21,22,23,24,25,26,27,28]. Many videos incorporate changes in perspectives which provide natural observations of 3D objects from different views [29], enabling the diffusion models to perceive the physical 3D world [23]. Current multi-view generation methods are based on image diffusion models, which can only generate a few views (less than 6). In contrast, video diffusion models can generate hundreds of frames, which is adequate for downstream 3D tasks. These advancements give us the possibility to generate consistent multi-view images using video diffusion models and then reconstruct underlying 3D assets to achieve high-quality 3D generation. However, reconstruction from multi-views imposes significant demands on consistency which is difficult for current video diffusion models. In this paper, we aim to fully unleash the potential of video diffusion models to perceive the 3D world and inject the geometrical consistency prior to make the diffusion model an effective multi-view generator. In light of this, we propose V3D, a novel approach for 3D generation with video diffusion models. Specifically, we propose to fine-tune video diffusion models on 3D datasets with additional conditions to generate novel views in both object-centric and scene-level scenarios. For object-centric 3D generation, we fine-tune the base video diffusion model on 360\\degree orbit videos of synthetic 3D objects with the front view as a condition. We find that our fine-tuned model can generate reliable multi-views for 3D reconstruction. However, there still exists inconsistency in some details which may diminish the reconstruction quality. To address this, we adopt perceptual loss instead of pixel-wise loss as the reconstruction objective. We employ Gaussian Splatting as the 3D representation due to its reconstruction and rendering efficiency. To further accelerate the reconstruction, we propose a space-carving initialization method for Gaussians, which involves unprojecting multi-view object masks back to 3D space to roughly position the Gaussians on the object’s surface, eliminating the invalid optimizations on empty spaces. Considering the demands of real-world applications, we also propose a novel mesh extraction method that initially extracts the surface using SDF and subsequently refines the appearance on generated views with image-level loss. Furthermore, we demonstrate the effectiveness of our approach in scene-level 3D generation. To achieve precise camera path control and accommodate multi-view input, we integrate a PixelNeRF encoder to enhance the video diffusion model with robust 3D signals. Combined with auxiliary loss and fine-tuning on real-world posed videos, we extend the video diffusion model to generate novel views on an arbitrary camera path given sparse view input. Our contributions are:\n\n- • We propose V3D, a framework that first employs a video diffusion model to generate consistent multi-view frames, then reconstructs the underlying 3D content. By fine-tuning on 3D datasets, we successfully boost the ability of geometrical consistency of video diffusion models. Our framework is generally applicable to both object and scene generation.\n\n- • We design a reconstruction pipeline tailored for video diffusion outputs to generate high-quality 3D Gaussians or textured meshes. With our designed efficient initialization and refinement, V3D can reconstruct delicate 3D assets within 3 minutes.\n\n- • We conduct experiments to validate the effectiveness of V3D. Both object-centric and scene-level experiments show that our method achieves state-of-the-art performance in reconstruction quality and multi-view consistency.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib67",
+      "text": "Poole, B., Jain, A., Barron, J.T., Mildenhall, B.: Dreamfusion: Text-to-3d using 2d diffusion. In: The Eleventh International Conference on Learning Representations, ICLR 2023, Kigali, Rwanda, May 1-5, 2023. OpenReview.net (2023), https://openreview.net/pdf?id=FjNys5c7VyY"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib99",
+      "text": "Wang, Z., Lu, C., Wang, Y., Bao, F., Li, C., Su, H., Zhu, J.: Prolificdreamer: High-fidelity and diverse text-to-3d generation with variational score distillation. arXiv preprint arXiv:2305.16213 (2023)"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib44",
+      "text": "Lin, C.H., Gao, J., Tang, L., Takikawa, T., Zeng, X., Huang, X., Kreis, K., Fidler, S., Liu, M.Y., Lin, T.Y.: Magic3d: High-resolution text-to-3d content creation. In: IEEE Conference on Computer Vision and Pattern Recognition (CVPR) (2023)"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib14",
+      "text": "Chen, R., Chen, Y., Jiao, N., Jia, K.: Fantasia3d: Disentangling geometry and appearance for high-quality text-to-3d content creation. In: Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV) (October 2023)"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib58",
+      "text": "Metzer, G., Richardson, E., Patashnik, O., Giryes, R., Cohen-Or, D.: Latent-nerf for shape-guided generation of 3d shapes and textures. arXiv preprint arXiv:2211.07600 (2022)"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib18",
+      "text": "Chen, Z., Wang, F., Wang, Y., Liu, H.: Text-to-3d using gaussian splatting. In: CVPR (2024), https://arxiv.org/abs/2309.16585"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib93",
+      "text": "Wang, P., Xu, D., Fan, Z., Wang, D., Mohan, S., Iandola, F., Ranjan, R., Li, Y., Liu, Q., Wang, Z., Chandra, V.: Taming mode collapse in score distillation for text-to-3d generation. arXiv preprint: 2401.00909 (2023)"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib1",
+      "text": "Armandpour, M., Zheng, H., Sadeghian, A., Sadeghian, A., Zhou, M.: Re-imagine the negative prompt algorithm: Transform 2d diffusion into 3d, alleviate janus problem and beyond. arXiv preprint arXiv:2304.04968 (2023)"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib78",
+      "text": "Seo, J., Jang, W., Kwak, M.S., Ko, J., Kim, H., Kim, J., Kim, J.H., Lee, J., Kim, S.: Let 2d diffusion model know 3d-consistency for robust text-to-3d generation. arXiv preprint arXiv:2303.07937 (2023)"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib117",
+      "text": "Zou, Z.X., Yu, Z., Guo, Y.C., Li, Y., Liang, D., Cao, Y.P., Zhang, S.H.: Triplane meets gaussian splatting: Fast and generalizable single-view 3d reconstruction with transformers. arXiv preprint arXiv:2312.09147 (2023)"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib85",
+      "text": "Tang, J., Chen, Z., Chen, X., Wang, T., Zeng, G., Liu, Z.: Lgm: Large multi-view gaussian model for high-resolution 3d content creation. arXiv preprint arXiv:2402.05054 (2024)"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib30",
+      "text": "Hong, Y., Zhang, K., Gu, J., Bi, S., Zhou, Y., Liu, D., Liu, F., Sunkavalli, K., Bui, T., Tan, H.: LRM: large reconstruction model for single image to 3d. CoRR abs/2311.04400 (2023). https://doi.org/10.48550/ARXIV.2311.04400, https://doi.org/10.48550/arXiv.2311.04400"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib40",
+      "text": "Li, J., Tan, H., Zhang, K., Xu, Z., Luan, F., Xu, Y., Hong, Y., Sunkavalli, K., Shakhnarovich, G., Bi, S.: Instant3d: Fast text-to-3d with sparse-view generation and large reconstruction model. CoRR abs/2311.06214 (2023). https://doi.org/10.48550/ARXIV.2311.06214, https://doi.org/10.48550/arXiv.2311.06214"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib32",
+      "text": "Jun, H., Nichol, A.: Shap-e: Generating conditional 3d implicit functions. CoRR abs/2305.02463 (2023). https://doi.org/10.48550/arXiv.2305.02463, https://doi.org/10.48550/arXiv.2305.02463"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib63",
+      "text": "Nichol, A., Jun, H., Dhariwal, P., Mishkin, P., Chen, M.: Point-e: A system for generating 3d point clouds from complex prompts. CoRR abs/2212.08751 (2022). https://doi.org/10.48550/arXiv.2212.08751, https://doi.org/10.48550/arXiv.2212.08751"
+    },
+    {
+      "n": 16,
+      "id": "bib.bib8",
+      "text": "Chan, E., Lin, C.Z., Chan, M., Nagano, K., Pan, B., Mello, S.D., Gallo, O., Guibas, L.J., Tremblay, J., Khamis, S., Karras, T., Wetzstein, G.: Efficient geometry-aware 3d generative adversarial networks. 2022 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) pp. 16102–16112 (2021), https://api.semanticscholar.org/CorpusID:245144673"
+    },
+    {
+      "n": 17,
+      "id": "bib.bib35",
+      "text": "Kerbl, B., Kopanas, G., Leimkühler, T., Drettakis, G.: 3d gaussian splatting for real-time radiance field rendering. ACM Transactions on Graphics 42 (4) (July 2023), https://repo-sam.inria.fr/fungraph/3d-gaussian-splatting/"
+    },
+    {
+      "n": 18,
+      "id": "bib.bib52",
+      "text": "Long, X., Guo, Y.C., Lin, C., Liu, Y., Dou, Z., Liu, L., Ma, Y., Zhang, S.H., Habermann, M., Theobalt, C., et al.: Wonder3d: Single image to 3d using cross-domain diffusion. arXiv preprint arXiv:2310.15008 (2023)"
+    },
+    {
+      "n": 19,
+      "id": "bib.bib50",
+      "text": "Liu, Y., Lin, C., Zeng, Z., Long, X., Liu, L., Komura, T., Wang, W.: Syncdreamer: Generating multiview-consistent images from a single-view image. arXiv preprint arXiv:2309.03453 (2023)"
+    },
+    {
+      "n": 20,
+      "id": "bib.bib48",
+      "text": "Liu, M., Xu, C., Jin, H., Chen, L., Xu, Z., Su, H., et al.: One-2-3-45: Any single image to 3d mesh in 45 seconds without per-shape optimization. arXiv preprint arXiv:2306.16928 (2023)"
+    },
+    {
+      "n": 21,
+      "id": "bib.bib4",
+      "text": "Blattmann, A., Dockhorn, T., Kulal, S., Mendelevitch, D., Kilian, M., Lorenz, D.: Stable video diffusion: Scaling latent video diffusion models to large datasets. ArXiv abs/2311.15127 (2023), https://api.semanticscholar.org/CorpusID:265312551"
+    },
+    {
+      "n": 22,
+      "id": "bib.bib5",
+      "text": "Blattmann, A., Rombach, R., Ling, H., Dockhorn, T., Kim, S.W., Fidler, S., Kreis, K.: Align your latents: High-resolution video synthesis with latent diffusion models. In: IEEE Conference on Computer Vision and Pattern Recognition (CVPR) (2023)"
+    },
+    {
+      "n": 23,
+      "id": "bib.bib7",
+      "text": "Brooks, T., Peebles, B., Holmes, C., DePue, W., Guo, Y., Jing, L., Schnurr, D., Taylor, J., Luhman, T., Luhman, E., Ng, C., Wang, R., Ramesh, A.: Video generation models as world simulators (2024), https://openai.com/research/video-generation-models-as-world-simulators"
+    },
+    {
+      "n": 24,
+      "id": "bib.bib25",
+      "text": "Guo, Y., Yang, C., Rao, A., Liang, Z., Wang, Y., Qiao, Y., Agrawala, M., Lin, D., Dai, B.: Animatediff: Animate your personalized text-to-image diffusion models without specific tuning (2023)"
+    },
+    {
+      "n": 25,
+      "id": "bib.bib13",
+      "text": "Chen, H., Zhang, Y., Cun, X., Xia, M., Wang, X., Weng, C., Shan, Y.: Videocrafter2: Overcoming data limitations for high-quality video diffusion models (2024)"
+    },
+    {
+      "n": 26,
+      "id": "bib.bib109",
+      "text": "Zeng, Y., Wei, G., Zheng, J., Zou, J., Wei, Y., Zhang, Y., Li, H.: Make pixels dance: High-dynamic video generation. arXiv:2311.10982 (2023)"
+    },
+    {
+      "n": 27,
+      "id": "bib.bib2",
+      "text": "Bar-Tal, O., Chefer, H., Tov, O., Herrmann, C., Paiss, R., Zada, S., Ephrat, A., Hur, J., Li, Y., Michaeli, T., Wang, O., Sun, D., Dekel, T., Mosseri, I.: Lumiere: A space-time diffusion model for video generation. arXiv preprint arXiv: 2401.12945 (2024)"
+    },
+    {
+      "n": 28,
+      "id": "bib.bib24",
+      "text": "Girdhar, R., Singh, M., Brown, A., Duval, Q., Azadi, S., Rambhatla, S.S., Shah, A., Yin, X., Parikh, D., Misra, I.: Emu video: Factorizing text-to-video generation by explicit image conditioning. arXiv preprint arXiv: 2311.10709 (2023)"
+    },
+    {
+      "n": 29,
+      "id": "bib.bib43",
+      "text": "Li, X., Zhou, D., Zhang, C., Wei, S., Hou, Q., Cheng, M.M.: Sora generates videos with stunning geometrical consistency. arXiv preprint arXiv: 2402.17403 (2024)"
+    }
+  ]
+}

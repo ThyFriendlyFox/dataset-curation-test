@@ -1,0 +1,219 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.04971",
+  "title": "Robust Surgical Tool Tracking with Pixel-based Probabilities for Projected Geometric Primitives",
+  "authors": "Christopher D'Ambrosia, Florian Richter, Zih-Yun Chiu, Nikhil Shinde, Fei Liu, Henrik I. Christensen, Michael C. Yip",
+  "year": "2024",
+  "categories": [
+    "cs.RO",
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2403.04971",
+  "html_url": "https://arxiv.org/html/2403.04971",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "INTRODUCTION",
+  "word_count": 679,
+  "text": "Surgical automation has the potential to increase access to and quality of surgical care [1]. For this reason, automation of surgical subtasks remains an active area of research [2]. Prior work includes autonomous surgical cutting [3,4], hemostasis [5], peg transfer [6], and suturing [7,8]. Surgical automation, however, requires robust and accurate end effector localization [9]. Localization typically involves camera or image-based feedback [10]. However, uncertainty in the camera-to-robot transforms [11] as well as imprecision due to mechanical factors including cable-stretch and hysteresis [12] limits image-based localization accuracy.\n\n## I-A Related Works\n\nPrior work in estimating the base-to-camera transform includes solving homogeneous linear systems based on multiple images that capture markers affixed to robotic links [14,15], Solve-PnP approaches using detected markers on robotic manipulators [16] or marker-less keypoint detection [17,18,19,20]. In the space of surgical robotics, previous works have calibrated remote center of motion (RCM) robotic systems [21] and kinematic remote center coordinate systems (KCS) that accounts for error in the RCM camera frame-to-base transform [22]. Markers, learned features, silhouette matching, and online template matching from images have been used for KCS tracking [23,24,25,26].\n\nTo estimate joint angle measurement errors in the context of cable-driven surgical robotics, prior work has applied data-driven approaches, real-time inverse kinematics, and physical modeling of cable transmission friction and hysteresis [27,28]. Learning-based approaches for estimating cable stretch and Gaussian processes for measurement error compensation have also been used [12,29,30]. Image-based methods have used unscented Kalman filters and deep learning tools to accurately estimate cable-driven joint angles [31,32].\n\nEstimating both camera-to-base transform and joint angle offsets simultaneously using joint calibration techniques have been proposed [33,34]. These methods, however, can not account for dynamic uncertainties such as non-constant joint angle errors. Methods to achieve real-time estimation of dynamic joint angle errors have used iterative closest point matching based on 3D point clouds and Kalman filters [35]. Probabilistic approaches using observation models parameterized by physical parameters have also been explored [36]. While these works prioritize integrating additional sensors such as depth cameras into real-time estimation, we rely solely on endoscopic images which is available in surgical robotic scenes. Furthermore, surgical robotics has the unique challenge of a partially visible kinematic chain which creates a one-to-many mapping between the detected images and the parameter set describing the camera-to-base transform and joint angle errors [11].\n\n## I-B Contribution\n\nTo address the challenge of estimating the camera-to-base transform and joint angle errors, our prior work introduced the concept of lumped error. Lumped error accounts for uncertainty in the camera-to-base transform, camera calibration, and joint transforms in a forward-kinematic model for partially visible kinematic chains [11]. Estimating this lumped error has enabled more accurate, probabilistic tool tracking for surgical systems [37] and utilized for autonomous blood suction [5] and suture needle manipulation [7].\n\nOne key observation we made is the importance of the insertion-shaft as an observation for estimating the lumped error. The insertion-shaft is how the surgical robotic manipulator is inserted into the surgical scene through port entries and a standard feature for any laparoscopic tool hence using it for estimation will help constrain the RCM location with respect to the camera frame [21,38]. Furthermore, the insertion-shaft can be modelled as geometric primitive, a cylinder, which has an analytical camera projection equation [39]. The insertion-shaft was incorporated into our previous work in a probabilistic fashion to estimate the lumped error via a detection algorithm and Bayesian filtering. While using the insertion-shaft as an observation was crucial for surgical robotic tool tracking, there are two limitations with our previous implementation: 1) detection of the insertion-shaft parameters from the endoscopic data was inconsistent in unstructured scenes and 2) the probabilistic observation model to update the lumped error belief was limited to a line parameterization space. To address these challenges we contribute a laparoscopic tool insertion-shaft detection approach based on a Deep Neural Network (DNN) with multiple observation models for Bayesian filtering. The approach is integrated into a Particle Filter and a comparative study is done to evaluate the different observation models on two datasets collected on the da Vinci Research Kit (dVRK) [40].",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "M. Yip and N. Das, “Robot autonomy for surgery,” in The Encyclopedia of MEDICAL ROBOTICS: Volume 1 Minimally Invasive Surgical Robotics . World Scientific, 2019, pp. 281–313."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "A. Wilcox, J. Kerr, B. Thananjeyan, J. Ichnowski, M. Hwang, S. Paradis, D. Fer, and K. Goldberg, “Learning to localize, grasp, and hand over unmodified surgical needles,” in 2022 International Conference on Robotics and Automation (ICRA) . IEEE, 2022, pp. 9637–9643."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "A. Murali, S. Sen, B. Kehoe, A. Garg, S. McFarland, S. Patil, W. D. Boyd, S. Lim, P. Abbeel, and K. Goldberg, “Learning by observation for surgical subtasks: Multilateral cutting of 3d viscoelastic and 2d orthotropic tissue phantoms,” in 2015 IEEE International Conference on Robotics and Automation (ICRA) . IEEE, 2015, pp. 1202–1209."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "B. Thananjeyan, A. Garg, S. Krishnan, C. Chen, L. Miller, and K. Goldberg, “Multilateral surgical pattern cutting in 2d orthotropic gauze with deep reinforcement learning policies for tensioning,” in 2017 IEEE international conference on robotics and automation (ICRA) . IEEE, 2017, pp. 2371–2378."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "F. Richter, S. Shen, F. Liu, J. Huang, E. K. Funk, R. K. Orosco, and M. C. Yip, “Autonomous robotic suction to clear the surgical field for hemostasis using image-based blood flow detection,” IEEE Robotics and Automation Letters , vol. 6, no. 2, pp. 1383–1390, 2021."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "M. Hwang, D. Seita, B. Thananjeyan, J. Ichnowski, S. Paradis, D. Fer, T. Low, and K. Goldberg, “Applying depth-sensing to automated surgical manipulation with a da vinci robot,” in 2020 International Symposium on Medical Robotics (ISMR) . IEEE, 2020, pp. 22–29."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "Z.-Y. Chiu, F. Richter, E. K. Funk, R. K. Orosco, and M. C. Yip, “Bimanual regrasping for suture needles using reinforcement learning for rapid motion planning,” in 2021 IEEE International Conference on Robotics and Automation (ICRA) . IEEE, 2021, pp. 7737–7743."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "Z.-Y. Chiu, A. Z. Liao, F. Richter, B. Johnson, and M. C. Yip, “Markerless suture needle 6d pose tracking with robust uncertainty estimation for autonomous minimally invasive robotic surgery,” in 2022 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS) . IEEE, 2022, pp. 5286–5292."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "J. Lu, F. Richter, and M. C. Yip, “Markerless camera-to-robot pose estimation via self-supervised sim-to-real transfer,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2023, pp. 21 296–21 306."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "S. Lin, A. J. Miao, J. Lu, S. Yu, Z.-Y. Chiu, F. Richter, and M. C. Yip, “Semantic-super: A semantic-aware surgical perception framework for endoscopic tissue classification, reconstruction, and tracking,” arXiv preprint arXiv:2210.16674 , 2022."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "F. Richter, J. Lu, R. K. Orosco, and M. C. Yip, “Robotic tool tracking under partially visible kinematic chain: A unified approach,” IEEE Transactions on Robotics , vol. 38, no. 3, pp. 1653–1670, 2021."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "M. Hwang, B. Thananjeyan, S. Paradis, D. Seita, J. Ichnowski, D. Fer, T. Low, and K. Goldberg, “Efficiently calibrating cable-driven surgical robots with rgbd fiducial sensing and recurrent neural networks,” IEEE Robotics and Automation Letters , vol. 5, no. 4, pp. 5937–5944, 2020."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "F. Liu, Z. Li, Y. Han, J. Lu, F. Richter, and M. C. Yip, “Real-to-sim registration of deformable soft tissue with position-based dynamics for surgical robot autonomy,” in 2021 IEEE International Conference on Robotics and Automation (ICRA) . IEEE, 2021, pp. 12 328–12 334."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "I. Fassi and G. Legnani, “Hand to sensor calibration: A geometrical interpretation of the matrix equation ax= xb,” Journal of Robotic Systems , vol. 22, no. 9, pp. 497–506, 2005."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "F. C. Park and B. J. Martin, “Robot sensor calibration: solving ax= xb on the euclidean group,” IEEE Transactions on Robotics and Automation , vol. 10, no. 5, pp. 717–721, 1994."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "V. Lepetit, F. Moreno-Noguer, and P. Fua, “Ep n p: An accurate o (n) solution to the p n p problem,” International journal of computer vision , vol. 81, pp. 155–166, 2009."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "J. Lambrecht and L. Kästner, “Towards the usage of synthetic data for marker-less pose estimation of articulated robots in rgb images,” in 2019 19th International Conference on Advanced Robotics (ICAR) . IEEE, 2019, pp. 240–247."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "J. Lambrecht, “Robust few-shot pose estimation of articulated robots using monocular cameras and deep-learning-based keypoint detection,” in 2019 7th International Conference on Robot Intelligence Technology and Applications (RiTA) . IEEE, 2019, pp. 136–141."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "T. E. Lee, J. Tremblay, T. To, J. Cheng, T. Mosier, O. Kroemer, D. Fox, and S. Birchfield, “Camera-to-robot pose estimation from a single image,” in 2020 IEEE International Conference on Robotics and Automation (ICRA) . IEEE, 2020, pp. 9426–9432."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "J. Lu, F. Richter, and M. Yip, “Robust keypoint detection and pose estimation of robot manipulators with self-occlusions via sim-to-real transfer,” arXiv preprint arXiv:2010.08054 , 2020."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "F. Zhong, Z. Wang, W. Chen, K. He, Y. Wang, and Y.-H. Liu, “Hand-eye calibration of surgical instrument for robotic surgery using interactive manipulation,” IEEE Robotics and Automation Letters , vol. 5, no. 2, pp. 1540–1547, 2020."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib22",
+      "text": "T. Zhao, W. Zhao, B. D. Hoffman, W. C. Nowlin, and H. Hui, “Efficient vision and kinematic data fusion for robotic surgical instruments and other applications,” Mar. 3 2015, uS Patent 8,971,597."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib23",
+      "text": "Y. Li, F. Richter, J. Lu, E. K. Funk, R. K. Orosco, J. Zhu, and M. C. Yip, “Super: A surgical perception framework for endoscopic tissue manipulation with surgical robotics,” IEEE Robotics and Automation Letters , vol. 5, no. 2, pp. 2294–2301, 2020."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib24",
+      "text": "A. Reiter, P. K. Allen, and T. Zhao, “Feature classification for tracking articulated surgical tools,” in Medical Image Computing and Computer-Assisted Intervention–MICCAI 2012: 15th International Conference, Nice, France, October 1-5, 2012, Proceedings, Part II 15 . Springer, 2012, pp. 592–600."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib25",
+      "text": "——, “Appearance learning for 3d tracking of robotic surgical tools,” The International Journal of Robotics Research , vol. 33, no. 2, pp. 342–356, 2014."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib26",
+      "text": "J. Lu, A. Jayakumari, F. Richter, Y. Li, and M. C. Yip, “Super deep: A surgical perception framework for robotic tissue manipulation using deep learning for feature extraction,” in 2021 IEEE International Conference on Robotics and Automation (ICRA) . IEEE, 2021, pp. 4783–4789."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib27",
+      "text": "P. Pastor, M. Kalakrishnan, J. Binney, J. Kelly, L. Righetti, G. Sukhatme, and S. Schaal, “Learning task error models for manipulation,” in 2013 IEEE International Conference on Robotics and Automation . IEEE, 2013, pp. 2612–2618."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib28",
+      "text": "F. Wang, K. Chen, and X. Chen, “An online calibration method for manipulator with joint clearance,” Robot , vol. 35, no. 5, pp. 521–526, 2013."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib29",
+      "text": "H. Peng, X. Yang, Y.-H. Su, and B. Hannaford, “Real-time data driven precision estimator for raven-ii surgical robot end effector position,” in 2020 IEEE International Conference on Robotics and Automation (ICRA) . IEEE, 2020, pp. 350–356."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib30",
+      "text": "J. Mahler, S. Krishnan, M. Laskey, S. Sen, A. Murali, B. Kehoe, S. Patil, J. Wang, M. Franklin, P. Abbeel, et al. , “Learning accurate kinematic control of cable-driven surgical robots using data cleaning and gaussian process regression,” in 2014 IEEE international conference on automation science and engineering (CASE) . IEEE, 2014, pp. 532–539."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib31",
+      "text": "M. Haghighipanah, M. Miyasaka, Y. Li, and B. Hannaford, “Unscented kalman filter and 3d vision to improve cable driven surgical robot joint angle estimation,” in 2016 IEEE international conference on robotics and automation (ICRA) . IEEE, 2016, pp. 4135–4142."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib32",
+      "text": "D. Seita, S. Krishnan, R. Fox, S. McKinley, J. Canny, and K. Goldberg, “Fast and reliable autonomous surgical debridement with cable-driven robots using a two-phase calibration procedure,” in 2018 IEEE International Conference on Robotics and Automation (ICRA) , 2018, pp. 6651–6658."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib33",
+      "text": "V. Pradeep, K. Konolige, and E. Berger, “Calibrating a multi-arm multi-sensor robot: A bundle adjustment approach,” in Experimental Robotics: The 12th International Symposium on Experimental Robotics . Springer, 2014, pp. 211–225."
+    },
+    {
+      "n": 34,
+      "id": "bib.bib34",
+      "text": "Q. V. Le and A. Y. Ng, “Joint calibration of multiple sensors,” in 2009 IEEE/RSJ International Conference on Intelligent Robots and Systems . IEEE, 2009, pp. 3651–3658."
+    },
+    {
+      "n": 35,
+      "id": "bib.bib35",
+      "text": "M. Krainin, P. Henry, X. Ren, and D. Fox, “Manipulator and object tracking for in hand model acquisition,” in Proceedings, IEEE International Conference on Robots and Automation , 2010, pp. 1817–1824."
+    },
+    {
+      "n": 36,
+      "id": "bib.bib36",
+      "text": "C. G. Cifuentes, J. Issac, M. Wüthrich, S. Schaal, and J. Bohg, “Probabilistic articulated real-time tracking for robot manipulation,” IEEE Robotics and Automation Letters , vol. 2, no. 2, pp. 577–584, 2016."
+    },
+    {
+      "n": 37,
+      "id": "bib.bib37",
+      "text": "Z.-Y. Chiu, F. Richter, and M. C. Yip, “Real-time constrained 6d object-pose tracking of an in-hand suture needle for minimally invasive robotic surgery,” arXiv preprint arXiv:2210.11973 , 2022."
+    },
+    {
+      "n": 38,
+      "id": "bib.bib38",
+      "text": "B. Lu, B. Li, Q. Dou, and Y. Liu, “A unified monocular camera-based and pattern-free hand-to-eye calibration algorithm for surgical robots with rcm constraints,” IEEE/ASME Transactions on Mechatronics , vol. 27, no. 6, pp. 5124–5135, 2022."
+    },
+    {
+      "n": 39,
+      "id": "bib.bib39",
+      "text": "F. Chaumette, “La relation vision-commande: théorie et application à des tâches robotiques,” Ph.D. dissertation, L’Université de Rennes I, 1990."
+    },
+    {
+      "n": 40,
+      "id": "bib.bib40",
+      "text": "P. Kazanzides, Z. Chen, A. Deguet, G. S. Fischer, R. H. Taylor, and S. P. DiMaio, “An open-source research kit for the da vinci® surgical system,” in 2014 IEEE international conference on robotics and automation (ICRA) . IEEE, 2014, pp. 6434–6439."
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.07136",
+  "title": "On the Limited Representational Power of Value Functions and its Links to Statistical (In)Efficiency",
+  "authors": "David Cheikhi, Daniel Russo",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.AI",
+    "stat.ML"
+  ],
+  "url": "https://arxiv.org/abs/2403.07136",
+  "html_url": "https://arxiv.org/html/2403.07136",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 871,
+  "text": "Policy evaluation is central to sequential decision making. Two main frameworks compete to tackle this problem. Model based methods start by learning the underlying dynamics of the problem (the model) and output a value-to-go estimate consistent with this learned model. While this approach enjoys nice theoretical properties (see e.g. Chapter 7 of [1]), computing the value-to-go at a single state typically requires computationally expensive forward simulation of the model. At the other end of the spectrum, model-free methods (or value-based) methods directly estimate the value function that fits data best, skipping the need for the difficult step of computing the value function corresponding to a model. As a result, direct model-free estimation of value functions is ubiquitous in reinforcement learning.\n\nWhen they work well, model-free approaches to value function estimation can be statistically and computationally efficient while sidestepping the need to estimate details of an underlying model. Unfortunately, model-free algorithms are sometimes sample inefficient.\n\n## Puzzling case-studies on the statistical efficiency of model-free methods.\n\nIn studying this sample efficiency tradeoff in simple examples, we encounter puzzling competing evidence. Consider Figure 1. It compares the error of least-squares temporal difference learning [2] against simple model-based least-squares baseline in three cases. Section 5 provides further details. Subfigure 1(a) looks at a linear quadratic control. As in [3], we see LSTD is severely outperformed by model-based. [4] conjectures that the issue is that model-based algorithms leverage vector state observations, whereas LSTD collapses these into scalar observations (of reward plus value-to-go). Subfigure 1(b) raises doubt about this interpretation. LSTD is efficient again if we adjust the linear-quadratic setting so that rewards are linear, rather than quadratic, functions of state. Why is the sample-efficiency so impacted by this change to the problem?\n\nIn Subfigure 1(c), we restrict the model dynamics to be diagonal. This structure is motivated by problems with decoupled structure — which we study in detail in Section 4 and we explain is a very important feature of many practical problems. We see that model-based are again far superior.\n\nAll scenarios may initially seem quite favorable to model-free methods, since the structure of the model implies a simple structure to the true value function. Yet (batch) LSTD is grossly sample inefficient in two cases; in one other, it is just as efficient as model-based methods.\n\n## Limited representational power of value functions.\n\nWe offer an explanation of the puzzling scenarios plotted above. The issue is not with LSTD itself, but with a loss of information when translating a simplifying structure of the model dynamics to an associated (simplifying) structure of the value-function representation.\n\nTo understand this precisely, it is helpful to abstract away from the details of LSTD. We view it as some rule for estimating value functions based on data. When specific problem structures are known, its behavior can be improved by supplying a specialized value function representation, e.g. by taking \\mathbb{V} below to consist of quadratic value functions.\n\nA model-free value function estimation algorithm (e.g. LSTD) is a function that maps a class of value functions \\mathbb{V} and a dataset D=\\{(s_{i},r_{i},s^{\\prime}_{i}):i=1,\\ldots,n\\} consisting of state, reward, next-state tuples, to an estimated value function \\hat{V}\\in\\mathbb{V}.\n\nThe next definition considers the conversion from a class of MRP models \\mathbb{M} to the induced class of value functions \\mathbb{V}=\\{V_{M}:M\\in\\mathbb{M}\\} where V_{M} is the value function associated with model M. We say that the value function representations lose information about the model structure if \\mathbb{V} is also induced by a larger class of models \\mathfrak{M}. Roughly, a generic algorithm like LSTD cannot ‘know’ or exploit a structure of the class of models \\mathbb{M} that is not present in \\mathfrak{M}.\n\nFor a class of models \\mathbb{M}, we say there is a loss of information in the space of value functions if there exists a larger set of models \\mathfrak{M}, that is \\mathbb{M}\\subsetneq\\mathfrak{M}, such that \\mathbb{M} and \\mathfrak{M} have the same class of value functions:\n\nA deeper look into the examples in Figure 1 seems to confirm that information-loss is the true driver of LSTD’s poor performance. In fact, in both the diagonal dynamics case in Figure 1(c) and the linear-quadratic example in Figure 1(a), we explain that LSTD is equivalent to a model-based least-squares estimation procedure that operates in a much larger space of models that shares the same value-function representation, like \\mathfrak{M} in Definition 1.2. Therefore, our theory offers an alternative explanation to the findings of [5].\n\nAs depicted in Table 1, the presence of severe information loss predicts the relative statistical efficiency or inefficiency of model-free methods in five important examples. In addition to the linear problems in Figure 1, we also study policy evaluation in problems with many state components that evolve independently. This structure is ubiquitous in operations research, see e.g. Chapter 6.2 of [6], and also appears naturally in other domains like recommender systems [7]. The very poor performance of generic model-free algorithms on simple variants of such problems is disconcerting.\n\nIt is worth stressing that all of our examples are purposefully stylized and meant to serve as a sanity check on the performance of model-free value function estimation procedures. It is usually easy to modify algorithms to perform well on a particular example, but it is unfortunate that these case-by-case modifications are necessary.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib23",
+      "text": "Moerland et al. (2023) Thomas M Moerland, Joost Broekens, Aske Plaat, Catholijn M Jonker, et al. Model-based reinforcement learning: A survey. Foundations and Trends® in Machine Learning , 16(1):1–118, 2023."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib6",
+      "text": "Bradtke & Barto (1996) Steven J Bradtke and Andrew G Barto. Linear least-squares algorithms for temporal difference learning. Machine learning , 22:33–57, 1996."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib27",
+      "text": "Tu & Recht (2018) Stephen Tu and Benjamin Recht. Least-squares temporal difference learning for the linear quadratic regulator. In International Conference on Machine Learning , pp. 5005–5014. PMLR, 2018."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib24",
+      "text": "Recht (2019) Benjamin Recht. A tour of reinforcement learning: The view from continuous control. Annual Review of Control, Robotics, and Autonomous Systems , 2:253–279, 2019."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib28",
+      "text": "Tu & Recht (2019) Stephen Tu and Benjamin Recht. The gap between model-based and model-free methods on the linear quadratic regulator: An asymptotic viewpoint. In Conference on Learning Theory , pp. 3036–3083. PMLR, 2019."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib5",
+      "text": "Bertsekas (2005) Dimitri P. Bertsekas. Dynamic Programming and Optimal Control , volume I. Athena Scientific, Belmont, MA, USA, 3rd edition, 2005."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib22",
+      "text": "Maystre et al. (2023) Lucas Maystre, Daniel Russo, and Yu Zhao. Optimizing audio recommendations for the long-term: A reinforcement learning perspective. arXiv preprint arXiv:2302.03561 , 2023."
+    }
+  ]
+}

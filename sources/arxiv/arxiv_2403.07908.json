@@ -1,0 +1,173 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.07908",
+  "title": "Adaptation of the Multi-Concept Multivariate Elo Rating System to Medical Students Training Data",
+  "authors": "Erva Nihan Kandemir, Jill-Jenn Vie, Adam Sanchez-Ayte, Olivier Palombi, Franck Ramus",
+  "year": "2024",
+  "categories": [
+    "cs.CY"
+  ],
+  "url": "https://arxiv.org/abs/2403.07908",
+  "html_url": "https://arxiv.org/html/2403.07908",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1276,
+  "text": "Over the last decade, as a result of the increasing use of educational technology involving significant amounts of data and learning analytics, personalized learning has gained increasing popularity. This has led a number of research groups to study the adaptation of personalized learning into educational technologies, leveraging insights from learning analytics [1,2]. Adaptive Learning Systems (ALSs) [3] achieve personalized learning experiences by using users’ prior interactions and by adjusting the learning content to match individual preferences and requirements. Research consistently highlights the effectiveness of ALSs when compared to non-adaptive systems, resulting in improved learning outcomes [4,5,6,7] and a positive impact on student motivation [8], engagement [9], and comprehension [10]. Today, prominent ALS platforms like Duolingo, and ALEKS deliver high-quality learning materials and personalized instruction to millions of users worldwide.\n\nWith all the benefits listed above, this adaptive method in online education requires effectively monitoring users’ learning paths, a procedure called knowledge tracing. This knowledge-tracing process involves creating learner models based on student performance and interactions with the system to represent their ability levels and the difficulty of educational materials.\n\n## 1.1. Background\n\nVarious models have been designed to monitor and predict students’ evolving knowledge levels over time [11]. These models can be broadly classified into four categories: Markov process models [12,13], logistic models [14,15,16,4], deep knowledge tracing models [17,18,19,20,21], and rating systems [8]. The first three classes of these models are well-established and already extensively documented in existing literature [22]. Although they exhibit strong prediction capabilities when evaluating student performance, they are not without limitations, particularly when deploying them in online educational environments, where they often demand intricate parameter estimation and calibration procedures, typically relying on large datasets. This complexity can impede the development of adaptive systems, making them more challenging, time-consuming, and resource-intensive to create.\n\nAn intriguing alternative is the utilization of rating systems, offering a computationally more economical approach. Rating Systems, particularly the Elo Rating system [23], have been widely applied in educational technologies [24,25,26,27]. Originally created for ranking chess players, the Elo rating system has been repurposed for educational settings, treating users and learning materials as opponents. In the educational context, it predicts ratings for users and questions, serving as an assessment of user ability and question difficulty.\n\nIn this framework, each user u is associated with a global ability parameter denoted as \\theta_{u}. Similarly, for each question i, there exists a question parameter \\theta_{i} reflecting the difficulty level of that question. The probability of a user u correctly attempting a multiple-choice question i, denoted as \\Pr(a_{ui}=1|\\theta_{u},\\theta_{i}), can be expressed as a logistic function of the difference between the user and question parameters:\n\nAfter a user u attempts question i, both the user’s ability and the question’s difficulty undergo updates that are proportional to the difference between the estimated probability and the actual outcome. These updates are defined by the following formulas for question difficulty (\\theta_{i}) and for user ability (\\theta_{u}):\n\nHere, a_{ui} represents the actual outcome of the attempt of the user u on question i, and K is a constant value that determines the degree of update sensitivity based on the user’s most recent attempt. The choice of the constant K in the update rule plays a pivotal role in shaping estimation dynamics. If K is set too low, the estimation process progresses too slowly, leading to prolonged uncertainty in skill assessment and potential failure to reach correct values. Conversely, if K is set too high, the system is unstable, heavily influenced by recent attempts, and thus provides erratic evaluations.\n\nIn light of this formulation, the classical Elo rating system in education reveals its iterative nature, refining user and question parameters after each interaction.\n\nWhile the Elo rating system does not provide statistically guaranteed estimations, in contrast to well-calibrated logistic models, numerous studies have explored the accuracy of the Elo rating system and compared its performance to state-of-the-art models. For instance, study [28] found that the IRT-Rasch model version, proportion correct, and the Elo rating system, increasingly correlate with the true difficulty parameter as sample size increases. Another study [29] compared Elo rating’s question difficulty estimates with those obtained through the joint maximum likelihood method (JMLE) and observed nearly identical outcomes. Studies using simulated data [30,31,25] have also concluded that Elo rating systems perform similarly to the Rasch model, making them suitable for systems requiring real-time user knowledge adaptation without the need for extensive question pretesting on large sample sizes.\n\nHowever, integrating the Elo rating algorithm into a real-time educational context presents challenges, especially in the initial stages when student abilities and question difficulties are unknown and are set to zero. Given the iterative nature of the model, these initial estimates are assumed to gradually correct themselves with each attempt. While starting the model from scratch is standard practice, to produce reliable estimates the system requires a substantial number of responses, typically at least 100 attempts [25]. Furthermore, uncertain initial estimates can exert a lasting influence on subsequent updates, potentially resulting in persistent inaccuracies. This issue is especially pronounced for questions and users with a limited number of attempts within the educational platform, as they may have fewer opportunities for correction.\n\n## 1.2. Goals of the present study\n\nIn this study, we have two primary objectives: firstly, to assess whether the Elo rating system meets the requirements of a complex real-life scenario with specific challenges, and secondly, to address the issue of imprecise early-stage estimations in the online application of the Elo rating system. To mitigate the uncertainty associated with initial Elo rating estimations, we used data collected in the previous year.\n\nIn brief, our learning platform is open to all French medical students throughout their studies to provide training for their medical studies (about 8600 students per year over 10 years, with one important national exam at the end of the 6 th year). The challenges raised by this particular learning context are multiple:\n\n- • The knowledge corpus is huge, as it encompasses all medical knowledge taught in French universities.\n\n- • This corpus is structured into knowledge components that are themselves very large: 362 distinct topics or subcategories (themes/areas) of medical knowledge, spread over 31 medical specialties.\n\n- • The corpus of questions is also huge (\\sim 1,500,000 questions), such that a given student takes only a tiny fraction of available questions (usually drawn at random), almost never takes the same question twice, and such that a given question is only taken by a tiny fraction of students (outside exams). Thus, the matrix is extremely large and sparse.\n\n- • Use of the training platform is optional, with some students using it intensively on a daily basis, and others doing most of their training outside the platform.\n\n- • Students are based in 42 universities which cover the same curriculum from 1 st to 6 th year, but with different material and in a different order.\n\nDespite these difficulties, the fact that all medical students from all universities can train and take exams on the same platform should make it possible and desirable to model their progress and use this modeling to provide them with an adaptive training program. Yet the first step is to show that a sufficiently reliable modeling of their progress is possible under the present conditions.\n\nThus, the main research question guiding this study is to examine the boundaries of the Elo rating system within a particularly challenging real-life scenario that encompasses various complexities. This evaluation involves a comparison of its accuracy against the widely accepted logistic regression model. Additionally, we seek to explore the potential advantages of initializing the Elo system with results obtained from logistic regression applied to data from preceding years.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib20",
+      "text": "Lee et al . (2020) Lap-Kei Lee, Simon KS Cheung, and Lam-For Kwok. 2020. Learning Analytics: Current Trends and Innovative Practices. Journal of Computers in Education 7 (2020), 1–6."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib6",
+      "text": "Aljawarneh and Lara (2021) Shadi Aljawarneh and Juan A. Lara. 2021. Data Science for Analyzing and Improving Educational Processes. Journal of Computing in Higher Education 33 (2021), 545–550."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib19",
+      "text": "Lee and Park (2008) Jung Lee and Ok-Choon Park. 2008. Adaptive Instructional Systems. In Handbook of Research on Educational Communications and Technology . Routledge, 469–484."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib21",
+      "text": "Lindsey et al . (2014) Robert V. Lindsey, Jeffery D. Shroyer, Harold Pashler, and Michael C. Mozer. 2014. Improving Students’ Long-Term Knowledge Retention Through Personalized Review. Psychological Science 25, 3 (2014), 639–647."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib32",
+      "text": "Tabibian et al . (2019) Behzad Tabibian, Utkarsh Upadhyay, Abir De, Ali Zarezade, Bernhard Schölkopf, and Manuel Gomez-Rodriguez. 2019. Enhancing Human Learning via Spaced Repetition Optimization. Proceedings of the National Academy of Sciences 116, 10 (2019), 3988–3993."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib34",
+      "text": "VanLehn (2011) Kurt VanLehn. 2011. The Relative Effectiveness of Human Tutoring, Intelligent Tutoring Systems, and Other Tutoring Systems. Educational Psychologist 46, 4 (2011), 197–221."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib22",
+      "text": "Ma et al . (2014) Wenting Ma, Olusola O. Adesope, John C. Nesbit, and Qing Liu. 2014. Intelligent Tutoring Systems and Learning Outcomes: A Meta-Analysis. Journal of Educational Psychology 106, 4 (2014), 901."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib4",
+      "text": "Abdi et al . (2019) Solmaz Abdi, Hassan Khosravi, Shazia Sadiq, and Dragan Gasevic. 2019. A multivariate ELO-based learner model for adaptive educational systems. In EDM 2019-Proceedings of the 12th International Conference on Educational Data Mining . International Educational Data Mining Society, 228–233."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib23",
+      "text": "Papoušek and Pelánek (2015) Jan Papoušek and Radek Pelánek. 2015. Impact of Adaptive Educational System Behaviour on Student Motivation. In Artificial Intelligence in Education: 17th International Conference, AIED 2015, Madrid, Spain, June 22-26, 2015. Proceedings (Madrid, Spain), Vol. 17. Springer International Publishing."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib5",
+      "text": "Alamri et al . (2020) Hamdan Alamri, Victoria Lowell, William Watson, and Sunnie Lee Watson. 2020. Using Personalized Learning as an Instructional Approach to Motivate Learners in Online Higher Education: Learner Self-Determination and Intrinsic Motivation. Journal of Research on Technology in Education 52, 3 (2020), 322–352."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib9",
+      "text": "Brooks and Thompson (2017) Christopher Brooks and Craig Thompson. 2017. Predictive Modelling in Teaching and Learning. Handbook of Learning Analytics (2017), 61–68."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib13",
+      "text": "Corbett and Anderson (1994) Albert T. Corbett and John R. Anderson. 1994. Knowledge Tracing: Modeling the Acquisition of Procedural Knowledge. User Modeling and User-Adapted Interaction 4 (1994), 253–278."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib17",
+      "text": "Gweon et al . (2015) G-H Gweon, Hee-Sun Lee, Chad Dorsey, Robert Tinker, William Finzer, and Daniel Damelin. 2015. Tracking student progress in a game-like learning environment with a monte carlo bayesian knowledge tracing model. In Proceedings of the Fifth International Conference on Learning Analytics And Knowledge . 166–170."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib12",
+      "text": "Choffin et al . (2019) Benoît Choffin, Fabrice Popineau, Yolaine Bourda, and Jill-Jênn Vie. 2019. DAS3H: Modeling Student Learning and Forgetting for Optimally Scheduling Distributed Practice of Skills. In Proceedings of the Twelfth International Conference on Educational Data Mining (EDM 2019) . 29–38."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib29",
+      "text": "Rasch (1960) Georg Rasch. 1960. Studies in Mathematical Psychology: I. Probabilistic Models for Some Intelligence and Attainment Tests ."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib33",
+      "text": "van der Linden and Hambleton (2013) Wim J. van der Linden and Ronald K. Hambleton (Eds.). 2013. Handbook of Modern Item Response Theory . Springer Science & Business Media."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib28",
+      "text": "Piech et al . (2015) Chris Piech, Joel Bassen, Jennifer Huang, Surya Ganguli, Mehran Sahami, Leonidas J. Guibas, and Jascha Sohl-Dickstein. 2015. Deep Knowledge Tracing. In Advances in Neural Information Processing Systems (NIPS) . 505–513."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib16",
+      "text": "Ghosh et al . (2020) Aritra Ghosh, Neil Heffernan, and Andrew S Lan. 2020. Context-aware attentive knowledge tracing. In Proceedings of the 26th ACM SIGKDD international conference on knowledge discovery & data mining . 2330–2339."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib11",
+      "text": "Chan and Yeung (2021) Wai-Lun Chan and Dit-Yan Yeung. 2021. Clickstream knowledge tracing: Modeling how students answer interactive online questions. In LAK21: 11th International Learning Analytics and Knowledge Conference . 99–109."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib30",
+      "text": "Ruan et al . (2021) Sherry Ruan, Wei Wei, and James Landay. 2021. Variational deep knowledge tracing for language learning. In LAK21: 11th International Learning Analytics and Knowledge Conference . 323–332."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib31",
+      "text": "Shin et al . (2021) Dongmin Shin, Yugeun Shim, Hangyeol Yu, Seewoo Lee, Byungsoo Kim, and Youngduck Choi. 2021. Saint+: Integrating temporal features for ednet correctness prediction. In LAK21: 11th International Learning Analytics and Knowledge Conference . 490–496."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib2",
+      "text": "Abdelrahman et al . (2023) Ghodai Abdelrahman, Qing Wang, and Bernardo Nunes. 2023. Knowledge tracing: A survey. Comput. Surveys 55, 11 (2023), 1–37."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib15",
+      "text": "Elo and Sloan (1978) Arpad E. Elo and Sam Sloan. 1978. The Rating of Chessplayers: Past and Present ."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib8",
+      "text": "Attali (2014) Yigal Attali. 2014. A Ranking Method for Evaluating Constructed Responses. Educational and Psychological Measurement 74, 5 (2014), 795–808."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib27",
+      "text": "Pelánek (2016) Radek Pelánek. 2016. Applications of the Elo Rating System in Adaptive Educational Systems. Computers & Education 98 (2016), 169–179."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib24",
+      "text": "Papoušek and Pelánek (2017) Jan Papoušek and Radek Pelánek. 2017. Should We Give Learners Control Over Item Difficulty?. In Adjunct Publication of the 25th Conference on User Modeling, Adaptation and Personalization . 299–303."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib18",
+      "text": "Klinkenberg et al . (2011) Sharon Klinkenberg, Marthe Straatemeier, and Han LJ van der Maas. 2011. Computer Adaptive Practice of Maths Ability Using a New Item Response Model for On-the-Fly Ability and Difficulty Estimation. Computers & Education 57, 2 (2011), 1813–1824."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib36",
+      "text": "Wauters et al . (2012) Kelly Wauters, Piet Desmet, and Wim Van Den Noortgate. 2012. Item Difficulty Estimation: An Auspicious Collaboration Between Data and Judgment. Computers & Education 58, 4 (2012), 1183–1193."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib25",
+      "text": "Papoušek et al . (2014) Jan Papoušek, Radek Pelánek, and Vít Stanislav. 2014. Adaptive Practice of Facts in Domains with Varied Prior Knowledge. In Educational Data Mining 2014 ."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib7",
+      "text": "Antal (2013) Margit Antal. 2013. On the Use of Elo Rating for Adaptive Assessment. Studia Universitatis Babes-Bolyai, Informatica 58, 1 (2013), 29–41."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib26",
+      "text": "Pelánek (2014) Radek Pelánek. 2014. Application of Time Decay Functions and the Elo System in Student Modeling. In Educational Data Mining 2014 ."
+    }
+  ]
+}

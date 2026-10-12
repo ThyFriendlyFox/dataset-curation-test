@@ -1,0 +1,116 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2401.08732",
+  "title": "Bayes Conditional Distribution Estimation for Knowledge Distillation Based on Conditional Mutual Information",
+  "authors": "Linfeng Ye, Shayan Mohajer Hamidi, Renhao Tan, En-Hui Yang",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.CV",
+    "cs.IT",
+    "math.IT"
+  ],
+  "url": "https://arxiv.org/abs/2401.08732",
+  "html_url": "https://arxiv.org/html/2401.08732",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 951,
+  "text": "Knowledge distillation [1,2] (KD) has received tremendous attention from both academia and industry in recent years as a highly effective model compression technique, and has been deployed in different settings [3,4,5]. The crux of KD is to distill the knowledge of a cumbersome model (teacher) into a lightweight model (student). Followed by [2], many researchers tried to improve the performance of KD [6,7,8], and to understand why distillation works [9,10,11,12,13].\n\nOne critical component of KD that has received relatively little attention is the training of the teacher model. In fact, in most of the existing KD methods, the teacher is trained to maximize its own performance, even though this does not necessarily lead to an improvement in the student’s performance [14,15]. Therefore, to effectively train a student to achieve high performance, it is essential to train the teacher accordingly.\n\nRecently, [12] observed that the teacher’s soft prediction can serve as a proxy for the true Bayes conditional probability distribution (BCPD) of label y given an input x, and that the closer the teacher’s prediction to BCPD, the lower the variance of the student objective function. On the other hand, [13] showed that the accuracy of the student is directly bounded by the distance between teacher’s prediction and the true BCPD through the Rademacher analysis. In addition, [16] showed that the error rate of a deep neural network (DNN) is upper bounded by the average of the cross entropy of the BCPD and the DNN’s output. This together with the observations in [12,13] implies that the better the estimation of the BCPD by the teacher, the better the student’s performance would be.\n\nIn conventional KD, the BCPD estimate is obtained by training the teacher using maximum log-likelihood (MLL) method. In this paper, we instead explore a different way to train the teacher for the purpose of providing a better BCPD estimate so as to improve the performance of KD. To this end, we introduce a novel BCPD estimator, the rationale behind which will be briefly explained in the sequel.\n\nIn a multi-class classification task, each of the “ground truth labels” can be regarded as a distinct prototype. In this sense, the images with the same label are different manifestations of a common prototype, each with its own context. For instance, consider the following two images whose prototypes are “dog”: (i) a dog in a jungle, and (ii) a dog in a desert. The first and second images have some contexts related to jungle and desert, respectively, although both have the same prototype. As such, each manifestation (for instance, a training/testing image) contains two types of information: (i) its prototype; and (ii) some contextual information on top its prototype. Therefore, in KD, it would be desirable for the teacher, providing an estimate of BCPD, to be capable of providing good amount of information about both of these types of information for the input images.\n\nA teacher trained using MLL solely aims at estimating the prototypes. In order for the teacher to provide a good amount of the contextual information, first we have to find out how this information could be quantified. To this aim, we introduce an information quantity from information theory [17] to measure such information. Specifically, by treating the teacher model as a mapping function, we argue that this contextual information resides in conditional mutual information (CMI) I(X;\\hat{Y}|\\penalty\\ Y), where X, Y and \\hat{Y} are three random variables representing the input image, the ground truth label, and the label predicted by the teacher, respectively. As such, I(X;\\hat{Y}|\\penalty\\ Y) quantifies how much information \\hat{Y} can tell about X, given the prototype Y; this aligns with the concept of contextual information. To provide a good amount of contextual information, a logical step would be to maximize the CMI value under certain constraints during the teacher’s training process.\n\nHenceforth, to balance the prototype and the contextual information, we train the teacher to simultaneously maximize (i) the log-likelihood (LL) of the prototype (which is equivalent to minimize its cross entropy loss), and (ii) its CMI value. We refer to such an estimator as maximum CMI (MCMI) method. As seen in section 6, although the classification accuracy of the teachers trained via MCMI is lower than that of the teachers trained via MLL, the former can consistently increase the accuracy of the student models. In addition, we show that MCMI is general in that it could be deployed in different knowledge transfer methods. In summary, the contributions of the paper are as follows:\n\n\\bullet We argue that the so-called dark knowledge passed by the teacher to the student is indeed the contextual information of the images which could be quantified via teacher’s CMI value.\n\n\\bullet Equipped with the concept of CMI, we attribute the reason of using temperature in KD to blindly increase the teacher’s CMI value.\n\n\\bullet We develop a novel BCPD estimator dubbed MCMI that simultaneously maximizes the LL and CMI of the teacher. This enables the teacher to provide more accurate estimate of the true BCPD to the student, thereby enhancing the student’s performance.\n\n\\bullet We show that since larger models generally have lower CMI values, they are not often good teachers for KD. However, this issue is mitigated when teachers are trained using MCMI. We further explain why the models trained via early stopping are better teachers than those that are fully-trained.\n\n\\bullet To demonstrate the effectiveness of MCMI, we conduct a thorough set of experiments over CIFAR-100 [18] and ImageNet [19] datasets, and show that by replacing the teacher trained by MLL with that trained by MCMI in the existing state-of-the-art KD methods, the student’s accuracy consistently increases. Moreover, these improvements are even more significant in both few-shot and zero-shot settings.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib8",
+      "text": "Buciluǎ et al. (2006) Cristian Buciluǎ, Rich Caruana, and Alexandru Niculescu-Mizil. Model compression. In Proceedings of the 12th ACM SIGKDD international conference on Knowledge discovery and data mining , pp. 535–541, 2006."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib24",
+      "text": "Hinton et al. (2015) Geoffrey Hinton, Oriol Vinyals, and Jeff Dean. Distilling the knowledge in a neural network. arXiv preprint arXiv:1503.02531 , 2015."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib47",
+      "text": "Radosavovic et al. (2018) Ilija Radosavovic, Piotr Dollár, Ross Girshick, Georgia Gkioxari, and Kaiming He. Data distillation: Towards omni-supervised learning. In Proceedings of the IEEE conference on computer vision and pattern recognition , pp. 4119–4128, 2018."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib19",
+      "text": "Furlanello et al. (2018) Tommaso Furlanello, Zachary Lipton, Michael Tschannen, Laurent Itti, and Anima Anandkumar. Born again neural networks. In International Conference on Machine Learning , pp. 1607–1616. PMLR, 2018."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib67",
+      "text": "Xie et al. (2020) Qizhe Xie, Minh-Thang Luong, Eduard Hovy, and Quoc V Le. Self-training with noisy student improves imagenet classification. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pp. 10687–10698, 2020."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib49",
+      "text": "Romero et al. (2014) Adriana Romero, Nicolas Ballas, Samira Ebrahimi Kahou, Antoine Chassang, Carlo Gatta, and Yoshua Bengio. Fitnets: Hints for thin deep nets. arXiv preprint arXiv:1412.6550 , 2014."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib4",
+      "text": "Anil et al. (2018) Rohan Anil, Gabriel Pereyra, Alexandre Passos, Robert Ormandi, George E Dahl, and Geoffrey E Hinton. Large scale distributed neural network training through online distillation. arXiv preprint arXiv:1804.03235 , 2018."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib41",
+      "text": "Park et al. (2019b) Wonpyo Park, Dongju Kim, Yan Lu, and Minsu Cho. Relational knowledge distillation. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition , pp. 3967–3976, 2019b."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib46",
+      "text": "Phuong & Lampert (2019) Mary Phuong and Christoph Lampert. Towards understanding knowledge distillation. In International conference on machine learning , pp. 5142–5151. PMLR, 2019."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib38",
+      "text": "Mobahi et al. (2020) Hossein Mobahi, Mehrdad Farajtabar, and Peter Bartlett. Self-distillation amplifies regularization in hilbert space. Advances in Neural Information Processing Systems , 33:3351–3361, 2020."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib3",
+      "text": "Allen-Zhu & Li (2020) Zeyuan Allen-Zhu and Yuanzhi Li. Towards understanding ensemble, knowledge distillation and self-distillation in deep learning. arXiv preprint arXiv:2012.09816 , 2020."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib36",
+      "text": "Menon et al. (2021) Aditya K Menon, Ankit Singh Rawat, Sashank Reddi, Seungyeon Kim, and Sanjiv Kumar. A statistical perspective on distillation. In International Conference on Machine Learning , pp. 7632–7642. PMLR, 2021."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib16",
+      "text": "Dao et al. (2020) Tri Dao, Govinda M Kamath, Vasilis Syrgkanis, and Lester Mackey. Knowledge distillation as semiparametric inference. In International Conference on Learning Representations , 2020."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "Cho & Hariharan (2019) Jang Hyun Cho and Bharath Hariharan. On the efficacy of knowledge distillation. In Proceedings of the IEEE/CVF international conference on computer vision , pp. 4794–4802, 2019."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib37",
+      "text": "Mirzadeh et al. (2020) Seyed Iman Mirzadeh, Mehrdad Farajtabar, Ang Li, Nir Levine, Akihiro Matsukawa, and Hassan Ghasemzadeh. Improved knowledge distillation via teacher assistant. In Proceedings of the AAAI conference on artificial intelligence , volume 34, pp. 5191–5198, 2020."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib71",
+      "text": "Yang et al. (2023) En-Hui Yang, Shayan Mohajer Hamidi, Linfeng Ye, Renhao Tan, and Beverly Yang. Conditional mutual information constrained deep learning for classification. arXiv preprint arXiv:2309.09123 , 2023."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib15",
+      "text": "Cover (1999) Thomas M Cover. Elements of information theory . John Wiley & Sons, 1999."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib29",
+      "text": "Krizhevsky et al. (2012) Alex Krizhevsky, Vinod Nair, and Geoffrey Hinton. Cifar-10 (canadian institute for advanced research). University of Toronto , 2012. URL http://www.cs.toronto.edu/~kriz/cifar.html ."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib17",
+      "text": "Deng et al. (2009) Jia Deng, Wei Dong, Richard Socher, Li-Jia Li, Kai Li, and Li Fei-Fei. Imagenet: A large-scale hierarchical image database. In 2009 IEEE conference on computer vision and pattern recognition , pp. 248–255. Ieee, 2009."
+    }
+  ]
+}
