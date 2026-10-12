@@ -1,0 +1,118 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2306.11975",
+  "title": "DGEMM on Integer Matrix Multiplication Unit",
+  "authors": "Hiroyuki Ootomo, Katsuhisa Ozaki, Rio Yokota",
+  "year": "2024",
+  "categories": [
+    "cs.DC"
+  ],
+  "url": "https://arxiv.org/abs/2306.11975",
+  "html_url": "https://arxiv.org/html/2306.11975",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 896,
+  "text": "The development of processors for machine learning is progressing rapidly, and researchers are exploring their potential for use in other HPC applications [1]. These processors often use low/mixed-precision floating-point, or low-bit-length integer computing units, such as NVIDIA Tensor Cores [2] and Google TPUs [3,4,5], to achieve high throughput. While the training of deep learning models typically requires floating-point types like FP16, Bfloat16, TF32, and FP32, the inference involves quantizing model parameters and input/output values to use lower-bit-length integer formats. This reduces data size, processor circuit area, and power consumption [6,5]. As a result, high-performance processors like NVIDIA GPUs and edge devices like Google Coral Edge TPUs [7] are equipped with low-bit-length integer matrix multiplication units (IMMU). For instance, NVIDIA GPUs provide a DP4A instruction that can efficiently compute the inner product of two length-4 8-bit integer (INT8) vectors and accumulate the result in a 32-bit integer (INT32). In addition, NVIDIA Tensor Cores support the multiplication of INT8 matrices with INT32 accumulation from the Turing architecture and the multiplication of 4-bit integer (INT4) matrices from the Ampere architecture. These integer Tensor Cores can achieve a theoretical peak performance that is 2\\sim 4 times faster than floating-point Tensor Cores. Other processors, such as Google TPU v1 [3], Intel AMX-INT8 [8], and Groq TSP [9], also support the multiplication of INT8 matrices with INT32 accumulation. In light of these advancements, our research aims to investigate whether these processors can be leveraged for other high-performance computing (HPC) applications.\n\nRecent research has explored the use of machine learning processors for HPC applications, in particular low- and mixed-precision floating-point matrix multiplication units (FMMU). For instance, Haidar et al. used the FP16 Tensor Core to solve FP64 linear equations with an iterative refinement method [10]. Finkelstein et al. have employed FP16 Tensor Cores to perform time-independent quantum response calculations with sufficient accuracy [11]. Our previous study has utilized FP16 Tensor Cores to improve the throughput of quantum circuit simulation by emulating single-precision matrix multiplication using an error correction method and avoiding rounding inside Tensor Cores without loss of accuracy [12,13]. However, despite the promising results obtained by these studies, few have explored the potential of integer matrix multiplication units for HPC applications. This paper investigates the feasibility of leveraging integer matrix multiplication units, for instance, INT8 Tensor Cores in NVIDIA GPUs, for HPC applications.\n\nEven before the advent of deep learning and specialized hardware for it, researchers had been exploring ways to perform high-precision matrix multiplication on lower-precision computing units. One such approach is the double-double and quad-double precision, where a single value is represented as the sum of two and four FP64 values, respectively, and arithmetic operations are performed using a sequence of FP64 operations [14]. GEMM and other BLAS functions for double-double precision have been evaluated on NVIDIA GPUs and AMD Cypress GPUs [15,16]. Another approach is the Ozaki scheme, which also splits a value into multiple lower-precision values [17,18]. In this scheme, input matrices are split into multiple matrix slices, and the resulting matrix is obtained by accumulating the multiplication of these slices. The key feature of this scheme is that it splits the matrices in a way that prevents rounding errors during each multiplication of the slices, which can be computed on lower-precision computing units. The resulting matrix can then be obtained by summing up the result of each multiplication of the slices in high precision. Mukunoki et al. have evaluated the Ozaki scheme on many-core processors, including NVIDIA GPUs [19], and combined it with FP16 Tensor Cores to compute double-precision matrix multiplication. They showed that their implementation outperformed the theoretical peak performance of FP64 on NVIDIA TITAN RTX [20].\n\nThis paper explores the possibility of using integer matrix multiplication units for the Ozaki scheme. Our study reveals that leveraging these units can offer more than just faster throughput compared to floating-point matrix multiplication units. In particular, we show the theoretical advantages in terms of accuracy, computational complexity, and memory consumption. To evaluate the throughput, we use NVIDIA consumer GPUs in addition to A100 GPU, which are not designed for HPC applications but have high-throughput integer matrix multiplication units, and show that we can run HPC applications fast even on these processors.\n\nThe summary of our contributions is as follows:\n\n- • We show the theoretical advantages of using the integer matrix multiplication unit instead of floating point one concerning the accuracy, memory consumption, and the number of operations. It reduces the 50 % \\sim 75 % of working memory, a major concern in the Ozaki scheme in practical use, in the middle \\sim large size of matrix multiplication.\n\n- • We implement the Ozaki scheme on NVIDIA integer Tensor Cores and evaluate the accuracy, throughput, and power efficiency. We compare our implementation to cuBLAS DGEMM and an existing implementation on FP16 Tensor Cores by Mukunoki et al. [20]. Although there is a tradeoff between the throughput and the width of the exponent distribution of the input matrices, our implementation outperforms cuBLAS DGEMM and the existing implementation up to about 6\\times on NVIDIA consumer GPUs.\n\n- • We apply the Ozaki scheme on integer Tensor Cores to quantum circuit simulation and evaluate the accuracy and throughput. For practical use, we implement an automatic accuracy tuning mechanism. We have achieved up to 4.33\\times throughput improvement compared to cuBLAS ZGEMM computation on NVIDIA RTX6000 Ada GPU while maintaining the FP64 accuracy.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "Ahmad Abdelfattah, Hartwig Anzt, Erik G Boman, Erin Carson, Terry Cojean, Jack Dongarra, Alyson Fox, Mark Gates, Nicholas J Higham, Xiaoye S Li, Jennifer Loe, Piotr Luszczek, Srikara Pranesh, Siva Rajamanickam, Tobias Ribizel, Barry F Smith, Kasia Swirydowicz, Stephen Thomas, Stanimire Tomov, Yaohung M Tsai, and Ulrike Meier Yang. A survey of numerical linear algebra methods utilizing mixed-precision arithmetic. International Journal of High Performance Computing Applications , 35(4):344–369, 2021."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib26",
+      "text": "Corporation NVIDIA. NVIDIA H100 TENSOR CORE GPU, 2022."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib18",
+      "text": "Norman P. Jouppi, Cliff Young, Nishant Patil, and et al. In-Datacenter Performance Analysis of a Tensor Processing Unit. In Proceedings of the 44th Annual International Symposium on Computer Architecture , ISCA ’17, pages 1–12, New York, NY, USA, June 2017. Association for Computing Machinery."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib17",
+      "text": "Norman P. Jouppi, George Kurian, Sheng Li, Peter Ma, Rahul Nagarajan, Lifeng Nai, Nishant Patil, Suvinay Subramanian, Andy Swing, Brian Towles, Cliff Young, Xiang Zhou, Zongwei Zhou, and David Patterson. TPU v4: An Optically Reconfigurable Supercomputer for Machine Learning with Hardware Support for Embeddings, April 2023. arXiv:2304.01433 [cs]."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib16",
+      "text": "Norman P. Jouppi, Doe Hyun Yoon, Matthew Ashcraft, Mark Gottscho, Thomas B. Jablin, George Kurian, James Laudon, Sheng Li, Peter Ma, Xiaoyu Ma, Thomas Norrie, Nishant Patil, Sushma Prasad, Cliff Young, Zongwei Zhou, and David Patterson. Ten Lessons From Three Generations Shaped Google’s TPUv4i : Industrial Product. In 2021 ACM/IEEE 48th Annual International Symposium on Computer Architecture (ISCA) , pages 1–14, June 2021. ISSN: 2575-713X."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib14",
+      "text": "Mark Horowitz. 1.1 Computing’s energy problem (and what we can do about it). In 2014 IEEE International Solid-State Circuits Conference Digest of Technical Papers (ISSCC) , pages 10–14, February 2014. ISSN: 2376-8606."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib33",
+      "text": "Kiran Seshadri, Berkin Akin, James Laudon, Ravi Narayanaswami, and Amir Yazdanbakhsh. An Evaluation of Edge TPU Accelerators for Convolutional Neural Networks. pages 79–91. IEEE Computer Society, November 2022."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib5",
+      "text": "Intel Corporation. Intel® C++ Compiler Classic Developer Guide and Reference, 2022."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib2",
+      "text": "Ibrahim Ahmed, Sahil Parmar, Matthew Boyd, Michael Beidler, Kris Kang, Bill Liu, Kyle Roach, John Kim, and Dennis Abts. Answer Fast: Accelerating BERT on the Tensor Streaming Processor. pages 80–87. IEEE Computer Society, July 2022."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "Azzam Haidar, Stanimire Tomov, Jack Dongarra, and Nicholas J. Higham. Harnessing GPU Tensor Cores for Fast FP16 Arithmetic to Speed up Mixed-Precision Iterative Refinement Solvers. In SC18: International Conference for High Performance Computing, Networking, Storage and Analysis , pages 603–613, November 2018."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib7",
+      "text": "Joshua Finkelstein, Emanuel H. Rubensson, Susan M. Mniszewski, Christian F. A. Negre, and Anders M. N. Niklasson. Quantum Perturbation Theory Using Tensor Cores and a Deep Neural Network. Journal of Chemical Theory and Computation , 18(7):4255–4268, July 2022. Publisher: American Chemical Society."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib28",
+      "text": "Hiroyuki Ootomo and Rio Yokota. Recovering single precision accuracy from Tensor Cores while surpassing the FP32 theoretical peak performance:. The International Journal of High Performance Computing Applications , June 2022. Publisher: SAGE PublicationsSage UK: London, England."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib27",
+      "text": "Hiroyuki Ootomo, Hidetaka Manabe, Kenji Harada, and Rio Yokota. Quantum Circuit Simulation by SGEMM Emulation on Tensor Cores and Automatic Precision Selection. In Abhinav Bhatele, Jeff Hammond, Marc Baboulin, and Carola Kruse, editors, High Performance Computing , Lecture Notes in Computer Science, pages 259–276, Cham, 2023. Springer Nature Switzerland."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib13",
+      "text": "Y. Hida, X.S. Li, and D.H. Bailey. Algorithms for quad-double precision floating point arithmetic. In Proceedings 15th IEEE Symposium on Computer Arithmetic. ARITH-15 2001 , pages 155–162, June 2001. ISSN: 1063-6889."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib22",
+      "text": "Daichi Mukunoki and Daisuke Takahashi. Implementation and Evaluation of Triple Precision BLAS Subroutines on GPUs. In 2012 IEEE 26th International Parallel and Distributed Processing Symposium Workshops & PhD Forum , pages 1378–1386, May 2012."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib24",
+      "text": "Naohito Nakasato. A fast GEMM implementation on the cypress GPU. ACM SIGMETRICS Performance Evaluation Review , 38(4):50–55, March 2011."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib30",
+      "text": "Katsuhisa Ozaki, Takeshi Ogita, Shin’ichi Oishi, and Siegfried M. Rump. Error-free transformations of matrix multiplication by using fast routines of matrix multiplication and its applications. Numerical Algorithms , 59(1):95–118, January 2012."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib29",
+      "text": "Katsuhisa Ozaki, Takeshi Ogita, Shin’ichi Oishi, and Siegfried M. Rump. Generalization of error-free transformation for matrix multiplication and its application. Nonlinear Theory and Its Applications, IEICE , 4(1):2–11, 2013."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib20",
+      "text": "Daichi Mukunoki, Takeshi Ogita, and Katsuhisa Ozaki. Reproducible BLAS Routines with Tunable Accuracy Using Ozaki Scheme for Many-Core Architectures. In Roman Wyrzykowski, Ewa Deelman, Jack Dongarra, and Konrad Karczewski, editors, Parallel Processing and Applied Mathematics , Lecture Notes in Computer Science, pages 516–527, Cham, 2020. Springer International Publishing."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib21",
+      "text": "Daichi Mukunoki, Katsuhisa Ozaki, Takeshi Ogita, and Toshiyuki Imamura. DGEMM Using Tensor Cores, and Its Accurate and Reproducible Versions. In Ponnuswamy Sadayappan, Bradford L. Chamberlain, Guido Juckeland, and Hatem Ltaief, editors, High Performance Computing , Lecture Notes in Computer Science, pages 230–248, Cham, 2020. Springer International Publishing."
+    }
+  ]
+}

@@ -1,0 +1,159 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.19474",
+  "title": "SG-PGM: Partial Graph Matching Network with Semantic Geometric Fusion for 3D Scene Graph Alignment and Its Downstream Tasks",
+  "authors": "Yaxu Xie, Alain Pagani, Didier Stricker",
+  "year": "2024",
+  "categories": [
+    "cs.CV",
+    "cs.RO"
+  ],
+  "url": "https://arxiv.org/abs/2403.19474",
+  "html_url": "https://arxiv.org/html/2403.19474",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 832,
+  "text": "The 3D semantic scene graph [1,2,3] is a semantic-rich model for scene representation, which summarizes the scene context in the form of an attributed and directed graph, in which 3D objects and structures as nodes are associated with semantic classes (e.g. sofa, wall), and geometrical semantic relationship between nodes are represented as edges with multiple classes (e.g. stand_on, supported_by). 3D scene graphs support many applications in spatial understanding, such as global localization for SLAM [4,5,6,7], loop-closure detecting [8], robot navigation [9,10], visual object grounding [11], graph-to-3D manipulation [12] and augmented reality [13]. One of the main problems of the aforementioned applications is searching for the partial alignment of two or more 3D scene graphs. As illustrated in Figure 1, once the alignment between nodes is found, tasks like localization and navigation can be conducted via point cloud registration within the overlapping area. Alternatively, the determination of whether scene fragments are overlapped or not can be achieved by analyzing the similarity of 3D scene graphs.\n\nSGAligner [14] is the first work specifically focusing on this problem. In this work, Sarkar et al. proposed a neural network that learns a joint multi-modal embedding encoded with semantic, geometric, and structural information for each node entity in the graph, which is trained with cross-modal contrastive loss and outputs the similarity between source and reference graph nodes as the alignment result. After the node(object)-level alignment is found, downstream tasks such as point cloud registration are conducted by using a pre-trained registration method, to search point matching within two aligned objects. Later, the point pairs of all aligned objects are fed into a graph-cut RANSAC algorithm [15] to estimate the transformation between the source and reference point clouds. Such decoupled design allows SGAligner to be easily plugged into most of the feature-based registration methods.\n\nHowever, the simplicity of such a two-stage approach comes with some drawbacks: First, SGAligner employs PointNet [16] to encode object-level geometric embedding. For downstream tasks like point cloud registration or mosaicking, the geometric feature will be extracted twice, once for scene graph alignment and once for registration. We find that reusing the geometric feature extracted from more powerful 3D points encoder like Edge Conv [17], FCGF [18] and KP-Conv [19] is more efficient since they are already integrated into recent registration method [20,21,22,23,24]. Second, SGAligner achieves a computation complexity less than \\textit{O}\\left(N^{2}\\right) (looping through all possible node pairs) by running registration only on the predicted alignment pairs. However, we argue the complexity can be further reduced by introducing explicit mechanisms, that enable one-to-one matching or even partial alignment to surpass false-positive prediction.\n\nAddressing the aforementioned aspects, we first define the 3D scene graph alignment as a partial graph matching problem. We build our graph matching neural network following the linear assignment formalism: encoding edge information into node features with the graph convolution and searching node-to-node matching via the Sinkhorn decoder [25]. We reuse the point features learned by the backbone of the point cloud registration method and cluster the point-wise geometric feature into entity nodes via our designed Point to Scene Graph Fusion module (P2SG). We additionally enable explicit partial matching by employing differentiable top-k method [26] to select the k most likely matching pairs. This further increases the alignment accuracy and reduces the false-positive prediction.\n\nMoreover, we design a Superpoint Matching Rescoring method using the predicted scene graph node alignment as the semantic level prior to guiding the point correspondence estimation during registration. We further reduce the search space of point-to-point matching during registration by masking out the non-aligned objects of both scene fragments. We conduct point cloud registration only once between the predicted overlap regions of scene fragments, instead of traversing through node pairs as done in [14]. By employing this strategy, we reduce the inference time, while retaining the long-distance cross-object geometric feature potentially encoded by registration methods [24,27].\n\nWe showcase the effectiveness of our approach, by experimenting with scene graph alignment and its downstream tasks: overlap-checking, point cloud registration, point cloud mosaicking, and alignment with dynamics on the 3RScan [28,2] dataset. Results show that our approach significantly improves the alignment accuracy by 10 \\sim 20% compared to [14], especially when transformation T\\neq I_{4} exists between scene fragments. It reduces the rotation error by 50%, and the translation error by 24% on the point cloud registration task, compared to [14] while keeping the registration RANSAC-free. We also conduct ablation studies to visually demonstrate the effecting mechanism of our proposed Superpoint Matching Rescoring and compare different strategies of using alignment results on registration. We summarize the contributions of this paper as follows:\n\n- 1. A graph neural network (SG-PGM) for partial graph matching to solve 3D scene graph alignment.\n\n- 2. The Point to Scene Graph Fusion module and the soft top-k method for increasing alignment accuracy.\n\n- 3. The Superpoint Matching Rescoring method for guiding the point matching with scene graph alignment results.\n\n- 4. Revisiting the strategies to stimulate the potential of using 3D scene graph alignment for downstream tasks.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib2",
+      "text": "Iro Armeni, Zhi-Yang He, JunYoung Gwak, Amir R Zamir, Martin Fischer, Jitendra Malik, and Silvio Savarese. 3d scene graph: A structure for unified semantics, 3d space, and camera. In Proceedings of the IEEE International Conference on Computer Vision , pages 5664–5673, 2019."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib41",
+      "text": "Johanna Wald, Helisa Dhamo, Nassir Navab, and Federico Tombari. Learning 3d semantic scene graphs from 3d indoor reconstructions. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 3961–3970, 2020."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib46",
+      "text": "Shun-Cheng Wu, Johanna Wald, Keisuke Tateno, Nassir Navab, and Federico Tombari. Scenegraphfusion: Incremental 3d scene graph prediction from rgb-d sequences. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 7515–7525, 2021."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib14",
+      "text": "Abel Gawel, Carlo Del Don, Roland Siegwart, Juan Nieto, and Cesar Cadena. X-view: Graph-based semantic multi-view localization. IEEE Robotics and Automation Letters , 3(3):1687–1694, 2018."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib23",
+      "text": "Yu Liu, Yvan Petillot, David Lane, and Sen Wang. Global localization with object-level semantics and topology. In 2019 International Conference on Robotics and Automation (ICRA) , pages 4909–4915. IEEE, 2019."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib17",
+      "text": "Nathan Hughes, Yun Chang, and Luca Carlone. Hydra: A real-time spatial perception system for 3d scene graph construction and optimization. arXiv preprint arXiv:2201.13360 , 2022."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib32",
+      "text": "Antoni Rosinol, Andrew Violette, Marcus Abate, Nathan Hughes, Yun Chang, Jingnan Shi, Arjun Gupta, and Luca Carlone. Kimera: From slam to spatial perception with 3d dynamic scene graphs. The International Journal of Robotics Research , 40(12-14):1510–1546, 2021."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib29",
+      "text": "Zhentian Qian, Jie Fu, and Jing Xiao. Towards accurate loop closure detection in semantic slam with 3d semantic covisibility graphs. IEEE Robotics and Automation Letters , 7(2):2455–2462, 2022."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib55",
+      "text": "Fengda Zhu, Xiwen Liang, Yi Zhu, Qizhi Yu, Xiaojun Chang, and Xiaodan Liang. Soon: Scenario oriented object navigation with graph-based exploration. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 12689–12699, 2021."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib42",
+      "text": "Fan Wang, Chaofan Zhang, Wen Zhang, Cuiyun Fang, Yingwei Xia, Yong Liu, and Hao Dong. Object-based reliable visual navigation for mobile robot. Sensors , 22(6):2387, 2022."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib10",
+      "text": "Mingtao Feng, Zhen Li, Qi Li, Liang Zhang, XiangDong Zhang, Guangming Zhu, Hui Zhang, Yaonan Wang, and Ajmal Mian. Free-form description guided 3d visual graph network for object grounding in point cloud. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 3722–3731, 2021."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib9",
+      "text": "Helisa Dhamo, Fabian Manhardt, Nassir Navab, and Federico Tombari. Graph-to-3d: End-to-end generation and manipulation of 3d scenes using scene graphs. In IEEE International Conference on Computer Vision (ICCV) , 2021."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib37",
+      "text": "Tomu Tahara, Takashi Seno, Gaku Narita, and Tomoya Ishikawa. Retargetable ar: Context-aware augmented reality in indoor scenes based on 3d scene graph. In 2020 IEEE International Symposium on Mixed and Augmented Reality Adjunct (ISMAR-Adjunct) , pages 249–255. IEEE, 2020."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib34",
+      "text": "Sayan Deb Sarkar, Ondrej Miksik, Marc Pollefeys, Daniel Barath, and Iro Armeni. Sgaligner : 3d scene alignment with scene graphs. Proceedings of the IEEE International Conference on Computer Vision (ICCV) , 2023."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib4",
+      "text": "Daniel Barath and Jiri Matas. Graph-cut RANSAC. In Conference on Computer Vision and Pattern Recognition , 2018a."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib28",
+      "text": "Charles R Qi, Hao Su, Kaichun Mo, and Leonidas J Guibas. Pointnet: Deep learning on point sets for 3d classification and segmentation. In Proceedings of the IEEE conference on computer vision and pattern recognition , pages 652–660, 2017."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib45",
+      "text": "Yue Wang, Yongbin Sun, Ziwei Liu, Sanjay E Sarma, Michael M Bronstein, and Justin M Solomon. Dynamic graph cnn for learning on point clouds. Acm Transactions On Graphics (tog) , 38(5):1–12, 2019b."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib8",
+      "text": "Christopher Choy, Jaesik Park, and Vladlen Koltun. Fully convolutional geometric features. In Proceedings of the IEEE/CVF international conference on computer vision , pages 8958–8966, 2019."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib38",
+      "text": "Hugues Thomas, Charles R Qi, Jean-Emmanuel Deschaud, Beatriz Marcotegui, François Goulette, and Leonidas J Guibas. Kpconv: Flexible and deformable convolution for point clouds. In Proceedings of the IEEE/CVF international conference on computer vision , pages 6411–6420, 2019."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib11",
+      "text": "Matthias Fey, Jan E Lenssen, Christopher Morris, Jonathan Masci, and Nils M Kriege. Deep graph matching consensus. In International Conference on Learning Representations , 2019."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib16",
+      "text": "Shengyu Huang, Zan Gojcic, Mikhail Usvyatsov, and Konrad Schindler Andreas Wieser. Predator: Registration of 3d point clouds with low overlap. In IEEE Conference on Computer Vision and Pattern Recognition, CVPR , 2021."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib50",
+      "text": "Hao Yu, Fu Li, Mahdi Saleh, Benjamin Busam, and Slobodan Ilic. Cofinet: Reliable coarse-to-fine correspondences for robust pointcloud registration. Advances in Neural Information Processing Systems , 34:23872–23884, 2021."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib13",
+      "text": "Kexue Fu, Shaolei Liu, Xiaoyuan Luo, and Manning Wang. Robust point cloud registration framework based on deep graph matching. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 8893–8902, 2021."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib31",
+      "text": "Zheng Qin, Hao Yu, Changjian Wang, Yulan Guo, Yuxing Peng, and Kai Xu. Geometric transformer for fast and robust point cloud registration. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 11143–11152, 2022."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib36",
+      "text": "Richard Sinkhorn. A relationship between arbitrary positive matrices and doubly stochastic matrices. The annals of mathematical statistics , 35(2):876–879, 1964."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib44",
+      "text": "Runzhong Wang, Ziao Guo, Shaofei Jiang, Xiaokang Yang, and Junchi Yan. Deep learning of partial graph matching via differentiable top-k. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 6272–6281, 2023."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib51",
+      "text": "Junle Yu, Luwei Ren, Yu Zhang, Wenhui Zhou, Lili Lin, and Guojun Dai. Peal: Prior-embedded explicit attention learning for low-overlap point cloud registration. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 17702–17711, 2023."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib40",
+      "text": "Johanna Wald, Armen Avetisyan, Nassir Navab, Federico Tombari, and Matthias Nießner. Rio: 3d object instance re-localization in changing indoor environments. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 7658–7667, 2019."
+    }
+  ]
+}

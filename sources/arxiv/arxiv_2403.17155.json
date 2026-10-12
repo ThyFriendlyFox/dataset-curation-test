@@ -1,0 +1,109 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.17155",
+  "title": "Task-Agnostic Detector for Insertion-Based Backdoor Attacks",
+  "authors": "Weimin Lyu, Xiao Lin, Songzhu Zheng, Lu Pang, Haibin Ling, Susmit Jha, Chao Chen",
+  "year": "2024",
+  "categories": [
+    "cs.CL",
+    "cs.CR"
+  ],
+  "url": "https://arxiv.org/abs/2403.17155",
+  "html_url": "https://arxiv.org/html/2403.17155",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 759,
+  "text": "Transformer models have demonstrated strong learning power in many natural language processing (NLP) tasks [1,2,3,4,5]. However, they have been found to be vulnerable to backdoor attacks [6,7,8,9,10,11]. Attackers inject backdoors into transformer models by poisoning data and manipulating training process. A well-trained backdoored model has a satisfying performance on clean samples, while consistently making wrong predictions once the triggers are added into the input. In popular attack mechanisms, such as insertion-based attacks, the triggers are pre-selected words [12], meaningful sentences [9], or characters [7].\n\nTo address backdoor attacks, existing methods mainly fall into two categories: 1) Defense: mitigating the attack effect by removing the trigger from models or inputs, and 2) Detection: directly detecting whether the model is backdoored or clean. Despite the development of defense methods [13,14,15], detecting whether a model has been backdoor attacked is less explored. In this study, we focus on detection as it is important in practice to identify malicious models before deployment and thereby preventing potential damages. T-Miner [16] identifies backdoors by finding outliers in an internal representation space. AttenTD [17] detects backdoors by checking the attention abnormality given a set of neutral words. PICCOLO [18] leverages a word discriminativity analysis to distinguish backdoors.\n\nAll these detection methods rely on reconstructing potential triggers or intermediate feature representation. This makes these methods rather sensitive to the backbone architecture and to the NLP task. When generalizing to a different backbone or a different NLP task, one may have to redesign the method or re-tune the hyperparameters. Indeed, most existing detection methods focus on common sentence classification (SC) tasks, such as sentiment analysis. It is very hard to generalize them to tasks requiring a structured output, e.g., named entity recognition (NER) and question answering (QA).\n\nIn this paper, we propose the first task-agnostic backdoor detector that directly detect backdoored models for different NLP tasks. A task-agnostic backdoor detector has multiple benefits. First, it will be easy to be deployed in the field, without redesigning the algorithm or re-tuning hyperparamters for different tasks. Second, a task-agnostic detector can fully exploit training model samples from different tasks and achieve better overall performance. Finally, a task-agnostic backdoor detector provides the opportunity to identify the intrinsic characteristic of backdoors shared across different tasks. This will advance our fundamental understanding of backdoor attack and defense, and advance our knowledge of NLP models in general.\n\nOur method, TABDet (T ask- A gnostic B ackdoor Det ector), constitutes two main technical contributions. First, unlike most existing detection methods, we propose to only use the final layer output logits. Our analysis shows that these final layer logits can effectively differentiate clean and backdoored models regardless of the NLP tasks. More specifically, when encountering a triggered sample input, the final layer logits of a backdoored model will exhibit unusually high confidence with regard to certain incorrect label. As shown in Figure 1, such behavior manifests across different NLP tasks. Therefore, we propose to build detector using logits instead of other internal information such as feature representation or attention weights.\n\nThere are more challenges we need to address. During detection, we do not know the real trigger. Instead, we could only use a large set of trigger candidates. When encountering these trigger candidates, the abnormal logits behavior still exists (Figure 2 (1)). However, not surprisingly, the signal also gets noisy (Figure 2 (2)). Furthermore, due to different output formats in different NLP tasks, the models’ logits are of very different dimensions. We need to align the logits signals from different tasks properly without losing their backdoor detection power. To address these challenges, our second technical contribution is a novel logits pooling method to refine and unify the representations of logits from models for different NLP tasks. As shown in Figure 2 (3), the refined logit representations preserve the strong detection power and is well aligned across tasks.\n\nIn summary, we propose the first task-agnostic backdoor detector with the following contributions:\n\n- • We only rely on the final layer logits for the detection.\n\n- • We propose an efficient logits pooling method to refine and unify logit representations across models from different tasks.\n\n- • Using the logit representation as features, we train the proposed backdoor detector that can fully learn from models of different tasks and achieve superior performance.\n\nEmpirical results demonstrate the strong detection power of our detector (TABDet) across different tasks including sentence classification, question answering and named entity recognition. Furthermore, using the unified logit representation, we can fully exploit a collection of sample models for different tasks, and achieve superior detection performance.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib53",
+      "text": "Vaswani et al. (2017) Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N Gomez, Łukasz Kaiser, and Illia Polosukhin. 2017. Attention is all you need. In Advances in neural information processing systems , pages 5998–6008."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib12",
+      "text": "Devlin et al. (2019) Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. 2019. Bert: Pre-training of deep bidirectional transformers for language understanding. In NAACL-HLT (1) ."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib32",
+      "text": "Liu et al. (2019) Yinhan Liu, Myle Ott, Naman Goyal, Jingfei Du, Mandar Joshi, Danqi Chen, Omer Levy, Mike Lewis, Luke Zettlemoyer, and Veselin Stoyanov. 2019. Roberta: A robustly optimized bert pretraining approach. arXiv preprint arXiv:1907.11692 ."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib48",
+      "text": "Sanh et al. (2019) Victor Sanh, Lysandre Debut, Julien Chaumond, and Thomas Wolf. 2019. Distilbert, a distilled version of bert: smaller, faster, cheaper and lighter. arXiv preprint arXiv:1910.01108 ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib8",
+      "text": "Clark et al. (2020) Kevin Clark, Minh-Thang Luong, Quoc V Le, and Christopher D Manning. 2020. Electra: Pre-training text encoders as discriminators rather than generators. arXiv preprint arXiv:2003.10555 ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib16",
+      "text": "Gu et al. (2017) T Gu, B Dolan-Gavitt, and SG BadNets. 2017. Identifying vulnerabilities in the machine learning model supply chain. In Proceedings of the Neural Information Processing Symposium Workshop Mach. Learning Security (MLSec) , pages 1–5."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib4",
+      "text": "Chen et al. (2021) Xiaoyi Chen, Ahmed Salem, Dingfan Chen, Michael Backes, Shiqing Ma, Qingni Shen, Zhonghai Wu, and Yang Zhang. 2021. Badnl: Backdoor attacks against nlp models with semantic-preserving improvements. In Annual Computer Security Applications Conference , pages 554–569."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib38",
+      "text": "Lyu et al. (2023b) Weimin Lyu, Songzhu Zheng, Lu Pang, Haibin Ling, and Chao Chen. 2023b. Attention-enhancing backdoor attacks against bert-based models. In Findings of the Association for Computational Linguistics: EMNLP 2023 , pages 10672–10690."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib10",
+      "text": "Dai et al. (2019) Jiazhu Dai, Chuanshuai Chen, and Yufeng Li. 2019. A backdoor attack against lstm-based text classification systems. IEEE Access , 7:138872–138878."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib9",
+      "text": "Cui et al. (2022) Ganqu Cui, Lifan Yuan, Bingxiang He, Yangyi Chen, Zhiyuan Liu, and Maosong Sun. 2022. A unified evaluation of textual backdoor learning: Frameworks and benchmarks. arXiv preprint arXiv:2206.08514 ."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib41",
+      "text": "Pang et al. (2023) Lu Pang, Tao Sun, Haibin Ling, and Chao Chen. 2023. Backdoor cleansing with unlabeled data. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 12218–12227."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib19",
+      "text": "Kurita et al. (2020) Keita Kurita, Paul Michel, and Graham Neubig. 2020. Weight poisoning attacks on pretrained models. In Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics , pages 2793–2806."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib43",
+      "text": "Qi et al. (2021a) Fanchao Qi, Yangyi Chen, Mukai Li, Yuan Yao, Zhiyuan Liu, and Maosong Sun. 2021a. Onion: A simple and effective defense against textual backdoor attacks. In Proceedings of the 2021 Conference on Empirical Methods in Natural Language Processing , pages 9558–9566."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib66",
+      "text": "Yang et al. (2021b) Wenkai Yang, Yankai Lin, Peng Li, Jie Zhou, and Xu Sun. 2021b. Rap: Robustness-aware perturbations for defending against backdoor attacks on nlp models. In Proceedings of the 2021 Conference on Empirical Methods in Natural Language Processing , pages 8365–8381."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib37",
+      "text": "Lyu et al. (2022c) Weimin Lyu, Songzhu Zheng, Tengfei Ma, Haibin Ling, and Chao Chen. 2022c. Attention hijacking in trojan transformers. arXiv preprint arXiv:2208.04946 ."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib1",
+      "text": "Azizi et al. (2021) Ahmadreza Azizi, Ibrahim Asadullah Tahmid, Asim Waheed, Neal Mangaokar, Jiameng Pu, Mobin Javed, Chandan K Reddy, and Bimal Viswanath. 2021. T-miner: A generative approach to defend against trojan attacks on dnn-based text classification. arXiv preprint arXiv:2103.04264 ."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib36",
+      "text": "Lyu et al. (2022b) Weimin Lyu, Songzhu Zheng, Tengfei Ma, and Chao Chen. 2022b. A study of the attention abnormality in trojaned berts. In Proceedings of the 2022 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies , pages 4727–4741."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib31",
+      "text": "Liu et al. (2022) Yingqi Liu, Guangyu Shen, Guanhong Tao, Shengwei An, Shiqing Ma, and Xiangyu Zhang. 2022. Piccolo: Exposing complex backdoors in nlp transformer models. In 2022 IEEE Symposium on Security and Privacy (SP) , pages 2025–2042. IEEE."
+    }
+  ]
+}

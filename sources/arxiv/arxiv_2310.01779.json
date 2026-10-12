@@ -1,0 +1,88 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2310.01779",
+  "title": "HallE-Control: Controlling Object Hallucination in Large Multimodal Models",
+  "authors": "Bohan Zhai, Shijia Yang, Chenfeng Xu, Sheng Shen, Kurt Keutzer, Chunyuan Li, Manling Li",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2310.01779",
+  "html_url": "https://arxiv.org/html/2310.01779",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 683,
+  "text": "In recent years, Large Multimodal Models (LMMs) [1,2,3,4] have achieved significant progress, advancing tasks such as detailed captioning, visual conversations, and vision question-answering (VQA) [5,6,7,8]. However, similar to Large Language Models (LLMs) [9,10,11] in the NLP domain, LMMs confront the issue of hallucination. This is particularly severe in detailed image captioning, which hinders the performance of downstream applications in robotics [12], visual search [13], etc. To better understand and address this challenge, we first outline three types of object hallucinations frequently observed in the detailed captions: (1) Object Existence Hallucination - The detailed image description references objects that are not present; (2) Object Attribute Hallucination - The detailed image description inaccurately characterizes objects, misrepresenting attributes such as color, shape, and size; (3) Object Relationship Hallucination - The detailed image description inaccurately depicts the relationships or interactions among objects, including erroneous relative positions, interaction states, and actions involving two or more objects. In this work, we mainly focus on defining the metric, analyzing the cause, and addressing the the problem of object existence hallucination.\n\nEvaluating detailed captions is inherently complex. Some of the efforts, including benchmarks like POPE [14], evaluate object hallucination using VQA. Such a bias towards VQA-based evaluations might result in an incomplete assessment of detailed captions, which requires obtaining a comprehensive view of visual details. To bridge this gap, we introduce CCEval, designed specifically for object existence hallucination in detailed captions. To avoid the model gaining an unfair advantage by favoring shorter descriptions, CCEval maintains consistency in metrics such as average sentence length and the number of objects (see Sec. 2). Notably, even models that well-performed on VQA-based object hallucination benchmarks showed substantial hallucinations when evaluated with CCEval.\n\nIn our exploration to uncover the underlying cause of object existence hallucination, we look into various factors including the size of the language decoder, the quantity, quality, and granularity of instruction data, and the input resolution to the vision encoder. We conclude the most crucial factor to be the alignment between objects mentioned in training caption and those vision encoder can perceive. During training of LMMs, the goal is to establish a one-to-one correspondence between objects mentioned in the caption and those present in the image. Objects successfully grounded by the vision encoder form accurate associations, internalizing them as contextual knowledge. Conversely, objects in the language that the vision encoder fails to ground create word-word semantic associations, which can be attributed to the generalization from the parametric knowledge within the model’s parameters. During inference, when the model draws from such parametric knowledge, any misalignment can manifest as hallucination, as the model attempts to “guess” details not grounded by the vision module.\n\nTo address such hallucination, we are motivated by that not all hallucination is bad, and it is more desirable to control the generalization rather than outright removal of all imagined objects. Recognizing the significance of both contextual and parametric knowledge in ensuring generation reliability, we present HallE-Control, a novel approach to control the extent of expressed hallucination or parametric knowledge. We curate a 33k dataset similar to LLaVA [1], incorporating both pure contextual knowledge and a blend of contextual knowledge with marked parametric knowledge. Leveraging this dataset, we train a lightweighted single linear layer to control over the frozen LMM. As demonstrated in Figure 1, a singular continuous parameter adjustment (e.g. -1\\rightarrow+1) during inference enables the model to produce detailed captions with only contextual knowledge (e.g., -1) or blend with parametric knowledge (e.g., +1). Furthermore, the inferred objects from parametric knowledge are automatically highlighted with distinct tokens (e.g., [object]) for human reference. This method offers the advantage of preserving object count and coverage as well as sentence length, while effectively control object existence hallucination.\n\nOverall, our contributions are:\n\n- • A comprehensive analysis on LMM components that influence hallucination, with a specific focus on alignment issues in the vision encoder and instruction data;\n\n- • The first approach to control object existence hallucination within detailed captions;\n\n- • A novel evaluation method for detailed caption object existence hallucination, with metrics such as object count, coverage, and average sentence length, alongside hallucination assessment.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib39",
+      "text": "Liu et al. (2023d) Haotian Liu, Chunyuan Li, Qingyang Wu, and Yong Jae Lee. Visual instruction tuning. arXiv preprint arXiv:2304.08485 , 2023d."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib10",
+      "text": "Dai et al. (2023) Wenliang Dai, Junnan Li, Dongxu Li, Anthony Meng Huat Tiong, Junqi Zhao, Weisheng Wang, Boyang Li, Pascale Fung, and Steven Hoi. Instructblip: Towards general-purpose vision-language models with instruction tuning, 2023."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib29",
+      "text": "Li et al. (2023b) Bo Li, Yuanhan Zhang, Liangyu Chen, Jinghao Wang, Jingkang Yang, and Ziwei Liu. Otter: A multi-modal model with in-context instruction tuning. arXiv preprint arXiv:2305.03726 , 2023b."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib69",
+      "text": "Zhu et al. (2023) Deyao Zhu, Jun Chen, Xiaoqian Shen, Xiang Li, and Mohamed Elhoseiny. Minigpt-4: Enhancing vision-language understanding with advanced large language models. arXiv preprint arXiv:2304.10592 , 2023."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib16",
+      "text": "Goyal et al. (2017) Yash Goyal, Tejas Khot, Douglas Summers-Stay, Dhruv Batra, and Devi Parikh. Making the V in VQA matter: Elevating the role of image understanding in Visual Question Answering. In Conference on Computer Vision and Pattern Recognition (CVPR) , 2017."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib40",
+      "text": "Liu et al. (2023e) Yuan Liu, Haodong Duan, Yuanhan Zhang, Bo Li, Songyang Zhnag, Wangbo Zhao, Yike Yuan, Jiaqi Wang, Conghui He, Ziwei Liu, Kai Chen, and Dahua Lin. Mmbench: Is your multi-modal model an all-around player? arXiv:2307.06281 , 2023e."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib21",
+      "text": "Hudson & Manning (2019) Drew A Hudson and Christopher D Manning. Gqa: A new dataset for real-world visual reasoning and compositional question answering. Conference on Computer Vision and Pattern Recognition (CVPR) , 2019."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib14",
+      "text": "Fu et al. (2023) Chaoyou Fu, Peixian Chen, Yunhang Shen, Yulei Qin, Mengdan Zhang, Xu Lin, Zhenyu Qiu, Wei Lin, Jinrui Yang, Xiawu Zheng, et al. Mme: A comprehensive evaluation benchmark for multimodal large language models. arXiv preprint arXiv:2306.13394 , 2023."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib58",
+      "text": "Touvron et al. (2023a) Hugo Touvron, Thibaut Lavril, Gautier Izacard, Xavier Martinet, Marie-Anne Lachaux, Timothée Lacroix, Baptiste Rozière, Naman Goyal, Eric Hambro, Faisal Azhar, Aurelien Rodriguez, Armand Joulin, Edouard Grave, and Guillaume Lample. Llama: Open and efficient foundation language models, 2023a."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib57",
+      "text": "Team (2023) MosaicML NLP Team. Introducing mpt-30b: Raising the bar for open-source foundation models, 2023. URL www.mosaicml.com/blog/mpt-30b . Accessed: 2023-06-22."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib45",
+      "text": "OpenAI (2022) OpenAI. OpenAI: Introducing ChatGPT, 2022. URL https://openai.com/blog/chatgpt ."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib20",
+      "text": "Huang et al. (2023) Wenlong Huang, Chen Wang, Ruohan Zhang, Yunzhu Li, Jiajun Wu, and Li Fei-Fei. Voxposer: Composable 3d value maps for robotic manipulation with language models. arXiv preprint arXiv:2307.05973 , 2023."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib19",
+      "text": "Hu et al. (2023) Ziniu Hu, Ahmet Iscen, Chen Sun, Kai-Wei Chang, Yizhou Sun, David A Ross, Cordelia Schmid, and Alireza Fathi. Avis: Autonomous visual information seeking with large language models. arXiv preprint arXiv:2306.08129 , 2023."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib32",
+      "text": "Li et al. (2023e) Yifan Li, Yifan Du, Kun Zhou, Jinpeng Wang, Wayne Xin Zhao, and Ji-Rong Wen. Evaluating object hallucination in large vision-language models. 2023e. URL https://arxiv.org/pdf/2305.10355 ."
+    }
+  ]
+}

@@ -1,0 +1,173 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2310.10136",
+  "title": "Mata, a Fast and Simple Finite Automata Library (Technical Report)",
+  "authors": "David ChocholatÃ½, TomÃ¡Å¡ Fiedor, VojtÄch Havlena, LukÃ¡Å¡ HolÃ­k, Martin HruÅ¡ka, OndÅej LengÃ¡l, Juraj SÃ­Ä",
+  "year": "2024",
+  "categories": [
+    "cs.FL"
+  ],
+  "url": "https://arxiv.org/abs/2310.10136",
+  "html_url": "https://arxiv.org/html/2310.10136",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 817,
+  "text": "We introduce a new finite automata library Mata. It is intended to be used in applications where automata languages are manipulated by set operations and queries, presumably in a tight loop where automata are iteratively combined together using the classical as well as special-purpose constructions. Examples are applications like string constraint solving algorithms such as [1,2,3,4,5,6,7], processing of regular expressions [8,9], regular model checking (e.g., [10,11,12,13,14,15,16]), or decision procedures for logics such as WS1S or quantified Presburger arithmetic [17,18,19,20]. The solved problems are computationally hard, often beyond the PSPACE-completeness of basic automata problems such as language inclusion. Efficiency is hence a primary concern. Achieving speed in applications requires, on one hand, fast implementation of basic automata algorithms (union, intersection, complement, minimization or size reduction, determinization, emptiness/inclusion/equivalence/membership test, parsing of regular expressions) and, on the other hand, access to low-level primitives to implement diverse application-specific algorithms and optimizations that often build on a tight integration with the application environment. Moreover, processing of regular expressions and, even more so, string constraint solving are areas of active research, with constantly evolving algorithms, heuristics, and optimizations. An automata library hence needs flexibility, extensibility, easy access to the low-level data structures, and ideally a low learning curve, which is important when involving students in academic research and utilizing limited resources of small research teams.\n\nFast and simple are therefore our two main requirements for the library. An additional third requirement is a well-engineered infrastructure and a good set of benchmarks and tests, important for effective research and reliable deployment. Mata is therefore built around a data structure for the transition relation of a non-deterministic automaton that is a compromise between simplicity and speed. It represents transitions explicitly, as triples of a sources state, a single symbol, and a target state. This contrasts with various flavors of symbolic representation of transition relation used in advanced automata implementations in order to handle large or infinite alphabets (e.g. Unicode in processing of texts, or bit vectors in reasoning about LTL, arithmetic, or WS1S). However, in the applications we consider, working internally with large alphabets can essentially always be avoided by preprocessing (mainly by mintermization, aka factorization of the alphabet). The simplicity of an explicit representation then seems preferable. It allows to use a data structure specifically tailored for computing post-images of tuples and sets of states in automata algorithms: a source state-indexed array, storing at each index the transitions from that source state in a two layered structure, with the first layer divided and ordered by symbols, and the second layer ordered by target states. The data structure seems to be unique among the existing libraries and yields an exceptional performance.\n\nMata currently provides basic functionality, basic automata operations and tests, parsing of regexes and automata in a textual format, and mintermization. From the more advanced algorithms for working with non-deterministic automata, it implements antichain-based inclusion checking [21], and simulation-based size reduction based on the advanced algorithm of [22,23,24]. The inclusion check appears to be by a large margin the fastest implementation available, and together with the tree automata library Vata [25], Mata is the only library with an implementation of a simulation algorithm of the second generation originating from [22,26] (the second generation algorithms combine partition-relation pairs to manipulate preorders that were handled explicitly by the first generation algorithms such as [27,28]). Mata is implemented in C++, uses almost exclusively the STL library for its data structures, and has no external dependencies This makes it relatively easy to learn and integrate with other software projects. It is a well-engineered project at GitHub, with modern test and quality of code assurance infrastructure. Besides the C++ API, it provides a Python binding for fast prototyping and easy experimenting, for instance using interactive Jupyter notebooks.\n\nWe evaluated its speed in, to our best knowledge, so far the most comprehensive comparison of automata libraries. We compare with 7 well-known automata libraries on a large benchmark of problems from domains close to Mata ’s designation, mainly string constraint solving, processing regular expressions, and regular model checking. Mata consistently outperforms all other libraries, from several times to orders of magnitude.\n\nThat Mata is a good fit for string constraint solving is demonstrated by its central role in the string solver Z3-Noodler, which implements the algorithms of [1,2], and outperforms the state of the art on many standard benchmarks (see [31] for details).\n\nOur contributions can be summarised by the following three points:\n\n- 1. Mata, a fast, simple, and well-engineered automata library, well suited for application in string constraint solving and regex processing, in research and student projects, as well as in industrial applications.\n\n- 2. An extension of a benchmark of automata problems from string constraint solving, processing regular expressions, regular model checking, and solving arithmetic constraints.\n\n- 3. A comparison of a representative sample of well-known automata libraries against the above benchmark, demonstrating the superior performance of Mata.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib11",
+      "text": "Blahoudek, F., Chen, Y.F., Chocholatý, D., Havlena, V., Holík, L., Lengál, O., Síč, J.: Word equations in synergy with regular constraints. In: Proc. of FM’23. Springer (2023)"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib24",
+      "text": "Chen, Y.F., Chocholatý, D., Havlena, V., Holík, L., Lengál, O., Síč, J.: Solving string constraints with lengths by stabilization. Proc. ACM Program. Lang. 7 (OOPSLA2) (oct 2023). https://doi.org/10.1145/3622872"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib22",
+      "text": "Chen, T., Chen, Y., Hague, M., Lin, A.W., Wu, Z.: What is decidable about string constraints with the replaceall function. Proc. of POPL’18 (2018)"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib1",
+      "text": "Abdulla, P.A., Atig, M.F., Chen, Y., Diep, B.P., Holík, L., Rezine, A., Rümmer, P.: Trau: SMT solver for string constraints. In: Proc. of FMCAD’18. IEEE (2018)"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib10",
+      "text": "Berzish, M., Kulczynski, M., Mora, F., Manea, F., Day, J.D., Nowotka, D., Ganesh, V.: An SMT solver for regular expressions and linear arithmetic over string length. In: Computer Aided Verification - 33rd International Conference, CAV 2021, Virtual Event, July 20-23, 2021, Proceedings, Part II. Lecture Notes in Computer Science, vol. 12760, pp. 289–312. Springer (2021). https://doi.org/10.1007/978-3-030-81688-9_14, https://doi.org/10.1007/978-3-030-81688-9_14"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib3",
+      "text": "Abdulla, P.A., Atig, M.F., Chen, Y.F., Holík, L., Rezine, A., Rümmer, P., Stenman, J.: Norn: An SMT solver for string constraints. In: Computer Aided Verification. pp. 462–469. Springer International Publishing, Cham (2015)"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib71",
+      "text": "Stanford, C., Veanes, M., Bjørner, N.S.: Symbolic boolean derivatives for efficiently solving extended regular expression constraints. In: Proc. of PLDI’21. ACM (2021)"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib28",
+      "text": "Cox, A., Leasure, J.: Model checking regular language constraints. CoRR abs/1708.09073 (2017)"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib49",
+      "text": "Hooimeijer, P., Weimer, W.: A decision procedure for subset constraints over regular languages. In: PLDI’09. ACM (2009)"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib16",
+      "text": "Bouajjani, A., Habermehl, P., Vojnar, T.: Abstract regular model checking. In: Alur, R., Peled, D.A. (eds.) Computer Aided Verification, 16th International Conference, CAV 2004, Boston, MA, USA, July 13-17, 2004, Proceedings. Lecture Notes in Computer Science, vol. 3114, pp. 372–386. Springer (2004). https://doi.org/10.1007/978-3-540-27813-9_29, https://doi.org/10.1007/978-3-540-27813-9_29"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib15",
+      "text": "Bouajjani, A., Habermehl, P., Holík, L., Touili, T., Vojnar, T.: Antichain-based universality and inclusion testing over nondeterministic finite tree automata. In: Proc. of CIAA’08. Springer (2008)"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib58",
+      "text": "Legay, A.: T(O)RMC: A tool for ( ω \\omega )-regular model checking. In: Gupta, A., Malik, S. (eds.) Computer Aided Verification. pp. 548–551. Springer Berlin Heidelberg, Berlin, Heidelberg (2008)"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib26",
+      "text": "Chen, Y., Hong, C., Lin, A.W., Rümmer, P.: Learning to prove safety over parameterised concurrent systems. In: Stewart, D., Weissenbacher, G. (eds.) 2017 Formal Methods in Computer Aided Design, FMCAD 2017, Vienna, Austria, October 2-6, 2017. pp. 76–83. IEEE (2017). https://doi.org/10.23919/FMCAD.2017.8102244, https://doi.org/10.23919/FMCAD.2017.8102244"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib13",
+      "text": "Boigelot, B., Legay, A., Wolper, P.: Iterating transducers in the large. In: Hunt, W.A., Somenzi, F. (eds.) Computer Aided Verification. pp. 223–235. Springer Berlin Heidelberg, Berlin, Heidelberg (2003)"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib81",
+      "text": "Wolper, P., Boigelot, B.: Verifying systems with infinite but regular state spaces. In: Hu, A.J., Vardi, M.Y. (eds.) Computer Aided Verification. pp. 88–97. Springer Berlin Heidelberg, Berlin, Heidelberg (1998)"
+    },
+    {
+      "n": 16,
+      "id": "bib.bib6",
+      "text": "Abdulla, P.A., Jonsson, B., Nilsson, M., Saksena, M.: A survey of regular model checking. In: Gardner, P., Yoshida, N. (eds.) CONCUR 2004 - Concurrency Theory. pp. 35–48. Springer Berlin Heidelberg, Berlin, Heidelberg (2004)"
+    },
+    {
+      "n": 17,
+      "id": "bib.bib20",
+      "text": "Büchi, J.R.: Weak Second-Order Arithmetic and Finite Automata, pp. 398–424. Springer New York, New York, NY (1990). https://doi.org/10.1007/978-1-4613-8928-6_22, https://doi.org/10.1007/978-1-4613-8928-6_22"
+    },
+    {
+      "n": 18,
+      "id": "bib.bib80",
+      "text": "Wolper, P., Boigelot, B.: An automata-theoretic approach to Presburger arithmetic constraints (extended abstract). In: Mycroft, A. (ed.) Proc. of SAS’95. LNCS, vol. 983. Springer (1995)"
+    },
+    {
+      "n": 19,
+      "id": "bib.bib43",
+      "text": "Henriksen, J.G., Jensen, J.L., Jørgensen, M.E., Klarlund, N., Paige, R., Rauhe, T., Sandholm, A.: Mona: Monadic second-order logic in practice. In: Proc. of TACAS ’95. LNCS, vol. 1019. Springer (1995)"
+    },
+    {
+      "n": 20,
+      "id": "bib.bib12",
+      "text": "Boigelot, B., Latour, L.: Counting the solutions of Presburger equations without enumerating them. Theoretical Computer Science 313 (1), 17–29 (2004). https://doi.org/https://doi.org/10.1016/j.tcs.2003.10.002, https://www.sciencedirect.com/science/article/pii/S0304397503005322 , implementation and Application of Automata"
+    },
+    {
+      "n": 21,
+      "id": "bib.bib35",
+      "text": "Doyen, L., Raskin, J.: Antichain algorithms for finite automata. In: Proc. of TACAS’10. LNCS, Springer (2010)"
+    },
+    {
+      "n": 22,
+      "id": "bib.bib65",
+      "text": "Ranzato, F., Tapparo, F.: An efficient simulation algorithm based on abstract interpretation. Information and Computation 208 , 1–22 (2010)"
+    },
+    {
+      "n": 23,
+      "id": "bib.bib4",
+      "text": "Abdulla, P.A., Bouajjani, A., Holík, L., Kaati, L., Vojnar, T.: Computing simulations over tree automata. In: Ramakrishnan, C.R., Rehof, J. (eds.) Tools and Algorithms for the Construction and Analysis of Systems, 14th International Conference, TACAS 2008, Held as Part of the Joint European Conferences on Theory and Practice of Software, ETAPS 2008, Budapest, Hungary, March 29-April 6, 2008. Proceedings. Lecture Notes in Computer Science, vol. 4963, pp. 93–108. Springer (2008). https://doi.org/10.1007/978-3-540-78800-3_8, https://doi.org/10.1007/978-3-540-78800-3_8"
+    },
+    {
+      "n": 24,
+      "id": "bib.bib48",
+      "text": "Holík, L., Šimáček, J.: Optimizing an LTS-simulation algorithm. Computing and Informatics 29 (6+), 1337–1348 (2010), https://arxiv.org/abs/2307.04235"
+    },
+    {
+      "n": 25,
+      "id": "bib.bib59",
+      "text": "Lengál, O., Šimáček, J., Vojnar, T.: VATA: A library for efficient manipulation of non-deterministic tree automata. In: Proc. of TACAS’12. LNCS, vol. 7214. Springer (2012)"
+    },
+    {
+      "n": 26,
+      "id": "bib.bib21",
+      "text": "Cécé, G.: Foundation for a series of efficient simulation algorithms. In: Proc. of LICS’17. IEEE (2017)"
+    },
+    {
+      "n": 27,
+      "id": "bib.bib44",
+      "text": "Henzinger, M.R., Henzinger, T.A., Kopke, P.W.: Computing simulations on finite and infinite graphs. In: Proc. of FOCS. IEEE (1995)"
+    },
+    {
+      "n": 28,
+      "id": "bib.bib52",
+      "text": "Ilie, L., Navarro, G., Yu, S.: On NFA reductions. In: Theory Is Forever: Essays Dedicated to Arto Salomaa on the Occasion of His 70th Birthday. Springer (2004)"
+    },
+    {
+      "n": 29,
+      "id": "bib.bib70",
+      "text": "Somenzi, F.: CUDD: CU decision diagram package release 3.0.0 (2015)"
+    },
+    {
+      "n": 30,
+      "id": "bib.bib41",
+      "text": "Google: Re2. https://github.com/google/re2"
+    },
+    {
+      "n": 31,
+      "id": "bib.bib25",
+      "text": "Chen, Y.F., Chocholatý, D., Havlena, V., Holík, L., Lengál, O., Síč, J.: Z3-noodler: An automata-based string solver. In: Proc. of TACAS’24. LNCS, Springer (2024)"
+    }
+  ]
+}

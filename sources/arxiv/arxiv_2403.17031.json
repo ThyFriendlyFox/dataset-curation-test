@@ -1,0 +1,78 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.17031",
+  "title": "The N+ Implementation Details of RLHF with PPO: A Case Study on TL;DR Summarization",
+  "authors": "Shengyi Huang, Michael Noukhovitch, Arian Hosseini, Kashif Rasul, Weixun Wang, Lewis Tunstall",
+  "year": "2024",
+  "categories": [
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2403.17031",
+  "html_url": "https://arxiv.org/html/2403.17031",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 499,
+  "text": "There has been tremendous development in pre-trained large language models (LLMs) over the years [1,2,3,4]. Given the previous tokens, these LLMs are trained to predict the next token accurately, and they can be prompted to solve a wide range of natural language processing (NLP) tasks. However, the next-token-prediction objective differs from the fundamental objective of “outputting contents that humans prefer”. To address this gap, Reinforcement Learning from Human Feedback (RLHF) [5,6,7] is introduced as a pipeline to collect pair-wise human preferences, train a reward model (RM) to model these preferences and use Reinforcement Learning (RL) to create a model that outputs contents that humans prefer.\n\nIt has proven challenging to reproduce OpenAI’s RLHF pipeline [6,8] in the open-source community for several reasons: 1) RL and RLHF have many subtle implementation details that can significantly impact training stability [9,10,11], 2) the models are challenging to evaluate for the instruction following tasks (e.g., evaluating the quality of 800 lines of generated code snippet for a coding task), 3) they take a long time to train and iterate.\n\nThis work addresses the aforementioned three challenges by taking a step back and reproducing OpenAI’s earlier but seminal RLHF work in TL;DR summarization [5]. TL;DR is one of the most popular benchmarks for RLHF methods alongside instruction following tasks such as Anthropic’s HH-RLHF [7] and AlpacaFarm [12]. But summarization tasks are much easier to evaluate than general instruction following tasks because summaries are typically short and bad summaries usually have bad accuracy, coverage, or make-up facts. The reduced context and generation length also mean more efficient training, allowing us to iterate quickly and polish a working RLHF pipeline. Specifically, our contributions are as follows:\n\nWe reproduced the RLHF scaling behaviors in [5]. Our end-to-end pipeline demonstrates that larger models lead to improved ROUGE scores for SFT models, higher validation accuracy for RMs, and higher win rates of the generated summaries over reference summaries for the final RL policies.\n\nOur highly reproducible RLHF pipeline uses a single learning rate – no LR sweeps. To simplify the setup and improve reproducibility, we use the same learning rate for SFT, RM, and PPO training. In contrast, the original setup ran hyperparameter sweeps separately for SFT, RM, and PPO model training. To ensure researchers can reliably reproduce our work, we ran our model training for four random seeds, including failure cases for analysis.\n\nWe enumerate over 20 relevant implementation details and offer detailed insights. This paper delves into the details of the TL;DR datasets, including their specifications, tokenization processes, and token length distributions. We then detail the training setups, implementation details, and results for both the Supervised Fine-Tuning (SFT) and Reward Model (RM) components. Additionally, we explore the details of PPO implementation and how they impact performance. We provide visualizations to compare the behavior of aligned models versus base models.\n\nOur work is fully open source and transparent. We make our complete source code available at https://github.com/vwxyzjn/summarize_from_feedback_details. We also release model checkpoints and training metrics in Appendix A.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib3",
+      "text": "Radford et al. [2018] Alec Radford, Karthik Narasimhan, Tim Salimans, Ilya Sutskever, et al. Improving language understanding by generative pre-training. 2018."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib4",
+      "text": "Radford et al. [2019] Alec Radford, Jeff Wu, Rewon Child, David Luan, Dario Amodei, and Ilya Sutskever. Language models are unsupervised multitask learners. 2019."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib5",
+      "text": "Brown et al. [2020] Tom Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared D Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, et al. Language models are few-shot learners. Advances in neural information processing systems , 33:1877–1901, 2020."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib6",
+      "text": "Rae et al. [2021] Jack W Rae, Sebastian Borgeaud, Trevor Cai, Katie Millican, Jordan Hoffmann, Francis Song, John Aslanides, Sarah Henderson, Roman Ring, Susannah Young, et al. Scaling language models: Methods, analysis & insights from training gopher. arXiv preprint arXiv:2112.11446 , 2021."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib1",
+      "text": "Stiennon et al. [2020] Nisan Stiennon, Long Ouyang, Jeffrey Wu, Daniel Ziegler, Ryan Lowe, Chelsea Voss, Alec Radford, Dario Amodei, and Paul F Christiano. Learning to summarize with human feedback. Advances in Neural Information Processing Systems , 33:3008–3021, 2020."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib7",
+      "text": "Ouyang et al. [2022] Long Ouyang, Jeffrey Wu, Xu Jiang, Diogo Almeida, Carroll Wainwright, Pamela Mishkin, Chong Zhang, Sandhini Agarwal, Katarina Slama, Alex Ray, et al. Training language models to follow instructions with human feedback. Advances in neural information processing systems , 35:27730–27744, 2022."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib8",
+      "text": "Bai et al. [2022] Yuntao Bai, Andy Jones, Kamal Ndousse, Amanda Askell, Anna Chen, Nova DasSarma, Dawn Drain, Stanislav Fort, Deep Ganguli, Tom Henighan, et al. Training a helpful and harmless assistant with reinforcement learning from human feedback. arXiv preprint arXiv:2204.05862 , 2022."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib9",
+      "text": "OpenAI et al. [2024] OpenAI, Josh Achiam, Steven Adler, Sandhini Agarwal, Lama Ahmad, Ilge Akkaya, Florencia Leoni Aleman, Diogo Almeida, Janko Altenschmidt, Sam Altman, Shyamal Anadkat, Red Avila, Igor Babuschkin, Suchir Balaji, Valerie Balcom, Paul Baltescu, Haiming Bao, Mohammad Bavarian, Jeff Belgum, Irwan Bello, Jake Berdine, Gabriel Bernadett-Shapiro, Christopher Berner, Lenny Bogdonoff, Oleg Boiko, Madelaine Boyd, Anna-Luisa Brakman, Greg Brockman, Tim Brooks, Miles Brundage, Kevin Button, Trevor Cai, Rosie Campbell, Andrew Cann, Brittany Carey, Chelsea Carlson, Rory Carmichael, Brooke Chan, Che Chang, Fotis Chantzis, Derek Chen, Sully Chen, Ruby Chen, Jason Chen, Mark Chen, Ben Chess, Chester Cho, Casey Chu, Hyung Won Chung, Dave Cummings, Jeremiah Currier, Yunxing Dai, Cory Decareaux, Thomas Degry, Noah Deutsch, Damien Deville, Arka Dhar, David Dohan, Steve Dowling, Sheila Dunning, Adrien Ecoffet, Atty Eleti, Tyna Eloundou, David Farhi, Liam Fedus, Niko Felix, Simón Posada Fishman, Juston Forte, Isabella Fulford, Leo Gao, Elie Georges, Christian Gibson, Vik Goel, Tarun Gogineni, Gabriel Goh, Rapha Gontijo-Lopes, Jonathan Gordon, Morgan Grafstein, Scott Gray, Ryan Greene, Joshua Gross, Shixiang Shane Gu, Yufei Guo, Chris Hallacy, Jesse Han, Jeff Harris, Yuchen He, Mike Heaton, Johannes Heidecke, Chris Hesse, Alan Hickey, Wade Hickey, Peter Hoeschele, Brandon Houghton, Kenny Hsu, Shengli Hu, Xin Hu, Joost Huizinga, Shantanu Jain, Shawn Jain, Joanne Jang, Angela Jiang, Roger Jiang, Haozhun Jin, Denny Jin, Shino Jomoto, Billie Jonn, Heewoo Jun, Tomer Kaftan, Łukasz Kaiser, Ali Kamali, Ingmar Kanitscheider, Nitish Shirish Keskar, Tabarak Khan, Logan Kilpatrick, Jong Wook Kim, Christina Kim, Yongjik Kim, Jan Hendrik Kirchner, Jamie Kiros, Matt Knight, Daniel Kokotajlo, Łukasz Kondraciuk, Andrew Kondrich, Aris Konstantinidis, Kyle Kosic, Gretchen Krueger, Vishal Kuo, Michael Lampe, Ikai Lan, Teddy Lee, Jan Leike, Jade Leung, Daniel Levy, Chak Ming Li, Rachel Lim, Molly Lin, Stephanie Lin, Mateusz Litwin, Theresa Lopez, Ryan Lowe, Patricia Lue, Anna Makanju, Kim Malfacini, Sam Manning, Todor Markov, Yaniv Markovski, Bianca Martin, Katie Mayer, Andrew Mayne, Bob McGrew, Scott Mayer McKinney, Christine McLeavey, Paul McMillan, Jake McNeil, David Medina, Aalok Mehta, Jacob Menick, Luke Metz, Andrey Mishchenko, Pamela Mishkin, Vinnie Monaco, Evan Morikawa, Daniel Mossing, Tong Mu, Mira Murati, Oleg Murk, David Mély, Ashvin Nair, Reiichiro Nakano, Rajeev Nayak, Arvind Neelakantan, Richard Ngo, Hyeonwoo Noh, Long Ouyang, Cullen O’Keefe, Jakub Pachocki, Alex Paino, Joe Palermo, Ashley Pantuliano, Giambattista Parascandolo, Joel Parish, Emy Parparita, Alex Passos, Mikhail Pavlov, Andrew Peng, Adam Perelman, Filipe de Avila Belbute Peres, Michael Petrov, Henrique Ponde de Oliveira Pinto, Michael, Pokorny, Michelle Pokrass, Vitchyr H. Pong, Tolly Powell, Alethea Power, Boris Power, Elizabeth Proehl, Raul Puri, Alec Radford, Jack Rae, Aditya Ramesh, Cameron Raymond, Francis Real, Kendra Rimbach, Carl Ross, Bob Rotsted, Henri Roussez, Nick Ryder, Mario Saltarelli, Ted Sanders, Shibani Santurkar, Girish Sastry, Heather Schmidt, David Schnurr, John Schulman, Daniel Selsam, Kyla Sheppard, Toki Sherbakov, Jessica Shieh, Sarah Shoker, Pranav Shyam, Szymon Sidor, Eric Sigler, Maddie Simens, Jordan Sitkin, Katarina Slama, Ian Sohl, Benjamin Sokolowsky, Yang Song, Natalie Staudacher, Felipe Petroski Such, Natalie Summers, Ilya Sutskever, Jie Tang, Nikolas Tezak, Madeleine B. Thompson, Phil Tillet, Amin Tootoonchian, Elizabeth Tseng, Preston Tuggle, Nick Turley, Jerry Tworek, Juan Felipe Cerón Uribe, Andrea Vallone, Arun Vijayvergiya, Chelsea Voss, Carroll Wainwright, Justin Jay Wang, Alvin Wang, Ben Wang, Jonathan Ward, Jason Wei, CJ Weinmann, Akila Welihinda, Peter Welinder, Jiayi Weng, Lilian Weng, Matt Wiethoff, Dave Willner, Clemens Winter, Samuel Wolrich, Hannah Wong, Lauren Workman, Sherwin Wu, Jeff Wu, Michael Wu, Kai Xiao, Tao Xu, Sarah Yoo, Kevin Yu, Qiming Yuan, Wojciech Zaremba, Rowan Zellers, Chong Zhang, Marvin Zhang, Shengjia Zhao, Tianhao Zheng, Juntang Zhuang, William Zhuk, and Barret Zoph. Gpt-4 technical report, 2024."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib10",
+      "text": "Engstrom et al. [2020] Logan Engstrom, Andrew Ilyas, Shibani Santurkar, Dimitris Tsipras, Firdaus Janoos, Larry Rudolph, and Aleksander Madry. Implementation matters in deep rl: A case study on ppo and trpo. In International Conference on Learning Representations , 2020. URL https://openreview.net/forum?id=r1etN1rtPB ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib11",
+      "text": "Huang et al. [2022] Shengyi Huang, Rousslan Fernand Julien Dossa, Antonin Raffin, Anssi Kanervisto, and Weixun Wang. The 37 implementation details of proximal policy optimization. In ICLR Blog Track , 2022. URL https://iclr-blog-track.github.io/2022/03/25/ppo-implementation-details/ . https://iclr-blog-track.github.io/2022/03/25/ppo-implementation-details/."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib12",
+      "text": "Huang et al. [2024] Shengyi Costa Huang, Tianlin Liu, and Leandro von Werra. The n implementation details of rlhf with ppo. In ICLR Blogposts 2024 , 2024. URL https://d2jud02ci9yv69.cloudfront.net/2024-05-07-the-n-implementation-details-of-rlhf-with-ppo-130/blog/the-n-implementation-details-of-rlhf-with-ppo/ . https://d2jud02ci9yv69.cloudfront.net/2024-05-07-the-n-implementation-details-of-rlhf-with-ppo-130/blog/the-n-implementation-details-of-rlhf-with-ppo/."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib13",
+      "text": "Dubois et al. [2023] Yann Dubois, Xuechen Li, Rohan Taori, Tianyi Zhang, Ishaan Gulrajani, Jimmy Ba, Carlos Guestrin, Percy Liang, and Tatsunori B. Hashimoto. AlpacaFarm: A Simulation Framework for Methods that Learn from Human Feedback. In Advances in Neural Information Processing Systems , 2023."
+    }
+  ]
+}

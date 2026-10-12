@@ -1,0 +1,54 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2303.13539",
+  "title": "Decentralized Multi-Agent Reinforcement Learning for Continuous-Space Stochastic Games",
+  "authors": "Awni Altabaa, Bora Yongacoglu, Serdar YÃ¼ksel",
+  "year": "2023",
+  "categories": [
+    "cs.LG",
+    "cs.GT"
+  ],
+  "url": "https://arxiv.org/abs/2303.13539",
+  "html_url": "https://arxiv.org/html/2303.13539",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1043,
+  "text": "Multi-agent reinforcement learning (MARL) is the study of the learning dynamics of strategic agents that coexist in a shared environment, and is one of the important frontiers of machine learning and control. In this paper, we study MARL in stochastic games, also known as Markov games, a multi-agent generalization of Markov decision problems (MDPs) in which the cost-relevant history of the system is summarized by a state variable [1]. Due to its ability to model both dynamic inter-temporal choice as well as strategic interaction, the stochastic games model has long been a popular framework for studying multi-agent learning [2].\n\nIn comparison to single-agent reinforcement learning, analysis of MARL is difficult due to several challenges inherent to multi-agent systems, including non-stationarity, conflicting interests, and decentralized information. As a result, fundamental understanding of multi-agent reinforcement learning theory has lagged behind its single-agent counterpart [3]. Owing partly to a variety of impressive empirical successes, such as those of [4] and [5], the subject of learning in stochastic games has recently attracted considerable attention, and theoretical advances have been made along several research axes. In Section 2, we survey some of these advances in greater detail, and we observe that the bulk of theoretical progress in MARL has focused on games with finitely many states. By contrast, considerably less is known about learning in games with more general state spaces, which model various real-world settings that do not admit finite state space models.\n\nIn this paper, we study the problem of decentralized multi-agent reinforcement learning in stochastic games with standard Borel state spaces, which includes finite sets, countably infinite sets, and finite dimensional vector spaces as special cases. We are interested in the setting in which a generative model is not available for sampling state and (joint) action feedback and in which there is no offline data set available to the players. Instead, we focus on a setting in which players must learn using in-game feedback, updating their estimates and adjusting their behaviour only as new information arises from sequential interaction with the environment. We approach the problem with an eye on decentralized settings, in which agents may not be able to observe the actions of other agents, but must nevertheless attempt to respond optimally to the decision rules of others. In this context, we wish to propose an algorithm that is justifiable from an individual rationality point of view, but also comes with some long term guarantee of system-wide stability—with policies converging to some joint policy under self-play.\n\nWith these objectives in mind, we present a decentralized MARL algorithm for stochastic games with standard Borel state spaces, and we give a formal analysis of its properties. The algorithm proposed here extends the Decentralized Q-learning algorithm of [6] to settings with general state spaces by quantizing the state variable. Although this approach is natural, one must implement it with care: by quantizing the state space, the algorithm designer artificially restricts the class of policies and may unintentionally limit the efficacy of its learning agents. We rigorously analyze such a state space quantization, and we provide sufficient conditions on the game that ensure such an approach entails an arbitrarily small loss in performance. To accomplish this analysis, we use recent theoretical advances in single-agent MDPs with general state spaces, building most prominently upon the quantized Q-learning results of [7].\n\nThe algorithm presented here relies on the exploration phase technique, which requires that agents change their policies only at prescribed times, t_{0}<t_{1}<\\dots, while holding their policies fixed during the intervals [t_{k},t_{k+1}-1], for k\\geq 0. (That is, players do not change policies between update times.) The update times are predetermined and common to all agents, but outside of this no special coordination structure is assumed. In particular, all agents may change their policies simultaneously at an update time t_{k} or may choose to not change their policy. Besides this assumption on synchrony, agents need not communicate, observe one another’s actions or cost realizations, or even be aware of the other agents or the fact that they are playing a game. Despite this decentralization, we show that policy updates of our algorithm are asymptotically optimal for each agent with respect to the most recently observed environment.\n\nIn addition to the near optimality of policy updates resulting from our algorithm, we also analyze the joint policy dynamics for a class of best-reply-based updates. For such algorithms, we study convergence to equilibrium and give a characterization of the convergence behaviour when the game admits weakly acyclic structure. Finally, we describe additional settings in which self-play of our algorithm drives the joint policy process to \\epsilon -equilibrium policies.\n\n## Contributions:\n\n- • In Algorithm 1, we propose a decentralized MARL algorithm for environments with general state spaces. In Theorem 4.1, we prove that this algorithm yields policy updates which are near-optimal with respect to each agent’s observed environment, under the assumptions of weak continuity of the transition kernel and continuity of the cost function.\n\n- • In Proposition 5.1, we theoretically analyze the global joint policy-updating dynamics of a general class of best-reply-based algorithms and study convergence to equilibria.\n\n- • In Section 7, we present a simulation study which corroborates our theoretical study.\n\n## Organization\n\nThe remainder of the paper is structured as follows. In Section 2 we discuss some related work on multi-agent reinforcement learning algorithms with theoretical guarantees. In Section 3 we give the relevant background on modeling multi-agent environments. In Section 4, we propose a continuous-space extension of the decentralized multi-agent Q-learning algorithm and present our accompanying theoretical results. In Section 5 we derive a complete characterization of the global policy-updating dynamics of our algorithms. In Section 6, we discuss the topic of convergence to equilibrium and suggest lines of future research. A simulation study of our algorithm is presented in Section 7.\n\nNotation. We use \\mathbb{P} and \\mathbb{E} to denote the probability measure or expectation with subscripts and superscripts to denote the underlying probability space. \\mathcal{P}(S) denotes the set of probability measures on S and \\mathcal{P}(S^{\\prime}|S) denotes the set of transition kernels from S to S^{\\prime}. We will tend to use \\hat{\\raisebox{-0.4pt}{\\parbox[b]{8.3pt}{\\hbox to8.3pt{\\vrule height=0.4pt,width=0.5pt\\leaders{\\hbox to1.5pt{\\hfill\\rule{0.5pt}{0.4pt}\\hfill}}{\\hfill}\\vrule height=0.4pt,width=0.5pt}\\kern-0.4pt\\par\\parbox{0.4pt}{\\vbox to0.79999pt{\\hrule height=0.5pt,width=0.4pt\\leaders{\\vbox to1.5pt{\\vfill\\rule{0.4pt}{0.5pt}\\vfill}}{\\vfill}}}\\kern 0.0pt\\parbox{7.50002pt}{\\vskip 0.0pt\\hbox{\\phantom{H}}\\vskip 0.0pt}\\kern 0.0pt\\parbox{0.4pt}{\\vbox to0.79999pt{\\hrule height=0.5pt,width=0.4pt\\leaders{\\vbox to1.5pt{\\vfill\\rule{0.4pt}{0.5pt}\\vfill}}{\\vfill}}}\\par\\kern-0.4pt\\hbox to8.3pt{\\vrule height=0.4pt,width=0.5pt\\leaders{\\hbox to1.5pt{\\hfill\\rule{0.5pt}{0.4pt}\\hfill}}{\\hfill}\\vrule height=0.4pt,width=0.5pt}}}} to denote quantities associated with approximation due to quantization.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib22",
+      "text": "Shapley [1953] L. S. Shapley. Stochastic Games*. Proceedings of the National Academy of Sciences , 39(10):1095–1100, Oct. 1953. doi: 10.1073/pnas.39.10.1095 ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib15",
+      "text": "Littman [1994] M. L. Littman. Markov Games as a Framework for Multi-Agent Reinforcement Learning. In In Proceedings of the Eleventh International Conference on Machine Learning , pages 157–163. Morgan Kaufmann, 1994."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib31",
+      "text": "Zhang et al. [2021] K. Zhang, Z. Yang, and T. Başar. Multi-Agent Reinforcement Learning: A Selective Overview of Theories and Algorithms. In K. G. Vamvoudakis, Y. Wan, F. L. Lewis, and D. Cansever, editors, Handbook of Reinforcement Learning and Control , volume 325, pages 321–384. Springer International Publishing, Cham, 2021. ISBN 978-3-030-60989-4 978-3-030-60990-0. doi: 10.1007/978-3-030-60990-0_12 ."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib23",
+      "text": "Silver et al. [2016] D. Silver, A. Huang, C. J. Maddison, A. Guez, L. Sifre, G. Van Den Driessche, J. Schrittwieser, I. Antonoglou, V. Panneershelvam, M. Lanctot, et al. Mastering the game of go with deep neural networks and tree search. Nature , 529(7587):484–489, 2016."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib24",
+      "text": "Vinyals et al. [2019] O. Vinyals, I. Babuschkin, J. Chung, M. Mathieu, M. Jaderberg, W. M. Czarnecki, A. Dudzik, A. Huang, P. Georgiev, and R. Powell. Alphastar: Mastering the real-time strategy game starcraft ii. DeepMind blog , 2, 2019."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib1",
+      "text": "Arslan and Yüksel [2017] G. Arslan and S. Yüksel. Decentralized Q-learning for stochastic teams and games. IEEE Trans. Automat. Contr. , 62(4):1545–1558, Apr. 2017. ISSN 0018-9286. doi: 10.1109/tac.2016.2598476 ."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib10",
+      "text": "Kara et al. [2021] A. D. Kara, N. Saldi, and S. Yüksel. Q-learning for MDPs with general spaces: Convergence and near optimality via quantization under weak continuity. Nov. 2021."
+    }
+  ]
+}

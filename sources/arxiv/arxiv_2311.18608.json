@@ -1,0 +1,90 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2311.18608",
+  "title": "Contrastive Denoising Score for Text-guided Latent Diffusion Image Editing",
+  "authors": "Hyelin Nam, Gihyun Kwon, Geon Yeong Park, Jong Chul Ye",
+  "year": "2024",
+  "categories": [
+    "cs.CV",
+    "cs.AI",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2311.18608",
+  "html_url": "https://arxiv.org/html/2311.18608",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 690,
+  "text": "Diffusion models(DMs) have made significant strides in controllable multi-modal generation tasks, particularly in text-to-image(T2I) synthesis. Evolving from basic models, recent Latent Diffusion Model(LDM) showed notable efficacy in T2I task [1,2,3]. Building on the progress of T2I models, various approaches have been explored to adapt these models for text-conditioned image editing tasks. Initial work primarily focused on incorporating source image conditions into the sampling or reverse process. This involved guiding the generation process through gradient-based sampling [4,5], or directly training models that take the source image as conditional input [6]. With the advent of LDM, researchers have begun directly leveraging the properties of T2I models [7,8].\n\nIn this context, one promising recent approach is Delta Denoising Score(DDS) [9] - an image editing technique builds upon the Score Distillation Sampling(SDS) [10] framework. SDS allows the optimization of a parametric image generator such as 3D NeRF [11], capitalizing on the rich generative prior of the diffusion model from which it samples. However, SDS is recognized for prominent concerns such as over-saturation and over-smoothing. To address these issue, DDS introduced an additional reference branch with a matching text prompt to refine the noisy gradient of SDS. Then, DDS queries the generative model with two pairs of images and texts. By utilizing the difference between the outcomes of the two queries, which provides a cleaner gradient direction, the target image is updated incrementally. Unfortunately, in DDS the structural details of the source image are often neglected, as shown in Fig. 3.\n\nAs preserving structural consistency is recongized as crucial in image manipulation, mechanisms to enforce structural consistency in the editing process have continued to evolve. In classical CycleGAN [12], target appearance is enforced using an adversarial loss, while content is preserved using cycle-consistency. However, cycle-consistency assumes the bijection between two domains, necessitating the training of two generator, which can be overly restrictive. Contrastive Unpaired Translation (CUT) [13] proposed an alternative approach by maximizing the mutual information between corresponding input and output patches in the latent domains. Building on the success of these approaches, similar ideas have incorporated into diffusion models, utilzing features from ViT [4] or the attention layer of the score network [5]. However, these approaches have only been applied to pixel domain diffusion models, not latent diffusion models, and also require additional encoder training, which is inefficient.\n\nTo address these challenges, here we propose an embarrassingly simple yet amazingly effective zero-shot training-free method called Contrastive Denoising Score(CDS). This method integrates the application of CUT loss to pretrained latent diffusion models such as Stable Diffusion [1], within DDS framework. We utilize the rich spatial information in the self-attention features of LDM’s to compute the CUT loss.\n\nImportantly, the application of CUT loss has been limited to pixel-domain diffusion models, and we are not aware of any prior work using latent diffusion models. Moreover, while previous image manipulation methods often use attention layers in a supervised manner [7,8,14], our approach utilizes attention in a fully unsupervised manner, randomly selecting sets of patches from the same spatial locations. Therefore, we believe that this is the first work to apply CUT loss to LDM for unsupervised image translation.\n\nWe validate the effectiveness of our proposed loss on various text-driven image editing tasks. Furthermore, as our work is rooted in the score distillation method, it can be applied to various domains, such as Neural Radiance Fields(NeRF) [11], as demonstrated in our experiments.\n\nTo summarize, we make the following key contributions:\n\n- • For the purpose of suitable structural consistency, we integrate CUT loss into the DDS framework using latent latent representations. To the best of our knowledge, this is the first work to apply CUT loss LDM for zero-shot image editing.\n\n- • We demonstrate that utilizing intermediate latent features from self-attention layers enables the application of CUT loss without requiring an additional network.\n\n- • We show that our method outperforms existing state-of-the-art baselines, achieving a significantly better balance between preserving the structural details of the original image and transforming the content in alignment with a target text prompt.\n\n- • This method, being grounded in the score distillation framework, is extendable to multiple domains including NeRF.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib24",
+      "text": "Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, and Björn Ommer. High-resolution image synthesis with latent diffusion models. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 10684–10695, 2022."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib23",
+      "text": "Aditya Ramesh, Prafulla Dhariwal, Alex Nichol, Casey Chu, and Mark Chen. Hierarchical text-conditional image generation with clip latents. arXiv preprint arXiv:2204.06125 , 1(2):3, 2022."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib25",
+      "text": "Chitwan Saharia, William Chan, Saurabh Saxena, Lala Li, Jay Whang, Emily Denton, Seyed Kamyar Seyed Ghasemipour, Raphael Gontijo-Lopes, Burcu Karagol Ayan, Tim Salimans, Jonathan Ho, David J. Fleet, and Mohammad Norouzi. Photorealistic text-to-image diffusion models with deep language understanding. In Advances in Neural Information Processing Systems , 2022."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib13",
+      "text": "Gihyun Kwon and Jong Chul Ye. Diffusion-based image translation using disentangled style and content representation. In The Eleventh International Conference on Learning Representations , 2023a."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib28",
+      "text": "Serin Yang, Hyunmin Hwang, and Jong Chul Ye. Zero-shot contrastive loss for text-guided diffusion image style transfer. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 22873–22882, 2023."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib2",
+      "text": "Tim Brooks, Aleksander Holynski, and Alexei A. Efros. Instructpix2pix: Learning to follow image editing instructions. In CVPR , 2023."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib27",
+      "text": "Narek Tumanyan, Michal Geyer, Shai Bagon, and Tali Dekel. Plug-and-play diffusion features for text-driven image-to-image translation. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 1921–1930, 2023."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "Amir Hertz, Ron Mokady, Jay Tenenbaum, Kfir Aberman, Yael Pritch, and Daniel Cohen-or. Prompt-to-prompt image editing with cross-attention control. In The Eleventh International Conference on Learning Representations , 2023b."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib7",
+      "text": "Amir Hertz, Kfir Aberman, and Daniel Cohen-Or. Delta denoising score. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 2328–2337, 2023a."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib21",
+      "text": "Ben Poole, Ajay Jain, Jonathan T. Barron, and Ben Mildenhall. Dreamfusion: Text-to-3d using 2d diffusion. In The Eleventh International Conference on Learning Representations , 2023."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib16",
+      "text": "Ben Mildenhall, Pratul P. Srinivasan, Matthew Tancik, Jonathan T. Barron, Ravi Ramamoorthi, and Ren Ng. Nerf: Representing scenes as neural radiance fields for view synthesis. In ECCV , 2020."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib29",
+      "text": "Jun-Yan Zhu, Taesung Park, Phillip Isola, and Alexei A Efros. Unpaired image-to-image translation using cycle-consistent adversarial networks. In Proceedings of the IEEE international conference on computer vision , pages 2223–2232, 2017."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib19",
+      "text": "Taesung Park, Alexei A. Efros, Richard Zhang, and Jun-Yan Zhu. Contrastive learning for unpaired image-to-image translation. In European Conference on Computer Vision , 2020."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib20",
+      "text": "Gaurav Parmar, Krishna Kumar Singh, Richard Zhang, Yijun Li, Jingwan Lu, and Jun-Yan Zhu. Zero-shot image-to-image translation. In ACM SIGGRAPH 2023 Conference Proceedings , pages 1–11, 2023."
+    }
+  ]
+}

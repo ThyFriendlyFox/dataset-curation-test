@@ -1,0 +1,118 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2309.17078",
+  "title": "Unsupervised Large Language Model Alignment for Information Retrieval via Contrastive Feedback",
+  "authors": "Qian Dong, Yiding Liu, Qingyao Ai, Zhijing Wu, Haitao Li, Yiqun Liu, Shuaiqiang Wang, Dawei Yin, Shaoping Ma",
+  "year": "2024",
+  "categories": [
+    "cs.IR"
+  ],
+  "url": "https://arxiv.org/abs/2309.17078",
+  "html_url": "https://arxiv.org/html/2309.17078",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 784,
+  "text": "Large Language Models (LLMs) have demonstrated promising performances across a wide range of research fields, including information retrieval (IR). IR aims to fulfil information needs of individuals though locating relevant documents from large-scale corpus [1], which plays a fundamental role in the digital era [2,3,4]. Previous studies have utilized LLMs in IR tasks such as generating search snippets [5,6,7,8], conducting query or document expansion [9,10,11], creating training data for retrieval models [12,13,14], and etc. These studies have demonstrated the significant potential of LLMs in IR.\n\nHowever, while widely adopted, applying an off-the-shelf LLM directly to IR tasks could be suboptimal. One of key reasons is the misalignment between the capabilities of off-the-shelf LLMs and the needs of IR tasks, particularly the capability to provide responses that capture the distinctiveness of each document among similar documents [14,9]. For instance, Figure 1 show the results of FLAN-T5 [15] when used for document summarization, a representative IR task. As we can see, off-the-shelf FLAN-T5 generates the same summary for three different documents, making them indistinguishable to human. Using such summaries as document representations or search snippets is not acceptable in search engines, as they fail to assist users in quickly and accurately locating their desired documents.\n\nTo empower LLMs with desired response attributes, one of the most widely adopted methods is to conduct LLM alignment. The idea of LLM alignment is to construct feedback to LLM’s responses based on the preferred attributes (e.g., helpfulness [16], harmlessness [17,18,19], etc.) and use them to optimize LLMs. Depending on how the feedback is collected, existing LLM alignments can be broadly categorized into human-based methods and model-based methods. Unfortunately, none of the existing alignment methods can be used to improve distinctiveness of response from LLMs.\n\n- • While human-based methods such as RLHF [16] are flexible and generic, the cost of collecting large-scale human feedback is expensive and usually prohibitive in IR scenarios.\n\n- • While existing model-based methods such as RLAIF [17] and RLCD [18] do not require human in the loop, they are inherently incapable of capturing distinctiveness, as their feedback signals (i.e., reward scores) are computed in a point-wise manner. Specifically, the distinctive information of an LLMs response must be specified in the context of other similar responses, and thus the feedback signals of distinctiveness can only be derived from differentiating multiple responses in a group-wise manner, where existing methods are clearly infeasible.\n\nTo address these limitations and improve the distinctiveness of LLMs responses, we propose a novel optimization framework called Reinforcement Learning from Contrastive Feedback (RLCF). RLCF is a group-wise alignment method that constructs feedback of distinctiveness for a group of similar inputs, and it is fully unsupervised. The workflow of RLCF is depicted in Figure 2. Specifically, we first identify a group of similar documents for each document in the corpus. Then, each document in the group is fed to an LLM to obtain a corresponding response. For example, the responses could be summaries of long documents for a summarization task. Next, we construct contrastive feedback from the group of LLM-generated responses, using a reward function named group-wise reciprocal rank. Finally, the LLM is optimized based on the contrastive feedback with the standard Proximal Policy Optimization (PPO) algorithm [20].\n\nTo demonstrate the effectiveness of RLCF in optimizing the distinctiveness of LLMs responses, we conduct comprehensive experiments, which include three representative IR tasks, various scales of LLMs (ranging from 770M to 11B) with both encoder-decoder and decoder-only architectures, and both Chinese and English corpora. In particular, we evaluate RLCF on the tasks of document summarization, document expansion and data augmentation. Note that the performances on these tasks are essentially sensitive to the distinctiveness of the LLM-generated responses (e.g., summaries). For document summarization, we directly evaluate the quality of the LLM-generated summaries, measured by human evaluation and an automatic metric called Rouge-diff. To assess the effectiveness of RLCF-optimized LLMs in document expansion and data augmentation, we evaluate the LLMs responses through downstream document retrieval tasks, i.e., comparing the performances of retrieval models enhanced by LLMs with different alignment methods. The results indicate that, compared to existing alignment methods, RLCF can significantly improve the distinctiveness of LLMs responses, which can largely benefit various IR applications.\n\nWe summarize our main contributions as follows:\n\n- • To the best of our knowledge, we are the first to study the distinctiveness of LLMs response and demonstrate its significance in powering IR applications.\n\n- • We propose a novel framework namely RLCF which utilizes the contrastive feedback to unsupervised align the capability of LLMs with the needs of IR.\n\n- • The experimental results demonstrate the effectiveness of RLCF on both English and Chinese LLMs as well as various parameter scales and architectures.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib12",
+      "text": "Cheng et al . (2023) Anfeng Cheng, Yiding Liu, Weibin Li, Qian Dong, Shuaiqiang Wang, Zhengjie Huang, Shikun Feng, Zhicong Cheng, and Dawei Yin. 2023. Layout-aware Webpage Quality Assessment. arXiv preprint arXiv:2301.12152 (2023)."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib23",
+      "text": "Dong et al . (2022b) Qian Dong, Shuzi Niu, Tao Yuan, and Yucheng Li. 2022b. Disentangled Graph Recurrent Network for Document Ranking. Data Science and Engineering 7, 1 (2022), 30–43."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib10",
+      "text": "Chen et al . (2022) Jia Chen, Yiqun Liu, Yan Fang, Jiaxin Mao, Hui Fang, Shenghao Yang, Xiaohui Xie, Min Zhang, and Shaoping Ma. 2022. Axiomatically Regularized Pre-training for Ad hoc Search. In Proceedings of the 45th International ACM SIGIR Conference on Research and Development in Information Retrieval . 1524–1534."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib64",
+      "text": "Yang et al . (2022) Shenghao Yang, Yiqun Liu, Xiaohui Xie, Min Zhang, and Shaoping Ma. 2022. Enhance Performance of Ad-hoc Search via Prompt Learning. In China Conference on Information Retrieval . Springer, 28–39."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib47",
+      "text": "Reid (2023) Elizabeth Reid. 2023. Supercharging search with Generative AI. https://blog.google/products/search/generative-ai-search/"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib35",
+      "text": "Liu et al . (2023) Nelson F Liu, Tianyi Zhang, and Percy Liang. 2023. Evaluating verifiability in generative search engines. arXiv preprint arXiv:2304.09848 (2023)."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib27",
+      "text": "Huang and Chang (2023) Jie Huang and Kevin Chen-Chuan Chang. 2023. Citation: A key to building responsible and accountable large language models. arXiv preprint arXiv:2307.02185 (2023)."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib30",
+      "text": "Kou et al . (2023) Bonan Kou, Muhao Chen, and Tianyi Zhang. 2023. Automated Summarization of Stack Overflow Posts. arXiv preprint arXiv:2305.16680 (2023)."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib25",
+      "text": "Gospodinov et al . (2023) Mitko Gospodinov, Sean MacAvaney, and Craig Macdonald. 2023. Doc2Query–: When Less is More. In European Conference on Information Retrieval . Springer, 414–422."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib37",
+      "text": "Ma et al . (2023) Guangyuan Ma, Xing Wu, Peng Wang, Zijia Lin, and Songlin Hu. 2023. Pre-training with Large Language Model-based Document Expansion for Dense Passage Retrieval. arXiv preprint arXiv:2308.08285 (2023)."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib58",
+      "text": "Wang et al . (2023) Liang Wang, Nan Yang, and Furu Wei. 2023. Query2doc: Query Expansion with Large Language Models. arXiv preprint arXiv:2303.07678 (2023)."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib57",
+      "text": "Wang et al . (2021) Kexin Wang, Nandan Thakur, Nils Reimers, and Iryna Gurevych. 2021. Gpl: Generative pseudo labeling for unsupervised domain adaptation of dense retrieval. arXiv preprint arXiv:2112.07577 (2021)."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib5",
+      "text": "Bonifacio et al . (2022) Luiz Bonifacio, Hugo Abonizio, Marzieh Fadaee, and Rodrigo Nogueira. 2022. InPars: Data Augmentation for Information Retrieval using Large Language Models. arXiv preprint arXiv:2202.05144 (2022)."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib17",
+      "text": "Dai et al . (2022) Zhuyun Dai, Vincent Y Zhao, Ji Ma, Yi Luan, Jianmo Ni, Jing Lu, Anton Bakalov, Kelvin Guu, Keith B Hall, and Ming-Wei Chang. 2022. Promptagator: Few-shot dense retrieval from 8 examples. arXiv preprint arXiv:2209.11755 (2022)."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib13",
+      "text": "Chung et al . (2022) Hyung Won Chung, Le Hou, Shayne Longpre, Barret Zoph, Yi Tay, William Fedus, Eric Li, Xuezhi Wang, Mostafa Dehghani, Siddhartha Brahma, et al . 2022. Scaling instruction-finetuned language models. arXiv preprint arXiv:2210.11416 (2022)."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib42",
+      "text": "Ouyang et al . (2022) Long Ouyang, Jeffrey Wu, Xu Jiang, Diogo Almeida, Carroll Wainwright, Pamela Mishkin, Chong Zhang, Sandhini Agarwal, Katarina Slama, Alex Ray, et al . 2022. Training language models to follow instructions with human feedback. Advances in Neural Information Processing Systems 35 (2022), 27730–27744."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib32",
+      "text": "Lee et al . (2023) Harrison Lee, Samrat Phatale, Hassan Mansoor, Kellie Lu, Thomas Mesnard, Colton Bishop, Victor Carbune, and Abhinav Rastogi. 2023. Rlaif: Scaling reinforcement learning from human feedback with ai feedback. arXiv preprint arXiv:2309.00267 (2023)."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib63",
+      "text": "Yang et al . (2023) Kevin Yang, Dan Klein, Asli Celikyilmaz, Nanyun Peng, and Yuandong Tian. 2023. RLCD: Reinforcement Learning from Contrast Distillation for Language Model Alignment. arXiv preprint arXiv:2307.12950 (2023)."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib16",
+      "text": "Dai et al . (2023b) Josef Dai, Xuehai Pan, Ruiyang Sun, Jiaming Ji, Xinbo Xu, Mickel Liu, Yizhou Wang, and Yaodong Yang. 2023b. Safe rlhf: Safe reinforcement learning from human feedback. arXiv preprint arXiv:2310.12773 (2023)."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib51",
+      "text": "Schulman et al . (2017) John Schulman, Filip Wolski, Prafulla Dhariwal, Alec Radford, and Oleg Klimov. 2017. Proximal policy optimization algorithms. arXiv preprint arXiv:1707.06347 (2017)."
+    }
+  ]
+}

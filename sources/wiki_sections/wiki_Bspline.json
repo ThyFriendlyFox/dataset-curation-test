@@ -1,0 +1,50 @@
+{
+  "source_type": "encyclopedia_article",
+  "source_id": "enwiki:B-spline#rev1361285886",
+  "title": "B-spline",
+  "authors": "Wikipedia contributors",
+  "year": "2026",
+  "url": "https://en.wikipedia.org/w/index.php?title=B-spline&oldid=1361285886",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Properties",
+  "word_count": 1151,
+  "text": "A B-spline function is a combination of flexible bands that is controlled by a number of points that are called control points, creating smooth curves. These functions are used to create and manage complex shapes and surfaces using a number of points. B-spline function and Bézier functions are applied extensively in shape optimization methods.[1]\n\nA B-spline of order n is a piecewise polynomial function of degree n - 1 in a variable x . It is defined over n locations t_i , called knots or breakpoints, which must be in non-descending order t_i \\leq t_{i+1} . The B-spline contributes only in the range between the first and last of these knots and is zero elsewhere. If each knot is separated by the same distance h (where h = t_{i+1} - t_i ) from its predecessor, the knot vector and the corresponding B-splines are called \"uniform\" (see cardinal B-spline below).\n\nFor each finite knot interval where it is non-zero, a B-spline is a polynomial of degree n - 1 . A B-spline is a continuous function at the knots. When all knots belonging to the B-spline are distinct, its derivatives are also continuous up to the derivative of degree n - 2 . If the knots are coincident at a given value of x , the continuity of derivative order is reduced by 1 for each additional coincident knot. B-splines may share a subset of their knots, but two B-splines defined over exactly the same knots are identical. In other words, a B-spline is uniquely defined by its knots.\n\nOne distinguishes internal knots and end points. Internal knots cover the x -domain one is interested in. Since a single B-spline already extends over n knots, it follows that the internal knots need to be extended with n - 1 endpoints on each side, to give full support to the first and last B-spline, which affect the internal knot intervals. The values of the endpoints do not matter, usually the first or last internal knot is just repeated.\n\nThe usefulness of B-splines lies in the fact that any spline function of order n on a given set of knots can be expressed as a linear combination of B-splines:\n\nS_{n,\\mathbf t}(x) = \\sum_i \\alpha_i B_{i,n}(x).\n\nB-splines play the role of basis functions for the spline function space, hence the name. This property follows from the fact that all pieces have the same continuity properties, within their individual range of support, at the knots.[2]\n\nExpressions for the polynomial pieces can be derived by means of the Cox–de Boor recursion formula[3]\n\nB_{i,0}(x) := \\begin{cases}\n\n1 & \\text{if } t_i \\leq x < t_{i+1}, \\\\\n\n0 & \\text{otherwise}.\n\n\\end{cases}\n\nB_{i,k}(x) := \\frac{x - t_i}{t_{i+k} - t_i} B_{i,k-1}(x) + \\frac{t_{i+k+1} - x}{t_{i+k+1} - t_{i+1}} B_{i+1,k-1}(x).\n\nThat is, B_{i,0}(x) is piecewise constant one or zero indicating which knot span x is in (zero if knot span i is repeated). The recursion equation is in two parts:\n\n\\frac{x - t_i}{t_{i+k} - t_i}\n\nramps from zero to one as x goes from t_i to t_{i+k} , and\n\n\\frac{t_{i+k+1} - x}{t_{i+k+1} - t_{i+1}}\n\nramps from one to zero as x goes from t_{i+1} to t_{i+k+1} . The corresponding Bs are zero outside those respective ranges. For example, B_{i,1}(x) is a triangular function that is zero below x = t_i , ramps to one at x = t_{i+1} and back to zero at and beyond x = t_{i+2} . However, because B-spline basis functions have local support, B-splines are typically computed by algorithms that do not need to evaluate basis functions where they are zero, such as de Boor's algorithm.\n\nThis relation leads directly to the FORTRAN-coded algorithm BSPLV, which generates values of the B-splines of order n at x.[4] The following scheme illustrates how each piece of order n is a linear combination of the pieces of B-splines of order n − 1 to its left.\n\n\\begin{matrix}\n\n0 & & B_{i-2,2} \\\\\n\n& B_{i-1,1} & \\\\\n\nB_{i,0} & & B_{i-1,2}\\\\\n\n& B_{i,1} & \\\\\n\n0 & & B_{i,2} \\\\\n\n\\end{matrix}\n\nApplication of the recursion formula with the knots at (0, 1, 2, 3) gives the piecewise components of the uniform B-spline of order 3\n\n\\begin{align}\n\nb_0 &= x^2/2 \\\\\n\nb_1 &= (-2x^2 + 6x - 3)/2 \\\\\n\nb_2 &= (3 - x)^2/2\n\n\\end{align}\n\nwhere\n\nB_{0,2}(x) = \\begin{cases}\n\nb_0 & \\text{if } 0 \\leq x < 1, \\\\\n\nb_1 & \\text{if } 1 \\leq x < 2, \\\\\n\nb_2 & \\text{if } 2 \\leq x < 3, \\\\\n\n0 & \\text{otherwise}.\n\n\\end{cases}\n\nThese pieces are shown in the diagram. The continuity property of a quadratic spline function and its first derivative at the internal knots are illustrated, as follows\n\n\\begin{align}\n\n& \\text{At }x = 1\\colon\\ b_0 = b_1 = 0.5,\\ \\frac{db_0}{dx} = \\frac{db_1}{dx} = 1. \\\\[6pt]\n\n& \\text{At }x = 2\\colon\\ b_1 = b_2 = 0.5,\\ \\frac{db_1}{dx} = \\frac{db_2}{dx} = -1.\n\n\\end{align}\n\nThe second derivative of a B-spline of degree 2 is discontinuous at the knots:\n\n\\frac{d^2b_0}{dx^2} = 1,\\ \\frac{d^2b_1}{dx^2} = -2,\\ \\frac{d^2b_2}{dx^2} = 1.\n\nFaster variants of the de Boor algorithm have been proposed, but they suffer from comparatively lower stability.[5,6]\n\n### Cardinal B-spline\n\nA cardinal B-spline has a constant separation h between knots. The cardinal B-splines for a given order n are just shifted copies of each other. They can be obtained from the simpler definition.[7]\n\nB_{i,n,t}(x) = \\frac{x-t_i}{h} n[0, \\dots, n](\\cdot - t_i)^{n-1}_+.\n\nThe \"placeholder\" notation is used to indicate that the n-th divided difference of the function (t-x)^{n-1}_+ of the two variables t and x is to be taken by fixing x and considering (t - x)^{n-1}_+ as a function of t alone.\n\nA cardinal B-spline has uniformly spaced knots, therefore interpolation between the knots equals convolution with a smoothing kernel.\n\nExample, if we want to interpolate three values in between B-spline nodes ( \\textbf{b} ), we can write the signal as\n\n\\mathbf{x} = [\\mathbf{b}_1, 0, 0, \\mathbf{b}_2, 0, 0, \\mathbf{b}_3, 0, 0, \\dots, \\mathbf{b}_n, 0, 0].\n\nConvolution of the signal \\mathbf{x} with a rectangle function \\mathbf{h} = [1/3, 1/3, 1/3] gives first order interpolated B-spline values. Second-order B-spline interpolation is convolution with a rectangle function twice \\mathbf{y} = \\mathbf{x} * \\mathbf{h} * \\mathbf{h} ; by iterative filtering with a rectangle function, higher-order interpolation is obtained.\n\nFast B-spline interpolation on a uniform sample domain can be done by iterative mean-filtering. Alternatively, a rectangle function equals sinc in Fourier domain. Therefore, cubic spline interpolation equals multiplying the signal in Fourier domain with sinc4.\n\nSee Irwin–Hall distribution#Special cases for algebraic expressions for the cardinal B-splines of degree 1–4.\n\n### P-spline\n\nThe term P-spline stands for \"penalized B-spline\". It refers to using the B-spline representation where the coefficients are determined partly by the data to be fitted, and partly by an additional penalty function that aims to impose smoothness to avoid overfitting.[8]\n\nTwo- and multidimensional P-spline approximations of data can use the face-splitting product of matrices to the minimization of calculation operations.[9]",
+  "references": [
+    {
+      "n": 1,
+      "text": "Talebitooti, R.. (2015). Shape design optimization of cylindrical tank using b-spline curves. Computer & Fluids. doi:10.1016/j.compfluid.2014.12.004"
+    },
+    {
+      "n": 2,
+      "text": "de Boor, p. 113."
+    },
+    {
+      "n": 3,
+      "text": "de Boor, p 131."
+    },
+    {
+      "n": 4,
+      "text": "de Boor, p. 134."
+    },
+    {
+      "n": 5,
+      "text": "Lee, E. T. Y.. (December 1982). A Simplified B-Spline Computation Routine. Computing. doi:10.1007/BF02246763"
+    },
+    {
+      "n": 6,
+      "text": "Lee, E. T. Y.. (1986). Comments on some B-spline algorithms. Computing. doi:10.1007/BF02240069"
+    },
+    {
+      "n": 7,
+      "text": "de Boor, p. 322."
+    },
+    {
+      "n": 8,
+      "text": "Eilers, P. H. C. and Marx, B. D. (1996). Flexible smoothing with B-splines and penalties (with comments and rejoinder). Statistical Science 11(2): 89–121."
+    },
+    {
+      "n": 9,
+      "text": "Eilers, Paul H. C.. (2003). Multivariate calibration with temperature interaction using two-dimensional penalized signal regression. Chemometrics and Intelligent Laboratory Systems. doi:10.1016/S0169-7439(03)00029-7"
+    }
+  ]
+}

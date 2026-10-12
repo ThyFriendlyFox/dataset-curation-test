@@ -1,0 +1,43 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2309.10966",
+  "title": "MBR and QE Finetuning: Training-time Distillation of the Best and Most Expensive Decoding Methods",
+  "authors": "Mara Finkelstein, Subhajit Naskar, Mehdi Mirzazadeh, Apurva Shah, Markus Freitag",
+  "year": "2024",
+  "categories": [
+    "cs.CL"
+  ],
+  "url": "https://arxiv.org/abs/2309.10966",
+  "html_url": "https://arxiv.org/html/2309.10966",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 505,
+  "text": "Beam search and greedy decoding are the most common decoding methods used for Natural Language Generation (NLG) tasks, including neural machine translation (NMT). However, [1] showed that maximum a posteriori (MAP) decoding methods, which approximate the most likely prediction based on model probabilities, are suboptimal for NMT due to misaligned probability distributions. They instead proposed Minimum Bayes Risk (MBR) decoding as an alternative decoding method. Unlike MAP decoding, MBR decoding does not aim to produce the prediction (i.e. translation) with the highest estimated model probability. Instead, it chooses the prediction that is estimated to have the highest quality with respect to a utility metric. A follow-up study by [2] showed that MBR decoding with neural utility metrics like BLEURT [3] and COMET [4] significantly outperforms beam search decoding, according to expert-based human evaluation.\n\nHowever, the main drawback of MBR decoding is that it is prohibitively expensive. In particular, the algorithm requires that, for every input query, a large number n of candidates be generated from the model, and then an (expensive) scoring function be computed on every pair of distinct candidates (n_{i},n_{j}), for a total of O(n^{2}) computations.\n\nGiven the significant quality improvements afforded by MBR decoding relative to beam search, we propose to distill the MBR quality gains at training time, without affecting decoding speed or resource usage. Despite its quality advantages, the slow inference speed of MBR decoding remains a limitation even when generating distillation data. As an alternative, we can rerank the same candidate model predictions using a neural quality estimation (QE) metric. Reranking is faster than MBR decoding, because its inference cost scales linearly with the number of candidate predictions, rather than quadratically. [5] showed that reranking with neural metrics produces better predictions than beam search, and that it has similar benefits to MBR decoding.\n\nIn this work, we focus on the task of NMT, and show that we can benefit from the quality gains of MBR decoding and QE reranking by finetuning NMT models on MBR-decoded and QE-reranked outputs generated from monolingual sources, either via self-training or using an external teacher model, and then using a more efficient decoding method (such as beam search) at inference time.\n\nOur contributions can be summarized as follows:\n\n- • We propose two finetuning methods, MBR finetuning and QE finetuning, each of which distills performance gains from MBR decoding and QE reranking, respectively, at training time while avoiding expensive decoding at inference time.\n\n- • Using the task of NMT, we show that these finetuning methods significantly outperform the base model across two language pairs, while finetuning on beam search output degrades quality.\n\n- • We show that both MBR and QE finetuning on top of a model finetuned on human translations yields additional quality improvements.\n\n- • We show that using a LLM as the teacher model substantially outperforms using a self-teacher for MBR and QE finetuning.\n\n- • Moreover, we show that both MBR and QE finetuning from the base student model using a LLM teacher even outperforms finetuning on human translations.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib4",
+      "text": "Eikema & Aziz (2020) Bryan Eikema and Wilker Aziz. Is map decoding all you need? the inadequacy of the mode in neural machine translation. arXiv preprint arXiv:2005.10283 , 2020."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib9",
+      "text": "Freitag et al. (2022a) Markus Freitag, David Grangier, Qijun Tan, and Bowen Liang. High quality rather than high model probability: Minimum bayes risk decoding with neural metrics. Transactions of the Association for Computational Linguistics , 10:811–825, 2022a."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib26",
+      "text": "Sellam et al. (2020) Thibault Sellam, Dipanjan Das, and Ankur P Parikh. Bleurt: Learning robust metrics for text generation. arXiv preprint arXiv:2004.04696 , 2020."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib22",
+      "text": "Rei et al. (2020) Ricardo Rei, Craig Stewart, Catarina Farinha, and Alon Lavie. Unbabel’s participation in the wmt20 metrics shared task. arXiv preprint arXiv:2010.15535 , 2020."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib6",
+      "text": "Fernandes et al. (2022) Patrick Fernandes, António Farinhas, Ricardo Rei, José GC de Souza, Perez Ogayo, Graham Neubig, and André FT Martins. Quality-aware decoding for neural machine translation. arXiv preprint arXiv:2205.00978 , 2022."
+    }
+  ]
+}

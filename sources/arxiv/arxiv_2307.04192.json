@@ -1,0 +1,121 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2307.04192",
+  "title": "Self-Adaptive Sampling for Efficient Video Question-Answering on Image--Text Models",
+  "authors": "Wei Han, Hui Chen, Min-Yen Kan, Soujanya Poria",
+  "year": "2024",
+  "categories": [
+    "cs.CV",
+    "cs.AI",
+    "cs.CL",
+    "cs.MM"
+  ],
+  "url": "https://arxiv.org/abs/2307.04192",
+  "html_url": "https://arxiv.org/html/2307.04192",
+  "license": "http://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Introduction",
+  "word_count": 819,
+  "text": "With the advancement in computer vision technology, we are witnessing an explosive surge of visual data. Together, research in vision–language understanding has progressed significantly in the past decade, challenging a wide variety multimodal application tasks [1,2,3,4,5], such as image captioning, visual question answering and multimodal retrieval. With the continuing improvement in computation, researchers have extended conventional image–text models (ITMs) to video–text ones, mainly by substituting image encoders with their video counterparts [6,7,8,9]. This learning paradigm achieves decent performance on numerous video–text tasks, as it incorporates temporal features into modeling. Nevertheless, 3D convolution, the core technique adopted in these video–text pretrained models, demands tremendous computational power in terms of both time and memory, limiting models’ deployment on consumer-level devices.\n\nA straightforward solution to reduce overhead is to extract solely those keyframes that describe the main content or are related to the task from a given video, so that image–text models can preprocess them [10,11,5]. Contemporary auto-regressive ITMs manage to adapt themselves to video–text tasks with a few frames sampled from those videos and yield promising results [10,11]. In this family of approaches, image frames or clips (consecutive frames, as shown in Fig. 2(a)) are sampled from raw videos, cut into patches, and then encoded through a visual encoder (e.g., ResNet [12] and ViT [13]). X-CLIP [14] further inserts cross-frame communication modules to construct connections across timestamps.\n\nDespite performing well, we observe that the sampling strategies employed in these models are simplistic: they are blind to the video and question and only base on statistical probability distributions (Fig. 2(a)). These data-agnostic approaches inevitably limit the performance when finetuning and inferring on these ITMs, since they may cause keyframe omission (Fig. 3).\n\nOn the other hand, recent works [15,16,17] introduce learning-based sampling methods. Assisted by the Gumbel-Softmax trick [18], they build a parametric sampling network and concatenate that to the backbone. Then, as an auxiliary module, the parametric sampling strategy is jointly optimized with the main video–QA task. Although these frameworks gain competitive performance, they have the following drawbacks. First, they sacrifice efficiency owing to the additional overhead and the slow convergence speed caused by the devised sampling network, compared to direct few-frame fine-tuning on ITMs (from less than 10 epochs to more than 50 epochs) [16,17]. Secondly, it also undermines flexibility—the intervention touches the preprocessing stage in these works [16,17]. They encode the pre-sampled clips with customized pretrained video encoders, like 3D ResNet101 [19] or CLIP [2], leading to incompatibility with ITMs which only accept raw images as input. Additionally, the sampling network must be optimized along with the backbones on such clip features, which deters them from being directly applied to ITMs.\n\nTo address these issues, we first explore the correlation between model’s performance and the frames output from captioning-based samplers. Specifically, we propose a learning-free sampling method, dubbed Most Implied Frames (MIF), which we show is an simplified and unification of previous V(isual) Q(uestion)-aware methods. It utilizes lightweight pretrained models to annotate frames and grades each of them with a caption–question score. The selected frames are those with highest scores, or the best captions that imply the answer. Then, we conclude from empirical studies on MIF that capturing the most question-related frames is not a prerequisite for better accuracy. Based on our analysis, we hypothesize that question-aware sampling is not necessary and propose another self-adaptive sampling strategy— Most Dominant Frames (MDF). The underlying logic is to diversify the input frames to minimize the dominant scenes in that video, because most of the answers can be answered from static scenes instead of dynamic segments. To this end, we first define a goal function that measures the dynamics in videos whose input is the visual feature encoded by the backbone model’s inherent image encoder. Then we devise a search algorithm to quickly locate the frames where features move slowest in that video. Since question content no longer participates in the sampling process, MDF is a V-aware Q-agnostic method. In implementation, both MIF and MDF are executed in an offline fashion Figure 1, enhancing the training efficiency compared to those online sampling algorithms. We further conduct experiments on three ITMs (CLIP [2], GIT [11] and All-in-one [20]) using four widely tested video QA datasets. The results show that both methods are feasible solutions towards Video–QA tasks on ITMs, among which MDF can provide better efficiency, and indirectly substantiating the correctness of our hypothesis.\n\nThe contributions in our paper are as follows:\n\n- • We propose MIF, an offline question-aware sampling method for video question answering, which leverages two backbone models as captioner and scorer respectively.\n\n- • Based on the analysis of the MIF experimental results, we hypothesize that question-aware is redundant and propose a more efficient question-agnostic sampling method, MDF.\n\n- • We conduct comprehensive evaluation on a large variety of datasets and models. MDF yields competitive results with MIF, and both methods exceeds strong baselines, which also substantiates our hypothesis.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib43",
+      "text": "Wang et al. (2021) Zirui Wang, Jiahui Yu, Adams Wei Yu, Zihang Dai, Yulia Tsvetkov, and Yuan Cao. 2021. Simvlm: Simple visual language model pretraining with weak supervision. ArXiv , abs/2108.10904."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib34",
+      "text": "Radford et al. (2021) Alec Radford, Jong Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry, Amanda Askell, Pamela Mishkin, Jack Clark, Gretchen Krueger, and Ilya Sutskever. 2021. Learning transferable visual models from natural language supervision. In International Conference on Machine Learning ."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib15",
+      "text": "Jia et al. (2021) Chao Jia, Yinfei Yang, Ye Xia, Yi-Ting Chen, Zarana Parekh, Hieu Pham, Quoc Le, Yun-Hsuan Sung, Zhen Li, and Tom Duerig. 2021. Scaling up visual and vision-language representation learning with noisy text supervision. In International Conference on Machine Learning , pages 4904–4916. PMLR."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib1",
+      "text": "Alayrac et al. (2022) Jean-Baptiste Alayrac, Jeff Donahue, Pauline Luc, Antoine Miech, Iain Barr, Yana Hasson, Karel Lenc, Arthur Mensch, Katie Millican, Malcolm Reynolds, Roman Ring, Eliza Rutherford, Serkan Cabi, Tengda Han, Zhitao Gong, Sina Samangooei, Marianne Monteiro, Jacob Menick, Sebastian Borgeaud, Andy Brock, Aida Nematzadeh, Sahand Sharifzadeh, Mikolaj Binkowski, Ricardo Barreira, Oriol Vinyals, Andrew Zisserman, and Karen Simonyan. 2022. Flamingo: a visual language model for few-shot learning. ArXiv , abs/2204.14198."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib21",
+      "text": "Li et al. (2023) Junnan Li, Dongxu Li, Silvio Savarese, and Steven Hoi. 2023. Blip-2: Bootstrapping language-image pre-training with frozen image encoders and large language models. arXiv preprint arXiv:2301.12597 ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib50",
+      "text": "Yang et al. (2021) Antoine Yang, Antoine Miech, Josef Sivic, Ivan Laptev, and Cordelia Schmid. 2021. Just ask: Learning to answer questions from millions of narrated videos. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 1686–1697."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib51",
+      "text": "Yang et al. (2022) Antoine Yang, Antoine Miech, Josef Sivic, Ivan Laptev, and Cordelia Schmid. 2022. Learning to answer visual questions from web videos. arXiv preprint arXiv:2205.05019 ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib54",
+      "text": "Zellers et al. (2021) Rowan Zellers, Ximing Lu, Jack Hessel, Youngjae Yu, Jae Sung Park, Jize Cao, Ali Farhadi, and Yejin Choi. 2021. Merlot: Multimodal neural script knowledge models. Advances in Neural Information Processing Systems , 34:23634–23651."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "Fu et al. (2021) Tsu-Jui Fu, Linjie Li, Zhe Gan, Kevin Lin, William Yang Wang, Lijuan Wang, and Zicheng Liu. 2021. Violet: End-to-end video-language transformers with masked visual-token modeling. arXiv preprint arXiv:2111.12681 ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib36",
+      "text": "Rasheed et al. (2022) Hanoona Rasheed, Muhammad Uzair Khattak, Muhammad Maaz, Salman Khan, and Fahad Shahbaz Khan. 2022. Fine-tuned clip models are efficient video learners. arXiv preprint arXiv:2212.03640 ."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib42",
+      "text": "Wang et al. (2022) Jianfeng Wang, Zhengyuan Yang, Xiaowei Hu, Linjie Li, Kevin Lin, Zhe Gan, Zicheng Liu, Ce Liu, and Lijuan Wang. 2022. Git: A generative image-to-text transformer for vision and language. arXiv preprint arXiv:2205.14100 ."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib11",
+      "text": "He et al. (2016) Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. 2016. Deep residual learning for image recognition. In Proceedings of the IEEE conference on computer vision and pattern recognition , pages 770–778."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib8",
+      "text": "Dosovitskiy et al. (2020) Alexey Dosovitskiy, Lucas Beyer, Alexander Kolesnikov, Dirk Weissenborn, Xiaohua Zhai, Thomas Unterthiner, Mostafa Dehghani, Matthias Minderer, Georg Heigold, Sylvain Gelly, et al. 2020. An image is worth 16x16 words: Transformers for image recognition at scale. arXiv preprint arXiv:2010.11929 ."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib32",
+      "text": "Ni et al. (2022) Bolin Ni, Houwen Peng, Minghao Chen, Songyang Zhang, Gaofeng Meng, Jianlong Fu, Shiming Xiang, and Haibin Ling. 2022. Expanding language-image pretrained models for general video recognition. In Computer Vision–ECCV 2022: 17th European Conference, Tel Aviv, Israel, October 23–27, 2022, Proceedings, Part IV , pages 1–18. Springer."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib25",
+      "text": "Li et al. (2022b) Yicong Li, Xiang Wang, Junbin Xiao, and Tat-Seng Chua. 2022b. Equivariant and invariant grounding for video question answering. In Proceedings of the 30th ACM International Conference on Multimedia , pages 4714–4722."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib26",
+      "text": "Li et al. (2022c) Yicong Li, Xiang Wang, Junbin Xiao, Wei Ji, and Tat-Seng Chua. 2022c. Invariant grounding for video question answering. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 2928–2937."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib44",
+      "text": "Wei et al. (2023) Yushen Wei, Yang Liu, Hong Yan, Guanbin Li, and Liang Lin. 2023. Visual causal scene refinement for video question answering. arXiv preprint arXiv:2305.04224 ."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib13",
+      "text": "Jang et al. (2016) Eric Jang, Shixiang Gu, and Ben Poole. 2016. Categorical reparameterization with gumbel-softmax. arXiv preprint arXiv:1611.01144 ."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib10",
+      "text": "Hara et al. (2018) Kensho Hara, Hirokatsu Kataoka, and Yutaka Satoh. 2018. Can spatiotemporal 3d cnns retrace the history of 2d cnns and imagenet? In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR) , pages 6546–6555."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib41",
+      "text": "Wang et al. (2023) Alex Jinpeng Wang, Yixiao Ge, Rui Yan, Ge Yuying, Xudong Lin, Guanyu Cai, Jianping Wu, Ying Shan, Xiaohu Qie, and Mike Zheng Shou. 2023. All in one: Exploring unified video-language pre-training. Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition ."
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2309.12790",
+  "title": "NTO3D: Neural Target Object 3D Reconstruction with Segment Anything",
+  "authors": "Xiaobao Wei, Renrui Zhang, Jiarui Wu, Jiaming Liu, Ming Lu, Yandong Guo, Shanghang Zhang",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2309.12790",
+  "html_url": "https://arxiv.org/html/2309.12790",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 591,
+  "text": "The neural field has made significant progress over the past few years and become one of the most popular 3D representations. The pioneering Neural Radiance Field (NeRF) [1] and its variants [2,3,4,5,6] learn coordinate-based neural networks to predict the density and color from multi-view images and use volume rendering to conduct novel view synthesis. NeuS [7] improves the 3D reconstruction quality of NeRF by representing a surface with a Signed Distance Function (SDF). They also developed a new volume rendering method to train the neural SDF representation. Many studies are proposed to improve the reconstruction quality and reduce the training cost [8,9]. However, existing methods usually learn a neural field for the whole scene, ignoring the reconstruction of a target object in the scene, which can be indicated by end users on the fly.\n\nAlthough traditional techniques such as in-hand scanning [10] have been proposed for target 3D object reconstruction, it is still non-trivial for neural 3D reconstruction methods since we need to obtain the multi-view consistent target object segmentation, which is labor-intensive and time-consuming.\n\nRecently, the Segment Anything Model (SAM) [11] has shown great potential for zero-shot segmentation, which can be used to segment a target object out of the scene. However, with a single prompt, SAM can only obtain the 2D segmentation of a single-view image, other than multi-view images. In addition, how to leverage the features of SAM to improve the reconstruction quality is still under-explored to the best of our knowledge.\n\nTo address the above issue, we propose NTO3D, a novel high-quality Neural Target Object 3D (NTO3D) reconstruction method that fully leverages the benefits of both neural field and SAM. Specifically, to separate the target object from the neural field, we first train a 3D occupancy field to merge the multi-view 2D segmentation masks. Our 3D occupancy field is based on the following assumptions: (1) If a pixel is foreground, then at least one of the positions passed through the ray is foreground. (2) If a pixel is background, then all the positions passed through the ray are background. We design a corresponding loss based on the assumptions to optimize the 3D occupancy field, lifting the 2D masks to a unified 3D occupancy field. The 3D occupancy field is then projected into 2D space and generates the new prompts for SAM. This process is iterative until convergence to finally segment the target object out of the scene.\n\nAfter this, in order to improve the reconstruction quality of the target object, we further lift the features of the SAM encoder into a 3D feature field. We add a lightweight output head to the neural field for learning the 3D features of SAM and use volume rendering to render the 2D features. The rendered 2D features are directly supervised by the 2D features of SAM. By lifting the 2D features of SAM, our method can reconstruct a more accurate 3D model for the target object.\n\nOur main contributions are summarized as follows:\n\n- • We propose NTO3D, a novel method that iteratively lifts the 2D masks of SAM into a unified 3D occupancy field, segmenting the target object out of the neural field. With our method, users can easily reconstruct any target objects by prompting in a single view.\n\n- • To boost the reconstruction quality, we further present a tactful strategy to lift the 2D features of SAM into a 3D feature field.\n\n- • We conduct detailed experiments on DTU, LLFF, and BlendedMVS datasets, where NTO3D surpasses the state-of-the-art reconstruction methods, demonstrating the advantages of our approach.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib28",
+      "text": "Ben Mildenhall, Pratul P Srinivasan, Matthew Tancik, Jonathan T Barron, Ravi Ramamoorthi, and Ren Ng. Nerf: Representing scenes as neural radiance fields for view synthesis. Communications of the ACM , 65(1):99–106, 2021."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib30",
+      "text": "Thomas Müller, Alex Evans, Christoph Schied, and Alexander Keller. Instant neural graphics primitives with a multiresolution hash encoding. ACM Transactions on Graphics (ToG) , 41(4):1–15, 2022."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib43",
+      "text": "Cheng Sun, Min Sun, and Hwann-Tzong Chen. Direct voxel grid optimization: Super-fast convergence for radiance fields reconstruction. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 5459–5469, 2022."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib2",
+      "text": "Jonathan T Barron, Ben Mildenhall, Matthew Tancik, Peter Hedman, Ricardo Martin-Brualla, and Pratul P Srinivasan. Mip-nerf: A multiscale representation for anti-aliasing neural radiance fields. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 5855–5864, 2021."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib59",
+      "text": "Alex Yu, Ruilong Li, Matthew Tancik, Hao Li, Ren Ng, and Angjoo Kanazawa. Plenoctrees for real-time rendering of neural radiance fields. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 5752–5761, 2021."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib8",
+      "text": "Sara Fridovich-Keil, Alex Yu, Matthew Tancik, Qinhong Chen, Benjamin Recht, and Angjoo Kanazawa. Plenoxels: Radiance fields without neural networks. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 5501–5510, 2022."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib47",
+      "text": "Peng Wang, Lingjie Liu, Yuan Liu, Christian Theobalt, Taku Komura, and Wenping Wang. Neus: Learning neural implicit surfaces by volume rendering for multi-view reconstruction. arXiv preprint arXiv:2106.10689 , 2021."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib52",
+      "text": "Tong Wu, Jiaqi Wang, Xingang Pan, Xudong Xu, Christian Theobalt, Ziwei Liu, and Dahua Lin. Voxurf: Voxel-based efficient and accurate neural surface reconstruction. arXiv preprint arXiv:2208.12697 , 2022."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib44",
+      "text": "Jiaxiang Tang, Hang Zhou, Xiaokang Chen, Tianshu Hu, Errui Ding, Jingdong Wang, and Gang Zeng. Delicate textured mesh recovery from nerf via adaptive surface refinement. arXiv preprint arXiv:2303.02091 , 2023."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib51",
+      "text": "Thibaut Weise, Thomas Wismer, Bastian Leibe, and Luc Van Gool. In-hand scanning with online loop closure. In 2009 IEEE 12th International Conference on Computer Vision Workshops, ICCV Workshops , pages 1630–1637. IEEE, 2009."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib20",
+      "text": "Alexander Kirillov, Eric Mintun, Nikhila Ravi, Hanzi Mao, Chloe Rolland, Laura Gustafson, Tete Xiao, Spencer Whitehead, Alexander C Berg, Wan-Yen Lo, et al. Segment anything. arXiv preprint arXiv:2304.02643 , 2023."
+    }
+  ]
+}

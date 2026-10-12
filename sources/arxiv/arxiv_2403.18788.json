@@ -1,0 +1,173 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.18788",
+  "title": "Peregrine: ML-based Malicious Traffic Detection for Terabit Networks",
+  "authors": "JoÃ£o Romeiras Amado, Francisco Pereira, David Pissarra, Salvatore Signorello, Miguel Correia, Fernando M. V. Ramos",
+  "year": "2024",
+  "categories": [
+    "cs.NI"
+  ],
+  "url": "https://arxiv.org/abs/2403.18788",
+  "html_url": "https://arxiv.org/html/2403.18788",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1060,
+  "text": "Network operators deploy Network Intrusion Detection Systems (NIDS) that capture and analyze packet flows to identify malicious traffic. The ideal NIDS should fulfil three requirements: (R1) Observe and analyze all network traffic at high speed (ideally Tbps), and (R2) detect any attack (R3) without generating false positives. Traditional signature or rule-based NIDS offer a good performance/accuracy trade-off and are, therefore, widely deployed. These systems use signature profiles [1,2] to detect network attacks. As a result, they detect attacks quickly with low false positives (R3). Regarding performance, modern NIDSs are already capable of securing multi-Gbps networks. The state-of-the-art, Pigasus, achieves 100Gbps on a single server [3] (R1).\n\nThis category of NIDS presents two limitations. First, as they need to scan packet payloads for attack signatures, they are ineffective when payloads are encrypted, which is the norm today [6,7,8]. Second, they are unable to detect zero-day attacks. As they depend on a threat signature database, they are ineffective against unknown attacks (thereby only partially fulfilling R2).\n\nA different category of NIDS can complement these systems to mitigate these issues. They work on the assumption that the traffic patterns of network attacks deviate from those of regular traffic, an assumption that often holds [9,10,11,4,12,13,14]. These solutions aim to spot these deviations and, as a result, can detect unknown attacks for which there is no defined signature (R2). The most promising solutions of this class leverage machine learning algorithms [13,14] to learn the traffic profiles of regular traffic, aiming to identify statistical variations. Recent advances in ML, and Deep Learning in particular, have led to promising results for this sort of detection in several domains [9,10,11,4,12] (R3). They can thus augment traditional NIDS detection [15] by discovering new attack instances missed by rule-based methods, assisting in deploying new signatures.\n\nProblem. These ML-based malicious traffic detection systems face a performance challenge. The processing overhead of machine learning algorithms, including running the model and computing the features that feed it, imposes a severe performance tax. As a result, many run offline [16,17,18,19]. Recent solutions propose new mechanisms for online detection [4,12], but their throughputs are at least one order of magnitude lower when compared to traditional rule-based NIDS (R1).\n\nAs a result, when deployed in a Terabit network [20,21], these detectors demand significant traffic sampling to align their processing capabilities (a few Gbps at best) to the data plane packet rates (Tbps scales). Figure 1 illustrates its consequence. The detection performance of a state-of-the-art malicious traffic detector [4] across different attacks, albeit excellent without sampling, sharply declines with sampling, rendering the detector ineffective: AUC values below 0.5 indicate a performance worse than a detector that classifies traffic randomly ! The required sampling reduces the detector’s visibility over network traffic, breaking its detection capabilities. We emphasize that this result should generalize to any server-based middlebox detector. As its processing capabilities are fundamentally limited by the host/NIC architecture and its network stacks [22], we anticipate any current and near-future middlebox-based detector to face the same limitation.\n\nPeregrine. To address this problem, in this paper, we present Peregrine, an ML-based malicious traffic detector that aims to be effective in Terabit networks. Figure 2 presents an overview of the system. In contrast with current ML-based detectors, which run entirely in a middlebox server, ours is a cross-platform approach that integrates a commodity network switch [23,24]. The key insight (and challenge) is to offload feature computation to the switch data plane. This design presents three key advantages. First, the features that feed the ML detector are computed per packet, for all packets, scaling to Tbps speeds (R1). The ability to compute multiple network features of different types over all network traffic is the crucial ingredient for high detection performance [4]. Second, as the ML inference component runs in the middlebox server, we can leverage the best-of-breed ML-based detection technology (R2, R3). Recent attempts to run ML in network switches severely restrict the ML model [25,26] and are thus insufficient for this task. As a server cannot keep up with the switch packet processing rates, its execution is not per-packet—it is per-epoch. At the end of each epoch, a features record is sent to the server with all computed features to trigger ML-based detection—the downsampling required to reconcile the traffic rates of the switch and the server. The critical observation here is that this downsampling is performed after computing the features (that summarize all traffic), while existing systems sample raw packets, hence have only a partial view of the traffic. Third, offloading the feature computation to a network switch is a cost- and energy-efficient solution compared to an alternative scaling approach that uses multiple detection servers (as we show in Section 5.7).\n\nThe main challenges entailed in developing Peregrine are rooted in the switch data plane’s computational constraints and hardware intricacies (Section 2). Its limited resources, including constrained memory (size and access), simplified match-action mechanisms, and availability of only basic arithmetic and logical operations, present significant obstacles to implementing the complex computations required for malicious traffic detection. Determining the placement of functionality within the switch’s data plane while maintaining the correctness of the computations involved is another challenge, especially given the complexity of the calculations typically involved.\n\nWe designed and implemented Peregrine targeting a commodity switch [24] (Section 3 and Section 4). We make the Peregrine prototype, including its two versions of the data plane implementation (for Intel Tofino 1 and 2), available at [27]. The switch processes close to one hundred features for different flow types, including number of packets, mean packet size, standard deviation, and several features that cross-correlate inbound and outbound traffic.\n\nOur evaluation (Section 5) on two datasets incorporating 15 attacks demonstrates the effectiveness of Peregrine as a malicious traffic detector for Terabit networks. The detection performance was consistently high (AUC > 0.8) for the vast majority of attacks considered (13/15), both with and without sampling. As a comparison point, our baseline (a state-of-the-art detector [4]) was ineffective (AUC < 0.5) for most attacks (12/15). Peregrine is also orders of magnitude more cost- and energy-efficient than a multi-server alternative that performs detection at Terabit traffic rates. As feature computation represents more than 50% of the overall processing time for most of the network attacks we evaluated, offloading FC to the switch also results in more than doubling the detection throughput.\n\nThis work does not raise any ethical issues.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib47",
+      "text": "(47) Vern Paxson. Bro: a system for detecting network intruders in real-time. Computer networks , 31(23-24):2435–2463, 1999."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib50",
+      "text": "(50) Martin Roesch et al. Snort: Lightweight intrusion detection for networks. In Proceedings of LISA’99: 13th Systems Administration Conference , volume 99, pages 229–238, 1999."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib70",
+      "text": "(70) Zhipeng Zhao, Hugo Sadok, Nirav Atre, James C Hoe, Vyas Sekar, and Justine Sherry. Achieving 100gbps intrusion prevention on a single server. In 14th USENIX Symposium on Operating Systems Design and Implementation , pages 1083–1100, 2020."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib41",
+      "text": "(41) Yisroel Mirsky, Tomer Doitshman, Yuval Elovici, and Asaf Shabtai. Kitsune: an ensemble of autoencoders for online network intrusion detection. In Network and Distributed Systems Security Symposium , 2018."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib51",
+      "text": "(51) Iman Sharafaldin, Arash Habibi Lashkari, and Ali A Ghorbani. Toward generating a new intrusion detection dataset and intrusion traffic characterization. ICISSp , 1:108–116, 2018."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib17",
+      "text": "(17) Cisco. isco Encrypted Traffic Analytics Whitepaper. Retrieved 2024-02-01. URL: https://www.cisco.com/c/en/us/solutions/collateral/enterprise-networks/enterprise-network-security/nb-09-encrytd-traf-anlytcs-wp-cte-en.pdf ."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib46",
+      "text": "(46) Thuy TT Nguyen and Grenville Armitage. A survey of techniques for internet traffic classification using machine learning. IEEE communications surveys & tutorials , 10(4):56–76, 2008."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib9",
+      "text": "(9) Diogo Barradas, Nuno Santos, Luís Rodrigues, Salvatore Signorello, Fernando MV Ramos, and André Madeira. Flowlens: Enabling efficient flow classification for ml-based network security applications. In NDSS , 2021."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib28",
+      "text": "(28) Grant Ho, Asaf Cidon, Lior Gavish, Marco Schweighauser, Vern Paxson, Stefan Savage, Geoffrey M. Voelker, and David Wagner. Detecting and characterizing lateral phishing at scale. In 28th USENIX Security Symposium , 2019."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib71",
+      "text": "(71) Ziyun Zhu and Tudor Dumitraş. Featuresmith: Automatically engineering features for malware detection by mining the security literature. In Proceedings of the 2016 ACM SIGSAC Conference on Computer and Communications Security , 2016."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib29",
+      "text": "(29) Austin Hounsel, Jordan Holland, Ben Kaiser, Kevin Borgolte, Nick Feamster, and Jonathan Mayer. Identifying disinformation websites using infrastructure features. In 10th USENIX Workshop on Free and Open Communications on the Internet , 2020."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib22",
+      "text": "(22) Chuanpu Fu, Qi Li, Meng Shen, and Ke Xu. Realtime robust malicious traffic detection via frequency domain analysis. In Proceedings of the 2021 ACM SIGSAC Conference on Computer and Communications Security , pages 3431–3446, 2021."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "(13) Anna L Buczak and Erhan Guven. A survey of data mining and machine learning methods for cyber security intrusion detection. IEEE Communications Surveys & Tutorials , 18(2):1153–1176, 2016."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib15",
+      "text": "(15) Nadia Chaabouni, Mohamed Mosbah, Akka Zemmari, Cyrille Sauvignac, and Parvez Faruki. Network intrusion detection for IoT security based on learning techniques. IEEE Communications Surveys & Tutorials , 21(3):2671–2701, 2019."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib12",
+      "text": "(12) Jacob Alexander Markson Brown, Xi Jiang, Van Tran, Arjun Nitin Bhagoji, Nguyen Phong Hoang, Nick Feamster, Prateek Mittal, and Vinod Yegneswaran. Augmenting rule-based dns censorship detection at scale with machine learning. arXiv preprint arXiv:2302.02031 , 2023."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib33",
+      "text": "(33) L. Invernizzi, S. Miskovic, Rubén Torres, Christopher Krügel, Sabyasachi Saha, Giovanni Vigna, Sung-Ju Lee, and M. Mellia. Nazca: Detecting malware distribution in large-scale networks. In NDSS 2014 , 2014."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib45",
+      "text": "(45) Terry Nelms, Roberto Perdisci, Manos Antonakakis, and Mustaque Ahamad. WebWitness: Investigating, categorizing, and mitigating malware download paths. In 24th USENIX Security Symposium , 2015."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib10",
+      "text": "(10) Karel Bartos, Michal Sofka, and Vojtech Franc. Optimized invariant representation of network traffic for detecting unseen malware variants. In 25th USENIX Security Symposium , 2016."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib21",
+      "text": "(21) Min Du, Zhi Chen, Chang Liu, Rajvardhan Oak, and Dawn Song. Lifelong anomaly detection through unlearning. In Proceedings of the 2019 ACM SIGSAC Conference on Computer and Communications Security , 2019."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib53",
+      "text": "(53) Arjun Singh, Joon Ong, Amit Agarwal, Glen Anderson, Ashby Armistead, Roy Bannon, Seb Boving, Gaurav Desai, Bob Felderman, Paulie Germano, et al. Jupiter rising: A decade of clos topologies and centralized control in google’s datacenter network. ACM SIGCOMM computer communication review , 45(4):183–197, 2015."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib49",
+      "text": "(49) Leon Poutievski, Omid Mashayekhi, Joon Ong, Arjun Singh, Mukarram Tariq, Rui Wang, Jianan Zhang, Virginia Beauregard, Patrick Conner, Steve Gribble, et al. Jupiter evolving: transforming google’s datacenter network via optical circuit switches and software-defined networking. In Proceedings of the ACM SIGCOMM 2022 Conference , pages 66–85, 2022."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib30",
+      "text": "(30) Stephen Ibanez, Alex Mallery, Serhat Arslan, Theo Jepsen, Muhammad Shahbaz, Changhoon Kim, and Nick McKeown. The nanopu: A nanosecond network stack for datacenters. In 15th USENIX Symposium on Operating Systems Design and Implementation , 2021."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib11",
+      "text": "(11) Pat Bosshart, Glen Gibb, Hun-Seok Kim, George Varghese, Nick McKeown, Martin Izzard, Fernando Mujica, and Mark Horowitz. Forwarding metamorphosis: Fast programmable match-action processing in hardware for SDN. In ACM SIGCOMM Computer Communication Review , volume 43, pages 99–110, 2013."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib32",
+      "text": "(32) Intel. The Intel® Tofino™ series of P4-programmable Ethernet switch ASICs. Retrieved 2022-10-20. URL: https://www.intel.com/content/www/us/en/products/details/network-io/programmable-ethernet-switch/tofino-series.html ."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib63",
+      "text": "(63) Zhaoqi Xiong and Noa Zilberman. Do switches dream of machine learning? toward in-network classification. In Proceedings of the 18th ACM workshop on hot topics in networks , pages 25–33, 2019."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib14",
+      "text": "(14) Coralie Busse-Grawitz, Roland Meier, Alexander Dietmüller, Tobias Bühler, and Laurent Vanbever. pforest: In-network inference with random forests. arXiv preprint arXiv:1909.05680 , 2019."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib4",
+      "text": "(4) João Romeiras Amado. Source code. Retrieved 2024-02-06. URL: https://github.com/netx-ulx/peregrine ."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib40",
+      "text": "(40) Zaoxing Liu, Hun Namkung, Georgios Nikolaidis, Jeongkeun Lee, Changhoon Kim, Xin Jin, Vladimir Braverman, Minlan Yu, and Vyas Sekar. Jaqen: A high-performance switch-native approach for detecting and mitigating volumetric DDoS attacks with programmable switches. In 30th USENIX Security Symposium , pages 3829–3846, 2021."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib69",
+      "text": "(69) Menghao Zhang, Guanyu Li, Shicheng Wang, Chang Liu, Ang Chen, Hongxin Hu, Guofei Gu, Qianqian Li, Mingwei Xu, and Jianping Wu. Poseidon: Mitigating volumetric DDoS attacks with programmable switches. In 27th Network and Distributed System Security Symposium , 2020."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib3",
+      "text": "(3) Albert Gran Alcoz, Martin Strohmeier, Vincent Lenders, and Laurent Vanbever. Aggregate-based congestion control for pulse-wave DDoS defense. In Proceedings of the ACM SIGCOMM 2022 Conference , pages 693–706, 2022."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib62",
+      "text": "(62) Xian Wang. Enidrift: A fast and adaptive ensemble system for network intrusion detection under real-world drift. In Proceedings of the 38th Annual Computer Security Applications Conference , pages 785–798, 2022."
+    }
+  ]
+}

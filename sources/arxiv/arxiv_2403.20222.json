@@ -1,0 +1,149 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.20222",
+  "title": "Shallow Cross-Encoders for Low-Latency Retrieval",
+  "authors": "Aleksandr V. Petrov, Sean MacAvaney, Craig Macdonald",
+  "year": "2024",
+  "categories": [
+    "cs.IR",
+    "cs.CL"
+  ],
+  "url": "https://arxiv.org/abs/2403.20222",
+  "html_url": "https://arxiv.org/html/2403.20222",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1220,
+  "text": "The introduction of the Transformer [1] neural network architecture, and especially pre-trained language models that use Transformers (such as BERT [2]), has been transformative for the IR field; for example, Nogueira et al. [3] improved MRR@10 on the MS-MARCO dev set by 31% with the help of a BERT-based model. Although there are a variety of ranking architectures used within IR (e.g., dense Bi-Encoders [4,5,6], sparse Bi-Encoders [7,8], and late interaction models [9,10]), the best results for document re-ranking are typically achieved with the help of Cross-Encoders [4] – a family of models which encode both the query and the document simultaneously as a single textual input [11]. Aside from their high in-domain precision, Cross-Encoders tend to be more robust when generalising across retrieval tasks/domains [12]. Although Cross-Encoders can only practically be used as re-ranking models, limitations in their first-stage recall can be efficiently mitigated using pseudo-relevance feedback [13]. Further, Cross-Encoders can typically be fine-tuned from scratch (i.e., starting from the checkpoint of a foundational model, such as BERT).\n\nDespite these benefits, the application of Cross-Encoders in production retrieval systems is still limited. Cross-Encoders require a model inference for each query-document pair and, therefore, struggle with high computational complexity and high latency [14]. In real-world search systems, high latency negatively affects key performance metrics, such as the number of clicks, revenue, and user satisfaction [15]. Further, high latencies tend to be correlated with higher energy usage, resulting in negative impacts on the climate [16].\n\nThe high computational complexity and resulting latency of Cross-Encoder models motivated researchers to investigate Bi-Encoder [4] models. These models separately encode the query and the document, and then estimate relevance score using an inexpensive operation over the encoded representations (e.g. cosine similarity [17] or the MaxSim operation [10]). By pre-computing the document representations offline and using a variety of approaches to accelerate retrieval [18], Bi-Encoders can achieve low retrieval latency. However, this comes at other costs. For instance, Bi-Encoders are markedly more complicated to train than Cross-Encoders, typically relying on knowledge distillation from other models (e.g., [19]), training data balancing (e.g., [20]), and/or hard negative mining (e.g., [6]). Further, Bi-Encoders must pre-encode all documents in the collection and keep the encoded versions of all documents in memory. This may be an inefficient strategy given the long-tail distribution of document popularity in a corpus. Indeed, if most documents are never retrieved, building their dense representations and keeping them in memory wastes resources. Moreover, document encoding costs for Bi-Encoders must also be incurred every time the retrieval model changes (e.g., when a model is re-trained to reflect new search trends.) Finally, Bi-Encoders often struggle to transfer across retrieval tasks and domains [12].\n\nTherefore, in this paper, we investigate shallow Cross-Encoders (Cross-Encoders with a limited number of transformer layers) as a solution for low-latency search. Shallow Cross-Encoders are much smaller than full-scale models and require much fewer computations than full-scale models. Therefore, these models can score many times more documents within the low-latency window than the full-scale models; this means that in low-latency scenarios, they can rerank more candidates and, ultimately, have better effectiveness than the full-scale models.\n\nNote that there are a number of approaches for reducing the latency of ranking models, such as dynamic pruning or the use of approximate nearest neighbour indices (an overview of these methods can be found in [22]); however, most of these methods are not applicable to cross-encoder models. Indeed, in this paper, we focus on two main ways of reducing latency in the cross-encoder: (i) reducing the model’s size and (ii) reducing the number of candidate documents, and we evaluate which of these ways achieves better effectiveness in the low-latency scenario.\n\nTraining effective Shallow Cross-Encoders, despite their promise of good efficiency, presents a significant challenge (this is in contrast to full-scale cross-encoders, which, as we previously mentioned, are relatively easy to train). MacAvaney et al. [14] first explored limiting the depths of a transformer network for ranking, but was only able to reduce the depth of the network to 5 layers without substantial effectiveness degradation. Other successful attempts to train shallower Cross-Encoder models have required applying complicated knowledge-distillation techniques. For example, the popular Sentence-Transformer package [17] provides several shallow models and reports model performance competitive to larger models. Unfortunately, no academic paper is associated with these checkpoints, and the exact details of training these models are unclear. Our analysis of the training code shows that these models were trained using a knowledge distillation setup from an ensemble of full-sale models, loosely following the process described by Hofstätter et al. [23], which assumes the existence of such an ensemble in the first place. While resulting in effective checkpoints for the MSMARCO dataset, we argue that a training strategy that requires training an ensemble of full-scale language models before training the shallow model is hard to replicate for other settings (e.g. for different languages or other datasets). Indeed, in [24], the challenges of reproducing knowledge distillation models with “dependency chains” of models was found to be challenging - and hence, we argue that training shallow Cross-Encoders this way is rather art than science.\n\nIn contrast, this paper proposes a direct training method for shallow Cross-Encoders, which does not resort to complex techniques such as Knowledge Distillation. Our approach based on the gBCE training scheme [25] has been recently shown to improve the effectiveness of transformer-based models for recommender systems. The training scheme consists of two key components: (i) an increased number of sampled negative instances for each labelled positive instance and (ii) the gBCE loss function, which counters the effects of negative sampling (which is typically used to train Cross-Encoder models). Our experiments show that both of these components positively affect model training. Figure 1 summarises some of the main findings of this paper. The figure illustrates efficiency/effectiveness tradeoffs of two very small cross-encoders (2 layers, TinyBERT [26]) and a full-scale MonoBERT-Large model [3]. One of the small Cross-Encoders is trained using the gBCE training scheme, and the is trained using traditional BCE. As the figure shows, while MonoBERT-Large is more effective when allowed latency is high (i.e. it is allowed to re-rank many documents), within the low latency zone (< 50ms latency), shallow Cross-Encoders are more effective. Moreover, TinyBERT trained with gBCE is more effective compared to TinyBERT trained with traditional BCE.\n\nOverall, the contributions of this paper can be summarised as follows: (i) We propose a simple and replicable method for training shallow Cross-Encoders based on the gBCE training scheme, which does not rely on knowledge distillation; (ii) We analyse the efficiency/effectiveness tradeoffs of Cross-Encoders of different sizes and demonstrate that shallow Cross-Encoders are preferable to full-size models under low-latency constraints; (iii) We demonstrate that shallow Cross-Encoders are efficient and effective even when used without a GPU.\n\nWe note that outside academia, there is interest in shallow Cross-Encoders, which is expressed in several industrial blog posts. This interest makes us believe that our research has high potential to be adopted by industry and serve as a basis for further study.\n\nThe rest of the paper is organised as follows: Section 2 provides an overview of the Cross-Encoder architecture and Efficiency/Effectiveness tradeoffs arising from this architecture, Section 3 describes training scheme for shallow Cross-Encoders, Section 4 contains experimental evaluation of the efficiency/effectiveness tradeoffs for shallow Cross-Encoders, and Section 5 contains final remarks.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib35",
+      "text": "Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A.N., Kaiser, Ł., Polosukhin, I.: Attention is All you Need. In: Proc. NeurIPS (2017)"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib7",
+      "text": "Devlin, J., Chang, M.W., Lee, K., Toutanova, K.: BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding. In: Proc. of NAACL-HLT. pp. 4171–4186 (2019)"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib27",
+      "text": "Nogueira, R., Cho, K.: Passage Re-ranking with BERT (2020), http://arxiv.org/abs/1901.04085"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib14",
+      "text": "Humeau, S., Shuster, K., Lachaux, M.A., Weston, J.: Poly-encoders: Transformer Architectures and Pre-training Strategies for Fast and Accurate Multi-sentence Scoring (2020), http://arxiv.org/abs/1905.01969"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib18",
+      "text": "Lin, S.C., Yang, J.H., Lin, J.: In-Batch Negatives for Knowledge Distillation with Tightly-Coupled Teachers for Dense Retrieval. In: Proc. RepL4NLP. pp. 163–173 (2021)"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib40",
+      "text": "Xiong, L., Xiong, C., Li, Y., Tang, K.F., Liu, J., Bennett, P., Ahmed, J., Overwijk, A.: Approximate Nearest Neighbor Negative Contrastive Learning for Dense Text Retrieval (2020)"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib9",
+      "text": "Formal, T., Piwowarski, B., Clinchant, S.: SPLADE: Sparse Lexical and Expansion Model for First Stage Ranking. In: Proc. SIGIR. pp. 2288–2292 (2021)"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib22",
+      "text": "MacAvaney, S., Nardini, F.M., Perego, R., Tonellotto, N., Goharian, N., Frieder, O.: Expansion via Prediction of Importance with Contextualization. In: Proc. SIGIR. pp. 1573–1576 (2020)"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib13",
+      "text": "Hofstätter, S., Zlabinger, M., Hanbury, A.: Interpretable & Time-Budget-Constrained Contextualization for Re-Ranking. In: Proc. ECAI (2020)"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib15",
+      "text": "Khattab, O., Zaharia, M.: ColBERT: Efficient and Effective Passage Search via Contextualized Late Interaction over BERT. In: Proc. SIGIR. pp. 39–48 (2020)"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib41",
+      "text": "Zhuang, H., Qin, Z., Jagerman, R., Hui, K., Ma, J., Lu, J., Ni, J., Wang, X., Bendersky, M.: RankT5: Fine-Tuning T5 for Text Ranking with Ranking Losses. In: Proc. SIGIR. pp. 2308–2313 (2023)"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib33",
+      "text": "Thakur, N., Reimers, N., Rücklé, A., Srivastava, A., Gurevych, I.: BEIR: A Heterogenous Benchmark for Zero-shot Evaluation of Information Retrieval Models (2021), http://arxiv.org/abs/2104.08663"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib23",
+      "text": "MacAvaney, S., Tonellotto, N., Macdonald, C.: Adaptive Re-Ranking with a Corpus Graph. In: Proc. SIGIR. pp. 1491–1500 (2022)"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib24",
+      "text": "MacAvaney, S., Yates, A., Cohan, A., Goharian, N.: CEDR: Contextualized Embeddings for Document Ranking. In: Proc. SIGIR. pp. 1101–1104 (2019)"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib16",
+      "text": "Kohavi, R., Tang, D., Xu, Y.: Trustworthy Online Controlled Experiments: A Practical Guide to A/B Testing. Cambridge University Press (2020)"
+    },
+    {
+      "n": 16,
+      "id": "bib.bib32",
+      "text": "Scells, H., Zhuang, S., Zuccon, G.: Reduce, Reuse, Recycle: Green Information Retrieval Research. In: Proc. SIGIR. pp. 2825–2837 (2022)"
+    },
+    {
+      "n": 17,
+      "id": "bib.bib30",
+      "text": "Reimers, N., Gurevych, I.: Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks. In: Proc. EMNLP (2019)"
+    },
+    {
+      "n": 18,
+      "id": "bib.bib17",
+      "text": "Kulkarni, H., MacAvaney, S., Goharian, N., Frieder, O.: Lexically-Accelerated Dense Retrieval. In: Proc. SIGIR. pp. 152–162 (2023)"
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "Lu, W., Jiao, J., Zhang, R.: TwinBERT: Distilling Knowledge to Twin-Structured Compressed BERT Models for Large-Scale Retrieval. In: Proc. CIKM. pp. 2645–2652 (2020)"
+    },
+    {
+      "n": 20,
+      "id": "bib.bib12",
+      "text": "Hofstätter, S., Lin, S.C., Yang, J.H., Lin, J., Hanbury, A.: Efficiently Teaching an Effective Dense Retriever with Balanced Topic Aware Sampling. In: Proc. SIGIR. pp. 113–122 (2021)"
+    },
+    {
+      "n": 21,
+      "id": "bib.bib6",
+      "text": "Dean, J., Barroso, L.A.: The tail at scale. Communications of the ACM 56 (2), 74–80 (2013)"
+    },
+    {
+      "n": 22,
+      "id": "bib.bib3",
+      "text": "Bruch, S., Lucchese, C., Nardini, F.M.: Efficient and Effective Tree-based and Neural Learning to Rank. Foundations and Trends® in Information Retrieval 17 (1), 1–123 (2023)"
+    },
+    {
+      "n": 23,
+      "id": "bib.bib11",
+      "text": "Hofstätter, S., Althammer, S., Schröder, M., Sertkan, M., Hanbury, A.: Improving Efficient Neural Ranking Models with Cross-Architecture Knowledge Distillation (2021), http://arxiv.org/abs/2010.02666"
+    },
+    {
+      "n": 24,
+      "id": "bib.bib37",
+      "text": "Wang, X., MacAvaney, S., Macdonald, C., Ounis, I.: An Inspection of the Reproducibility and Replicability of TCT-ColBERT. In: Proc. SIGIR. pp. 2790–2800 (2022)"
+    },
+    {
+      "n": 25,
+      "id": "bib.bib29",
+      "text": "Petrov, A.V., Macdonald, C.: gSASRec: Reducing Overconfidence in Sequential Recommendation Trained with Negative Sampling. In: Proc. RecSys. pp. 116–128 (2023)"
+    },
+    {
+      "n": 26,
+      "id": "bib.bib34",
+      "text": "Turc, I., Chang, M.W., Lee, K., Toutanova, K.: Well-Read Students Learn Better: On the Importance of Pre-training Compact Models (2019), http://arxiv.org/abs/1908.08962"
+    }
+  ]
+}

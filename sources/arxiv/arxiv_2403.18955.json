@@ -1,0 +1,129 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.18955",
+  "title": "Structurally Prune Anything: Any Architecture, Any Framework, Any Time",
+  "authors": "Xun Wang, John Rachwan, Stephan GÃ¼nnemann, Bertrand Charpentier",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2403.18955",
+  "html_url": "https://arxiv.org/html/2403.18955",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 720,
+  "text": "The increasing complexity and scale of deep learning models [1,2,3] have sparked significant research interest in compression methods. Compression methods, like pruning, aim to reduce model size and computational cost in order to increase inference speed, save energy, and enable deployment on computationally limited devices. In particular, pruning methods mostly fall into two main categories: unstructured pruning which involves setting specific parameters to zero while maintaining the overall network structure [4,5,6,7,8,9,10], and structured pruning which involves removing entire channels [11,12,13,14,15,16]. While structured pruning advantageously results in direct computational and memory reduction, it is considered a more complex undertaking. Specifically, structured pruning methods often come with three main challenges.\n\nChallenge 1: The first major challenge consists of the difficulty of applying different structured pruning methods to various model architectures. Indeed, structured pruning entails managing the interdependencies between coupled channels in different layers to modify the model structure without breaking the model connectivity (e.g. see residual connection in Figure 5). Hence, when dealing with coupled channels, most of the existing approaches heavily rely on case-by-case analysis of different model architectures.\n\nChallenge 2: The second challenge consists of unifying structured pruning methods in a single framework making pruning possible at any stage of training. Pruning can be done either before, during, or after training. The majority of works adhere to the pruning with fine-tuning approach, which we will refer to as the train-prune-finetune setting, and involves conducting finetuning after pruning pre-trained models to restore any performance degradation incurred during the pruning process. Another approach consists in pruning a model before training, which we will refer to as the prune-train setting, thus allowing to directly train a sparse model. Nonetheless, a more challenging yet advantageous scenario is the pruning without fine-tuning setting, which we will refer to as the train-prune setting [17], wherein no additional training is permitted after pruning a pre-trained model. Instead, the train-prune setting has only access to a limited set of calibration data [9,18], or, even more challenging, has access to no calibration data [19] for the pruning step.\n\nChallenge 3: The third challenge is that existing pruning methods are not only often designed with specific architectures or training paradigms in mind, but they are also further entrenched by the deep learning frameworks they were developed. This framework specificity arises due to several factors: differences in computational graph, definition of specific layers, and the existence of unique APIs and optimization libraries. As such, a pruning method effective in one setting may require non-trivial adaptations to be ported to another framework or architecture, complicating its general applicability. Hence, the third challenge lies in crafting an approach robust enough to transcend the limitations imposed by framework-specific constraints and progress toward a unified, generalizable approach to model pruning.\n\nPrevious works have tried to address parts of these three challenges. For instance, DepGraph [20] and OTO-v2 [21] enables the automatic pruning of different networks by maintaining a dependency graph. However, they lack the ability to support models other than PyTorch and only support pruning after training with or without fine-tuning scheme. Further, DFPC [22] proposed a method to prune coupled channels data-free without fine-tuning, but it lacks the ability to adapt to different architectures and frameworks.\n\nTo jointly tackle the aforementioned three challenges, we propose Structurally Prune Anything (SPA), an architecture-and-framework-agnostic neural network pruning method, which supports different criteria that encompass the previous three settings we defined. We show an overview of our method in Figure 1. Its contributions can be summarized as follows. (1) Prune Any Framework: We directly operate on a flexible computational graph compatible across frameworks. To this end, we use the ONNX format. With this procedure, we are the first pruning method that can handle the most common deep learning frameworks. (2) Prune Any Architecture: We propose a four-step procedure for the structured pruning of grouped channels. This procedure allows automatic pruning of neural networks with any structures, and the easy transfer of many existing pruning criteria for a grouped structured version, often achieving superior performance/efficiency trade-off. (3) Prune Any Time: We propose a group-level importance estimation method, enabling pruning at any training stage including prune-train, train-prune-finetune, and train-prune. In the latter setting, we propose a novel method Optimal Brain SPA (OBSPA) which achieves state-of-the-art results with ResNet50 on CIFAR10 and VGG19 on CIFAR100 without the need for calibration data.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib17",
+      "text": "He et al. (2015) He, K., Zhang, X., Ren, S., and Sun, J. Deep residual learning for image recognition. 2016 IEEE Conference on Computer Vision and Pattern Recognition (CVPR) , pp. 770–778, 2015."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib43",
+      "text": "Simonyan & Zisserman (2015) Simonyan, K. and Zisserman, A. Very deep convolutional networks for large-scale image recognition. In International Conference on Learning Representations , 2015."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib9",
+      "text": "Dosovitskiy et al. (2020) Dosovitskiy, A., Beyer, L., Kolesnikov, A., Weissenborn, D., Zhai, X., Unterthiner, T., Dehghani, M., Minderer, M., Heigold, G., Gelly, S., Uszkoreit, J., and Houlsby, N. An image is worth 16x16 words: Transformers for image recognition at scale. ArXiv , abs/2010.11929, 2020."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib32",
+      "text": "LeCun et al. (1989) LeCun, Y., Denker, J. S., and Solla, S. A. Optimal brain damage. In NIPS , 1989."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib16",
+      "text": "Hassibi & Stork (1992) Hassibi, B. and Stork, D. G. Second order derivatives for network pruning: Optimal brain surgeon. In NIPS , 1992."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib8",
+      "text": "Dong et al. (2017) Dong, X., Chen, S., and Pan, S. J. Learning to prune deep neural networks via layer-wise optimal brain surgeon. In NIPS , 2017."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib15",
+      "text": "Han et al. (2015) Han, S., Pool, J., Tran, J., and Dally, W. J. Learning both weights and connections for efficient neural network. In NIPS , 2015."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib33",
+      "text": "Lee et al. (2019) Lee, N., Ajanthan, T., and Torr, P. H. Snip: Single-shot network pruning based on connection sensitivity. In ICLR , 2019."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib14",
+      "text": "Frantar et al. (2022) Frantar, E., Singh, S. P., and Alistarh, D. Optimal Brain Compression: a framework for accurate post-training quantization and pruning. Advances in Neural Information Processing Systems , 36, 2022."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib50",
+      "text": "Xiao et al. (2019) Xiao, X., Wang, Z., and Rajasekaran, S. Autoprune: Automatic network pruning by regularizing auxiliary parameters. In Neural Information Processing Systems , 2019."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib34",
+      "text": "Li et al. (2016) Li, H., Kadav, A., Durdanovic, I., Samet, H., and Graf, H. P. Pruning filters for efficient convnets. ArXiv , abs/1608.08710, 2016."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib21",
+      "text": "He et al. (2018b) He, Y., Liu, P., Wang, Z., Hu, Z., and Yang, Y. Filter pruning via geometric median for deep convolutional neural networks acceleration. 2019 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pp. 4335–4344, 2018b."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib19",
+      "text": "He et al. (2017) He, Y., Zhang, X., and Sun, J. Channel pruning for accelerating very deep neural networks. 2017 IEEE International Conference on Computer Vision (ICCV) , pp. 1398–1406, 2017."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib35",
+      "text": "Lin et al. (2020) Lin, M., Ji, R., Wang, Y., Zhang, Y., Zhang, B., Tian, Y., and Shao, L. Hrank: Filter pruning using high-rank feature map. 2020 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pp. 1526–1535, 2020."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib37",
+      "text": "Liu et al. (2017a) Liu, Z., Li, J., Shen, Z., Huang, G., Yan, S., and Zhang, C. Learning efficient convolutional networks through network slimming. 2017 IEEE International Conference on Computer Vision (ICCV) , pp. 2755–2763, 2017a."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib41",
+      "text": "Rachwan et al. (2022) Rachwan, J., Zügner, D., Charpentier, B., Geisler, S., Ayle, M., and Günnemann, S. Winning the lottery ahead of time: Efficient early network pruning. In Proceedings of the 39th International Conference on Machine Learning , volume 162 of Proceedings of Machine Learning Research . PMLR, 2022."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib30",
+      "text": "Lazarevich et al. (2021) Lazarevich, I., Kozlov, A., and Malinin, N. Post-training deep neural network pruning via layer-wise calibration. 2021 IEEE/CVF International Conference on Computer Vision Workshops (ICCVW) , pp. 798–805, 2021."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib13",
+      "text": "Frantar & Alistarh (2023) Frantar, E. and Alistarh, D. Sparsegpt: Massive language models can be accurately pruned in one-shot. ArXiv , abs/2301.00774, 2023."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib45",
+      "text": "Srinivas & Babu (2015) Srinivas, S. and Babu, R. V. Data-free parameter pruning for deep neural networks. In British Machine Vision Conference , 2015."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib12",
+      "text": "Fang et al. (2023) Fang, G., Ma, X., Song, M., Mi, M. B., and Wang, X. Depgraph: Towards any structural pruning. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pp. 16091–16101, 2023."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib3",
+      "text": "Chen et al. (2023) Chen, T., Liang, L., Tianyu, D., Zhu, Z., and Zharkov, I. Otov2: Automatic, generic, user-friendly. In International Conference on Learning Representations , 2023."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib40",
+      "text": "Narshana et al. (2023) Narshana, T., Murti, C., and Bhattacharyya, C. DFPC: Data flow driven pruning of coupled channels without data. In The Eleventh International Conference on Learning Representations , 2023. URL https://openreview.net/forum?id=mhnHqRqcjYU ."
+    }
+  ]
+}

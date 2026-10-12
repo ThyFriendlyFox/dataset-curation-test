@@ -1,0 +1,288 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2212.04612",
+  "title": "Training Data Influence Analysis and Estimation: A Survey",
+  "authors": "Zayd Hammoudeh, Daniel Lowd",
+  "year": "2024",
+  "categories": [
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2212.04612",
+  "html_url": "https://arxiv.org/html/2212.04612",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1057,
+  "text": "Machine learning is built on training data [1]. Without good training data, nothing else works. How modern models learn from and use training data is increasingly opaque [2,3,4]. Regarding state-of-the-art black-box models, [5] notes, “If all we have is a ‘black box’ it is impossible to understand causes of failure and improve system safety.”\n\nLarge modern models require tremendous amounts of training data [6]. Today’s uncurated, internet-derived datasets commonly contain numerous anomalous instances [7]. These anomalies can arise from multiple potential sources. For example, training data anomalies may have a natural cause such as distribution shift [8,9], measurement error, or non-representative samples drawn from the tail of the data distribution [10,11,12]. Anomalous training instances also occur due to human or algorithmic labeling errors – even on well-known, highly-curated datasets [13]. Malicious adversaries can insert anomalous poison instances into the training data with the goal of manipulating specific model predictions [14,15,16,17]. Regardless of the cause, anomalous training instances degrade a model’s overall generalization performance.\n\nToday’s large datasets also generally overrepresent established and dominant viewpoints [18]. Models trained on these huge public datasets encode and exhibit biases based on protected characteristics, including gender, race, religion, and disability [19,20,21,22,23]. These training data biases can translate into real-world harm, where, as an example, a recidivism model falsely flagged black defendants as high risk at twice the rate of white defendants [24].\n\nUnderstanding the data and its relationship to trained models is essential for building trustworthy ML systems. However, it can be very difficult to answer even basic questions about the relationship between training data and model predictions; for example:\n\n- 1. Is a prediction well-supported by the training data, or was the prediction just random?\n\n- 2. Which portions of the training data improve a prediction? Which portions make it worse?\n\n- 3. Which instances in the training set caused the model to make a specific prediction?\n\nOne strategy to address basic questions like those above is to render them moot by exclusively using simple, transparent model classes [25]. Evidence exists that this “interpretable-only” strategy may be appropriate in some settings [26]. However, even interpretable model classes can be grossly affected by training data issues [10,27,28]. Moreover, as the performance penalty of interpretable models grows, their continued use becomes harder to justify.\n\nWith the growing use of black-box models, we need better methods to analyze and understand black-box model decisions. Otherwise, society must carry the burden of black-box failures.\n\n## 1.1 Relating Models and Their Training Data\n\nAll model decisions are rooted in the training data. Training data influence analysis (also known as data valuation [29,30,31] and data attribution [32,33,34]) partially demystifies the relationship between training data and model predictions by determining how to apportion credit (and blame) for specific model behavior to the training instances [35,2,36,37]. Essentially, influence analysis’s objective is to answer the question: What is each training instance’s effect on a model ? An instance’s “effect” is with respect to some specific perspective. For example, an instance’s effect may be quantified as the change in model performance when some instance is deleted from the training data. The effect can also be relative, e.g., whether one training instance changes the model more than another.\n\nInfluence analysis emerged alongside the initial study of linear models and regression [38,28]. This early analysis focused on quantifying how worst-case perturbations to the training data affected the final model parameters. The insights gained from early influence analysis contributed to the development of numerous methods that improved model robustness and reduced model sensitivity to training outliers [39,40].\n\nSince these early days, machine learning models have grown substantially in complexity and opacity [41,42,43]. Training datasets have also exploded in size [6]. These factors combine to make training data influence analysis significantly more challenging where, for multilayer parametric models (e.g., neural networks), determining a single training instance’s exact effect can be NP - complete in the worst case [44].\n\nIn practice, influence may not need to be measured exactly. Influence estimation methods provide an approximation of training instances’ true influence. Influence estimation is generally much more computationally efficient and is now the approach of choice [45]. However, modern influence estimators achieve their efficiency via various assumptions about the model’s architecture and learning environment [2,36,29]. These varied assumptions result in influence estimators having different advantages and disadvantages as well as in some cases, even orthogonal perspectives on the definition of influence itself [37].\n\n## 1.2 Our Contributions\n\nTo the extent of our knowledge, there has not yet been a comprehensive review of these differing perspectives of training data influence, much less of the various methods themselves. This paper fills in that gap by providing the first comprehensive survey of existing influence analysis techniques. We describe how these various methods overlap and, more importantly, the consequences – both positive and negative – that arise out of their differences. We provide this broad and nuanced understanding of influence analysis so that ML researchers and practitioners can better decide which influence analysis method best suits their specific application objectives [45].\n\nAlthough we aim to provide a comprehensive survey of influence analysis, we cannot cover every method in detail. Instead, we focus on the most impactful methods so as not to distract from the key takeaways. In particular, we concentrate on influence analysis methods that are general [28,29,46] or targeted towards parametric models [2,36,37,47] with less emphasis on non-parametric methods [48,30,49]. Multiple other research areas are based on ranking and subsampling training instances including data pruning [50], coreset selection [51,52], active learning [53], and submodular dataset selection [54], but these topics are beyond the scope of this work.\n\nIn the remainder of this paper, we first standardize the general notation used throughout this work (Sec. 2). Section 3 reviews the various general formulations through which training data influence is viewed. We also categorize and summarize the properties of the seven most impactful influence analysis methods. Sections 4 and 5 describe these foundational influence methods in detail. For each method, we (1) formalize the associated definition of influence and how it is measured, (2) detail the formulation’s strengths and weaknesses, (3) enumerate any related or derivative methods, and (4) explain the method’s time, space, and storage complexities. Section 6 reviews various learning tasks where influence analysis has been applied. We provide our perspective on future directions for influence analysis research in Section 7.",
+  "references": [
+    {
+      "n": 1,
+      "id": "biba.bibx151",
+      "text": "[Red+21a] Vijay Reddi, Greg Diamos, Pete Warden, Peter Mattson and David Kanter “Data Engineering for Everyone”, 2021 arXiv: 2102.11447 [cs.LG]"
+    },
+    {
+      "n": 2,
+      "id": "biba.bibx71",
+      "text": "[KL17a] Pang Koh and Percy Liang “Understanding Black-box Predictions via Influence Functions” In Proceedings of the 34th International Conference on Machine Learning , ICML’17 Sydney, Australia: PMLR, 2017 URL: https://arxiv.org/abs/1703.04730"
+    },
+    {
+      "n": 3,
+      "id": "biba.bibx160",
+      "text": "[Zha+21c] Chiyuan Zhang, Samy Bengio, Moritz Hardt, Benjamin Recht and Oriol Vinyals “Understanding Deep Learning (Still) Requires Rethinking Generalization” In Communications of the ACM 64.3 New York, NY, USA: Association for Computing Machinery, 2021, pp. 107–115 URL: https://dl.acm.org/doi/10.1145/3446776"
+    },
+    {
+      "n": 4,
+      "id": "biba.bibx184",
+      "text": "[Xia22a] Chloe Xiang “Scientists Increasingly Can’t Explain How AI Works” In Vice , 2022 URL: https://www.vice.com/en/article/y3pezm/scientists-increasingly-cant-explain-how-ai-works"
+    },
+    {
+      "n": 5,
+      "id": "biba.bibx125",
+      "text": "[Yam20a] Roman. Yampolskiy “Unexplainability and Incomprehensibility of AI” In Journal of Artificial Intelligence and Consciousness 7.2 , 2020, pp. 277–291 URL: https://arxiv.org/abs/1907.03869"
+    },
+    {
+      "n": 6,
+      "id": "biba.bibx130",
+      "text": "[BF21a] Emily Black and Matt Fredrikson “Leave-One-Out Unfairness” In Proceedings of the 2021 ACM Conference on Fairness, Accountability, and Transparency , FAccT’21, 2021 URL: https://arxiv.org/abs/2107.10171"
+    },
+    {
+      "n": 7,
+      "id": "biba.bibx119",
+      "text": "[Ple+20a] Geoff Pleiss, Tianyi Zhang, Ethan Elenberg and Kilian. Weinberger “Identifying Mislabeled Data Using the Area Under the Margin Ranking” In Proceedings of the 34th International Conference on Neural Information Processing Systems , NeurIPS’20 Red Hook, NY, USA: Curran Associates Inc., 2020 URL: https://arxiv.org/abs/2001.10528"
+    },
+    {
+      "n": 8,
+      "id": "biba.bibx23",
+      "text": "[RL87a] Peter. Rousseeuw and Annick.. Leroy “Robust Regression and Outlier Detection” USA: John Wiley & Sons, Inc., 1987"
+    },
+    {
+      "n": 9,
+      "id": "biba.bibx159",
+      "text": "[Yan+21a] Jingkang Yang, Kaiyang Zhou, Yixuan Li and Ziwei Liu “Generalized Out-of-Distribution Detection: A Survey”, 2021 arXiv: 2110.11334 [cs.CV]"
+    },
+    {
+      "n": 10,
+      "id": "biba.bibx18",
+      "text": "[Hub81a] Peter Huber “Robust Statistics” John Wiley & Sons, 1981"
+    },
+    {
+      "n": 11,
+      "id": "biba.bibx111",
+      "text": "[Fel20c] Vitaly Feldman “Does Learning Require Memorization? A Short Tale about a Long Tail” In Proceedings of the 52nd Annual ACM SIGACT Symposium on Theory of Computing , STOC’20, 2020 URL: https://arxiv.org/abs/1906.05271"
+    },
+    {
+      "n": 12,
+      "id": "biba.bibx143",
+      "text": "[Jia+21c] Ziheng Jiang, Chiyuan Zhang, Kunal Talwar and Michael Mozer “Characterizing Structural Regularities of Labeled Data in Overparameterized Models” In Proceedings of the 38th International Conference on Machine Learning , ICML’21, 2021, pp. 5034–5044 URL: https://arxiv.org/abs/2002.03206"
+    },
+    {
+      "n": 13,
+      "id": "biba.bibx67",
+      "text": "[EGH17a] Rajmadhan Ekambaram, Dmitry. Goldgof and Lawrence. Hall “Finding Label Noise Examples in Large Scale Datasets” In Proceedings of the 2017 IEEE International Conference on Systems, Man, and Cybernetics , SMC’17, 2017 DOI: 10.1109/SMC.2017.8122985"
+    },
+    {
+      "n": 14,
+      "id": "biba.bibx44",
+      "text": "[BNL12a] Battista Biggio, Blaine Nelson and Pavel Laskov “Poisoning Attacks against Support Vector Machines” In Proceedings of the 29th International Conference on Machine Learning , ICML’12 Edinburgh, Great Britain: PMLR, 2012 URL: https://arxiv.org/abs/1206.6389"
+    },
+    {
+      "n": 15,
+      "id": "biba.bibx66",
+      "text": "[Che+17a] Xinyun Chen, Chang Liu, Bo Li, Kimberly Lu and Dawn Song “Targeted Backdoor Attacks on Deep Learning Systems Using Data Poisoning”, 2017 arXiv: 1712.05526 [cs.CR]"
+    },
+    {
+      "n": 16,
+      "id": "biba.bibx80",
+      "text": "[Sha+18b] Ali Shafahi, W. Huang, Mahyar Najibi, Octavian Suciu, Christoph Studer, Tudor Dumitras and Tom Goldstein “Poison Frogs! Targeted Clean-Label Poisoning Attacks on Neural Networks” In Proceedings of the 32nd Conference on Neural Information Processing Systems , NeurIPS’18 Montreal, Canada: Curran Associates, Inc., 2018 URL: https://arxiv.org/abs/1804.00792"
+    },
+    {
+      "n": 17,
+      "id": "biba.bibx190",
+      "text": "[HL23a] Zayd Hammoudeh and Daniel Lowd “Reducing Certified Regression to Certified Classification for General Poisoning Attacks” In Proceedings of the 1st IEEE Conference on Secure and Trustworthy Machine Learning , SaTML’23, 2023 URL: https://arxiv.org/abs/2208.13904"
+    },
+    {
+      "n": 18,
+      "id": "biba.bibx129",
+      "text": "[Ben+21a] Emily. Bender, Timnit Gebru, Angelina McMillan-Major and Shmargaret Shmitchell “On the Dangers of Stochastic Parrots: Can Language Models Be Too Big?” In Proceedings of the 2021 ACM Conference on Fairness, Accountability, and Transparency , FAccT’21 New York, NY, USA: Association for Computing Machinery, 2021, pp. 610–623 URL: https://dl.acm.org/doi/10.1145/3442188.3445922"
+    },
+    {
+      "n": 19,
+      "id": "biba.bibx84",
+      "text": "[BCC19a] Christine Basta, Marta. Costa-jussà and Noe Casas “Evaluating the Underlying Gender Bias in Contextualized Word Embeddings” In Proceedings of the First Workshop on Gender Bias in Natural Language Processing Florence, Italy: Association for Computational Linguistics, 2019 URL: https://arxiv.org/abs/1904.08783"
+    },
+    {
+      "n": 20,
+      "id": "biba.bibx96",
+      "text": "[Kur+19a] Keita Kurita, Nidhi Vyas, Ayush Pareek, Alan Black and Yulia Tsvetkov “Measuring Bias in Contextualized Word Representations” In Proceedings of the First Workshop on Gender Bias in Natural Language Processing Association for Computational Linguistics, 2019 URL: https://arxiv.org/abs/1906.07337"
+    },
+    {
+      "n": 21,
+      "id": "biba.bibx99",
+      "text": "[TC19a] Yi Tan and L. Celis “Assessing Social and Intersectional Biases in Contextualized Word Representations” In Proceedings of the 33rd Conference on Neural Information Processing Systems , NeurIPS’19 Vancouver, Canada: Curran Associates, Inc., 2019 URL: https://arxiv.org/abs/1911.01485"
+    },
+    {
+      "n": 22,
+      "id": "biba.bibx126",
+      "text": "[Zha+20a] Haoran Zhang, Amy. Lu, Mohamed Abdalla, Matthew McDermott and Marzyeh Ghassemi “Hurtful Words: Quantifying Biases in Clinical Contextual Word Embeddings” In Proceedings of the ACM Conference on Health, Inference, and Learning , CHIL’20 New York, NY, USA: Association for Computing Machinery, 2020 DOI: 10.1145/3368555.3384448"
+    },
+    {
+      "n": 23,
+      "id": "biba.bibx115",
+      "text": "[Hut+20a] Ben Hutchinson, Vinodkumar Prabhakaran, Emily Denton, Kellie Webster, Yu Zhong and Stephen Denuyl “Social Biases in NLP Models as Barriers for Persons with Disabilities” In Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics Association for Computational Linguistics, 2020 DOI: 10.18653/v1/2020.acl-main.487"
+    },
+    {
+      "n": 24,
+      "id": "biba.bibx59",
+      "text": "[Ang+16a] Julia Angwin, Jeff Larson, Surya Mattu and Lauren Kirchner “Machine Bias” In ProPublica , 2016 URL: https://www.propublica.org/article/machine-bias-risk-assessments-in-criminal-sentencing"
+    },
+    {
+      "n": 25,
+      "id": "biba.bibx78",
+      "text": "[Lip18a] Zachary. Lipton “The Mythos of Model Interpretability: In Machine Learning, the Concept of Interpretability is Both Important and Slippery.” In Queue 16.3 New York, NY, USA: Association for Computing Machinery, 2018, pp. 31–57 URL: https://dl.acm.org/doi/10.1145/3236386.3241340"
+    },
+    {
+      "n": 26,
+      "id": "biba.bibx70",
+      "text": "[Kni17a] Will Knight “The Dark Secret at the Heart of AI” In MIT Technology Review , 2017 URL: https://www.technologyreview.com/2017/04/11/5113/the-dark-secret-at-the-heart-of-ai/"
+    },
+    {
+      "n": 27,
+      "id": "biba.bibx19",
+      "text": "[CHW82a] R. Cook, Norton Holschuh and Sanford Weisberg “A Note on an Alternative Outlier Model” In Journal of the Royal Statistical Society. Series B (Methodological) 44.3 Wiley, 1982, pp. 370–376"
+    },
+    {
+      "n": 28,
+      "id": "biba.bibx20",
+      "text": "[CW82a] R. Cook and Sanford Weisberg “Residuals and Influence in Regression” New York: ChapmanHall, 1982"
+    },
+    {
+      "n": 29,
+      "id": "biba.bibx88",
+      "text": "[GZ19a] Amirata Ghorbani and James Zou “Data Shapley: Equitable Valuation of Data for Machine Learning” In Proceedings of the 36th International Conference on Machine Learning , ICML’19, 2019 URL: https://proceedings.mlr.press/v97/ghorbani19c.html"
+    },
+    {
+      "n": 30,
+      "id": "biba.bibx91",
+      "text": "[Jia+19b] Ruoxi Jia, David Dao, Boxin Wang, Frances Hubis, Nezihe Gürel, Bo Li, Ce Zhang, Costas. Spanos and Dawn Song “Efficient Task-Specific Data Valuation for Nearest Neighbor Algorithms” In Proceedings of the VLDB Endowment , PVLDB’19, 2019 URL: https://arxiv.org/abs/1908.08619"
+    },
+    {
+      "n": 31,
+      "id": "biba.bibx191",
+      "text": "[KCC23a] Nohyun Ki, Hoyong Choi and Hye Chung “Data Valuation Without Training of a Model” In Proceedings of the 11th International Conference on Learning Representations , ICLR’23, 2023 URL: https://openreview.net/forum?id=XIzO8zr-WbM"
+    },
+    {
+      "n": 32,
+      "id": "biba.bibx193",
+      "text": "[Par+23a] Sung Park, Kristian Georgiev, Andrew Ilyas, Guillaume Leclerc and Aleksander Madry “TRAK: Attributing Model Behavior at Scale” In Proceedings of the 40th International Conference on Machine Learning , ICML’23, 2023 URL: https://arxiv.org/abs/2303.14186"
+    },
+    {
+      "n": 33,
+      "id": "biba.bibx192",
+      "text": "[NSO23a] Elisa Nguyen, Minjoon Seo and Seong Oh “A Bayesian Perspective On Training Data Attribution”, 2023 arXiv: 2305.19765 [cs.LG]"
+    },
+    {
+      "n": 34,
+      "id": "biba.bibx189",
+      "text": "[DG23a] Zheng Dai and David. Gifford “Training Data Attribution for Diffusion Models”, 2023 arXiv: 2306.02174 [stat.ML]"
+    },
+    {
+      "n": 35,
+      "id": "biba.bibx24",
+      "text": "[SR88a] Lloyd. Shapley and Alvin. Roth “The Shapley Value: Essays in Honor of Lloyd S. Shapley” Cambridge University Press, 1988"
+    },
+    {
+      "n": 36,
+      "id": "biba.bibx83",
+      "text": "[Yeh+18a] Chih“=/Kuan Yeh, Joon Kim, Ian.H. Yen and Pradeep Ravikumar “Representer Point Selection for Explaining Deep Neural Networks” In Proceedings of the 32nd Conference on Neural Information Processing Systems , NeurIPS’18 Montreal, Canada: Curran Associates, Inc., 2018 URL: https://arxiv.org/abs/1811.09720"
+    },
+    {
+      "n": 37,
+      "id": "biba.bibx120",
+      "text": "[Pru+20a] Garima Pruthi, Frederick Liu, Satyen Kale and Mukund Sundararajan “Estimating Training Data Influence by Tracing Gradient Descent” In Proceedings of the 34th Conference on Neural Information Processing Systems , NeurIPS’20 Virtual Only: Curran Associates, Inc., 2020 URL: https://arxiv.org/abs/2002.08484"
+    },
+    {
+      "n": 38,
+      "id": "biba.bibx7",
+      "text": "[Jae72a] Louis. Jaeckel “The Infinitesimal Jackknife”, 1972"
+    },
+    {
+      "n": 39,
+      "id": "biba.bibx16",
+      "text": "[Hog79a] Robert. Hogg “Statistical Robustness: One View of its Use in Applications Today” In The American Statistician 33.3 Taylor & Francis, 1979, pp. 108–115"
+    },
+    {
+      "n": 40,
+      "id": "biba.bibx30",
+      "text": "[Rou94a] Peter Rousseeuw “Least Median of Squares Regression” In Journal of the American Statistical Association 79.388 Taylor & Francis, 1994"
+    },
+    {
+      "n": 41,
+      "id": "biba.bibx87",
+      "text": "[Dev+19a] Jacob Devlin, Ming-Wei Chang, Kenton Lee and Kristina Toutanova “BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding” In Proceedings of the 2019 Conference of the North American Chapter of the Association for Computational Linguistics , ACL’19 Minneapolis, Minnesota: Association for Computational Linguistics, 2019 URL: https://arxiv.org/abs/1810.04805"
+    },
+    {
+      "n": 42,
+      "id": "biba.bibx46",
+      "text": "[KSH12a] Alex Krizhevsky, Ilya Sutskever and Geoffrey Hinton “ImageNet Classification with Deep Convolutional Neural Networks” In Proceedings of the 25th Conference on Neural Information Processing Systems , NeurIPS’12, 2012, pp. 1097–1105"
+    },
+    {
+      "n": 43,
+      "id": "biba.bibx136",
+      "text": "[Dos+21a] Alexey Dosovitskiy, Lucas Beyer, Alexander Kolesnikov, Dirk Weissenborn, Xiaohua Zhai, Thomas Unterthiner, Mostafa Dehghani, Matthias Minderer, Georg Heigold, Sylvain Gelly, Jakob Uszkoreit and Neil Houlsby “An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale” In Proceedings of the 9th International Conference on Learning Representations , ICLR’21, 2021 URL: https://arxiv.org/abs/2010.11929"
+    },
+    {
+      "n": 44,
+      "id": "biba.bibx27",
+      "text": "[BR92a] Avrim. Blum and Ronald. Rivest “Training a 3-Node Neural Network is NP-Complete” In Neural Networks 5.1 , 1992, pp. 117–127"
+    },
+    {
+      "n": 45,
+      "id": "biba.bibx181",
+      "text": "[Sch+22a] Andrea Schioppa, Polina Zablotskaia, David Torres and Artem Sokolov “Scaling Up Influence Functions” In Proceedings of the 36th AAAI Conference on Artificial Intelligence , AAAI’22, 2022 URL: https://arxiv.org/abs/2112.03052"
+    },
+    {
+      "n": 46,
+      "id": "biba.bibx112",
+      "text": "[FZ20a] Vitaly Feldman and Chiyuan Zhang “What Neural Networks Memorize and Why: Discovering the Long Tail via Influence Estimation” In Proceedings of the 34th Conference on Neural Information Processing Systems , NeurIPS’20 Virtual Only: Curran Associates, Inc., 2020 URL: https://arxiv.org/abs/2008.03703"
+    },
+    {
+      "n": 47,
+      "id": "biba.bibx133",
+      "text": "[Che+21a] Yuanyuan Chen, Boyang Li, Han Yu, Pengcheng Wu and Chunyan Miao “HyDRA: Hypergradient Data Relevance Analysis for Interpreting Deep Neural Networks” In Proceedings of the 35th AAAI Conference on Artificial Intelligence , AAAI’21 Virtual Only: Association for the Advancement of Artificial Intelligence, 2021 URL: https://arxiv.org/abs/2102.02515"
+    },
+    {
+      "n": 48,
+      "id": "biba.bibx81",
+      "text": "[Sha+18c] Boris Sharchilev, Yury Ustinovskiy, Pavel Serdyukov and Maarten de Rijke “Finding Influential Training Samples for Gradient Boosted Decision Trees” In Proceedings of the 35th International Conference on Machine Learning , ICML’18 PMLR, 2018, pp. 4577–4585 URL: https://arxiv.org/abs/1802.06640"
+    },
+    {
+      "n": 49,
+      "id": "biba.bibx188",
+      "text": "[BHL23a] Jonathan Brophy, Zayd Hammoudeh and Daniel Lowd “Adapting and Evaluating Influence-Estimation Methods for Gradient-Boosted Decision Trees” In Journal of Machine Learning Research 24 , 2023, pp. 1–48 URL: https://arxiv.org/abs/2205.00359"
+    },
+    {
+      "n": 50,
+      "id": "biba.bibx200",
+      "text": "[Yan+23a] Shuo Yang, Zeke Xie, Hanyu Peng, Min Xu, Mingming Sun and Ping Li “Dataset Pruning: Reducing Training Data by Examining Generalization Influence” In Proceedings of the 11th International Conference on Learning Representations , ICLR’23, 2023 URL: https://arxiv.org/abs/2205.09329"
+    },
+    {
+      "n": 51,
+      "id": "biba.bibx65",
+      "text": "[BLK17a] Olivier Bachem, Mario Lucic and Andreas Krause “Practical Coreset Constructions for Machine Learning”, 2017 arXiv: 1703.06476 [stat.ML]"
+    },
+    {
+      "n": 52,
+      "id": "biba.bibx110",
+      "text": "[Fel20b] Dan Feldman “Introduction to Core-sets: an Updated Survey”, 2020 arXiv: 2011.09384 [cs.LG]"
+    },
+    {
+      "n": 53,
+      "id": "biba.bibx152",
+      "text": "[Ren+21a] Pengzhen Ren, Yun Xiao, Xiaojun Chang, Po-Yao Huang, Zhihui Li, Brij. Gupta, Xiaojiang Chen and Xin Wang “A Survey of Deep Active Learning” In ACM Computing Surveys 54.9 New York, NY, USA: Association for Computing Machinery, 2021 URL: https://arxiv.org/abs/2009.00236"
+    },
+    {
+      "n": 54,
+      "id": "biba.bibx58",
+      "text": "[WIB15a] Kai Wei, Rishabh Iyer and Jeff Bilmes “Submodularity in Data Subset Selection and Active Learning” In Proceedings of the 32nd International Conference on Machine Learning , ICML’15 Lille, France: PMLR, 2015 URL: https://proceedings.mlr.press/v37/wei15.html"
+    }
+  ]
+}

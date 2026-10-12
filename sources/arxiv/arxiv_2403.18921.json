@@ -1,0 +1,95 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.18921",
+  "title": "SMOF: Streaming Modern CNNs on FPGAs with Smart Off-Chip Eviction",
+  "authors": "Petros Toupas, Zhewen Yu, Christos-Savvas Bouganis, Dimitrios Tzovaras",
+  "year": "2024",
+  "categories": [
+    "cs.AR",
+    "cs.CV",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2403.18921",
+  "html_url": "https://arxiv.org/html/2403.18921",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 535,
+  "text": "Convolutional Neural Networks (CNNs) have been applied to a wide range of applications, and they are especially successful in dealing with vision tasks such as image classification, object detection, and semantic segmentation. Due to their computational intensity, a large amount of work has been done to accelerate CNNs in hardware, with Field-Programmable Gate Arrays (FPGA) devices serving as a high-performing and energy-efficient platform of choice.\n\nIn the realm of mapping CNNs to FPGAs, there are two alternatives. The first one involves building a unified accelerator architecture, embracing the concept of “one-fits-all” to minimise the engineering effort of re-development [1,2]. The second approach entails building a streaming dataflow architecture, by customising a layerwise pipeline for each specific workload. In this work, we focus on the design of the streaming architecture which is often the preferred choice under a fixed model workload.\n\nTo facilitate the end-to-end deployment of streaming architectures, toolflows such as fpgaConvNet [3], FINN [4], hls4ml [5] and HPIPE [6] have been developed, that generate HLS or RTL designs from high-level network descriptions (Tensorflow, PyTorch, ONNX). In terms of memory storage, the common practice employed in these toolflows involves confining most data movements within the FPGA chip [4,3]. This practice entails storing weights statically on-chip in a read-only format, while activations are transferred between layers employing FIFOs with handshake interfaces. However, as networks expand to accommodate millions of parameters and complex skip connections, scaling this approach becomes a challenging task. For example, the UNet model [7], a popular benchmark utilised in semantic segmentation, has a significant operation count at 130.1G. Moreover, UNet contains lengthy hierarchical branch connections, which require the extensive placement of FIFOs to synchronise data streams across its branching structure. Similar model characteristics and specifics are encountered in YOLO [8], X3D [9] and many other models across various domains.\n\nIn fact, existing streaming architectures primarily concentrate on the optimisation of computation engines and on-chip memory resources. Off-chip memory is mainly utilised for transferring data at the input and output pipeline stages, prohibiting the utilisation of existing toolflows when on-chip memory requirements exceed the available resources. As such, existing streaming architectures are often limited by the on-chip memory, while leaving off-chip memory underutilised.\n\nIn this paper, we introduce a groundbreaking memory optimisation methodology that systematically considers the allocation and utilisation of both on-chip and off-chip memory within a layerwise pipelined, streaming architecture. Our contributions extend beyond conventional approaches, aiming to address the limitations encountered in scaling networks with substantial numbers of parameters and intricate connections that require excessive buffering. Our key contributions are:\n\n- • We propose the first streaming CNN accelerator that can partially offload weights and activations to the off-chip memory, without stalling the computation pipeline.\n\n- • We introduce a subgraph-based partitioning methodology offering the latency-throughput design trade-off, by exploiting the device reconfigurability of FPGAs.\n\n- • We propose a Design Space Exploration (DSE) methodology that relies on a greedy and iterative optimisation algorithm to automatically explore and determine the optimal memory and partitioning configuration.\n\n- • We accelerate a wide range of CNN benchmarks on a diverse spectrum of computer vision tasks using the proposed methodology, demonstrating competitive and even state-of-the-art performance, particularly on networks with complex, hierarchical skip connections.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "V. Gokhale, A. Zaidy, A. X. M. Chang, and E. Culurciello, “Snowflake: A model agnostic accelerator for deep convolutional neural networks,” arXiv preprint arXiv:1708.02579 , 2017."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "K. Guo, L. Sui, J. Qiu, J. Yu, J. Wang, S. Yao, S. Han, Y. Wang, and H. Yang, “Angel-eye: A complete design flow for mapping cnn onto embedded fpga,” IEEE transactions on computer-aided design of integrated circuits and systems , vol. 37, no. 1, pp. 35–47, 2017."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "S. I. Venieris and C. S. Bouganis, “FpgaConvNet: Mapping Regular and Irregular Convolutional Neural Networks on FPGAs,” IEEE Transactions on Neural Networks and Learning Systems , vol. 30, no. 2, 2019."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "Y. Umuroglu, N. J. Fraser, G. Gambardella, M. Blott, P. Leong, M. Jahre, and K. Vissers, “Finn: A framework for fast, scalable binarized neural network inference,” in Proceedings of the 2017 ACM/SIGDA international symposium on field-programmable gate arrays , 2017, pp. 65–74."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "F. Fahim, B. Hawks, C. Herwig, J. Hirschauer, S. Jindariani, N. Tran, L. P. Carloni, G. Di Guglielmo, P. Harris, J. Krupa et al. , “hls4ml: An open-source codesign workflow to empower scientific low-power machine learning devices,” arXiv preprint arXiv:2103.05579 , 2021."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "M. Hall and V. Betz, “From tensorflow graphs to luts and wires: Automated sparse and physically aware cnn hardware generation,” in 2020 International Conference on Field-Programmable Technology (ICFPT) . IEEE, 2020, pp. 56–65."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "O. Ronneberger, P. Fischer, and T. Brox, “U-net: Convolutional networks for biomedical image segmentation,” in Medical Image Computing and Computer-Assisted Intervention–MICCAI 2015: 18th International Conference, Munich, Germany, October 5-9, 2015, Proceedings, Part III 18 . Springer, 2015, pp. 234–241."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "J. Redmon, S. Divvala, R. Girshick, and A. Farhadi, “You only look once: Unified, real-time object detection,” in Proceedings of the IEEE conference on computer vision and pattern recognition , 2016, pp. 779–788."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "C. Feichtenhofer, “X3D: Expanding Architectures for Efficient Video Recognition,” in IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2020."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "J. Fowers, K. Ovtcharov, M. Papamichael, T. Massengill, M. Liu, D. Lo, S. Alkalay, M. Haselman, L. Adams, M. Ghandi et al. , “A configurable cloud-scale dnn processor for real-time ai,” in 2018 ACM/IEEE 45th Annual International Symposium on Computer Architecture (ISCA) . IEEE, 2018, pp. 1–14."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "J. Shen, Y. Huang, Z. Wang, Y. Qiao, M. Wen, and C. Zhang, “Towards a uniform template-based architecture for accelerating 2d and 3d cnns on fpga,” in Proceedings of the 2018 ACM/SIGDA International Symposium on Field-Programmable Gate Arrays , 2018, pp. 97–106."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "S. Liu, H. Fan, X. Niu, H.-c. Ng, Y. Chu, and W. Luk, “Optimizing cnn-based segmentation with deeply customized convolutional and deconvolutional architectures on fpga,” ACM Transactions on Reconfigurable Technology and Systems (TRETS) , vol. 11, no. 3, pp. 1–22, 2018."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "V. Kathail, “Xilinx vitis unified software platform,” in Proceedings of the 2020 ACM/SIGDA International Symposium on Field-Programmable Gate Arrays , 2020, pp. 173–174."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "Y. Wang, J. Xu, Y. Han, H. Li, and X. Li, “Deepburning: Automatic generation of fpga-based learning accelerators for the neural network family,” in Proceedings of the 53rd Annual Design Automation Conference , 2016, pp. 1–6."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "X. Zhang, J. Wang, C. Zhu, Y. Lin, J. Xiong, W.-m. Hwu, and D. Chen, “Dnnbuilder: An automated tool for building high-performance dnn hardware accelerators for fpgas,” in 2018 IEEE/ACM International Conference on Computer-Aided Design (ICCAD) . IEEE, 2018, pp. 1–8."
+    }
+  ]
+}

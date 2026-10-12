@@ -1,0 +1,158 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.18999",
+  "title": "Deciding Boolean Separation Logic via Small Models (Technical Report)",
+  "authors": "TomÃ¡Å¡ DacÃ­k, Adam Rogalewicz, TomÃ¡Å¡ Vojnar, Florian Zuleger",
+  "year": "2024",
+  "categories": [
+    "cs.LO"
+  ],
+  "url": "https://arxiv.org/abs/2403.18999",
+  "html_url": "https://arxiv.org/html/2403.18999",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 993,
+  "text": "In the last decade, separation logic (SL) [1,2] has become one of the most popular formalisms for reasoning about programs working with dynamically-allocated memory, including approaches based on deductive verification [3], abstract interpretation [4], symbolic execution [5], or bi-abductive analysis [6,7,8]. The key ingredients of SL used in these approaches include the separating conjunction *, which allows modular reasoning by stating that the program heap can be decomposed into disjoint parts satisfying operands of the separating conjunction, along with inductive predicates describing shapes of data structures, such as lists, trees, or their various combinations.\n\nThe high expressive power of SL comes with the price of high complexity and even undecidability when several of its features are combined together. The existing decision procedures are usually limited to the so-called symbolic heap fragment that disallows any boolean structure of spatial assertions.\n\nIn this paper, we present a novel decision procedure for a fragment of SL that we call boolean separation logic (BSL). The fragment allows arbitrary nesting of separating conjunctions and boolean connectives of conjunction, disjunction, and a limited form of negation of the form \\varphi\\land\\neg\\psi called guarded negation. To the best of our knowledge, no existing, practically applicable decision procedure supports a fragment with such a rich boolean structure and at least basic inductive predicates. The decision procedure for SL in cvc5 [9] supports arbitrary nesting of boolean connectives (including even unguarded negation, which is considered very expensive in the context of SL) but no inductive predicates. A support for conjunctions and disjunctions under separating conjunctions is available in the backend solver of the GRASShopper verifier [10,11] though not described in the papers. In our experimental evaluation, we outperform both of these approaches on some benchmarks (and can decide some formulae beyond the capabilities of both of them). We further show that adding guarded negations to BSL makes its satisfiability problem \\mathsf{PSPACE} -hard.\n\nTo motivate the usefulness of the fragment we consider, we now give several examples when SL formulae with a rich boolean structure are useful. First, in symbolic execution of heap manipulating programs, one usually needs to consider functions that involve some non-determinism—typically, at least the malloc statement has the non-deterministic contract \\{\\mathsf{emp}\\}\\;\\texttt{x = malloc()}\\;\\{x\\mapsto f\\lor(x=\\mathsf{nil}\\land\\mathsf{emp})\\} (where f is a fresh variable) stating that when the statement is started in the empty heap, once it finishes, x is either allocated, or the allocation had failed and the heap is empty. Such contracts typically need a dedicated (and usually incomplete) treatment when no support of disjunctions is available. Further, the guarded negation semantically represents the set of counterexamples of the entailment \\varphi\\models\\psi, and hence allows one to reduce entailment queries to UNSAT checking. Guarded negation can also be used when one needs to obtain several models of a formula \\varphi by joining formulae representing the already obtained models to \\varphi using guarded negations. One can also use the guarded negation to express interesting properties such as the fact that given a list \\mathsf{sls}(x,y) and a pointer y\\mapsto z, the pointer does not point back somewhere into the list closing a lasso. This can be expressed through the formula \\bigl(\\mathsf{sls}(x,y)\\land\\neg\\bigl(\\mathsf{sls}(x,z)\\ast\\mathsf{sls}(z,y)\\bigr)\\bigr)\\ast y\\mapsto z. Finally, boolean connectives can be introduced by translating quantitative separation logic into the classical SL [12].\n\nIn this work, we consider BSL with three fixed, built-in inductive predicates representing the most-common variants of lists: singly-linked (SLL), doubly-linked (DLL), and nested singly-linked (NLL). Our results can be easily extended for their variations such as nested doubly-linked lists of singly-linked lists and the like, but for the price of manually defining their semantics in the SMT encoding. We do, however, believe that our approach of bounding the sizes of models and instantiations of the individual predicates can be lifted to more complex inductive definitions and can serve as a starting point for allowing integration of SL with inductive definitions into SMT.\n\n## Contributions.\n\nOur approach to deciding BSL formulae is inspired by previous works on translation of SL to SMT. The early works [10] and [11] translate SL to intermediate theories first. Our approach is closer to the more recent approach of [13], which builds on small-model properties and axiomatizes reachability through pointer links directly. We extend the SL fragment considered in [13] by going beyond the so-called unique footprint property (under which it is much easier to obtain an efficient translation). Further, we define a more precise way to obtain global bounds on models of entire formulae, and, most importantly, we modify the translation of inductive predicates in a way that allows us to encode them succinctly by computing local bounds on their instantiations. According to our experiments, this makes the decision procedure efficient and competitive with the state-of-the-art approaches on the symbolic heap fragment (despite the increased decisive power).\n\n## Related work.\n\nIn [14], a proof system for deciding entailments of symbolic heaps with lists was proposed. This problem was later shown to be solvable in polynomial time in [15] via graph homomorphism checking. A superposition-based calculus for the fragment was presented in [16], and a model-based approach enhancing SMT solvers was proposed in [17]. In [17], a combination of SL with SMT theories is considered but still limited to the symbolic heap fragment. A more expressive boolean structure and integration with SMT theories was developed in [10] for lists and extended for trees in [11] but still without a support for guarded negations.\n\nOther decision procedures are focusing on more general, user-defined inductive predicates (usually of some restricted form). They are based, e.g., on cyclic proof systems (Cyclist [18], S2S [19,20]); lemma synthesis (Songbird [21]); or automata—tree automata are used in the tools Slide [22] and Spen [23], and a specialised type of automata, called heap automata, is used in Harrsh [24]. These procedures do, however, not support nested use of boolean connectives and separating conjunctions.\n\nThere also exist works on deciding much more expressive fragments of SL such as [25,26,27,28] but they do not lead to practically implementable decision procedures.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib29",
+      "text": "Reynolds, J.: Separation Logic: A Logic for Shared Mutable Data Structures. In: Proceedings 17th Annual IEEE Symposium on Logic in Computer Science (2002)"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib14",
+      "text": "Ishtiaq, S., O’Hearn, P.: Separation and Information Hiding. In: Proc. of POPL’01. ACM (2001)"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib31",
+      "text": "Summers, A.J., Müller, P.: Automating deductive verification for weak-memory programs (extended version). Int. J. Softw. Tools Technol. Transf. 22 (6), 709–728 (2020). https://doi.org/10.1007/s10009-020-00559-y"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib33",
+      "text": "Yang, H., Lee, O., Berdine, J., Calcagno, C., Cook, B., Distefano, D., O’Hearn, P.: Scalable Shape Analysis for Systems Code. In: Proc. of CAV’08. LNCS, vol. 5123. Springer (2008)"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib30",
+      "text": "Santos, J., Maksimovic, P., Ayoun, S.E., Gardner, P.: Gillian, Part I: A Multi-Language Platform for Symbolic Execution. In: Proc. of PLDI’20. ACM (2020)"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "Calcagno, C., Distefano, D., O’Hearn, P., Yang, H.: Compositional Shape Analysis by Means of Bi-Abduction. Journal of the ACM 58 (6) (2011)"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib17",
+      "text": "Le, Q.L., Gherghina, C., Qin, S., Chin, W.N.: Shape Analysis via Second-Order Bi-Abduction. In: Proc. of CAV’14. LNCS, vol. 8559. Springer (2014)"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib11",
+      "text": "Holík, L., Peringer, P., Rogalewicz, A., Šoková, V., Vojnar, T., Zuleger, F.: Low-level bi-abduction. In: ECOOP 2022. LIPIcs, vol. 222, pp. 19:1–19:30 (2022)"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib28",
+      "text": "Reynolds, A., Iosif, R., King, T.: A Decision Procedure for Separation Logic in SMT. In: ATVA (2016)"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib26",
+      "text": "Piskac, R., Wies, T., Zufferey, D.: Automating Separation Logic Using SMT. In: CAV (2013)"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib27",
+      "text": "Piskac, R., Wies, T., Zufferey, D.: Automating Separation Logic with Trees and Data. In: CAV (2014)"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib2",
+      "text": "Batz, K., Fesefeldt, I., Jansen, M., Katoen, J.P., Keßler, F., Matheja, C., Noll, T.: Foundations for Entailment Checking in Quantitative Separation Logic. In: ESOP (2022)"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib15",
+      "text": "Katelaan, J., Jovanovic, D., Weissenbacher, G.: A Separation Logic with Data: Small Models and Automation. In: IJCAR (2018)"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib3",
+      "text": "Berdine, J., Calcagno, C., O’Hearn, P.W.: A Decidable Fragment of Separation Logic. In: FSTTCS 2004. LNCS, vol. 3328 (2004)"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib8",
+      "text": "Cook, B., Haase, C., Ouaknine, J., Parkinson, M., Worrell, J.: Tractable Reasoning in a Fragment of Separation Logic. In: CONCUR. LNCS, vol. 3901 (2011)"
+    },
+    {
+      "n": 16,
+      "id": "bib.bib22",
+      "text": "Navarro Pérez, J.A., Rybalchenko, A.: Separation Logic + Superposition Calculus = Heap Theorem Prover. In: PLDI (2011)"
+    },
+    {
+      "n": 17,
+      "id": "bib.bib23",
+      "text": "Navarro Pérez, J.A., Rybalchenko, A.: Separation Logic Modulo Theories. In: APLAS. LNCS, vol. 8301 (2013)"
+    },
+    {
+      "n": 18,
+      "id": "bib.bib5",
+      "text": "Brotherston, J., Gorogiannis, N., Petersen, R.L.: A Generic Cyclic Theorem Prover. In: APLAS. LNCS, vol. 7705 (2012)"
+    },
+    {
+      "n": 19,
+      "id": "bib.bib18",
+      "text": "Le, Q.L.: Compositional Satisfiability Solving in Separation Logic. In: VMCAI. LNCS, vol. 12597 (2021)"
+    },
+    {
+      "n": 20,
+      "id": "bib.bib19",
+      "text": "Le, Q.L., Le, X.B.D.: An Efficient Cyclic Entailment Procedure in a Fragment of Separation Logic. In: FoSSaCS (2023)"
+    },
+    {
+      "n": 21,
+      "id": "bib.bib32",
+      "text": "Ta, Q.T., Le, T.C., Khoo, S.C., Chin, W.N.: Automated Lemma Synthesis in Symbolic-Heap Separation Logic. In: POPL (2018)"
+    },
+    {
+      "n": 22,
+      "id": "bib.bib12",
+      "text": "Iosif, R., Rogalewicz, A., Vojnar, T.: Deciding Entailments in Inductive Separation Logic with Tree Automata. In: ATVA (2014)"
+    },
+    {
+      "n": 23,
+      "id": "bib.bib10",
+      "text": "Enea, C., Lengál, O., Sighireanu, M., Vojnar, T.: Compositional Entailment Checking for a Fragment of Separation Logic. In: APLAS (2014)"
+    },
+    {
+      "n": 24,
+      "id": "bib.bib16",
+      "text": "Katelaan, J., Matheja, C., Noll, T., Zuleger, F.: Harrsh: A Tool for Unied Reasoning about Symbolic-Heap Separation Logic. In: LPAR-22 Workshop and Short Paper Proceedings. vol. 9 (2018)"
+    },
+    {
+      "n": 25,
+      "id": "bib.bib9",
+      "text": "Echenim, M., Iosif, R., Peltier, N.: The Bernays-Schönfinkel-Ramsey Class of Separation Logic with Uninterpreted Predicates. ACM Transactions on Computational Logic 21 (2019)"
+    },
+    {
+      "n": 26,
+      "id": "bib.bib20",
+      "text": "Matheja, C., Pagel, J., Zuleger, F.: A Decision Procedure for Guarded Separation Logic Complete Entailment Checking for Separation Logic with Inductive Definitions. ACM Trans. Comput. Logic 24 (1) (2023)"
+    },
+    {
+      "n": 27,
+      "id": "bib.bib25",
+      "text": "Pagel, J., Zuleger, F.: Strong-separation logic. ACM Trans. Program. Lang. Syst. 44 (3), 16:1–16:40 (2022). https://doi.org/10.1145/3498847, https://doi.org/10.1145/3498847"
+    },
+    {
+      "n": 28,
+      "id": "bib.bib13",
+      "text": "Iosif, R., Zuleger, F.: Expressiveness results for an inductive logic of separated relations. In: Pérez, G.A., Raskin, J. (eds.) CONCUR. LIPIcs, vol. 279, pp. 20:1–20:20 (2023). https://doi.org/10.4230/LIPICS.CONCUR.2023.20, https://doi.org/10.4230/LIPIcs.CONCUR.2023.20"
+    }
+  ]
+}

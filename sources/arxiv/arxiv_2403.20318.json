@@ -1,0 +1,129 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.20318",
+  "title": "SeaBird: Segmentation in Bird's View with Dice Loss Improves Monocular 3D Detection of Large Objects",
+  "authors": "Abhinav Kumar, Yuliang Guo, Xinyu Huang, Liu Ren, Xiaoming Liu",
+  "year": "2024",
+  "categories": [
+    "cs.CV",
+    "cs.AI"
+  ],
+  "url": "https://arxiv.org/abs/2403.20318",
+  "html_url": "https://arxiv.org/html/2403.20318",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 853,
+  "text": "Monocular 3 D object detection (Mono3D) task aims to estimate both the 3 D position and dimensions of objects in a scene from a single image. Its applications span autonomous driving [1,2,3], robotics [4], and augmented reality [5,6,7,8], where accurate 3 D understanding of the environment is crucial. Our study focuses explicitly on 3 D object detectors applied to autonomous vehicles (AVs), considering the challenges and motivations deviate drastically across different applications.\n\nAVs demand object detectors that generalize to diverse intrinsics [9], camera-rigs [10,11], rotations [12], weather and geographical conditions [13] and also are robust to adversarial examples [14]. Since each of these poses a significant challenge, recent works focus exclusively on the generalization of object detectors to all these out-of-distribution shifts. However, our focus is on the generalization of another type, which, thus far, has been understudied in the literature – Mono3D generalization to large objects.\n\nLarge objects like trailers, buses and trucks are harder to detect [15] in Mono3D, sometimes resulting in fatal accidents [16,17]. Some attribute these failures to training data scarcity [18] or the receptive field requirements [15] of large objects, but, to the best of our knowledge, no existing literature provides a comprehensive analytical explanation for this phenomenon. The goal of this paper is, thus, to bring understanding and a first analytical approach to this real-world problem in the AV space – Mono3D generalization to large objects.\n\nWe conjecture that the generalization issue stems not only from limited training data or larger receptive field but also from the noise sensitivity of depth regression losses in Mono3D. To substantiate our argument, we analyze the Mono3D performance of state-of-the-art (SoTA) frontal detectors on the KITTI-360 dataset [19], which includes almost equal number (1\\!:\\!2) of large objects and cars. We observe that SoTA detectors struggle with large objects on this dataset (Fig. 1 a). Next, we carefully investigate the SGD convergence of losses used in Mono3D task and mathematically prove that the dice loss, widely used in BEV segmentation, exhibits superior noise-robustness than the regression losses, particularly for large objects (Fig. 1 c). Thus, the dice loss facilitates better model convergence than regression losses, improving Mono3D of large objects.\n\nIncorporating dice loss in detection introduces unique challenges. Firstly, the dice loss does not apply to sparse detection centers and only incorporates depth information when used in the BEV space. Secondly, naive joint training of Mono3D and BEV segmentation tasks with image inputs does not always benefit Mono3D task [3,20] due to negative transfer [21], and the underlying reasons remain unclear. Fortunately, many Mono3D segmentors and detectors are in the BEV space, where the BEV segmentor can seamlessly apply dice loss and the BEV detector can readily benefit from the segmentor in the same space. To mitigate negative transfer, we find it effective to train the BEV segmentation head on the foreground detection categories.\n\nBuilding upon our theoretical findings about the dice loss, we propose a simple and effective pipeline called Segmentation in Bird’s View (SeaBird) for enhancing Mono3D of large objects. SeaBird employs a sequential approach for the BEV segmentation and Mono3D heads (Fig. 2). SeaBird first utilizes a BEV segmentation head to predict the segmentation of only foreground objects, supervised by the dice loss. The dice loss offers superior noise-robustness for large objects, ensuring stable convergence, while focusing on foreground objects in segmentation mitigates negative transfer. Subsequently, SeaBird concatenates the resulting BEV segmentation map with the original BEV features as an additional feature channel and feeds this concatenated feature to a Mono3D head supervised by Mono3D losses. Building upon this, we adopt a two-stage training pipeline: the first stage exclusively focuses on training the BEV segmentation head with dice loss, which fully exploits its noise-robustness and superior convergence in localizing large objects. The second stage involves both the detection loss and dice loss to finetune the Mono3D head.\n\nIn our experiments, we first comprehensively evaluate SeaBird and conduct ablations on the balanced single-camera KITTI-360 dataset [19]. SeaBird outperforms the SoTA baselines by a substantial margin. Subsequently, we integrate SeaBird as a plug-in-and-play module into two SoTA detectors on the multi-camera nuScenes dataset [22]. SeaBird again significantly improves the original detectors, particularly on large objects. Additionally, SeaBird consistently enhances Mono3D performance across backbones with those two SoTA detectors (Fig. 1 b), demonstrating its utility in both edge and cloud deployments.\n\nIn summary, we make the following contributions:\n\n- • We highlight the understudied problem of generalization to large objects in Mono3D, showing that even on nearly balanced datasets, SoTA frontal models struggle to generalize due to the noise sensitivity of regression losses.\n\n- • We mathematically prove that the dice loss leads to superior noise-robustness and model convergence for large objects compared to regression losses for a simplified case and provide empirical support for more general settings.\n\n- • We propose SeaBird, which treats BEV segmentation head on foreground objects and Mono3D head sequentially and trains in a two-stage protocol to fully harness the noise-robustness of the dice loss.\n\n- • We empirically validate our theoretical findings and show significant improvements, particularly for large objects, on both KITTI-360 and nuScenes leaderboards.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib74",
+      "text": "Dennis Park, Rares Ambrus, Vitor Guizilini, Jie Li, and Adrien Gaidon. Is Pseudo-LiDAR needed for monocular 3 3 D object detection? In ICCV , 2021."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib43",
+      "text": "Abhinav Kumar, Garrick Brazil, Enrique Corona, Armin Parchami, and Xiaoming Liu. DEVIANT: Depth Equivariant Network for monocular 3 3 D object detection. In ECCV , 2022."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib50",
+      "text": "Zhiqi Li, Wenhai Wang, Hongyang Li, Enze Xie, Chonghao Sima, Tong Lu, Yu Qiao, and Jifeng Dai. BEVFormer: Learning bird’s-eye-view representation from multi-camera images via spatiotemporal transformers. In ECCV , 2022b."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib84",
+      "text": "Ashutosh Saxena, Justin Driemeyer, and Andrew Ng. Robotic grasping of novel objects using vision. IJRR , 2008."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib1",
+      "text": "Hassan Alhaija, Siva Mustikovela, Lars Mescheder, Andreas Geiger, and Carsten Rother. Augmented reality meets computer vision: Efficient data generation for urban driving scenes. IJCV , 2018."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib110",
+      "text": "Xiang Yu, Tanner Schmidt, Venkatraman Narayanan, and Dieter Fox. PoseCNN: A convolutional neural network for 6 6 D object pose estimation in cluttered scenes. In RSS , 2018."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib76",
+      "text": "Kiru Park, Timothy Patten, and Markus Vincze. Pix2Pose: Pixel-wise coordinate regression of objects for 6 6 D pose estimation. In ICCV , 2019."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib70",
+      "text": "Nathaniel Merrill, Yuliang Guo, Xingxing Zuo, Xinyu Huang, Stefan Leutenegger, Xi Peng, Liu Ren, and Guoquan Huang. Symmetry and uncertainty-aware object SLAM for 6 6 DoF object pose estimation. In CVPR , 2022."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib6",
+      "text": "Garrick Brazil, Abhinav Kumar, Julian Straub, Nikhila Ravi, Justin Johnson, and Georgia Gkioxari. Omni3D: A large benchmark and model for 3 3 D object detection in the wild. In CVPR , 2023."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib35",
+      "text": "Jinrang Jia, Zhenjia Li, and Yifeng Shi. MonoUNI: A unified vehicle and infrastructure-side monocular 3 3 D object detection network with sufficient depth clues. In NeurIPS , 2023."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib39",
+      "text": "Tzofi Klinghoffer, Jonah Philion, Wenzheng Chen, Or Litany, Zan Gojcic, Jungseock Joo, Ramesh Raskar, Sanja Fidler, and Jose Alvarez. Towards viewpoint robustness in Bird’s Eye View segmentation. In ICCV , 2023."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib72",
+      "text": "SungHo Moon, JinWoo Bae, and SungHoon Im. Rotation matters: Generalized monocular 3 3 D object detection for various camera systems. arXiv preprint arXiv:2310.05366 , 2023."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib21",
+      "text": "Yinpeng Dong, Caixin Kang, Jinlai Zhang, Zijian Zhu, Yikai Wang, Xiao Yang, Hang Su, Xingxing Wei, and Jun Zhu. Benchmarking robustness of 3 3 D object detection to common corruptions. In CVPR , 2023."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib120",
+      "text": "Zijian Zhu, Yichi Zhang, Hai Chen, Yinpeng Dong, Shu Zhao, Wenbo Ding, Jiachen Zhong, and Shibao Zheng. Understanding the robustness of 3 3 D object detection with bird’s-eye-view representations in autonomous driving. In CVPR , 2023."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib102",
+      "text": "Chen Wu. Waymo keynote talk, CVPR workshop on autonomous driving at 17:20. https://www.youtube.com/watch?v=fXsbI2VkHgc , 2023. Accessed: 2023-11-11."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib8",
+      "text": "Brittany Caldwell. 2 die when tesla crashes into parked tractor-trailer in florida. https://www.wftv.com/news/local/2-die-when-tesla-crashes-into-parked-tractor-trailer-florida/KJGMHHYTQZA2HNAHWL2OFSVIPM/ , 2022. Accessed: 2023-11-06."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib24",
+      "text": "Roshan Fernandez. A tesla driver was killed after smashing into a firetruck on a california highway. https://www.npr.org/2023/02/20/1158367204/tesla-driver-killed-california-firetruck-nhtsa , 2023. Accessed: 2023-11-06."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib119",
+      "text": "Benjin Zhu, Zhengkai Jiang, Xiangxin Zhou, Zeming Li, and Gang Yu. Class-balanced grouping and sampling for point cloud 3 3 D object detection. In CVPR Workshop , 2019."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib52",
+      "text": "Yiyi Liao, Jun Xie, and Andreas Geiger. KITTI-360: A novel dataset and benchmarks for urban scene understanding in 2 2 D and 3 3 D. TPAMI , 2022."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib69",
+      "text": "Yuexin Ma, Tai Wang, Xuyang Bai, Huitong Yang, Yuenan Hou, Yaming Wang, Yu Qiao, Ruigang Yang, Dinesh Manocha, and Xinge Zhu. Vision-centric BEV perception: A survey. arXiv preprint arXiv:2208.02797 , 2022."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib19",
+      "text": "Michael Crawshaw. Multi-task learning with deep neural networks: A survey. arXiv preprint arXiv:2009.09796 , 2020."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib7",
+      "text": "Holger Caesar, Varun Bankiti, Alex Lang, Sourabh Vora, Venice Liong, Qiang Xu, Anush Krishnan, Yu Pan, Giancarlo Baldan, and Oscar Beijbom. nuScenes: A multimodal dataset for autonomous driving. In CVPR , 2020."
+    }
+  ]
+}

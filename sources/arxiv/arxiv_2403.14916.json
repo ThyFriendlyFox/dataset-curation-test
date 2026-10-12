@@ -1,0 +1,73 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.14916",
+  "title": "Snail: Secure Single Iteration Localization",
+  "authors": "James Choncholas, Pujith Kachana, AndrÃ© Mateus, Gregoire Phillips, Ada Gavrilovska",
+  "year": "2024",
+  "categories": [
+    "cs.CR"
+  ],
+  "url": "https://arxiv.org/abs/2403.14916",
+  "html_url": "https://arxiv.org/html/2403.14916",
+  "license": "http://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Introduction",
+  "word_count": 744,
+  "text": "Visual localization algorithms allow devices to infer their position in a three-dimensional map from features derived from images. Popular applications include autonomous vehicles, virtual reality, and robotics where a device with a camera is moving through an environment and localizing repeatedly on camera frames to infer its position and orientation over time [1,2,3].\n\nIncorporating privacy into visual localization is an active area of research. Consider a lightweight robot equipped with a camera. Privacy preserving localization allows the robot to offload the localization task to more powerful resources without revealing its location, its map, or images taken by its camera. Offloading conserves onboard power and frees resources for other tasks. Privacy is important in this setting because the robot may inadvertently take pictures of sensitive information, or people who do not want their picture taken. Ethical or legal requirements may prevent the images from being shared outside the device domain. Privacy preserving localization also enables settings when the map and camera image are held by different parties, or when both are held by the same party who is trying to prevent data exfiltration by requiring an attacker to compromise multiple systems simultaneously. While technologies have emerged to make privacy preserving localization more efficient, none make formal security statements and many of the claimed security properties have been broken [4,5,6,7].\n\nPrevious attempts at secure localization rely on techniques based on obfuscation, like line cloud transformations [4] and adversarial affine subspace embeddings [5]. Such obfuscation-based techniques do not make formal security statements, but they have low overhead and run efficiently. Consequently, these techniques have been shown to be vulnerable to attacks which can recover the input image [8,9]. Recently, differential privacy has been used to address one such attack however privacy is inversely related to the amount of data processed sequentially [9]. While this is appropriate for some applications, it is not appropriate for repeated invocation, common when localizing on sequential camera frames.\n\nAs recent innovation demonstrates, applying privacy-preserving techniques to visual localization that prioritize efficiency over formal security guarantees leaves weaknesses in the protection these techniques afford. At the same time, general purpose secure computation can present performance obstacles with high computation overhead and communication costs. Localization is not well suited to execution under homomorphic encryption due to the algorithm’s high multiplicative depth, heavy use of division, and requirement for floating point data representation. Garbled circuits are a better fit for localization, however they are communication intensive. What is needed is a co-design approach that meets privacy expectations with practical efficiency.\n\nIn this work, we investigate privacy preserving visual localization using secure multi-party computation (MPC). We first develop a data-oblivious implementation in which we run a standard visual localization algorithm under MPC based on non-linear optimization. This provides the first known implementation of visual localization with formal security guarantees drawn from general purpose secure computation. While secure, this naïve approach has inefficiencies which stem from the iterative nature of localization algorithms. The popular localization approach we consider (minimizing reprojection error via non-linear least squares) is composed of two nested iterative steps which are unfriendly to data-oblivious execution, one being optimization via gradient descent and the other being singular value decomposition (SVD). To address the performance issues these iterative steps present we develop a novel Single Iteration Localization approach, leveraging the fact that localization is typically run repeatedly on sequential camera frames. We modify the outer iterative algorithm, gradient descent, to run each iteration independently in a way which maintains security for a series of localization runs. Then, we address the inner iterative algorithm, the SVD, by finding the optimal number of iterations a priori, which in practice does not depend on secret input data. The resulting secure, non-linear and iterative localization – SNaIL – runs two orders of magnitude faster than a naïve adaptation of localization to MPC.\n\nIn summary, this work makes the following contributions:\n\n- \\bullet We design a novel Single Iteration Localization (SIL) method for visual localization which increases round complexity in exchange for orders of magnitude runtime improvement and better privacy properties.\n\n- \\bullet We present a simulation-based definition of security for privacy preserving localization.\n\n- \\bullet We experimentally evaluate SIL against a data-oblivious baseline using two different visual localization algorithms and two different MPC frameworks, EMP [10] and ABY [11].\n\n- \\bullet We demonstrate real-world practicality with Turbo the Snail, the first robot to offload localization without revealing the view of its camera or its position and orientation in the environment.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib37",
+      "text": "Lu et al . (2019) Weixin Lu, Yao Zhou, Guowei Wan, Shenhua Hou, and Shiyu Song. 2019. L3-net: Towards learning based lidar localization for autonomous driving. In IEEE Conf. Computer Vision and Pattern Recognition (CVPR) . 6389–6398."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib16",
+      "text": "Di et al . (2016) Kaichang Di, Qiang Zhao, Wenhui Wan, Yexin Wang, and Yunjun Gao. 2016. RGB-D SLAM based on extended bundle adjustment with 2D and 3D information. Sensors 16, 8 (2016), 1285."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib2",
+      "text": "Auat Cheein et al . (2010) Fernando A Auat Cheein, Natalia Lopez, Carlos M Soria, Fernando A di Sciascio, Fernando Lobo Pereira, and Ricardo Carelli. 2010. SLAM algorithm applied to robotics assistance for navigation in unknown environments. Journal of Neuroengineering and Rehabilitation (JNER) 7, 1 (2010), 1–16."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib57",
+      "text": "Speciale et al . (2019) Pablo Speciale, Johannes L Schonberger, Sudipta N Sinha, and Marc Pollefeys. 2019. Privacy preserving image queries for camera localization. In IEEE Int’l Conf. Computer Vision (ICCV) . 1486–1496."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib18",
+      "text": "Dusmanu et al . (2021) Mihai Dusmanu, Johannes L Schonberger, Sudipta N Sinha, and Marc Pollefeys. 2021. Privacy-preserving image features via adversarial affine subspace embeddings. In IEEE Conf. Computer Vision and Pattern Recognition (CVPR) . 14267–14277."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib5",
+      "text": "Brachmann and Rother (2021) Eric Brachmann and Carsten Rother. 2021. Visual camera re-localization from RGB and RGB-D images using DSAC. IEEE Trans. Pattern Analysis and Machine Intelligence (T-PAMI) (2021)."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib34",
+      "text": "Liu et al . (2018) Xingcheng Liu, Shaohua Su, Feng Han, Yitong Liu, and Zhihong Pan. 2018. A range-based secure localization algorithm for wireless sensor networks. IEEE Sensors Journal 19, 2 (2018), 785–796."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib11",
+      "text": "Chelani et al . (2021) Kunal Chelani, Fredrik Kahl, and Torsten Sattler. 2021. How Privacy-Preserving are Line Clouds? Recovering Scene Details from 3D Lines. In IEEE Conf. Computer Vision and Pattern Recognition (CVPR) . 15668–15678."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib48",
+      "text": "Pittaluga and Zhuang (2023) Francesco Pittaluga and Bingbing Zhuang. 2023. LDP-Feat: Image Features with Local Differential Privacy. arXiv:2308.11223"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib62",
+      "text": "Wang et al . (2016) Xiao Wang, Alex J. Malozemoff, and Jonathan Katz. 2016. EMP-toolkit: Efficient MultiParty computation toolkit. https://github.com/emp-toolkit ."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib15",
+      "text": "Demmler et al . (2015) Daniel Demmler, Thomas Schneider, and Michael Zohner. 2015. ABY-A framework for efficient mixed-protocol secure two-party computation. In Network and Distributed System Security Symposium (NDSS) ."
+    }
+  ]
+}

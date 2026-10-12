@@ -1,0 +1,58 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2312.01629",
+  "title": "CLAMP: Contrastive LAnguage Model Prompt-tuning",
+  "authors": "Piotr Teterwak, Ximeng Sun, Bryan A. Plummer, Kate Saenko, Ser-Nam Lim",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2312.01629",
+  "html_url": "https://arxiv.org/html/2312.01629",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 700,
+  "text": "In the past several years the capabilities of Large Language Models (LLMs) have progressed from interesting to extremely useful. Recent work has adapted LLMs to multimodal inputs such as images, by learning a mapping from a frozen visual backbone to a continuous token used as input to the LLM. Such multimodal LLMs (mLLMs) include LLaVA [1], MiniGPT [3], Instruct-BLIP [4], and GPT-4V [5] and have impressive image captioning and question-answering capabilities. For example, they can use the LLM’s world knowledge to effectively answer common sense questions, such as why a photo is unusual (Fig. 1 left).\n\nOne might assume that the LLM’s world knowledge would similarly help in classifying objects into categories, such as what type of car is in the image (Fig. 1). After all, an LLM can provide a detailed description of what different cars look like. In this paper we ask, can multimodal LLMs also perform zero-shot classification tasks? For instance, given a list of vehicle types and an image, can an mLLM identify which type of vehicle is present? We find that the answer is, surprisingly, not well. For example, state-of-the-art mLLMs get under 10% top-1 classification accuracy on Stanford Cars [6], while CLIP achieves over 80% (Tab. 1). This is despite the fact that the best classification algorithm for current mLLMs computes the likelihood for each image-label pair, inefficiently requiring many passes through the LLM (see Section 4.2, Runtime). Poor classification performance of mLLMs is counter-intuitive; LLMs have been proven to encode extensive knowledge about the world. Furthermore, visual classification is a fundamental computer vision task, and is a capability we definitely want a foundation model to have.\n\nWe hypothesize that this weakness is due not to a lack of capability of the LLM but to improper training, and that the generative captioning and instruction-tuning objectives do not enable effective classification. To build some intuition for this, consider that LLMs contain a powerful language prior which may improve visual-question answering even without image features; for example, the correct answer may simply have higher-likelihood in the language model, as illustrated by Visual GPT-Score [7]. In that work, it was shown that SoTA performance can be achieved on several vision-language benchmarks by ignoring the context image completely and just computing the likelihood of the text sequences using the language model.\n\nGiven our hypothesis that generative training is not sufficient for discriminative image tasks, but that LLMs still encode knowledge useful for those tasks, we propose to replace the text encoder of a vision-language pretrained model like CLIP [2]) with an LLM. We call our method Contrastive LAnguage Model Prompt-tuning (CLAMP) (Fig. 2.) We find that by updating a minority of the LLM parameters, our method can approach the performance of zero-shot CLIP trained on much larger scale data while outperforming a text-encoder trained from scratch on the same data (LiT [8]). This finding highlights the benefits of using Large Language Models; LiT earlier found that initializing to pre-trained (but smaller scale) LMs is not helpful for zero-shot classification in English. We instead find that carefully finetuning modern, large language models is helpful relative to training a text-encoder from scratch, especially on evaluation datasets which have poor coverage in data used for contrastive training. Surprisingly, we’re also able to mostly retain the generative capabilities of the language model, pointing towards universal generative and discriminative models. Finally, because we use parameter-efficient finetuning methods for our training and the same base LLM as current instruction-tuned mLLMs, our method makes it possible to swap CLAMP’s finetuned parameters with those of mLLMs like LLaVA. As we illustrate in Fig. 1, this enables captioning, VQA, chat and classification with the same foundational LLM.\n\nIn summary, our contributions are as the follows:\n\n- • We show that SOTA multimodal LLMs are neither accurate nor efficient at zero-shot image classification.\n\n- • We train a set of adapter modules with a contrastive loss, which enable an LLM to be used for visual discrimination tasks by replacing a text encoder in a contrastive vision-language model.\n\n- • We show that the LLM initialization in CLAMP allows for improved performance in domains under-represented in the pre-training data, and that our CLAMP retains generative abilities despite our fine-tuning.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib28",
+      "text": "Liu, H., Li, C., Wu, Q., Lee, Y.J.: Visual instruction tuning. arXiv preprint arXiv:2304.08485 (2023)"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib36",
+      "text": "Radford, A., Kim, J.W., Hallacy, C., Ramesh, A., Goh, G., Agarwal, S., Sastry, G., Askell, A., Mishkin, P., Clark, J., et al.: Learning transferable visual models from natural language supervision. In: International conference on machine learning. pp. 8748–8763. PMLR (2021)"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib57",
+      "text": "Zhu, D., Chen, J., Shen, X., Li, X., Elhoseiny, M.: Minigpt-4: Enhancing vision-language understanding with advanced large language models. arXiv preprint arXiv:2304.10592 (2023)"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib8",
+      "text": "Dai, W., Li, J., Li, D., Tiong, A.M.H., Zhao, J., Wang, W., Li, B., Fung, P., Hoi, S.: Instructblip: Towards general-purpose vision-language models with instruction tuning (2023)"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib33",
+      "text": "OpenAI, R.: Gpt-4 technical report. arXiv pp. 2303–08774 (2023)"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib21",
+      "text": "Krause, J., Stark, M., Deng, J., Fei-Fei, L.: 3d object representations for fine-grained categorization. In: 4th International IEEE Workshop on 3D Representation and Recognition (3dRR-13). Sydney, Australia (2013)"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib26",
+      "text": "Lin, Z., Chen, X., Pathak, D., Zhang, P., Ramanan, D.: Visualgptscore: Visio-linguistic reasoning with multimodal generative pre-training scores. arXiv preprint arXiv:2306.01879 (2023)"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib54",
+      "text": "Zhai, X., Wang, X., Mustafa, B., Steiner, A., Keysers, D., Kolesnikov, A., Beyer, L.: Lit: Zero-shot transfer with locked-image text tuning. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 18123–18133 (2022)"
+    }
+  ]
+}

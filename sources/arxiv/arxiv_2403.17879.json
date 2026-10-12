@@ -1,0 +1,114 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.17879",
+  "title": "Low-Latency Neural Stereo Streaming",
+  "authors": "Qiqi Hou, Farzad Farhadzadeh, Amir Said, Guillaume Sautiere, Hoang Le",
+  "year": "2024",
+  "categories": [
+    "cs.CV",
+    "eess.IV"
+  ],
+  "url": "https://arxiv.org/abs/2403.17879",
+  "html_url": "https://arxiv.org/html/2403.17879",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 633,
+  "text": "The rise in popularity of autonomous vehicles (AVs) equipped with stereo cameras, along with the widespread use of virtual reality (VR) headsets, has led to a significant increase in stereo video data. For AVs, stereo cameras serve as a cost-effective alternative to sensors like LIDAR or RADAR. The data they capture is crucial for time-sensitive safety analyses during vehicle operation, necessitating low-latency data transmission. In VR, to achieve an immersive user experience, the demands for both resolution and latency are even higher. For both AV and VR applications, it’s crucial that the codec encodes stereo video efficiently while maintaining low latency.\n\nA basic approach to stereo video coding would apply a low-delay, single-view codec like AVC [3] or HEVC [1] to each view independently. While these traditional codecs yield promising results, and are used in commercial products, such as Meta Quest [4], they double the rate and ignore the similarities between two views. Consequently, several standard codecs have been proposed to reduce the redundancy between two views through disparity compensation [5,6]. They typically first encode the right view frame using a single-view codec. Then left view frame is predicted from the encoded right view frame. However, these sequential processing limits the ability to process multiple views simultaneously.\n\nRecent years have seen rapid progress in single-view neural video codecs [7,8,9,10,11,12,13,14], particularly in low-delay settings. For instance, recent DCVC-DC [13] has shown better Rate-Distortion (R-D) performance than the H.266 standard codec [15]. Our method is inspired by the most recent work LSVC, which is the first neural codec for stereo video. Although LSVC achieves great results and shows significant superiority over MV-HEVC [2] codec, it sequentially processes the right and left view frames, which constrains its suitability for low-latency applications like VR and AVs.\n\nIn this work, we present a Low-Latency Stereo video Streaming (LLSS) codec designed for parallel stereo video coding. This codec’s development is grounded in two key insights. First, inspired from the recent progresses in the stereo matching methods [16,17,18], the disparity compensation module between left and right views can be greatly simplified, compared to complex motion compensation schemes in LSVC. It can be efficiently represented with horizontal shifts. Second, we observed that these disparity compensations can be executed concurrently for both views. A careful encoder design, sharing horizontally-shifted features across views, can implicitly estimate disparity, while facilitating parallel processing of both views, thereby achieving low-latency inference. Figure 1 shows a schematic comparison of these approaches. We introduce a novel component, BiShiftMod (Bidirectional Shifting Module), which facilitates the connections and information exchange between views in our network. This module is integrated into both the codec and hypercodec [19], which enables data-dependent optimization of the cross-view mutual information. By following this approach, we replace the sequential disparity compensation with a parallel coding network that can exploit cross-view mutual information in a “disparity-agnostic” fashion.\n\nFinally, we show that our solution substantially improves R-D performance compared to the state-of-the-art method on three common stereo video benchmarks, with 50.6% BD-rate savings on the CityScapes dataset, 18.2% on the KITTI 2012 dataset and 15.8% on the KITTI 2015 dataset. Besides, we also provide a neural network complexity and inference time study, and show that our model has only 35% of the complexity of LSVC in terms of FLOPS. We further ablate each design choice to showcase the contribution of the proposed modules toward the final R-D performance.\n\nThe contributions of this paper include:\n\n- • A novel low-latency neural stereo video codec architecture that replaces sequential inter-view compensation with an efficient and parallelizable learned module to connect parallel autoencoders\n\n- • A bidirectional shift module that effectively captures and exhibits redundancy between inter-view features\n\n- • A set of thorough experiments demonstrating that our method is fast, efficient, and obtaining comparable and often better than state-of-the-art methods",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib23",
+      "text": "HEVC. Hevc test model (hm). https://hevc.hhi.fraunhofer.de/HM-doc/ , 2023a. [Online; accessed 19-Apr-2023]."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib24",
+      "text": "MV HEVC. Multiview high efficiency video coding (mv-hevc). https://hevc.hhi.fraunhofer.de/mvhevc , 2023b. [Online; accessed 19-Apr-2023]."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib62",
+      "text": "Thomas Wiegand, Gary J Sullivan, Gisle Bjontegaard, and Ajay Luthra. Overview of the h. 264/avc video coding standard. IEEE Transactions on circuits and systems for video technology , 13(7):560–576, 2003b."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib16",
+      "text": "Meta Quest for Creators. Encoding immersive videos for meta quest 2. https://creator.oculus.com/getting-started/media-production-specifications-for-delivery-to-meta-quest-2-headsets/ , 2022. Accessed: 2023-11-16."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib59",
+      "text": "Anthony Vetro, Thomas Wiegand, and Gary J. Sullivan. Overview of the stereo and multiview video coding extensions of the h.264/mpeg-4 avc standard. Proceedings of the IEEE , 99(4):626–642, 2011."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib54",
+      "text": "Gerhard Tech, Ying Chen, Karsten Müller, Jens-Rainer Ohm, Anthony Vetro, and Ye-Kui Wang. Overview of the multiview and 3d extensions of high efficiency video coding. IEEE Transactions on Circuits and Systems for Video Technology , 26(1):35–49, 2016."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib2",
+      "text": "Eirikur Agustsson, David Minnen, Nick Johnston, Johannes Balle, Sung Jin Hwang, and George Toderici. Scale-space flow for end-to-end optimized video compression. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 8503–8512, 2020."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib32",
+      "text": "Hoang Le, Liang Zhang, Amir Said, Guillaume Sautiere, Yang Yang, Pranav Shrestha, Fei Yin, Reza Pourreza, and Auke Wiggers. Mobilecodec: neural inter-frame video compression on mobile devices. In Proceedings of the 13th ACM Multimedia Systems Conference , pages 324–330, 2022b."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib31",
+      "text": "Hoang Le, Reza Pourreza, Amir Said, Guillaume Sautiere, and Auke Wiggers. Gamecodec: Neural cloud gaming video codec. In BMVC , page 204, 2022a."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib26",
+      "text": "Zhihao Hu, Guo Lu, Jinyang Guo, Shan Liu, Wei Jiang, and Dong Xu. Coarse-to-fine deep video coding with hyperprior-guided mode prediction. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 5921–5930, 2022."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib38",
+      "text": "Guo Lu, Wanli Ouyang, Dong Xu, Xiaoyun Zhang, Chunlei Cai, and Zhiyong Gao. Dvc: An end-to-end deep video compression framework. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 11006–11015, 2019."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib49",
+      "text": "Oren Rippel, Alexander G Anderson, Kedar Tatwawadi, Sanjay Nair, Craig Lytle, and Lubomir Bourdev. Elf-vc: Efficient learned flexible-rate video coding. Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 14479–14488, 2021."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib36",
+      "text": "Jiahao Li, Bin Li, and Yan Lu. Neural video compression with diverse contexts. In IEEE/CVF Conference on Computer Vision and Pattern Recognition, CVPR 2023, Vancouver, Canada, June 18-22, 2023 , 2023."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib47",
+      "text": "Reza Pourreza, Hoang Le, Amir Said, Guillaume Sautière, and Auke Wiggers. Boosting neural video codecs by exploiting hierarchical redundancy. In Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision (WACV) , pages 5355–5364, 2023."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib7",
+      "text": "Benjamin Bross, Ye-Kui Wang, Yan Ye, Shan Liu, Jianle Chen, Gary J. Sullivan, and Jens-Rainer Ohm. Overview of the versatile video coding (vvc) standard and its applications. IEEE Transactions on Circuits and Systems for Video Technology , 31(10):3736–3764, 2021."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib50",
+      "text": "Zhelun Shen, Yuchao Dai, Xibin Song, Zhibo Rao, Dingfu Zhou, and Liangjun Zhang. Pcw-net: Pyramid combination and warping cost volume for stereo matching. In Computer Vision–ECCV 2022: 17th European Conference, Tel Aviv, Israel, October 23–27, 2022, Proceedings, Part XXXII , pages 280–297. Springer, 2022."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib20",
+      "text": "Xiaoyang Guo, Kai Yang, Wukui Yang, Xiaogang Wang, and Hongsheng Li. Group-wise correlation stereo network. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 3273–3282, 2019."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib9",
+      "text": "Jia-Ren Chang and Yong-Sheng Chen. Pyramid stereo matching network. In Proceedings of the IEEE conference on computer vision and pattern recognition , pages 5410–5418, 2018."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib42",
+      "text": "David Minnen, Johannes Ballé, and George D Toderici. Joint autoregressive and hierarchical priors for learned image compression. Advances in neural information processing systems , 31, 2018."
+    }
+  ]
+}

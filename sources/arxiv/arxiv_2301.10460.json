@@ -1,0 +1,58 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2301.10460",
+  "title": "HAL3D: Hierarchical Active Learning for Fine-Grained 3D Part Labeling",
+  "authors": "Fenggen Yu, Yiming Qian, Francisca Gil-Ureta, Brian Jackson, Eric Bennett, Hao Zhang",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2301.10460",
+  "html_url": "https://arxiv.org/html/2301.10460",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 847,
+  "text": "Semantic shape segmentation and labeling [1,2] is a classical problem with numerous applications [3], including shape/part recognition, retrieval, indexing, and attribute transfer. We consider the problem of fine-grained 3D part labeling, a task that has not received as much attention as the typical semantic segmentation into coarse/major parts (e.g., backs, seats, and legs for chairs). While these coarse semantic groups support high-level visual perception, they do not possess sufficient granularity to address shape properties related to motion, function, interaction, or construction. Indeed, fine-grained object parts, e.g., the individual wheels and the small mechanical parts in a swivel leg, are both function-revealing and build-aware (see Fig. 1), with strong ties to how the objects were physically assembled or virtually built by artists. Real-world applications such as product inspection, assembly, customization, and robot interaction all operate on fine-grained object parts.\n\nLearning to label fine-grained parts is a highly challenging problem due to the great structural variations among the small and intricate parts, even for shapes that belong to the same category, as shown in Fig. 1. On a challenging dataset with average part counts per category ranging from 15 to more than 500, state-of-the-art learned models such as [4] can only achieve mean IoU scores below 50%, out of a maximum of 100% for ground truth (GT) results. Also challenging is the tremendous data annotation effort needed to train methods to segment and label fine-grained parts. On the other hand, for applications which demand de facto full accuracy, e.g., for diagnoses in medicine and quality assurance in e-commerce, one can hardly rely on a fully automatic method to reach the mark. It is arguable that the only means to attain full accuracy is to have humans validate all the results, as in the case of data annotation.\n\nIn this paper, we present the first active learning tool for fine-grained 3D part labeling. Given a set of 3D shapes segmented into fine parts, our labeling tool assigns one of the predefined labels to each part. These input parts are deemed atomic (i.e., indivisible); they can be as low-level as mesh triangles and as high-level as results obtained by an unlabelled semantic segmentation, or mid-level components from an over-segmentation. In general, active learning iterates between automated labeling and human input for label rectification [5]. Compared to conventional learned models with full autonomy, such a human-in-the-loop approach provides a viable option to achieve close to error-free part labeling on test sets, barring human errors.\n\nAs shown in Fig. 2, our interactive labeling tool iteratively verifies or modifies part labels predicted by a deep neural network, with human feedback continually improving the network prediction. Specifically, our system consists of three modules for label proposal, verification, and modification. Label proposals are produced by dynamic graph CNN (DGCNN) [6], with the resulting label probabilities dictating whether to pass the predicted labels to the verification or modification module. Both human-verified and corrected labels are passed back to the label proposal network to fine-tune it. The iteration terminates once all part labels have passed human verification.\n\nAs the key criterion for success with active learning is the minimization of human effort, we design and incorporate two novel features into our labeling tool:\n\n- • Hierarchical labeling: We organize all the part labels in a hierarchical tree structure, which guides our prediction-verification-modification process so that labels further down in the hierarchy are dealt with only after their parent labels have been fully verified. This leads to labeling efficiency, since our labeling process is coarse-to-fine, with fewer labels to process in the coarser levels of the hierarchy. In addition, with both human users and the prediction network only needing to deal with labels at the same level of the hierarchy rather than across all levels, there is less load on the users to reduce possible errors and the prediction accuracy improves, which reduces the amount of label modifications, which are the most expensive task.\n\n- • Part symmetry: Since symmetric parts receive the same label, we employ detected symmetries to constrain and facilitate both label verification and modification.\n\nOur hierarchical active learning tool is coined HAL3D. We adopt the hierarchical labels from PartNet [7] and train and test our labeling tool on both PartNet, which comes with semantic part segmentations, and Amazon-Berkeley Objects (ABO). ABO is a recently published dataset of high-quality, artist-created 3D models of real products sold online. These models are composed of build-aware connected components, However, since some of these components are too coarse, we first obtain an over-segmentation via convex decomposition [8] and then apply HAL3D.\n\nWe evaluate the core components of HAL3D, i.e., the label proposal network being fine-tuned by human feedback, and both hierarchical and symmetry-aware active labeling, by comparing to baselines and performing an ablation. The results demonstrate clear efficiency of HAL3D over labeling tools without active learning and non-hierarchical designs. Overall, HAL3D achieves 80% speed-up over manual fine-grained labeling, on the PartNet test set. A supplementary video shows our interactive tool at work. We will release the finely labeled ABO models to serve the community pending permission from the dataset owner.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib8",
+      "text": "Yong He, Hongshan Yu, Xiaoyan Liu, Zhengeng Yang, Wei Sun, Yaonan Wang, Qiang Fu, Yanmei Zou, and Ajmal Mian. Deep learning based 3d segmentation: A survey. CoRR , abs/2103.05423, 2021."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib27",
+      "text": "Ariel Shamir. A survey on mesh segmentation techniques. Comput. Graph. Forum , 27(6):1539–1556, 2018."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib18",
+      "text": "Niloy Mitra, Michael Wand, Hao Zhang, Daniel Cohen-Or, and Martin Bokeloh. Structure-aware shape processing. In Eurographics State-of-the-Art Report (STAR) , 2013."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib33",
+      "text": "Xiaogang Wang, Xun Sun, Xinyu Cao, Kai Xu, and Bin Zhou. Learning fine-grained segmentation of 3D shapes without part labels. In CVPR , 2021."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib44",
+      "text": "Li Yi, Vladmir G. Kim, I.-Chao Shen Duygu Ceylan, Mengyuan Yan, Hao Su, Cewu Lu, Qixing Huang, Alla Sheffer, and Leonidas J. Guibas. A scalable active framework for region annotation in 3D shape collections. ACM TOG , 35(6), 2016."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib37",
+      "text": "Yue Wang, Yongbin Sun, Ziwei Liu, Sanjay E. Sarma, Michael M. Bronstein, and Justin M. Solomon. Dynamic graph CNN for learning on point clouds. ACM TOG , 2019."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib20",
+      "text": "Kaichun Mo, Shilin Zhu, Angel X. Chang, Li Yi, Subarna Tripathi, Leonidas J. Guibas, and Hao Su. PartNet: A large-scale benchmark for fine-grained and hierarchical part-level 3D object understanding. In CVPR , June 2019."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib39",
+      "text": "Xinyue Wei, Minghua Liu, Zhan Ling, and Hao Su. Approximate convex decomposition for 3d meshes with collision-aware concavity and tree search. ACM TOG , 41(4), 2022."
+    }
+  ]
+}

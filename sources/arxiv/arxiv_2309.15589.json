@@ -1,0 +1,128 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2309.15589",
+  "title": "Domain generalization across tumor types, laboratories, and species -- insights from the 2022 edition of the Mitosis Domain Generalization Challenge",
+  "authors": "Marc Aubreville, Nikolas Stathonikos, Taryn A. Donovan, Robert Klopfleisch, Jonathan Ganz, Jonas Ammeling, Frauke Wilm, Mitko Veta, Samir Jabari, Markus Eckstein, Jonas Annuscheit, Christian Krumnow, Engin Bozaba, Sercan Cayir, Hongyan Gu, Xiang 'Anthony' Chen, Mostafa Jahanifar, Adam Shephard, Satoshi Kondo, Satoshi Kasai, Sujatha Kotte, VG Saipradeep, Maxime W. Lafarge, Viktor H. Koelzer, Ziyue Wang, Yongbing Zhang, Sen Yang, Xiyue Wang, Katharina Breininger, Christof A. Bertram",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2309.15589",
+  "html_url": "https://arxiv.org/html/2309.15589",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1233,
+  "text": "Despite advances in molecular characterization of biological tumor behavior, morphological tumor classification using established histopathologic techniques remains an important factor in tumor prognostication [1,2]. One criterion of particular interest within many tumor grading schemes is the density of cells undergoing division, which are visible as MF in HE (HE)-stained histopathological sections [3,4]. The number of MF within a specific tumor area is enumerated by experienced pathologists, resulting in the MC (MC). Despite the prognostic relevance of the MC, low inter-rater consistency on an object level has been reported in many studies [5,6,7,8,9]. The recommendation for pathologists is to select the region of the suspected highest mitotic activity, which is considered to be the best predictor of tumor behavior [10,11,3]. Selection of this ROI (ROI) within the tumor has a great impact on the MC [12], but is difficult for pathologists to reliably accomplish and is poorly reproducible [13,9]. While assessment of mitotic activity in the entire tumor section (or in the case of the digital image: the WSI (WSI)) would be preferable in order to identify those mitotic hotspot ROI, this is not feasible in current practice. Additionally, low inter-rater consistency on an object level within these selected ROI has been reported in many studies with the tendency of pathologists to overlook MF [5,6,7,8,9]. The combination of these circumstances and the recent availability of large-scale digital pathology solutions makes automatic detection of MF desirable.\n\nUnsurprisingly, MF detection was one of the earliest identified areas of research interest in computational pathology, with the first approaches in 2008 [14]. The first challenge on MF detection in breast cancer (MITOS2012, [15]) was held at ICPR (ICPR) and resulted in the first publicly available MF dataset. While this gave rise to algorithm development in the field, it was also an example of questionable dataset quality, as the training and test sets were selected from the same histology slides [15]. More recent challenges (MITOS2014 [16], AMIDA13 [3], TUPAC16 [4]) also comprised breast cancer and incorporated a higher number of cases, yet, were still limited by having the same digitization device for the training and test set.\n\nAs shown by prior research [17], the digitization device has a decisive influence on the detection quality, as it coincides with a shift in the image representation, leading to a domain shift in the latent representation of the detection models [18,19]. Investigation of these limitations was the main idea behind the MIDOG (MIDOG) challenge, held as a one-time event at the International Conference on MICCAI (MICCAI) in 2021. This challenge, which was the first to directly target domain generalization in histopathology, evaluated the detection of MF in ROI of human breast cancer, digitized using various devices (WSI scanners).\n\nSince MF are not only of interest for human breast cancer, the 2022 MIDOG challenge extended the task of MF domain generalization to include further representation shifts of interest: In addition to the use of different WSI scanners, the training dataset was enhanced by including histological specimens from different tumor types as well as different species (human, canine, feline), processed by different laboratories. Each of these contributing factors defined a tumor domain. We define a tumor domain as a specific combination of tumor type, species, lab, and WSI scanner. We found that the domain gap between tumor types is substantial [20] and seems to be more important than the domain gap between scanners, thus the cases used for the MIDOG 2022 challenge were primarily categorized by the tumor type.\n\n## Challenge format and task\n\nAs in previous challenges on MF detection, we provided ROI, selected by an experienced pathologist from a tumor region with the presumed highest mitotic activity and appropriate tissue and scan quality. MF candidates were identified and assessed by a blinded majority vote of three experts (with the third expert only asked if the first two disagreed). The training set, consisting of 405 tumor cases (corresponding to 405 patients) and featuring 9,501 MF annotations was released on April 20, 2022. These cases were split across six tumor domains (see Fig. 1), out of which five were provided with labels and one was provided without labels as an additional data source for unsupervised domain adaptation techniques. An extended version of the training set, including two novel domains, was made available under a Creative Commons CC0 license post-challenge [20].\n\nThe participants were required to package their algorithmic solution in the form of a docker container, which was subsequently evaluated on the test data on the grand-challenge.org platform in a fully automatic manner, i.e., no participant had access to any of the test images during or after the challenge. To perform a technical validation of the docker containers, we provided an independent preliminary test set, consisting of four unseen tumor domains. During a preliminary test phase, which started on August 5, participants were allowed to perform one evaluation of an algorithmic approach per day. We explicitly made the participants aware that the four domains of the preliminary test set were disjointed from the tumor domains of the actual challenge test set, so overfitting to those domains by means of hyperparameter or model selection would not be meaningful. The final challenge submission phase started on August 26 and lasted until August 30. During this phase, participating teams were exclusively authorized to submit a single algorithmic approach.\n\nThe challenge provided two tracks: As multiple openly accessible datasets on MF detection already exist, we gave participants the choice to either use only data provided by the challenge (track 1) or additionally use publicly available data and labels (track 2). In the second track, participants also had the option to use in-house datasets under the condition that these datasets were made publicly available and announced on the challenge website up to one month prior to the challenge. We opted for this strategy to maximize the reproducibility of the challenge results. However, no participating team chose to use previously non-public datasets.\n\nThe structured challenge design includes details about the policies regarding participation, publication, awards, and results announcement, and was made available publicly [21]. The challenge design was proposed and evaluated in a single-blinded peer review for admission to MICCAI 2022.\n\n## Main novelties over the predecessor\n\nWhile the task (MF detection on ROI images) was identical to the preceding MIDOG 2021 challenge, we incorporated three major modifications in the 2022 challenge design that set it apart from its predecessor:\n\n- • We extended the sources of domain shift by not only including the imaging device and the inherent stain differences between cases but also by incorporating different laboratories (and hence tissue processing), different tumor types, and different species, minimizing the gap to real-world data variability.\n\n- • The evaluation was carried out on ten independent tumor domains, representing a wide variety of conditions and thus allowing for better generalization of the assessment. The ten domains were additionally disjoint from the four independent domains of the preliminary test used for technical validation of the docker pipeline.\n\n- • We established the ground truth of the test set not only as the majority vote of three experts on the HE -stained sections (used for challenge evaluation and ranking) but also by additionally using an IHC (IHC) stain for PHH3 (PHH3) (specific for cells entering the mitotic cycle [22]), which was superimposed on the HE image for assisted labeling aiming to object-level confusion, which is a main source of inter-rater disagreement [5].",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib49",
+      "text": "Makki [2015] Jaafar Makki. Diversity of breast carcinoma: histological subtypes and clinical relevance. Clinical medicine insights: Pathology , 8:CPath–S31563, 2015."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib62",
+      "text": "Soliman and Yussif [2016] Nahed A Soliman and Shaimaa M Yussif. Ki-67 as a prognostic marker according to breast cancer molecular subtype. Cancer biology & medicine , 13(4):496, 2016."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib71",
+      "text": "Veta et al. [2015] Mitko Veta, Paul J Van Diest, Stefan M Willems, Haibo Wang, Anant Madabhushi, Angel Cruz-Roa, Fabio Gonzalez, Anders BL Larsen, Jacob S Vestergaard, Anders B Dahl, et al. Assessment of algorithms for mitosis detection in breast cancer histopathology images. Medical image analysis , 20(1):237–248, 2015. doi: 10.1016/j.media.2014.11.010 ."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib73",
+      "text": "Veta et al. [2019] Mitko Veta, Yujing J Heng, Nikolas Stathonikos, Babak Ehteshami Bejnordi, Francisco Beca, Thomas Wollmann, Karl Rohr, Manan A Shah, Dayong Wang, Mikael Rousson, et al. Predicting breast tumor proliferation from whole-slide images: the tupac16 challenge. Medical image analysis , 54:111–121, 2019. doi: 10.1016/j.media.2019.02.012 ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib72",
+      "text": "Veta et al. [2016] Mitko Veta, Paul J Van Diest, Mehdi Jiwa, Shaimaa Al-Janabi, and Josien PW Pluim. Mitosis counting in breast cancer: Object-level interobserver agreement and comparison to an automatic method. PloS one , 11(8):e0161286, 2016. doi: 10.1371/journal.pone.0161286 ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib55",
+      "text": "Meyer et al. [2005] John S Meyer, Consuelo Alvarez, Clara Milikowski, Neal Olson, Irma Russo, Jose Russo, Andrew Glass, Barbara A Zehnbauer, Karen Lister, and Reza Parwaresch. Breast carcinoma malignancy grading by Bloom-Richardson system vs proliferation index: Reproducibility of grade and advantages of proliferation index. Modern Pathol , 18(8):1067–1078, August 2005. doi: 10.1038/modpathol.3800388 ."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib56",
+      "text": "Meyer et al. [2009] John S Meyer, Eric Cosatto, and Hans Peter Graf. Mitotic index of invasive breast carcinoma. Achieving clinically meaningful precision and evaluating tertial cutoffs. Arch Pathol Lab Med , 133(11):1826–1833, November 2009. doi: 10.5858/133.11.1826 ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib51",
+      "text": "Malon et al. [2012] Christopher Malon, Elena Brachtel, Eric Cosatto, Hans Peter Graf, Atsushi Kurata, Masahiko Kuroda, John S Meyer, Akira Saito, Shulin Wu, and Yukako Yagi. Mitotic figure recognition: Agreement among pathologists and computerized detector. Analytical Cellular Pathology , 35(2):97–100, 2012. doi: 10.3233/ACP-2011-0029 ."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib15",
+      "text": "Bertram et al. [2021] Christof A. Bertram, Marc Aubreville, Taryn A Donovan, Alexander Bartel, Frauke Wilm, Christian Marzahl, Charles-Antoine Assenmacher, Kathrin Becker, Mark Bennett, Sarah Corner, Brieuc Cossic, Daniela Denk, Martina Dettwiler, Beatriz Garcia Gonzalez, Corinne Gurtner, Ann-Kathrin Haverkamp, Annabelle Heier, Annika Lehmbecker, Sophie Merz, Erica L. Noland, Stephanie Plog, Anja Schmidt, Franziska Sebastian, Dodd G. Sledge, Rebecca C. Smedley, Marco Tecilla, Tuddow Thaiwong, Andrea Fuchs-Baumgartinger, Donald J. Meuten, Katharina Breininger, Matti Kiupel, Andreas Maier, and Robert Klopfleisch. Computer-assisted mitotic count using a deep learning–based algorithm improves interobserver reproducibility and accuracy. Veterinary Pathology , 2021. doi: 10.1177/03009858211067478 ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "Azzola et al. [2003] Manuela F Azzola, Helen M Shaw, John F Thompson, Seng-jaw Soong, Richard A Scolyer, Geoffrey F Watson, Marjorie H Colman, and Yuting Zhang. Tumor mitotic rate is a more powerful prognostic indicator than ulceration in patients with primary cutaneous melanoma. Cancer , 97(6):1488–1498, March 2003. doi: 10.1002/cncr.11196 ."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib54",
+      "text": "Meuten et al. [2008] DJ Meuten, FM Moore, and W George. Appendix: Diagnostic Schemes and Algorithms. In Donald J Meuten, editor, Tumors in Domestic Animals , pages 755–769. Iowa State Press, Ames, Iowa, USA, April 2008."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib13",
+      "text": "Bertram et al. [2020a] Christof A Bertram, Marc Aubreville, Corinne Gurtner, Alexander Bartel, Sarah M Corner, Martina Dettwiler, Olivia Kershaw, Erica L Noland, Anja Schmidt, Dodd G Sledge, et al. Computerized calculation of mitotic count distribution in canine cutaneous mast cell tumor sections: mitotic count is area dependent. Veterinary pathology , 57(2):214–226, 2020a. doi: 10.1177/0300985819890686 ."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib4",
+      "text": "Aubreville et al. [2020] Marc Aubreville, Christof A Bertram, Christian Marzahl, Corinne Gurtner, Martina Dettwiler, Anja Schmidt, Florian Bartenschlager, Sophie Merz, Marco Fragoso, Olivia Kershaw, et al. Deep learning algorithms out-perform veterinary pathologists in detecting the mitotically most active tumor region. Scientific Reports , 10:16447(1):1–11, 2020. doi: 10.1038/s41598-020-73246-2 ."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib50",
+      "text": "Malon et al. [2008] Christopher Malon, Matthew Miller, Harold Christopher Burger, Eric Cosatto, and Hans Peter Graf. Identifying histological elements with convolutional neural networks. In Proceedings of the 5th international conference on Soft computing as transdisciplinary science and technology , pages 450–456, 2008. doi: 10.1145/1456223.1456316 ."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib59",
+      "text": "Roux et al. [2013] Ludovic Roux, Daniel Racoceanu, Nicolas Loménie, Maria Kulikova, Humayun Irshad, Jacques Klossa, Frédérique Capron, Catherine Genestie, Gilles Le Naour, and Metin N Gurcan. Mitosis detection in breast cancer histological images an icpr 2012 contest. Journal of Pathology Informatics , 4(1):8, 2013. ISSN 2153-3539. doi: 10.4103/2153-3539.112693 ."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib60",
+      "text": "Roux et al. [2014] Ludovic Roux, Daniel Racoceanu, Frédérique Capron, Jessica Calvo, Elham Attieh, Gilles Le Naour, and Anne Gloaguen. Mitos & atypia. Image Pervasive Access Lab (IPAL), Agency Sci., Technol. & Res. Inst. Infocom Res., Singapore, Tech. Rep , 1:1–8, 2014."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib5",
+      "text": "Aubreville et al. [2021] Marc Aubreville, Christof Bertram, Mitko Veta, Robert Klopfleisch, Nikolas Stathonikos, Katharina Breininger, Natalie ter Hoeve, Francesco Ciompi, and Andreas Maier. Quantifying the scanner-induced domain gap in mitosis detection. In Medical Imaging with Deep Learning (MIDL), Lübeck, 2021 , pages 1–3, 2021."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib63",
+      "text": "Stacke et al. [2020] Karin Stacke, Gabriel Eilertsen, Jonas Unger, and Claes Lundström. Measuring domain shift for deep learning in histopathology. IEEE journal of biomedical and health informatics , 25(2):325–336, 2020. doi: 10.1109/JBHI.2020.3032060 ."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib7",
+      "text": "Aubreville et al. [2023a] Marc Aubreville, Nikolas Stathonikos, Christof A Bertram, Robert Klopfleisch, Natalie Ter Hoeve, Francesco Ciompi, Frauke Wilm, Christian Marzahl, Taryn A Donovan, Andreas Maier, et al. Mitosis domain generalization in histopathology images—the MIDOG challenge. Medical Image Analysis , 84:102699, 2023a."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib8",
+      "text": "Aubreville et al. [2023b] Marc Aubreville, Frauke Wilm, Nikolas Stathonikos, Katharina Breininger, Taryn A. Donovan, Samir Jabari, Mitko Veta, Jonathan Ganz, Jonas Ammeling, Paul J. Van Diest, Robert Klopfleisch, and Christof A. Bertram. A comprehensive multi-domain dataset for mitotic figure detection. Scientific Data , 10(1):484, July 2023b. ISSN 2052-4463. doi: 10.1038/s41597-023-02327-4 ."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib6",
+      "text": "Aubreville et al. [2022] Marc Aubreville, Christof Bertram, Katharina Breininger, Samir Jabari, Nikolas Stathonikos, and Mitko Veta. MItosis DOmain Generalization Challenge 2022. Structured description of the challenge design, March 2022."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib34",
+      "text": "Hendzel et al. [1997] Michael J Hendzel, Yi Wei, Michael A Mancini, Aaron Van Hooser, Tamara Ranalli, BR Brinkley, David P Bazett-Jones, and C David Allis. Mitosis-specific phosphorylation of histone h3 initiates primarily within pericentromeric heterochromatin during g2 and spreads in an ordered fashion coincident with mitotic chromosome condensation. Chromosoma , 106:348–360, 1997. doi: 10.1007/s004120050256 ."
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.18142",
+  "title": "HERTA: A High-Efficiency and Rigorous Training Algorithm for Unfolded Graph Neural Networks",
+  "authors": "Yongyi Yang, Jiaming Yang, Wei Hu, MichaÅ DereziÅski",
+  "year": "2024",
+  "categories": [
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2403.18142",
+  "html_url": "https://arxiv.org/html/2403.18142",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 756,
+  "text": "Graph Neural Networks (GNNs) have become a powerful modern tool for handling graph data because of their strong representational capabilities and ability to explore the relationships between data points [1,2,3]. Like many deep learning models, GNNs are generally designed by heuristics and experience, which makes analyzing and understanding them a difficult task. Unfolded GNNs [4] are a type of GNNs that are rigorously derived from an optimization problem, which makes their inductive bias and training dynamics easier to interpret.\n\nDespite their enhanced interpretability, training unfolded models can be extremely expensive, especially when the graph is large and (relatively) dense. This issue can come from two aspects:\n\n- 1) Slow iterations: in every iteration the whole graph must be fed into the model, and the interactive nature of graphs prevents trivially utilizing techniques like mini-batch training;\n\n- 2) Slow convergence: the training convergence rate is related to the connectivity of the graph and the well-conditionedness of the node features, and the model converges slowly when the data is ill-conditioned.\n\nMany methods have been proposed to address the high cost of training unfolded models [5,6,7,8,9,10], primarily by using graph sampling to enable mini-batch training schemes that reduce the per-iteration cost (Issue 1). However, these approaches typically require distorting the underlying optimization objective explicitly or implicitly, thus diminishing the rigorous and interpretable nature of Unfolded GNNs. Moreover, existing works have mostly focused on per-iteration efficiency, while the convergence rate of the optimization in training Unfolded GNNs (Issue 2) remains un-addressed, leading to methods that are not robust to ill-conditioned data.\n\nWe propose HERTA: a High-Efficiency and Rigorous Training Algorithm for Unfolded GNNs, which is an algorithmic framework designed to address both Issues 1 and 2, while at the same time preserving the rigorous and interpretable nature of Unfolded GNNs. Unlike many existing methods that require changing the GNN model or defining a new objective, HERTA converges to the optimum of the original training problem, and thus preserves the interpretability of the unfolded models. Moreover, HERTA uses a specialized preconditioner to ensure fast linear convergence to the optimum, requiring only a logarithmic number of passes over the data. We show empirically that HERTA can be used to accelerate training for a variety of GNN objectives, as an extension of popular optimization techniques.\n\nA key novelty of our algorithm lies in the construction of a preconditioner for the GNN objective, which accelerates the convergence rate. To construct this preconditioner, we design a spectral sparsification method for approximating the squared inverse of a normalized and regularized Laplacian matrix, by relying on an extension of the notion of effective resistance to overcome the limitations of existing graph sparsification tools. Below, we present an informal statement of our main result.\n\nHERTA solves the \\lambda -regularized Unfolded GNN objective (4.2) with n nodes, m edges and d -dimensional node features to within accuracy \\epsilon in time \\tilde{O}\\left((m+nd)\\left(\\log\\frac{1}{\\epsilon}\\right)^{2}+d^{3}\\right) as long as the number of large eigenvalues of the graph Laplacian is O(n/\\lambda^{2}).\n\nIn practice, the node feature dimensionality d is generally much smaller than the graph size m, in which case, the running time of HERTA is \\tilde{O}\\left((m+nd)\\left(\\log\\frac{1}{\\epsilon}\\right)^{2}\\right). Notice that to describe a typical graph dataset with m edges, n nodes and d -dimensional node features, we need at least O(m+nd) float or integer numbers. This shows the essential optimality of HERTA: its running time is of the same magnitude as reading the input data (up to logarithm factors).\n\nThe condition that the graph Laplacian has O(n/\\lambda^{2}) large eigenvalues is not strictly necessary; it is used here to simplify the time complexity (see Theorem 5.1 for the full statement). This condition is also not particularly restrictive, since in most practical settings the GNN parameter \\lambda is chosen as an absolute constant. At the same time, it is natural that the complexity of training a GNN depends on the number of large eigenvalues in the graph Laplacian, since this quantity can be interpreted as the effective dimension in the Laplacian energy function (4.1) used to define the Unfolded GNN (see more discussion in Section 5).\n\nOutline. The paper is organized as follows. In Section 2 we introduce related work. In Section 3 we introduce the mathematical notation and concepts used in this paper. We define our problem setting in Section 4. In Section 5 we present and analyze our algorithm HERTA, and introduce the techniques that are used in proving the main result. We conduct experiments on real-world datasets and show the results in Section 6. Finally, we conclude with some potential future directions in Section 7.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib22",
+      "text": "Kipf & Welling (2016) Kipf, T. N. and Welling, M. Semi-supervised classification with graph convolutional networks. CoRR , abs/1609.02907, 2016."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "Battaglia et al. (2018) Battaglia, P. W., Hamrick, J. B., Bapst, V., Sanchez-Gonzalez, A., Zambaldi, V., Malinowski, M., Tacchetti, A., Raposo, D., Santoro, A., Faulkner, R., et al. Relational inductive biases, deep learning, and graph networks. arXiv preprint arXiv:1806.01261 , 2018."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib42",
+      "text": "Xu et al. (2018) Xu, K., Hu, W., Leskovec, J., and Jegelka, S. How powerful are graph neural networks? arXiv preprint arXiv:1810.00826 , 2018."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib45",
+      "text": "Yang et al. (2021a) Yang, Y., Liu, T., Wang, Y., Huang, Z., and Wipf, D. Implicit vs unfolded graph neural networks. arXiv preprint arXiv:2111.06592 , 2021a."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib6",
+      "text": "Chen et al. (2018b) Chen, J., Zhu, J., and Song, L. Stochastic training of graph convolutional networks with variance reduction. In Dy, J. G. and Krause, A. (eds.), Proceedings of the 35th International Conference on Machine Learning, ICML 2018, Stockholmsmässan, Stockholm, Sweden, July 10-15, 2018 , volume 80 of Proceedings of Machine Learning Research , pp. 941–949. PMLR, 2018b. URL http://proceedings.mlr.press/v80/chen18p.html ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib7",
+      "text": "Chiang et al. (2019) Chiang, W.-L., Liu, X., Si, S., Li, Y., Bengio, S., and Hsieh, C.-J. Cluster-gcn: An efficient algorithm for training deep and large graph convolutional networks. In Proceedings of the 25th ACM SIGKDD international conference on knowledge discovery & data mining , pp. 257–266, 2019."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib47",
+      "text": "Zeng et al. (2021) Zeng, H., Zhang, M., Xia, Y., Srivastava, A., Malevich, A., Kannan, R., Prasanna, V., Jin, L., and Chen, R. Decoupling the depth and scope of graph neural networks. Advances in Neural Information Processing Systems , 34:19665–19679, 2021."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib14",
+      "text": "Ding et al. (2021) Ding, M., Kong, K., Li, J., Zhu, C., Dickerson, J., Huang, F., and Goldstein, T. VQ-GNN: A universal framework to scale up graph neural networks using vector quantization. In Ranzato, M., Beygelzimer, A., Dauphin, Y. N., Liang, P., and Vaughan, J. W. (eds.), Advances in Neural Information Processing Systems 34: Annual Conference on Neural Information Processing Systems 2021, NeurIPS 2021, December 6-14, 2021, virtual , pp. 6733–6746, 2021."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib16",
+      "text": "Fey et al. (2021) Fey, M., Lenssen, J. E., Weichert, F., and Leskovec, J. Gnnautoscale: Scalable and expressive graph neural networks via historical embeddings. In Meila, M. and Zhang, T. (eds.), Proceedings of the 38th International Conference on Machine Learning, ICML 2021, 18-24 July 2021, Virtual Event , volume 139 of Proceedings of Machine Learning Research , pp. 3294–3304. PMLR, 2021."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib20",
+      "text": "Jiang et al. (2023) Jiang, H., Liu, R., Yan, X., Cai, Z., Wang, M., and Wipf, D. Musegnn: Interpretable and convergent graph neural network layers at scale. arXiv preprint arXiv:2310.12457 , 2023."
+    }
+  ]
+}

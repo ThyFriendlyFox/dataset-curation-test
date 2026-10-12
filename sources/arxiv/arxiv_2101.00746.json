@@ -1,0 +1,120 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2101.00746",
+  "title": "MetaVIM: Meta Variationally Intrinsic Motivated Reinforcement Learning for Decentralized Traffic Signal Control",
+  "authors": "Liwen Zhu, Peixi Peng, Zongqing Lu, Xiangqian Wang, Yonghong Tian",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.AI",
+    "cs.MA"
+  ],
+  "url": "https://arxiv.org/abs/2101.00746",
+  "html_url": "https://arxiv.org/html/2101.00746",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1068,
+  "text": "Traffic signals that direct traffic movements play an important role in efficient transportation. Most conventional methods aim to control traffic signals by fixed-time plans [1] or hand-crafted heuristics [2]. However, the pre-defined rules cannot adapt to dynamic and uncertain traffic conditions. Recently, deep reinforcement learning (RL) [3,4,5,6,7,8,9,10,11] has been applied in Intelligent Transportation Systems (ITS) and demonstrated promising performance. Specifically, recent works [12,13,14] use RL for traffic signal control, and provide a promising way to handle dynamic and uncertain traffic conditions, where a RL agent employs a deep neural network to control an intersection and the network is learned by directly interacting with the environment.\n\nThe most straightforward RL baseline considers each intersection independently and models the task as a single agent RL problem [12]. However, the observation, received reward and dynamics of each traffic signal are closely related to its neighbors, and the coordination between signals should be modeled. Hence, optimizing traffic signal control in a large-scale road network could be modeled as a multi-agent reinforcement learning (MARL) problem. Prior works [15,16] in this domain resort to centralized training to ensure that agents learn to coordinate, they demonstrate that communication among agents could help coordination. However, as the joint action space grows exponentially with the number of agents, it is infeasible or costly in realistic deployment, and training emergent communication protocols also remains a challenging problem. In addition, once the policy function is conditioned on not only the current agent’s observation but also the neighbors’, the policy function would be closely related to the training scenario and cause poor generalizability because the agents in various scenarios often have heterogeneous neighbors. Therefore, learning decentralized policies opens up a window of new opportunities for advanced MARL research in this area.\n\nTo learn effective decentralized policies, there are two main challenges. Firstly, it is impractical to learn an individual policy for each intersection in a city or a district containing thousands of intersections. Parameter sharing may help. However, each intersection has a different traffic pattern, and a simple shared policy hardly learns and acts optimally at all intersections. To handle this challenge, we formulate the policy learning in a road network as a meta-learning problem, where traffic signal control at each intersection corresponds to a task, and a policy is learned to adapt to various tasks. Reward function and state transition of these tasks vary but share similarities since they follow the same traffic rules and have similar optimization goals. Therefore, we represent each task as a learned and low-dimensional latent variable obtained by encoding the past trajectory in each task. The latent variable is a part of the input of the policy, which captures task-specific information and helps improve the policy adaption.\n\nSecondly, even for a specific task, the received rewards and observations are uncertain to the agent, as illustrated in Fig. 1, which make the policy learning unstable and non-convergent. Even if the agent performs the same action on the same observation at different timesteps, the agent may receive different rewards and observation transitions because of neighbor agents’ different actions. In this case, the received rewards and observation transitions of the current agent could not be well predicted only conditioned on its own or partial neighbors’ observations and performed actions. To avoid this situation, four decoders are introduced to predict the next observations and rewards without neighbor agents’ policies or with partially neighbor agents, respectively. In addition, an intrinsic reward is designed to reduce the bias among different predictions and enhance learning stability. In other words, the design of the decoders and intrinsic reward is similar to the law of contra-positive. The unstable learning will cause the predicted rewards and observation transitions unstable in a decentralized way, while our decoders and intrinsic reward encourage the prediction convergent. In addition, from the perspective of information theory, the intrinsic reward design makes the policy of each agent robust to neighbours’ polices, which could make the learned policy easy to transfer.\n\nIntrinsic motivation refers to reward functions that allow agents to learn useful behaviors across various tasks. Previous approaches to intrinsic motivation often focus on curiosity [17], imagination [18] or synergy [19], these approaches rely on hand-crafted rewards specific to the environment, or limit to the bimanual manipulation tasks. Such structural constraints make it impossible to achieve independent training of MARL agents across multiple environments. Here, we consider the problem of deriving intrinsic motivation as an exploration bias from other agents in MARL. Our key idea is that a good guiding principle for intrinsic motivation is to make approximations robust to a dynamic environment. Intrinsic motivation is assessed using comparison reasoning: at each timestep, an agent measures the effect of another agent’s policy on its model’s predictions. Neighbor’s policies that lead to a relatively higher change in an agent’s own model estimates are considered highly influential, and because the explicit effect of neighbor’s influence in this task is to increase incoming traffic volumes, which exacerbates the agent’s own traffic load. Therefore, we minimize this influence bias to make the model’s estimations free from interference from others. We show that this inductive bias will drive agents to learn effective decentralized policies.\n\nWe conduct extensive experiments on CityFlow [20] in public datasets Hangzhou (China), Jinan (China), New York (USA), and our derived dataset Shenzhen (China) road networks under various traffic patterns, and empirically demonstrate that our proposed method can achieve state-of-the-art performances over the above scenarios. Furthermore, our method shows superior adaptivity in transfer experiments. In summary, the main contributions of this paper are concluded as three aspects:\n\n1) The traffic signal control is modeled as a meta-learning problem over a set of related tasks, and a novel method MetaVIM is proposed to learn decentralized policy to handle large-scale traffic lights.\n\n2) A learnable latent variable is introduced to represent task-specific information by performing approximate inference on the task, and make the policy function shareable across the tasks.\n\n3) A novel intrinsic reward is designed to tackle the challenge of unstable policy learning in dynamically changing traffic environments. We show that this design will drive agents to learn effective decentralized policies.\n\nThe paper is structured as follows. We describe the related work in Section II, and the MARL setting in Section III. Section IV introduces the details of the proposed method. Section V presents experimental results that empirically demonstrate the efficacy of MetaVIM. Finally, conclusions and future work are discussed in Section VI.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "P. Koonce and L. Rodegerdts, “Traffic signal timing manual.” United States. Federal Highway Administration, Tech. Rep. FHWA-HOP-08-024, 2008."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "P. Varaiya, “The max-pressure controller for arbitrary networks of signalized intersections,” in Advances in Dynamic Network Modeling in Complex Transportation Systems . Springer, 2013."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "X. Guo, Z. Yu, P. Wang, Z. Jin, J. Huang, D. Cai, X. He, and X. Hua, “Urban traffic light control via active multi-agent communication and supply-demand modeling,” IEEE Transactions on Knowledge and Data Engineering , pp. 1–11, 2021, early access."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "J. Ke, F. Xiao, H. Yang, and J. Ye, “Learning to delay in ride-sourcing systems: A multi-agent deep reinforcement learning framework,” IEEE Transactions on Knowledge and Data Engineering , vol. 34, no. 5, pp. 2280–2292, 2022."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "Z. Pan, W. Zhang, Y. Liang, W. Zhang, Y. Yu, J. Zhang, and Y. Zheng, “Spatio-temporal meta learning for urban traffic prediction,” IEEE Transactions on Knowledge and Data Engineering , vol. 34, no. 3, pp. 1462–1476, 2022."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "S. He and K. G. Shin, “Spatio-temporal capsule-based reinforcement learning for mobility-on-demand coordination,” IEEE Transactions on Knowledge and Data Engineering , vol. 34, no. 3, pp. 1446–1461, 2022."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "Y. Tong, D. Shi, Y. Xu, W. Lv, Z. Qin, and X. Tang, “Combinatorial optimization meets reinforcement learning: Effective taxi order dispatching at large-scale,” IEEE Transactions on Knowledge and Data Engineering , pp. 1–12, 2021, early access."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "S. Wang, J. Cao, and P. S. Yu, “Deep learning for spatio-temporal data mining: A survey,” IEEE Transactions on Knowledge and Data Engineering , vol. 34, no. 8, pp. 3681–3700, 2022."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "J. Gu, Q. Zhou, J. Yang, Y. Liu, F. Zhuang, Y. Zhao, and H. Xiong, “Exploiting interpretable patterns for flow prediction in dockless bike sharing systems,” IEEE Transactions on Knowledge and Data Engineering , vol. 34, no. 2, pp. 640–652, 2022."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "J. Liu, T. Li, S. Ji, P. Xie, S. Du, F. Teng, and J. Zhang, “Urban flow pattern mining based on multi-source heterogeneous data fusion and knowledge graph embedding,” IEEE Transactions on Knowledge and Data Engineering , pp. 1–13, 2021, early access."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "F. Zhang, Y. Liu, N. Feng, C. Yang, J. Zhai, S. Zhang, B. He, J. Lin, X. Zhang, and X. Du, “Periodic weather-aware lstm with event mechanism for parking behavior prediction,” IEEE Transactions on Knowledge and Data Engineering , vol. 34, no. 12, pp. 5896–5909, 2022."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "H. Wei, G. Zheng, H. Yao, and Z. Li, “Intellilight: A reinforcement learning approach for intelligent traffic light control,” in SIGKDD , 2018."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "H. Wei, C. Chen, G. Zheng, K. Wu, V. Gayah, K. Xu, and Z. Li, “Presslight: Learning max pressure control to coordinate traffic signals in arterial network,” in SIGKDD , 2019."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "X. Zang, H. Yao, G. Zheng, N. Xu, K. Xu, and Z. Li, “Metalight: Value-based meta-reinforcement learning for traffic signal control,” in AAAI , 2020, pp. 1153–1160."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "L. Kuyer, S. Whiteson, B. Bakker, and N. Vlassis, “Multiagent reinforcement learning for urban traffic control using coordination graphs,” in ECML-PKDD . Springer, 2008."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "E. Van der Pol and F. A. Oliehoek, “Coordinated deep reinforcement learners for traffic light control,” in NeurIPS 2016 Workshop on Learning, Inference and Control of Multi-Agent Systems , 2016, pp. 1–8."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "D. Pathak, P. Agrawal, A. A. Efros, and T. Darrell, “Curiosity-driven exploration by self-supervised prediction,” in CVPR Workshops , 2017."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "M. Andrychowicz, F. Wolski, A. Ray, J. Schneider, R. Fong, P. Welinder, B. McGrew, J. Tobin, O. P. Abbeel, and W. Zaremba, “Hindsight experience replay,” in NeurIPS , 2017, pp. 5048–5058."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "R. Chitnis, S. Tulsiani, S. Gupta, and A. Gupta, “Intrinsic motivation for encouraging synergistic behavior,” in ICLR , 2019, pp. 1–15."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "H. Zhang, S. Feng, C. Liu, Y. Ding, Y. Zhu, Z. Zhou, W. Zhang, Y. Yu, H. Jin, and Z. Li, “Cityflow: A multi-agent reinforcement learning environment for large scale city traffic scenario,” in WWW , 2019."
+    }
+  ]
+}

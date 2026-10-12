@@ -1,0 +1,95 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2402.19161",
+  "title": "MemoNav: Working Memory Model for Visual Navigation",
+  "authors": "Hongxin Li, Zeyu Wang, Xu Yang, Yuran Yang, Shuqi Mei, Zhaoxiang Zhang",
+  "year": "2024",
+  "categories": [
+    "cs.CV",
+    "cs.AI",
+    "cs.RO"
+  ],
+  "url": "https://arxiv.org/abs/2402.19161",
+  "html_url": "https://arxiv.org/html/2402.19161",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 694,
+  "text": "Image-goal navigation (ImageNav) is an attractive embodied AI task where an agent is guided toward a destination indicated by an image within unfamiliar environments. This task has garnered significant attention recently, owing to its promising applications in enabling robots to navigate open-world scenarios.\n\nCentral to ImageNav is scene memory, which serves as a repository of crucial historical information for decision-making in unseen environments [1]. During navigation, this memory typically stores both scene features and the agent’s navigation history [2], thereby enhancing navigation by mitigating the challenges of partial observability [3]. In literature, various memory mechanisms have been introduced for ImageNav, which can be classified into three categories according to memory structure: (a) metric map-based methods [4,5] that reconstruct local top-down maps and aggregate them into a global map, (b) stacked memory-based methods [6,7,8] that stack the past observations chronologically, and (c) topological map-based methods [1,2,9,10,11] that store sparse landmark features in graph nodes. Notably, topological map-based methods leverage the sparsity of topological maps, demonstrating impressive performance in ImageNav.\n\nNevertheless, existing topological map-based methods still suffer from two major limitations: (a) Unawareness of useful nodes. These methods typically use all node features for generating actions without considering the contribution of each node, thus being easily misled by redundant nodes that are uninformative of the goal. (b) Local representation. Each node feature only represents a small area in a large scene, limiting the agent’s capacity to learn a higher-level semantic and geometric representation of the entire scene.\n\nTo address these limitations, we present a novel ImageNav method named MemoNav (refer to Fig. 1), which draws inspiration from the classical concept of working memory in cognitive neuroscience [12] and loosely aligns with the working memory model in human navigation [13].\n\nMemoNav learns three types of scene representations: Short-term memory (STM) represents the local and transient features of nodes in a topological map. Long-term memory (LTM) represents a global node that acquires a scene-level representation by continuously aggregating STM. Working memory (WM) learns goal-relevant features about 3D scenes and is used by a policy network to generate actions. The WM is formed by encoding the informative fraction of the STM and the LTM.\n\nBased on the above three representations, MemoNav navigation pipeline (Fig. 2) contains five steps: (1) STM generation. The map updating module stores landmark features on the map as STM. (2) Selective forgetting. A forgetting module incorporates goal-relevant STM into WM by temporarily removing nodes with attention scores ranking below a predefined threshold. After this process, the navigation pipeline excludes the forgotten nodes in subsequent time steps. (3) LTM generation. To assist STM, a global node is added to the map as LTM. This node links to all map nodes and continuously aggregates their features at each time step. (4) WM generation. A graph attention module encodes the retained STM and LTM to generate WM. The WM combines goal-relevant information from STM with scene-level features from LTM, enhancing the agent’s ability to use informative scene representations for improved navigation. (5) Action generation. Two Transformer decoders use the embeddings of the goal image and the current observation to decode the WM. The decoded features are then used to generate navigation actions.\n\nConsequently, with the synergy of the three representations, MemoNav outperforms state-of-the-art methods in the Gibson scenes [14], enjoying substantial improvements on multi-goal navigation tasks. Comparison in the Matterport3D scenes [15] also highlights MemoNav’s superiority.\n\nThe main contributions of this paper are as follows:\n\n- • We propose MemoNav, which learns three types of scene representations (STM, LTM, and WM) to improve navigation performance in the ImageNav task.\n\n- • We use a forgetting module to retain informative STM, thereby reducing redundancy in the map and improving navigation efficiency. We also introduce a global node as the LTM, connecting to all STM nodes and providing a global scene-level perspective to the agent.\n\n- • We adopt a graph attention module to generate WM from the retained STM and the LTM. This module utilizes adaptive weighting to generate effective WM used for challenging multi-goal navigation.\n\n- • The experimental results demonstrate that our method outperforms existing methods on both 1-goal and multi-goal tasks across two popular scene datasets.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib34",
+      "text": "Nikolay Savinov, Alexey Dosovitskiy, and Vladlen Koltun. Semi-parametric topological memory for navigation. In ICLR , 2018."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib23",
+      "text": "Obin Kwon, Nuri Kim, Yunho Choi, Hwiyeon Yoo, Jeongho Park, and Songhwai Oh. Visual graph memory with unsupervised representation for visual navigation. In CVPR , pages 15890–15899, 2021."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib29",
+      "text": "Emilio Parisotto and Ruslan Salakhutdinov. Neural map: Structured memory for deep reinforcement learning. In ICLR , 2018."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib10",
+      "text": "Devendra Singh Chaplot, Dhiraj Gandhi, Saurabh Gupta, Abhinav Gupta, and Ruslan Salakhutdinov. Learning to explore using active neural slam. In ICLR , 2020a."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib13",
+      "text": "Tao Chen, Saurabh Gupta, and Abhinav Gupta. Learning exploration policies for navigation. In ICLR , 2019."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib30",
+      "text": "Alexander Pashevich, Cordelia Schmid, and Chen Sun. Episodic transformer for vision-and-language navigation. In CVPR , pages 15942–15952, 2021."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib28",
+      "text": "Lina Mezghani, Sainbayar Sukhbaatar, Thibaut Lavril, Oleksandr Maksymets, Dhruv Batra, Piotr Bojanowski, and Alahari Karteek. Memory-augmented reinforcement learning for image-goal navigation. IROS , pages 3316–3323, 2021."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib18",
+      "text": "Kuan Fang, Alexander Toshev, Li Fei-Fei, and Silvio Savarese. Scene memory transformer for embodied agents in long-horizon tasks. In CVPR , pages 538–547, 2019."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib11",
+      "text": "Devendra Singh Chaplot, Ruslan Salakhutdinov, Abhinav Gupta, and Saurabh Gupta. Neural topological slam for visual navigation. In CVPR , pages 12875–12884, 2020b."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib5",
+      "text": "Edward Beeching, Jilles Dibangoye, Olivier Simonin, and Christian Wolf. Learning to plan with uncertain topological maps. In ECCV , pages 1–24, 2020."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib22",
+      "text": "Nuri Kim, Obin Kwon, Hwiyeon Yoo, Yunho Choi, Jeongho Park, and Songhwai Oh. Topological semantic graph memory for image-goal navigation. In CoRL , pages 393–402. PMLR, 2023."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib15",
+      "text": "Nelson Cowan. What are the differences between long-term, short-term, and working memory? Progress in brain research , 169:323–338, 2008."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib7",
+      "text": "Kara J Blacker, Steven M Weisberg, Nora S Newcombe, and Susan M Courtney. Keeping track of where we are: Spatial working memory in navigation. Visual Cognition , 25(7-8):691–702, 2017."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib42",
+      "text": "Fei Xia, Amir R Zamir, Zhiyang He, Alexander Sax, Jitendra Malik, and Silvio Savarese. Gibson env: Real-world perception for embodied agents. In CVPR , pages 9068–9079, 2018."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib9",
+      "text": "Angel Chang, Angela Dai, Thomas Funkhouser, Maciej Halber, Matthias Niebner, Manolis Savva, Shuran Song, Andy Zeng, and Yinda Zhang. Matterport3d: Learning from rgb-d data in indoor environments. In 3DV , pages 667–676. IEEE, 2017."
+    }
+  ]
+}

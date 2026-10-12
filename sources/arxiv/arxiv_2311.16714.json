@@ -1,0 +1,173 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2311.16714",
+  "title": "Embodied Multi-Modal Agent trained by an LLM from a Parallel TextWorld",
+  "authors": "Yijun Yang, Tianyi Zhou, Kanxue Li, Dapeng Tao, Lusong Li, Li Shen, Xiaodong He, Jing Jiang, Yuhui Shi",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2311.16714",
+  "html_url": "https://arxiv.org/html/2311.16714",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 701,
+  "text": "Embodied multi-modal agents have been acknowledged as a pivotal stride towards achieving Artificial General Intelligence (AGI), as they encompass the potential for a broad scope of intelligent activities [1,2]. The rising of foundation models brings a glimmer of hope for constructing such agents [3,4,5,6,7,8,9], and notable efforts from the community have tried to harness them in many decision-making scenarios, e.g., autonomous driving [10,11], daily household robots [12,13,14], and complex manipulation tasks [15,16,17,18].\n\nLLMs can perform as reflex agents interacting with a text world via verbalized descriptions of the world states and textual actions. In addition, they exhibit great potential in planning, reflection, and reward shaping. This is mainly due to their prior knowledge and semantic abstraction of the world. However, LLM-based agents cannot be directly applied in a visual world. Although current vision-language models (VLMs) try to align LLMs with the visual modality, their pretraining only focuses on static alignment between image-text pairs so the resulting agents have not been aligned well with the dynamics of the visual world. As shown in Fig. 1 (a), even the privileged VLM, e.g., GPT-4V [19], fails to accomplish tasks in an embodied ALFWorld environment [20]. In such a zero-shot setting, GPT-4V tends to mainly rely on its language prior of these objects detected in the current step, rather than the alignment between the visual input and the environment dynamics conditioned on the task instruction.\n\nIn this paper, we study how to train a VLM towards an embodied agent in a visual world by aligning it with the visual world dynamics and distilling the skills of an LLM agent in a parallel text world. Our overarching goal is to build such an E mbodied M ulti- M odal A gent (EMMA) that can take a textual task instruction (e.g., from human users) and pixel observations of the state per step to produce a sequence of actions leading to the efficient completion of the task. This is a challenging problem due to (1) the sparsity of task reward [21,22,23,24], (2) noisy visual representations, (3) the hallucination of VLMs [25], and (4) the misalignment of VLM’s static representations to the visual world dynamics. While offline distillation and imitation from a powerful LLM agent in a parallel text world can potentially overcome the former two challenges [26], effectively mitigating the remaining challenges necessitates online finetuning of the VLM agent within an interactive and visual world [27,28,29].\n\nTo this end, we finetune a VLM agent by imitation learning from an LLM expert (e.g., built on ChatGPT) launched in a parallel text world on the same tasks. Specifically, in each step of EMMA interacting with the visual world, we convert its visual observation into an equivalent textual description sent to the LLM agent, which produces an action for EMMA to imitate. Such cross-modality interactive imitation learning is based on DAgger [30], which overcomes the cumulative errors and distribution shifts caused by behavior cloning (BC). As depicted in Fig. 1 (b), an InstructBLIP [5] agent finetuned by BC on 170K expert demonstrations produced by a rule-based expert in the visual world still fails to take correct actions based on visual observations. We further improve the DAgger’s objective to be the direct preference optimization (DPO) [31], which maximizes the preference of LLM-expert’s action (positive) over VLM-student’s action (negative) in each interaction step. To collect better teaching signals retrospective to the VLM student’s actions, the LLM expert is composed of an LLM actor prompted to output expert actions, and an LLM critic prompted for reflection feedback on the VLM agent’s historical trajectories. We maintain a long-term memory storing the feedback, which is then used to induce the LLM actor to improve actions for imitation in future episodes.\n\nWe evaluate EMMA and compare it with vision-only agents, LLM agents, and VLM agents deployed to the ALFWorld benchmark [20], which includes numerous tasks in both visual and textual environments. Extensive evaluations highlight that EMMA substantially outperforms state-of-the-art (SOTA) VLM agents in visual-only environments by 20%-70% in terms of success rate. In addition, EMMA is the only VLM agent that can generalize to open-vocabulary and free-form test tasks, shedding novel insights on using LLM feedback to train more versatile and generalizable embodied agents in multi-modality environments.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib63",
+      "text": "Michael Wooldridge and Nicholas R Jennings. Intelligent agents: Theory and practice. The knowledge engineering review , 10(2):115–152, 1995."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib27",
+      "text": "Marcus Hutter. Universal artificial intelligence: Sequential decisions based on algorithmic probability . Springer Science & Business Media, 2004."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib32",
+      "text": "Chunyuan Li, Zhe Gan, Zhengyuan Yang, Jianwei Yang, Linjie Li, Lijuan Wang, and Jianfeng Gao. Multimodal foundation models: From specialists to general-purpose assistants. arXiv preprint arXiv:2309.10020 , 2023a."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib34",
+      "text": "Junnan Li, Dongxu Li, Silvio Savarese, and Steven C. H. Hoi. BLIP-2: bootstrapping language-image pre-training with frozen image encoders and large language models. In ICML , 2023c."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib11",
+      "text": "Wenliang Dai, Junnan Li, Dongxu Li, Anthony Tiong, Junqi Zhao, Weisheng Wang, Boyang Li, Pascale Fung, and Steven Hoi. InstructBLIP: Towards general-purpose vision-language models with instruction tuning. In NeurIPS , 2023."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib76",
+      "text": "Deyao Zhu, Jun Chen, Xiaoqian Shen, Xiang Li, and Mohamed Elhoseiny. Minigpt-4: Enhancing vision-language understanding with advanced large language models. arXiv preprint arXiv:2304.10592 , 2023."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib38",
+      "text": "Haotian Liu, Chunyuan Li, Qingyang Wu, and Yong Jae Lee. Visual instruction tuning. arXiv preprint arXiv:2304.08485 , 2023."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib71",
+      "text": "Yijun Yang, Tianyi Zhou, Jing Jiang, Guodong Long, and Yuhui Shi. Continual task allocation in meta-policy network via sparse prompting. In ICML , 2023c."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib35",
+      "text": "Chen Liang, Jiahui Yu, Ming-Hsuan Yang, Matthew Brown, Yin Cui, Tuo Zhao, Boqing Gong, and Tianyi Zhou. Module-wise adaptive distillation for multimodality foundation models. 2024."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib15",
+      "text": "Daocheng Fu, Xin Li, Licheng Wen, Min Dou, Pinlong Cai, Botian Shi, and Yu Qiao. Drive like a human: Rethinking autonomous driving with large language models. arXiv preprint arXiv:2307.07162 , 2023."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib66",
+      "text": "Zhenhua Xu, Yujia Zhang, Enze Xie, Zhen Zhao, Yong Guo, Kenneth KY Wong, Zhenguo Li, and Hengshuang Zhao. Drivegpt4: Interpretable end-to-end autonomous driving via large language model. arXiv preprint arXiv:2310.01412 , 2023."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib13",
+      "text": "Danny Driess, Fei Xia, Mehdi SM Sajjadi, Corey Lynch, Aakanksha Chowdhery, Brian Ichter, Ayzaan Wahid, Jonathan Tompson, Quan Vuong, Tianhe Yu, et al. Palm-e: An embodied multimodal language model. arXiv preprint arXiv:2303.03378 , 2023."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib6",
+      "text": "Anthony Brohan, Noah Brown, Justice Carbajal, Yevgen Chebotar, Joseph Dabis, Chelsea Finn, Keerthana Gopalakrishnan, Karol Hausman, Alex Herzog, Jasmine Hsu, et al. Rt-1: Robotics transformer for real-world control at scale. arXiv preprint arXiv:2212.06817 , 2022."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib77",
+      "text": "Brianna Zitkovich, Tianhe Yu, Sichun Xu, Peng Xu, Ted Xiao, Fei Xia, Jialin Wu, Paul Wohlhart, Stefan Welker, Ayzaan Wahid, et al. Rt-2: Vision-language-action models transfer web knowledge to robotic control. In CoRL , 2023."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib25",
+      "text": "Wenlong Huang, Chen Wang, Ruohan Zhang, Yunzhu Li, Jiajun Wu, and Li Fei-Fei. Voxposer: Composable 3d value maps for robotic manipulation with language models. arXiv preprint arXiv:2307.05973 , 2023."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib42",
+      "text": "Yao Mu, Qinglong Zhang, Mengkang Hu, Wenhai Wang, Mingyu Ding, Jun Jin, Bin Wang, Jifeng Dai, Yu Qiao, and Ping Luo. Embodiedgpt: Vision-language pre-training via embodied chain of thought. arXiv preprint arXiv:2305.15021 , 2023."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib57",
+      "text": "Theodore Sumers, Kenneth Marino, Arun Ahuja, Rob Fergus, and Ishita Dasgupta. Distilling internet-scale vision-language models into embodied agents. In ICML , 2023."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib29",
+      "text": "Yunfan Jiang, Agrim Gupta, Zichen Zhang, Guanzhi Wang, Yongqiang Dou, Yanjun Chen, Li Fei-Fei, Anima Anandkumar, Yuke Zhu, and Linxi Fan. VIMA: robot manipulation with multimodal prompts. In ICML , 2023."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib43",
+      "text": "OpenAI. GPT-4V(ision) system card. https://cdn.openai.com/papers/GPTV_System_Card.pdf , 2023."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib56",
+      "text": "Mohit Shridhar, Xingdi Yuan, Marc-Alexandre Côté, Yonatan Bisk, Adam Trischler, and Matthew J. Hausknecht. Alfworld: Aligning text and embodied environments for interactive learning. In ICLR , 2021."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib2",
+      "text": "Marcin Andrychowicz, Filip Wolski, Alex Ray, Jonas Schneider, Rachel Fong, Peter Welinder, Bob McGrew, Josh Tobin, OpenAI Pieter Abbeel, and Wojciech Zaremba. Hindsight experience replay. 2017."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib14",
+      "text": "Meng Fang, Tianyi Zhou, Yali Du, Lei Han, and Zhengyou Zhang. Curriculum-guided hindsight experience replay. NeurIPS , 2019."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib3",
+      "text": "Shuang Ao, Tianyi Zhou, Guodong Long, Qinghua Lu, Liming Zhu, and Jing Jiang. Co-pilot: Collaborative planning and reinforcement learning on sub-task curriculum. 2021."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib4",
+      "text": "Shuang Ao, Tianyi Zhou, Jing Jiang, Guodong Long, Xuan Song, and Chengqi Zhang. Eat-c: environment-adversarial sub-task curriculum for efficient reinforcement learning. In ICML , 2022."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib60",
+      "text": "Xiyao Wang, Yuhang Zhou, Xiaoyu Liu, Hongjin Lu, Yuancheng Xu, Feihong He, Jaehong Yoon, Taixi Lu, Gedas Bertasius, Mohit Bansal, et al. Mementos: A comprehensive benchmark for multimodal large language model reasoning over image sequences. arXiv preprint arXiv:2401.10529 , 2024."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib75",
+      "text": "Victor Zhong, Dipendra Misra, Xingdi Yuan, and Marc-Alexandre Côté. Policy improvement using language feedback models. arXiv preprint arXiv:2402.07876 , 2024."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib31",
+      "text": "Sergey Levine, Aviral Kumar, George Tucker, and Justin Fu. Offline reinforcement learning: Tutorial, review, and perspectives on open problems. arXiv preprint arXiv:2005.01643 , 2020."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib70",
+      "text": "Yijun Yang, Jing Jiang, Tianyi Zhou, Jie Ma, and Yuhui Shi. Pareto policy pool for model-based offline reinforcement learning. In ICLR , 2022."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib18",
+      "text": "Jiayi Guan, Guang Chen, Jiaming Ji, Long Yang, Zhijun Li, et al. Voce: Variational optimization with conservative estimation for offline safe reinforcement learning. NeurIPS , 36, 2023."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib51",
+      "text": "Stéphane Ross, Geoffrey J. Gordon, and Drew Bagnell. A reduction of imitation learning and structured prediction to no-regret online learning. In AISTATS , 2011."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib48",
+      "text": "Rafael Rafailov, Archit Sharma, Eric Mitchell, Christopher D Manning, Stefano Ermon, and Chelsea Finn. Direct preference optimization: Your language model is secretly a reward model. NeurIPS , 2024."
+    }
+  ]
+}

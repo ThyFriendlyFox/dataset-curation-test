@@ -1,0 +1,89 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.17353",
+  "title": "Multi-Objective Trajectory Planning with Dual-Encoder",
+  "authors": "Beibei Zhang, Tian Xiang, Chentao Mao, Yuhua Zheng, Shuai Li, Haoyi Niu, Xiangming Xi, Wenyuan Bai, Feng Gao",
+  "year": "2024",
+  "categories": [
+    "cs.RO",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2403.17353",
+  "html_url": "https://arxiv.org/html/2403.17353",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 814,
+  "text": "Driven by the imperative for increased productivity in future smart factories, we demand robotic arms to efficiently and reliably accomplish a sequence of dynamic tasks. As an example, aircraft assembly lines employ robotic arms to place components with varying shapes and sizes, adjusting to the changing requirements of the assembly process [1]. A robotic arm trajectory, commonly quoted as a robot configuration as a function of time, is pivotal for a robot manipulator to fulfill the tasks. To optimize productivity and enhance the stability of a robot manipulator, we consider time and the time derivative of acceleration, known as a jerk, as optimization objectives when proposing the trajectory. Our time objective targets to minimize the overall duration of a trajectory and the jerk objective prioritizes diminishing the abrupt changes in trajectory accelerations.\n\nThe trajectory can be carried out in the joint space with a series of successive joint values that each robot joint should assume over time, referred to as waypoints. Trajectory planning seeks to create interpolation functions, such as polynomial [2], Bezier [3], and B-spline [4], to accurately traverse the waypoints as illustrated in Fig. 1. Fundamentally, obtaining a time-jerk optimal trajectory amounts to solving a nonlinear programming problem, which is NP-hard [5]. The inherent computational demands of trajectory planning result in prolonged trajectory generation time, making it difficult to cope with the dynamic task requirements of future smart factories. In this paper, we focus on speeding up the time-jerk optimal trajectory planning process.\n\nCurrent research addresses the time-jerk optimal trajectory planning through two classes of methods. A first group of work tackles the problem by optimizing a system of equations that consists of the interpolation function type and the constraints imposed on it. The problem can be solved through genetic algorithms (GA) [4,6,7] that iteratively improve the approximation set or the sequential quadratic programming (SQP) algorithm [8] that decomposes the nonlinear and non-convex problem into a sequential convex problem. Another line of research resorts to devising supervised learning models, such as artificial neural networks [9] and long short-term memory [10], trained on time-jerk optimal trajectory datasets. The supervised learning models take kinematic configurations of robotic manipulators and waypoints as inputs to generate a time-jerk optimal trajectory.\n\nUpon investigating and experimenting on the released code of state-of-the-art methods, we empirically observe that: First, the result optimality and computation time of the GA or the SQP methods are highly sensitive to how good the initial estimate is. As an example [11], the SQP-based solution takes an average 2.6 seconds to generate a trajectory and requires multiple times of optimizations with different initial estimates to get a time-jerk optimal trajectory. Second, although it is faster to generate a trajectory with supervised learning methods, the black-box nature of such approaches leads to poor robustness when faced with kinematic constraints and joint configurations not represented in the training data. This lack of robustness renders these methods unsuitable for future smart factories [1].\n\nTo sum up, the optimization-based methods fall short of delivering efficiency. This gap not only affects the throughput of production lines but also limits the potential for real-time adjustments, which are essential features in future smart factories. The supervised learning-based methods show promising efficiency that caters to the demands of future smart manufacturing. However, the methods struggle with robustness and fail to achieve optimal results.\n\nIn response to these challenges, our paper introduces a two-stage trajectory planning method. First, with the observation that a good initial estimate of the trajectory noticeably improves the convergence speed of the SQP optimization routine, we propose a dual-encoder based transformer model [12] to predict initial trajectory parameters. Next, based on the initial parameters, we further optimize the trajectory with SQP to derive a time-jerk optimal trajectory, thereby enhancing the robustness of the method without compromising efficiency. Technically, we design a dual-encoder based transformer model that consists of a source encoder and a context encoder. The source encoder represents the dynamic characteristics of the current joint. Meanwhile, the context encoder depicts the motion relationships between the current joint and other joints.\n\nThereafter, we conduct extensive experiments on five counterparts including SQP [8], NSGA-II [4], IPTP [13], TOTG [14], and LSTM [10]. Empirically, our approach consistently and significantly outperforms state-of-the-art methods. Interestingly, we observe that, unlike other methods, our approach is less impacted by trajectory length, measured by the number of waypoints, in terms of trajectory planning time.\n\nTo summarize, our key contributions are as follows: 1) A two-stage solution to expedite the generation of time-jerk optimal trajectory, where we design a dual-encoder based transformer model trained on time-jerk optimal trajectories to predict the initial estimate of the SQP. 2) Our method achieves new state-of-the-art performance over optimization-based approaches and supervised learning methods, particularly highlighting the balance between computational efficiency and robustness in trajectory planning. The implementations are released, hoping to facilitate future research in robust and efficient multi-objective trajectory planning.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "E. Masehian and S. Ghandi, “Assembly sequence and path planning for monotone and nonmonotone assemblies with rigid and flexible parts,” Robotics and Computer-Integrated Manufacturing , vol. 72, p. 102180, 2021."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "M. Švejda and T. Čechura, “Interpolation method for robot trajectory planning,” in 2015 20th International Conference on Process Control (PC) . IEEE, 2015, pp. 406–411."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "S. G. Manyam, D. W. Casbeer, I. E. Weintraub, and C. Taylor, “Trajectory optimization for rendezvous planning using quadratic bézier curves,” in 2021 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS) . IEEE, 2021, pp. 1405–1412."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "J. Huang, P. Hu, K. Wu, and M. Zeng, “Optimal time-jerk trajectory planning for industrial robots,” Mechanism and Machine Theory , vol. 121, pp. 530–544, 2018."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "A. Gasparetto and V. Zanotto, “A technique for time-jerk optimal planning of robot trajectories,” Robotics and Computer-Integrated Manufacturing , vol. 24, no. 3, pp. 415–426, 2008."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "F. Wang, Z. Wu, and T. Bao, “Time-jerk optimal trajectory planning of industrial robots based on a hybrid woa-ga algorithm,” Processes , vol. 10, no. 5, p. 1014, 2022."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "J. Lin, N. Somani, B. Hu, M. Rickert, and A. Knoll, “An efficient and time-optimal trajectory generation approach for waypoints under kinematic constraints and error bounds,” in 2018 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS) . IEEE, 2018, pp. 5869–5876."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "Y. Zhang, Z. Sun, Q. Sun, Y. Wang, X. Li, and J. Yang, “Time-jerk optimal trajectory planning of hydraulic robotic excavator,” Advances in Mechanical Engineering , vol. 13, no. 7, p. 16878140211034611, 2021."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "S. Yin, W. Ji, and L. Wang, “A machine learning based energy efficient trajectory planning approach for industrial robots,” Procedia CIRP , vol. 81, pp. 429–434, 2019."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "A. Molina-Leal, A. Gómez-Espinosa, J. A. Escobedo Cabello, E. Cuan-Urquizo, and S. R. Cruz-Ramírez, “Trajectory planning for a mobile robot in a dynamic environment using an lstm neural network,” Applied Sciences , vol. 11, no. 22, p. 10689, 2021."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "I. Gukov and A. Logins, “Real-time multi-objective trajectory optimization,” in 2022 Sixth IEEE International Conference on Robotic Computing (IRC) . IEEE, 2022, pp. 391–394."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A. N. Gomez, Ł. Kaiser, and I. Polosukhin, “Attention is all you need,” Advances in neural information processing systems , vol. 30, 2017."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "Q.-C. Pham, “A general, fast, and robust implementation of the time-optimal path parameterization algorithm,” IEEE Transactions on Robotics , vol. 30, no. 6, pp. 1533–1540, 2014."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "T. Kunz and M. Stilman, “Time-optimal trajectory generation for path following with bounded acceleration and velocity,” in Robotics: Science and Systems VIII, University of Sydney, Sydney, NSW, Australia, July 9-13, 2012 , 2012."
+    }
+  ]
+}

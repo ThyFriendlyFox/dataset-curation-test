@@ -1,0 +1,38 @@
+{
+  "source_type": "encyclopedia_article",
+  "source_id": "enwiki:Branch and bound#rev1373372943",
+  "title": "Branch and bound",
+  "authors": "Wikipedia contributors",
+  "year": "2026",
+  "url": "https://en.wikipedia.org/w/index.php?title=Branch_and_bound&oldid=1373372943",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Overview",
+  "word_count": 743,
+  "text": "The goal of a branch-and-bound algorithm is to find a value x that maximizes or minimizes the value of a real-valued function f(x), called an objective function, among some set S of admissible or candidate solutions. The set S is called the search space, or feasible region. The rest of this section assumes that minimization of f(x) is desired; this assumption comes without loss of generality, since one can find the maximum value of f(x) by finding the minimum of g(x) −f(x). A B&B algorithm operates according to two principles:\n\nIt recursively splits the search space into smaller spaces, then minimizes f(x) on these smaller spaces; the splitting is called branching.\n\nBranching alone would amount to brute-force enumeration of candidate solutions and testing them all. To improve on the performance of brute-force search, a B&B algorithm keeps track of bounds on the minimum that it is trying to find, and uses these bounds to \"prune\" the search space, eliminating candidate solutions that it can prove will not contain an optimal solution.\n\nTurning these principles into a concrete algorithm for a specific optimization problem requires some kind of data structure that represents sets of candidate solutions. Such a representation is called an instance of the problem. Denote the set of candidate solutions of an instance I by SI. The instance representation has to come with three operations:\n\nbranch(I) produces two or more instances that each represent a subset of SI. (Typically, the subsets are disjoint to prevent the algorithm from visiting the same candidate solution twice, but this is not required. However, an optimal solution among SI must be contained in at least one of the subsets.[1])\n\nbound(I) computes a lower bound on the value of any candidate solution in the space represented by I, that is, bound(I) ≤ f(x) for all x in SI.\n\nsolution(I) determines whether I represents a single candidate solution. (Optionally, if it does not, then the operation may choose to return some feasible solution from among SI.) If solution(I) returns a solution, then f(solution(I)) provides an upper bound for the optimal objective value over the whole space of feasible solutions.\n\nUsing these operations, a B&B algorithm performs a top-down recursive search through the tree of instances formed by the branch operation. Upon visiting an instance I, it checks whether bound(I) is equal to or greater than the current upper bound; if so, I may be safely discarded from the search and the recursion stops. This pruning step is usually implemented by maintaining a global variable that records the minimum upper bound seen among all instances examined so far.\n\n### Generic version\n\nThe following is the skeleton of a generic branch-and-bound algorithm for minimizing an arbitrary objective function f.[2] To obtain an actual algorithm from this, one requires a bounding function bound, that computes lower bounds of f on nodes of the search tree, as well as a problem-specific branching rule.\n\nUsing a heuristic, find a solution xh to the optimization problem. Store its value, B f(xh). (If no heuristic is available, set B to infinity.) B will denote the best solution found so far, and will be used as an upper bound on candidate solutions.\n\nInitialize a queue to hold a partial solution with none of the variables of the problem assigned.\n\nLoop until the queue is empty:\n\nTake a node N off the queue.\n\nIf N represents a single candidate solution x and f(x) < B, then x is the best solution so far. Record it and set B ← f(x). The same can be done with a heuristic whenever the node does not identify a unique solution.\n\nElse, branch on N to produce new nodes Ni. Add all feasible nodes for which bound(Ni) < B to the queue. The remaining nodes, having a lower bound greater than or equal to the upper bound of the problem, will never lead to the optimal solution and are discarded.\n\nSeveral different queue data structures can be used. A stack (LIFO queue) will yield a depth-first algorithm. A best-first branch-and-bound algorithm can be obtained by using a priority queue that sorts nodes on their lower bounds.[2] The depth-first variant is recommended when no good heuristic is available for producing an initial solution, because it quickly produces full solutions, and therefore upper bounds.[3]\n\n### Improvements\n\nWhen \\mathbf{x} is a vector of \\mathbb{R}^n , branch-and-bound algorithms can be combined with interval analysis[4] and contractor techniques to provide guaranteed enclosures of the global minimum.[5,6]",
+  "references": [
+    {
+      "n": 1,
+      "text": "Bader, David A.. (2004). Parallel Algorithm Design for Branch and Bound. Kluwer Academic Press. http://www.cc.gatech.edu/~bader/papers/ParallelBranchBound.pdf"
+    },
+    {
+      "n": 2,
+      "text": "Clausen, Jens. (1999). Branch and Bound Algorithms—Principles and Examples. University of Copenhagen. http://www.diku.dk/OLD/undervisning/2003e/datV-optimer/JensClausenNoter.pdf"
+    },
+    {
+      "n": 3,
+      "text": "Mehlhorn, Kurt. (2008). Algorithms and Data Structures: The Basic Toolbox. Springer. http://people.mpi-inf.mpg.de/~mehlhorn/ftp/Toolbox/GenericMethods.pdf"
+    },
+    {
+      "n": 4,
+      "text": "Moore, R. E.. (1966). Interval Analysis. Prentice-Hall."
+    },
+    {
+      "n": 5,
+      "text": "Jaulin, L.. (2001). Applied Interval Analysis. Springer."
+    },
+    {
+      "n": 6,
+      "text": "Hansen, E.R.. (1992). Global Optimization using Interval Analysis. Marcel Dekker."
+    }
+  ]
+}

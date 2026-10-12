@@ -1,0 +1,44 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2311.08968",
+  "title": "Identifying Linear Relational Concepts in Large Language Models",
+  "authors": "David Chanin, Anthony Hunter, Oana-Maria Camburu",
+  "year": "2024",
+  "categories": [
+    "cs.CL",
+    "cs.AI"
+  ],
+  "url": "https://arxiv.org/abs/2311.08968",
+  "html_url": "https://arxiv.org/html/2311.08968",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 675,
+  "text": "How do large language models (LLMs) represent concepts, and how can we identify those concepts in hidden activations? If we can identify human-interpretable concepts in model activations, we can analyze how concepts are created and changed during inference. Identifying concept representations inside of models opens up the possibility of visualizing the computation process of a model as sentences are processed, and can help to understand incorrect or undesirable responses from the model. Moreover, future work examining how concept directions arise in model weights and how models express relations between concepts may benefit from a robust method to find those concept directions as a first step.\n\nAn intuitive approach when trying to locate a human-interpretable concept, like the concept of a city being in France, is to collect examples of sentences with cities that are in France and cities that are not, and train a probing classifier [1,2] on hidden layers of the model, typically a simple linear classifier. However, the learned classifier may be picking up features correlated with the concept being probed while overlooking the feature direction that causally influences model output [3].\n\nFurthermore, the hidden layer in modern transformer models has high dimensionality: even older models such as GPT2-xl have 1600 dimensions in the hidden layer [4], and modern language models such as Llama2 have over 4000 dimensions for the smallest model (7B) [5]. Naively training a probing classifier may require a high number of training samples.\n\nOur technique builds on work by [3], which models the relation between a subject s and object o as an affine linear transformation, called a linear relational embedding (LRE). While the LRE work was mainly an investigation into how models represent relational knowledge, we find that inverting the LRE can generate concept directions that achieve surprisingly strong performance as a classifier while also causally impacting model outputs, outperforming standard probing classifiers such as a linear support vector machine (SVM). We refer to the concept direction that our method creates as a linear relational concept (LRC). An LRC represents a concept as a direction in a latent space, while also functioning as a linear classifier.\n\nFigure 1 shows our method for generating an LRC. We first generate an LRE for a relation, mapping subject activations to their corresponding object activations as a linear transformation. Then, we perform a low-rank pseudo-inverse of the LRE, mapping from object activations back to subject activations. Applying this inverted LRE to an object in the relation results in an LRC. LRCs beat traditional probing classifiers in both classification accuracy and causality, where causality is defined as being able to control the output of the model. For instance, we can force the model to output that “London is located in France” by subtracting the “Located in England” LRC from the activation of “London” and adding the “Located in France” LRC.\n\nIn addition, since we use the LRE only as an intermediate step to obtain LRCs, we can relax the requirement that LREs must faithfully predict object output logits directly. This allows us to train the LRE using object activations before the final model layer, and use all object token activations rather than only using the first object token. This improves classification accuracy for both single-token and multi-token objects compared with the original LRE work, where only the final object layer can be used and only the first object token can be modeled.\n\nIn this paper, we investigate the problem of locating human-interpretable concepts within the hidden layer of auto-regressive LLMs such as GPT [4] and Llama [5]. We evaluate our technique using the LRE relations dataset [3] in both multi-class classification accuracy, and causality (the ability of concepts to modify model output). Our technique achieves high scores for both classification accuracy and causality across the four concept types in the dataset.\n\nOur contributions include: (1) Extending LREs to handle multi-token objects, (2) Using non-terminal model layers for the object activation, and (3) Using inverted LREs as an intermediate step to find concept directions (LRCs) in subject activations. Our code is available on GitHub.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib4",
+      "text": "Ettinger et al. (2016) Allyson Ettinger, Ahmed Elgohary, and Philip Resnik. 2016. Probing for semantic evidence of composition by means of simple classification tasks. In Proceedings of the 1st workshop on evaluating vector-space representations for nlp , pages 134–139."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib5",
+      "text": "Finlayson et al. (2021) Matthew Finlayson, Aaron Mueller, Sebastian Gehrmann, Stuart Shieber, Tal Linzen, and Yonatan Belinkov. 2021. Causal analysis of syntactic agreement mechanisms in neural language models . In Proceedings of the 59th Annual Meeting of the Association for Computational Linguistics and the 11th International Joint Conference on Natural Language Processing (Volume 1: Long Papers) , pages 1828–1843, Online. Association for Computational Linguistics."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib10",
+      "text": "Hernandez et al. (2023b) Evan Hernandez, Arnab Sen Sharma, Tal Haklay, Kevin Meng, Martin Wattenberg, Jacob Andreas, Yonatan Belinkov, and David Bau. 2023b. Linearity of relation decoding in transformer language models. arXiv preprint arXiv:2308.09124 ."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib15",
+      "text": "Radford et al. (2019) Alec Radford, Jeffrey Wu, Rewon Child, David Luan, Dario Amodei, Ilya Sutskever, et al. 2019. Language models are unsupervised multitask learners. OpenAI blog , 1(8):9."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib16",
+      "text": "Touvron et al. (2023) Hugo Touvron, Louis Martin, Kevin Stone, Peter Albert, Amjad Almahairi, Yasmine Babaei, Nikolay Bashlykov, Soumya Batra, Prajjwal Bhargava, Shruti Bhosale, et al. 2023. Llama 2: Open foundation and fine-tuned chat models. arXiv preprint arXiv:2307.09288 ."
+    }
+  ]
+}

@@ -1,0 +1,209 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.16712",
+  "title": "Chase Termination Beyond Polynomial Time",
+  "authors": "Philipp Hanisch, Markus KrÃ¶tzsch",
+  "year": "2024",
+  "categories": [
+    "cs.DB",
+    "cs.LO"
+  ],
+  "url": "https://arxiv.org/abs/2403.16712",
+  "html_url": "https://arxiv.org/html/2403.16712",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1062,
+  "text": "The chase [1,2,3] is an essential method for reasoning with constraints in databases, with application areas including data exchange [4], constraint implication [5], data cleansing [6], query optimization [7,8,9], query answering under constraints [10,11], and ontological reasoning [12,13]. The basis for this wide applicability is the chase’s ability to compute a universal model for a set of constraints [14], which is either used directly (e.g., as a repaired database) or indirectly (e.g., for deciding query entailment).\n\nHowever, universal models can be infinite, and chase termination is undecidable on a single database [5] as well as in its stricter uniform version over arbitrary databases [15,16]. The root of this problem are a form of constraints known as tuple-generating dependencies (tgds) – or existential rules: Horn logic rules with existential quantification in conclusions –, since they may require additional domain elements (represented by nulls) to be satisfied.\n\nA large body of research is devoted to finding decidable cases for which termination can be guaranteed, mainly by analysing the data flow, i.e., the propagation of nulls in the chase [17,4,18,19,20,21]. Here we can distinguish graph-based abstractions, such as weak acyclicity [4], from materialisation-based approaches, such as MFA [20]. In general, decidable criteria are sufficient but not necessary for termination, but recent breakthroughs established decidability of termination for the linear, guarded, and sticky classes of tgds [22,23,24,25].\n\nMeanwhile, another productive line of recent research clarified the computational power of the chase, characterising the query functions that can be expressed by conjunctive queries under tgd constraints. This expressive power is bounded by data complexity, but can be lower: famously, Datalog does not capture all queries in P, not even those closed under homomorphisms [27]. Results are more satisfying for tuple-generating dependencies. Not only do arbitrary tgds capture the recursively enumerable homomorphism-closed queries [28], but, surprisingly, the decidable homomorphism-closed queries can be captured by tgds for which the standard (a.k.a. restricted) chase terminates [29]. In other words, the standard chase over tgds without any extensions is a universal computational paradigm for database query answering. This is highly encouraging since a majority of chase implementations already support this version of the chase procedure [8,9,6,30,11,31], often with favourable performance [1].\n\nNaturally, tractable data complexity is often desirable in database applications, and has therefore been the focus of many works in the area. Unfortunately, the potential of chase-based computation for more complex computations has meanwhile been neglected. To our knowledge, the only line of research where the chase was used for harder-than- P computations relies on a method for modelling finite sets with tgds [32]. Practical feasibility was shown for ExpTime -complete ontology-based query answering [32], set-terms in answer set programming [33], complex values in Datalog [34], and why-provenance [35]. In essence, all of these works are based on a single set of tgds for which uniform termination is shown directly. Known chase termination criteria fail for this case, since they only recognise queries in P. In fact, most criteria are even known to describe fragments that do not increase upon the expressive power of Datalog [36,37], This limitation is common to all tgd sets on which the semi-oblivious chase uniformly terminates. We are aware of only one approach so far that studies the more complicated standard chase at all [21], but which also remains in P.\n\nWe tackle this challenge with a new method that extends the graph-based termination criterion of joint acyclicity [19] with new decidable conditions that allow for some kinds of cycles. These conditions are specific to the standard chase, and enforce that tgd applications within a cycle are eventually blocked, possibly only after (double) exponentially many loops. Our conditions detect the uniform termination of the set-modelling tgds of Carral et al. [32], but significantly extend upon this baseline: even a single strongly connected component in the data-flow graph can correspond to a 2\\text{-\\text{{\\sc ExpTime}} } -complete query (whereas Carral et al. deal with exponentially many sets).\n\nLeveraging again the graph-based view, we can further analyse the data flows between cyclic strongly connected components to describe decidable fragments of arbitrary multi-exponential data complexity. Our resulting decidable fragment of saturating tgds therefore has non-elementary complexity. This is already very general, especially when considering that capturing all decidable homomorphism-closed queries can in principle only be achieved with tgd fragments that are not even recursively enumerable [29].\n\nThe structure of the data-flow graph enables us to compute more precise \\kappa\\text{-\\text{{\\sc ExpTime}} } bounds for any saturating tgd set. Refining this analysis further, we then identify cases where the complexity of query answering drops to (\\kappa-1)\\text{-\\text{{\\sc ExpSpace}} }. In particular, we therefore obtain a decidable fragment of uniformly terminating tgd sets with PSpace -complete query entailment. To the best of our knowledge, this is the first such fragment.\n\nAll of our results establish uniform termination of the standard chase under all chase strategies that prioritise Datalog rules (Krötzsch et al. call this the Datalog-first strategy [37]). By a recent result, this is a stronger requirement than termination under some strategies [38]. As of today, however, all known termination criteria imply Datalog-first termination, and preferring Datalog rules is also a common heuristic in practice.\n\nIn summary, our main contributions are as follows:\n\n- • In Section 3, we refine the dependency graph of [19] [19] to capture data flow in more detail.\n\n- • In Section 4, we study the propagation of inferences between nulls related to strongly connected components in the extended dependency graph. We find conditions that suffice to prevent infinite repetitions of inference cycles, define the language of saturating tgds, and show uniform standard chase termination for this fragment.\n\n- • In Section 5, we analyse the exact complexity (and size) of the standard chase over saturating sets by assigning ranks to strongly connected components in the extended dependency graph. We differentiate the case of single and double exponential complexity for individual components, and we establish matching lower bounds to show that query entailment is \\kappa\\text{-\\text{{\\sc ExpTime}} } -complete for tgd sets of rank \\kappa.\n\n- • In Section 6, we describe conditions that reduce query entailment for tgd sets of rank \\kappa to (\\kappa-1)\\text{-\\text{{\\sc ExpSpace}} }. To this end, we discover a tree-like structure within the chase, and we define a syntactic condition called path guardedness that allows us to use an optimised chase procedure. Again, we establish matching lower bounds.\n\nDetailed proofs are included in the appendix.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib7",
+      "text": "Benedikt et al . (2017) Michael Benedikt, George Konstantinidis, Giansalvatore Mecca, Boris Motik, Paolo Papotti, Donatello Santoro, and Efthymia Tsamoura. 2017. Benchmarking the Chase. In Proc. 36th Symposium on Principles of Database Systems (PODS’17) , Emanuel Sallinger, Jan Van den Bussche, and Floris Geerts (Eds.). ACM, 37–52."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib34",
+      "text": "Maier et al . (1979) David Maier, Alberto O. Mendelzon, and Yehoshua Sagiv. 1979. Testing implications of data dependencies. ACM Transactions on Database Systems 4 (1979), 455–469. Issue 4."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib2",
+      "text": "Aho et al . (1979a) Alfred V. Aho, Catriel Beeri, and Jeffrey D. Ullman. 1979a. The Theory of Joins in Relational Databases. ACM Trans. Database Syst. 4, 3 (1979), 297–314."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib25",
+      "text": "Fagin et al . (2005) Ronald Fagin, Phokion G. Kolaitis, Renée J. Miller, and Lucian Popa. 2005. Data exchange: semantics and query answering. Theoretical Computer Science 336, 1 (2005), 89–124."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib6",
+      "text": "Beeri and Vardi (1984) Catriel Beeri and Moshe Y. Vardi. 1984. A Proof Procedure for Data Dependencies. J. ACM 31, 4 (1984), 718–741."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib27",
+      "text": "Geerts et al . (2014) Floris Geerts, Giansalvatore Mecca, Paolo Papotti, and Donatello Santoro. 2014. That’s All Folks! LLUNATIC Goes Open Source. PVLDB 7, 13 (2014), 1565–1568."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib3",
+      "text": "Aho et al . (1979b) Alfred V. Aho, Yehoshua Sagiv, and Jeffrey D. Ullman. 1979b. Efficient Optimization of a Class of Relational Expressions. ACM Trans. Database Syst. 4, 4 (1979), 435–454. https://doi.org/10.1145/320107.320112"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib37",
+      "text": "Meier (2014) Michael Meier. 2014. The backchase revisited. VLDB J. 23, 3 (2014), 495–516. https://doi.org/10.1007/S00778-013-0333-Y"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib8",
+      "text": "Benedikt et al . (2014) Michael Benedikt, Julien Leblay, and Efthymia Tsamoura. 2014. PDQ: Proof-driven Query Answering over Web-based Data. Proc. VLDB Endowment 7, 13 (2014), 1553–1556."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib14",
+      "text": "Calì et al . (2003) Andrea Calì, Domenico Lembo, and Riccardo Rosati. 2003. On the decidability and complexity of query answering over inconsistent and incomplete databases. In Proc. 22nd Symposium on Principles of Database Systems (PODS’03) , Frank Neven, Catriel Beeri, and Tova Milo (Eds.). ACM, 260–271. https://doi.org/10.1145/773153.773179"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib39",
+      "text": "Nenov et al . (2015) Yavor Nenov, Robert Piro, Boris Motik, Ian Horrocks, Zhe Wu, and Jay Banerjee. 2015. RDFox: A Highly-Scalable RDF Store. In Proc. 14th Int. Semantic Web Conf. (ISWC’15), Part II (LNCS, Vol. 9367) , Marcelo Arenas, Óscar Corcho, Elena Simperl, Markus Strohmaier, Mathieu d’Aquin, Kavitha Srinivas, Paul T. Groth, Michel Dumontier, Jeff Heflin, Krishnaprasad Thirunarayan, and Steffen Staab (Eds.). Springer, 3–20."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib5",
+      "text": "Baget et al . (2011) Jean-François Baget, Michel Leclère, Marie-Laure Mugnier, and Eric Salvat. 2011. On rules with existential variables: Walking the decidability line. Artificial Intelligence 175, 9–10 (2011), 1620–1654."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "Calì et al . (2012) Andrea Calì, Georg Gottlob, and Andreas Pieris. 2012. Towards more expressive ontology languages: The query answering problem. J. of Artif. Intell. 193 (2012), 87–128."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib22",
+      "text": "Deutsch et al . (2008) Alin Deutsch, Alan Nash, and Jeffrey B. Remmel. 2008. The Chase Revisited. In Proc. 27th Symposium on Principles of Database Systems (PODS’08) , Maurizio Lenzerini and Domenico Lembo (Eds.). ACM, 149–158."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib28",
+      "text": "Gogacz and Marcinkowski (2014) Tomasz Gogacz and Jerzy Marcinkowski. 2014. All-Instances Termination of Chase is Undecidable. In Proc. 41st Int. Colloquium on Automata, Languages, and Programming (ICALP’14); Part II (LNCS, Vol. 8573) , Javier Esparza, Pierre Fraigniaud, Thore Husfeldt, and Elias Koutsoupias (Eds.). Springer, 293–304."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib30",
+      "text": "Grahne and Onet (2018) Gösta Grahne and Adrian Onet. 2018. Anatomy of the Chase. Fundam. Inform. 157, 3 (2018), 221–270."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib23",
+      "text": "Deutsch and Tannen (2003) Alin Deutsch and Val Tannen. 2003. Reformulation of XML Queries and Constraints. In Proc. 9th Int. Conf. on Database Theory (ICDT’03) (LNCS, Vol. 2572) , Diego Calvanese, Maurizio Lenzerini, and Rajeev Motwani (Eds.). Springer, 225–241."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib35",
+      "text": "Marnette (2009) Bruno Marnette. 2009. Generalized Schema-Mappings: from Termination to Tractability. In Proc. 28th Symposium on Principles of Database Systems (PODS’09) , Jan Paredaens and Jianwen Su (Eds.). ACM, 13–22."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib32",
+      "text": "Krötzsch and Rudolph (2011) Markus Krötzsch and Sebastian Rudolph. 2011. Extending Decidable Existential Rules by Joining Acyclicity and Guardedness. In Proc. 22nd Int. Joint Conf. on Artificial Intelligence (IJCAI’11) , Toby Walsh (Ed.). AAAI Press/IJCAI, 963–968."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib19",
+      "text": "Cuenca Grau et al . (2013) Bernardo Cuenca Grau, Ian Horrocks, Markus Krötzsch, Clemens Kupke, Despoina Magka, Boris Motik, and Zhe Wang. 2013. Acyclicity Notions for Existential Rules and Their Application to Query Answering in Ontologies. J. of Artificial Intelligence Research 47 (2013), 741–808."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib15",
+      "text": "Carral et al . (2017) David Carral, Irina Dragoste, and Markus Krötzsch. 2017. Restricted Chase (Non)Termination for Existential Rules with Disjunctions. In Proc. 26th Int. Joint Conf. on Artificial Intelligence (IJCAI’17) , Carles Sierra (Ed.). ijcai.org, 922–928."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib38",
+      "text": "Michel Leclére and Ulliana (2019) Michaël Thomazo Michel Leclére, Marie-Laure Mugnier and Federico Ulliana. 2019. On Chase Termination for Linear Existential Rules. In Proc. 22nd Int. Conf. on Database Theory (ICDT’19) . Schloss Dagstuhl – Leibniz-Zentrum fuer Informatik."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib10",
+      "text": "Calautti et al . (2022) Marco Calautti, Georg Gottlob, and Andreas Pieris. 2022. Non-Uniformly Terminating Chase: Size and Complexity. In Proc. 41st Symposium on Principles of Database Systems (PODS’22) , Leonid Libkin and Pablo Barceló (Eds.). ACM, 369–378."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib11",
+      "text": "Calautti et al . (2023) Marco Calautti, Mostafa Milani, and Andreas Pieris. 2023. Semi-Oblivious Chase Termination for Linear Existential Rules: An Experimental Study. Proc. VLDB Endow. 16, 11 (2023), 2858–2870. https://doi.org/10.14778/3611479.3611493"
+    },
+    {
+      "n": 25,
+      "id": "bib.bib29",
+      "text": "Gogacz et al . (2023) Tomasz Gogacz, Jerzy Marcinkowski, and Andreas Pieris. 2023. Uniform Restricted Chase Termination. SIAM J. Comput. 52, 3 (2023), 641–683. https://doi.org/10.1137/20M1377035"
+    },
+    {
+      "n": 26,
+      "id": "bib.bib41",
+      "text": "Rudolph and Thomazo (2016) Sebastian Rudolph and Michaël Thomazo. 2016. Expressivity of Datalog Variants - Completing the Picture. In Proc. 25th Int. Joint Conf. on Artificial Intelligence (IJCAI’15) , Subbarao Kambhampati (Ed.). AAAI Press, 1230–1236."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib21",
+      "text": "Dawar and Kreutzer (2008) Anuj Dawar and Stephan Kreutzer. 2008. On Datalog vs. LFP. In Proc. 35th Int. Colloquium on Automata, Languages, and Programming (ICALP’08); Part II (LNCS, Vol. 5126) , Luca Aceto, Ivan Damgård, Leslie Ann Goldberg, Magnús M. Halldórsson, Anna Ingólfsdóttir, and Igor Walukiewicz (Eds.). Springer, 160–171."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib40",
+      "text": "Rudolph and Thomazo (2015) Sebastian Rudolph and Michaël Thomazo. 2015. Characterization of the Expressivity of Existential Rule Queries. In Proc. 24th Int. Joint Conf. on Artificial Intelligence (IJCAI’15) , Qiang Yang and Michael Wooldridge (Eds.). AAAI Press, 3193–3199."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib9",
+      "text": "Bourgaux et al . (2021) Camille Bourgaux, David Carral, Markus Krötzsch, Sebastian Rudolph, and Michaël Thomazo. 2021. Capturing Homomorphism-Closed Decidable Queries with Existential Rules. In Proc. 18th Int. Conf. on Principles of Knowledge Representation and Reasoning (KR’21) , Meghyn Bienvenu, Gerhard Lakemeyer, and Esra Erdem (Eds.). 141–150."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib42",
+      "text": "Urbani et al . (2018) Jacopo Urbani, Markus Krötzsch, Ceriel J. H. Jacobs, Irina Dragoste, and David Carral. 2018. Efficient Model Construction for Horn Logic with VLog: System description. In Proc. 9th Int. Joint Conf. on Automated Reasoning (IJCAR’18) (LNCS, Vol. 10900) , Didier Galmiche, Stephan Schulz, and Roberto Sebastiani (Eds.). Springer, 680–688."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib4",
+      "text": "Baget et al . (2015) Jean-François Baget, Michel Leclère, Marie-Laure Mugnier, Swan Rocher, and Clément Sipieter. 2015. Graal: A Toolkit for Query Answering with Existential Rules. In Proc. 9th Int. Web Rule Symposium (RuleML’15) (LNCS, Vol. 9202) , Nick Bassiliades, Georg Gottlob, Fariba Sadri, Adrian Paschke, and Dumitru Roman (Eds.). Springer, 328–344."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib16",
+      "text": "Carral et al . (2019) David Carral, Irina Dragoste, Markus Krötzsch, and Christian Lewe. 2019. Chasing Sets: How to Use Existential Rules for Expressive Reasoning. In Proc. 28th Int. Joint Conf. on Artificial Intelligence (IJCAI’19) , Sarit Kraus (Ed.). ijcai.org, 1624–1631."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib26",
+      "text": "Gaggl et al . (2022) Sarah Alice Gaggl, Philipp Hanisch, and Markus Krötzsch. 2022. Simulating Sets in Answer Set Programming. In Proc. 31st Int. Joint Conf. on Artificial Intelligence (IJCAI’22) , Luc De Raedt (Ed.). ijcai.org, 2634–2640. https://doi.org/10.24963/ijcai.2022/365"
+    },
+    {
+      "n": 34,
+      "id": "bib.bib36",
+      "text": "Marx and Krötzsch (2022) Maximilian Marx and Markus Krötzsch. 2022. Tuple-Generating Dependencies Capture Complex Values. In Proc. 25th Int. Conf. on Database Theory (ICDT’22) (LIPIcs, Vol. 220) , Dan Olteanu and Nils Vortmeier (Eds.). Schloss Dagstuhl - Leibniz-Zentrum für Informatik, 13:1–13:20. https://doi.org/10.4230/LIPIcs.ICDT.2022.13"
+    },
+    {
+      "n": 35,
+      "id": "bib.bib24",
+      "text": "Elhalawati et al . (2022) Ali Elhalawati, Markus Krötzsch, and Stephan Mennicke. 2022. An Existential Rule Framework for Computing Why-Provenance On-Demand for Datalog. In Proc. 2nd Int. Joint Conf. on Rules and Reasoning (RuleML+RR’22) (LNCS, Vol. 13752) , Guido Governatori and Anni-Yasmin Turhan (Eds.). Springer, 146–163."
+    },
+    {
+      "n": 36,
+      "id": "bib.bib43",
+      "text": "Zhang et al . (2015) Heng Zhang, Yan Zhang, and Jia-Huai You. 2015. Existential Rule Languages with Finite Chase: Complexity and Expressiveness. In Proc. 29th AAAI Conf. on Artificial Intelligence (AAAI’15) , Blai Bonet and Sven Koenig (Eds.). AAAI Press."
+    },
+    {
+      "n": 37,
+      "id": "bib.bib33",
+      "text": "Krötzsch et al . (2019) Markus Krötzsch, Maximilian Marx, and Sebastian Rudolph. 2019. The Power of the Terminating Chase. In Proc. 22nd Int. Conf. on Database Theory (ICDT’19) (LIPIcs, Vol. 127) , Pablo Barceló and Marco Calautti (Eds.). Schloss Dagstuhl - Leibniz-Zentrum fuer Informatik, 3:1–3:17."
+    },
+    {
+      "n": 38,
+      "id": "bib.bib17",
+      "text": "Carral et al . (2022) David Carral, Lucas Larroque, Marie-Laure Mugnier, and Michaël Thomazo. 2022. Normalisations of Existential Rules: Not so Innocuous!. In Proc. 19th Int. Conf. on Principles of Knowledge Representation and Reasoning (KR’22) , Gabriele Kern-Isberner, Gerhard Lakemeyer, and Thomas Meyer (Eds.). 10 pages."
+    }
+  ]
+}

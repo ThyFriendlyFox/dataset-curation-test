@@ -1,0 +1,128 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.18092",
+  "title": "OCAI: Improving Optical Flow Estimation by Occlusion and Consistency Aware Interpolation",
+  "authors": "Jisoo Jeong, Hong Cai, Risheek Garrepalli, Jamie Menjay Lin, Munawar Hayat, Fatih Porikli",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2403.18092",
+  "html_url": "https://arxiv.org/html/2403.18092",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 634,
+  "text": "Optical flow estimation and Video Frame Interpolation (VFI) share a complementary relationship. Accurate optical flow contributes significantly to various downstream tasks such as video compression [1,2], video denoising and blur removal [3,4,5], action recognition [6,7], and VFI stands as one of these applications. Pixel-level correspondence by optical flow enables estimating pixel-level movement and generating intermediate frames (or inter-frames). While utilizing flow-based methods is a common practice in VFI [8,9,10,11], leveraging inter-frames to train optical flow models is relatively less explored.\n\nWhile the scarcity of ground-truth data has long been a critical challenge in learning-based optical flow estimation [12,13,14,15,16,17], there has been little attention into leveraging Video Frame Interpolation (VFI) to augment the training of optical flow networks. State-of-the-art VFI models predominantly employ deep networks trained to interpolate the exact middle frame between two consecutive time steps within a video sequence, which restricts their capability to generate frames at other intermediate time instances thus hampering their ability to produce optical flows between existing and intermediate frames reliably. Besides, these models lack generalizability across new domains without necessitating finetuning or retraining. These limitations hinder the potential use of existing VFI models for augmenting the training data for optical flow models.\n\nTo address data scarcity in optical flow training: data augmentation [18,19], data generation [12,18,20], and semi-supervised learning [21,22,20,19] have been explored. Most of the current data augmentation methods prioritize modifying the existing frames, e.g., [19], as illustrated in Fig. 1 (top). Notably, RealFlow [20] stands out by synthesizing a new second frame via forward warping. Given a pair of frames and the model’s prediction, the original first and second frames form a new training pair, used to update model weights. Model prediction, frame synthesis, and model update are iterated in an Expectation-Maximization (EM) framework, as depicted in Fig. 1 (middle). While it is possible to use forward warping to interpolate frames, RealFlow focuses only on making the model’s prediction consistent with frame synthesis. Moreover, the EM steps significantly increase the training workload.\n\nIn this paper, we introduce OCAI, a novel approach for training optical flow networks within a semi-supervised framework using readily available unlabeled pairs. Our method leverages video frames and flow interpolation to achieve this goal. OCAI implements an occlusion-aware forward warping technique, facilitating the interpolation of both inter-frames and intermediate flows, and can effectively tackle pixel value ambiguities during the warping process without needing any depth information and can do confidence-aware estimation of missing values utilizing forward-backward consistency. Our algorithm can perform interpolation at any intermediate time step, thus offering a broad diversity of data and motion ranges essential for training optical flow models. Our innovative teacher-student style semi-supervised learning scheme utilizes these resulting inter-frames to train optical flow networks effectively.\n\nIn summary, our main contributions are as follows:\n\n- • We propose a novel approach, OCAI, that tackles the data scarcity challenge in training optical flow models, by exploiting useful, hidden information in existing videos. Specifically, we interpolating frames and flows to generate supplementary data, and use them in a semi-supervised learning framework.\n\n- • To do this, we propose a new, effective video interpolation method that derives occlusion information to address ambiguous pixels and fill in holes by exploiting optical flow consistency. Our algorithm flexibly generates high-quality intermediate frames and reliable intermediate flows along with corresponding confidence maps at any intermediate time step.\n\n- • We devise a new teacher-student semi-supervised learning strategy leveraging VFI to train an optical flow network, incorporating exponential moving averaging (EMA) to enhance training stability.\n\n- • We demonstrate that OCAI achieves higher quality in video interpolation than existing SOTA methods on standard datasets including Sintel and KITTI. By incorporating interpolated video information, our semi-supervised learning scheme significantly improves the optical flow estimation performance, e.g., 0.5+ Fl-all reduction on KITTI test set when comparing to latest SOTA.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib44",
+      "text": "Chao-Yuan Wu, Nayan Singhal, and Philipp Krahenbuhl. Video compression through image interpolation. In Proceedings of the European Conference on Computer Vision , pages 416–431, 2018."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib26",
+      "text": "Guo Lu, Wanli Ouyang, Dong Xu, Xiaoyun Zhang, Chunlei Cai, and Zhiyong Gao. Dvc: An end-to-end deep video compression framework. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 11006–11015, 2019."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "Antoni Buades, Jose-Luis Lisani, and Marko Miladinović. Patch-based video denoising with optical flow estimation. IEEE Transactions on Image Processing , 25(6):2573–2586, 2016."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib46",
+      "text": "Yuan Yuan, Wei Su, and Dandan Ma. Efficient dynamic scene deblurring using spatially variant deconvolution network with optical flow guided training. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 3555–3564, 2020."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib49",
+      "text": "Jiawei Zhang, Jinshan Pan, Daoye Wang, Shangchen Zhou, Xing Wei, Furong Zhao, Jianbo Liu, and Jimmy Ren. Deep dynamic scene deblurring from optical flow. IEEE Transactions on Circuits and Systems for Video Technology , 32(12):8250–8260, 2021."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib22",
+      "text": "Myunggi Lee, Seungeui Lee, Sungjoon Son, Gyutae Park, and Nojun Kwak. Motion feature network: Fixed motion filter for action recognition. In Proceedings of the European Conference on Computer Vision , pages 387–403, 2018."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib5",
+      "text": "Zixi Cai, Helmut Neher, Kanav Vats, David A Clausi, and John Zelek. Temporal hockey action recognition via pose and optical flows. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition Workshops , pages 0–0, 2019."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib20",
+      "text": "Lingtong Kong, Boyuan Jiang, Donghao Luo, Wenqing Chu, Xiaoming Huang, Ying Tai, Chengjie Wang, and Jie Yang. Ifrnet: Intermediate feature refine network for efficient frame interpolation. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 1969–1978, 2022."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib27",
+      "text": "Liying Lu, Ruizheng Wu, Huaijia Lin, Jiangbo Lu, and Jiaya Jia. Video frame interpolation with transformer. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 3532–3542, 2022."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib12",
+      "text": "Zhewei Huang, Tianyuan Zhang, Wen Heng, Boxin Shi, and Shuchang Zhou. Real-time intermediate flow estimation for video frame interpolation. In European Conference on Computer Vision , pages 624–642. Springer, 2022b."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib23",
+      "text": "Zhen Li, Zuo-Liang Zhu, Ling-Hao Han, Qibin Hou, Chun-Le Guo, and Ming-Ming Cheng. Amt: All-pairs multi-field transforms for efficient frame interpolation. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 9801–9810, 2023."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib8",
+      "text": "Alexey Dosovitskiy, Philipp Fischer, Eddy Ilg, Philip Hausser, Caner Hazirbas, Vladimir Golkov, Patrick Van Der Smagt, Daniel Cremers, and Thomas Brox. Flownet: Learning optical flow with convolutional networks. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 2758–2766, 2015."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "Eddy Ilg, Nikolaus Mayer, Tonmoy Saikia, Margret Keuper, Alexey Dosovitskiy, and Thomas Brox. Flownet 2.0: Evolution of optical flow estimation with deep networks. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 2462–2470, 2017."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib34",
+      "text": "Anurag Ranjan and Michael J Black. Optical flow estimation using a spatial pyramid network. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 4161–4170, 2017."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib38",
+      "text": "Deqing Sun, Xiaodong Yang, Ming-Yu Liu, and Jan Kautz. Pwc-net: Cnns for optical flow using pyramid, warping, and cost volume. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 8934–8943, 2018."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib41",
+      "text": "Zachary Teed and Jia Deng. Raft: Recurrent all-pairs field transforms for optical flow. In Proceedings of the European Conference on Computer Vision , pages 402–419. Springer, 2020."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib11",
+      "text": "Zhaoyang Huang, Xiaoyu Shi, Chao Zhang, Qiang Wang, Ka Chun Cheung, Hongwei Qin, Jifeng Dai, and Hongsheng Li. Flowformer: A transformer architecture for optical flow. In Proceedings of the European Conference on Computer Vision , 2022a."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib39",
+      "text": "Deqing Sun, Daniel Vlasic, Charles Herrmann, Varun Jampani, Michael Krainin, Huiwen Chang, Ramin Zabih, William T Freeman, and Ce Liu. Autoflow: Learning a better training set for optical flow. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 10093–10102, 2021."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib18",
+      "text": "Jisoo Jeong, Hong Cai, Risheek Garrepalli, and Fatih Porikli. Distractflow: Improving optical flow estimation via realistic distractions and pseudo-labeling. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 13691–13700, 2023."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib10",
+      "text": "Yunhui Han, Kunming Luo, Ao Luo, Jiangyu Liu, Haoqiang Fan, Guiming Luo, and Shuaicheng Liu. Realflow: Em-based realistic optical flow dataset generation from videos. arXiv preprint arXiv:2207.11075 , 2022."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib17",
+      "text": "Jisoo Jeong, Jamie Menjay Lin, Fatih Porikli, and Nojun Kwak. Imposing consistency for optical flow estimation. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 3181–3191, 2022."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib14",
+      "text": "Woobin Im, Sebin Lee, and Sung-Eui Yoon. Semi-supervised learning of optical flow by flow supervisor. In Proceedings of the European Conference on Computer Vision , 2022."
+    }
+  ]
+}

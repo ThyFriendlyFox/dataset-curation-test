@@ -1,0 +1,68 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.18917",
+  "title": "Formal Verification of Consistency for Systems with Redundant Controllers",
+  "authors": "Bjarne Johansson, Bahman Pourvatan, Zahra Moezkarimi, Alessandro Papadopoulos, Marjan Sirjani",
+  "year": "2024",
+  "categories": [
+    "cs.SE"
+  ],
+  "url": "https://arxiv.org/abs/2403.18917",
+  "html_url": "https://arxiv.org/html/2403.18917",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 859,
+  "text": "Control systems are essential in the automation solution of domains such as offshore oil extraction, refineries, and hydropower plants - sectors where downtime can lead to significant financial losses or even life-threatening incidents. These automation solutions incorporate redundancy to mitigate the risk of unplanned downtime due to hardware failures by duplicating critical components like controllers. The common approach is standby redundancy, where an active primary controller manages the process, and a passive backup is ready to take over in case of primary failure [1]. These controllers, or Distributed Controller Nodes (DCN), interact with the physical world through Field Communication Interfaces (FCI), connecting to input/output (I/O) devices. The FCI supplies process values to the DCN, which then executes control actions based on these inputs and sends outputs back to the FCI.\n\nFor a backup DCN to seamlessly assume the primary role, it must detect the primary’s failure and resume the primary role with the former primary’s last known state. The primary cyclically replicates its latest state to the backup and sends a heartbeat, i.e., a message with predetermined intervals for failure detection. Heartbeat absence signifies a possible primary failure. Controller redundancy communication is conventionally carried out over a dedicated, point-to-point connection [2,3,4], as illustrated in Figure 1. Failure of the redundancy link can partition the DCN pair, disrupting synchronization and causing their internal states to diverge. This divergence might result in inconsistent outputs to the FCI.\n\nTwo strategies are common when managing failures in redundancy communication links: (i) disabling redundancy following the failure of one of the links or (ii) continuing in redundant mode. These strategies reflect the alternatives a distributed system has in case of partitioning: remain consistent and sacrifice availability or vice versa—consequence of the Consistency, Availability, and Partitioning tolerance (CAP) theorem [5].\n\nDisabling redundancy after a redundancy link failure compromises availability, as the backup won’t activate if the primary controller fails before the link is repaired. While this method prioritizes consistency, a concurrent loss of both redundancy links can still lead to a dual primary situation [4].\n\nThe alternative, operating redundantly with only one functioning redundancy link, risks causing a dual primary situation if the remaining redundancy link fails. This is because the backup can not distinguish missing heartbeats due to a failure of the link from a failure of the primary. Some vendors call a dual primary scenario non-synchronized active units, signifying the consistency compromise following from CAP [3]. Controllers unable to communicate can not synchronize, leading to an inconsistent state in the redundant pair.\n\nThe advent of Industry 4.0 is steering industrial controllers towards a network-centric design [6,7,8]. As defined by the Open Process Automation Forum (OPAF), the DCNs and FCI are integrated into a cohesive communication network. Additionally, this network backbone can support redundancy communication and replace the redundancy link shown in Figure 1 with a network, see Figure 2.\n\nWhen communication between a redundant DCN pair fails, as shown in Figure 3(a), traditional approaches either disable redundancy at the first failure (F1) or allow the system to operate in a non-synchronized dual-primary mode, as shown in Figure 3(b). Johansson et al. [9] introduce the Network Reference Point Failure Detection (NRP FD) for such redundant DCN systems. NRP FD prioritizes consistency while reducing the impact on availability. It uses an external Network Reference Point (NRP) as a tiebreaker for primary role determination, aiding the backup DCN in differentiating between primary and network failures. For a DCN to attain and retain the primary role, it must maintain communication with the NRP. The importance of addressing dual primary risks is emphasized in manuals recommending spatially separated redundancy links in current systems to avoid simultaneous damage and undefined system states [4].\n\nTo design an algorithm that guarantees the uniqueness of the primary the following questions need to be answered:\n\n- • How should the backup know about a failure?\n\n- • When should the backup become a primary?\n\nAs described by Johansson et al. in [9], the NRP FD uses heartbeats for primary failure detection (heartbeat) and a separate message for NRP reachability testing and detecting network failure. This introduces a potential vulnerability: the absence of a heartbeat is a sign of the primary failure, while NRP reachability is verified separately. Consequently, temporary disturbances could lead to inconsistencies, underscoring the importance of testing with temporal disturbances. Hence, one other question also have to be answered:\n\n- • How should we take care of the transient errors in switches or DCNs?\n\nSince nondeterministic behavior is generally undesirable in control systems, particularly in high-integrity systems crucial for safety-critical solutions, like the ABB AC 800M High Integrity system [10], we need assurance of the correctness of the algorithm. Therefore, this paper describes in detail the modeling and formal verification of the NRP FD algorithm, considering the main safety property of ”NoDualPrimary”. We use Timed Rebeca which is an actor-based modeling language for reactive and distributed systems and its model checker tool Afra to model and verify NRF FD. We model different failures including transient errors and illustrate the results. We also propose an enhanced lease-based version of NRP FD that ensures a singular primary in the case of transient errors.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib22",
+      "text": "Andrei Simion & Calin Bira (2023): A review of redundancy in PLC-based systems . Advanced Topics in Optoelectronics, Microelectronics, and Nanotechnologies XI 12493, pp. 269–276, 10.1117/12.2644462 ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib28",
+      "text": "Jacek Stój (2020): Cost-effective hot-standby redundancy with synchronization using EtherCAT and real-time ethernet protocols . IEEE Transactions on Automation Science and Engineering 18(4), pp. 2035–2047, 10.1109/TASE.2020.3031128 ."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib19",
+      "text": "PACSys (2023): PACSystems™ RX3i Hot Standby CPU Redundancy . https://emerson-mas.my.site.com/communities/en_US/Documentation/PACSystems-Hot-Standby-CPU-Redundancy-Users-Manual . Accessed: 2024-03-07."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib21",
+      "text": "Siemens (2024): Siemens System Manual S7-1500R/H redundant system . https://cache.industry.siemens.com/dl/files/833/109754833/att_965668/v3/s71500rh_manual_en-US_en-US.pdf . Accessed: 2024-03-07."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib7",
+      "text": "Seth Gilbert & Nancy Lynch (2002): Brewer’s conjecture and the feasibility of consistent, available, partition-tolerant web services . Acm Sigact News 33(2), pp. 51–59, 10.1145/564585.564601 ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib3",
+      "text": "The DCS of Tomorrow - ABB’s Process Automation System Vision Whitepaper . https://new.abb.com/control-systems/control-systems/envisioning-the-future-of-process-automation-systems/automation-system-whitepaper . Accessed: 2024-03-07."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib5",
+      "text": "Johan Åkerberg, Johan Furunäs Åkesson, Jorgen Gade, Maryam Vahabi, Mats Björkman, Mehrzad Lavassani, Rahul Nandkumar Gore, Thomas Lindh & Xiaolin Jiang (2021): Future industrial networks in process automation: Goals, challenges, and future directions . Applied Sciences 11(8), p. 3345, 10.3390/app11083345 ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib17",
+      "text": "Björn Leander, Bjarne Johansson, Tomas Lindström, Olof Holmgren, Thomas Nolte & Alessandro V Papadopoulos (2023): Dependability and Security Aspects of Network-Centric Control . In: 2023 IEEE 28th International Conference on Emerging Technologies and Factory Automation (ETFA) , IEEE, pp. 1–8, 10.1109/ETFA54631.2023.10275344 ."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib11",
+      "text": "Bjarne Johansson, Mats Rågberger, Alessandro Papadopoulos & Thomas Nolte (2023): Consistency Before Availability: Network Reference Point based Failure Detection for Controller Redundancy . In: 28th International Conference on Emerging Technologies and Factory Automation , pp. 1–8, 10.1109/ETFA54631.2023.10275664 ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib2",
+      "text": "AC 800M High Integrity . https://new.abb.com/control-systems/safety-systems/system-800xa-high-integrity/ac-800m-hi-controller . Accessed: 2024-03-07."
+    }
+  ]
+}

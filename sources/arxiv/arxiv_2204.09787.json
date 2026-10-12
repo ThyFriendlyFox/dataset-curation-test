@@ -1,0 +1,195 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2204.09787",
+  "title": "Reinforcement Learning from Partial Observation: Linear Function Approximation with Provable Sample Efficiency",
+  "authors": "Qi Cai, Zhuoran Yang, Zhaoran Wang",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "math.OC",
+    "stat.ML"
+  ],
+  "url": "https://arxiv.org/abs/2204.09787",
+  "html_url": "https://arxiv.org/html/2204.09787",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1000,
+  "text": "Partial observability poses significant challenges for reinforcement learning, especially when the observation and state spaces are infinite. Given full observability, reinforcement learning is well studied empirically [1,2,3] and theoretically [4,5,6,7,8,9,10,11,12]. In particular, for infinite state spaces, neural function approximators achieve remarkable successes empirically [1,13,14], while linear function approximators become better understood theoretically [8,9,10,11,12]. In contrast, reinforcement learning in partially observed Markov decision processes (POMDPs) is less investigated theoretically despite its prevalence in practice [15,16,17,18].\n\nMore specifically, partial observability poses both statistical and computational challenges. From a statistical perspective, it is challenging to predict future rewards, observations, or states due to a lack of the Markov property. In particular, predicting the future often involves inferring the distribution of the state (also known as the belief state) or its functionals as a summary of the history, which is already challenging even assuming the (observation) emission and (state) transition kernels are known [19,20]. Meanwhile, learning the emission and transition kernels faces various issues commonly encountered in causal inference [21]. For example, they are generally nonidentifiable [22]. Even assuming they are identifiable, their estimation possibly requires a sample size that scales exponentially in the horizon and dimension [23]. Such statistical challenges are already prohibitive even for the evaluation of a policy [24,22,25], which forms the basis of policy optimization. From a computational perspective, it is known that policy optimization is generally intractable [19,20]. Moreover, infinite observation and state spaces amplify both statistical and computational challenges. On the other hand, most existing results are restricted to the tabular setting [26,27,23,28], where the observation and state spaces are finite.\n\nIn this paper, we study linear function approximation in POMDPs to address the statistical challenges amplified by infinite observation and state spaces. In particular, our contribution is fourfold. First, we define a class of POMDPs with a linear structure and identify an ill conditioning measure for sample-efficient reinforcement learning. Such an ill conditioning measure corresponds to the undercompleteness in the tabular setting [23]. Second, we propose a reinforcement learning algorithm (OP-TENET), which applies to any POMDP admitting the aforementioned linear structure. Moreover, we use a minimax optimization formulation in OP-TENET such that the algorithm can be implemented in a computation-efficient manor even if the dataset is large. Third, we prove in theory that OP-TENET attains an \\epsilon -optimal policy within O(1/\\epsilon^{2}) episodes. In particular, the sample complexity scales polynomially in the intrinsic dimension of the linear structure and is independent of the size of the observation and state spaces. Fourth, our algorithm and analysis are based on new tools. In particular, the sample efficiency of OP-TENET is enabled by a sequence of ingredients: (i) a Bellman operator with finite memory, which represents the value function in a recursive manner, (ii) the identification and estimation of such an operator via an adversarial integral equation, which features a smoothed discriminator tailored to the linear structure, and (iii) the exploration of the observation and state spaces via optimism, which is based on quantifying the uncertainty in the adversarial integral equation.\n\n## 1.1 Related Work\n\nOur work is related to a line of recent work on the sample efficiency of reinforcement learning for POMDPs. In detail, [26,27,28] establish sample complexity guarantees for searching the optimal policy in POMDPs whose models are identifiable and can be estimated by spectral methods. However, [26] and [27] add extra assumptions such that efficient exploration of the POMDP can always be achieved by running arbitrary policies. In contrast, the upper bound confidence (UCB) method is used in [28] for adaptive exploration. However, they require strictly positive state transition and observation emission kernels to ensure fast convergence to the stationary distribution. The more related work is [23], which considers undercomplete POMDPs, in other words, the observations are more than the latent states. Their proposed algorithm can attain the optimal policy without estimating the exact model, but an observable component [29,30], which is the same for our algorithm design, while only applies to tabular POMDPs.\n\nIn a broader context of reinforcement learning with partial observability, our work is related to several recent works on POMDPs with special structures. For example, [31] considers latent POMDPs, where each process has only one latent state, and the proposed algorithm efficiently infers the latent state using a short trajectory. [32] considers POMDPs having tree-structured states with their positions in certain partitions being the observations. Compared with general POMDPs, these specially structures reduce the complexity of finding the optimal actions, and the corresponding algorithms use techniques closer to those for MDPs. Also, the aforementioned literature only consider tabular POMDPs.\n\nIn the contexture of reinforcement learning with function approximations, our work is related to a vast body of recent progress [8,9,33,12,11,34,35,10] on the sample efficiency of reinforcement learning for MDPs with linear function approximations. These works characterize the uncertainty in the regression for estimating either the model or value function of an MDP and use the uncertainty as a bonus on the rewards to encourage exploration. However, none of these approaches directly apply to POMDPs due to the latency of the states.\n\n## 1.2 Notation\n\nFor any discrete or continuous set {\\mathcal{X}} and p\\in\\mathbb{N}, we denote by L^{p}({\\mathcal{X}}) the L^{p} space of functions over {\\mathcal{X}}, and \\Delta({\\mathcal{X}}) the set of probability density functions over {\\mathcal{X}} when {\\mathcal{X}} is continuous or probability mass functions when {\\mathcal{X}} is discrete. For any d\\in\\mathbb{N}, we denote by [d] the set of integers from 1 to d. For a vector v and a matrix M, we denote by [v]_{i} the i -th entry of v and [M]_{i,j} the entry of M at the i -th row and j -th column. We denote by \\|\\cdot\\|_{p} the \\ell^{p} -norm of a vector or L^{p} -norm of a function. Also, for an operator M, we denote by \\|M\\|_{p\\mapsto q} the operator norm of M induced by the \\ell^{p} -norm or L^{p} -norm of the domain and \\ell^{q} -norm or L^{q} -norm of the range. We use the notation {\\rm linspan}(\\cdot) and {\\rm conh}(\\cdot) to represent the linear span and convex combination, respectively.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib25",
+      "text": "Mnih et al. (2015) Mnih, V. , Kavukcuoglu, K. , Silver, D. , Rusu, A. A. , Veness, J. , Bellemare, M. G. , Graves, A. , Riedmiller, M. , Fidjeland, A. K. , Ostrovski, G. et al. (2015). Human-level control through deep reinforcement learning. nature , 518 529–533."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib33",
+      "text": "Silver et al. (2016) Silver, D. , Huang, A. , Maddison, C. J. , Guez, A. , Sifre, L. , Van Den Driessche, G. , Schrittwieser, J. , Antonoglou, I. , Panneershelvam, V. , Lanctot, M. et al. (2016). Mastering the game of Go with deep neural networks and tree search. nature , 529 484–489."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib34",
+      "text": "Silver et al. (2017) Silver, D. , Schrittwieser, J. , Simonyan, K. , Antonoglou, I. , Huang, A. , Guez, A. , Hubert, T. , Baker, L. , Lai, M. , Bolton, A. et al. (2017). Mastering the game of Go without human knowledge. nature , 550 354–359."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib3",
+      "text": "Auer et al. (2008) Auer, P. , Jaksch, T. and Ortner, R. (2008). Near-optimal regret bounds for reinforcement learning. In Advances in Neural Information Processing Systems ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib27",
+      "text": "Osband et al. (2016) Osband, I. , Van Roy, B. and Wen, Z. (2016). Generalization and exploration via randomized value functions. In International Conference on Machine Learning ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib5",
+      "text": "Azar et al. (2017) Azar, M. G. , Osband, I. and Munos, R. (2017). Minimax regret bounds for reinforcement learning. In International Conference on Machine Learning ."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib18",
+      "text": "Jin et al. (2018) Jin, C. , Allen-Zhu, Z. , Bubeck, S. and Jordan, M. I. (2018). Is Q-learning provably efficient? In Advances in Neural Information Processing Systems ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib38",
+      "text": "Yang and Wang (2020) Yang, L. and Wang, M. (2020). Reinforcement learning in feature space: Matrix bandit, kernels, and regret bound. In International Conference on Machine Learning ."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib20",
+      "text": "Jin et al. (2020b) Jin, C. , Yang, Z. , Wang, Z. and Jordan, M. I. (2020b). Provably efficient reinforcement learning with linear function approximation. In Conference on Learning Theory ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib4",
+      "text": "Ayoub et al. (2020) Ayoub, A. , Jia, Z. , Szepesvari, C. , Wang, M. and Yang, L. (2020). Model-based reinforcement learning with value-targeted regression. In International Conference on Machine Learning ."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib21",
+      "text": "Kakade et al. (2020) Kakade, S. , Krishnamurthy, A. , Lowrey, K. , Ohnishi, M. and Sun, W. (2020). Information theoretic regret bounds for online nonlinear control. arXiv preprint arXiv:2006.12466 ."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "Du et al. (2021) Du, S. S. , Kakade, S. M. , Lee, J. D. , Lovett, S. , Mahajan, G. , Sun, W. and Wang, R. (2021). Bilinear classes: A structural framework for provable generalization in RL. arXiv preprint arXiv:2103.10897 ."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib8",
+      "text": "Berner et al. (2019) Berner, C. , Brockman, G. , Chan, B. , Cheung, V. , Debiak, P. , Dennison, C. , Farhi, D. , Fischer, Q. , Hashme, S. , Hesse, C. et al. (2019). Dota 2 with large scale deep reinforcement learning. arXiv preprint arXiv:1912.06680 ."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib2",
+      "text": "Arulkumaran et al. (2019) Arulkumaran, K. , Cully, A. and Togelius, J. (2019). Alphastar: An evolutionary computation perspective. In Proceedings of the genetic and evolutionary computation conference companion ."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib11",
+      "text": "Cassandra et al. (1996) Cassandra, A. R. , Kaelbling, L. P. and Kurien, J. A. (1996). Acting under uncertainty: Discrete bayesian models for mobile-robot navigation. In Proceedings of IEEE/RSJ International Conference on Intelligent Robots and Systems ."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib15",
+      "text": "Hauskrecht and Fraser (2000) Hauskrecht, M. and Fraser, H. (2000). Planning treatment of ischemic heart disease with partially observable markov decision processes. Artificial Intelligence in Medicine , 18 221–244."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib9",
+      "text": "Brown and Sandholm (2018) Brown, N. and Sandholm, T. (2018). Superhuman AI for heads-up no-limit poker: Libratus beats top professionals. Science , 359 418–424."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib31",
+      "text": "Rafferty et al. (2011) Rafferty, A. N. , Brunskill, E. , Griffiths, T. L. and Shafto, P. (2011). Faster teaching by POMDP planning. In International Conference on Artificial Intelligence in Education . Springer."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib36",
+      "text": "Vlassis et al. (2012) Vlassis, N. , Littman, M. L. and Barber, D. (2012). On the computational complexity of stochastic controller optimization in POMDPs. ACM Transactions on Computation Theory (TOCT) , 4 1–8."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib13",
+      "text": "Golowich et al. (2022) Golowich, N. , Moitra, A. and Rohatgi, D. (2022). Planning in observable POMDPs in quasipolynomial time. arXiv preprint arXiv:2201.04735 ."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib39",
+      "text": "Zhang and Bareinboim (2016) Zhang, J. and Bareinboim, E. (2016). Markov decision processes with unobserved confounders: A causal approach. Tech. rep., Technical report, Technical Report R-23, Purdue AI Lab."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib22",
+      "text": "Kallus et al. (2021) Kallus, N. , Mao, X. and Uehara, M. (2021). Causal inference under unmeasured confounding with negative controls: A minimax learning approach. arXiv preprint arXiv:2103.14029 ."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib19",
+      "text": "Jin et al. (2020a) Jin, C. , Kakade, S. M. , Krishnamurthy, A. and Liu, Q. (2020a). Sample-efficient reinforcement learning of undercomplete POMDPs. arXiv preprint arXiv:2006.12484 ."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib26",
+      "text": "Nair and Jiang (2021) Nair, Y. and Jiang, N. (2021). A spectral approach to off-policy evaluation for POMDPs. arXiv preprint arXiv:2109.10502 ."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib7",
+      "text": "Bennett and Kallus (2021) Bennett, A. and Kallus, N. (2021). Proximal reinforcement learning: Efficient off-policy evaluation in partially observed markov decision processes. arXiv preprint arXiv:2110.15332 ."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib6",
+      "text": "Azizzadenesheli et al. (2016) Azizzadenesheli, K. , Lazaric, A. and Anandkumar, A. (2016). Reinforcement learning of POMDPs using spectral methods. In Conference on Learning Theory ."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib14",
+      "text": "Guo et al. (2016) Guo, Z. D. , Doroudi, S. and Brunskill, E. (2016). A PAC RL algorithm for episodic POMDPs. In Artificial Intelligence and Statistics ."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib37",
+      "text": "Xiong et al. (2021) Xiong, Y. , Chen, N. , Gao, X. and Zhou, X. (2021). Sublinear regret for learning POMDPs. arXiv preprint arXiv:2107.03635 ."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib17",
+      "text": "Jaeger (2000) Jaeger, H. (2000). Observable operator models for discrete stochastic time series. Neural computation , 12 1371–1398."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib16",
+      "text": "Hsu et al. (2012) Hsu, D. , Kakade, S. M. and Zhang, T. (2012). A spectral algorithm for learning hidden Markov models. Journal of Computer and System Sciences , 78 1460–1480."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib24",
+      "text": "Kwon et al. (2021) Kwon, J. , Efroni, Y. , Caramanis, C. and Mannor, S. (2021). RL for latent MDPs: Regret guarantees and a lower bound. arXiv preprint arXiv:2102.04939 ."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib23",
+      "text": "Kozuno et al. (2021) Kozuno, T. , Ménard, P. , Munos, R. and Valko, M. (2021). Model-free learning for two-player zero-sum partially observable Markov games with perfect recall. arXiv preprint arXiv:2106.06279 ."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib10",
+      "text": "Cai et al. (2020) Cai, Q. , Yang, Z. , Jin, C. and Wang, Z. (2020). Provably efficient exploration in policy optimization. In International Conference on Machine Learning ."
+    },
+    {
+      "n": 34,
+      "id": "bib.bib1",
+      "text": "Agarwal et al. (2020) Agarwal, A. , Henaff, M. , Kakade, S. and Sun, W. (2020). PC-PG: Policy cover directed exploration for provable policy gradient learning. arXiv preprint arXiv:2007.08459 ."
+    },
+    {
+      "n": 35,
+      "id": "bib.bib40",
+      "text": "Zhou et al. (2021) Zhou, D. , Gu, Q. and Szepesvari, C. (2021). Nearly minimax optimal reinforcement learning for linear mixture Markov decision processes. In Conference on Learning Theory ."
+    }
+  ]
+}

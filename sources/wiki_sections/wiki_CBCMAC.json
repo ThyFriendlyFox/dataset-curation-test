@@ -1,0 +1,34 @@
+{
+  "source_type": "encyclopedia_article",
+  "source_id": "enwiki:CBC-MAC#rev1366851603",
+  "title": "CBC-MAC",
+  "authors": "Wikipedia contributors",
+  "year": "2026",
+  "url": "https://en.wikipedia.org/w/index.php?title=CBC-MAC&oldid=1366851603",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Security with fixed and variable-length messages",
+  "word_count": 401,
+  "text": "If the block cipher used is secure (meaning that it is a pseudorandom permutation), then CBC-MAC is secure for fixed-length messages.[1] However, by itself, it is not secure for variable-length messages. Thus, any single key must only be used for messages of a fixed and known length. This is because an attacker who knows the correct authentication tag (i.e. CBC-MAC) pairs for two messages (m, t) and (m', t') can generate a third message m'' whose CBC-MAC will also be t' . This is simply done by XORing the first block of m' with t and then concatenating m with this modified m' ; i.e., by making m'' = m \\| [(m_1' \\oplus t) \\| m_2' \\| \\dots \\| m_x'] . When computing the MAC for the message m'' , it follows that we compute the MAC for m in the usual manner as t, but when this value is chained forwards to the stage computing E_{K_\\text{MAC}}(m_1' \\oplus t) we will perform an exclusive OR operation with the value derived for the MAC of the first message. The presence of that tag in the new message means it will cancel, leaving no contribution to the MAC from the blocks of plain text in the first message m: E_{K_\\text{MAC}}(m_1' \\oplus t \\oplus t) = E_{K_\\text{MAC}}(m_1') and thus the tag for m'' is t' .\n\nThis problem cannot be solved by adding a message-size block to the end.[2] There are three main ways of modifying CBC-MAC so that it is secure for variable length messages: 1) Input-length key separation; 2) Length-prepending; 3) Encrypt last block.[2] In such a case, it may also be recommended to use a different mode of operation, for example, CMAC or HMAC to protect the integrity of variable-length messages.\n\n### Length prepending\n\nOne solution is to include the length of the message in the first block;[3] in fact CBC-MAC has been proven secure as long as no two messages that are prefixes of each other are ever used and prepending the length is a special case of this.[4] This can be problematic if the message length may not be known when processing begins.\n\n### Encrypt-last-block\n\nEncrypt-last-block CBC-MAC (ECBC-MAC)[5] is defined as CBC-MAC-ELB(m, (k1, k2)) E(k2, CBC-MAC(k1, m)).[2] Compared to the other discussed methods of extending CBC-MAC to variable-length messages, encrypt-last-block has the advantage of not needing to know the length of the message until the end of the computation.",
+  "references": [
+    {
+      "n": 1,
+      "text": "M. Bellare, J. Kilian and P. Rogaway. The security of the cipher block chaining message authentication code. JCSS 61(3):362–399, 2000."
+    },
+    {
+      "n": 2,
+      "text": "See Section 5 of Bellare, et al."
+    },
+    {
+      "n": 3,
+      "text": "ISO/IEC 9797-1:1999 Information technology – Security techniques – Message Authentication Codes (MACs) – Part 1: Mechanisms using a block cipher, clause 6.1.3 Padding Method 3"
+    },
+    {
+      "n": 4,
+      "text": "C. Rackoff and S. Gorbunov. On the Security of Block Chaining Message Authentication Code."
+    },
+    {
+      "n": 5,
+      "text": "Boneh, Dan. Message Integrity: CBC-MAC and NMAC. spark-university.s3.amazonaws.com. http://spark-university.s3.amazonaws.com/stanford-crypto/slides/05.3-integrity-cbc-mac-and-nmac.pptx"
+    }
+  ]
+}

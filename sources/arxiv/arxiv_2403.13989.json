@@ -1,0 +1,133 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.13989",
+  "title": "FastFlip: Compositional Error Injection Analysis",
+  "authors": "Keyur Joshi, Rahul Singh, Tommaso Bassetto, Sarita Adve, Darko Marinov, Sasa Misailovic",
+  "year": "2024",
+  "categories": [
+    "cs.SE"
+  ],
+  "url": "https://arxiv.org/abs/2403.13989",
+  "html_url": "https://arxiv.org/html/2403.13989",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1010,
+  "text": "As conventional technology scaling approaches its end, hardware is becoming increasingly susceptible to errors [1,2]. Unlike crashes, timeouts, or detectable output corruptions, the presence of Silent Data Corruptions (SDCs) in program outputs caused by such hardware errors may not become apparent until long after the program has terminated. Researchers have proposed various hardware and software techniques to protect programs against SDCs. Software protection techniques such as instruction or task duplication [3,4,5,6] are particularly attractive as they can be used on existing hardware. They typically use additional computational resources to detect SDCs and/or recover from them. To limit their time and energy overhead, it is necessary to selectively use such techniques on the parts of the program that are most vulnerable to SDCs.\n\nFinding vulnerable instructions is the task of instruction-level error injection analyses. These analyses inject errors into different architectural components of a simulated CPU at various points in a program’s execution, and record the effect of the error on the program output. For targeted SDC protection, the analysis must provide information on how errors at each instruction in the program affect the output (e.g., [7,8]). Such detailed per-instruction analyses are time-consuming, requiring thousands of core-hours even for small programs and inputs. While sampling-based tools like [9,10] are faster, they cannot provide the necessary vulnerability information for every instruction.\n\nThis high cost of per-instruction error injection analysis is concerning because modern programs are continuously evolving; developers change code to fix bugs, add features, or add optimizations manually or using compilers. The modified program sections react differently to errors, so they must be re-analyzed. However, current error injection analyses must be rerun on the whole program, not just the modified sections, before applying software protection techniques.\n\nAn intuitive solution is to leverage the compositional nature of programs by dividing them into multiple dynamic sections (such as function calls or executions of code blocks or nested loops), applying the error injection analysis on each section separately, and then combining the results. However, such a compositional error injection analysis must overcome multiple challenges: 1) SDCs in the output of one section must be propagated through downstream sections to determine the SDCs in the final output of the program, and 2) an error in one section can corrupt data that will be used only by downstream sections, thus causing unexpected side effects that do not affect the current section’s output. To the best of our knowledge, none of the previously proposed analyses (e.g., [11,12,13,8,14,15,16,17,18,19,9,20,21]) can selectively analyze only the modified parts of the program.\n\n## Our work.\n\nWe present FastFlip, a unique combination of empirical (error injection) and symbolic (SDC propagation) techniques, which makes it the first approach for compositional and incremental error injection analysis of evolving programs. Given a program and an input that FastFlip has not previously analyzed, FastFlip proceeds as follows: First, FastFlip analyzes the sections of the program for that input with a per-instruction error injection analysis to determine the outcome of each possible injected error. Second, FastFlip uses a local sensitivity analysis to determine how each section propagates and amplifies SDCs within its input, and then uses an SDC propagation analysis to determine how SDCs propagate across different sections to affect the final output. Third, FastFlip combines the results of the error injection analysis and the SDC propagation analysis to determine how injected errors in any section affect the final output. FastFlip uses this information to select a set of static instructions to protect, such that the dynamic cost of protecting the selected instructions is minimized, while ensuring that the degree of protection against SDC-causing errors is above a developer-specified threshold. FastFlip correctly accounts for side effects that only occur due to errors.\n\nIf developers modify a program after FastFlip has analyzed it, FastFlip can reuse large portions of its analysis results. In particular, FastFlip must only rerun the expensive error injection analysis on the modified program section, and any downstream sections whose input changes as a result of the modification. Consequently, FastFlip saves significant analysis time with each program modification.\n\nWe instantiate FastFlip using the Approxilyzer [8] per-instruction error injection analysis and the Chisel [22] SDC propagation analysis. Approxilyzer focuses on analyzing the effects of hardware errors that manifest within CPU architectural registers as bitflips. While analyses exist that also inject errors in other architectural components (e.g., [10]), they rely on sampling, and would be impractical if used to obtain per-instruction results. We analyze five benchmarks with FastFlip, each with three or more separately analyzed sections, and compare against a baseline Approxilyzer-only approach, which treats the entire program as a single section.\n\nWe evaluate the utility of protecting the static instructions selected by FastFlip and Approxilyzer using two metrics. The value of protecting a selection of instructions is the total probability that an SDC-causing error will be detected through said protection. The cost of a selection is roughly equal to the runtime overhead of protecting the selected instructions. For our evaluation, we use the value and cost model from [23], which assumes that value is proportional to the number of SDC-causing errors that can occur in the selected instructions, and that cost is proportional to the number of dynamic instances of the selected instructions that must be protected. FastFlip’s selection provides a protection value within 0.3% (geomean) of the target protection value for a cost of protection within 0.7% (geomean) of the cost of protecting Approxilyzer’s selection. FastFlip can also use more complex value and cost metrics to make its selection.\n\nNext, we make two modifications to each benchmark: a small, simple modification and a large modification that uses a lookup table. FastFlip does not need to inject errors in the unmodified sections, providing a 3.2\\times speedup (geomean) over Approxilyzer. Crucially, FastFlip provides this speedup with minimal additional loss in protection value or increase in cost with respect to Approxilyzer. We also experiment with a modification that adds error detection mechanisms to a benchmark; FastFlip is able to efficiently verify that such a modification significantly decreases the likelihood of SDCs occurring due to errors in the protected sections.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib5",
+      "text": "S. Borkar, “Designing reliable systems from unreliable components: The challenges of transistor variability and degradation,” IEEE Micro , 2005."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib50",
+      "text": "S. Wang, G. Zhang, J. Wei, Y. Wang, J. Wu, and Q. Luo, “Understanding silent data corruptions in a large production CPU population,” in Proceedings of the 29th Symposium on Operating Systems Principles , 2023."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib42",
+      "text": "G. Reis, J. Chang, N. Vachharajani, R. Rangan, and D. August, “SWIFT: software implemented fault tolerance,” in International Symposium on Code Generation and Optimization , 2005."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib35",
+      "text": "K. Mitropoulou, V. Porpodas, and M. Cintra, “DRIFT: Decoupled compileR-based Instruction-level Fault-Tolerance,” in Languages and Compilers for Parallel Computing , 2014."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib16",
+      "text": "S. Feng, S. Gupta, A. Ansari, and S. Mahlke, “Shoestring: Probabilistic soft error reliability on the cheap,” in Proceedings of the 15th International Conference on Architectural Support for Programming Languages and Operating Systems , 2010."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib13",
+      "text": "M. Didehban and A. Shrivastava, “NZDC: A compiler technique for near zero silent data corruption,” in Proceedings of the 53rd Annual Design Automation Conference , 2016."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib20",
+      "text": "S. K. S. Hari, S. V. Adve, H. Naeimi, and P. Ramachandran, “Relyzer: Exploiting application-level fault equivalence to analyze application resiliency to transient faults,” in Proceedings of the 17th International Conference on Architectural Support for Programming Languages and Operating Systems , 2012."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib49",
+      "text": "R. Venkatagiri, A. Mahmoud, S. K. S. Hari, and S. V. Adve, “Approxilyzer: Towards a systematic framework for instruction-level approximate computing and its application to hardware resiliency,” in 49th Annual IEEE/ACM International Symposium on Microarchitecture , 2016."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib47",
+      "text": "A. Thomas and K. Pattabiraman, “LLFI: An intermediate code level fault injector for soft computing applications,” in IEEE International Conference on Software Quality, Reliability and Security , 2013."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib39",
+      "text": "——, “AVGI: Microarchitecture-driven, fast and accurate vulnerability assessment,” in IEEE International Symposium on High-Performance Computer Architecture , 2023."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib14",
+      "text": "W. Dweik, M. Annavaram, and M. Dubois, “Reliability-aware exceptions: Tolerating intermittent faults in microprocessor array structures,” in Design, Automation and Test in Europe Conference and Exhibition , 2014."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib22",
+      "text": "M. Kaliorakis, D. Gizopoulos, R. Canal, and A. Gonzalez, “MeRLiN: Exploiting dynamic instruction behavior for fast and accurate microarchitecture level reliability assessment,” in ACM/IEEE 44th Annual International Symposium on Computer Architecture , 2017."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib28",
+      "text": "M.-L. Li, P. Ramachandran, U. R. Karpuzcu, S. K. S. Hari, and S. V. Adve, “Accurate microarchitecture-level fault modeling for studying hardware faults,” in IEEE 15th International Symposium on High Performance Computer Architecture , 2009."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib48",
+      "text": "R. Venkatagiri, K. Ahmed, A. Mahmoud, S. Misailovic, D. Marinov, C. W. Fletcher, and S. V. Adve, “gem5-Approxilyzer: An open-source tool for application-level soft error analysis,” in 49th Annual IEEE/IFIP International Conference on Dependable Systems and Networks , 2019."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib27",
+      "text": "J. Li and Q. Tan, “SmartInjector: Exploiting intelligent fault injection for SDC rate analysis,” in IEEE International Symposium on Defect and Fault Tolerance in VLSI and Nanotechnology Systems , 2013."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib45",
+      "text": "H. Schirmeier, M. Hoffmann, C. Dietrich, M. Lenz, D. Lohmann, and O. Spinczyk, “FAIL*: An open and versatile fault-injection framework for the assessment of software-implemented hardware fault tolerance,” in 11th European Dependable Computing Conference , 2015."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib23",
+      "text": "M. Kaliorakis, S. Tselonis, A. Chatzidimitriou, N. Foutris, and D. Gizopoulos, “Differential fault injection on microarchitectural simulators,” in IEEE International Symposium on Workload Characterization , 2015."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib40",
+      "text": "K. Parasyris, G. Tziantzoulis, C. D. Antonopoulos, and N. Bellas, “GemFI: A fault injection tool for studying the behavior of applications on unreliable substrates,” in 44th Annual IEEE/IFIP International Conference on Dependable Systems and Networks , 2014."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib9",
+      "text": "J. Calhoun, L. Olson, and M. Snir, “FlipIt: An LLVM based fault injector for HPC,” in European Conference on Parallel Processing Workshops , 2014."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib10",
+      "text": "C.-K. Chang, S. Lym, N. Kelly, M. B. Sullivan, and M. Erez, “Hamartia: A fast and accurate error injection framework,” in 48th Annual IEEE/IFIP International Conference on Dependable Systems and Networks Workshops , 2018."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib29",
+      "text": "X. Li, S. V. Adve, P. Bose, and J. A. Rivers, “Online estimation of architectural vulnerability factor for soft errors,” in International Symposium on Computer Architecture , 2008."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib34",
+      "text": "S. Misailovic, M. Carbin, S. Achour, Z. Qi, and M. C. Rinard, “Chisel: Reliability- and accuracy-aware optimization of approximate computational kernels,” in Proceedings of the ACM International Conference on Object Oriented Programming Systems Languages & Applications , 2014."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib19",
+      "text": "S. Hari, S. Adve, and H. Naeimi, “Low-cost program-level detectors for reducing silent data corruptions,” in IEEE/IFIP International Conference on Dependable Systems and Networks , 2012."
+    }
+  ]
+}

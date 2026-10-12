@@ -1,0 +1,190 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2311.01822",
+  "title": "Random ISAC Signals Deserve Dedicated Precoding",
+  "authors": "Shihang Lu, Fan Liu, Fuwang Dong, Yifeng Xiong, Jie Xu, Ya-Feng Liu, Shi Jin",
+  "year": "2024",
+  "categories": [
+    "cs.IT",
+    "eess.SP",
+    "math.IT"
+  ],
+  "url": "https://arxiv.org/abs/2311.01822",
+  "html_url": "https://arxiv.org/html/2311.01822",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1267,
+  "text": "The sixth generation (6G) of wireless networks has been envisioned as a key enabler for numerous emerging applications, including autonomous driving, smart manufacturing, digital twin, and low-altitude economy [1,2], among which wireless sensing is anticipated to play a vital role on top of conventional wireless communication functionalities, giving rise to the Integrated Sensing and Communications (ISAC) technology [3,4]. Indeed, the International Telecommunication Union (ITU) has recently approved the global 6G vision, where ISAC was recognized as one of the six key usage scenarios for 6G [5].\n\nThe basic rationale of 6G ISAC is to deploy ubiquitous wireless sensing capability over 6G network infrastructures, through the shared use of wireless resources (time, frequency, beam, and power) and the hardware platform [6,7,8]. Provably, ISAC systems may achieve performance gain over individual sensing and communication (S&C) systems in terms of the resource efficiency, and may potentially reap extra mutual benefits via sensing-assisted communication and communication-assisted sensing [9,10,11,12]. To realize these promises, however, novel ISAC signaling strategies capable of simultaneously accomplishing both tasks are indispensable, which are at the core of the practical implementation of 6G ISAC systems [13,14]. In a nutshell, the signal design methodologies for ISAC can be generally categorized as sensing-centric, communication-centric, and joint designs [15]. While the first two approaches aim to conceive an ISAC waveform on the basis of existing sensing or communication signals, e.g., chirp signals for radar or orthogonal frequency division multiplexing (OFDM) signals for communications [16,17], the joint design builds an ISAC signal from the ground-up through precoding techniques, in the hope of attaining a scalable performance tradeoff between S&C [18,19,20,21]. Pioneered by [20,21], joint ISAC precoding designs are typically formulated into nonlinear optimization problems, where ISAC precoders are conceived by optimizing a communication/sensing performance metric subject to sensing/communication quality-of-service (QoS) constraints. Typical figures-of-merit include achievable rate, symbol error rate (SER), Cramér-Rao bound (CRB), singal-to-interference-plus-noise ratio (SINR), etc [22,23,24].\n\nCurrently, the ISAC design based on 5G New Radio (NR) primarily exploits physical layer reference signals to realize sensing [25]. In a typical NR frame structure, the reference signals account for only about 10\\% of the resources in the time-frequency domain [26]. In view of this, it is necessary to reuse the 90\\% of time-frequency resources occupied by random communication data signals to realize sensing, thus improving both sensing performance and resource efficiency. Towards that end, ISAC signals must be random due to the shared use of data signals for S&C. More precisely, ISAC signals are supposed to be randomly realized from certain codebooks, such as Gaussian codebook or discrete Quadrature Amplitude Modulation (QAM)/Phase-Shift Keying Modulation (PSK) alphabets [27]. To maximize the achievable communication rate, the information-bearing signals are required to be “as random as possible” [14,28]. As an example, Gaussian signals that achieve the capacity of Gaussian channels possess the maximum degree of randomness, in the sense that it has the maximum entropy under an average power constraint [29]. In contrast to that, radar sensing systems usually prefer deterministic signals having favorable ambiguity properties, e.g., phase-coded sequences with low range sidelobes [30,31], in which case the randomness of the ISAC signal may potentially degrade the sensing performance. This contradictory conflict between S&C is consistent with both the engineers’ experience and S&C signal processing theory, leading to the fundamental Deterministic-Random Tradeoff (DRT) in ISAC systems [14,28]. Recently, the DRT has been theoretically depicted in Gaussian channels [14], by analyzing the Pareto frontier between the sensing CRB and achievable communication rate in a point-to-point ISAC system. More relevant to this work, it has been shown that signal randomness may significantly degrade the favorable ambiguity properties of OFDM ISAC systems [32].\n\nAlthough existing schemes are well-designed by sophisticated methods, most of them overlook the random nature of ISAC signals. For instance, many previous studies treat the sample covariance matrix of ISAC signals as deterministic [21,33,34], i.e., as equivalent to the statistical covariance matrix, under the assumption that the data frame is sufficiently long. In such a case, one may concentrate solely on designing the ISAC precoder without the need of accounting for the impact brought by the random data. However, such an approximation may not be reliable in practical time-sensitive ISAC scenarios, particularly for ISAC base stations (BSs) equipped with massive antennas. The reason is that the sample covariance matrix converges to its statistical counterpart only when the frame length is much larger than the array size, as will be shown in Sec. II. This imposes unaffordably huge computational and signal processing overheads for sensing. More severely, unlike conventional radar systems, the state-of-the-art BS may be unable to accumulate massive raw sensory data due to its limited caching capabilities. Consequently, the ISAC BS has to perform sensing by leveraging short-frame observations, where the law of large numbers no longer holds and the data randomness cannot be eliminated. To ensure reliable sensing performance, one has to conceive dedicated precoders to account for the signal randomness, which motivates the study of this paper.\n\nTo address the unique challenge arising in ISAC systems due to random signaling, this paper investigates the dedicated precoding designs while considering sensing with random signals in multi-antenna ISAC systems, where the transmitter aims at estimating the target impulse response (TIR) matrix while communicating with users by emitting information-bearing Gaussian signals. Against this background, we summarize the contributions of our work as follows:\n\n- • We commence by revisiting the conventional linear minimum mean squared error (LMMSE) estimation through deterministic orthogonal training signals. Then, we define a new metric, namely, ergodic LMMSE (ELMMSE) for sensing with random signals, which is the estimation error averaged over random signal realizations. Moreover, we reveal that the deterministic LMMSE is merely a lower bound of the ELMMSE due to Jensen’s inequality, which characterizes the theoretical sensing performance loss due to random signaling. It is worth noting that this conclusion not only applies to scenarios under LMMSE and ELMMSE but generally holds for any convex cost functions for sensing.\n\n- • We develop novel precoding designs to minimize the ELMMSE for sensing-only scenarios with Gaussian codebooks, namely, data-dependent precoding (DDP) and data-independent precoding (DIP), where the precoder changes adaptively based on the instantaneous realization of Gaussian data, and remains unchanged for all data samples, respectively. We show that the sensing-only DDP problem can be solved in closed form despite its non-convexity and that its DIP counterpart can be solved via the classical stochastic gradient projection (SGP) and momentum-based SGP (MB-SGP) algorithms. To gain more insights into the ELMMSE minimization problem, we unveil the optimal structures of both precoders.\n\n- • We extend the DDP and DIP strategies to ISAC scenarios by imposing a communication rate constraint, and propose a penalty-based alternating optimization (AO) approach to tackle the non-convex problems. To reduce the complexity of solving DIP problems, we further simplify the stochastic optimization problems by exploiting their high signal-to-ratio (SNR) approximations.\n\n- • We provide extensive numerical results by comparing with conventional deterministic ISAC precoding designs, which illustrate that both DDP and DIP schemes attain favorable sensing performance under Gaussian codebooks while satisfying the communication requirement. This convincingly suggests that random ISAC signals deserve dedicated precoding designs, especially when the ISAC BS cannot accumulate sufficient raw sensory data.\n\nThe remainder of this paper is organized as follows. Sec. II introduces the system model of the considered ISAC system and the corresponding performance metrics. Sec. III elaborates on the dedicated DDP and DIP precoding designs for sensing-only scenarios with random signaling. Sec. IV generalizes the DDP and DIP framework to ISAC scenarios. Sec. V provides simulation results to validate the performance of the proposed precoders. Finally, Sec. VI concludes the paper.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib2",
+      "text": "Y. Cui, F. Liu, X. Jing, and J. Mu, “Integrating sensing and communications for ubiquitous IoT: Applications, trends, and challenges,” IEEE Network , vol. 35, no. 5, pp. 158–167, Sept. 2021."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib3",
+      "text": "M. Chafii, L. Bariah, S. Muhaidat, and M. Debbah, “Twelve scientific challenges for 6G: Rethinking the foundations of communications theory,” IEEE Commun. Surveys Tuts. , vol. 25, no. 2, pp. 868–904, Secondquarter 2023."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib4",
+      "text": "A. Liu, Z. Huang, M. Li, Y. Wan, W. Li, T. X. Han, C. Liu, R. Du, D. K. P. Tan, J. Lu, Y. Shen, F. Colone, and K. Chetty, “A survey on fundamental limits of integrated sensing and communication,” IEEE Commun. Surveys Tuts. , vol. 24, no. 2, pp. 994–1034, 2nd quarter 2022."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib5",
+      "text": "F. Liu, L. Zheng, Y. Cui, C. Masouros, A. P. Petropulu, H. Griffiths, and Y. C. Eldar, “Seventy years of radar and communications: The road from separation to integration,” IEEE Signal Process. Mag. , vol. 40, no. 5, pp. 106–121, Jul. 2023."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib6",
+      "text": "ITU-R WP5D, “Draft New Recommendation ITU-R M. [IMT. FRAMEWORK FOR 2030 AND BEYOND],” 2023."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib7",
+      "text": "X. Liu, T. Huang, N. Shlezinger, Y. Liu, J. Zhou, and Y. C. Eldar, “Joint transmit beamforming for multiuser MIMO communications and MIMO radar,” IEEE Trans. Signal Process. , vol. 68, pp. 3929–3944, Jun. 2020."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib8",
+      "text": "F. Liu, C. Masouros, A. Li, T. Ratnarajah, and J. Zhou, “MIMO radar and cellular coexistence: A power-efficient approach enabled by interference exploitation,” IEEE Trans. Signal Process. , vol. 66, no. 14, pp. 3681–3695, Jul. 2018."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib9",
+      "text": "L. Chen, F. Liu, W. Wang, and C. Masouros, “Joint radar-communication transmission: A generalized Pareto optimization framework,” IEEE Trans. Signal Process. , vol. 69, pp. 2752–2765, May 2021."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib10",
+      "text": "N. T. Nguyen, N. Shlezinger, Y. C. Eldar, and M. Juntti, “Multiuser MIMO wideband joint communications and sensing system with subcarrier allocation,” IEEE Trans. Signal Process. , vol. 71, pp. 2997–3013, Aug. 2023."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib11",
+      "text": "Z. Ren, Y. Peng, X. Song, Y. Fang, L. Qiu, L. Liu, D. W. K. Ng, and J. Xu, “Fundamental CRB-rate tradeoff in multi-antenna ISAC systems with information multicasting and multi-target sensing,” IEEE Trans. Wireless Commun. , pp. 1–1, 2023."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib12",
+      "text": "A. Bazzi and M. Chafii, “On outage-based beamforming design for dual-functional radar-communication 6G systems,” IEEE Trans. Wireless Commun. , vol. 22, no. 8, pp. 5598–5612, Aug 2023."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib13",
+      "text": "H. Hua, T. X. Han, and J. Xu, “MIMO integrated sensing and communication: CRB-rate tradeoff,” IEEE Trans. Wireless Commun. , Aug. 2023, doi:10.1109/TWC.2023.3303326."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib14",
+      "text": "M. Ahmadipour, M. Kobayashi, M. Wigger, and G. Caire, “An information-theoretic approach to joint sensing and communication,” IEEE Trans. Inf. Theory , pp. 1–1, 2022."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib15",
+      "text": "Y. Xiong, F. Liu, Y. Cui, W. Yuan, T. X. Han, and G. Caire, “On the fundamental tradeoff of integrated sensing and communications under Gaussian channels,” IEEE Trans. Inf. Theory , vol. 69, no. 9, pp. 5723–5751, Jun. 2023."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib16",
+      "text": "K. V. Mishra, M. B. Shankar, V. Koivunen, B. Ottersten, and S. A. Vorobyov, “Toward millimeter-wave joint radar communications: A signal processing perspective,” IEEE Signal Process. Mag. , vol. 36, no. 5, pp. 100–114, Sept. 2019."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib17",
+      "text": "M. F. Keskin, V. Koivunen, and H. Wymeersch, “Limited feedforward waveform design for OFDM dual-functional radar-communications,” IEEE Trans. Signal Process. , vol. 69, pp. 2955–2970, Apr. 2021."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib18",
+      "text": "Z. Cheng, Z. He, and B. Liao, “Hybrid beamforming design for OFDM dual-function radar-communication system,” IEEE J. Sel. Topics Signal Process. , vol. 15, no. 6, pp. 1455–1467, Oct. 2021."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib19",
+      "text": "X. Mu, Y. Liu, L. Guo, J. Lin, and L. Hanzo, “NOMA-aided joint radar and multicast-unicast communication systems,” IEEE J. Sel. Areas Commun. , vol. 40, no. 6, pp. 1978–1992, Mar. 2022."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib20",
+      "text": "R. P. Sankar, S. P. Chepuri, and Y. C. Eldar, “Beamforming in integrated sensing and communication systems with reconfigurable intelligent surfaces,” IEEE Trans. Wireless Commun. , 2023, doi:10.1109/TWC.2023.3313938."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib21",
+      "text": "F. Liu, L. Zhou, C. Masouros, A. Li, W. Luo, and A. Petropulu, “Toward dual-functional radar-communication systems: Optimal waveform design,” IEEE Trans. Signal Process. , vol. 66, no. 16, pp. 4264–4279, Jun. 2018."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib22",
+      "text": "F. Liu, Y.-F. Liu, A. Li, C. Masouros, and Y. C. Eldar, “Cramér-Rao bound optimization for joint radar-communication beamforming,” IEEE Trans. Signal Process. , vol. 70, pp. 240–253, Dec. 2021."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib23",
+      "text": "X. Song, J. Xu, F. Liu, T. X. Han, and Y. C. Eldar, “Intelligent reflecting surface enabled sensing: Cramér-Rao bound optimization,” IEEE Trans. Signal Process. , vol. 71, pp. 2011–2026, May 2023."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib24",
+      "text": "K. Meng, Q. Wu, S. Ma, W. Chen, K. Wang, and J. Li, “Throughput maximization for UAV-enabled integrated periodic sensing and communication,” IEEE Trans. Wireless Commun. , vol. 22, no. 1, pp. 671–687, Aug. 2023."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib25",
+      "text": "R. Liu, M. Li, Q. Liu, and A. L. Swindlehurst, “Dual-functional radar-communication waveform design: A symbol-level precoding approach,” IEEE J. Sel. Topics Signal Process. , vol. 15, no. 6, pp. 1316–1331, Sept. 2021."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib26",
+      "text": "Z. Wei, Y. Wang, L. Ma, S. Yang, Z. Feng, C. Pan, Q. Zhang, Y. Wang, H. Wu, and P. Zhang, “5g prs-based sensing: A sensing reference signal approach for joint sensing and communication system,” IEEE Trans. Veh. Technol. , vol. 72, no. 3, pp. 3250–3263, Oct. 2022."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib27",
+      "text": "X. Lin and N. Lee, “5g and beyond,” Cham, Switzerland: Springer Nature Switzerland AG , 2021."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib28",
+      "text": "Y. Zhang, S. Aditya, and B. Clerckx, “Input distribution optimization in OFDM dual-function radar-communication systems,” arXiv preprint arXiv:2305.06635 , 2023."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib29",
+      "text": "Y. Xiong, F. Liu, and M. Lops, “Generalized deterministic-random tradeoff in integrated sensing and communications: The sensing-optimal operating point,” arXiv preprint arXiv:2308.14336 , 2023."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib30",
+      "text": "T. M. Cover, Elements of Information Theory . John Wiley & Sons, 1999."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib31",
+      "text": "P. Stoica, J. Li, and Y. Xie, “On probing signal design for MIMO radar,” IEEE Trans. Signal Process. , vol. 55, no. 8, pp. 4151–4161, May 2007."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib32",
+      "text": "I. Bekkerman and J. Tabrikian, “Target detection and localization using MIMO radars and sonars,” IEEE Trans. Signal Process. , vol. 54, no. 10, pp. 3873–3883, Sept. 2006."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib33",
+      "text": "Z. Du, F. Liu, Y. Xiong, T. X. Han, Y. C. Eldar, and S. Jin, “Reshaping the ISAC tradeoff under OFDM signaling: A probabilistic constellation shaping approach,” arXiv preprint arXiv:2312.15941 , 2023."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib34",
+      "text": "S. Lu, X. Meng, Z. Du, Y. Xiong, and F. Liu, “On the performance gain of integrated sensing and communications: A subspace correlation perspective,” in Proc. IEEE ICC , Jul. 2023, pp. 1–6."
+    },
+    {
+      "n": 34,
+      "id": "bib.bib35",
+      "text": "F. Liu, Y.-F. Liu, C. Masouros, A. Li, and Y. C. Eldar, “A joint radar-communication precoding design based on Cramér-Rao bound optimization,” in Proc. IEEE Radar Conf. (RadarConf22) , May 2022, pp. 1–6."
+    }
+  ]
+}

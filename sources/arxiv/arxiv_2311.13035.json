@@ -1,0 +1,303 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2311.13035",
+  "title": "Real-Time Distributed Infrastructure-free Searching and Target Tracking via Virtual Pheromones",
+  "authors": "Joseph Prince Mathew, Cameron Nowzari",
+  "year": "2024",
+  "categories": [
+    "cs.RO"
+  ],
+  "url": "https://arxiv.org/abs/2311.13035",
+  "html_url": "https://arxiv.org/html/2311.13035",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1189,
+  "text": "## Introduction\n\nSearching an environment and tracking a priori unknown targets, a.k.a. active perception, forms one of the cornerstone tasks of many robotic applications. These include: search and rescue [1], environmental process monitoring [2,3], and traversing hazardous environments. For searching and tracking, utilizing multiple mobile sensors can reduce the time taken to cover a large area.Existing work shows both centralized [4,5,6] and decentralized [7,8] approaches to multi-robot information gathering. Decentralized solutions are preferred for systems requiring scalability and reliability.\n\nConsider a scenario where a team of robotic agents must search an environment for multiple targets while wireless communicating. In cases where prior information about the environment is available, and/or global positioning of agents is enabled (e.g., GPS [7], or overhead cameras/VICON [9]), there is an ample amount of research dedicating to optimally searching such spaces. The closest area of research related to this type of active perception problem utilizes tree-based offline planning; where for a given planning horizon and initial configuration of the mobile sensors, all possible configurations for the subsequent time-steps are computed [4,5,6]. One of the main requirements is to have all robots use information from every other robot, either as a centralized collation of sensor data [4,6], or connected graph in a distributed version [5]. Since these policies are computed offline, the deployment of these algorithms requires prior knowledge of the environment and hence it’s very difficult to transfer the plan to a new environment. Reinforcement learning-based solutions have also been considered which also require prior knowledge of the environment to be searched [10,11,12]. Further, there are POMDP based search and tracking strategies [13,14], however, these algorithms do not scale well with growing environment size as well as number of agents and targets. They also require the robots to know the global positions for the formulation to work. The strong GPS requirement limits the deployment of such solutions in many environments, like, GPS-denied environments or an environment inaccessible to set up infrastructure. To relax this constraint we can employ relative positioning systems [15], where we have seen RF solutions utilizing WiFi [16,17], Bluetooth [18,19,20] and UWB systems [21,22,23,24] or vision based solutions like RGBD Camera [25,26] or LIDAR based SLAM systems [27,28].\n\n## 1.1 Limited-View Searching and Tracking without Prior Information\n\nLet us now consider a much harder version of this problem where no prior information is available, including the number of potential targets to be found. Additionally, consider that the robots have don’t have access to their global positions nor the span/map of the environment. Designing optimal strategies for searching and tracking problem in such cases is intractable due to unavailability of information. For instance, robots will not know where they have searched in the environment, nor do they know how many targets are left to be tracked in the environment. Thus, common strategies in these scenarios involve simply randomly searching environments and finding targets [29,30,31]. Other search strategies utilize specific patterns for search like lawnmower [32,33] pattern, spiral [34,35] pattern or other efficient search paths depending on the application.\n\nAlthough the different pieces of the solution to distributed multi-agent search and track exists, extending those to the limited information version while maintaining properties of the various sub-algorithms of the problem is non-trivial. Can these optimal solutions, whose optimality depends on information that may be unavailable or unverifiable in the real-world scenario, be somehow modified to be effective in the limited information case? In this paper we explore this possibility using a systems’ integration approach. To that end, we partition our searching and tracking problem into two sub-problems which have clearly related works in the literature we can borrow from: dynamic coverage control and dynamic target assignment. We take the basic theory from these algorithms and modify them to be applicable with real-world implementations and demonstrate our results on real hardware as a proof of concept.\n\nFor dynamic coverage control, sophisticated strategies like Voronoi-based methods [36,37,38,7] could be used, but, these require agents with complex sensing and communication capabilities. For example, they require communicating to agents at arbitrary long distance to/from their neighbors, or they need the ability to sense the target density function. These requirements may not be feasible in a priori unknown environment or supported by current hardware. The closest applicable solution is a probability-based map to determine previously explored areas and prioritize unexplored areas. This has been known as awareness control [39,8], Anti-Flocking [40,41] or Pheromone-based coverage control [42], where the explored areas get higher scalar weights and the controller points the mobile sensor towards areas with lower weights. This strategy has been shown to work with multi-agent systems, however, we see that these systems require a central pheromone processing system [43,44,45]. They also include assumptions that all robots communicate with each other (thereby having instant access to the other’s data) or use pre-existing infrastructure like RFID tags or light based region sensing [46,47] or access to global agent positions [40]. These requirements limit the use of these implementations in large unknown environments. The decentralized storage and propagation of pheromones effectively in the multi-agent system is an area that require more investigation and our work with the virtual pheromone is directly aimed at this.\n\nFor dynamic target assignment, we look to linear sum assignment problems where two of the most popular solutions are Hungarian algorithm [48,49] and Auction algorithms [50,51]. We have seen centralized target assignment solutions in [6,52,53], where the centralized processing system has all the information and can easily make target assignment decisions as all information required to make the decision is readily available. This becomes nontrivial in a decentralized implementation of active perception due to the inherent asymmetry in the data available to each agent as they move in the environment. To overcome this, we have observed other works that have the agents make sequentially distributed decisions as seen in [5,54]. This, however, does not scale well with large number of agents. One way to ensure optimal target assignment is to ensure connectivity between agents [55,56], however, connectivity maintenance works against exploration required for searching. Additionally, the agents may not know how many targets are there in a given environment which presents additional challenges to existing strategies.\n\nOur primary contribution is an integrated solution for the distributed online multi-agent multi-target search problem, where agents only have access to limited relative state information based on local sensing and communication between neighbors in an r-disk. Our solution combines a distributed virtual pheromone-based storage and waypoint selection algorithm for coverage control, with a distributed greedy target selection algorithm to ensure the team cooperatively finds all the targets in the domain. We had presented an initial concept of the algorithm and preliminary simulation results in our previous work [57], and in this paper, we further extend it with refinements to the algorithm, study of the performance of the algorithm in multiple scenarios, and the proof-of-concept validation of the proposed solution in real robots. The paper also details the real-world sensing suite and the data processing pipeline for the implementation of the solution on a robotic multi-agent system consisting of LTA agents that attempt to search and track multicolored balls in a 3D environment.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib54",
+      "text": "Queralta et al. (2020) Queralta, J.P., J. Taipalmaa, B. Can Pullinen, V.K. Sarker, T. Nguyen Gia, H. Tenhunen, M. Gabbouj, J. Raitoharju, and T. Westerlund. 2020. Collaborative multi-robot search and rescue: Planning, coordination, perception, and active vision. IEEE Access 8: 191617–191643 ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib39",
+      "text": "Liu and Williams (2020) Liu, J. and R.K. Williams 2020. Coupled temporal and spatial environment monitoring for multi-agent teams in precision farming. In 2020 IEEE Conference on Control Technology and Applications (CCTA) , pp. 273–278."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib65",
+      "text": "Villarrubia et al. (2017) Villarrubia, G., J. De Paz, D. Hernández de la Iglesia, and J. Bajo. 2017, 08. Combining multi-agent systems and wireless sensor networks for monitoring crop irrigation. Sensors 17: 1775 ."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib5",
+      "text": "Atanasov et al. (2015) Atanasov, N., J. Le Ny, K. Daniilidis, and G.J. Pappas 2015. Decentralized active information acquisition: Theory and application to multi-robot slam. In 2015 IEEE International Conference on Robotics and Automation (ICRA) , pp. 4775–4782."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib58",
+      "text": "Schlotfeldt et al. (2018) Schlotfeldt, B., D. Thakur, N. Atanasov, V. Kumar, and G.J. Pappas. 2018. Anytime planning for decentralized multirobot active information gathering. IEEE Robotics and Automation Letters 3 (2): 1025–1032 ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib37",
+      "text": "Kantaros et al. (2021) Kantaros, Y., B. Schlotfeldt, N. Atanasov, and G.J. Pappas. 2021, 6. Sampling-based planning for non-myopic multi-robot information gathering. Auton. Robots : 1–18 ."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib18",
+      "text": "Chen and Dames (2021) Chen, J. and P. Dames 2021. Distributed multi-target tracking for heterogeneous mobile sensing networks with limited field of views. In 2021 IEEE International Conference on Robotics and Automation (ICRA) , pp. 9058–9064."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib82",
+      "text": "Zhong and Cassandras (2011) Zhong, M. and C.G. Cassandras. 2011. Distributed coverage control and data collection with mobile sensor networks. IEEE Transactions on Automatic Control 56 (10): 2445–2455. 10.1109/TAC.2011.2163860 ."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib67",
+      "text": "Viseras et al. (2020) Viseras, A., Z. Xu, and L. Merino. 2020. Distributed multi-robot information gathering under spatio-temporal inter-robot constraints. Sensors 20 (2) ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib34",
+      "text": "Jeong et al. (2019) Jeong, H., B. Schlotfeldt, H. Hassani, M. Morari, D.D. Lee, and G.J. Pappas 2019. Learning q-network for active information acquisition. In 2019 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS) , pp. 6822–6827."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib66",
+      "text": "Viseras and Garcia (2019) Viseras, A. and R. Garcia. 2019. Deepig: Multi-robot information gathering with deep reinforcement learning. IEEE Robotics and Automation Letters 4 (3): 3059–3066. 10.1109/LRA.2019.2924839 ."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib11",
+      "text": "Best et al. (2019) Best, G., O.M. Cliff, T. Patten, R.R. Mettu, and R. Fitch. 2019. Dec-mcts: Decentralized planning for multi-robot active perception. The International Journal of Robotics Research 38 (2-3): 316–337. 10.1177/0278364918755924 ."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib31",
+      "text": "Hollinger et al. (2009) Hollinger, G., S. Singh, J. Djugash, and A. Kehagias. 2009, 2. Efficient multi-robot search for a moving target. http://dx.doi.org/10.1177/0278364908099853 28: 201–219 ."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib47",
+      "text": "Nguyen et al. (2019) Nguyen, H.V., H. Rezatofighi, B.N. Vo, and D.C. Ranasinghe. 2019, 11. Multi-objective multi-agent planning for jointly discovering and tracking mobile object. AAAI 2020 - 34th AAAI Conference on Artificial Intelligence : 7227–7235 ."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib19",
+      "text": "Chen et al. (2022) Chen, S., D. Yin, and Y. Niu. 2022, 6. A survey of robot swarms’ relative localization method. Sensors 2022, Vol. 22, Page 4424 22: 4424 ."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib56",
+      "text": "Retscher (2020) Retscher, G. 2020, 9. Fundamental concepts and evolution of wi-fi user localization: An overview based on different case studies. Sensors 2020, Vol. 20, Page 5121 20: 5121. 10.3390/S20185121 ."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib64",
+      "text": "Tong et al. (2021) Tong, X., H. Li, X. Tian, and X. Wang. 2021, 4. Wi-fi localization enabling self-calibration. IEEE/ACM Transactions on Networking 29: 904–917 ."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib75",
+      "text": "Wang et al. (2016) Wang, Y., Q. Ye, J. Cheng, and L. Wang 2016, 2. Rssi-based bluetooth indoor localization. In Proceedings - 11th International Conference on Mobile Ad-Hoc and Sensor Networks, MSN 2015 , pp. 165–171. Institute of Electrical and Electronics Engineers Inc."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib49",
+      "text": "Obreja and Vulpe (2020) Obreja, S.G. and A. Vulpe 2020, 6. Evaluation of an indoor localization solution based on bluetooth low energy beacons. In 2020 13th International Conference on Communications, COMM 2020 - Proceedings , pp. 227–231. Institute of Electrical and Electronics Engineers Inc."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib7",
+      "text": "Baronti et al. (2018) Baronti, P., P. Barsocchi, S. Chessa, F. Mavilia, and F. Palumbo. 2018, 12. Indoor bluetooth low energy dataset for localization, tracking, occupancy, and social interaction. Sensors 2018, Vol. 18, Page 4462 18: 4462 ."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib63",
+      "text": "Tiemann et al. (2020) Tiemann, J., O. Fuhr, and C. Wietfeld 2020. CELIDON: Supporting first responders through 3D AOA-based UWB Ad-hoc localization. In Int. Conf. Wirel. Mob. Comput. Netw. Commun. , Volume 2020-Octob. IEEE Computer Society."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib30",
+      "text": "Heydariaan et al. (2020) Heydariaan, M., H. Dabirian, and O. Gnawali 2020, may. AnguLoc: Concurrent Angle of Arrival Estimation for Indoor Localization with UWB Radios. In Proc. - 16th Annu. Int. Conf. Distrib. Comput. Sens. Syst. DCOSS 2020 , pp. 112–119. Institute of Electrical and Electronics Engineers Inc."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib42",
+      "text": "Macoir et al. (2019) Macoir, N., J. Bauwens, B. Jooris, B.V. Herbruggen, J. Rossey, J. Hoebeke, and E.D. Poorter. 2019, 1. Uwb localization with battery-powered wireless backbone for drone-based inventory management. Sensors 2019, Vol. 19, Page 467 19: 467 ."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib59",
+      "text": "Silva et al. (2014) Silva, B., Z. Pang, J. Akerberg, J. Neander, and G. Hancke 2014, 11. Experimental study of uwb-based high precision localization for industrial applications. In Proceedings - IEEE International Conference on Ultra-Wideband , pp. 280–285. IEEE Computer Society."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib80",
+      "text": "Zhang et al. (2020) Zhang, J., M. Ren, P. Wang, J. Meng, and Y. Mu. 2020, 5. Indoor localization based on vio system and three-dimensional map matching. Sensors 2020, Vol. 20, Page 2790 20: 2790 ."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib51",
+      "text": "Pavliv et al. (2021) Pavliv, M., F. Schiano, C. Reardon, D. Floreano, and G. Loianno. 2021, 4. Tracking and relative localization of drone swarms with a vision-based headset. IEEE Robotics and Automation Letters 6: 1455–1462 ."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib69",
+      "text": "Vodisch et al. (2022) Vodisch, N., O. Unal, K. Li, L.V. Gool, and D. Dai. 2022, 4. End-to-end optimization of lidar beam configuration for 3d object detection and localization. IEEE Robotics and Automation Letters 7: 2242–2249 ."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib20",
+      "text": "Cho et al. (2022) Cho, Y., G. Kim, S. Lee, and J.H. Ryu. 2022, 4. Openstreetmap-based lidar global localization in urban environment without a prior lidar map. IEEE Robotics and Automation Letters 7: 4999–5006 ."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib57",
+      "text": "Robin and Lacroix (2016) Robin, C. and S. Lacroix. 2016, 4. Multi-robot target detection and tracking: taxonomy and survey. Autonomous Robots 40: 729–760 ."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib16",
+      "text": "Cao et al. (2006) Cao, Z., M. Tan, L. Li, N. Gu, and S. Wang. 2006. Cooperative hunting by distributed mobile robots based on local interaction. IEEE Transactions on Robotics 22 (2): 402–406 ."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib62",
+      "text": "Sutantyo et al. (2011) Sutantyo, D., S. Kernbach, V. Nepomnyashchikh, and P. Levi. 2011, 08. Multi-robot searching algorithm using levy flight and artificial potential field. 8th IEEE International Workshop on Safety, Security, and Rescue Robotics, SSRR-2010 . 10.1109/SSRR.2010.5981560 ."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib6",
+      "text": "Azpúrua et al. (2018) Azpúrua, H., G. Freitas, D. Macharet, and M. Campos. 2018, 04. Multi-robot coverage path planning using hexagonal segmentation for geophysical surveys. Robotica 36: 1–23. 10.1017/S0263574718000292 ."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib1",
+      "text": "Alpern and Gal (2003) Alpern, S. and S. Gal. 2003, 01. The Theory of Search Games and Rendezvous , Volume 55."
+    },
+    {
+      "n": 34,
+      "id": "bib.bib73",
+      "text": "Wang et al. (2022) Wang, P., M. Meghjani, and G. Chen 2022. Marine trash collection: A multi-agent, multi-target search. In OCEANS 2022, Hampton Roads , pp. 1–7."
+    },
+    {
+      "n": 35,
+      "id": "bib.bib14",
+      "text": "Cabreira et al. (2018) Cabreira, T.M., C.D. Franco, P.R. Ferreira, and G.C. Buttazzo. 2018. Energy-aware spiral coverage path planning for uav photogrammetric applications. IEEE Robotics and Automation Letters (4): 3662–3668. 10.1109/LRA.2018.2854967 ."
+    },
+    {
+      "n": 36,
+      "id": "bib.bib48",
+      "text": "Nowzari and Cortes (2012) Nowzari, C. and J. Cortes. 2012, 06. Self-triggered coordination of robotic networks for optimal deployment. Automatica 48: 1077–1087. 10.1016/j.automatica.2012.03.009 ."
+    },
+    {
+      "n": 37,
+      "id": "bib.bib3",
+      "text": "Arslan and Koditschek (2016) Arslan, O. and D.E. Koditschek 2016. Voronoi-based coverage control of heterogeneous disk-shaped robots. In 2016 IEEE International Conference on Robotics and Automation (ICRA) , pp. 4259–4266."
+    },
+    {
+      "n": 38,
+      "id": "bib.bib41",
+      "text": "Luo and Sycara (2019) Luo, W. and K. Sycara 2019. Voronoi-based coverage control with connectivity maintenance for robotic sensor networks. In 2019 International Symposium on Multi-Robot and Multi-Agent Systems (MRS) , pp. 148–154."
+    },
+    {
+      "n": 39,
+      "id": "bib.bib74",
+      "text": "Wang and Hussein (2008) Wang, Y. and I.I. Hussein 2008. Awareness coverage control over large scale domains with intermittent communications. In 2008 American Control Conference , pp. 4370–4375."
+    },
+    {
+      "n": 40,
+      "id": "bib.bib26",
+      "text": "Ganganath et al. (2016) Ganganath, N., C.T. Cheng, and C.K. Tse. 2016, oct. Distributed Antiflocking Algorithms for Dynamic Coverage of Mobile Sensor Networks. IEEE Transactions on Industrial Informatics 12 (5): 1795–1805. 10.1109/TII.2016.2519913 ."
+    },
+    {
+      "n": 41,
+      "id": "bib.bib71",
+      "text": "Wang et al. (2021) Wang, G.G., C.L. Wei, Y. Wang, and W. Pedrycz. 2021. Improving distributed anti-flocking algorithm for dynamic coverage of mobile wireless networks with obstacle avoidance. Knowledge-Based Systems 225: 107133 ."
+    },
+    {
+      "n": 42,
+      "id": "bib.bib72",
+      "text": "Wang et al. (2022) Wang, L., Z. Pu, T. Qiu, and J. Yi 2022. A selected interaction swarming algorithm for connected dynamic coverage of mobile sensor networks. Accepted to 2022 American Control Conference (ACC)."
+    },
+    {
+      "n": 43,
+      "id": "bib.bib25",
+      "text": "Filipescu et al. (2009) Filipescu, A., I. Susnea, S. Filipescu, and G. Stamatescu 2009. Wheeled mobile robot control using virtual pheromones and neural networks. In 2009 IEEE Int. Conf. Control Autom. ICCA 2009 , pp. 157–162."
+    },
+    {
+      "n": 44,
+      "id": "bib.bib13",
+      "text": "Bottone et al. (2016) Bottone, M., F. Palumbo, G. Primiero, F. Raimondi, and R. Stocker 2016, dec. Implementing Virtual Pheromones in BDI Robots Using MQTT and Jason (Short Paper). In Proc. - 2016 5th IEEE Int. Conf. Cloud Networking, CloudNet 2016 , pp. 196–199. Institute of Electrical and Electronics Engineers Inc."
+    },
+    {
+      "n": 45,
+      "id": "bib.bib50",
+      "text": "Oliveira et al. (2014) Oliveira, J.R., R. Calvo, and R.A. Romero 2014, sep. Integration of virtual pheromones for mapping/exploration of environments by using multiple robots. In Proc. IEEE RAS EMBS Int. Conf. Biomed. Robot. Biomechatronics , pp. 835–840. IEEE Computer Society."
+    },
+    {
+      "n": 46,
+      "id": "bib.bib61",
+      "text": "Sun et al. (2019) Sun, X., T. Liu, C. Hu, Q. Fu, and S. Yue. 2019, jul. ColCOS Φ \\Phi : AAA multiple pheromone communication system for swarm robotics and social insects research. 2019 4th IEEE Int. Conf. Adv. Robot. Mechatronics, ICARM 2019 : 59–66 ."
+    },
+    {
+      "n": 47,
+      "id": "bib.bib60",
+      "text": "Sugawara et al. (2004) Sugawara, K., T. Kazama, and T. Watanabe 2004. Foraging behavior of interacting robots with virtual pheromone. In 2004 IEEE/RSJ Int. Conf. Intell. Robot. Syst. , Volume 3, pp. 3074–3079."
+    },
+    {
+      "n": 48,
+      "id": "bib.bib23",
+      "text": "Crouse (2016) Crouse, D.F. 2016. On implementing 2d rectangular assignment algorithms. IEEE Transactions on Aerospace and Electronic Systems 52 (4): 1679–1696. 10.1109/TAES.2016.140952 ."
+    },
+    {
+      "n": 49,
+      "id": "bib.bib21",
+      "text": "Chopra et al. (2017) Chopra, S., G. Notarstefano, M. Rice, and M. Egerstedt. 2017. A distributed version of the hungarian method for multirobot assignment. IEEE Transactions on Robotics 33 (4): 932–947. 10.1109/TRO.2017.2693377 ."
+    },
+    {
+      "n": 50,
+      "id": "bib.bib10",
+      "text": "Bertsekas (1979) Bertsekas, D.P. 1979. A distributed algorithm for the assignment problem. Lab. for Information and Decision Systems Working Paper, MIT ."
+    },
+    {
+      "n": 51,
+      "id": "bib.bib78",
+      "text": "Zavlanos et al. (2008) Zavlanos, M.M., L. Spesivtsev, and G.J. Pappas 2008. A distributed auction algorithm for the assignment problem. In 2008 47th IEEE Conference on Decision and Control , pp. 1212–1217."
+    },
+    {
+      "n": 52,
+      "id": "bib.bib53",
+      "text": "Qie et al. (2019) Qie, H., D. Shi, T. Shen, X. Xu, Y. Li, and L. Wang. 2019. Joint optimization of multi-uav target assignment and path planning based on multi-agent reinforcement learning. IEEE access 7: 146264–146272 ."
+    },
+    {
+      "n": 53,
+      "id": "bib.bib83",
+      "text": "Zhou and Roumeliotis (2011) Zhou, K. and S.I. Roumeliotis. 2011, 8. Multirobot active target tracking with combinations of relative observations. IEEE Transactions on Robotics 27: 678–695 ."
+    },
+    {
+      "n": 54,
+      "id": "bib.bib70",
+      "text": "Volle et al. (2016) Volle, K., J. Rogers, and K. Brink. 2016, 07. Decentralized cooperative control methods for the modified weapon–target assignment problem. Journal of Guidance, Control, and Dynamics 39: 1–15. 10.2514/1.G001752 ."
+    },
+    {
+      "n": 55,
+      "id": "bib.bib76",
+      "text": "Xia et al. (2022) Xia, Z., J. Du, J. Wang, C. Jiang, Y. Ren, G. Li, and Z. Han. 2022. Multi-agent reinforcement learning aided intelligent uav swarm for target tracking. IEEE Transactions on Vehicular Technology 71 (1): 931–945 ."
+    },
+    {
+      "n": 56,
+      "id": "bib.bib77",
+      "text": "Zahroof et al. (2022) Zahroof, R., J. Liu, L. Zhou, and V. Kumar. 2022. Multi-robot localization and target tracking with connectivity maintenance and collision avoidance."
+    },
+    {
+      "n": 57,
+      "id": "bib.bib43",
+      "text": "Mathew and Nowzari (2022) Mathew, J.P. and C. Nowzari 2022. Real-Time Distributed Multi-Robot Target Tracking via Virtual Pheromones. In IEEE Int. Conf. Intell. Robot. Syst. , Volume 2022-Octob, pp. 5833–5839. Institute of Electrical and Electronics Engineers Inc."
+    }
+  ]
+}

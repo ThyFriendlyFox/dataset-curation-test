@@ -1,0 +1,179 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.17370",
+  "title": "Formal Verification of the Empty Hexagon Number",
+  "authors": "Bernardo Subercaseaux, Wojciech Nawrocki, James Gallicchio, Cayden Codel, Mario Carneiro, Marijn J. H. Heule",
+  "year": "2024",
+  "categories": [
+    "cs.CG",
+    "cs.LO"
+  ],
+  "url": "https://arxiv.org/abs/2403.17370",
+  "html_url": "https://arxiv.org/html/2403.17370",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 926,
+  "text": "Mathematicians are often rightfully skeptical of proofs that rely on extensive computation (e.g., the controversy around the four color theorem [1]). Nonetheless, many mathematically-interesting theorems have been resolved that way. SAT solving in particular has been a powerful tool for mathematics, successfully resolving Keller’s conjecture [2], the packing chromatic number of the infinite grid [3], the Pythagorean triples problem [4], Lam’s problem [5], and one case of the Erdős discrepancy conjecture [6]. All of these proofs rely on the same two-step structure:\n\n- • (Reduction) Show that the mathematical theorem of interest is true if a concrete propositional formula \\phi is unsatisfiable.\n\n- • (Solving) Show that \\phi is indeed unsatisfiable.\n\nFormal methods researchers have devoted significant attention to making the solving step reliable, reproducible and trustworthy. Modern SAT solvers produce proofs of unsatisfiability in formal systems such as DRAT [7] that can in turn be checked with verified proof checkers such as cake_lpr [8]. These tools ensure that when a SAT solver declares a formula \\phi to be unsatisfiable, the formula is indeed unsatisfiable. In contrast, the reduction step can use problem-specific mathematical insights that, when left unverified, threaten the trustworthiness of SAT-based proofs in mathematics. A perfect example of the complexity of this reduction step can be found in a recent breakthrough of Heule and Scheucher [9] in discrete computational geometry. They constructed (and solved) a formula \\phi whose unsatisfiability implies that every set of 30 points, without three in a common line, must contain an empty convex hexagon. However, as is common with such results, their reduction argument was only sketched, relied heavily on intuition, and left several gaps to be filled in.\n\nIn this paper we complete and formalize the reduction of Heule and Scheucher in the Lean theorem prover [10]. We do so by connecting existing geometric definitions in the mathematical proof library mathlib [11] to the unsatisfiability of a particular SAT instance, thus setting a new standard for verifying results which rely on extensive computation. Our formalization is publicly available at https://github.com/bsubercaseaux/EmptyHexagonLean/tree/itp2024.\n\n## Verification of SAT proofs.\n\nFormal verification plays a crucial role in certifying the solving step of SAT-based results. For example, theorem provers and formal methods tools have been used to verify solvers [12,13,14] and proof checkers [15,8]. However, the reduction step has not received similar scrutiny. Some work has been done to verify the reductions to SAT underlying these kinds of mathematical results. The solution to the Pythagorean triples problem was verified in the Coq proof assistant by Cruz-Filipe and coauthors [16,17]. More generally, Giljegård and Wennerbreck [18] provide a CakeML library of verified SAT encodings, which they used to write verified reductions from different puzzles (e.g., Sudoku, Kakuro, the N-queens problem). The reduction verification techniques we use in this paper are based on that of Codel, Avigad, and Heule [19] in the Lean theorem prover.\n\nFormal verification for SAT-based combinatorial geometry was pioneered by Marić [20]. He developed a reduction of a case of the Happy Ending Problem to SAT and formally verified it in Isabelle/HOL. We give a detailed comparison between his work and ours in Section 7.\n\n## Lean.\n\nInitially developed by Leonardo de Moura in 2013 [10], the Lean theorem prover has become a popular choice for formalizing modern mathematical research. Recent successes include the Liquid Tensor Experiment [21] and the proof of the polynomial Freiman-Ruzsa conjecture [22,23], both of which brought significant attention to Lean. A major selling point for Lean is the mathlib project [11], a monolithic formalization of foundational mathematics. By relying on mathlib for definitions, lemmas, and proof tactics, mathematicians can focus on the interesting components of a formalization while avoiding duplication of proof efforts across formalizations. In turn, by making a formalization compatible with mathlib, future proof efforts can rely on work done today. In this spirit, we connect our results to mathlib as much as possible.\n\n## The Empty Hexagon Number.\n\nIn the 1930s, Erdős and Szekeres, inspired by Esther Klein, showed that for any k\\geq 3, one can find a sufficiently large number n such that every n points in general position (i.e., with no three points collinear) contain a convex k -gon, i.e., a convex polygon with k vertices [24]. The minimal such n is denoted g(k). The same authors later showed that g(k)>2^{k-2} and conjectured that this bound is tight [25]. Indeed, it is known that g(5)=9 and g(6)=17, with the latter result obtained by Szekeres and Peters 71 years after the initial conjecture via exhaustive computer search [26]. Larger cases remain open, with g(k)\\leq 2^{k+o(k)} the best known upper bound [27,28]. This problem is now known as the Happy Ending Problem, as it led to the marriage of Klein and Szekeres.\n\nIn a similar spirit, Erdős defined h(k) to be the minimal number of points in general position that is guaranteed to contain a k -hole, or empty k -gon, meaning a convex k -gon with no other point inside. It is easy to check that h(3)=3 and h(4)=5. In 1978, Harborth established that h(5)=10 [29]. Surprisingly, in 1983, Horton discovered constructions of arbitrarily large point sets that avoid k -holes for k\\geq 7 [30]. Only h(6) remained. The Empty Hexagon Theorem, establishing h(6) to be finite, was proven independently by Gerken and Nicolás in 2006 [31,32]. In 2008, Valtr narrowed the range of possible values down to 30\\leq h(6)\\leq 1717, where the problem remained until the breakthrough by Heule and Scheucher [9], who used a SAT solver to prove that h(6)\\leq 30, a result we refer to as the Empty Hexagon Number.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib39",
+      "text": "Mark Walters. It Appears That Four Colors Suffice : A Historical Overview of the Four-Color Theorem. 2004. URL: https://api.semanticscholar.org/CorpusID:14382286 ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "Joshua Brakensiek, Marijn Heule, John Mackey, and David Narváez. The Resolution of Keller’s Conjecture, 2023. arXiv:1910.03740 ."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib33",
+      "text": "Bernardo Subercaseaux and Marijn J. H. Heule. The Packing Chromatic Number of the Infinite Square Grid is 15. In Sriram Sankaranarayanan and Natasha Sharygina, editors, Tools and Algorithms for the Construction and Analysis of Systems - 29th International Conference, TACAS 2023, Held as Part of ETAPS 2022, Proceedings, Part I , volume 13993 of Lecture Notes in Computer Science , page 389–406. Springer, 2023. doi:10.1007/978-3-031-30823-9_20 ."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib18",
+      "text": "Marijn J. H. Heule, Oliver Kullmann, and Victor W. Marek. Solving and Verifying the Boolean Pythagorean Triples Problem via Cube-and-Conquer , page 228–245. Springer International Publishing, 2016. URL: http://dx.doi.org/10.1007/978-3-319-40970-2_15 , doi:10.1007/978-3-319-40970-2_15 ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib3",
+      "text": "Curtis Bright, Kevin K. H. Cheung, Brett Stevens, Ilias S. Kotsireas, and Vijay Ganesh. A SAT-based resolution of Lam’s Problem. In Thirty-Fifth AAAI Conference on Artificial Intelligence, AAAI 2021 , pages 3669–3676. AAAI Press, 2021. URL: https://doi.org/10.1609/aaai.v35i5.16483 , doi:10.1609/AAAI.V35I5.16483 ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib23",
+      "text": "Boris Konev and Alexei Lisitsa. A SAT Attack on the Erdos Discrepancy Conjecture, 2014. arXiv:1402.2184 ."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib40",
+      "text": "Nathan Wetzler, Marijn J. H. Heule, and Warren A. Hunt. DRAT-trim: Efficient checking and trimming using expressive clausal proofs. In Carsten Sinz and Uwe Egly, editors, Theory and Applications of Satisfiability Testing – SAT 2014 , pages 422–429, Cham, 2014. Springer International Publishing."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib38",
+      "text": "Yong Kiam Tan, Marijn J. H. Heule, and Magnus O. Myreen. Verified Propagation Redundancy and Compositional UNSAT Checking in CakeML. International Journal on Software Tools for Technology Transfer , 25(2):167–184, April 2023. doi:10.1007/s10009-022-00690-y ."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib19",
+      "text": "Marijn J. H. Heule and Manfred Scheucher. Happy ending: An empty hexagon in every set of 30 points, 2024. arXiv:2403.00737 ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "Leonardo de Moura, Soonho Kong, Jeremy Avigad, Floris van Doorn, and Jakob von Raumer. The Lean Theorem Prover (System Description). In Amy P. Felty and Aart Middeldorp, editors, Automated Deduction - CADE-25 , pages 378–388, Cham, 2015. Springer International Publishing."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib27",
+      "text": "The mathlib Community. The Lean mathematical library. In Proceedings of the 9th ACM SIGPLAN International Conference on Certified Programs and Proofs , POPL ’20. ACM, January 2020. URL: http://dx.doi.org/10.1145/3372885.3373824 , doi:10.1145/3372885.3373824 ."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib25",
+      "text": "Filip Maric. Formal verification of a modern SAT solver by shallow embedding into Isabelle/HOL. Theor. Comput. Sci. , 411(50):4333–4356, 2010. URL: https://doi.org/10.1016/j.tcs.2010.09.014 , doi:10.1016/J.TCS.2010.09.014 ."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib29",
+      "text": "Duckki Oe, Aaron Stump, Corey Oliver, and Kevin Clancy. Versat: A Verified Modern SAT Solver. In Viktor Kuncak and Andrey Rybalchenko, editors, Verification, Model Checking, and Abstract Interpretation , pages 363–378, Berlin, Heidelberg, 2012. Springer Berlin Heidelberg."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib31",
+      "text": "Sarek Høverstad Skotåm. CreuSAT, Using Rust and Creusot to create the world’s fastest deductively verified SAT solver. Master’s thesis, University of Oslo, 2022. URL: https://www.duo.uio.no/handle/10852/96757 ."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib24",
+      "text": "Peter Lammich. Efficient Verified (UN)SAT Certificate Checking. Journal of Automated Reasoning , 64(3):513–532, March 2020. doi:10.1007/s10817-019-09525-z ."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib8",
+      "text": "Luís Cruz-Filipe, João Marques-Silva, and Peter Schneider-Kamp. Formally Verifying the Solution to the Boolean Pythagorean Triples Problem. J. Autom. Reason. , 63(3):695–722, oct 2019. doi:10.1007/s10817-018-9490-4 ."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib9",
+      "text": "Luís Cruz-Filipe and Peter Schneider-Kamp. Formally Proving the Boolean Pythagorean Triples Conjecture. In Thomas Eiter and David Sands, editors, LPAR-21. 21st International Conference on Logic for Programming, Artificial Intelligence and Reasoning , volume 46 of EPiC Series in Computing , pages 509–522. EasyChair, 2017. URL: https://easychair.org/publications/paper/xq6J , doi:10.29007/jvdj ."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib15",
+      "text": "Sofia Giljegård and Johan Wennerbeck. Puzzle Solving with Proof. Master’s thesis, Chalmers University of Technology, 2021."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib6",
+      "text": "Cayden Codel, Marijn J. H. Heule, and Jeremy Avigad. Verified Encodings for SAT Solvers. In Alexander Nadel and Kristin Yvonne Rozier, editors, Proceedings of the 23rd conference on Formal Methods In Computer-Aided Design , 2023."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib26",
+      "text": "Filip Maric. Fast formal proof of the Erdős-Szekeres conjecture for convex polygons with at most 6 points. J. Autom. Reason. , 62(3):301–329, 2019. URL: https://doi.org/10.1007/s10817-017-9423-7 , doi:10.1007/S10817-017-9423-7 ."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib5",
+      "text": "Davide Castelvecchi. Mathematicians welcome computer-assisted proof in ’grand unification’ theory. Nature , 595(7865):18–19, June 2021. URL: http://dx.doi.org/10.1038/d41586-021-01627-2 , doi:10.1038/d41586-021-01627-2 ."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib16",
+      "text": "W. T. Gowers, Ben Green, Freddie Manners, and Terence Tao. On a conjecture of Marton, 2023. arXiv:2311.05762 ."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib32",
+      "text": "Leila Sloman. ‘A-Team’ of Math Proves a Critical Link Between Addition and Sets. https://www.quantamagazine.org/a-team-of-math-proves-a-critical-link-between-addition-and-sets-20231206/, December 2023."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib12",
+      "text": "Paul Erdős and György Szekeres. A combinatorial problem in geometry. Compositio Mathematica , 2:463–470, 1935. URL: http://eudml.org/doc/88611 ."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib11",
+      "text": "Paul Erdős and George Szekeres. On some extremum problems in elementary geometry. Ann. Univ. Sci. Budapest. Eötvös Sect. Math. , 3(4):53–62, 1960."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib37",
+      "text": "George Szekeres and Lindsay Peters. Computer solution to the 17-point erdős-szekeres problem. The ANZIAM Journal , 48(2):151–164, 2006."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib35",
+      "text": "Andrew Suk. On the erdős-szekeres convex polygon problem. Journal of the American Mathematical Society , 30(4):1047–1053, 2017."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib20",
+      "text": "Andreas F Holmsen, Hossein Nassajian Mojarrad, János Pach, and Gábor Tardos. Two extensions of the erdős-szekeres problem. arXiv preprint arXiv:1710.11415 , 2017."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib17",
+      "text": "Heiko Harborth. Konvexe Fünfecke in ebenen Punktmengen. Elemente der Mathematik , 33:116–118, 1978. URL: http://eudml.org/doc/141217 ."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib21",
+      "text": "J. D. Horton. Sets with No Empty Convex 7-Gons. Canadian Mathematical Bulletin , 26(4):482–484, 1983. doi:10.4153/CMB-1983-077-8 ."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib14",
+      "text": "Tobias Gerken. Empty Convex Hexagons in Planar Point Sets. Discrete & Computational Geometry , 39(1):239–272, mar 2008. doi:10.1007/s00454-007-9018-x ."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib28",
+      "text": "Carlos M. Nicolas. The Empty Hexagon Theorem. Discrete & Computational Geometry , 38(2):389–397, September 2007. doi:10.1007/s00454-007-1343-6 ."
+    }
+  ]
+}

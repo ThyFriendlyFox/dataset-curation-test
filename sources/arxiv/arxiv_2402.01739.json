@@ -1,0 +1,101 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2402.01739",
+  "title": "OpenMoE: An Early Effort on Open Mixture-of-Experts Language Models",
+  "authors": "Fuzhao Xue, Zian Zheng, Yao Fu, Jinjie Ni, Zangwei Zheng, Wangchunshu Zhou, Yang You",
+  "year": "2024",
+  "categories": [
+    "cs.CL",
+    "cs.AI",
+    "cs.DC",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2402.01739",
+  "html_url": "https://arxiv.org/html/2402.01739",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 958,
+  "text": "Large Language Model (LLM) has exhibited remarkable performance on various NLP tasks [1,2], and has even become a part of our daily lives through chatbot applications such as ChatGPT, Bard, and Copilot. However, LLMs are computationally expensive in both training and inference. As LLMs become increasingly prevalent, enhancing their performance without proportionally increasing computational resources is a critical challenge. In response to this challenge, [3,4] proposed the Mixture-of-Experts (MoE) to scale up the trainable parameters of the transformer with little additional computation overhead. Recent advancements in MoE-based language models, such as GLaM [5] and ST-MoE [6] have demonstrated superior performance in various tasks. However, before the release of OpenMoE, there were few open-sourced MoE language models trained with trillion-level diverse datasets.\n\nIn this work, we set forth three primary goals: (1) To offer a first-attempt solution in detail for training a decoder-only MoE model within the existing framework of training LLMs. (2) To perform an in-depth analysis of the MoE routing mechanisms, thereby providing the research community with deeper insights into the behaviors and potential limitations of MoE-based LLMs. (3) To pave the way for future MoE LLM development. Through this early endeavor, we aim to stimulate and accelerate the growth of the open-source MoE community.\n\nReleasing OpenMoE. First, we release OpenMoE, a series of open-sourced MoE-based LLMs, including: (1) OpenMoE-Base/16E: a small model with 0.65B parameters for debugging purposes. 16E means 16 experts per MoE layer; (2) OpenMoE-8B/32E: this variant features 8B parameters in total, activating around 2B parameters per token in Transformer blocks, and is pre-trained on over 1 trillion tokens; (3) OpenMoE-8B/32E-Chat, a chat version of OpenMoE-8B/32E, fine-tuned with a 100K subset of the WildChat [7] dataset; (4) OpenMoE-34B/32E: a larger scale model, activating 6B parameters per token in Transformer blocks and trained with 200B tokens, serving as a testament to the scalability of our approach. Detailed configuration can be found in Appendix B Our OpenMoE-8B/32E models achieved comparable performance with OpenLLaMA-3B [8] and TinyLLaMA-1.1B [9], two dense open LLMs used higher training cost. Notably, On the MT-Bench [10], OpenMoE-8B/32E-Chat outperformed the two dense LLMs significantly on the single-turn conversation. In addition, we release 5 intermediate checkpoints of OpenMoE-8B/32E, each trained with 200B more tokens than the previous one, to support and encourage future research. Section 2 and 3 will discuss the design, training details, and evaluation results of OpenMoE.\n\nExploring Advanced Training Strategies. As part of our research endeavor, we are committed to exploring more advanced Techniques in LLM training: (1) Different from the common practice of training models on in-house or text-dominated open-sourced data, we train OpenMoE with a substantial proportion of code, constituting up to 52.25% during the early stages of pre-training; (2) Moving beyond the conventional next-token prediction training objective, we investigate UL2 training objective [11], motivated by its proven effectiveness in previous work [12] and its good alignment with coding data [13]. We acknowledge that the performance of our model, while acceptable, does not significantly exceed our expectations, which may be attributed to some sub-optimal design choices. Nevertheless, we believe that this exploratory work offers substantial value to the open-source community, particularly in assessing the potential and effectiveness of these under-explored techniques.\n\nStudying MoE Routing In-depth. While MoE is effective, there remains a lack of study on why MoE performs well. From a high level, MoE introduces more trainable parameters than its dense counterpart. To keep the FLOPs fixed when scaling the number of parameters, MoE applies a routing layer that sparsely and adaptively assigns each token to a few experts. This process of sparse expert selection is crucial to MoE’s functionality. Unfortunately, despite existing pieces of literature briefly visualizing the routing decison [14,15,6,16,3], we still don’t have a clear understanding of how the router works and how the routing decision impacts the results in MoE models, especially for the post-ChatGPT LLMs trained on a mixture of datasets from diverse domains. In this work, we study this problem based on various taxonomies, including domain, language, task, and token. Our key findings are as follows: (1) Context-independent Specialization: MoE tends to simply cluster tokens based on similar token-level semantics, implying that, regardless of context, a certain token is more likely to be routed to a certain expert; (2) Early Routing Learning: Token ID routing specialization is established early in pre-training and remains largely fixed, resulting in tokens being consistently processed by the same experts throughout the training; (3) Drop-towards-the-End: Since each expert has a fixed max capacity, tokens appearing later in the sequence face a higher risk of being dropped if the expert is already at capacity. This issue is more severe in instruction-tuning datasets. These datasets often exhibit a domain gap compared to the pre-training data, meaning that the balanced token assignment strategies established and solidified during early pre-training may not be samely effective in instruction-tuning scenarios. This is concerning as instruction data plays an important role in deploying LLMs to real-world applications. Section 4 discusses the above phenomenons in detail.\n\nRethinking Our Mistakes and Proposing Potential Solutions. In retrospect, our project encountered several mistakes and made sub-optimal decisions (e.g., aggressive data mixture), as detailed in Section 5. As an early open-source effort, we believe that sharing these experiences and insights is crucial, perhaps even more important than solely focusing on successful strategies. Based on our empirical findings during training and subsequent visualization analysis (Section 4), we have developed a set of potential solutions. We sincerely hope these insights can help the community develop better models in the future.\n\nThe structure of this paper mirrors the lifecycle of the OpenMoE project, encompassing all its phases. This includes the initial design (Section 2), training and evaluation (Section 3, in-depth analysis (Section 4), and a rethinking of the OpenMoE project (Section 5).",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bibx37",
+      "text": "Colin Raffel et al. “Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer” In Journal of Machine Learning Research 21.140 , 2020, pp. 1–67 URL: http://jmlr.org/papers/v21/20-074.html"
+    },
+    {
+      "n": 2,
+      "id": "bib.bibx29",
+      "text": "Junlong Li, Zhuosheng Zhang and Hai Zhao “Self-Prompting Large Language Models for Open-Domain QA” In arXiv preprint arXiv:2212.08635 , 2022"
+    },
+    {
+      "n": 3,
+      "id": "bib.bibx38",
+      "text": "Carlos Riquelme et al. “Scaling vision with sparse mixture of experts” In Advances in Neural Information Processing Systems 34 , 2021, pp. 8583–8595"
+    },
+    {
+      "n": 4,
+      "id": "bib.bibx15",
+      "text": "William Fedus, Barret Zoph and Noam Shazeer “Switch transformers: Scaling to trillion parameter models with simple and efficient sparsity” In J. Mach. Learn. Res 23 , 2021, pp. 1–40"
+    },
+    {
+      "n": 5,
+      "id": "bib.bibx14",
+      "text": "Nan Du et al. “Glam: Efficient scaling of language models with mixture-of-experts” In International Conference on Machine Learning , 2022, pp. 5547–5569 PMLR"
+    },
+    {
+      "n": 6,
+      "id": "bib.bibx61",
+      "text": "Barret Zoph et al. “St-moe: Designing stable and transferable sparse expert models” In URL https://arxiv. org/abs/2202.08906 , 2022"
+    },
+    {
+      "n": 7,
+      "id": "bib.bibx2",
+      "text": "Anonymous “(InThe)WildChat: 570K ChatGPT Interaction Logs In The Wild” In The Twelfth International Conference on Learning Representations , 2024 URL: https://openreview.net/forum?id=Bl8u7ZRlbM"
+    },
+    {
+      "n": 8,
+      "id": "bib.bibx19",
+      "text": "Xinyang Geng and Hao Liu “OpenLLaMA: An Open Reproduction of LLaMA”, 2023 URL: https://github.com/openlm-research/open_llama"
+    },
+    {
+      "n": 9,
+      "id": "bib.bibx56",
+      "text": "Peiyuan Zhang, Guangtao Zeng, Tianduo Wang and Wei Lu “TinyLlama: An Open-Source Small Language Model”, 2024 arXiv: 2401.02385 [cs.CL]"
+    },
+    {
+      "n": 10,
+      "id": "bib.bibx58",
+      "text": "Lianmin Zheng et al. “Judging LLM-as-a-judge with MT-Bench and Chatbot Arena” In arXiv preprint arXiv:2306.05685 , 2023"
+    },
+    {
+      "n": 11,
+      "id": "bib.bibx47",
+      "text": "Yi Tay et al. “Unifying language learning paradigms” In arXiv preprint arXiv:2205.05131 , 2022"
+    },
+    {
+      "n": 12,
+      "id": "bib.bibx1",
+      "text": "Rohan Anil et al. “Palm 2 technical report” In arXiv preprint arXiv:2305.10403 , 2023"
+    },
+    {
+      "n": 13,
+      "id": "bib.bibx5",
+      "text": "Mohammad Bavarian et al. “Efficient training of language models to fill in the middle” In arXiv preprint arXiv:2207.14255 , 2022"
+    },
+    {
+      "n": 14,
+      "id": "bib.bibx42",
+      "text": "Noam Shazeer et al. “Outrageously large neural networks: The sparsely-gated mixture-of-experts layer” In arXiv preprint arXiv:1701.06538 , 2017"
+    },
+    {
+      "n": 15,
+      "id": "bib.bibx28",
+      "text": "Mike Lewis et al. “Base layers: Simplifying training of large, sparse models” In International Conference on Machine Learning , 2021, pp. 6265–6274 PMLR"
+    },
+    {
+      "n": 16,
+      "id": "bib.bibx33",
+      "text": "Basil Mustafa et al. “Multimodal contrastive learning with limoe: the language-image mixture of experts” In Advances in Neural Information Processing Systems 35 , 2022, pp. 9564–9576"
+    }
+  ]
+}

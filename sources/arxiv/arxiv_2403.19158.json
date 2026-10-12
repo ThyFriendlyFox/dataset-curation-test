@@ -1,0 +1,94 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.19158",
+  "title": "Uncertainty-Aware Deep Video Compression with Ensembles",
+  "authors": "Wufei Ma, Jiahao Li, Bin Li, Yan Lu",
+  "year": "2024",
+  "categories": [
+    "cs.CV",
+    "eess.IV"
+  ],
+  "url": "https://arxiv.org/abs/2403.19158",
+  "html_url": "https://arxiv.org/html/2403.19158",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 769,
+  "text": "Video contents are reported to account for 82% percent of all consumer Internet traffic by 2021, and they are proliferating with an increasing demand for high-resolution videos (e.g., 4K movies) and live streaming services [1]. Therefore, we must improve the video compression performance to transmit video with a higher quality given limited Internet bandwidth. In recent years, there has been a surge of deep learning-based video compression models [2,3,4,5] and some of them have achieved comparable or even better performance than previous traditional video codecs, such as x264 and x265 [6].\n\nAlthough previous deep learning-based video codecs have achieved improved performance on many challenging datasets, most state-of-the-art models estimate deterministic predictions for intermediate representations, such as optical flows and residuals. These models fail to represent the aleatoric uncertainty inherent in the model inputs or the epistemic uncertainty in the model parameters and would blindly assume the predictions to be accurate, which is not always the case [7,8]. In terms of video compression, such models produce deterministic motion vectors (or optical flows) and residuals for each pixel location, ignoring the fact that optical flows may not be estimated accurately in occluded regions and around object boundaries, and the quantization operation before lossless entropy coding also introduces additional noises to the inputs of the decoders. Underlying errors in such overconfident intermediate predictions are propagated to later stages of the P-frame model and even to subsequent frames for models built on temporal correlation, leading to suboptimal performance of the compression system.\n\nPredictive uncertainty is crucial for us to understand how confident the model is about the predictions, especially for out-of-distribution data. However, most neural networks do not offer such information and tend to produce overconfident predictions [9,10]. Bayesian neural networks [11,12] are widely used to quantify predictive uncertainty but lack practicality due to significantly increased computation complexity and do not scale well to high-dimensional data. [13] proposed Monte Carlo dropout that performs test-time dropout. It is simple to implement but unsuitable for deep learning-based compression, since it requires multiple decoding-time inferences and yields nondeterministic outputs.\n\nIn terms of deep learning-based video compression, two non-Bayesian approaches are considered to represent the predictive uncertainty: (1) modeling the uncertainty explicitly by regressing the empirical variance of the model outputs [14]; and (2) using ensembles for predictive uncertainty estimation [10]. Scale-space flow [4] took the first approach and proposed to regress a scale field besides the standard 2D flow field, representing the variance associated with each predicted MV (motion vector). Gaussian blurring is then applied to the reference frame, and the scale parameter is used to control the size of the Gaussian kernel. Although this approach has been shown to be effective, regressed scales are unreliable for out-of-distribution data and are often misinterpreted as predictive uncertainty [9].\n\nIn this work, we consider the second approach and represent the underlying uncertainty with deep ensembles. Instead of producing a deterministic prediction, ensemble methods perform model combination and reflect the uncertainty of out-of-distribution data. Our ensemble-based decoding module generates an ensemble of intermediate outputs, such as motion vectors and residuals, and implicitly represents the predictive uncertainty with the variance of the Gaussian mixture prediction. This uncertainty is then propagated to later stages, and all modules in our framework are optimized in an end-to-end fashion. Moreover, unlike previous works on whole model-level ensembles, our approach ensembles the partial intermediate layers of the decoding module and achieves improved performance with limited overhead.\n\nTo further improve the performance of our uncertainty-aware video compression model, we propose an ensemble-aware loss to encourage diversity between different branches and incorporate an adversarial training strategy, fast gradient sign method (FGSM) [15], to effectively learn a smooth latent representation. Our experiments show that our model can achieve a bitrate saving of more than 20% on 1080p sequences compared to DVC Pro [3]. Visualizations of the predictive uncertainty captured by our model support our claims and demonstrate the effectiveness of our approach.\n\nThe contributions of this work are summarized as follows:\n\n- • We identify the underlying uncertainty of intermediate representations as a key limitation of residual-based video compression models and propose an ensemble-based decoder to effectively capture the predictive uncertainty.\n\n- • We design a novel ensemble-aware loss to encourage the diversity between ensemble members and better capture the predictive uncertainty. We also show that fast gradient sign method can benefit deep learning-based video compression by learning a smooth intermediate representation.\n\n- • Experiments show that our model outperforms previous state-of-the-art models such as DVC Pro [3] and scale-space flow [4], and our approach can be widely applied to optical flow-based video codecs with negligible complexity increase.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "Cisco, “Cisco annual internet report (2018-2023) white paper,” 2020. [Online]. Available: https://www.cisco.com/c/en/us/solutions/collateral/executive-perspectives/annual-internet-report/white-paper-c11-741490.html"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "O. Rippel, S. Nair, C. Lew, S. Branson, A. G. Anderson, and L. Bourdev, “Learned video compression,” in Proceedings of the IEEE/CVF International Conference on Computer Vision , 2019, pp. 3454–3463."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "G. Lu, X. Zhang, W. Ouyang, L. Chen, Z. Gao, and D. Xu, “An end-to-end learning framework for video compression,” IEEE Transactions on Pattern Analysis and Machine Intelligence , pp. 1–1, 2020."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "E. Agustsson, D. Minnen, N. Johnston, J. Balle, S. J. Hwang, and G. Toderici, “Scale-space flow for end-to-end optimized video compression,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , June 2020."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "H. Chen, B. He, H. Wang, Y. Ren, S.-N. Lim, and A. Shrivastava, “Nerv: Neural representations for videos s,” in NeurIPS , 2021."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "S. Tomar, “Converting video formats with ffmpeg,” Linux Journal , vol. 2006, no. 146, p. 10, 2006."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "A. Der Kiureghian and O. Ditlevsen, “Aleatory or epistemic? does it matter?” Structural safety , vol. 31, no. 2, pp. 105–112, 2009."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "A. Kendall and Y. Gal, “What uncertainties do we need in bayesian deep learning for computer vision?” arXiv preprint arXiv:1703.04977 , 2017."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "Y. Gal, “Uncertainty in deep learning,” Ph.D. dissertation, University of Cambridge, 2016."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "B. Lakshminarayanan, A. Pritzel, and C. Blundell, “Simple and scalable predictive uncertainty estimation using deep ensembles,” in Advances in Neural Information Processing Systems , I. Guyon, U. V. Luxburg, S. Bengio, H. Wallach, R. Fergus, S. Vishwanathan, and R. Garnett, Eds., vol. 30. Curran Associates, Inc., 2017."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "D. J. MacKay, “A practical bayesian framework for backpropagation networks,” Neural computation , vol. 4, no. 3, pp. 448–472, 1992."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "G. E. Hinton and R. Neal, “Bayesian learning for neural networks,” 1995."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "Y. Gal and Z. Ghahramani, “Dropout as a bayesian approximation: Representing model uncertainty in deep learning,” in international conference on machine learning . PMLR, 2016, pp. 1050–1059."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "D. Nix and A. Weigend, “Estimating the mean and variance of the target probability distribution,” in Proceedings of 1994 IEEE International Conference on Neural Networks (ICNN’94) , vol. 1, 1994, pp. 55–60 vol.1."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "I. J. Goodfellow, J. Shlens, and C. Szegedy, “Explaining and harnessing adversarial examples,” arXiv preprint arXiv:1412.6572 , 2014."
+    }
+  ]
+}

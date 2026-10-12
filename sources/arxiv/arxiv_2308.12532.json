@@ -1,0 +1,160 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2308.12532",
+  "title": "FedSOL: Stabilized Orthogonal Learning with Proximal Restrictions in Federated Learning",
+  "authors": "Gihun Lee, Minchan Jeong, Sangmook Kim, Jaehoon Oh, Se-Young Yun",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.AI",
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2308.12532",
+  "html_url": "https://arxiv.org/html/2308.12532",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 774,
+  "text": "Federated Learning (FL) is an emerging distributed learning framework that preserves data privacy while leveraging client data for training [1,2]. In this approach, individual clients train their local models using their private data, and a server aggregates these models into a global model. FL eliminates the need for direct access to clients’ raw data, enabling the use of extensive data collected from various sources such as mobile phones, vehicles, and facilities [3,4]. However, FL encounters a notorious challenge known as data heterogeneity [5,6,7]. As data from different clients often come from diverse underlying distributions, local datasets are not independently and identically distributed (Non-IID). This common issue in real-world scenarios leads to a misalignment between global and local objectives [8,9]. Consequently, local learning deviates from the global objective, resulting in significantly degraded performance and slower convergence [7,10].\n\nRecent research suggests that such deviation in FL resembles Catastrophic Forgetting in Continual Learning (CL) [11,12,13]. In CL, fitting the model to a new task alters parameters critical for previous tasks, thus impairing their performance [14,15,16,17]. Similarly in FL, local learning is prone to be overfitted on local datasets, causing the model to forget global knowledge not represented in the local distributions [11,18]. Consequently, FL must navigate the balance between preserving previous global knowledge and acquiring new local knowledge during local learning. Inspired by CL, we aim to resolve the conflict between two objectives through Orthogonal Learning [19,20]. In CL, an effective strategy for preserving previous knowledge is to minimizing the new task’s loss using gradients that are orthogonal to the loss space of the old tasks [21,22,23,24]. These orthogonal gradients enable the model to reduce the loss on the new task without negatively affecting performance on previous tasks. Our primary motivation is to adapt this strategy to FL by identifying gradients that are orthogonal to directions affecting the global knowledge while still enabling effective training on local datasets.\n\nHowever, applying this strategy to FL presents unique challenges. First, implementing orthogonal gradients in CL often requires retaining past data or gradients for reference [21,22]. This practice becomes problematic in FL as it can compromise data privacy and introduce additional communication overhead. Second, unlike in CL where task distributions are often disjoint [25,26], FL clients may have overlapping data distributions, including instances from the same class. As a result, the global distribution, formed by combining local distributions, also presents overlap with individual local distributions. Such an overlap not only complicates the identification of an orthogonal update direction but also makes the process computationally demanding. Moreover, finding an orthogonal gradient that accommodates multiple local distributions is challenging and the obtained gradient may significantly undermine the effectiveness of learning on local datasets.\n\nTo address these problems, we initially focus on proximal restrictions in FL [9,27,28]. Many previous studies have integrated these restrictions into local objectives to tackle the data heterogeneity issue. By constraining the deviation of local learning from the global objective, the proximal restrictions maintain performance on the global distribution outside of local distributions. This leads us to interpret proximal objectives as losses that preserve global knowledge in FL, notably without requiring direct access to other clients’ data or the need to communicate their information. Unfortunately, as the proximal objective is closely tied to the local objective, we find that directly negating the projected proximal gradient component in the local gradient substantially degrades the performance.\n\nInstead, we hypothesize that identifying the parameter region where local gradients naturally align as orthogonal to the proximal gradients can effectively reduce interference between the two objectives. To this end, we propose a novel algorithm, Federated Stabilized Orthogonal Learning (FedSOL). At each local update, FedSOL adversarially perturbs weight parameters using the gradient of proximal objectives, and then captures the local gradient at these perturbed weights. FedSOL aims to find a parameter region where the local gradient is stable against proximal perturbation, ensuring that the resulting local gradient remains orthogonal to the proximal gradient.\n\nTo summarize, our main contributions are as follows:\n\n- • We suggest that orthogonal learning in CL could be an effective strategy in FL, by resolving conflicts between local and proximal objectives. (section 2)\n\n- • We propose a novel FL method, FedSOL, which targets a parameter region where the local gradient is orthogonal to the proximal gradient. (section 3)\n\n- • We validate the efficacy of FedSOL in various setups, demonstrating consistent state-of-the-art performance. We also highlight its robustness when integrated with different types of proximal objectives. (section 4)\n\n- • We provide a comprehensive analysis of the benefits that FedSOL offers to FL, effectively preserving global knowledge during local learning and enhancing the smoothness of the global model. (section 5)",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib31",
+      "text": "Jakub Konečnỳ, H Brendan McMahan, Felix X Yu, Peter Richtárik, Ananda Theertha Suresh, and Dave Bacon. Federated learning: Strategies for improving communication efficiency. arXiv preprint arXiv:1610.05492 , 2016b."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib30",
+      "text": "Jakub Konečnỳ, H Brendan McMahan, Daniel Ramage, and Peter Richtárik. Federated optimization: Distributed machine learning for on-device intelligence. arXiv preprint arXiv:1610.02527 , 2016a."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "Mohammed Aledhari, Rehma Razzak, Reza M Parizi, and Fahad Saeed. Federated learning: A survey on enabling technologies, protocols, and applications. IEEE Access , 8:140699–140725, 2020."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib72",
+      "text": "Qiang Yang, Yang Liu, Tianjian Chen, and Yongxin Tong. Federated machine learning: Concept and applications. ACM Transactions on Intelligent Systems and Technology (TIST) , 10(2):1–19, 2019."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib39",
+      "text": "Xiang Li, Kaixuan Huang, Wenhao Yang, Shusen Wang, and Zhihua Zhang. On the convergence of fedavg on non-iid data. arXiv preprint arXiv:1907.02189 , 2019."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib37",
+      "text": "Tian Li, Anit Kumar Sahu, Ameet Talwalkar, and Virginia Smith. Federated learning: Challenges, methods, and future directions. IEEE Signal Processing Magazine , 37(3):50–60, 2020a."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib27",
+      "text": "Peter Kairouz, H Brendan McMahan, Brendan Avent, Aurélien Bellet, Mehdi Bennis, Arjun Nitin Bhagoji, Keith Bonawitz, Zachary Charles, Graham Cormode, Rachel Cummings, et al. Advances and open problems in federated learning. arXiv preprint arXiv:1912.04977 , 2019."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib64",
+      "text": "Jianyu Wang, Qinghua Liu, Hao Liang, Gauri Joshi, and H Vincent Poor. Tackling the objective inconsistency problem in heterogeneous federated optimization. arXiv preprint arXiv:2007.07481 , 2020b."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib28",
+      "text": "Sai Praneeth Karimireddy, Satyen Kale, Mehryar Mohri, Sashank Reddi, Sebastian Stich, and Ananda Theertha Suresh. Scaffold: Stochastic controlled averaging for federated learning. In International Conference on Machine Learning , pages 5132–5143. PMLR, 2020."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib75",
+      "text": "Yue Zhao, Meng Li, Liangzhen Lai, Naveen Suda, Damon Civin, and Vikas Chandra. Federated learning with non-iid data. arXiv preprint arXiv:1806.00582 , 2018."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib33",
+      "text": "Gihun Lee, Yongjin Shin, Minchan Jeong, and Se-Young Yun. Preservation of the global knowledge by not-true self knowledge distillation in federated learning. arXiv preprint arXiv:2106.03097 , 2021a."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib57",
+      "text": "Neta Shoham, Tomer Avidor, Aviv Keren, Nadav Israel, Daniel Benditkis, Liron Mor-Yosef, and Itai Zeitak. Overcoming forgetting in federated learning on non-iid data. arXiv preprint arXiv:1910.07796 , 2019."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib67",
+      "text": "Zhenyi Wang, Enneng Yang, Li Shen, and Heng Huang. A comprehensive survey of forgetting in deep learning beyond continual learning. arXiv preprint arXiv:2307.09218 , 2023c."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib53",
+      "text": "German I Parisi, Ronald Kemker, Jose L Part, Christopher Kanan, and Stefan Wermter. Continual lifelong learning with neural networks: A review. Neural Networks , 113:54–71, 2019."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib45",
+      "text": "Michael McCloskey and Neal J Cohen. Catastrophic interference in connectionist networks: The sequential learning problem. In Psychology of learning and motivation , pages 109–165. Elsevier, 1989."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib65",
+      "text": "Liyuan Wang, Xingxing Zhang, Hang Su, and Jun Zhu. A comprehensive survey of continual learning: Theory, method and application. arXiv preprint arXiv:2302.00487 , 2023a."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib48",
+      "text": "Martial Mermillod, Aurélia Bugaiska, and Patrick Bonin. The stability-plasticity dilemma: Investigating the continuum from catastrophic forgetting to age-limited learning effects. Frontiers in psychology , 4:504, 2013."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib69",
+      "text": "Chencheng Xu, Zhiwei Hong, Minlie Huang, and Tao Jiang. Acceleration of federated learning with alleviated forgetting in local training. arXiv preprint arXiv:2203.02645 , 2022."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "Mehrdad Farajtabar, Navid Azizan, Alex Mott, and Ang Li. Orthogonal gradient descent for continual learning. In International Conference on Artificial Intelligence and Statistics , pages 3762–3773. PMLR, 2020."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib41",
+      "text": "David Lopez-Paz and Marc’Aurelio Ranzato. Gradient episodic memory for continual learning. Advances in neural information processing systems , 30, 2017."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib56",
+      "text": "Gobinda Saha, Isha Garg, and Kaushik Roy. Gradient projection memory for continual learning. arXiv preprint arXiv:2103.09762 , 2021."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib9",
+      "text": "Arslan Chaudhry, Marc’Aurelio Ranzato, Marcus Rohrbach, and Mohamed Elhoseiny. Efficient lifelong learning with a-gem. arXiv preprint arXiv:1812.00420 , 2018."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib10",
+      "text": "Arslan Chaudhry, Naeemullah Khan, Puneet Dokania, and Philip Torr. Continual learning in low-rank orthogonal subspaces. Advances in Neural Information Processing Systems , 33:9900–9911, 2020."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib76",
+      "text": "Zhen Zhao, Zhizhong Zhang, Xin Tan, Jun Liu, Yanyun Qu, Yuan Xie, and Lizhuang Ma. Rethinking gradient projection continual learning: Stability/plasticity feature space decoupling. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 3718–3727, 2023."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib73",
+      "text": "Guanxiong Zeng, Yang Chen, Bo Cui, and Shan Yu. Continual learning of context-dependent processing in neural networks. Nature Machine Intelligence , 1(8):364–372, 2019."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib13",
+      "text": "Danruo Deng, Guangyong Chen, Jianye Hao, Qiong Wang, and Pheng-Ann Heng. Flattening sharpness for dynamic gradient projection memory benefits continual learning. Advances in Neural Information Processing Systems , 34:18710–18721, 2021."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib36",
+      "text": "Qinbin Li, Bingsheng He, and Dawn Song. Model-contrastive federated learning. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 10713–10722, 2021."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib38",
+      "text": "Tian Li, Anit Kumar Sahu, Manzil Zaheer, Maziar Sanjabi, Ameet Talwalkar, and Virginia Smith. Federated optimization in heterogeneous networks. Proceedings of Machine Learning and Systems , 2:429–450, 2020b."
+    }
+  ]
+}

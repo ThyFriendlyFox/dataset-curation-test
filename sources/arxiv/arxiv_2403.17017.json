@@ -1,0 +1,53 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.17017",
+  "title": "Seer: Predictive Runtime Kernel Selection for Irregular Problems",
+  "authors": "Ryan Swann, Muhammad Osama, Karthik Sangaiah, Jalal Mahmud",
+  "year": "2024",
+  "categories": [
+    "cs.DC"
+  ],
+  "url": "https://arxiv.org/abs/2403.17017",
+  "html_url": "https://arxiv.org/html/2403.17017",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 524,
+  "text": "Modern Graphics Processing Units (GPUs) have been proposed to leverage the available parallelism in problems such as linear algebra, high-performance scientific computing, graph analytics, and more. Many workloads are dense and regular, where all threads within the GPU receive equal amounts of parallel work to process. It is not always the case, however, that parallel workloads are regular in nature. Problems such as graph analytics and sparse-linear algebra have an abundance of available fine-grained but irregular parallelism [1].\n\nThe design of a GPU is fundamentally challenged when the volume of parallelism available is not regular or structured [2]. Within irregular problems each thread within a Single Instruction/Multiple Data (SIMD) [3] lane receives a different allotment of work. This imbalance leads to issues in which threads with less work may be waiting on threads with more work. This load imbalance causes the efficiency of execution on irregular problems to be data dependent [4]. This fundamental limitation of GPUs has inspired the adoption of many load balancing techniques [2,5] as well as compressed sparse formats [6], which hope to extrapolate the best strategy and data-structure to map irregular data to the naturally regular graphics hardware.\n\nDue to the regular nature of the graphics processor architecture and the broad range of different forms which data may come in, there is not an objective method for technique or data structure selection which does not require explicit tuning by a domain-expert. Thus, many libraries implement the load balancing technique which is best for their workloads without consideration of other techniques which may yield better results depending on the shape of the input data. Fig. 1 illustrates this problem by visualizing performance of a Sparse-Matrix Vector Multiplication (SpMV) kernel with several different load-balancing schedules and compressed formats on the SuiteSparse Matrix Collection [7]. The techniques and formats used are discussed in detail later in the paper. Each color and shape represent a different kernel being selected for a given dataset, and it shows that even for problems with similar amounts of work (a vertical slice of the plot), there can be a different kernel selection for optimal performance. Selecting the best load-balancing schedule and compressed sparse format at runtime without costly overhead is a challenging and non-trivial problem.\n\nTo address this problem, we propose Seer, a machine learning-based predictor which considers the shape of the irregular data at runtime and uses a light-weight machine learning model to provide an inference which selects the best method to map the irregular data to the hardware. The contributions of this paper are as follows:\n\n- 1. A predictive runtime framework and abstraction for kernel selection. Our framework considers the cost of preprocessing for iterative algorithms, the cost of feature collection, and various compressed sparse formats and load-balancing schedules, all built on an explainable decision tree model.\n\n- 2. A classifier selection predictor that weighs the cost of feature collection versus a no overhead approach and selects the best method of prediction at runtime.\n\n- 3. A case study of SpMV using our method yields 2 \\times better performance over the best kernel and a geomean speed-up of 6.5 \\times across the test set.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "Y. Wang, Y. Pan, A. Davidson, Y. Wu, C. Yang, L. Wang, M. Osama, C. Yuan, W. Liu, A. T. Riffel, and J. D. Owens, “Gunrock: GPU graph analytics,” ACM Transactions on Parallel Computing , vol. 4, no. 1, pp. 3:1–3:49, Aug. 2017. [Online]. Available: http://escholarship.org/uc/item/9gj6r1dj"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "M. Osama, S. D. Porumbescu, and J. D. Owens, “A programming model for GPU load balancing,” in Proceedings of the 28th ACM SIGPLAN Symposium on Principles and Practice of Parallel Programming , ser. PPoPP 2023, Feb./Mar. 2023."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "M. Flynn, “Very high-speed computing systems,” Proceedings of the IEEE , vol. 54, no. 12, pp. 1901–1909, Dec. 1966."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "M. Osama, “GPU load balancing,” Ph.D. dissertation, University of California, Davis, 2022."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "F. Busato and N. Bombieri, “A performance, power, and energy efficiency analysis of load balancing techniques for GPUs,” in 12th IEEE International Symposium on Industrial Embedded Systems , ser. SIES 2017, 2017, pp. 1–8."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "S. Filippone, V. Cardellini, D. Barbieri, and A. Fanfarillo, “Sparse matrix-vector multiplication on GPGPUs,” ACM Trans. Math. Softw. , vol. 43, no. 4, Jan. 2017. [Online]. Available: https://doi.org/10.1145/3017994"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "T. A. Davis and Y. Hu, “The University of Florida sparse matrix collection,” ACM Trans. Math. Softw. , vol. 38, no. 1, Dec. 2011. [Online]. Available: https://doi.org/10.1145/2049662.2049663"
+    }
+  ]
+}

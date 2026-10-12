@@ -1,0 +1,88 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.17092",
+  "title": "A Unified CPU-GPU Protocol for GNN Training",
+  "authors": "Yi-Chien Lin, Gangda Deng, Viktor Prasanna",
+  "year": "2024",
+  "categories": [
+    "cs.DC"
+  ],
+  "url": "https://arxiv.org/abs/2403.17092",
+  "html_url": "https://arxiv.org/html/2403.17092",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 743,
+  "text": "Graph Neural Network (GNN) is an emerging type of Machine Learning model that can extract useful information from graph-structured data. GNNs are widely used in various applications such as Electronic Design Automation [1,2], molecular property prediction [3,4], and social recommendation system [5,6,7], where the input is often a large-scale graph with over billion edges. Training a GNN model on these real-world graphs involves a high volume of data communications and computations. While state-of-the-art CPUs and GPUs feature high compute power and memory bandwidth, existing GNN training protocols adopted in popular frameworks like PyTorch-Geometric (PyG) [8] and Deep Graph Library (DGL) [9] cannot efficiently utilize the available platform resources; therefore, large-scale GNN training is time-consuming, taking hours or even days [10]. We conduct a detailed analysis of state-of-the-art GNN frameworks and observe several inefficiencies in the existing Standard GNN training protocols. First, Standard GNN training protocols (shown in Figure 1) offload most of the workload to the GPUs, leaving the CPUs mostly idle. Such a task allocation is sub-optimal as state-of-the-art CPUs offer comparable GNN training performance with GPUs. For example, the epoch time of training a three-layer GCN [11] model on the ogbn-products [12] dataset takes 10 seconds using an Intel Xeon 8280 with only 28 cores [13], and takes 5 seconds using a high-end NVIDIA V100 GPU [14]. This suggests that CPUs should be incorporated in GNN training due to their potential to enhance overall performance. In addition, existing GNN training protocols adopt a coarse-grained task scheduling, alternating between memory-intensive and compute-intensive operations. This approach leads to sub-optimal resource utilization: the memory bandwidth is under-utilized during compute-intensive tasks, and the compute cores are under-utilized during memory-intensive tasks.\n\nMotivated by the above challenges, we propose a novel Unified CPU-GPU training protocol that improves the resource utilization of GNN training on a CPU-GPU platform. The Unified CPU-GPU protocol defines the CPU-GPU interaction to perform GNN training collaboratively. Note that our protocol not only supports platforms with a single CPU and single GPU, but also platforms with multiple CPUs and multiple GPUs. Our protocol instantiates GNN training processes on both the CPUs and the GPUs, as opposed to offloading all the workload to the GPUs. Allocating GNN training processes on the CPUs to share a portion of the workload leads to several advantages: (1) It allows our protocol to exploit the compute cores of CPUs to execute GNN operations, leading to higher platform resource utilization than the Standard training protocol, and reduces the workload on the GPUs; (2) It reduces the data transferred to the GPU via the PCIe channel, which often causes significant overhead; (3) It reduces the memory usage on the GPU global memory, and the memory space that becomes available can be used for data caching, which further reduces the expensive PCIe data transfer. Furthermore, instantiating multiple GNN training processes improves memory bandwidth utilization because it overlaps the communications with computations across the processes. Since the performance of the CPU and GPU for training a GNN model varies, we develop a Dynamic Load Balancer to ensure the workload is balanced; otherwise, one platform can easily become the system bottleneck and lead to performance degradation. As GPUs often face high demand from multiple users, and the CPUs are becoming increasingly powerful, our protocol exploits the CPU resources, which are under-utilized by the Standard training protocol, to improve GNN training performance. Note that none of the proposed optimizations alter the GNN training semantics, meaning that training with the Unified CPU-GPU protocol leads to the same model accuracy and convergence rate as the Standard training protocol. Our key contributions are:\n\n- • We conduct a detailed analysis of the state-of-the-art GNN frameworks to identify the inefficiencies in the Standard GNN training protocol.\n\n- • We propose a novel Unified CPU-GPU protocol for GNN training that can effectively improve the utilization of both the compute resources and memory bandwidth.\n\n- • We develop a novel Dynamic Load Balancer that effectively balances the workload between the CPUs and the GPUs dynamically during runtime.\n\n- • We evaluate our work using various CPU-GPU platforms: on a platform where the GPU moderately outperforms the CPU, our protocol accelerates GNN training by up to 1.41 \\times; on a platform where the GPU significantly outperforms the CPU, our protocol accelerates GNN training by up to 1.26 \\times.\n\n- • Our protocol is open-sourced and can seamlessly integrate into existing GNN frameworks such as PyG and DGL to improve GNN training performance.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib23",
+      "text": "Lopera et al . (2021) Daniela Sánchez Lopera, Lorenzo Servadei, Gamze Naz Kiprit, Souvik Hazra, Robert Wille, and Wolfgang Ecker. 2021. A survey of graph neural networks for electronic design automation. In Workshop on Machine Learning for CAD (MLCAD) . IEEE."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib35",
+      "text": "Wu et al . (2022) Nan Wu, Hang Yang, Yuan Xie, Pan Li, and Cong Hao. 2022. High-Level Synthesis Performance Prediction Using GNNs: Benchmarking, Modeling, and Advancing. In Proceedings of the Design Automation Conference ."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib37",
+      "text": "Yang and Li (2023) Chu-I Yang and Yi-Pei Li. 2023. Explainable uncertainty quantifications for deep learning-based molecular property prediction. Journal of Cheminformatics (2023)."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib7",
+      "text": "Hamilton et al . (2017) William L Hamilton, Rex Ying, and Jure Leskovec. 2017. Inductive representation learning on large graphs. In Proceedings of the 31st International Conference on Neural Information Processing Systems ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib39",
+      "text": "Ying et al . (2018) Rex Ying, Ruining He, Kaifeng Chen, Pong Eksombatchai, William L Hamilton, and Jure Leskovec. 2018. Graph convolutional neural networks for web-scale recommender systems. In Proceedings of the 24th ACM International Conference on Knowledge Discovery & Data Mining ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib46",
+      "text": "Zhu et al . (2019) Rong Zhu, Kun Zhao, Hongxia Yang, Wei Lin, Chang Zhou, Baole Ai, Yong Li, and Jingren Zhou. 2019. AliGraph: a comprehensive graph neural network platform. Proceedings of the VLDB Endowment (2019)."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib21",
+      "text": "Lin et al . (2022a) Zhongyi Lin, Louis Feng, Ehsan K. Ardestani, Jaewon Lee, John Lundell, Changkyu Kim, Arun Kejariwal, and John D. Owens. 2022a. Building a Performance Model for Deep Learning Recommendation Model Training on GPUs. In 2022 IEEE International Symposium on Performance Analysis of Systems and Software (ISPASS) ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib4",
+      "text": "Fey and Lenssen (2019) Matthias Fey and Jan E. Lenssen. 2019. Fast Graph Representation Learning with PyTorch Geometric. In ICLR Workshop on Representation Learning on Graphs and Manifolds ."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib33",
+      "text": "Wang et al . (2019) Minjie Wang, Da Zheng, Zihao Ye, Quan Gan, Mufei Li, Xiang Song, Jinjing Zhou, Chao Ma, Lingfan Yu, Yu Gai, Tianjun Xiao, Tong He, George Karypis, Jinyang Li, and Zheng Zhang. 2019. Deep Graph Library: A Graph-Centric, Highly-Performant Package for Graph Neural Networks. arXiv preprint arXiv:1909.01315 (2019)."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib31",
+      "text": "Thorpe et al . (2021) John Thorpe, Yifan Qiao, Jonathan Eyolfson, Shen Teng, Guanzhou Hu, Zhihao Jia, Jinliang Wei, Keval Vora, Ravi Netravali, Miryung Kim, and Guoqing Harry Xu. 2021. Dorylus: Affordable, scalable, and accurate GNN training with distributed CPU servers and serverless threads. In 15th USENIX Symposium on Operating Systems Design and Implementation (OSDI 21) ."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "Kipf and Welling (2017) Thomas N. Kipf and Max Welling. 2017. Semi-Supervised Classification with Graph Convolutional Networks. In International Conference on Learning Representations ."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib9",
+      "text": "Hu et al . (2020) Weihua Hu, Matthias Fey, Marinka Zitnik, Yuxiao Dong, Hongyu Ren, Bowen Liu, Michele Catasta, and Jure Leskovec. 2020. Open Graph Benchmark: Datasets for Machine Learning on Graphs. arXiv preprint arXiv:2005.00687 (2020)."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib24",
+      "text": "Md et al . (2021) Vasimuddin Md, Sanchit Misra, Guixiang Ma, Ramanarayan Mohanty, Evangelos Georganas, Alexander Heinecke, Dhiraj D. Kalamkar, Nesreen K. Ahmed, and Sasikanth Avancha. 2021. DistGNN: Scalable Distributed Training for Large-Scale Graph Neural Networks. In Proceedings of the International Conference for High Performance Computing, Networking, Storage and Analysis (SC) ."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib38",
+      "text": "Yang et al . (2022) Jianbang Yang, Dahai Tang, Xiaoniu Song, Lei Wang, Qiang Yin, Rong Chen, Wenyuan Yu, and Jingren Zhou. 2022. GNNLab: A Factored System for Sample-Based GNN Training over GPUs. In Proceedings of the 17th European Conference on Computer Systems ."
+    }
+  ]
+}

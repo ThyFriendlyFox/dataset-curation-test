@@ -1,0 +1,133 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2309.12378",
+  "title": "Unsupervised Semantic Segmentation Through Depth-Guided Feature Correlation and Sampling",
+  "authors": "Leon Sick, Dominik Engel, Pedro Hermosilla, Timo Ropinski",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2309.12378",
+  "html_url": "https://arxiv.org/html/2309.12378",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 657,
+  "text": "Semantic segmentation plays a critical role in many of today’s vision systems in a multitude of domains. These include, among others, autonomous driving [1], medical applications [2,3], and many more [4,5,6,7]. Until recently, the main body of research in this area was focused on supervised models that require a large amount pixel-level annotations for training. Not only is sourcing this image data often a labor intensive process, but also annotating the large datasets required for good performance comes at a high price. Several benchmark datasets report their annotation times. For example, the MS COCO dataset [8] required more than 28K hours of human annotation for around 164K images, and annotating a single image in the Cityscapes dataset [9] took 1.5 hours on average. These costs have triggered the advent of unsupervised semantic segmentation [10,11,12,13], which aims to remove the need for labeled training data in order to train segmentation models. Recently, work by Hamilton et al. [12] has accelerated the progress towards removing the need for labels to achieve good results on semantic segmentation tasks. Their model, STEGO, uses a DINO-pretrained [14] Vision Transformer (ViT) [15] to extract features that are then distilled across the entire dataset to learn semantically relevant features, using a contrastive learning approach. The to-be-distilled features are sampled randomly from feature maps produced from the same image, k-NN matched images as well as other negative images. Seong et al. [13] build on this process by trying to identify features that are most relevant to the model by discovering hidden positives. Their work exposes an inefficiency of random sampling in STEGO as hidden positives sampling leads to significant improvements. However, both approaches only operate on the pixel space and therefore fail to take into account the spatial layout of the scene. Not only do we humans perceive the world in 3D, but also previous work [16,17,18,19,20,21] has shown that supervised semantic segmentation can benefit greatly from spatial information during training. Inspired by these observations, we propose to incorporate spatial information in the form of depth maps into the STEGO training process. Depth is considered a product of vision and does not provide a labeled training signal. To obtain depth information for the benchmark image datasets in our evaluations, we make use of an off-the-shelf zero-shot monocular depth estimator to obtain spatial information of the scene. This allows us to incorporate the depth information without the need for human annotations or sensor ground truth.\n\nWith our method, DepthG, we propose to (1) guide the model to learn a rough spatial layout of the scene, since we hypothesize this will aid the network in differentiating objects much better. We achieve this by extending the contrastive process to the spatial dimension: We do not limit the model to learning only Feature-Feature Correlations, but also Depth-Feature Correlations. Through this process, the model is guided towards pulling apart the features with high distances in 3D space, as well as mapping them closer together if their distance is low depth space. Figure 1 visualizes this process.\n\nWith the information about the spatial layout of the scene present, we furthermore propose to (2) spatially inform our feature sampling process by utilizing Farthest-Point Sampling (FPS) [22,23] on the depth map, which equally samples scenes in 3D. We show these techniques in combination make our approach to unsupervised segmentation highly effective, since in our evaluations across multiple benchmark datasets, we demonstrate state-of-the-art performance. We include a short video presenting our method as part of the supplementary materials. To the best of our knowledge, we are the first to propose a mechanism to incorporate 3D knowledge of the scene into unsupervised learning for 2D images without encoding depth maps as part of the network input. This design aspect of our method alleviates the risk of the model developing an input dependency. Therefore, our approach does not rely on depth information during inference and is not affected by availability or quality of such depth information.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib15",
+      "text": "Di Feng, Christian Haase-Schütz, Lars Rosenbaum, Heinz Hertlein, Claudius Glaeser, Fabian Timm, Werner Wiesbeck, and Klaus Dietmayer. Deep multi-modal object detection and semantic segmentation for autonomous driving: Datasets, methods, and challenges. IEEE Transactions on Intelligent Transportation Systems , 22(3):1341–1360, 2020."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib33",
+      "text": "Olaf Ronneberger, Philipp Fischer, and Thomas Brox. U-net: Convolutional networks for biomedical image segmentation. In Medical Image Computing and Computer-Assisted Intervention–MICCAI 2015: 18th International Conference, Munich, Germany, October 5-9, 2015, Proceedings, Part III 18 , pages 234–241. Springer, 2015."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib40",
+      "text": "Risheng Wang, Tao Lei, Ruixia Cui, Bingtao Zhang, Hongying Meng, and Asoke K Nandi. Medical image segmentation using deep learning: A survey. IET Image Processing , 16(5):1243–1267, 2022."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib27",
+      "text": "Chen Liang-Chieh, George Papandreou, Iasonas Kokkinos, Kevin Murphy, and Alan Yuille. Semantic image segmentation with deep convolutional nets and fully connected crfs. In International Conference on Learning Representations , 2015."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib42",
+      "text": "Enze Xie, Wenhai Wang, Zhiding Yu, Anima Anandkumar, Jose M Alvarez, and Ping Luo. Segformer: Simple and efficient design for semantic segmentation with transformers. Advances in Neural Information Processing Systems , 34:12077–12090, 2021."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib46",
+      "text": "Sixiao Zheng, Jiachen Lu, Hengshuang Zhao, Xiatian Zhu, Zekun Luo, Yabiao Wang, Yanwei Fu, Jianfeng Feng, Tao Xiang, Philip HS Torr, et al. Rethinking semantic segmentation from a sequence-to-sequence perspective with transformers. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 6881–6890, 2021."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib9",
+      "text": "Bowen Cheng, Ishan Misra, Alexander G. Schwing, Alexander Kirillov, and Rohit Girdhar. Masked-attention mask transformer for universal image segmentation. 2022."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib28",
+      "text": "Tsung-Yi Lin, Michael Maire, Serge Belongie, James Hays, Pietro Perona, Deva Ramanan, Piotr Dollár, and C Lawrence Zitnick. Microsoft coco: Common objects in context. In European conference on computer vision , pages 740–755. Springer, 2014."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib11",
+      "text": "Marius Cordts, Mohamed Omran, Sebastian Ramos, Timo Rehfeld, Markus Enzweiler, Rodrigo Benenson, Uwe Franke, Stefan Roth, and Bernt Schiele. The cityscapes dataset for semantic urban scene understanding. In Proceedings of the IEEE conference on computer vision and pattern recognition , pages 3213–3223, 2016."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib20",
+      "text": "Xu Ji, Joao F Henriques, and Andrea Vedaldi. Invariant information clustering for unsupervised image classification and segmentation. In Proceedings of the IEEE/CVF international conference on computer vision , pages 9865–9874, 2019."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib10",
+      "text": "Jang Hyun Cho, Utkarsh Mall, Kavita Bala, and Bharath Hariharan. Picie: Unsupervised semantic segmentation using invariance and equivariance in clustering. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 16794–16804, 2021."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib16",
+      "text": "Mark Hamilton, Zhoutong Zhang, Bharath Hariharan, Noah Snavely, and William T Freeman. Unsupervised semantic segmentation by distilling feature correspondences. In International Conference on Learning Representations , 2021."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib35",
+      "text": "Hyun Seok Seong, WonJun Moon, SuBeen Lee, and Jae-Pil Heo. Leveraging hidden positives for unsupervised semantic segmentation. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 19540–19549, 2023."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib7",
+      "text": "Mathilde Caron, Hugo Touvron, Ishan Misra, Hervé Jégou, Julien Mairal, Piotr Bojanowski, and Armand Joulin. Emerging properties in self-supervised vision transformers. In Proceedings of the IEEE/CVF international conference on computer vision , pages 9650–9660, 2021."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib13",
+      "text": "Alexey Dosovitskiy, Lucas Beyer, Alexander Kolesnikov, Dirk Weissenborn, Xiaohua Zhai, Thomas Unterthiner, Mostafa Dehghani, Matthias Minderer, Georg Heigold, Sylvain Gelly, et al. An image is worth 16x16 words: Transformers for image recognition at scale. In International Conference on Learning Representations , 2020."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib18",
+      "text": "Lukas Hoyer, Dengxin Dai, Yuhua Chen, Adrian Koring, Suman Saha, and Luc Van Gool. Three ways to improve semantic segmentation with self-supervised depth estimation. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 11130–11140, 2021."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib39",
+      "text": "Qin Wang, Dengxin Dai, Lukas Hoyer, Luc Van Gool, and Olga Fink. Domain adaptive semantic segmentation with self-supervised depth estimation. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 8515–8525, 2021."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib5",
+      "text": "Adriano Cardace, Luca De Luigi, Pierluigi Zama Ramirez, Samuele Salti, and Luigi Di Stefano. Plugging self-supervised monocular depth into unsupervised domain adaptation for semantic segmentation. In Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision , pages 1129–1139, 2022."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib38",
+      "text": "Tuan-Hung Vu, Himalaya Jain, Maxime Bucher, Matthieu Cord, and Patrick Pérez. Dada: Depth-aware domain adaptation in semantic segmentation. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 7364–7373, 2019."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib45",
+      "text": "Zhenyu Zhang, Zhen Cui, Chunyan Xu, Yan Yan, Nicu Sebe, and Jian Yang. Pattern-affinitive propagation across depth, surface normal and semantic segmentation. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 4106–4115, 2019."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib8",
+      "text": "Po-Yi Chen, Alexander H Liu, Yen-Cheng Liu, and Yu-Chiang Frank Wang. Towards scene understanding: Unsupervised monocular depth estimation with semantic-aware representation. In Proceedings of the IEEE/CVF Conference on computer vision and pattern recognition , pages 2624–2632, 2019."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib14",
+      "text": "Yuval Eldar, Michael Lindenbaum, Moshe Porat, and Yehoshua Y Zeevi. The farthest point strategy for progressive image sampling. IEEE Transactions on Image Processing , 6(9):1305–1315, 1997."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib31",
+      "text": "Charles Ruizhongtai Qi, Li Yi, Hao Su, and Leonidas J Guibas. Pointnet++: Deep hierarchical feature learning on point sets in a metric space. Advances in neural information processing systems , 30, 2017."
+    }
+  ]
+}

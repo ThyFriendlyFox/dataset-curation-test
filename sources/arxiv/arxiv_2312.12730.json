@@ -1,0 +1,68 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2312.12730",
+  "title": "A Closer Look at the Few-Shot Adaptation of Large Vision-Language Models",
+  "authors": "Julio Silva-RodrÃ­guez, Sina Hajimiri, Ismail Ben Ayed, Jose Dolz",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2312.12730",
+  "html_url": "https://arxiv.org/html/2312.12730",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1019,
+  "text": "Large vision-language models (VLMs), such as CLIP [1], are reshaping the research landscape with their unprecedented performance. These models undergo training on an extensive dataset consisting of hundreds of millions of image-text pairs, which are leveraged via contrastive learning [1]. Once trained, VLMs offer a remarkable zero-shot performance on a wide span of visual recognition problems thanks to the rich learned representations [1,2]. Nevertheless, the extensive hardware and data-driven resources that such training demands [3] suggest that these models can only be trained on singular occasions. Furthermore, the large scale of these networks poses important challenges when it comes to adjusting their parameters on small downstream tasks that involve only a few labeled samples, making the full fine-tuning of the entire model impractical.\n\nAn emerging alternative to alleviate this issue consists in fine-tuning VLMs by adding a small set of learnable parameters, whose values are optimized during the adaptation step [4,5,6,7,8]. These tunable weights can be introduced in the input space as visual [5] or text prompts [4,6], or added in the form of adapters across the network [7,8,9]. While both families of approaches fit within the Efficient Transfer Learning (ETL) literature, prompt learning still requires backpropagating the gradients through the entire network. Thus, besides introducing a burden on resource reuse, these methods preclude black-box adaptation, introducing a potential concern about leaking the source data, which is paramount in privacy-oriented applications. In contrast, strategies based on adapters only need gradients on the extra set of parameters, typically in the last layer, avoiding costly fine-tuning processes and data leakage, yet yielding state-of-the-art performance [9,10].\n\nDespite the progress observed in adapter-based methods for fine-tuning VLMs under the few-shot learning paradigm, improving the performance on the target task while preserving their generalization capabilities remains still a challenge [4]. We argue that this is likely due to the severe overfitting to the support set samples employed during few-shot adaptation, which significantly deviates the updated class prototypes from the zero-shot prototypes initially provided by the pre-trained model. In fact, popular adapter-based ETL strategies, such as CLIP-Adapter [7] and TIP-Adapter [8], carefully adjust the model-specific hyperparameters, in conjunction with other key hyperparameters related to the learning scheduler, to control the trade-off between initial zero-shot inference and the integration of new information from the support set. Furthermore, recent evidence [10] suggests that these works apparently use the large-scale test set to adjust their hyperparameters.\n\nA significant limitation becomes evident in that these hyperparameters, when optimized for one specific task, do not exhibit strong generalizability to other tasks, as illustrated in Fig. 1. Indeed, state-of-the-art (SoTA) methods struggle to find a homogeneous configuration that outperforms a simple well-initialized Linear Probing (LP) adaptation. Notably, in a realistic adaptation scenario (Fig. 1), we can observe dramatic performance degradations, up to 21%, compared to this simple baseline. These practices virtually bias the model selection process, as assuming access to a significantly larger set of labeled samples, and adjusting the model hyperparameters in a case-specific manner, is not only unrealistic but also impractical (grid-search must be done for each case). Thus, we argue that if an ETL method’s model selection strategy is not solely based on the support samples, the method is incomplete, and impractical for real-world few-shot adaptation problems.\n\nIn this work, we seek to redirect the efforts on few-shot ETL to a more strict, but realistic scenario, in which only the support samples are accessible during training. The absence of an evaluation subset urges novel adapters to include a model selection strategy, robust across a large spectrum of tasks. Interestingly, we empirically observed that a carefully designed Linear Probing (ZS-LP), whose weights are initialized with the zero-shot prototypes from CLIP, is a strong baseline that outperforms more convoluted ETL solutions. To further improve the baseline ZS-LP and optimize the trade-off between initial zero-shot representations and updated class prototypes on novel tasks, we propose penalizing large deviations from the original zero-shot prototypes during adaptation. The resulting learning objective, however, presents two major issues. First, the penalty included to control the deviation between original and updated prototypes is a scalar value, uniform across all classes, which can detrimentally affect the model’s performance in the presence of harder-to-learn classes. Second, the penalty balancing weight must be set using a validation set, which juxtaposes with our validation-free scenario. To address these limitations, we propose CLass-Adaptive linear Probe (CLAP), which is based on an Augmented Lagrangian Multiplier approach. We can summarize our contributions as:\n\n- • We empirically observe that SoTA few-shot ETL adapters require careful adjustment of a set of key hyperparameters for each task, which is unrealistic and impractical in real-world settings. Surprisingly, if a fixed configuration is adopted across tasks, these methods are likely to substantially underperform a simple Linear Probing strategy initialized with the zero-shot prototypes from CLIP.\n\n- • We propose a principled solution to tackle the trade-off between original and updated class prototypes in Linear Probing, which integrates a penalty term to penalize large deviations from zero-shot prototypes. To address the underlying challenges from the resulting constrained optimization problem, we present a modified Augmented Lagrangian Multiplier (ALM) method. This alleviates the need of having to fine-tune the penalty balancing weight, which is learned in the outer iteration of the optimization process. In order to adapt ALM to the presented scenario, two critical choices were made: i) Leveraging class prototypes, as well as data augmentation, motivate the use of class-wise multipliers, instead of sample and class-wise multipliers as in the original ALM; ii) In the presented scenario, there is no access to a validation set, and the only feedback available is from the support samples. Hence, we only perform one outer-step update, which can avoid potential overfitting on the support set.\n\n- • We provide extensive experiments to assess the performance of CLAP in the proposed scenario, including few-shot adaptation on 11 popular classification benchmarks, domain generalization, comparison to full fine-tuning methods, and ablation studies to validate our choices. As shown in Fig. 1 and in the experimental section, CLAP delivers consistent performance across different tasks with a homogeneous configuration, and largely outperforms SoTA ETL approaches in all scenarios.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib30",
+      "text": "Alec Radford, Jong Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry, Amanda Askell, Pamela Mishkin, Jack Clark, et al. Learning transferable visual models from natural language supervision. In International Conference on Machine Learning (ICML) , pages 8748–8763, 2021."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib27",
+      "text": "Sachit Menon and Carl Vondrick. Visual classification via description from large language models. In International Conference on Learning Representations (ICLR) , pages 1–17, 2023."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "Rishi Bommasani et al. On the opportunities and risks of foundation models. ArXiv , 2021."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib46",
+      "text": "Kaiyang Zhou, Jingkang Yang, Chen Change Loy, and Ziwei Liu. Learning to prompt for vision-language models. International Journal of Computer Vision (IJCV) , 2022c."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib19",
+      "text": "Menglin Jia, Luming Tang, Bor-Chun Chen, Claire Cardie, Serge Belongie, Bharath Hariharan, and Ser-Nam Lim. Visual prompt tuning. In European Conference on Computer Vision (ECCV) , pages 709–727, 2022."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib45",
+      "text": "Kaiyang Zhou, Jingkang Yang, Chen Change Loy, and Ziwei Liu. Conditional prompt learning for vision-language models. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 2022b."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib11",
+      "text": "Peng Gao, Shijie Geng, Renrui Zhang, Teli Ma, Rongyao Fang, Yongfeng Zhang, Hongsheng Li, and Yu Qiao. Clip-adapter: Better vision-language models with feature adapters. International Journal of Computer Vision (IJCV) , 2023."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib42",
+      "text": "Renrui Zhang, Rongyao Fang, Wei Zhang, Peng Gao, Kunchang Li, Jifeng Dai, Yu Qiao, and Hongsheng Li. Tip-adapter: Training-free clip-adapter for better vision-language modeling. In European Conference on Computer Vision (ECCV) , pages 1–19, 2022."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib40",
+      "text": "Tao Yu, Zhihe Lu, Xin Jin, Zhibo Chen, and Xinchao Wang. Task residual for tuning vision-language models. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 10899–10909, 2023."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib24",
+      "text": "Zhiqiu Lin, Samuel Yu, Zhiyi Kuang, Deepak Pathak, and Deva Ramanan. Multimodality helps unimodality: Cross-modal few-shot learning with multimodal models. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 2023."
+    }
+  ]
+}

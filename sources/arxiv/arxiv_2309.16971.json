@@ -1,0 +1,63 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2309.16971",
+  "title": "Multi-Resolution Active Learning of Fourier Neural Operators",
+  "authors": "Shibo Li, Xin Yu, Wei Xing, Mike Kirby, Akil Narayan, Shandian Zhe",
+  "year": "2024",
+  "categories": [
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2309.16971",
+  "html_url": "https://arxiv.org/html/2309.16971",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "INTRODUCTION",
+  "word_count": 767,
+  "text": "Operator learning is emerging as an important topic in scientific machine learning. It intends to estimate function-to-function mappings and can serve as a useful surrogate model for many physical simulation related applications, such as weather forecast [1], control [2], engineering design [3] and inverse problems [4]. One representative approach is the Fourier neural operator (FNO) [5], which uses fast Fourier transform (FFT) and convolution theorem to implement global linear transforms in the functional space. The FNO not only shows state-of-the-art performance in many tasks, but also is highly efficient in training and prediction.\n\nDespite the advantages, collecting training data for the FNO can be a severe bottleneck in practice because it often requires many physical simulations (e.g., running numerical solvers), which is known to be computationally expensive. To reduce the cost, one can consider leveraging multi-resolution data. The low-resolution data is cheap to obtain — typically computed with rough meshes — but the provided output function samples are quite inaccurate (large bias). On the contrary, high-resolution data offers accurate output function samples, yet is much more costly to generate from dense meshes. Although with substantial difference in quality, the low and high resolution examples share the same underlying physics and are strongly correlated. Hence, one can reasonably expect using multi-resolution data to well train the FNO while reducing the data cost.\n\nHowever, blindly collecting examples at different resolutions is hardly optimal in both cost saving and learning efficiency. To reduce the data cost to the greatest extent while optimizing the learning efficiency, we propose MRA-FNO, a novel multi-resolution active learning method, which can dynamically select the best input function and resolution each step, at which to generate new examples. The major contributions of our work are summarized as follows.\n\n- • Probabilistic Multi-Resolution FNO. We first extend the FNO to integrate multi-resolution training data. To capture the influence of the resolution choice on the predictive distribution, we append a resolution embedding to the samples of the input function. After the FNO layers, we create two branches: one generates the prediction mean of the target function and the other the variance. In this way, the prediction is up to not only the input function samples but also the resolution choice. We then use Monte-Carlo ensemble learning [6] to fulfill effective uncertainty quantification, which is critical for utility evaluation and active learning.\n\n- • Active Learning. To optimize the learning efficiency while reducing the data cost as much as possible, we maximize the utility-cost ratio to select the best training input and resolution at each step, where the utility is measured by mutual information. The strategy is similar to the state-of-the-art multi-fidelity active learning and Bayesian optimization methods [7,8,9], but there are two severe challenges. The first challenge is that the computation of the utility function is analytically intractable and costly. We use moment matching to approximate the posterior predictive distribution as a multi-variate Gaussian. We then leverage the structure of the covariance matrix, and apply the matrix determinant lemma to achieve efficient, closed-form mutual information calculation. The second challenge is that, directly maximizing the utility-cost ratio as in previous methods, tends to trap the active learning at low-resolution queries and inferior performance. This is due to that when the data is few (at the early stage), the mutual information measurement for examples at different resolutions is close. High-resolution examples are thereby over-penalized by the large cost. We propose a cost annealing framework, which initializes the same cost for every resolution. The cost for each resolution is scheduled to gradually converge to the true cost along with data accumulation. When the data is enough and mutual information can reflect the true potential of each example, our active learning returns to maximizing the benefit-cost ratio. In this way, our method can flexibly incorporate high-resolution examples at the early stage to ensure continuous improvement. Our framework applies to general multi-fidelity learning and optimization problems.\n\n- • Experimental Results. We evaluated MRA-FNO with four benchmark operator learning tasks, based on Burger’s, Darcy flow, nonlinear diffusion and Navier-Stoke equations. On fixed training datasets, our multi-resolution FNO shows better or very close prediction error as compared to the standard FNO. Both the prediction accuracy and test log likelihood are much higher than applying other popular Bayesian inference methods, including Monte-Carlo (MC) dropout, stochastic gradient Langevin dynamics and variational inference. It shows our ensemble inference provides much better uncertainty quantification. During the course of each active learning experiment, MRA-FNO consistently achieves much better prediction accuracy with the same accumulated data cost, as compared with random queries, core-set active learning, and our framework using dropout inference.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib29",
+      "text": "Pathak et al., (2022) Pathak, J., Subramanian, S., Harrington, P., Raja, S., Chattopadhyay, A., Mardani, M., Kurth, T., Hall, D., Li, Z., Azizzadenesheli, K., et al. (2022). Fourcastnet: A global data-driven high-resolution weather model using adaptive fourier neural operators. arXiv preprint arXiv:2202.11214 ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib3",
+      "text": "Bhan et al., (2023) Bhan, L., Shi, Y., and Krstic, M. (2023). Operator learning for nonlinear adaptive control. In Learning for Dynamics and Control Conference , pages 346–357. PMLR."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib25",
+      "text": "Liu et al., (2023) Liu, Z., Li, Y., Hu, J., Yu, X., Shiau, S., Ai, X., Zeng, Z., and Zhang, Z. (2023). Deepoheat: Operator learning-based ultra-fast thermal simulation in 3d-ic design. arXiv preprint arXiv:2302.12949 ."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib13",
+      "text": "Kaltenbach et al., (2022) Kaltenbach, S., Perdikaris, P., and Koutsourelakis, P.-S. (2022). Semi-supervised invertible deeponets for bayesian inverse problems. arXiv preprint arXiv:2209.02772 ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib24",
+      "text": "(24) Li, Z., Kovachki, N. B., Azizzadenesheli, K., Bhattacharya, K., Stuart, A., Anandkumar, A., et al. (2020d). Fourier neural operator for parametric partial differential equations. In International Conference on Learning Representations ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib16",
+      "text": "Lakshminarayanan et al., (2017) Lakshminarayanan, B., Pritzel, A., and Blundell, C. (2017). Simple and scalable predictive uncertainty estimation using deep ensembles. Advances in neural information processing systems , 30."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib18",
+      "text": "(18) Li, S., Wang, Z., Kirby, R., and Zhe, S. (2022b). Deep multi-fidelity active learning of high-dimensional outputs. In International Conference on Artificial Intelligence and Statistics , pages 1694–1711. PMLR."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib32",
+      "text": "Takeno et al., (2020) Takeno, S., Fukuoka, H., Tsukada, Y., Koyama, T., Shiga, M., Takeuchi, I., and Karasuyama, M. (2020). Multi-fidelity Bayesian optimization with max-value entropy search and its parallelization. In International Conference on Machine Learning , pages 9334–9345. PMLR."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib20",
+      "text": "(20) Li, S., Xing, W., Kirby, R., and Zhe, S. (2020a). Multi-fidelity bayesian optimization via deep neural networks. Advances in Neural Information Processing Systems , 33:8521–8531."
+    }
+  ]
+}

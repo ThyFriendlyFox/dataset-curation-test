@@ -1,0 +1,70 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2310.03294",
+  "title": "DISTFLASHATTN: Distributed Memory-efficient Attention for Long-context LLMs Training",
+  "authors": "Dacheng Li, Rulin Shao, Anze Xie, Eric P. Xing, Xuezhe Ma, Ion Stoica, Joseph E. Gonzalez, Hao Zhang",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.AI",
+    "cs.DC"
+  ],
+  "url": "https://arxiv.org/abs/2310.03294",
+  "html_url": "https://arxiv.org/html/2310.03294",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 660,
+  "text": "Large language models (LLMs) capable of processing long context have enabled many novel applications, such as generating a complete codebase [1] and chatting with long documents [2]. Yet, training these LLMs with long sequences significantly increases activation memory footprints, posing new challenges.\n\nContemporary approaches to manage the high memory demands of long-context LLMs training involve either reducing activation memory on a single device or partitioning and distributing the sequences across multiple devices. Memory-efficient attention [3,4,5] represents the former, which reduces the peak memory usage of attention operations on a single device. Despite their effectiveness, the absence of a distributed extension limits their application to sequence lengths that a single device can accommodate. Naively combining it with existing tensor or pipeline parallelisms [6]) leads to excessive communication (§ D) and cannot scale with sequence length (§ 4). On the other hand, sequence parallelism systems, Ring Self-Attention [7] and Ring Attention [8], distribute the activations of a long sequence across multiple devices, but they lack support for memory-efficient attentions (e.g., FlashAttention) or scheduling optimizations, making them inefficient in training long sequences (§ 4.3).\n\nThis paper introduces DistFlashAttn to extend the advantages of FlashAttention [4] to the distributed setting while maintaining high GPU utilization and low communication overhead. DistFlashAttn efficiently distributes token chunks across multiple devices, while maintaining the IO-aware benefits of memory-efficient attention. We identify three key challenges in achieving high GPU utilization on distributed FlashAttention design for long-context LLMs and propose three optimizations to addgress them.\n\nThe first challenge is the token-level workload imbalance caused by causal language modeling. As shown in Figure 1 (a), the causal attention introduces a quadratic work dependency on the prefix of each token. This leads to workers assigned earlier tokens to remain idle while waiting for workers with later tokens to complete, lowering the GPU utilization almost by half. We address this challenge by introducing a load-balancing schedule that routes the extra attention computation of later tokens to those idle workers (§ 3.2). This optimization yields twice throughput of the unbalanced version as shown in Figure 4.\n\nThe second challenge is the prohibitive communication overhead. When tokens are distributed to multiple machines, these machines need to communicate key-value tensors and softmax statistics to jointly compute the global attention. The communication volume is nontrivial, leading to large communication overhead, which grows with the context length. By leveraging the attention dependencies, we propose a scheduling technique that overlaps communication and computation by pre-fetching tensors. This successfully hides communication overhead inside the computation time, resulting in a 1.32\\times end-to-end speedup (Figure 4) compared to a non-overlapping version.\n\nThe third challenge is the high computation overhead due to the re-computation in gradient checkpointing [9]. Gradient checkpointing effectively trades computation for memory by selectively storing intermediate activations (e.g., the inputs of every layer) and recomputing on-the-fly during the backward pass. It has become a standard technique in the training of long-context LLMs to accommodate the prohibitive activation memory [10]. However, the recomputation of the FlashAttention causes a high computation overhead in long sequences where the attention dominates the computation time. In § 3.3, we show the recomputation of FlashAttention is unnecessary for its backward pass and propose a novel gradient checkpointing strategy to avoid it. Our new strategy results in an 1.31 \\times speedup (§ 4.5) without introducing any numerical difference.\n\nOur main contributions are:\n\n- 1. We develop DistFlashAttn, a distributed, memory-efficient, exact attention mechanism with sequence parallelism. We propose new optimization techniques to balance the causal computation workloads and overlap computation and computation to increase GPU utilization and reduce communication overhead for training long-context LLMs. We also propose a rematerialization-aware gradient checkpointing strategy that eliminates redundant forward recomputation of FlashAttention.\n\n- 2. We perform comprehensive evaluation of DistFlashAttn on LLaMA models, against four strong distributed systems. DistFlashAttn supports 8\\times longer sequences with 5.64\\times compared to Ring Self-Attention, 2-8\\times longer sequences with 1.24-2.01\\times speedup compared to Megatron-LM. DistFlashAttn achieves 1.67\\times and 1.26-1.88\\times speedup compared to Ring Attention and DeepSpeed-Ulysses.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib19",
+      "text": "Osika (2023) Anton Osika. gpt-engineer, 2023. URL https://github.com/AntonOsika/gpt-engineer ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib14",
+      "text": "Li et al. (2023) Dacheng Li, Rulin Shao, Anze Xie, Ying Sheng, Lianmin Zheng, Joseph E Gonzalez, Ion Stoica, Xuezhe Ma, and Hao Zhang. How long can open-source llms truly promise on context length, 2023."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib6",
+      "text": "Dao et al. (2022) Tri Dao, Dan Fu, Stefano Ermon, Atri Rudra, and Christopher Ré. Flashattention: Fast and memory-efficient exact attention with io-awareness. Advances in Neural Information Processing Systems , 35:16344–16359, 2022."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib5",
+      "text": "Dao (2023) Tri Dao. Flashattention-2: Faster attention with better parallelism and work partitioning. arXiv preprint arXiv:2307.08691 , 2023."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib21",
+      "text": "Rabe & Staats (2021) Markus N Rabe and Charles Staats. Self-attention does not need o ( n 2 ) (n^{2}) memory. arXiv preprint arXiv:2112.05682 , 2021."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib24",
+      "text": "Shoeybi et al. (2019) Mohammad Shoeybi, Mostofa Patwary, Raul Puri, Patrick LeGresley, Jared Casper, and Bryan Catanzaro. Megatron-lm: Training multi-billion parameter language models using model parallelism. arXiv preprint arXiv:1909.08053 , 2019."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib15",
+      "text": "Li et al. (2021) Shenggui Li, Fuzhao Xue, Yongbin Li, and Yang You. Sequence parallelism: Making 4d parallelism possible. arXiv preprint arXiv:2105.13120 , 2021."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib16",
+      "text": "Liu et al. (2023) Hao Liu, Matei Zaharia, and Pieter Abbeel. Ring attention with blockwise transformers for near-infinite context. arXiv preprint arXiv:2310.01889 , 2023."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib4",
+      "text": "Chen et al. (2016) Tianqi Chen, Bing Xu, Chiyuan Zhang, and Carlos Guestrin. Training deep nets with sublinear memory cost. arXiv preprint arXiv:1604.06174 , 2016."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib30",
+      "text": "Zheng et al. (2023) Lianmin Zheng, Wei-Lin Chiang, Ying Sheng, Siyuan Zhuang, Zhanghao Wu, Yonghao Zhuang, Zi Lin, Zhuohan Li, Dacheng Li, Eric. P Xing, Hao Zhang, Joseph E. Gonzalez, and Ion Stoica. Judging llm-as-a-judge with mt-bench and chatbot arena, 2023."
+    }
+  ]
+}

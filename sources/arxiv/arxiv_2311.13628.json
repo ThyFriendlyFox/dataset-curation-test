@@ -1,0 +1,115 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2311.13628",
+  "title": "Prompt Risk Control: A Rigorous Framework for Responsible Deployment of Large Language Models",
+  "authors": "Thomas P. Zollo, Todd Morrill, Zhun Deng, Jake C. Snell, Toniann Pitassi, Richard Zemel",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.AI",
+    "cs.CL"
+  ],
+  "url": "https://arxiv.org/abs/2311.13628",
+  "html_url": "https://arxiv.org/html/2311.13628",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 717,
+  "text": "Recent leaps in the capabilities of large language models (LLMs) such as GPT-4 [1], LLaMA [2], and Claude have driven a wave of interest in constructing the best prompt for a given task, where a prompt generally refers to an input to the LLM. Various prompting strategies have been proposed, including but not limited to: in-context learning [3], instruction following [4], chain-of-thought prompting [5], and prompt-tuning [6], as well as a range of more complex approaches. Despite this proliferation of methods and their suggested strengths, prompting remains an experimental and poorly understood area, with little clear evidence why one task verbalization or a particular ordering of few-shot exemplars should improve performance [7,8]. Lacking a rigorous understanding of the underlying mechanisms, prompt choices are usually made based on empirical average results on a validation set [9]. However, a prompt that performs well on average on a validation set may in fact be prone to producing some poor generations in deployment with an unacceptably high probability, since a single validation score lacks information about the underlying variance or likelihood of outlier events. For example, when deploying an open-ended chatbot, one may find that the prompt that produces the most helpful generations on a validation set also produces unacceptably high toxicity for some portion of users in deployment. This potential trade-off between usefulness and safety (or helpfulness and harmlessness) is an area of increasing interest and importance, both in the context of prompting as well as under the various fine-tuning alignment methods that are applied to models before deployment [10,11].\n\nTo mitigate this prospect of unexpectedly bad outcomes in LLM deployment and manage these trade-offs in a principled way, we introduce Prompt Risk Control (PRC), a framework for selecting a prompt based on rigorous upper bounds on some user-chosen risk measure. Our framework employs statistically and theoretically sound methods from the Distribution-Free Uncertainty Quantification (DFUQ) family of techniques [12,13,14,15,16] in order to control (i.e., produce bounds on) a rich set of informative risk measures, and uses these bounds to return a set of prompts that with high probability will not incur an unacceptable outcome according to some user-chosen criteria (see Figure 1). PRC can be applied to open source models like LlaMA, as well as proprietary models behind an API such as GPT-4. We also provide a novel extension of the underlying statistical techniques used to produce these bounds in order to accommodate distribution shifts in deployment, and demonstrate our framework’s application to this important setting.\n\nWithin our framework, we make an important distinction between the notions of loss and risk, and consider the value of incorporating diverse risk measures when making decisions regarding LLM deployment. We use loss to refer to a particular scoring notion that can be calculated for a single data point, for instance ROUGE score [17], toxicity, or top-1 accuracy. On the other hand, risk refers to some population-level measure of these scores, such as mean, median, conditional value at risk (CVaR) [18], or the Gini coefficient [19]. While prompt selection is usually based on average performance across a validation set, such a view is insufficient in many cases, especially in risk-sensitive domains such as medicine and law in which LLMs are increasingly being deployed. Instead, one must consider contextually relevant risk measures that capture different aspects of the loss distribution. As an example, in the deployment of an LLM in a domain with high social impact, one may be interested in choosing a prompt that is unlikely to produce very different losses across different subgroups in the population according to race, gender, or income. To this end, we provide methods for (and example applications of) bounding many expressive risk measures of LLM performance, in the hope that such measures can be considered more often both in practice and research.\n\nWe study our framework via diverse and comprehensive experiments on open source models with as many as 40B parameters, and find that Prompt Risk Control is both critical for and easily applied to high-impact applications like open-ended chat, code generation, and patient inquiry summarization, including in cases where no labeled data is available or there is a distribution shift at test time. We believe that the rigorous, effective, and lightweight nature of our framework makes it a strong candidate for inclusion in any LLM deployment pipeline.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib30",
+      "text": "OpenAI (2023) OpenAI. Gpt-4 technical report, 2023."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib47",
+      "text": "Touvron et al. (2023) Hugo Touvron, Louis Martin, Kevin Stone, Peter Albert, Amjad Almahairi, Yasmine Babaei, Nikolay Bashlykov, Soumya Batra, Prajjwal Bhargava, Shruti Bhosale, Dan Bikel, Lukas Blecher, Cristian Canton Ferrer, Moya Chen, Guillem Cucurull, David Esiobu, Jude Fernandes, Jeremy Fu, Wenyin Fu, Brian Fuller, Cynthia Gao, Vedanuj Goswami, Naman Goyal, Anthony Hartshorn, Saghar Hosseini, Rui Hou, Hakan Inan, Marcin Kardas, Viktor Kerkez, Madian Khabsa, Isabel Kloumann, Artem Korenev, Punit Singh Koura, Marie-Anne Lachaux, Thibaut Lavril, Jenya Lee, Diana Liskovich, Yinghai Lu, Yuning Mao, Xavier Martinet, Todor Mihaylov, Pushkar Mishra, Igor Molybog, Yixin Nie, Andrew Poulton, Jeremy Reizenstein, Rashi Rungta, Kalyan Saladi, Alan Schelten, Ruan Silva, Eric Michael Smith, Ranjan Subramanian, Xiaoqing Ellen Tan, Binh Tang, Ross Taylor, Adina Williams, Jian Xiang Kuan, Puxin Xu, Zheng Yan, Iliyan Zarov, Yuchen Zhang, Angela Fan, Melanie Kambadur, Sharan Narang, Aurelien Rodriguez, Robert Stojnic, Sergey Edunov, and Thomas Scialom. Llama 2: Open foundation and fine-tuned chat models. arXiv:2307.09288 , 2023."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib10",
+      "text": "Brown et al. (2020) Tom Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared D Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, Sandhini Agarwal, Ariel Herbert-Voss, Gretchen Krueger, Tom Henighan, Rewon Child, Aditya Ramesh, Daniel Ziegler, Jeffrey Wu, Clemens Winter, Chris Hesse, Mark Chen, Eric Sigler, Mateusz Litwin, Scott Gray, Benjamin Chess, Jack Clark, Christopher Berner, Sam McCandlish, Alec Radford, Ilya Sutskever, and Dario Amodei. Language models are few-shot learners. In Advances in Neural Information Processing Systems , 2020."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib51",
+      "text": "Wei et al. (2022a) Jason Wei, Maarten Bosma, Vincent Y. Zhao, Kelvin Guu, Adams Wei Yu, Brian Lester, Nan Du, Andrew M. Dai, and Quoc V. Le. Finetuned language models are zero-shot learners. In International Conference on Learning Representations , 2022a."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib52",
+      "text": "Wei et al. (2022b) Jason Wei, Xuezhi Wang, Dale Schuurmans, Maarten Bosma, Brian Ichter, Fei Xia, Ed Chi, Quoc V Le, and Denny Zhou. Chain-of-thought prompting elicits reasoning in large language models. In Advances in Neural Information Processing Systems , 2022b."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib23",
+      "text": "Lester et al. (2021) Brian Lester, Rami Al-Rfou, and Noah Constant. The power of scale for parameter-efficient prompt tuning. In Proceedings of the 2021 Conference on Empirical Methods in Natural Language Processing , 2021."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib21",
+      "text": "Kaddour et al. (2023) Jean Kaddour, Joshua Harris, Maximilian Mozes, Herbie Bradley, Roberta Raileanu, and Robert McHardy. Challenges and applications of large language models. arXiv:2307.10169 , 2023."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib50",
+      "text": "Webson and Pavlick (2022) Albert Webson and Ellie Pavlick. Do prompt-based models really understand the meaning of their prompts? In Proceedings of the 2022 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies , 2022."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib11",
+      "text": "Burnell et al. (2023) Ryan Burnell, Wout Schellaert, John Burden, Tomer D. Ullman, Fernando Martinez-Plumed, Joshua B. Tenenbaum, Danaja Rutar, Lucy G. Cheke, Jascha Sohl-Dickstein, Melanie Mitchell, Douwe Kiela, Murray Shanahan, Ellen M. Voorhees, Anthony G. Cohn, Joel Z. Leibo, and Jose Hernandez-Orallo. Rethink reporting of evaluation results in AI. Science , 380(6641):136–138, 2023."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib5",
+      "text": "Bai et al. (2022) Yuntao Bai, Andy Jones, Kamal Ndousse, Amanda Askell, Anna Chen, Nova DasSarma, Dawn Drain, Stanislav Fort, Deep Ganguli, Tom Henighan, Nicholas Joseph, Saurav Kadavath, Jackson Kernion, Tom Conerly, Sheer El-Showk, Nelson Elhage, Zac Hatfield-Dodds, Danny Hernandez, Tristan Hume, Scott Johnston, Shauna Kravec, Liane Lovitt, Neel Nanda, Catherine Olsson, Dario Amodei, Tom Brown, Jack Clark, Sam McCandlish, Chris Olah, Ben Mann, and Jared Kaplan. Training a helpful and harmless assistant with reinforcement learning from human feedback. arXiv:2204.05862 , 2022."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib17",
+      "text": "Ganguli et al. (2022) Deep Ganguli, Liane Lovitt, Jackson Kernion, Amanda Askell, Yuntao Bai, Saurav Kadavath, Ben Mann, Ethan Perez, Nicholas Schiefer, Kamal Ndousse, Andy Jones, Sam Bowman, Anna Chen, Tom Conerly, Nova DasSarma, Dawn Drain, Nelson Elhage, Sheer El-Showk, Stanislav Fort, Zac Hatfield-Dodds, Tom Henighan, Danny Hernandez, Tristan Hume, Josh Jacobson, Scott Johnston, Shauna Kravec, Catherine Olsson, Sam Ringer, Eli Tran-Johnson, Dario Amodei, Tom Brown, Nicholas Joseph, Sam McCandlish, Chris Olah, Jared Kaplan, and Jack Clark. Red teaming language models to reduce harms: Methods, scaling behaviors, and lessons learned. arXiv:2209.07858 , 2022."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib49",
+      "text": "Vovk et al. (2005) Vladimir Vovk, Akimichi Takemura, and Glenn Shafer. Defensive forecasting for linear protocols. In Proceedings of the Tenth International Workshop on Artificial Intelligence and Statistics , 2005."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib6",
+      "text": "Bates et al. (2021) Stephen Bates, Anastasios Angelopoulos, Lihua Lei, Jitendra Malik, and Michael Jordan. Distribution-free, risk-controlling prediction sets. Journal of the ACM , 68(6):1–34, 2021."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib2",
+      "text": "Angelopoulos and Bates (2021) Anastasios N Angelopoulos and Stephen Bates. A gentle introduction to conformal prediction and distribution-free uncertainty quantification. arXiv:2107.07511 , 2021."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib46",
+      "text": "Snell et al. (2023) Jake Snell, Thomas P Zollo, Zhun Deng, Toniann Pitassi, and Richard Zemel. Quantile risk control: A flexible framework for bounding the probability of high-loss predictions. In International Conference on Learning Representations , 2023."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib13",
+      "text": "Deng et al. (2023) Zhun Deng, Thomas P. Zollo, Jake C. Snell, Toniann Pitassi, and Richard Zemel. Distribution-free statistical dispersion control for societal applications. In Advances in Neural Information Processing Systems , 2023."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib25",
+      "text": "Lin (2004) Chin-Yew Lin. ROUGE: A package for automatic evaluation of summaries. In Text Summarization Branches Out . Association for Computational Linguistics, 2004."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib40",
+      "text": "Rockafellar and Uryasev (2000) R. Tyrrell Rockafellar and Stanislav Uryasev. Optimization of conditional value-at-risk. The Journal of Risk , 2(3):21–41, 2000."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib54",
+      "text": "Yitzhaki (1979) Shlomo Yitzhaki. Relative deprivation and the Gini coefficient. The quarterly journal of economics , 93(2):321–324, 1979."
+    }
+  ]
+}

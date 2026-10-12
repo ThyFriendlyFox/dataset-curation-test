@@ -1,0 +1,84 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.19462",
+  "title": "Offline Imitation Learning from Multiple Baselines with Applications to Compiler Optimization",
+  "authors": "Teodor V. Marinov, Alekh Agarwal, Mircea Trofin",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.PL"
+  ],
+  "url": "https://arxiv.org/abs/2403.19462",
+  "html_url": "https://arxiv.org/html/2403.19462",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 743,
+  "text": "When applying Reinforcement Learning (RL) to real-world applications, two key challenges often prove to be critical blockers to adoption. First is that the online interaction-then-update loop in conventional RL poses a significant engineering overhead in most large-scale systems, that are more naturally designed to take a static Machine Learning (ML) model as a dependency and update this model only periodically in an offline manner. Second is that RL algorithms typically begin tabula rasa, that is, they only leverage the information they glean about the task at hand through these online interactions. Typical scenarios, where the use of RL is often preceded by prior attempts using rule-based or supervised ML approaches, come with a treasure trove of valuable data about desirable and undesirable behaviors, ignoring which leads to undesirable sample complexity of learning from scratch for RL. More important, the previously tried decision making policies, even when individually suboptimal, provide a valuable source of insight into the plausibly good choices in many scenarios. In this work, we study the question of leveraging such prior policies and any data collected using them, without necessarily relying on online policy updates.\n\nGiven these shortcomings, offline RL [1,2,3,4], where the agent just learns from a static dataset collected using some arbitrary policy, as well as hybrid protocols [5,6,7] interpolating the fully online and offline settings have been proposed in the literature to take advantage of existing datasets, as well as to ease the requirement of completely online policy updates. In a different thread of work, the substantial literature on imitation learning [8,9,10,11] aims to leverage any existing policies that we seek to improve upon, along with the data collected using them. While imitation learning is studied in both online and offline settings, the particular scenario of having access to multiple policies of variable qualities that is of interest here, is only previously studied in an online setting [12,13].\n\nIn this paper, we formalize this question of having access to K baseline policies \\pi_{1},\\ldots,\\pi_{K}, each of which can be quite suboptimal in isolation, and which we hope are strong in complementary parts of the state space. We further restrict ourselves to only receiving static datasets D^{i} collected from each policy \\pi_{i}, and seek to learn a policy which can combine the strengths of all the baseline policies. We are particularly interested in challenging settings where the underlying RL problem has a long horizon, and we only receive sparse trajectory-level feedback at the end of each trajectory. To motivate this setting, we consider a running example of optimizing the inlining decisions in a compiler. The horizon of the RL problem here corresponds to the number of callsites in the program or function being compiled., which can range from tens to tens of thousands. The reward of a trajectory is the size of the binary we obtain after compiling the entire function. The offline setting we study is extremely well motivated here, where each interaction with the RL environment involves the expensive operation of compiling and linking the program, and integrating this within the RL loop engenders a significant engineering overhead.. With this setup, our paper makes the following contributions:\n\n- • A natural behavior cloning algorithm, BC-Max, that combines the multiple policies by executing each policy in every starting state in our dataset, and then imitating the trajectory of the policy with the highest reward in that state. We give an upper bound on the expected regret of the learned policy to the maximal reward obtained in each starting state by choosing the best baseline policy for that state.\n\n- • We complement our analysis with a lower bound showing that the result is unimprovable beyond polylogarithmic factors in our setting.\n\n- • We apply BC-Max to two different real-world datasets for the task of optimizing compiler inlining for binary size, and show that we outperform strong baselines in both the cases. In both cases we start with a single baseline policy, which is a prior model trained using online RL, which already has a strong performance on this task. We demonstrate the versatility of BC-Max by iteratively applying BC-Max on the initial expert, along with all prior policies trained using previous BC-Max iterations as the next set of baselines. We show that with a limited amount of interaction with the environment (to collect trajectories using each successive set of baselines), we obtain strong policies in a small number of iterations, creating a promising practical recipe for challenging real-world settings.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib5",
+      "text": "Ernst et al. (2005) Ernst, D., Geurts, P., and Wehenkel, L. Tree-based batch mode reinforcement learning. Journal of Machine Learning Research , 6, 2005."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib8",
+      "text": "Hester et al. (2018) Hester, T., Vecerik, M., Pietquin, O., Lanctot, M., Schaul, T., Piot, B., Horgan, D., Quan, J., Sendonaris, A., Osband, I., et al. Deep q-learning from demonstrations. In Proceedings of the AAAI conference on artificial intelligence , volume 32, 2018."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib11",
+      "text": "Kumar et al. (2020) Kumar, A., Zhou, A., Tucker, G., and Levine, S. Conservative q-learning for offline reinforcement learning. Advances in Neural Information Processing Systems , 33:1179–1191, 2020."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "Cheng et al. (2022) Cheng, C.-A., Xie, T., Jiang, N., and Agarwal, A. Adversarially trained actor critic for offline reinforcement learning. In International Conference on Machine Learning , pp. 3852–3878. PMLR, 2022."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib20",
+      "text": "Song et al. (2022) Song, Y., Zhou, Y., Sekhari, A., Bagnell, J. A., Krishnamurthy, A., and Sun, W. Hybrid rl: Using both offline and online data can make rl efficient. arXiv preprint arXiv:2210.06718 , 2022."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib7",
+      "text": "Haarnoja et al. (2018) Haarnoja, T., Zhou, A., Hartikainen, K., Tucker, G., Ha, S., Tan, J., Kumar, V., Zhu, H., Gupta, A., Abbeel, P., et al. Soft actor-critic algorithms and applications. arXiv preprint arXiv:1812.05905 , 2018."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib19",
+      "text": "Silver et al. (2014) Silver, D., Lever, G., Heess, N., Degris, T., Wierstra, D., and Riedmiller, M. Deterministic policy gradient algorithms. In International conference on machine learning , pp. 387–395. Pmlr, 2014."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib14",
+      "text": "Pomerleau (1988) Pomerleau, D. A. Alvinn: An autonomous land vehicle in a neural network. Advances in neural information processing systems , 1, 1988."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib17",
+      "text": "Ross et al. (2011) Ross, S., Gordon, G., and Bagnell, D. A reduction of imitation learning and structured prediction to no-regret online learning. In Proceedings of the fourteenth international conference on artificial intelligence and statistics , pp. 627–635. JMLR Workshop and Conference Proceedings, 2011."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib1",
+      "text": "Abbeel & Ng (2004) Abbeel, P. and Ng, A. Y. Apprenticeship learning via inverse reinforcement learning. In Proceedings of the twenty-first international conference on Machine learning , pp. 1, 2004."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib9",
+      "text": "Ho & Ermon (2016) Ho, J. and Ermon, S. Generative adversarial imitation learning. Advances in neural information processing systems , 29, 2016."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib3",
+      "text": "Cheng et al. (2020) Cheng, C.-A., Kolobov, A., and Agarwal, A. Policy improvement via imitation of multiple oracles. Advances in Neural Information Processing Systems , 33:5587–5598, 2020."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib2",
+      "text": "Barreto et al. (2020) Barreto, A., Hou, S., Borsa, D., Silver, D., and Precup, D. Fast reinforcement learning with generalized policy updates. Proceedings of the National Academy of Sciences , 117(48):30079–30087, 2020."
+    }
+  ]
+}

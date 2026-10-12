@@ -1,0 +1,133 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2402.11800",
+  "title": "Stochastic Approximation with Delayed Updates: Finite-Time Rates under Markovian Sampling",
+  "authors": "Arman Adibi, Nicolo Dal Fabbro, Luca Schenato, Sanjeev Kulkarni, H. Vincent Poor, George J. Pappas, Hamed Hassani, Aritra Mitra",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.AI",
+    "cs.MA",
+    "cs.SY",
+    "eess.SY",
+    "math.OC"
+  ],
+  "url": "https://arxiv.org/abs/2402.11800",
+  "html_url": "https://arxiv.org/html/2402.11800",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "INTRODUCTION",
+  "word_count": 1143,
+  "text": "The goal of Stochastic Approximation (SA) theory, introduced by [1], is to find the root (or fixed point) of an operator, given access to noisy observations. The general framework of SA finds applications in various fields like control, optimization, and reinforcement learning (RL). Recently, the surge of interest in distributed and asynchronous learning has motivated the study of variants of SA - e.g., stochastic gradient descent (SGD) - in the presence of delays. This leads to the study of iterative optimization algorithms where the gradients used for the iterative updates are computed at potentially stale iterates from the past [2,3]. Notably, the literature on understanding the effects of delays in SA has focused almost exclusively on optimization.\n\nIn particular, while delayed versions of more general SA algorithms have been shown to perform well in practice in the context of asynchronous and multi-agent RL [4], there is little to no theory to substantiate these empirical observations. Bridging the above gap is the main objective of this paper. However, this task is non-trivial since the transition from optimization to RL requires contending with one major challenge: in the latter, the noisy observations are typically generated from a Markov process. As such, unlike the i.i.d. sampling assumption in optimization, the observations in RL are temporally correlated. The interplay between such temporal correlations and delayed updates remains poorly understood in RL. Given this motivation, we provide the first comprehensive finite-time analysis of SA schemes under Markovian sampling and delayed updates. As we explain later in the paper, this entails the development of novel analysis techniques that may be of independent interest to both the optimization and RL communities.\n\n## 1.1 Related Works\n\nTo position our work and contributions, we now provide a brief summary of relevant literature. A more elaborate survey is deferred to Appendix A.\n\n\\bullet SA under Markovian Sampling. The asymptotic convergence of SA under correlated Markov randomness was thoroughly investigated for temporal difference (TD) learning in the pioneering work by [5]. However, finite-time analyses for TD learning and linear SA were only recently provided by [6,7]. These contributions were followed by finite-time analyses of more general nonlinear SA algorithms, such as Q-learning [8,9]. More recent work has delved into the non-asymptotic convergence of decentralized SA [10,11].\n\n\\bullet Delays and Asynchrony in Optimization. The study of delays and asynchrony in distributed optimization dates back to the seminal work by [12]. While the focus of this work was on asymptotic convergence, the current focus in ML has shifted towards finite-sample guarantees. As such, motivated by the growing popularity of distributed ML, a significant body of work has explored the finite-time effects of delays on the performance of stochastic optimization algorithms such as stochastic gradient descent (SGD), and variants thereof [2,13,14,15,3,16,17]. We note here that stochastic optimization is a special case of SA, where the noise samples that enter into the gradients are generated in an i.i.d. manner, i.e., they exhibit no temporal correlations. However, for applications centered around asynchronous multi-agent RL (MARL) [4,18,19], one needs to contend with two key challenges simultaneously: (i) the randomness in the observations comes from a temporally correlated Markov process, and (ii) the noisy SA operator is evaluated at potentially stale iterates. We are unaware of any work that provides a finite-time analysis of SA schemes that feature both the above challenges.\n\n## 1.2 Contributions\n\nIn light of the above discussion, the main contributions of this work are summarized below.\n\n- 1. Novel Problem Formulation: Our work provides the first comprehensive finite-time convergence analysis for delayed SA schemes under Markovian sampling.\n\n- 2. Tight Bound in the Constant Delay Case: We start by analyzing the constant-delay setting in Section 3, and prove exponential convergence of the delayed SA update rule to a noise ball around the fixed point of the SA operator; see Theorem 1. Our analysis reveals that the exponent of convergence gets scaled down by \\max\\{\\tau,\\tau_{mix}\\}, where \\tau represents the constant delay, and \\tau_{mix} represents the mixing time of the underlying Markov process. Notably, our result (i) complies with existing finite-time bounds for non-delayed SA schemes [7]; and (ii) exhibits a tight dependence on the delay \\tau; see Section 3 for more discussion on this aspect.\n\n- 3. Tight Bound for Time-Varying Delays: One of the main contributions of this work is to generalize our result on constant delays to arbitrary time-varying delays that are bounded. We provide such a result in Theorem 2 of Section 4, where we show that the exponent of convergence gets scaled down this time by \\max\\{\\tau_{max},\\tau_{mix}\\}. Here, \\tau_{max} is the maximum possible delay. An interesting observation stemming from our analysis is that for slowly mixing Markov chains where \\tau_{mix}>\\tau_{max}, the effect of delays gets subsumed by the natural mixing of the underlying Markov process. As such, slowly mixing Markov chains tend to be more robust to delays.\n\n- 4. Novel Proof Technique: As we explain in detail in Section 4, achieving a tight dependence on \\tau_{max} in Theorem 2 requires a significantly different proof technique than those existing. In particular, our proof neither employs generating function techniques as in [20], nor the popular error-feedback framework as in [21]. Instead, it relies on a new inductive argument to establish uniform boundedness of the iterates generated by the delayed SA scheme. This allows us to treat the joint effect of delays and Markovian sampling as a bounded perturbation, thereby considerably simplifying the subsequent analysis. The resulting approach is novel, and may be of independent interest to both RL and optimization.\n\n- 5. Introduction and Analysis of a Delay-Adaptive Algorithm: In Section 5, we propose and analyze an intuitive delay-adaptive SA scheme, where an update is made only when the staleness in the update direction falls below a carefully chosen threshold. In Theorem 3, we show that the convergence rate of this scheme depends on the average delay \\tau_{avg}, as opposed to the maximum delay \\tau_{max}. Furthermore, the step-size for this adaptive rule requires no knowledge at all of the delay sequence.\n\n- 6. Applications of Our Results: As we explain in Section 2.2, our theoretical findings find applications in a variety of settings, including the effects of delays in TD learning, Q-learning, and SGD under Markovian sampling.\n\nMotivation and Scope. One of the main practical motivations for the present study lies in multi-agent RL where asynchronous communication naturally leads to delays. That said, the scope of this paper is limited to the single-agent case since even this basic setting poses major technical challenges that remain completely unexplored. As such, by laying the foundations for this single-agent setting, our work opens up avenues for understanding and designing algorithms in more complex MARL environments as future work. We also note that this type of single-agent configuration has been the key enabler for the fundamental understanding of finite-time rates for SGD with delayed updates (under i.i.d. sampling) [22,20,21].",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib34",
+      "text": "Robbins and Monro, (1951) Robbins, H. and Monro, S. (1951). A stochastic approximation method. The Annals of Mathematical Statistics , 22(3):400–407."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib21",
+      "text": "Feyzmahdavian et al., (2016) Feyzmahdavian, H. R., Aytekin, A., and Johansson, M. (2016). An asynchronous mini-batch algorithm for regularized stochastic optimization. IEEE Transactions on Automatic Control , 61(12):3740–3754."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib25",
+      "text": "Koloskova et al., (2022) Koloskova, A., Stich, S. U., and Jaggi, M. (2022). Sharper convergence guarantees for asynchronous sgd for distributed and federated learning. Advances in Neural Information Processing Systems , 35:17202–17215."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib9",
+      "text": "Bouteiller et al., (2020) Bouteiller, Y., Ramstedt, S., Beltrame, G., Pal, C., and Binas, J. (2020). Reinforcement learning with random delays. In International conference on learning representations ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib40",
+      "text": "Tsitsiklis and Vanroy, (1997) Tsitsiklis, J. and Vanroy, B. (1997). An analysis of temporal-difference learning with function approximation. IEEE Transactions on Automatic Control , 42(5):674–690."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib7",
+      "text": "Bhandari et al., (2018) Bhandari, J., Russo, D., and Singal, R. (2018). A finite time analysis of temporal difference learning with linear function approximation. In Conference on learning theory , pages 1691–1692. PMLR."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib35",
+      "text": "Srikant and Ying, (2019) Srikant, R. and Ying, L. (2019). Finite-time error bounds for linear stochastic approximation and TD learning. In Conference on Learning Theory , pages 2803–2830. PMLR."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib12",
+      "text": "(12) Chen, Z., Maguluri, S. T., and Zubeldia, M. (2023b). Concentration of contractive stochastic approximation: Additive and multiplicative noise. arXiv preprint arXiv:2303.15740 ."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib32",
+      "text": "Qu and Wierman, (2020) Qu, G. and Wierman, A. (2020). Finite-time analysis of asynchronous stochastic approximation and q q -learning. In Conference on Learning Theory , pages 3185–3205. PMLR."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib43",
+      "text": "Zeng et al., (2022) Zeng, S., Doan, T. T., and Romberg, J. (2022). Finite-time convergence rates of decentralized stochastic approximation with applications in multi-agent and multi-task learning. IEEE Transactions on Automatic Control ."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib17",
+      "text": "Doan, (2023) Doan, T. T. (2023). Finite-time convergence rates of distributed local stochastic approximation. Automatica , 158:111294."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib39",
+      "text": "Tsitsiklis et al., (1986) Tsitsiklis, J., Bertsekas, D., and Athans, M. (1986). Distributed asynchronous deterministic and stochastic gradient optimization algorithms. IEEE Transactions on Automatic Control , 31(9):803–812."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib23",
+      "text": "Gurbuzbalaban et al., (2017) Gurbuzbalaban, M., Ozdaglar, A., and Parrilo, P. A. (2017). On the convergence rate of incremental aggregated gradient algorithms. SIAM Journal on Optimization , 27(2):1035–1048."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib18",
+      "text": "Dutta et al., (2018) Dutta, S., Joshi, G., Ghosh, S., Dube, P., and Nagpurkar, P. (2018). Slow and stale gradients can win the race: Error-runtime trade-offs in distributed sgd. In International conference on artificial intelligence and statistics , pages 803–812. PMLR."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib14",
+      "text": "Cohen et al., (2021) Cohen, A., Daniely, A., Drori, Y., Koren, T., and Schain, M. (2021). Asynchronous stochastic optimization robust to arbitrary delays. Advances in Neural Information Processing Systems , 34:9024–9035."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib22",
+      "text": "Glasgow and Wootters, (2022) Glasgow, M. R. and Wootters, M. (2022). Asynchronous distributed optimization with stochastic delays. In International Conference on Artificial Intelligence and Statistics , pages 9247–9279. PMLR."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib30",
+      "text": "Nguyen et al., (2022) Nguyen, J., Malik, K., Zhan, H., Yousefpour, A., Rabbat, M., Malek, M., and Huba, D. (2022). Federated learning with buffered asynchronous aggregation. In International Conference on Artificial Intelligence and Statistics , pages 3581–3607. PMLR."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib11",
+      "text": "(11) Chen, M., Bai, Y., Poor, H. V., and Wang, M. (2023a). Efficient RL with impaired observability: Learning to act with delayed and missing state observations. arXiv preprint arXiv:2306.01243 ."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib28",
+      "text": "Mnih et al., (2016) Mnih, V., Badia, A. P., Mirza, M., Graves, A., Lillicrap, T., Harley, T., Silver, D., and Kavukcuoglu, K. (2016). Asynchronous methods for deep reinforcement learning. In International conference on machine learning , pages 1928–1937. PMLR."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib2",
+      "text": "Arjevani et al., (2020) Arjevani, Y., Shamir, O., and Srebro, N. (2020). A tight convergence analysis for stochastic gradient descent with delayed updates. In Algorithmic Learning Theory , pages 111–132. PMLR."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib36",
+      "text": "Stich and Karimireddy, (2020) Stich, S. U. and Karimireddy, S. P. (2020). The error-feedback framework: Better rates for sgd with delayed gradients and compressed updates. The Journal of Machine Learning Research , 21(1):9613–9648."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib20",
+      "text": "Feyzmahdavian et al., (2014) Feyzmahdavian, H. R., Aytekin, A., and Johansson, M. (2014). A delayed proximal gradient method with linear convergence rate. In 2014 IEEE international workshop on machine learning for signal processing (MLSP) , pages 1–6. IEEE."
+    }
+  ]
+}

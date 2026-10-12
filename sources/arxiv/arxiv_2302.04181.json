@@ -1,0 +1,150 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2302.04181",
+  "title": "Attending to Graph Transformers",
+  "authors": "Luis MÃ¼ller, Mikhail Galkin, Christopher Morris, Ladislav RampÃ¡Å¡ek",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.AI",
+    "cs.NE"
+  ],
+  "url": "https://arxiv.org/abs/2302.04181",
+  "html_url": "https://arxiv.org/html/2302.04181",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1089,
+  "text": "Graph-structured data are prevalent across application domains ranging from chemo- and bioinformatics [1,2] to image [3] and social-network analysis [4], underlining the importance of machine learning methods for graph data. In recent years, (message-passing) graph neural networks (GNNs) [5,6,7] were the dominant paradigm in machine learning for graphs. However, with the rise of transformer architectures [8] in natural language processing [9] and computer vision [10], recently, a large number of works in the field focused on designing transformer architectures capable of dealing with graphs, so-called graph transformers (GTs).\n\nGraph transformers have already shown promising performance [11], e.g., by topping the leaderboard of the OGB Large-Scale Challenge [12,13] in the molecular property prediction track. The superiority of GTs over standard GNN architecture is often explained by GNNs’ bias towards encoding local structure and being unable to capture global or long-range information, often attributed to phenomena such as over-smoothing [14], under-reaching [15], and over-squashing [16,17]. Many papers [18] speculate that GTs do not suffer from such effects as they aggregate information over all nodes in a given graph and hence are not limited to local structure bias. However, to make GTs aware of graph structure, one has to equip them with so-called structural and positional encodings. Here, structural encodings are, e.g., additional node features to make the GT aware of (sub-)graph structure. In contrast, positional encodings make a node aware of its position in the graph concerning the other nodes.\n\n## Present Work.\n\nHere, we derive a taxonomy of state-of-the-art GT architectures, giving an organized overview of recent developments. In addition, we survey common positional and structural encodings and clarify how they are related to GTs’ theoretical properties, e.g., their expressive power to capture graph structure. Additionally, we investigate these properties empirically by probing how well GTs can recover various graph properties, deal with heterophilic graphs, and to what extent GTs alleviate the over-squashing phenomenon. Further, we outline open challenges and research directions to stimulate future work. Our categorization, theoretical clarification, and experimental study present a useful handbook for the GT and the broader graph machine-learning community. We hope that its insights and principles will help spur novel research results and avenues.\n\n## Related Work.\n\nSince GTs emerged recently, only a few surveys exist. Notably, [19] provide a high-level overview of some of the recent GT architectures. Different from the present work, they do not discuss GTs’ theoretical and practical shortcomings and miss out on recent architectural advancements. [20] gives an overview of GTs for computer vision. Finally, [18] provide a general recipe for classifying GT architectures, focusing on devising empirically well-performing architectures rather than giving a detailed, principled overview of the literature.\n\n## 1.1 Background\n\nA graph G is a pair (V(G),E(G)) with a finite set of nodes V(G) and a set of edges E(G)\\subseteq\\{\\{u,v\\}\\subseteq V\\mid u\\neq v\\}. For ease of notation, we denote an edge \\{u,v\\} as (u,v) or (v,u). In the case of directed graphs, E(G)\\subseteq\\{(u,v)\\in V(G)^{2}\\mid u\\neq v\\}. Throughout the paper, we set n\\coloneqq|V(G)| and m\\coloneqq|E(G)|. A node-attributed graph G is a triple (V(G),E(G),\\mathbf{X}), where \\mathbf{X}\\in\\mathbb{R}^{n\\times d}, for d>0, is a node feature matrix and \\mathbf{X}_{v} is the node feature of node v\\in V(G). Similarly, we can represent edge features by an edge feature matrix \\mathbf{E}\\in\\mathbb{R}^{m\\times e}, for e>0, where \\mathbf{E}_{vw} is the edge feature of edge (v,w)\\in E(G). The neighborhood of v\\in V(G) is N(v)\\coloneqq\\{u\\in V(G)\\mid(v,u)\\in E(G)\\}. We say that two graphs G and H are isomorphic if there exists an edge-preserving bijection \\varphi\\colon V(G)\\to V(H), i.e., (u,v) is in E(G) if and only if (\\varphi(u),\\varphi(v)) is in E(H) for all u,v\\in V(G). We denote a multiset by \\{\\!\\!\\{\\dots\\}\\!\\!\\}.\n\n## Equivariance and Invariance.\n\nIdeally, machine learning models for graphs respect their symmetries, such as being agnostic to the node permutations or other (group) transformations, such as rotation, leading to the definitions of equivariance and invariance. In particular, we can expect better generalization for models respecting these symmetries [21]. In general [22], given a transformation \\mathbf{T}, a function f is equivariant if transforming the vector input \\mathbf{x} is equal to transforming the output of the function f, i.e., f(\\mathbf{T}\\mathbf{x})=\\mathbf{T}f(\\mathbf{x}). A function g is invariant if transforming the vector input \\mathbf{x} does not change the output, i.e., g(\\mathbf{T}\\mathbf{x})=g(\\mathbf{x}). In the 3D Euclidean space, 3D translations, rotations, and reflections form the E(3) group. Translation and rotation form the SE(3) group. Rotations form the SO(3) group, rotations and reflections form the O(3) group.\n\n## Graph Transformers.\n\nA transformer is a stack of alternating blocks of multi-head attention and fully-connected feed-forward networks. Let G be a graph with node feature matrix \\mathbf{X}\\in\\mathbb{R}^{n\\times d}. In each layer, t>0, given node feature matrix \\mathbf{X}^{(t)}\\in\\mathbb{R}^{n\\times d}, a single attention head computes\n\nwhere the softmax is applied row-wise, d_{k} denotes the feature dimension of the matrices \\mathbf{Q} and \\mathbf{K}, with \\mathbf{X}^{(0)}\\coloneqq\\mathbf{X}. Here, the matrices \\mathbf{Q},\\mathbf{K}, and \\mathbf{V} are the result of projecting \\mathbf{X}^{(t)} linearly,\n\nusing three matrices \\mathbf{W}_{Q},\\mathbf{W}_{K}\\in\\mathbb{R}^{d\\times d_{K}}, and \\mathbf{W}_{V}\\in\\mathbb{R}^{d\\times d}, with optional bias terms omitted for clarity. Now, multi-head attention \\mathsf{MultiHead}(\\mathbf{X}^{(t)}) concatenates multiple (single) attention heads, followed by an output projection to the feature space of \\mathbf{X}^{(t)}. By combining the above with additional residual connections and normalization, the transformer layer updates features \\mathbf{X}^{(t)} via\n\n## Graph Neural Networks.\n\nIntuitively, GNNs learn a vector representing each node in a graph by aggregating information from neighboring nodes. Formally, let G be a graph with node feature matrix \\mathbf{X}\\in\\mathbb{R}^{n\\times d}. A GNN architecture consists of a stack of neural network layers, i.e., a composition of permutation-equivariant parameterized functions. Each layer aggregates local neighborhood information, i.e., the neighbors’ features, around each node and then passes this aggregated information on to the next layer. Following [6] and [23], in each layer, t\\geq 0, we compute node features\n\nwhere \\mathsf{UPD}^{(t)} and \\mathsf{AGG}^{(t)} may be differentiable parameterized functions, e.g., neural networks. For example, GNNs often compute a vector for node v by using sum aggregation [24], i.e.,\n\nwhere \\sigma is a non-linearity applied in a point-wise fashion, \\mathbf{W}^{(t)}_{1} and \\mathbf{W}^{(t)}_{2}\\in\\mathbb{R}^{d\\times d} are parameter matrices, and \\mathbf{h}_{v}^{(0)}\\coloneqq\\mathbf{X}_{v}. As noticed by [25], we can rewrite attention as defined in Eq. 1 as\n\nfor v\\in V(G), where\n\nand obtain an aggregation reminiscent of a GNN. In fact, we may view a GT as a special GNN, operating on a complete graph, where the attention score weights the importance of each node during the sum aggregation. Conversely, [26] propose graph attention networks (GAT), a GNN that replaces sum aggregation with self-attention. We note that their definition of self-attention differs from Equation 1 in that GAT replaces the dot-product with concatenation and subsequent linear projection.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib3",
+      "text": "Barabasi & Oltvai (2004) Albert-Laszlo Barabasi and Zoltan N Oltvai. Network biology: understanding the cell’s functional organization. Nature Reviews Genetics , 5(2):101–113, 2004."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib72",
+      "text": "Reiser et al. (2022) Patrick Reiser, Marlen Neubert, André Eberhard, Luca Torresi, Chen Zhou, Chen Shao, Houssam Metni, Clint van Hoesel, Henrik Schopmans, Timo Sommer, et al. Graph neural networks for materials science and chemistry. Communications Materials , 3(1):93, 2022."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib79",
+      "text": "Simonovsky & Komodakis (2017) Martin Simonovsky and Nikos Komodakis. Dynamic edge-conditioned filters in convolutional neural networks on graphs. In CVPR , pp. 29–38, 2017."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib24",
+      "text": "Easley & Kleinberg (2010) David Easley and Jon Kleinberg. Networks, Crowds, and Markets: Reasoning About a Highly Connected World . Cambridge University Press, 2010."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib10",
+      "text": "Chami et al. (2022) Ines Chami, Sami Abu-El-Haija, Bryan Perozzi, Christopher Ré, and Kevni Murphy. Machine learning on graphs: A model and comprehensive taxonomy. JMLR , pp. 1–64, 2022."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib30",
+      "text": "Gilmer et al. (2017) Justin Gilmer, Samuel S. Schoenholz, Patrick F. Riley, Oriol Vinyals, and George E. Dahl. Neural message passing for quantum chemistry. In ICML , pp. 1263–1272, 2017."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib64",
+      "text": "Morris et al. (2021) C. Morris, Y. L., H. Maron, B. Rieck, N. M. Kriege, M. Grohe, M. Fey, and K. Borgwardt. Weisfeiler and Leman go machine learning: The story so far. ArXiv , 2021."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib83",
+      "text": "Vaswani et al. (2017) Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Lukasz Kaiser, and Illia Polosukhin. Attention is all you need. In NeurIPS , pp. 5998–6008, 2017."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib53",
+      "text": "Lin et al. (2021b) Tianyang Lin, Yuxin Wang, Xiangyang Liu, and Xipeng Qiu. A survey of transformers. ArXiv , 2021b."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib31",
+      "text": "Han et al. (2022) Kai Han, Yunhe Wang, Hanting Chen, Xinghao Chen, Jianyuan Guo, Zhenhua Liu, Yehui Tang, An Xiao, Chunjing Xu, Yixing Xu, et al. A survey on vision transformer. TPAMI , 2022."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib92",
+      "text": "Ying et al. (2021) Chengxuan Ying, Tianle Cai, Shengjie Luo, Shuxin Zheng, Guolin Ke, Di He, Yanming Shen, and Tie-Yan Liu. Do transformers really perform badly for graph representation? In NeurIPS , 2021."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib35",
+      "text": "Hu et al. (2021) Weihua Hu, Matthias Fey, Hongyu Ren, Maho Nakata, Yuxiao Dong, and Jure Leskovec. OGB-LSC: A large-scale challenge for machine learning on graphs. In NeurIPS: Datasets and Benchmarks Track , 2021."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib60",
+      "text": "Masters et al. (2022) Dominic Masters, Josef Dean, Kerstin Klaser, Zhiyi Li, Sam Maddrell-Mander, Adam Sanders, Hatem Helal, Deniz Beker, Ladislav Rampášek, and Dominique Beaini. GPS++: an optimised hybrid MPNN/transformer for molecular property prediction. ArXiv , 2022."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib49",
+      "text": "Li et al. (2018) Qimai Li, Zhichao Han, and Xiao-Ming Wu. Deeper insights into graph convolutional networks for semi-supervised learning. In AAAI , pp. 3538–3545, 2018."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib4",
+      "text": "Barceló et al. (2020) Pablo Barceló, Egor V. Kostylev, Mikael Monet, Jorge Pérez, Juan Reutter, and Juan Pablo Silva. The logical expressiveness of graph neural networks. In ICLR , 2020."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib1",
+      "text": "Alon & Yahav (2021) Uri Alon and Eran Yahav. On the bottleneck of graph neural networks and its practical implications. In ICLR , 2021."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib19",
+      "text": "Di Giovanni et al. (2023) Francesco Di Giovanni, Lorenzo Giusti, Federico Barbero, Giulia Luise, Pietro Lio, and Michael M. Bronstein. On over-squashing in message passing neural networks: The impact of width, depth, and topology. In ICML , pp. 7865–7885, 2023."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib71",
+      "text": "Rampášek et al. (2022) Ladislav Rampášek, Mikhail Galkin, Vijay Prakash Dwivedi, Anh Tuan Luu, Guy Wolf, and Dominique Beaini. Recipe for a General, Powerful, Scalable Graph Transformer. In NeurIPS , 2022."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib62",
+      "text": "Min et al. (2022a) Erxue Min, Runfa Chen, Yatao Bian, Tingyang Xu, Kangfei Zhao, Wenbing Huang, Peilin Zhao, Junzhou Huang, Sophia Ananiadou, and Yu Rong. Transformer for graphs: An overview from architecture perspective. ArXiv , 2022a."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib11",
+      "text": "Chen et al. (2022a) Chaoqi Chen, Yushuang Wu, Qiyuan Dai, Hong-Yu Zhou, Mutian Xu, Sibei Yang, Xiaoguang Han, and Yizhou Yu. A survey on graph neural networks and graph transformers in computer vision: A task-oriented perspective. ArXiv , 2022a."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib69",
+      "text": "Petrache & Trivedi (2023) Mircea Petrache and Shubhendu Trivedi. Approximation-generalization trade-offs under (approximate) group equivariance. In NeurIPS , 2023."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib27",
+      "text": "Fuchs et al. (2021) Fabian B. Fuchs, Edward Wagstaff, Justas Dauparas, and Ingmar Posner. Iterative SE(3)-Transformers. In Geometric Science of Information , pp. 585–595, 2021."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib75",
+      "text": "Scarselli et al. (2009) F. Scarselli, M. Gori, A. C. Tsoi, M. Hagenbuchner, and G. Monfardini. The graph neural network model. IEEE Transactions on Neural Networks , 20(1):61–80, 2009."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib65",
+      "text": "Morris et al. (2019) Christopher Morris, Martin Ritzert, Matthias Fey, William L. Hamilton, Jan Eric Lenssen, Gaurav Rattan, and Martin Grohe. Weisfeiler and leman go neural: Higher-order graph neural networks. In AAAI , pp. 4602–4609, 2019."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib61",
+      "text": "Mialon et al. (2021) Grégoire Mialon, Dexiong Chen, Margot Selosse, and Julien Mairal. GraphiT: Encoding graph structure in transformers. ArXiv , 2021."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib84",
+      "text": "Veličković et al. (2018) Petar Veličković, Guillem Cucurull, Arantxa Casanova, Adriana Romero, Pietro Liò, and Yoshua Bengio. Graph attention networks. In ICLR , 2018."
+    }
+  ]
+}

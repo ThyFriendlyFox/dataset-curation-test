@@ -1,0 +1,93 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2311.13612",
+  "title": "Descriptor and Word Soups: Overcoming the Parameter Efficiency Accuracy Tradeoff for Out-of-Distribution Few-shot Learning",
+  "authors": "Christopher Liao, Theodoros Tsiligkaridis, Brian Kulis",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2311.13612",
+  "html_url": "https://arxiv.org/html/2311.13612",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 796,
+  "text": "## Problem Setting\n\nThere is extensive interest from the computer vision community for training classifiers that are robust to distribution shifts. Pioneering works in this area [1,2,3] focused on optimizing for simple shifts in the image distribution, such as sketch-to-real adaptation. As the topic evolved, the community proposed increasingly harder adaptation problems by eliminating some restrictive assumptions. For the domain generalization (DG) problem [4,5], we do not assume access to unlabeled target data; for the cross-dataset generalization (XD) problem [6], we allow source and target label spaces to be different; and for the parameter efficient learning (PEFT) problem [7,8,9], we impose a tight budget on the number of parameters that can be tuned. Our work lies at the confluence of these three topics. Similar to CoOp [6] and MaPLe [10], we do assume access to labeled few-shot generic source data, such as ImageNet. Since we assume nothing about the relationship between source and target datasets, this setting can be more useful in practice than strict zero-shot learning. In this paper, we propose two parameter efficient few-shot methods, called word and descriptor soups, that finetune vision-language (VL) models to generalize to target datasets which may contain unseen labels and/or shifts in the image distribution. Our methods achieve state-of-the-art on some benchmarks without additional gradient-based tuning, but can also improve state-of-the-art gradient-based finetuning methods with an additional diversity loss.\n\n## Motivation\n\nOur work is motivated by the recent success of classification by description methods [11,12,13] in both zero-shot (ZS) classification and open-vocabulary object detection. These methods ask an LLM like GPT to generate a list of short descriptions for each class, then aggregate predictions from the descriptions to improve ZS accuracy, see Fig. 1 (a). It is often claimed that the impressive gain in ZS accuracy comes from additional information given by the GPT descriptions. However, a recent study called WaffleCLIP [14] observed that random descriptors or even strings of random words can achieve similar ZS accuracy to GPT descriptors, when ensembled together (see Fig. 7). Therefore, gains in ZS accuracy achieved by descriptor methods are mostly driven by ensembling rather than the content of the descriptors themselves. Inspired by this observation, we propose descriptor and word soups, two methods which outperform WaffleCLIP by selecting descriptors or chains of words that maximize few-shot accuracy. Word soup has 3 advantages: (1) it outperforms existing descriptor-inspired ZS methods in the few-shot OOD setting since it directly maximizes classification accuracy (see Fig. 1 (c)); (2) it is more parameter efficient than existing few-shot methods since the model is frozen and only the discrete descriptor tokens need to be stored; and (3) it does not require an LLM. The pros and cons of both descriptor and word soups are concisely stated in Figure 1 and discussed more in the method section.\n\n## Method Overview\n\nAccording to the above motivation, we design a progression of three methods: descriptor soup, word soup, and word soup training with diversity loss. These methods build upon each other but can be used independently and in combination with prior methods. We opted for this style of presentation, since there are motivating empirical insights at each stage, and each method achieves state-of-the-art depending on resource constraints (such as availability of an LLM at training time or parameter storage budget). Descriptor soup is loosely inspired by model soups [15]; “soup” refers to a set of descriptors. We calculate an aggregate prediction based on the centroid of descriptors in the soup. We start with the most accurate descriptor on the training data and greedily add descriptors to the soup if training accuracy increases, see Fig. 1 (b). Similarly, for word soups, we assemble a chain of words by greedily appending a word if it increases the training accuracy of the word chain, see Fig. 1 (c). Finally, we present a diversity loss that can be used to optimize the CLIP model, using the word soup as an initialization. This loss is required to maintain the initial diversity among word soup members throughout finetuning.\n\n## Contributions\n\nWe make the following contributions to the computer vision literature:\n\n- • We present word soup, which improves SoTA on few-shot cross-dataset (XD) and domain-generalization (DG) benchmarks by 1% and 0.8% resp.\n\n- • Our word soup uses fewer parameters than SoTA parameter efficient methods while achieving higher accuracy than parameter-free ZS methods in both few-shot settings.\n\n- • We propose a diversity loss to train VL models initialized with word soup. This allows our method to seamlessly combine with prior few-shot finetuning methods.\n\n- • We present qualitative results (e.g. Tab. 1) to understand what is means for a descriptor to be “good”, and analyze the generalizability of these descriptors (Fig. 5). These results extend the current understanding of how descriptor and prompting methods work.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib23",
+      "text": "Guoliang Kang, Lu Jiang, Yi Yang, and Alexander G Hauptmann. Contrastive adaptation network for unsupervised domain adaptation. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 4893–4902, 2019."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib67",
+      "text": "Yuchen Zhang, Tianle Liu, Mingsheng Long, and Michael Jordan. Bridging theory and algorithm for domain adaptation. In International conference on machine learning , pages 7404–7413. PMLR, 2019."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib47",
+      "text": "Kuniaki Saito, Donghyun Kim, Stan Sclaroff, Trevor Darrell, and Kate Saenko. Semi-supervised domain adaptation via minimax entropy. In Proceedings of the IEEE/CVF international conference on computer vision , pages 8050–8058, 2019."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib68",
+      "text": "Kaiyang Zhou, Ziwei Liu, Yu Qiao, Tao Xiang, and Chen Change Loy. Domain generalization: A survey. IEEE Transactions on Pattern Analysis and Machine Intelligence , 2022a."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib55",
+      "text": "Kevin Vogt-Lowell, Noah Lee, Theodoros Tsiligkaridis, and Marc Vaillant. Robust fine-tuning of vision-language models for domain generalization. In IEEE High Performance Extreme Computing Conference (HPEC) , 2023."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib70",
+      "text": "Kaiyang Zhou, Jingkang Yang, Chen Change Loy, and Ziwei Liu. Learning to prompt for vision-language models. International Journal of Computer Vision , 130(9):2337–2348, 2022c."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib20",
+      "text": "Menglin Jia, Luming Tang, Bor-Chun Chen, Claire Cardie, Serge Belongie, Bharath Hariharan, and Ser-Nam Lim. Visual prompt tuning. In European Conference on Computer Vision , pages 709–727. Springer, 2022."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib57",
+      "text": "Zifeng Wang, Zizhao Zhang, Chen-Yu Lee, Han Zhang, Ruoxi Sun, Xiaoqi Ren, Guolong Su, Vincent Perot, Jennifer Dy, and Tomas Pfister. Learning to prompt for continual learning. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 139–149, 2022."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib37",
+      "text": "Laura Niss, Kevin Vogt-Lowell, and Theodoros Tsiligkaridis. Quantified task misalignment to inform PEFT: An exploration of domain generalization and catastrophic forgetting in CLIP. In ICLR 2024 Workshop on Mathematical and Empirical Understanding of Foundation Models , 2024."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib25",
+      "text": "Muhammad Uzair Khattak, Hanoona Rasheed, Muhammad Maaz, Salman Khan, and Fahad Shahbaz Khan. Maple: Multi-modal prompt learning. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 19113–19122, 2023a."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib35",
+      "text": "Sachit Menon and Carl Vondrick. Visual classification via description from large language models. arXiv preprint arXiv:2210.07183 , 2022."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib42",
+      "text": "Sarah Pratt, Ian Covert, Rosanne Liu, and Ali Farhadi. What does a platypus look like? generating customized prompts for zero-shot image classification. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 15691–15701, 2023."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib24",
+      "text": "Prannay Kaul, Weidi Xie, and Andrew Zisserman. Multi-modal classifiers for open-vocabulary object detection. arXiv preprint arXiv:2306.05493 , 2023."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib45",
+      "text": "Karsten Roth, Jae Myung Kim, A Koepke, Oriol Vinyals, Cordelia Schmid, and Zeynep Akata. Waffling around for performance: Visual classification with random words and broad concepts. arXiv preprint arXiv:2306.07282 , 2023."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib58",
+      "text": "Mitchell Wortsman, Gabriel Ilharco, Samir Ya Gadre, Rebecca Roelofs, Raphael Gontijo-Lopes, Ari S Morcos, Hongseok Namkoong, Ali Farhadi, Yair Carmon, Simon Kornblith, et al. Model soups: averaging weights of multiple fine-tuned models improves accuracy without increasing inference time. In International Conference on Machine Learning , pages 23965–23998. PMLR, 2022a."
+    }
+  ]
+}

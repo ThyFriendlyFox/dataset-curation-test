@@ -1,0 +1,54 @@
+{
+  "source_type": "encyclopedia_article",
+  "source_id": "enwiki:Bounding volume hierarchy#rev1375585542",
+  "title": "Bounding volume hierarchy",
+  "authors": "Wikipedia contributors",
+  "year": "2026",
+  "url": "https://en.wikipedia.org/w/index.php?title=Bounding_volume_hierarchy&oldid=1375585542",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Usage",
+  "word_count": 727,
+  "text": "### Ray tracing\n\nBVHs are often used in ray tracing to eliminate potential intersection candidates within a scene by omitting geometric objects located in bounding volumes which are not intersected by the current ray.[1] Additionally, as a common performance optimization, when only the closest intersection of the ray is of interest, while the ray tracing traversal algorithm is descending nodes, and multiple child nodes intersect the ray, the traversal algorithm will consider the closer volume first, and if it finds an intersection there, which is definitively closer than any possible intersection in a second (or other) volume (i.e., volumes are non-overlapping), it can safely ignore the second volume. This only requires a small change in line 11-12 of the above pseudo-code. Similar optimizations during BVH traversal can be employed when descending into child volumes of the second volume, to restrict further search space and thus reduce traversal time.\n\nAdditionally, many specialized methods were developed for BVHs, especially ones based on AABB (axis-aligned bounding boxes), such as parallel building, SIMD accelerated traversal, good split heuristics (SAH - surface-area heuristic is often used in ray tracing), wide trees (4-ary and 16-ary trees provide some performance benefits, both in build and query performance for practical scenes), and quick structure update (in real time applications objects might be moving or deforming spatially relatively slowly or be still, and same BVH can be updated to be still valid without doing a full rebuild from scratch).\n\n### Scene-graph management\n\nBVHs also naturally support inserting and removing objects without full rebuild, but with resulting BVH having usually worse query performance compared to full rebuild. To solve these problems (as well as quick structure update being sub-optimal), the new BVH could be built asynchronously in parallel or synchronously, after sufficient change is detected (leaf overlap is big, number of insertions and removals crossed the threshold, and other more refined heuristics).\n\nBVHs can also be combined with scene graph methods, and geometry instancing, to reduce memory usage, improve structure update and full rebuild performance, as well as guide better object or primitive splitting.\n\n### Collision detection\n\nBVHs are often used for accelerating collision detection computation. In the context of cloth simulation, BVHs are used to compute collision between a cloth and itself as well as with other objects.[2]\n\n### Distance calculation between set of objects\n\nAnother use case for BVH is pair-wise distance computation. A naive approach to find the minimum distance between two set of objects would compute the distance between all of the pair-wise combinations. A BVH allows one to prune many of the comparisons without needing to compute distance between all the objects. Pseudo code for computing pairwise distance between two set of objects and approaches for building BVH, well suited for distance calculation is discussed here [3]\n\n### Hardware-enabled BVH acceleration\n\n### Accelerating ray tracing\n\nBVH can significantly accelerate ray tracing applications by reducing the number of ray-surface intersection calculations. Hardware implementation of BVH operations such as traversal can further accelerate ray-tracing. Currently, real-time ray tracing is available on multiple platforms. Hardware implementation of BVH is one of the key innovations making it possible.\n\n### Nvidia RT Cores\n\nIn 2018, Nvidia introduced RT Cores with their Turing GPU architecture as part of the RTX platform. RT Cores are specialized hardware units designed to accelerate BVH traversal and ray-triangle intersection tests.[4]\n\nThe combination of these key features enables real-time ray tracing that can be use for video games.[5] as well as design applications.\n\n### AMD RDNA 2/3\n\nAMD's RDNA (Radeon DNA) architecture, introduced in 2019, has incorporated hardware-accelerated ray tracing since its second iteration, RDNA 2. The architecture uses dedicated hardware units called Ray Accelerators to perform ray-box and ray-triangle intersection tests, which are crucial for traversing Bounding Volume Hierarchies (BVH).[6] In RDNA 2 and 3, the shader is responsible for traversing the BVH, while the Ray Accelerators handle intersection tests for box and triangle nodes.[7]\n\n### Usage of HW enabled BVH beyond ray tracing\n\nOriginally designed to accelerate ray tracing, researchers are now exploring ways to leverage fast BVH traversal to speed up other applications. These include determining the containing tetrahedron for a point,[8] enhancing granular matter simulations,[9] and performing nearest neighbor calculations.[10] Some methods repurpose Nvidia's RT core components by reframing these tasks as ray-tracing problems.[9] This direction seems promising as substantial speedups in performance are reported across the various applications.",
+  "references": [
+    {
+      "n": 1,
+      "text": "Günther, J.. (2007). 2007 IEEE Symposium on Interactive Ray Tracing. IEEE. doi:10.1109/RT.2007.4342598"
+    },
+    {
+      "n": 2,
+      "text": "Bridson, Robert. (25 June 1997). Robust treatment of collisions, contact and friction for cloth animation. ACM Trans. Graph.. doi:10.1145/566654.566623"
+    },
+    {
+      "n": 3,
+      "text": "Ytterlid, Robin. (January 27, 2015). BVH Split Strategies for Fast Distance Queries. Journal of Computer Graphics Techniques. http://jcgt.org/published/0004/01/01/"
+    },
+    {
+      "n": 4,
+      "text": "NVIDIA Turing GPU Architecture. NVIDIA. https://www.nvidia.com/content/dam/en-zz/Solutions/design-visualization/technologies/turing-architecture/NVIDIA-Turing-Architecture-Whitepaper.pdf"
+    },
+    {
+      "n": 5,
+      "text": "The NVIDIA Turing GPU Architecture Deep Dive: Prelude to GeForce RTX. AnandTech. https://www.anandtech.com/show/13282/nvidia-turing-architecture-deep-dive"
+    },
+    {
+      "n": 6,
+      "text": "(27 December 2020). RDNA 2 hardware raytracing. Interplay of Light. https://interplayoflight.wordpress.com/2020/12/27/rdna-2-hardware-raytracing/"
+    },
+    {
+      "n": 7,
+      "text": "(2023-03-22). Raytracing on AMD's RDNA 2/3, and Nvidia's Turing and Pascal. Chips and Cheese. https://chipsandcheese.com/p/raytracing-on-amds-rdna-2-3-and-nvidias-turing-and-pascal"
+    },
+    {
+      "n": 8,
+      "text": "Wald, Ingo. (2019). RTX Beyond Ray Tracing: Exploring the Use of Hardware Ray Tracing Cores for Tet-Mesh Point Location. High-Performance Graphics - Short Papers. doi:10.2312/HPG.20191189"
+    },
+    {
+      "n": 9,
+      "text": "Zhao, Shiwei. (November 1, 2023). Revolutionizing granular matter simulations by high-performance ray tracing discrete element method for arbitrarily-shaped particles. Computer Methods in Applied Mechanics and Engineering. doi:10.1016/j.cma.2023.116370"
+    },
+    {
+      "n": 10,
+      "text": "Zhu, Yuhao. (2022-04-02). Proceedings of the 27th ACM SIGPLAN Symposium on Principles and Practice of Parallel Programming. ACM. doi:10.1145/3503221.3508409"
+    }
+  ]
+}

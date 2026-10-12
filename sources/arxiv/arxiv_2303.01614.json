@@ -1,0 +1,230 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2303.01614",
+  "title": "STEP: Stochastic Traversability Evaluation and Planning for Risk-Aware Off-road Navigation; Results from the DARPA Subterranean Challenge",
+  "authors": "Anushri Dixit, David D. Fan, Kyohei Otsu, Sharmita Dey, Ali-Akbar Agha-Mohammadi, Joel W. Burdick",
+  "year": "2023",
+  "categories": [
+    "cs.RO",
+    "cs.SY",
+    "eess.SY"
+  ],
+  "url": "https://arxiv.org/abs/2303.01614",
+  "html_url": "https://arxiv.org/html/2303.01614",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1164,
+  "text": "Robust autonomous traversal over extreme, hazardous terrain is an open problem with many applications to extra-terrestrial [1], disaster-struck [2], and subterranean environments [3]. The robots operate in uneven and highly risky terrain based on the use of noisy sensor measurements and localization uncertainty. Autonomous motion planning in such conditions requires a framework that can account for the traversability risk arising from sources like rubble, sudden drops, muddy/slippery areas, while also considering the uncertainty in the robots estimates. The framework must be able to make tractable reformulations of the nonconvex constraints arising from these risks so that it can plan reactive motions in real time.\n\nIn this work, our evaluation of a terrain’s traversability accounts for the hazards from the uneven terrain (geometric, confidence-aware analysis) and type of terrain (semantic analysis), see Figure 1. We will treat this traversability cost as a random variable and account for the uncertainty in the traversability cost using Conditional Value-at-Risk (CVaR). Using the CVaR assessment of the terrain, we obtain a geometric path and a low-level model predictive control (MPC) plan that accounts for the risk in the terrain.\n\nMost traversability analyses are dependent on the types of sensors used to obtain information of the terrain, and are based on geometry, appearance, or proprioceptive methods [4]. Geometry-based methods often rely on building a 2.5D terrain map which is used to extract features such as maximum, minimum, and variance of the terrain height and slope [5]. Planning algorithms for such methods take into account the stability of the robot on the terrain [6]. In [7,8], the authors estimate the probability distributions of states based on the kinematic model of the vehicle and the terrain height uncertainty. Furthermore, a method for incorporating sensor and state uncertainty to obtain a probabilistic terrain estimate in the form of a grid-based elevation map was considered in [9]. Learning-based traversability frameworks are becoming increasingly popular. In [10], the authors proposed an inverse reinforcement learning-based method for learning the traversability cost from raw exterioceptive and proprioceptive sensor measurements. In [11], the authors learn a speed-map representation given semantic information while in [12], the authors use a self-supervised learning-based terrain roughness classifier. In [13], the authors proposed a neural network architecture for learning the distribution of traversability costs arising from geometric risks using the pointcloud obtained from a LiDAR in a supervised manner. In this paper, we build upon the traversability analyses of classical geometric methods, while using semantic information from a LiDAR and incorporating the uncertainty of these methods for risk-aware planning [14,15,16].\n\nRisk can be incorporated into motion planning using a variety of different methods, including chance constraints [1,17], exponential utility functions [18], distributional robustness [19,20], and quantile regression [21,22]. Risk measures, often used in finance and operations research, provide a mapping from a random variable (usually the cost) to a real number. These risk metrics should satisfy certain axioms in order to be well-defined as well as to enable practical use in robotic applications [23]. Conditional value-at-risk (CVaR) is one such risk measure that has this desirable set of properties, and is a part of a class of risk metrics known as coherent risk measures [24]. Coherent risk measures have been used in a variety of decision making problems, especially Markov decision processes (MDPs) [25,26,27,28]. Coherent risk measures have been used in a MPC framework when the system model is uncertain [29,30], when the uncertainty is a result of measurement noise or moving obstacles [31,32], and when the uncertainty arises from both measurement and process noise [33]. Our work extends CVaR risk to a risk-based planning framework which utilizes different sources of traversability risk (such as collision risk, step risk, slippage risk, etc.) Morever, this paper introduces the first field-hardened and theoretically grounded approach to traversability assessment and risk-constrained planning using CVaR metrics. Using CVaR to assess traversability risks allows us to dynamically tune the entire system’s behavior - from aggressive to highly conservative - by changing a single value, the risk level. When the value of the risk level is small, the behavior of the traversability assessment is equivalent to an expectation-based assessment, which is similar to the geometric traversability evaluation in the past literature. Conversely, when the risk level is high, we account for the worst possible value of our terrain assessment given the uncertainty in our measurements.\n\nModel Predictive Control has long been used to robustly control more complex systems, including time-varying, nonlinear, or MIMO systems [34]. While simple linear PID controllers are sufficient for simpler systems, MPC is well-suited to more complex tasks while being computationally feasible - MPC can account for the nonlinear robot dynamics while making multi-step predictions of the trajectory followed by the robot, and incorporating complex state and control constraints such as CVaR constraints, obstacle avoidance constraints, and non-holonomic constraints. Hence, MPC provides an optimization-based framework to mimic a suboptimal infinite-horizon controller while being computationally tractable. In particular, we employ Sequential Quadratic Programming (SQP), which iteratively solves locally quadratic sub-problems to converge to a globally (more) optimal solution [35]. This approach reduces computational costs and flexibility for handling a wide variety of costs and constraints [36,37,38,39,40]. A common criticism of SQP-based MPC methods (and nonlinear MPC methods in general) is that they are susceptible to local minima. We address this problem by incorporating a trajectory library (which can be predefined and/or randomly generated, e.g. as in [41]) to use in a preliminary trajectory selection process. This approach finds more globally optimal initial guesses for the SQP problem to refine locally. Another common difficulty with risk-constrained nonlinear MPC problems is ensuring recursive feasibility [42]. We bystep this problem by dynamically relaxing the severity of the risk constraints while penalizing CVaR in the cost function.\n\nIn this work, we propose STEP (Stochastic Traversability Evaluation and Planning), that pushes the boundaries of the state-of-the-practice to enable safe, risk-aware, and high-speed ground traversal of unknown environments. Specifically, our contributions include:\n\n- 1. Uncertainty-aware 2.5D traversability evaluation which accounts for localization error, sensor noise, and occlusion, and combines multiple sources of traversability risk.\n\n- 2. An approach for combining these traversability risks into a unified risk-aware CVaR planning framework.\n\n- 3. A highly efficient MPC architecture for robustly solving non-convex risk-constrained optimal control problems.\n\n- 4. A suite of recovery behaviors to account for fast response to failure scenarios.\n\n- 5. Risk-based gait adaptation for quadrupedal robots (in our case, the Boston Dynamics Spot platform).\n\n- 6. Real-world demonstration of real-time CVaR planning on wheeled and legged robotic platforms in unknown and risky environments.\n\nThis work significantly extends our previous work [16] to incorporate semantic and confidence-aware traversability risk sources in addition to geometric ones to provide a complete suite of traversability analyses using LiDARs. Further, we provide recovery behaviors in our hierarchical planning framework to account for high-risk situations that the geometric and kinodynamic planners fail to account for. Lastly, we also provide risk-aware gait selection techniques for quadrupedal robots. This hierarchical framework is tested extensively in multiple subterranean environments.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bibx42",
+      "text": "Masahiro Ono, Marco Pavone, Kuwata Kuwata and J.(Bob) Balaram “Chance-constrained dynamic programming with application to risk-aware robotic space exploration” In Autonomous Robots 39.4 , 2015, pp. 555–571"
+    },
+    {
+      "n": 2,
+      "id": "bib.bibx1",
+      "text": "A. Agha-mohammadi, et al. “NeBula: Quest for robotic autonomy in challenging environments; TEAM CoSTAR at the DARPA Subterranean Challenge” In Field Robotics , 2021"
+    },
+    {
+      "n": 3,
+      "id": "bib.bibx34",
+      "text": "Himangshu Kalita, Steven Morad, Aaditya Ravindran and Jekan Thangavelautham “Path planning and navigation inside off-world lava tubes and caves” In IEEE/ION Position, Location and Navigation Symposium , 2018, pp. 1311–1318"
+    },
+    {
+      "n": 4,
+      "id": "bib.bibx45",
+      "text": "Panagiotis Papadakis “Terrain traversability analysis methods for unmanned ground vehicles: A survey” In Engineering Applications of Artificial Intelligence 26.4 , 2013, pp. 1373–1385"
+    },
+    {
+      "n": 5,
+      "id": "bib.bibx28",
+      "text": "Steven Goldberg, Mark Maimone and Larry Matthies “Stereo vision and rover navigation software for planetary exploration” In IEEE Aerospace Conference , 2002 IEEE"
+    },
+    {
+      "n": 6,
+      "id": "bib.bibx29",
+      "text": "Alain Haït, Thierry Simeon and Michel Taïx “Algorithms for rough terrain trajectory planning” In Advanced Robotics 16.8 Taylor & Francis, 2002, pp. 673–699"
+    },
+    {
+      "n": 7,
+      "id": "bib.bibx43",
+      "text": "Kyohei Otsu et al. “Fast approximate clearance evaluation for rovers with articulated suspension systems” In Journal of Field Robotics 37 Wiley Online Library, 2020, pp. 768–785"
+    },
+    {
+      "n": 8,
+      "id": "bib.bibx27",
+      "text": "S. Ghosh, K. Otsu and M. Ono “Probabilistic Kinematic State Estimation for Motion Planning of Planetary Rovers” In IEEE/RSJ International Conference on Intelligent Robots and Systems , 2018, pp. 5148–5154"
+    },
+    {
+      "n": 9,
+      "id": "bib.bibx23",
+      "text": "Péter Fankhauser, Michael Bloesch and Marco Hutter “Probabilistic Terrain Mapping for Mobile Robots With Uncertain Localization” In IEEE Robotics and Automation Letters 3.4 , 2018, pp. 3019–3026"
+    },
+    {
+      "n": 10,
+      "id": "bib.bibx26",
+      "text": "Lu Gan, Jessy Grizzle, Ryan Eustice and Maani Ghaffari “Energy-Based Legged Robots Terrain Traversability Modeling via Deep Inverse Reinforcement Learning” In IEEE Robotics and Automation Letters 7.4 IEEE, 2022, pp. 8807–8814"
+    },
+    {
+      "n": 11,
+      "id": "bib.bibx10",
+      "text": "Xiaoyi Cai, Michael Everett, Jonathan Fink and Jonathan How “Risk-Aware Off-Road Navigation via a Learned Speed Distribution Map” In arXiv preprint arXiv:2203.13429 , 2022"
+    },
+    {
+      "n": 12,
+      "id": "bib.bibx39",
+      "text": "Travis Manderson, Stefan Wapnick, David Meger and Gregory Dudek “Learning to drive off road on smooth terrain in unstructured environments using an on-board camera and sparse aerial images” In 2020 IEEE International Conference on Robotics and Automation (ICRA) , 2020, pp. 1263–1269 IEEE"
+    },
+    {
+      "n": 13,
+      "id": "bib.bibx22",
+      "text": "David. Fan, Ali-akbar Agha-mohammadi and Evangelos. Theodorou “Learning Risk-Aware Costmaps for Traversability in Challenging Environments” In IEEE Robotics and Automation Letters 7.1 , 2022, pp. 279–286 DOI: 10.1109/LRA.2021.3125047"
+    },
+    {
+      "n": 14,
+      "id": "bib.bibx2",
+      "text": "A. Agha-Mohammadi, Eric Heiden, Karol Hausman and Gaurav Sukhatme “Confidence-rich grid mapping” In The International Journal of Robotics Research 38.12-13 , 2017, pp. 1352–1374"
+    },
+    {
+      "n": 15,
+      "id": "bib.bibx51",
+      "text": "Rohan Thakker et al. “Autonomous off-road navigation over extreme terrains with perceptually-challenging conditions” In International Symposium on Experimental Robotics , 2020"
+    },
+    {
+      "n": 16,
+      "id": "bib.bibx20",
+      "text": "D.D. Fan et al. “STEP: Stochastic Traversability Evaluation and Planning for Risk-Aware Off-road Navigation” In Robot.: Sci. Syst. , 2021"
+    },
+    {
+      "n": 17,
+      "id": "bib.bibx52",
+      "text": "Allen Wang, Ashkan Jasour and Brian Williams “Non-gaussian chance-constrained trajectory planning for autonomous vehicles under agent uncertainty” In Robotics and Automation Letters 5.4 IEEE, 2020, pp. 6041–6048"
+    },
+    {
+      "n": 18,
+      "id": "bib.bibx35",
+      "text": "Sven Koenig and Reid Simmons “Risk-sensitive planning with probabilistic decision graphs” In Principles of Knowledge Representation and Reasoning , 1994, pp. 363–373 Elsevier"
+    },
+    {
+      "n": 19,
+      "id": "bib.bibx54",
+      "text": "Huan Xu and Shie Mannor “Distributionally robust Markov decision processes” In Advances in Neural Information Processing Systems , 2010, pp. 2505–2513"
+    },
+    {
+      "n": 20,
+      "id": "bib.bibx53",
+      "text": "Skylar Wei, Anushri Dixit, Shashank Tomar and Joel Burdick “Moving obstacle avoidance: a data-driven risk-aware approach” In IEEE Control Systems Letters IEEE, 2022"
+    },
+    {
+      "n": 21,
+      "id": "bib.bibx21",
+      "text": "David Fan, Ali-akbar Agha-mohammadi and Evangelos Theodorou “Deep learning tubes for Tube MPC” In Robotics: Science and Systems (RSS) , 2020"
+    },
+    {
+      "n": 22,
+      "id": "bib.bibx13",
+      "text": "Will Dabney, Mark Rowland, Marc Bellemare and Rémi Munos “Distributional reinforcement learning with quantile regression” In Thirty-Second AAAI Conference on Artificial Intelligence , 2018"
+    },
+    {
+      "n": 23,
+      "id": "bib.bibx38",
+      "text": "Anirudha Majumdar and Marco Pavone “How should a robot assess risk? Towards an axiomatic theory of risk in robotics” In Robotics Research Springer, 2020, pp. 75–84"
+    },
+    {
+      "n": 24,
+      "id": "bib.bibx7",
+      "text": "Philippe Artzner, Freddy Delbaen, J. Eber and David Heath “Coherent measures of risk” In Mathematical finance 9.3 Wiley Online Library, 1999, pp. 203–228"
+    },
+    {
+      "n": 25,
+      "id": "bib.bibx12",
+      "text": "Yinlam Chow, Aviv Tamar, Shie Mannor and Marco Pavone “Risk-sensitive and robust decision-making: a CVaR optimization approach” In Advances in Neural Information Processing Systems , 2015, pp. 1522–1530"
+    },
+    {
+      "n": 26,
+      "id": "bib.bibx4",
+      "text": "Mohamadreza Ahmadi et al. “Risk-Averse Planning Under Uncertainty” In American Control Conference , 2020, pp. 3305–3312"
+    },
+    {
+      "n": 27,
+      "id": "bib.bibx3",
+      "text": "Mohamadreza Ahmadi et al. “Constrained Risk-Averse Markov Decision Processes” In AAAI Conference on Artificial Intelligence , 2021"
+    },
+    {
+      "n": 28,
+      "id": "bib.bibx5",
+      "text": "Mohamadreza Ahmadi, Anushri Dixit, Joel. Burdick and Aaron. Ames “Risk-Averse Stochastic Shortest Path Planning” In arXiv:2103.14727 , 2021"
+    },
+    {
+      "n": 29,
+      "id": "bib.bibx49",
+      "text": "Sumeet Singh, Y. Chow, Anirudha Majumdar and Marco Pavone “A Framework for Time-Consistent, Risk-Sensitive Model Predictive Control: Theory and Algorithms” In IEEE Transactions on Automatic Control 64.7 , 2018, pp. 2905–2912"
+    },
+    {
+      "n": 30,
+      "id": "bib.bibx15",
+      "text": "Anushri Dixit, Mohamadreza Ahmadi and Joel Burdick “Distributionally Robust Model Predictive Control with Total Variation Distance” In arXiv preprint arXiv:2203.12062 , 2022"
+    },
+    {
+      "n": 31,
+      "id": "bib.bibx30",
+      "text": "Astghik Hakobyan, Gyeong Kim and Insoon Yang “Risk-aware motion planning and control using CVaR-constrained optimization” In IEEE Robotics and Automation Letters 4.4 IEEE, 2019, pp. 3924–3931"
+    },
+    {
+      "n": 32,
+      "id": "bib.bibx18",
+      "text": "Anushri Dixit, Mohamadreza Ahmadi and Joel. Burdick “Risk-Sensitive Motion Planning using Entropic Value-at-Risk” In European Control Conference , 2021"
+    },
+    {
+      "n": 33,
+      "id": "bib.bibx17",
+      "text": "Anushri Dixit, Mohamadreza Ahmadi and Joel. Burdick “Risk-Averse Receding Horizon Motion Planning”, 2022 arXiv: 2204.09596 [eess.SY]"
+    },
+    {
+      "n": 34,
+      "id": "bib.bibx11",
+      "text": "Eduardo Camacho and Carlos Alba “Model predictive control” Springer Science & Business Media, 2013"
+    },
+    {
+      "n": 35,
+      "id": "bib.bibx9",
+      "text": "Paul Boggs and Jon Tolle “Sequential quadratic programming” In Acta numerica , 1995, pp. 529–562"
+    },
+    {
+      "n": 36,
+      "id": "bib.bibx47",
+      "text": "John Schulman et al. “Motion planning with sequential convex optimization and convex collision checking” In The International Journal of Robotics Research 33.9 SAGE Publications Sage UK: London, England, 2014, pp. 1251–1270"
+    },
+    {
+      "n": 37,
+      "id": "bib.bibx36",
+      "text": "Thomas Lew, Riccardo Bonalli and Marco Pavone “Chance-constrained sequential convex programming for robust trajectory optimization” In 2020 European Control Conference (ECC) , 2020, pp. 1871–1878 IEEE"
+    },
+    {
+      "n": 38,
+      "id": "bib.bibx40",
+      "text": "D. Morgan, S.J. Chung and F. Hadaegh “Model Predictive Control of Swarms of Spacecraft Using Sequential Convex Programming” In Journal of Guidance, Control, and Dynamics 37 , 2014, pp. 1–16 DOI: 10.2514/1.G000218"
+    },
+    {
+      "n": 39,
+      "id": "bib.bibx8",
+      "text": "F. Augugliaro, A.P Schoellig and R. D’Andrea “Generation of collision-free trajectories for a quadrocopter fleet: A sequential convex programming approach” In Int. Conf Intell. Robots Syst. , 2012"
+    },
+    {
+      "n": 40,
+      "id": "bib.bibx25",
+      "text": "R. Foust, S.J. Chung and F.Y. Hadaegh “Optimal Guidance and Control with Nonlinear Dynamics Using Sequential Convex Programming” In J. of Guid., Control, and Dyn. 43.4 , 2020, pp. 633–644"
+    },
+    {
+      "n": 41,
+      "id": "bib.bibx33",
+      "text": "Mrinal Kalakrishnan et al. “STOMP: Stochastic trajectory optimization for motion planning” In IEEE International Conference on Robotics and Automation , 2011, pp. 4569–4574"
+    },
+    {
+      "n": 42,
+      "id": "bib.bibx37",
+      "text": "Johan Löfberg “Oops! I cannot do it again: Testing for recursive feasibility in MPC” In Automatica 48.3 Elsevier, 2012, pp. 550–555"
+    }
+  ]
+}

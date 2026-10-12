@@ -1,0 +1,200 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2310.03325",
+  "title": "Learning Concept-Based Causal Transition and Symbolic Reasoning for Visual Planning",
+  "authors": "Yilue Qian, Peiyu Yu, Ying Nian Wu, Yao Su, Wei Wang, Lifeng Fan",
+  "year": "2024",
+  "categories": [
+    "cs.AI",
+    "cs.CV",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2310.03325",
+  "html_url": "https://arxiv.org/html/2310.03325",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1234,
+  "text": "As one of the fundamental abilities of human intelligence, planning is the process of insightfully proposing a sequence of actions to achieve desired goals, which requires the capacity to think ahead, to employ knowledge of causality, and the capacity of imagination [1], so as to reason and foresee the proper actions and their consequences on the states for all the intermediate transition steps before finally reaching the goal state. Visual planning simulates this thinking process of sequential causal imagination in the form of searching for visual transitions between an initial visual state and a final visual goal state. With its advantages in guiding agents to perform daily tasks in the first-person view, visual planning has become more and more important in egocentric vision [2] and embodied AI. In robotics, visual planning could also avoid manually designing the required specific goal conditions, action preconditions, and effects for robots.\n\nPrevious works for visual planning can be roughly categorized into three tracks, i.e., neural-network-based models [3,4], reinforcement-learning-based models [5,6] and classic search-based models [7,8]. Neural-network-based models can be trained in an end-to-end manner, which tends to fall short in terms of its interpretability [9]. Reinforcement-learning-based models can perform goal-conditioned decisions, but could suffer from sparse reward, low data efficiency [10], and low environment and task generalization ability [11]. Considering these limitations and inspired by human cognition, our method falls into the third “search-based” category and further proposes three key components for visual planning, namely representation learning, symbolic reasoning, and causal transition modeling. Representation learning focuses on extracting objects’ dynamic and goal-oriented attributes. Symbolic reasoning performs action planning at the abstract higher level via learned symbols. Causal transition models the visual preconditions and action effects on attribute changes.\n\nAt the perception level, we propose to learn concept-based disentangled representation and believe such human-like perception ability to abstract concepts from observations is vital for visual causal transition modeling [12]. The reason is that such representation learning could encode images at a higher semantic level beyond pixels, identifying distinct attribute concepts and isolating “essential” factors of variation, thus serving causal learning [13]. This also enhances both robustness and interpretability [14,13,15], and facilitates compositional generalization to unseen scenarios in zero-shot inference [16,13,17,18], thereby supporting a wide range of real-world downstream tasks. At the reasoning and planning level, we argue that understanding the atomic causal mechanisms is inevitable for task planning. Leveraging learned disentangled representations of concepts, we gain insight into the core of atomic causal transitions, which involves identifying key relevant variable concepts and predicting the outcomes of actions executed upon them. The understanding and reasoning of the abstract higher-level task planning composed of the lower-level atomic causal transition also have the potential to be more generalizable and interpretable [19,20]. Thus, we propose a vict (vict) and its abstracted symbolic transition model, which corresponds to the discrete higher-level task planning and avoids the problem of “error accumulation” [21]. Guided by symbolic transition, the visual transition reconstructs intermediate and final goal images.\n\nTechnically, there are three critical modules in our visual planning framework. First, a novel scl (scl) (Sec. III-A) is learned by switching the latent concept representations of a pair of images with different attribute concepts. Second, a set of state symbols is abstracted from clustering low-level concept token representations (Sec. III-B). The most efficient symbolic transition path can be found via a Markov Decision Process (MDP). Third, a visual transition model (Sec. III-C) is proposed to learn the action-induced transition of the changeable attributes given the concept representations of the precondition image and thus generate the resulting effect image. To verify the effectiveness of our framework, we collect a large-scale visual planning dataset, which contains a concept learning dataset and a causal planning dataset. Extensive comparison experiments and ablation studies on this dataset demonstrate that our model achieves superior performance in the visual planning task and various forms of generalization tests.\n\nTo summarize our main contributions: (i) We propose a novel concept-based visual planning framework, which models both discrete symbolic transition and continuous visual transition for efficient path search and intermediate image generations. Comprehensive experiments show that our method achieves superior performances in visual task planning and generalization tests. (ii) Apart from generalizability, our method has better interpretability by generating a causal chain (the action sequences and the intermediate state images) to explicitly demonstrate the transition process to the goal. (iii) We collect a large-scale visual planning dataset, which can foster future research in the community.\n\n## I-A Related Work\n\nVisual planning is feasible with the learned representation and atomic causal effects. [22] proposed a method for long-horizon deformable object manipulation tasks from sensory observations, which relies heavily on differentiable physics simulators. [7] performed a tree-search-based planning algorithm on the learned world representation after applying high-level actions for visual robot task planning, but they ignored learning disentangled representations. [3] learned how to plan a goal-directed decision-making procedure from real-world videos, leveraging the structured and plannable latent state and action spaces learned from human instructional videos, but their transformer-based end-to-end model is hard to generalize to unseen planning tasks. [4] proposed a model based on deep neural networks consisting of encoding, action-conditional transformation, and decoding for video prediction in Atari Games, but they do not abstract symbols for efficient reasoning. [23] is the most similar to ours, which learned symbolic operators for task and motion planning, but cannot generate intermediate images.\n\nConcept-based disentangled representation learning has emerged as a popular way of extracting human-interpretable representations [24]. Discrete and semantically-grounded representation is argued to be helpful for human understanding and abstract visual reasoning, enables few-shot or zero-shot learning and leads to better down-stream task performance [25,26]. Previous studies tried to learn disentangled concept representation either in a completely unsupervised manner [27,28,29,30], or via weak supervision and implicit prototype representations [31], or by employing supervision from the linguistic space [32,33]. There have been diverse learning techniques, such as Transformer [30], (sequential) variational autoencoder [28,29], and information maximizing generative adversarial nets [27], etc. Existing techniques have proved successful on objects mostly with limited variation, such as digits, simple geometric objects [31], and faces [27]. In this work, we propose a variant of [30] by imposing more reconstruction constraints, which works very well on more complex household objects with diverse variations (Sec. II) and better benefits the downstream planning task compared to prior works.\n\nCausal reasoning for task understanding is one of the essential capabilities of human intelligence, and a big challenge for ai with the difficulty of generating a detailed understanding of situated actions, their dependencies, and causal effects on object states [34]. Various evaluated state-of-the-art models only thrive on the perception-based descriptive task, but perform poorly on the causal tasks (i.e., explanatory, predictive, and counterfactual tasks), suggesting that a principled approach for causal reasoning should incorporate not only disentangled and semantically grounded visual perception, but also the underlying hierarchical causal relations and dynamics [35]. [36] built a sequential Causal And-Or Graph (C-AOG) to represent actions and their effects on objects over time, but suffers from ambiguity in real-life images due to their not-well-disentangled representation. Our work benefits from our disentangled concept representation by finding a latent space where important factors could be isolated from other confounding factors [16], and we ground actions to their causal effects on relevant object attributes. Our bi-level causal planning framework with discrete symbolic transition and continuous visual transition also helps to resist the real-world data noises and ambiguity.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "C. M. Walker and A. Gopnik, “22 causality and imagination,” The Oxford handbook of the development of imagination , p. 342, 2013."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "S. Gupta, J. Davidson, S. Levine, R. Sukthankar, and J. Malik, “Cognitive mapping and planning for visual navigation,” in IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 2017."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "J. Sun, D.-A. Huang, B. Lu, Y.-H. Liu, B. Zhou, and A. Garg, “Plate: Visually-grounded planning with transformers in procedural tasks,” IEEE Robotics and Automation Letters , vol. 7, no. 2, pp. 4924–4930, 2022."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "J. Oh, X. Guo, H. Lee, R. L. Lewis, and S. Singh, “Action-conditional video prediction using deep networks in atari games,” Advances in neural information processing systems , vol. 28, 2015."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "O. Rybkin, C. Zhu, A. Nagabandi, K. Daniilidis, I. Mordatch, and S. Levine, “Model-based reinforcement learning via latent-space collocation,” in International Conference on Machine Learning , 2021."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "F. Ebert, C. Finn, S. Dasari, A. Xie, A. Lee, and S. Levine, “Visual foresight: Model-based deep reinforcement learning for vision-based robotic control,” arXiv preprint arXiv:1812.00568 , 2018."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "C. Paxton, Y. Barnoy, K. Katyal, R. Arora, and G. D. Hager, “Visual robot task planning,” in IEEE International Conference on Robotics and Automation (ICRA) , 2019."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "K. Liu, T. Kurutach, C. Tung, P. Abbeel, and A. Tamar, “Hallucinative topological memory for zero-shot visual planning,” in International Conference on Machine Learning , 2020."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "L. Gao and L. Guan, “Interpretability of machine learning: Recent advances and future prospects,” IEEE MultiMedia , 2023."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "P. Ladosz, L. Weng, M. Kim, and H. Oh, “Exploration in deep reinforcement learning: A survey,” Information Fusion , vol. 85, pp. 1–22, 2022."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "C. Packer, K. Gao, J. Kos, P. Krähenbühl, V. Koltun, and D. Song, “Assessing generalization in deep reinforcement learning,” arXiv preprint arXiv:1810.12282 , 2018."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "Y. Zhu, T. Gao, L. Fan, S. Huang, M. Edmonds, H. Liu, F. Gao, C. Zhang, S. Qi, Y. N. Wu et al. , “Dark, beyond deep: A paradigm shift to cognitive ai with humanlike common sense,” Engineering , vol. 6, no. 3, pp. 310–345, 2020."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "F. Träuble, E. Creager, N. Kilbertus, F. Locatello, A. Dittadi, A. Goyal, B. Schölkopf, and S. Bauer, “On disentangled representations learned from correlated data,” in International Conference on Machine Learning , 2021."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "R. Suter, D. Miladinovic, S. Bauer, and B. Schölkopf, “Interventional robustness of deep latent variable models,” arXiv , pp. 1811–00 007, 2018."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "T. Adel, Z. Ghahramani, and A. Weller, “Discovering interpretable representations for both deep generative and discriminative models,” in International Conference on Machine Learning , 2018."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "Y. Atzmon, F. Kreuk, U. Shalit, and G. Chechik, “A causal view of compositional zero-shot recognition,” Advances in Neural Information Processing Systems , vol. 33, pp. 1462–1473, 2020."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "I. Higgins, A. Pal, A. Rusu, L. Matthey, C. Burgess, A. Pritzel, M. Botvinick, C. Blundell, and A. Lerchner, “Darla: Improving zero-shot transfer in reinforcement learning,” in International Conference on Machine Learning , 2017."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "F. Locatello, B. Poole, G. Rätsch, B. Schölkopf, O. Bachem, and M. Tschannen, “Weakly-supervised disentanglement without compromises,” in International Conference on Machine Learning , 2020."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "M. Edmonds, Learning How and Why: Causal Learning and Explanation from Physical, Interactive, and Communicative Environments . University of California, Los Angeles, 2021."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "B. Schölkopf, “Causality for machine learning,” in Probabilistic and Causal Inference: The Works of Judea Pearl , 2022, pp. 765–804."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "A. d. Garcez, S. Bader, H. Bowman, L. C. Lamb, L. de Penning, B. Illuminoo, H. Poon, and C. G. Zaverucha, “Neural-symbolic learning and reasoning: A survey and interpretation,” Neuro-Symbolic Artificial Intelligence: The State of the Art , vol. 342, no. 1, p. 327, 2022."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib22",
+      "text": "X. Lin, Z. Huang, Y. Li, J. B. Tenenbaum, D. Held, and C. Gan, “Diffskill: Skill abstraction from differentiable physics for deformable object manipulations with tools,” arXiv preprint arXiv:2203.17275 , 2022."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib23",
+      "text": "T. Silver, R. Chitnis, J. Tenenbaum, L. Kaelbling, and T. Lozano-Perez, “Learning symbolic operators for task and motion planning,” in IEEE/RAS International Conference on Intelligent Robots and Systems (IROS) , 2021."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib24",
+      "text": "D. Kazhdan, B. Dimanov, H. A. Terre, M. Jamnik, P. Liò, and A. Weller, “Is disentanglement all you need? comparing concept-based & disentanglement approaches,” arXiv preprint arXiv:2104.06917 , 2021."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib25",
+      "text": "S. Van Steenkiste, F. Locatello, J. Schmidhuber, and O. Bachem, “Are disentangled representations helpful for abstract visual reasoning?” Advances in Neural Information Processing Systems , vol. 32, 2019."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib26",
+      "text": "P. Yu, S. Xie, X. Ma, B. Jia, B. Pang, R. Gao, Y. Zhu, S.-C. Zhu, and Y. N. Wu, “Latent diffusion energy-based model for interpretable text modelling,” in International Conference on Machine Learning , 2022."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib27",
+      "text": "X. Chen, Y. Duan, R. Houthooft, J. Schulman, I. Sutskever, and P. Abbeel, “Infogan: Interpretable representation learning by information maximizing generative adversarial nets,” Advances in neural information processing systems , vol. 29, 2016."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib28",
+      "text": "Y. Zhu, M. R. Min, A. Kadav, and H. P. Graf, “S3vae: Self-supervised sequential vae for representation disentanglement and data generation,” in IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 2020."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib29",
+      "text": "I. Higgins, L. Matthey, X. Glorot, A. Pal, B. Uria, C. Blundell, S. Mohamed, and A. Lerchner, “Early visual concept learning with unsupervised deep learning,” arXiv preprint arXiv:1606.05579 , 2016."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib30",
+      "text": "T. Yang, Y. Wang, Y. Lu, and N. Zheng, “Visual concepts tokenization,” arXiv preprint arXiv:2205.10093 , 2022."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib31",
+      "text": "W. Stammer, M. Memmel, P. Schramowski, and K. Kersting, “Interactive disentanglement: Learning concepts by interacting with their prototype representations,” in IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 2022."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib32",
+      "text": "N. Saini, K. Pham, and A. Shrivastava, “Disentangling visual embeddings for attributes and objects,” in IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 2022."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib33",
+      "text": "J. Mao, C. Gan, P. Kohli, J. B. Tenenbaum, and J. Wu, “The neuro-symbolic concept learner: Interpreting scenes, words, and sentences from natural supervision,” arXiv preprint arXiv:1904.12584 , 2019."
+    },
+    {
+      "n": 34,
+      "id": "bib.bib34",
+      "text": "B. Jia, T. Lei, S.-C. Zhu, and S. Huang, “Egotaskqa: Understanding human tasks in egocentric videos,” arXiv preprint arXiv:2210.03929 , 2022."
+    },
+    {
+      "n": 35,
+      "id": "bib.bib35",
+      "text": "K. Yi, C. Gan, Y. Li, P. Kohli, J. Wu, A. Torralba, and J. B. Tenenbaum, “Clevrer: Collision events for video representation and reasoning,” arXiv preprint arXiv:1910.01442 , 2019."
+    },
+    {
+      "n": 36,
+      "id": "bib.bib36",
+      "text": "A. Fire and S.-C. Zhu, “Inferring hidden statuses and actions in video by causal reasoning,” in Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition Workshops , 2017."
+    }
+  ]
+}

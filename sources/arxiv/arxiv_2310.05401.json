@@ -1,0 +1,134 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2310.05401",
+  "title": "Entropy-MCMC: Sampling from Flat Basins with Ease",
+  "authors": "Bolian Li, Ruqi Zhang",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "stat.ML"
+  ],
+  "url": "https://arxiv.org/abs/2310.05401",
+  "html_url": "https://arxiv.org/html/2310.05401",
+  "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+  "section": "Introduction",
+  "word_count": 584,
+  "text": "The effectiveness of Bayesian neural networks relies heavily on the quality of posterior distribution estimation. However, achieving an accurate estimation of the full posterior is extremely difficult due to its high-dimensional and highly multi-modal nature [1,2]. Moreover, the numerous modes in the energy landscape typically exhibit varying generalization performance. Flat modes often show superior accuracy and robustness, whereas sharp modes tend to have high generalization errors [3,4,5]. This connection between the geometry of energy landscape and generalization has spurred many works in optimization, ranging from theoretical understanding [6,7,8,9] to new optimization algorithms [10,11,12,13].\n\nHowever, most of the existing Bayesian methods are not aware of the flatness in the energy landscape during posterior inference [14,15,16,1]. Their inference strategies are usually energy-oriented and cannot distinguish between flat and sharp modes that have the same energy values. This limitation can significantly undermine their generalization performance, particularly in practical situations where capturing the full posterior is too costly. In light of this, we contend that prioritizing the capture of flat modes is essential when conducting posterior inference for Bayesian neural networks. This is advantageous for improved generalization as justified by previous works [3,4,5]. It can further be rationalized from a Bayesian marginalization perspective: within the flat basin, each model configuration occupies a substantial volume and contributes significantly to a more precise estimation of the predictive distribution [17]. Moreover, existing flatness-aware methods often rely on a single solution to represent the entire flat basin [12,13], ignoring the fact that the flat basin contains many high-performing models. Therefore, Bayesian marginalization can potentially offer significant improvements over flatness-aware optimization by sampling from the flat basins [18,19].\n\nPrioritizing flat basins during posterior inference poses an additional challenge to Bayesian inference. Even for single point estimation, explicitly biasing toward the flat basins will introduce substantial computational overhead, inducing nested loops [12,8], doubled gradients calculation [13,20] or min-max problems [13]. The efficiency problem needs to be addressed before any flatness-aware Bayesian method becomes practical for deep neural networks.\n\nIn this paper, we propose an efficient sampling algorithm to explicitly prioritize flat basins in the energy landscape of deep neural networks. Specifically, we introduce an auxiliary guiding variable \\bm{\\theta}_{a} into the Markov chain to pull model parameters \\bm{\\theta} toward flat basins at each updating step (Fig. 1a). \\bm{\\theta}_{a} is sampled from a smoothed posterior distribution which eliminates sharp modes based on local entropy [21] (Fig. 1b). \\bm{\\theta}_{a} can also be viewed as being achieved by Gaussian convolution, a common technique in diffusion models [22,23]. Our method enjoys a simple joint distribution of \\bm{\\theta} and \\bm{\\theta}_{a}, and the computational overhead is similar to Stochastic gradient Langevin dynamics (SGLD) [14]. Theoretically, we prove that our method is guaranteed to converge faster than some common flatness-aware methods [12,8] in the strongly convex setting. Empirically, we demonstrate that our method successfully finds flat basins efficiently across multiple tasks. Our main contributions are summarized as follows:\n\n- • We propose Entropy-MCMC (EMCMC) for sampling from flat basins in the energy landscape of deep neural networks. EMCMC utilizes an auxiliary guiding variable and a simple joint distribution to efficiently steer the model toward flat basins.\n\n- • We prove the convergence of EMCMC and further show that it converges faster than several existing flatness-aware methods in the strongly convex setting.\n\n- • We provide extensive experimental results to demonstrate the advantages of EMCMC in sampling from flat basins. EMCMC outperforms all compared baselines on classification, calibration, and out-of-distribution detection with comparable overhead akin to SGLD. We release the code at https://github.com/lblaoke/EMCMC.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib55",
+      "text": "Zhang et al. (2020b) Ruqi Zhang, Chunyuan Li, Jianyi Zhang, Changyou Chen, and Andrew Gordon Wilson. Cyclical stochastic gradient mcmc for bayesian deep learning. In International Conference on Learning Representations , 2020b."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib26",
+      "text": "Izmailov et al. (2021) Pavel Izmailov, Sharad Vikram, Matthew D Hoffman, and Andrew Gordon Gordon Wilson. What are bayesian neural network posteriors really like? In International conference on machine learning , pp. 4629–4640. PMLR, 2021."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib23",
+      "text": "Hochreiter & Schmidhuber (1997) Sepp Hochreiter and Jürgen Schmidhuber. Flat minima. Neural computation , 9(1):1–42, 1997."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib29",
+      "text": "Keskar et al. (2017) Nitish Shirish Keskar, Jorge Nocedal, Ping Tak Peter Tang, Dheevatsa Mudigere, and Mikhail Smelyanskiy. On large-batch training for deep learning: Generalization gap and sharp minima. In 5th International Conference on Learning Representations, ICLR 2017 , 2017."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib3",
+      "text": "Bahri et al. (2022) Dara Bahri, Hossein Mobahi, and Yi Tay. Sharpness-aware minimization improves language model generalization. In Proceedings of the 60th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) , pp. 7360–7371, 2022."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib44",
+      "text": "Neyshabur et al. (2017) Behnam Neyshabur, Srinadh Bhojanapalli, David McAllester, and Nati Srebro. Exploring generalization in deep learning. Advances in neural information processing systems , 30, 2017."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib13",
+      "text": "Dinh et al. (2017) Laurent Dinh, Razvan Pascanu, Samy Bengio, and Yoshua Bengio. Sharp minima can generalize for deep nets. In International Conference on Machine Learning , pp. 1019–1028. PMLR, 2017."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib14",
+      "text": "Dziugaite & Roy (2018) Gintare Karolina Dziugaite and Daniel Roy. Entropy-sgd optimizes the prior of a pac-bayes bound: Generalization properties of entropy-sgd and data-dependent priors. In International Conference on Machine Learning , pp. 1377–1386. PMLR, 2018."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib27",
+      "text": "Jiang et al. (2019a) Yiding Jiang, Behnam Neyshabur, Hossein Mobahi, Dilip Krishnan, and Samy Bengio. Fantastic generalization measures and where to find them. In International Conference on Learning Representations , 2019a."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib39",
+      "text": "Mobahi (2016) Hossein Mobahi. Training recurrent neural networks by diffusion. arXiv preprint arXiv:1601.04114 , 2016."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib25",
+      "text": "Izmailov et al. (2018) P Izmailov, AG Wilson, D Podoprikhin, D Vetrov, and T Garipov. Averaging weights leads to wider optima and better generalization. In 34th Conference on Uncertainty in Artificial Intelligence 2018, UAI 2018 , pp. 876–885, 2018."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib8",
+      "text": "Chaudhari et al. (2019) Pratik Chaudhari, Anna Choromanska, Stefano Soatto, Yann LeCun, Carlo Baldassi, Christian Borgs, Jennifer Chayes, Levent Sagun, and Riccardo Zecchina. Entropy-sgd: Biasing gradient descent into wide valleys. Journal of Statistical Mechanics: Theory and Experiment , 2019(12):124018, 2019."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib15",
+      "text": "Foret et al. (2020) Pierre Foret, Ariel Kleiner, Hossein Mobahi, and Behnam Neyshabur. Sharpness-aware minimization for efficiently improving generalization. In International Conference on Learning Representations , 2020."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib52",
+      "text": "Welling & Teh (2011) Max Welling and Yee W Teh. Bayesian learning via stochastic gradient langevin dynamics. In Proceedings of the 28th international conference on machine learning (ICML-11) , pp. 681–688, 2011."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib9",
+      "text": "Chen et al. (2014) Tianqi Chen, Emily Fox, and Carlos Guestrin. Stochastic gradient hamiltonian monte carlo. In International conference on machine learning , pp. 1683–1691. PMLR, 2014."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib35",
+      "text": "Ma et al. (2015) Yi-An Ma, Tianqi Chen, and Emily Fox. A complete recipe for stochastic gradient mcmc. Advances in neural information processing systems , 28, 2015."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib6",
+      "text": "Bishop (2006) Christopher M Bishop. Pattern recognition and machine learning , volume 4. Springer, 2006."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib53",
+      "text": "Wilson (2020) Andrew Gordon Wilson. The case for bayesian deep learning. arXiv preprint arXiv:2001.10995 , 2020."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib24",
+      "text": "Huang et al. (2020) W Ronny Huang, Zeyad Ali Sami Emam, Micah Goldblum, Liam H Fowl, JK Terry, Furong Huang, and Tom Goldstein. Understanding generalization through visualizations. In ”I Can’t Believe It’s Not Better!”NeurIPS workshop , 2020."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib40",
+      "text": "Möllenhoff & Khan (2022) Thomas Möllenhoff and Mohammad Emtiyaz Khan. Sam as an optimal relaxation of bayes. In The Eleventh International Conference on Learning Representations , 2022."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib5",
+      "text": "Baldassi et al. (2016) Carlo Baldassi, Christian Borgs, Jennifer T Chayes, Alessandro Ingrosso, Carlo Lucibello, Luca Saglietti, and Riccardo Zecchina. Unreasonable effectiveness of learning neural networks: From accessible states and robust ensembles to basic algorithmic schemes. Proceedings of the National Academy of Sciences , 113(48):E7655–E7662, 2016."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib49",
+      "text": "Sohl-Dickstein et al. (2015) Jascha Sohl-Dickstein, Eric Weiss, Niru Maheswaranathan, and Surya Ganguli. Deep unsupervised learning using nonequilibrium thermodynamics. In International conference on machine learning , pp. 2256–2265. PMLR, 2015."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib50",
+      "text": "Song & Ermon (2019) Yang Song and Stefano Ermon. Generative modeling by estimating gradients of the data distribution. Advances in neural information processing systems , 32, 2019."
+    }
+  ]
+}

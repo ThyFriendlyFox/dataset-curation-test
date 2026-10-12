@@ -1,0 +1,74 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.18506",
+  "title": "Faster Convergence for Transformer Fine-tuning with Line Search Methods",
+  "authors": "Philip Kenneweg, Leonardo Galli, Tristan Kenneweg, Barbara Hammer",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.AI"
+  ],
+  "url": "https://arxiv.org/abs/2403.18506",
+  "html_url": "https://arxiv.org/html/2403.18506",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "INTRODUCTION",
+  "word_count": 664,
+  "text": "In modern machine learning, there is a variety of optimization algorithms. Figuring out which one is the best and matching the learning rate or learning rate schedule to the specific problem can require a lot of expert knowledge and computing power. In particular, the current state of the art is to treat the learning rate as a hyperparameter and train the network until the value that yields the best performance is found, i.e., hyperparameter tuning. To simplify and significantly accelerate this process, a recent branch of the deep learning research [1,2,3,4] has suggested to reintroduce line search methods for selecting the step size. These methods are widely adopted in the optimization community since their introduction in [5]. In particular, they automatically find an adaptive learning rate by calculating the loss at different points along the (gradient) direction and selecting an appropriate step size. Using line search can save time and resources by eliminating the need for manual optimization of the learning rate, thus eliminating costly hyperparameter tuning.\n\nAs traditional line search requires multiple forward passes per gradient update, a more efficient approach is needed. In [4], a Stochastic Line Search (SLS) has been combined with a smart re-initialization of the step size to alleviate the need for multiple forward passes for every step. This approach was shown to outperform a variety of other optimization methods, such as Stochastic Gradient Descent (SGD), SGD with Nesterov Momentum and many others on tasks such as matrix factorization as well as image classification for small networks and datasets.\n\nIt is however unclear if stochastic line search methods work well for larger networks and different architectures such as Transformers [6] as well as in challenging domains such as Natural Language Processing (NLP). In this work we adapt and expand upon this active topic of research in the NLP domain.\n\nIn addition, given the deep structure of recent networks, it is natural to ask if it would be beneficial to train each layer at a different speed, i.e. learning rate, instead of using a single value for the whole network. For this reason, we propose to modify SLS [4] and apply it in a layer-wise manner in order to specialize the step size for separate network components. This novel idea aims at localizing the line search in order to capture the loss variation due to the update of a single network component.\n\nThe Adam [7] optimizer has been shown to outperform SGD in the training of Transformers [8] by a large margin. In this work, we propose to use SLS [9] in combination with Adam to train Transformers or any other architecture. In particular, we will compare the following optimization schemas on the problem of fine-tuning Transformers:\n\n- • Adam optimizer with warm starting and cosine decay (ADAM).\n\n- • Armijo line search combined with stochastic gradient descent (SGDSLS).\n\n- • Armijo line search combined with the Adam optimizer (ADAMSLS).\n\n- • Per-layer-ADAMSLS, as a novel optimization method (PLASLS).\n\nWe test all optimizers fine-tuning BERT [10] on the Glue [11] dataset collection, which is widely used to evaluate common natural language processing skills. We find that SGDSLS does not work well in this scenario. In contrast, ADAMSLS and PLASLS perform better than ADAM, especially if they are trained on smaller data sets, as is often the case for retraining language models [10]. To make our work easy to reproduce and easy to use, we implement all methods as pytorch optimizers. ADAMSLS can be used as an optimizer, that does not require to manually set the learning rate. For PLASLS the network parameters need to be manually split into components which are optimized separately.\n\nIn the next Section, we will review the related literature, in Section III we will describe our method. In Section IV we will describe our experimental approach and in Section V we will show and discuss our results. In Section VI we will go into details on some choices for PLASLS. Finally Section VII contains our conclusion.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib3",
+      "text": "M. Mahsereci and P. Hennig, “Probabilistic line searches for stochastic optimization,” Advances in neural information processing systems , vol. 28, 2015."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib4",
+      "text": "R. Bollapragada, J. Nocedal, D. Mudigere, H.-J. Shi, and P. T. P. Tang, “A progressive batching l-bfgs method for machine learning,” in International Conference on Machine Learning , pp. 620–629, PMLR, 2018."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib5",
+      "text": "C. Paquette and K. Scheinberg, “A stochastic line search method with expected complexity analysis,” SIAM Journal on Optimization , vol. 30, no. 1, pp. 349–376, 2020."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib1",
+      "text": "S. Vaswani, A. Mishkin, I. Laradji, M. Schmidt, G. Gidel, and S. Lacoste-Julien, “Painless stochastic gradient: Interpolation, line-search, and convergence rates,” NIPS’19: Proceedings of the 33rd International Conference on Neural Information Processing Systems , 2019."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib6",
+      "text": "L. Armijo, “Minimization of functions having lipschitz continuous first partial derivatives,” Pacific Journal of mathematics , vol. 16, no. 1, pp. 1–3, 1966."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib7",
+      "text": "A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A. N. Gomez, L. u. Kaiser, and I. Polosukhin, “Attention is all you need,” in Advances in Neural Information Processing Systems (I. Guyon, U. V. Luxburg, S. Bengio, H. Wallach, R. Fergus, S. Vishwanathan, and R. Garnett, eds.), vol. 30, Curran Associates, Inc., 2017."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib8",
+      "text": "D. P. Kingma and J. Ba, “Adam: A method for stochastic optimization,” in 3rd International Conference on Learning Representations, ICLR 2015, San Diego, CA, USA, May 7-9, 2015, Conference Track Proceedings (Y. Bengio and Y. LeCun, eds.), 2015."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib9",
+      "text": "F. Kunstner, J. Chen, J. W. Lavington, and M. Schmidt, “Noise is not the main factor behind the gap between sgd and adam on transformers, but sign descent might be,” in The Eleventh International Conference on Learning Representations , 2023."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib2",
+      "text": "S. Vaswani, F. Kunstner, I. H. Laradji, S. Y. Meng, M. Schmidt, and S. Lacoste-Julien, “Adaptive gradient methods converge faster with over-parameterization (and you can do a line-search),” CoRR , vol. abs/2006.06835, 2020."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "J. Devlin, M. Chang, K. Lee, and K. Toutanova, “BERT: pre-training of deep bidirectional transformers for language understanding,” in Proceedings of the 2019 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, NAACL-HLT 2019, Minneapolis, MN, USA, June 2-7, 2019, Volume 1 (Long and Short Papers) (J. Burstein, C. Doran, and T. Solorio, eds.), pp. 4171–4186, Association for Computational Linguistics, 2019."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "A. Wang, A. Singh, J. Michael, F. Hill, O. Levy, and S. Bowman, “GLUE: A multi-task benchmark and analysis platform for natural language understanding,” in Proceedings of the 2018 EMNLP Workshop BlackboxNLP: Analyzing and Interpreting Neural Networks for NLP , (Brussels, Belgium), pp. 353–355, Association for Computational Linguistics, Nov. 2018."
+    }
+  ]
+}

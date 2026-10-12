@@ -1,0 +1,63 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2401.00616",
+  "title": "GD^2-NeRF: Generative Detail Compensation via GAN and Diffusion for One-shot Generalizable Neural Radiance Fields",
+  "authors": "Xiao Pan, Zongxin Yang, Shuai Bai, Yi Yang",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2401.00616",
+  "html_url": "https://arxiv.org/html/2401.00616",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 831,
+  "text": "One-shot Novel View Synthesis (O-NVS) is a long-standing problem in computer vision and graphics which targets on synthesizing photo-realistic novel views of a scene given a single reference image. An important technology solving this task is the One-shot Generalizable Neural Radiance Fields (OG-NeRF) which trains image-conditioned NeRF across scenes for learning general 3D priors and can generalize to a new scene by a single feed-forward pass, i.e., inference-time finetuning-free.\n\nHowever, 1) the existing OG-NeRF methods [1,2,3] mainly suffer the blurry issue since their encoder-only architectures highly rely on the reference images that contain limited information. For instance, [1,2] first encodes the reference image into a 2D feature map and then indexes the condition features via pixel-wise projection. It works well when the target view is close to the reference view, yet tends to get blurry as the view difference becomes larger since the reference image can provide limited or even misleading scene information, e.g., as shown by the upper row of Fig. 2, the query point requires the wheel information from the right view while the misleading body information from the back view is projected. 2) On the other hand, recent advances of diffusion-based image-to-3d methods [4,5] show vivid plausible novel view results via distilling the 2D generative priors from pre-trained diffusion models [6,7] into a 3D representation, yet requires tedious per-scene optimization.\n\nTargeting these issues, we explore an O-NVS framework that is both inference-time finetuning-free and with vivid plausible outputs. To this end, we propose the GD 2 -NeRF, a coarse-to-fine generative detail compensation framework that hierarchically includes GAN and pre-trained diffusion models into OG-NeRF. GD 2 -NeRF is mainly composed of a One-stage Parallel Pipeline (OPP) that captures in-distribution priors via GAN model and a Diffusion-based 3D-consistent Enhancer (Diff3DE) that injects out-distribution priors from pre-trained diffusion models [6,7], as illustrated by the second row of Fig. 2. In detail:\n\n(i) Coarse-stage OPP (GAN model). At the coarse stage, we intend to devise a pipeline that efficiently injects the GAN model into the existing OG-NeRF pipeline to primarily relieve the blurry issue using in-distribution detail priors captured from the training dataset. Targeting this, a naive solution is to directly build the GAN model on top of the OG-NeRF model tandemly, either in a two-stage or one-stage manner, as illustrated by the first two rows in Fig. 3 and will be detailed in § IV. However, though the sharpness (LPIPS, FID) is significantly improved, we empirically find it hard to maintain the fidelity (PSNR, SSIM), even with the more coherent one-stage tandem pipeline.\n\nTo address such contradiction between fidelity and sharpness, we further propose the One-stage Parallel Pipeline (OPP) that integrates the OG-NeRF and GAN model in a unified parallel framework, as shown by the bottom part of Fig. 3. It is built on the one-stage tandem pipeline with the proposed Dual-Paradigm Structure (DPS), Confidence Radiance Fields (CoRF), and Dual-Paradigm Fusion (DPF). With DPS, the OG-NeRF model and the GAN model can be optimized in parallel within a single framework. Then, CoRF takes the occlusion information as input and predicts a confidence map which adaptively gives the blurry part with low confidence. Finally, DPF aggregates the outputs from two paradigms via the learned confidence map.\n\n(ii) Fine-stage Diff3DE (diffusion model). Due to the limited size and quality of the training datasets, we find the in-distribution prior at the coarse stage is not enough for vivid outputs with rich plausible details. Therefore, at the fine stage, to break through such limitation, we turn to the large-scale diffusion models [6,7] pre-trained on billions of high-quality images for more vivid out-distribution details.\n\nHowever, naively using such an image diffusion model to process the rendered views from the coarse stage frame-by-frame leads to poor 3D consistency. Targeting this issue and inspired by the recent advances in zero-shot diffusion-based video editing methods [8,9], we propose the Diffusion-based 3D Enhancer (Diff3DE). The main idea of Diff3DE is to first ensure the consistency between several keyframes dispersed around the dome. Then, given an arbitrary target view, the information from nearby keyframes is aggregated in the feature space based on view information, formulating a robust 3D-consistent enhancer.\n\nExtensive experiments on both the synthetic and real-world datasets show that, without any inference-time finetuning, 1) our OPP shows noticeable improvements over the baseline methods with balanced sharpness and fidelity while with little additional cost, and 2) Diff3DE can further compensate rich plausible details with decent 3D-consistency.\n\nOur contributions are summarized as follows:\n\n- • We devise a coarse-to-fine generative detail compensation framework, GD 2 -NeRF, for O-NVS task that is both inference-time finetuning-free and with vivid plausible outputs.\n\n- • Our coarse-stage method OPP (§ IV) effectively inserts the GAN model into the existing OG-NeRF pipeline to primarily relieve the blurry issue with a good balance between fidelity and sharpness.\n\n- • To our best knowledge, our fine-stage method Diff3DE (§ V) makes the early attempt to directly use the pre-trained diffusion model as a 3D-consistent enhancer without any further finetuning.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "A. Yu, V. Ye, M. Tancik, and A. Kanazawa, “pixelnerf: Neural radiance fields from one or few images,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2021, pp. 4578–4587."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib4",
+      "text": "K.-E. Lin, L. Yen-Chen, W.-S. Lai, T.-Y. Lin, Y.-C. Shih, and R. Ramamoorthi, “Vision transformer for nerf-based view synthesis from a single input image,” in WACV , 2023."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib5",
+      "text": "P. Guo, M. A. Bautista, A. Colburn, L. Yang, D. Ulbricht, J. M. Susskind, and Q. Shan, “Fast and explicit neural view synthesis,” in Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision , 2022, pp. 3791–3800."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib6",
+      "text": "R. Liu, R. Wu, B. Van Hoorick, P. Tokmakov, S. Zakharov, and C. Vondrick, “Zero-1-to-3: Zero-shot one image to 3d object,” in Proceedings of the IEEE/CVF International Conference on Computer Vision , 2023, pp. 9298–9309."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib7",
+      "text": "J. Tang, T. Wang, B. Zhang, T. Zhang, R. Yi, L. Ma, and D. Chen, “Make-it-3d: High-fidelity 3d creation from a single image with diffusion prior,” arXiv preprint arXiv:2303.14184 , 2023."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib2",
+      "text": "R. Rombach, A. Blattmann, D. Lorenz, P. Esser, and B. Ommer, “High-resolution image synthesis with latent diffusion models,” in Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , 2022, pp. 10 684–10 695."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib3",
+      "text": "L. Zhang, A. Rao, and M. Agrawala, “Adding conditional control to text-to-image diffusion models,” 2023."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "S. Yang, Y. Zhou, Z. Liu, and C. C. Loy, “Rerender a video: Zero-shot text-guided video-to-video translation,” arXiv preprint arXiv:2306.07954 , 2023."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "M. Geyer, O. Bar-Tal, S. Bagon, and T. Dekel, “Tokenflow: Consistent diffusion features for consistent video editing,” arXiv preprint arXiv:2307.10373 , 2023."
+    }
+  ]
+}

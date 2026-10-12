@@ -1,0 +1,42 @@
+{
+  "source_type": "encyclopedia_article",
+  "source_id": "enwiki:Block Range Index#rev1345274649",
+  "title": "Block Range Index",
+  "authors": "Wikipedia contributors",
+  "year": "2026",
+  "url": "https://en.wikipedia.org/w/index.php?title=Block_Range_Index&oldid=1345274649",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Design",
+  "word_count": 328,
+  "text": "BRIN operate by \"summarising\" large blocks of data into a compact form, which can be efficiently tested to exclude many of them from a database query, early on. These tests exclude a large block of data for each comparison. By reducing the data volume so early on, both by representing large blocks as small tuples, and by eliminating many blocks, BRIN substantially reduce the amount of detailed data that must be examined by the database node on a row-by-row basis.[1]\n\nData storage in large databases is layered and chunked, with the table storage arranged into 'blocks'. Each block contains perhaps 1MB in each chunk[2] and they are retrieved by requesting specific blocks from a disk-based storage layer. BRIN are a lightweight in-memory summary layer above this: each tuple in the index summarises one block as to the range of the data contained therein: its minimum and maximum values, and if the block contains any non-null data for the column(s) of interest.[3]\n\nUnlike a traditional index which locates the regions of the table containing values of interest, BRIN act as \"negative indexes\",[4] showing the blocks that are definitely not of interest and thus do not need to be processed further.\n\nSome simple benchmarks suggest a five-fold improvement in search performance with an index scan, compared to the unindexed table.[5] Compared to B-trees, they avoid their maintenance overhead.[6]\n\nAs BRIN are so lightweight, they may be held entirely in memory, thus avoiding disk overhead during the scan. The same may not be true of B-tree: B-tree requires a tree node for every approximately N rows in the table, where N is the capacity of a single node, thus the index size is large. As BRIN only requires a tuple for each block (of many rows), the index becomes sufficiently small to make the difference between disk and memory. For a 'narrow' table the B-tree index volume approaches that of the table itself; the BRIN may be only 5–15% of it.[7]",
+  "references": [
+    {
+      "n": 1,
+      "text": "Herrera, Alvaro. (7 November 2014). commitdiff - BRIN: Block Range Indexes. git.postgresql.org. https://git.postgresql.org/gitweb/?p=postgresql.git;a=commitdiff;h=7516f5259411c02ae89e49084452dc342aadb2ae"
+    },
+    {
+      "n": 2,
+      "text": "Richard Foote. (4 October 2012). Exadata Storage Indexes – Part I. https://richardfoote.wordpress.com/2012/10/04/exadata-storage-indexes-part-i-beginning-to-see-the-light/"
+    },
+    {
+      "n": 3,
+      "text": "Mark Wong. (10 March 2015). PostgreSQL Performance Presentation. https://axleproject2015.files.wordpress.com/2015/03/postgresql-performance-presentation-sfpgday2015.pdf"
+    },
+    {
+      "n": 4,
+      "text": "Arup Nanda. (May–June 2011). Smart Scans Meet Storage Indexes. Oracle Magazine. http://www.oracle.com/technetwork/issue-archive/2011/11-may/o31exadata-354069.html"
+    },
+    {
+      "n": 5,
+      "text": "What's new in PostgreSQL 9.5. PostgreSQL. https://wiki.postgresql.org/wiki/What%27s_new_in_PostgreSQL_9.5#BRIN_Indexes"
+    },
+    {
+      "n": 6,
+      "text": "Alvaro Herrera. (2013-06-14). Minmax indexes. Pg Hackers. http://www.postgresql.org/message-id/20130614222805.GZ5491@eldon.alvh.no-ip.org"
+    },
+    {
+      "n": 7,
+      "text": "(May 22, 2015). Block Range (BRIN) Indexes in PostgreSQL 9.5. Python Sweetness. http://pythonsweetness.tumblr.com/post/119568339102/block-range-brin-indexes-in-postgresql-95"
+    }
+  ]
+}

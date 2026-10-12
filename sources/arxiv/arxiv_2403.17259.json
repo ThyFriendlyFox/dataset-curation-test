@@ -1,0 +1,134 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.17259",
+  "title": "Diffusion-based Negative Sampling on Graphs for Link Prediction",
+  "authors": "Trung-Kien Nguyen, Yuan Fang",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.SI"
+  ],
+  "url": "https://arxiv.org/abs/2403.17259",
+  "html_url": "https://arxiv.org/html/2403.17259",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1058,
+  "text": "Graph, which consists of nodes and links between them, is a ubiquitous data structure for real-world networks and systems. Link prediction [1] is a fundamental problem in graph analysis, aiming to model the probability that two nodes relate to each other in a network or system. Alternatively, given a query node, link prediction aims to rank other nodes based on their probability of linking to the query node. Graph link prediction enables a wide range of applications on the Web, such as friend suggestions in social networks [2], products recommendation in e-commerce platforms [3], and knowledge graph completion [4] for Web-scale knowledge bases.\n\nA prominent approach that has been extensively studied for link prediction is graph representation learning. It trains an encoder to produce low-dimensional node embeddings that capture the original graph topology in a latent space. Toward link prediction, many graph representation learning methods [5,6,7] follow the noise contrastive estimation approach [8], which resorts to sampling a set of positive and negative nodes for any query node. Specifically, the encoder is trained to capture graph topology by bringing positive node pairs closer while separating the negative pairs in the embedding space. While sampling the positive examples for link prediction is relatively straightforward (e.g., one-hop neighbors of the query node), sampling the negative examples involves a huge search space that is potentially quadratic in the number of nodes and a significant fraction of unlinked node pairs could be false negatives since not all links may be observed. Therefore, studying negative sampling for contrastive link prediction on graphs is a crucial research problem.\n\nMany strategies have been proposed for negative sampling on graphs, yet it is often challenging to flexibly model and control the quality of negative nodes. While uniform negative sampling [5,7] is simple, it ignores the quality of negative examples: Harder negative examples can often contribute more to model training than easier ones. Many studies explore predefined heuristics to select hard negative nodes, such as popularity [9], dynamic selections based on current predictions [10], k -hop neighborhoods [4], Personalized PageRank [3], etc. However, heuristics not only need elaborate designs, but also tend to be inflexible and may not extend to different kinds of graph. For instance, homophilous and heterophilous graphs exhibit different connectivity patterns, which means a good heuristic for one would not work well for the other. Besides heuristics, automatic methods leveraging generative adversarial networks (GANs) [11,12] are also popular. They aim to learn the underlying distribution of the nodes and retrieve harder ones automatically. However, it is still difficult to flexibly control the “hardness” of the negative examples for more optimal contrastive learning. Furthermore, it has been shown that the hardest negative examples may impair the performance [13,14], when they are nearly indistinguishable from the positive ones particularly in the early phase of training. To overcome this, we propose a strategy of multi-level negative sampling, where we can flexibly control the hardness level of the negative examples according to the need. For instance, easier negative examples can be used to warm-up model training, while harder ones are more critical to refining the decision boundary. Overall, a well-controlled mixture of easy and hard examples are expected to improve learning.\n\nThe idea of multi-level negative sampling immediately brings up the second question: Where do we find enough negative examples of variable hardness? Most negative sampling approaches [5,7,9,10,4,3] are limited to sampling nodes from the observed graph. However, observed graphs in real-world scenarios are often noisy or incomplete, which are not ideal sources for directly sampling a sufficient mixture of negative examples at different levels of hardness. To tackle this issue, we propose to synthesize more negative nodes to complement the real ones in the latent space. The latent space can potentially provide infinite negative examples with arbitrary hardness, to aid the generation of multi-level negative examples in a flexible and controllable manner. Although a few studies [15,16] also utilize GANs to generate additional samples in the latent space, they are not designed to synthesize multi-level examples.\n\nTo materialize our multi-level strategy, a natural choice is diffusion models. Recently, diffusion models have achieved promising results in generation tasks [17,18], particularly in visual applications [19,20]. While GAN-based models are successful in generating high-fidelity examples, they face many issues in training such as vanishing gradients and mode collapse [21,22]. In contrast, diffusion models follow a reconstruction mechanism that offers a stable training process [23]. More specific to our context, a desirable property of diffusion model is that it utilizes a Markov chain with multiple time steps to denoise random input, where the sample generated at each time step is conditioned on the sample in the immediately preceding step. Hence, during the generation process, we can naturally access the generated samples at different denoised time steps to achieve our multi-level strategy. Hence, we propose a novel diffusion-based framework to generate negative examples for graph link prediction, named Conditional Diffusion-based Multi-level Negative Sampling (DMNS). On one hand, we employ a diffusion model to learn the one-hop connectivity distribution of any given query node, i.e., the positive distribution in link prediction. The diffusion model allows us to flexibly control the hardness of each negative example by looking up a specified time step t, ranging from a virtually positive example (or indistinguishable from the positives) when t=0 and harder examples as t\\to 0, to easier ones amounting to random noises as t\\to\\infty. On the other hand, we adopt a conditional diffusion model [19,20], which is designed to explicitly condition the generation on side information. In graph link prediction, we condition the positive distribution of a specific query node on the node itself, and thus obtain query-specific diffusion models. Theoretically, we show that the density function of our negative examples obeys the sub-linear positivity principle [6] under some constraint, ensuring robust negative sampling on graphs.\n\nOur contributions in this work are summarized as follows. 1) We investigate the strategy of multi-level negative sampling on graphs for contrastive link prediction. 2) We propose a novel framework DMNS based on a conditional diffusion model, which generates multi-level negative examples that can be flexibly controlled to improve training. 3) We show that the distribution function of our negative examples follows the sub-linear positivity principle under a defined constraint. 4) We conduct extensive experiments on several benchmark datasets, showing that our model outperforms state-of-the-art baselines on graph link prediction.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib29",
+      "text": "Lü and Zhou (2011) Linyuan Lü and Tao Zhou. 2011. Link prediction in complex networks: A survey. Physica A: statistical mechanics and its applications 390, 6 (2011), 1150–1170."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib8",
+      "text": "Chen et al . (2020) Liang Chen, Yuanzhen Xie, Zibin Zheng, Huayou Zheng, and Jingdun Xie. 2020. Friend recommendation based on multi-social graph convolutional network. IEEE Access 8 (2020), 43618–43629."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib52",
+      "text": "Ying et al . (2018) Rex Ying, Ruining He, Kaifeng Chen, Pong Eksombatchai, William L Hamilton, and Jure Leskovec. 2018. Graph convolutional neural networks for web-scale recommender systems. In Proceedings of the 24th ACM SIGKDD international conference on knowledge discovery & data mining . 974–983."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib3",
+      "text": "Ahrabian et al . (2020) Kian Ahrabian, Aarash Feizi, Yasmin Salehi, William L Hamilton, and Avishek Joey Bose. 2020. Structure aware negative sampling in knowledge graphs. arXiv preprint arXiv:2009.11355 (2020)."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib45",
+      "text": "Tang et al . (2015) Jian Tang, Meng Qu, Mingzhe Wang, Ming Zhang, Jun Yan, and Qiaozhu Mei. 2015. Line: Large-scale information network embedding. In Proceedings of the 24th international conference on world wide web . 1067–1077."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib51",
+      "text": "Yang et al . (2020) Zhen Yang, Ming Ding, Chang Zhou, Hongxia Yang, Jingren Zhou, and Jie Tang. 2020. Understanding negative sampling in graph representation learning. In Proceedings of the 26th ACM SIGKDD international conference on knowledge discovery & data mining . 1666–1676."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib15",
+      "text": "Hamilton et al . (2017) Will Hamilton, Zhitao Ying, and Jure Leskovec. 2017. Inductive representation learning on large graphs. In NeurIPS . 1024–1034."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib14",
+      "text": "Gutmann and Hyvärinen (2010) Michael Gutmann and Aapo Hyvärinen. 2010. Noise-contrastive estimation: A new estimation principle for unnormalized statistical models. In Proceedings of the thirteenth international conference on artificial intelligence and statistics . JMLR Workshop and Conference Proceedings, 297–304."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib31",
+      "text": "Mikolov et al . (2013) Tomas Mikolov, Ilya Sutskever, Kai Chen, Greg S Corrado, and Jeff Dean. 2013. Distributed representations of words and phrases and their compositionality. Advances in neural information processing systems 26 (2013)."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib55",
+      "text": "Zhang et al . (2013) Weinan Zhang, Tianqi Chen, Jun Wang, and Yong Yu. 2013. Optimizing top-n collaborative filtering via dynamic negative item sampling. In Proceedings of the 36th international ACM SIGIR conference on Research and development in information retrieval . 785–788."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib6",
+      "text": "Cai and Wang (2017) Liwei Cai and William Yang Wang. 2017. Kbgan: Adversarial learning for knowledge graph embeddings. arXiv preprint arXiv:1711.04071 (2017)."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib47",
+      "text": "Wang et al . (2018) Hongwei Wang, Jia Wang, Jialin Wang, Miao Zhao, Weinan Zhang, Fuzheng Zhang, Xing Xie, and Minyi Guo. 2018. Graphgan: Graph representation learning with generative adversarial nets. In Proceedings of the AAAI conference on artificial intelligence , Vol. 32."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib11",
+      "text": "Faghri et al . (2017) Fartash Faghri, David J Fleet, Jamie Ryan Kiros, and Sanja Fidler. 2017. Vse++: Improving visual-semantic embeddings with hard negatives. arXiv preprint arXiv:1707.05612 (2017)."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib48",
+      "text": "Xuan et al . (2020) Hong Xuan, Abby Stylianou, Xiaotong Liu, and Robert Pless. 2020. Hard negative examples are hard, but useful. In Computer Vision–ECCV 2020: 16th European Conference, Glasgow, UK, August 23–28, 2020, Proceedings, Part XIV 16 . Springer, 126–142."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib20",
+      "text": "Hu et al . (2019) Binbin Hu, Yuan Fang, and Chuan Shi. 2019. Adversarial learning on heterogeneous information networks. In Proceedings of the 25th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining . 120–129."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib25",
+      "text": "Li et al . (2023) Jianxin Li, Xingcheng Fu, Shijie Zhu, Hao Peng, Senzhang Wang, Qingyun Sun, S Yu Philip, and Lifang He. 2023. A robust and generalized framework for adversarial graph embedding. IEEE Transactions on Knowledge and Data Engineering (2023)."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "Ho et al . (2020) Jonathan Ho, Ajay Jain, and Pieter Abbeel. 2020. Denoising diffusion probabilistic models. Advances in Neural Information Processing Systems 33 (2020), 6840–6851."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib42",
+      "text": "Song and Ermon (2019) Yang Song and Stefano Ermon. 2019. Generative modeling by estimating gradients of the data distribution. Advances in neural information processing systems 32 (2019)."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib18",
+      "text": "Ho et al . (2022b) Jonathan Ho, Chitwan Saharia, William Chan, David J Fleet, Mohammad Norouzi, and Tim Salimans. 2022b. Cascaded Diffusion Models for High Fidelity Image Generation. J. Mach. Learn. Res. 23, 47 (2022), 1–33."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib9",
+      "text": "Dhariwal and Nichol (2021) Prafulla Dhariwal and Alexander Nichol. 2021. Diffusion models beat gans on image synthesis. Advances in Neural Information Processing Systems 34 (2021), 8780–8794."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib4",
+      "text": "Arjovsky and Bottou (2017) Martin Arjovsky and Léon Bottou. 2017. Towards principled methods for training generative adversarial networks. arXiv preprint arXiv:1701.04862 (2017)."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib5",
+      "text": "Arjovsky et al . (2017) Martin Arjovsky, Soumith Chintala, and Léon Bottou. 2017. Wasserstein generative adversarial networks. In International conference on machine learning . PMLR, 214–223."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib30",
+      "text": "Luo (2022) Calvin Luo. 2022. Understanding diffusion models: A unified perspective. arXiv preprint arXiv:2208.11970 (2022)."
+    }
+  ]
+}

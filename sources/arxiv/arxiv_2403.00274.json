@@ -1,0 +1,140 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.00274",
+  "title": "CustomListener: Text-guided Responsive Interaction for User-friendly Listening Head Generation",
+  "authors": "Xi Liu, Ying Guo, Cheng Zhen, Tong Li, Yingying Ao, Pengfei Yan",
+  "year": "2024",
+  "categories": [
+    "cs.CV",
+    "cs.SD",
+    "eess.AS"
+  ],
+  "url": "https://arxiv.org/abs/2403.00274",
+  "html_url": "https://arxiv.org/html/2403.00274",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 941,
+  "text": "Listening Head Generation (LHG) is to generate listener motions (face expressions, head movements, etc.) that respond synchronously to the speaker during face-to-face communication. Good communication is a two-way process, and the roles of speakers and listeners are equally important [1]. Whether the listener responds promptly will affect whether the speaker can actively express the follow-up content [2,3]. Unlike speaker head generation (SHG) [4,5,6,7], listeners can only convey information through non-verbal feedback (nodding, frowning, etc.), and their responses are affected by both sides of the interaction (speaker’s motion, tone, and listener’s own personality and emotion state). Currently, many applications, such as digital avatar generation [8,9] and human-computer interaction [10], use the listener agent to simulate more realistic conversations, which has promoted many studies in LHG.\n\nSome early works manually integrate motions based on rules [11,12,13], or rely on 2D facial keypoints [14,15] to manipulate the head, but they are limited in the variety of motions and the detailed control ability. Recent works [16,17,18,19,20] have introduced 3D face coefficients [21], combined with the post-rendering module to achieve more precise control. Specifically, RLHG [16] uses a sequence-sequence structure as the baseline method for decoding 3DMM coefficients. PCH [17] further improves the render module to inpaint image artifacts. L2L [20] quantizes listener motions into the discrete one-dimensional codebook by VQ-VAE [22], and ELP [19] expands the codebook to a composition of several discrete codewords to achieve more fine-grained control. MFR-Net [18] designs a feature aggregation module to achieve better identity preservation and motion diversity.\n\nAlthough the above methods can combine speaker-listener information to generate diverse and fine-grained listener motions, they have restrictions in the explicit control of the listener agent’s response. Specifically, L2L [20] focuses on the motion diversity but cannot control the motion under specific conditions. RLHG [16], PCH [17], MFR-Net [18], and ELP [19] achieves controllable listener motion conditioned on the input attitude. However, the attitude is limited to a few fixed labels (eg. positive, neutral, negative), posing limitations on the generation of realistic listeners: First, simple labels are not enough to give accurate responses. For example, for negative attitudes, the two emotions of doubt and anger correspond to different facial expressions. More importantly, a realistic listener agent should have its own identity (parent, friend, teacher, etc.), personality (lively, calm, etc.) and behavioral habits (e.g. frowning when thinking), which users can customize and set in advance. However, simple labels cannot achieve the control under these conditions.\n\nConsidering the above limitations of simple labels, in this paper, we propose a user-friendly framework called CustomListener to enable the text-guided generation, as shown in Figure 1. Users can pre-customize detailed attributes of the listener agent. Then using a large language model, we combine speech content and user-customized attributes to obtain the text prior of the listener’s basic portrait. In CustomListener, we seamlessly incorporate speaker information while being guided by the text prior, so as to generate realistic listener responses that are controllable and interactive.\n\nFor the guidance of text prior, due to the interactive nature of communication, listener motions cannot simply be regarded as text-conditioned motion generation, but faces the following challenges: 1) Speaker-listener coordination: the text provides the basic portrait style of the listener’s response. While to precisely express the listener’s emotional empathy towards the speaker, the response not only needs to complete the text-specified motion, but also needs to adjust its completion timing and rhythm, and fluctuate with the speaker’s semantics, intonation and movement amplitude. 2) Listener motion coherence: When motions conditioned on different text priors are combined into a long video, different segments should be coherent. Due to the customization, apart from ensuring smooth motion switching, we also need to guarantee that the user-customized listener’s behavioral habits reflected in past segments are maintained in the current segment. Maintaining the style of the past while still showing the motion of the current text can be challenging.\n\nTo solve the above challenges, in our CustomListener, we design the Static to Dynamic Portrait module (SDP) and the Past Guided Generation module (PGG) to achieve the coordination and the coherence respectively. In SDP, we transform the static portrait provided by the text prior to be dynamic one, which interacts with audio to obtain the time-dependent information about the completion time and rhythm of the gradual motion changes, and refines the listener’s motions to make the speaker-listener fluctuations relevant. In PGG, we generate a motion prior based on the similarity of dynamic portrait tokens between adjacent segments, which provides reference information for features that need to be maintained in the current compared to the past. Then, the motion prior and the dynamic portrait token are input as conditions into the diffusion-based structure [23] with fixed noise at the segment connection, finally generating listener coefficients that enable coordination and coherence in interactions.\n\nIn summary, this paper has the following contributions:\n\n- • We argue that simple labels are not sufficient to achieve freely controllable listener generation, and thus propose the CustomListener framework that can freely control listener head motions guided by the text prior.\n\n- • We design a SDP module to achieve the speaker-listener coordination, so that the completion timing and rhythm of text-specified motions correspond to the speaker, and fluctuate with the speaker’s semantics, tone, and movements.\n\n- • For long-term generation, we design a PGG module to meet listener motion coherence between different text-prior-conditioned segments, so that the consistency of the listener’s customized behavioral habits between segments can be maintained and the motion switching is smooth.\n\n- • Extensive experiments on ViCo [16] and Realtalk [24] datasets confirm that our method can realize the state-of-the-art performance, and achieve the controllable and interactive realistic listener motion generation.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib4",
+      "text": "Justine Cassell and Kristinn R Thorisson. The power of a nod and a glance: Envelope vs. emotional feedback in animated conversational agents. Applied Artificial Intelligence , 13(4-5):519–538, 1999."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib17",
+      "text": "Adam Kendon. Movement coordination in social interaction: Some examples described. Acta psychologica , 32:101–125, 1970."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib19",
+      "text": "Marianne LaFrance. Nonverbal synchrony and rapport: Analysis by the cross-lag panel technique. Social Psychology Quarterly , pages 66–70, 1979."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib7",
+      "text": "Lele Chen, Ross K Maddox, Zhiyao Duan, and Chenliang Xu. Hierarchical cross-modal talking face generation with dynamic pixel-wise loss. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 7832–7841, 2019."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib16",
+      "text": "Xinya Ji, Hang Zhou, Kaisiyuan Wang, Wayne Wu, Chen Change Loy, Xun Cao, and Feng Xu. Audio-driven emotional video portraits. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 14080–14089, 2021."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib31",
+      "text": "Alexander Richard, Michael Zollhöfer, Yandong Wen, Fernando De la Torre, and Yaser Sheikh. Meshtalk: 3d face animation from speech using cross-modality disentanglement. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 1173–1182, 2021."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib39",
+      "text": "Konstantinos Vougioukas, Stavros Petridis, and Maja Pantic. Realistic speech-driven facial animation with gans. International Journal of Computer Vision , 128:1398–1413, 2020."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "Lele Chen, Chen Cao, Fernando De la Torre, Jason Saragih, Chenliang Xu, and Yaser Sheikh. High-fidelity face tracking for ar/vr via deep lighting adaptation. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 13059–13069, 2021."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib20",
+      "text": "Ruilong Li, Shan Yang, David A Ross, and Angjoo Kanazawa. Ai choreographer: Music conditioned 3d dance generation with aist++. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 13401–13412, 2021."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib45",
+      "text": "Zhimeng Zhang, Lincheng Li, Yu Ding, and Changjie Fan. Flow-guided one-shot talking face generation with a high-resolution audio-visual dataset. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 3661–3670, 2021."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib36",
+      "text": "Sinan Sonlu, Uğur Güdükbay, and Funda Durupinar. A conversational agent framework with multi-modal personality expression. ACM Transactions on Graphics (TOG) , 40(1):1–16, 2021."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib1",
+      "text": "Dan Bohus and Eric Horvitz. Facilitating multiparty dialog with gaze, gesture, and speech. In International Conference on Multimodal Interfaces and the Workshop on Machine Learning for Multimodal Interaction , pages 1–8, 2010."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib5",
+      "text": "Justine Cassell, Catherine Pelachaud, Norman Badler, Mark Steedman, Brett Achorn, Tripp Becket, Brett Douville, Scott Prevost, and Matthew Stone. Animated conversation: rule-based generation of facial expression, gesture & spoken intonation for multiple conversational agents. In Proceedings of the 21st annual conference on Computer graphics and interactive techniques , pages 413–420, 1994."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib11",
+      "text": "Will Feng, Anitha Kannan, Georgia Gkioxari, and C Lawrence Zitnick. Learn2smile: Learning non-verbal interaction through observation. In 2017 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS) , pages 4131–4138. IEEE, 2017."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib26",
+      "text": "Behnaz Nojavanasghari, Yuchi Huang, and Saad Khan. Interactive generative adversarial networks for facial expression generation in dyadic interactions. arXiv preprint arXiv:1801.09092 , 2018."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib46",
+      "text": "Mohan Zhou, Yalong Bai, Wei Zhang, Ting Yao, Tiejun Zhao, and Tao Mei. Responsive listening head generation: A benchmark dataset and baseline. In Proceedings of the European conference on computer vision (ECCV) , 2022."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib15",
+      "text": "Ailin Huang, Zhewei Huang, and Shuchang Zhou. Perceptual conversational head generation with regularized driver and enhanced renderer. In Proceedings of the 30th ACM International Conference on Multimedia (MM’22) , 2022."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib21",
+      "text": "Jin Liu, Xi Wang, Xiaomeng Fu, Yesheng Chai, Cai Yu, Jiao Dai, and Jizhong Han. Mfr-net: Multi-faceted responsive listening head generation via denoising diffusion model. In Proceedings of the 31th ACM International Conference on Multimedia (MM’23) , 2023."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib35",
+      "text": "Luchuan Song, Guojun Yin, Zhenchao Jin, Xiaoyi Dong, and Chenliang Xu. Emotional listener portrait: Neural listener head generation with emotion. In Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV) , pages 20839–20849, 2023."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib25",
+      "text": "Evonne Ng, Hanbyul Joo, Liwen Hu, Hao Li, Trevor Darrell, Angjoo Kanazawa, and Shiry Ginosar. Learning to listen: Modeling non-deterministic dyadic facial motion. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 20395–20405, 2022."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib9",
+      "text": "Yu Deng, Jiaolong Yang, Sicheng Xu, Dong Chen, Yunde Jia, and Xin Tong. Accurate 3d face reconstruction with weakly-supervised learning: From single image to image set. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition workshops , pages 0–0, 2019."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib37",
+      "text": "Aaron Van Den Oord, Oriol Vinyals, et al. Neural discrete representation learning. Advances in neural information processing systems , 30, 2017."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib14",
+      "text": "Jonathan Ho, Ajay Jain, and Pieter Abbeel. Denoising diffusion probabilistic models. Advances in neural information processing systems , 33:6840–6851, 2020."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib12",
+      "text": "Scott Geng, Revant Teotia, Purva Tendulkar, Sachit Menon, and Carl Vondrick. Affective faces for goal-driven dyadic communication. arXiv preprint arXiv:2301.10939 , 2023."
+    }
+  ]
+}

@@ -1,0 +1,129 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2303.05101",
+  "title": "Scalable Stochastic Gradient Riemannian Langevin Dynamics in Non-Diagonal Metrics",
+  "authors": "Hanlin Yu, Marcelo Hartmann, Bernardo Williams, Arto Klami",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "stat.CO"
+  ],
+  "url": "https://arxiv.org/abs/2303.05101",
+  "html_url": "https://arxiv.org/html/2303.05101",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 857,
+  "text": "Bayesian methods are increasingly being used for large-scale models, especially deep neural networks, with significant literature on both sampling-based algorithms [1,2,3,4] and distributional approximation algorithms [5,6,7,8]. Even though sampling-based methods are often considered inefficient in the general Bayesian inference literature, they are highly practical for neural networks due to the stochastic-gradient sampling methods following closely the process of stochastic optimization [9]. In effect, we get efficient samplers by relatively minor modification of optimization algorithms. There are two prominent families of stochastic-gradient sampling methods, based on Langevin dynamics [1] and Hamiltonian dynamics [2]. We build on the former that has the advantage of ease of implementation and fewer hyper-parameters, but our contributions focusing on accounting for local curvature could likely be used also in Hamiltonian dynamics.\n\nThe samplers based on Langevin dynamics operate by numerical integration of a particular stochastic differential equation (SDE) [10]. Our starting point is the Stochastic Gradient Riemannian Langevin Dynamics (SGRLD) method where the underlying SDE is defined on a manifold characterised by a metric tensor G(\\btheta)\\in\\mathbb{R}^{D\\times D} (for a problem of D parameters) and the integration is carried along the manifold. This formulation allows improved sampling by careful choice of the metric [10]. Perhaps the optimal choice is to use metrics that accurately capture the local curvature of the target distribution and e.g. [11] have demonstrated that using the Fisher information matrix as the metric tensor provides advantages in exploration for sufficiently small problems where it is technically feasible. However, this comes with a substantial computational challenge: Already constructing the Fisher information matrix is computationally costly and the samplers need to repeatedly compute its inverse and inverse square root.\n\nFor large-scale problems the practical methods sacrifice flexibility for computational efficiency by using simplified metrics. The early works used constant G that was further restricted to be diagonal, resulting in the basic SGLD method [1]. More recent methods use position-dependent G(\\btheta) but assume it to be diagonal to retain computational efficiency. In a suitably chosen diagonal metric the computational overhead is negligible as element-wise operations can be used throughout the algorithm. Furthermore, the metric is typically not formed using differential geometric arguments, and is often adaptively tuned during optimization. For example, [12] used G(\\btheta) motivated by the RMSprop preconditioner used commonly for optimization, and [9] constructed a diagonal G(\\btheta) with separate scaling for each layer of a neural network. These methods remain the standard choices for inference for general cases. Some attempts of using non-diagonal metrics have been done, but all of the current solutions are structure-dependent and only applicable for specific scenarios. [13] and [14] provide computationally more efficient approximations for the Fisher information metric in form of quasi-diagonal approximations and the K-FAC approximation, respectively, but they still incur a higher computational cost and require explicit construction of the approximation for a specific network structure. Recently, [15] constructed a non-diagonal preconditioner that accounts for the curvature induced by the batch normalization operation and showed that it improves efficiency for networks using that operation, but they do not provide a general recipe for forming the metric for all other structures.\n\nIn this work we provide two new SGRLD variants using non-diagonal metrics G(\\btheta) that – when implemented in a suitable manner – are computationally efficient and applicable for general deep neural networks with arbitrary network structures. The resulting algorithms yield well-defined operations for different network layer types without specific treatments, in contrast to the previous attempts. The first method builds on the Monge metric [16] introduced in the context of Lagrangian Monte Carlo [17]. This metric is a combination of a diagonal matrix and a rank-one matrix that depends only on the gradients, taking the form I_{D}+\\alpha^{2}\\nabla\\ell\\nabla\\ell^{\\top} with \\ell being the log posterior, having a differential geometric justification. Despite of full-matrix form, the metric is fast to compute and has efficient inverse. We incorporate the metric into SGRLD and show that we can implement many operations in element-wise manner just as in the case of diagonal metrics. The sampler is generally applicable as the metric does not rely on e.g. the structure of a neural network, but it is found to be quite sensitive to a tuning parameter \\alpha^{2} controlling the metric.\n\nThe second metric builds on the Shampoo method [18] proposed for optimization. They construct a full matrix preconditioner G(\\btheta) by using Kronecker products of layer-wise matrices that can be efficiently updated during optimization. We incorporate their preconditioner as a metric tensor in SGRLD. The updates are considerably more efficient than direct inversion of the full matrix but the sampler still has some computational overhead compared to diagonal metrics, in our experiments around factor of 1.3-2.4. We argue that such small overhead is justified by consistent good performance in our experiments.\n\nWe evaluate the metrics in problems of varying complexity. We observe that for fully connected neural networks with Gaussian priors the metric may not be that important. For heavy-tailed priors often recommended for these networks [19], such as the horseshoe prior [20] used by [21] and [22], the posterior is more challenging and the choice of the metric is more important. For convolutional neural networks, we also observe differences between the metrics.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib49",
+      "text": "Welling & Teh (2011) Max Welling and Yee Whye Teh. Bayesian Learning via Stochastic Gradient Langevin Dynamics. In International Conference on Machine Learning , 2011."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib5",
+      "text": "Chen et al. (2014) Tianqi Chen, Emily B. Fox, and Carlos Guestrin. Stochastic Gradient Hamiltonian Monte Carlo. In Proceedings of the 31st International Conference on Machine Learning , Proceedings of Machine Learning Research, pp. 1683–1691, 2014."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib52",
+      "text": "Zhang et al. (2020) Ruqi Zhang, Chunyuan Li, Jianyi Zhang, Changyou Chen, and Andrew Gordon Wilson. Cyclical Stochastic Gradient MCMC for Bayesian Deep Learning. In International Conference on Learning Representations (ICLR) , 2020."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib47",
+      "text": "Vono et al. (2022) Maxime Vono, Vincent Plassier, Alain Durmus, Aymeric Dieuleveut, and Eric Moulines. Qlsd: Quantised Langevin Stochastic Dynamics for Bayesian Federated Learning. In Proceedings of The 25th International Conference on Artificial Intelligence and Statistics , volume 151, pp. 6459–6500. PMLR, 28–30 Mar 2022."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib13",
+      "text": "Graves (2011) Alex Graves. Practical variational inference for neural networks. In Advances in Neural Information Processing Systems , volume 24. Curran Associates, Inc., 2011."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib2",
+      "text": "Blundell et al. (2015) Charles Blundell, Julien Cornebise, Koray Kavukcuoglu, and Daan Wierstra. Weight Uncertainty in Neural Networks. In Proceedings of the 32nd International Conference on Machine Learning - Volume 37 , ICML’15, pp. 1613–1622. JMLR.org, 2015."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib17",
+      "text": "Huix et al. (2022) Tom Huix, Szymon Majewski, Alain Durmus, Eric Moulines, and Anna Korba. Variational Inference of overparameterized Bayesian Neural Networks: a theoretical and empirical study, 2022."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib35",
+      "text": "Nazaret & Blei (2022) Achille Nazaret and David Blei. Variational Inference for Infinitely Deep Neural Networks. In Proceedings of the 39th International Conference on Machine Learning , volume 162 of Proceedings of Machine Learning Research , pp. 16447–16461. PMLR, 17–23 Jul 2022."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib50",
+      "text": "Wenzel et al. (2020) Florian Wenzel, Kevin Roth, Bastiaan S. Veeling, Jakub Swiatkowski, Linh Tran, Stephan Mandt, Jasper Snoek, Tim Salimans, Rodolphe Jenatton, and Sebastian Nowozin. How Good is the Bayes Posterior in Deep Neural Networks Really? In International Conference on Machine Learning (ICML) . JMLR.org, 2020."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib31",
+      "text": "Ma et al. (2015) Yi-An Ma, Tianqi Chen, and Emily B. Fox. A Complete Recipe for Stochastic Gradient MCMC. In Advances in Neural Information Processing Systems , pp. 2917–2925. MIT Press, 2015."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "Girolami & Calderhead (2011) Mark Girolami and Ben Calderhead. Riemann manifold Langevin and Hamiltonian Monte Carlo methods. Journal of the Royal Statistical Society: Series B (Statistical Methodology) , 73(2):123–214, 2011."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib29",
+      "text": "Li et al. (2016) Chunyuan Li, Changyou Chen, David Carlson, and Lawrence Carin. Preconditioned Stochastic Gradient Langevin Dynamics for Deep Neural Networks. In AAAI Conference on Artificial Intelligence , AAAI’16, pp. 1788–1794, 2016."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib32",
+      "text": "Marceau-Caron & Ollivier (2017) Gaétan Marceau-Caron and Yann Ollivier. Natural Langevin Dynamics for Neural Networks. In Geometric Science of Information - Third International Conference, GSI 2017, Proceedings , volume 10589 of Lecture Notes in Computer Science , pp. 451–459. Springer, 2017."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib33",
+      "text": "Nado et al. (2018) Zachary Nado, Jasper Snoek, Roger Grosse, David Duvenaud, Bowen Xu, and James Martens. Stochastic Gradient Langevin Dynamics that exploit Neural Network Structure. In ICLR Workshop , 2018."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib26",
+      "text": "Lange et al. (2023) Susanna Lange, Wei Deng, Qiang Ye, and Guang Lin. Batch Normalization Preconditioning for Stochastic Gradient Langevin Dynamics. Journal of Machine Learning , 2(1):65–82, 2023."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib15",
+      "text": "Hartmann et al. (2022) Marcelo Hartmann, Mark Girolami, and Arto Klami. Lagrangian manifold Monte Carlo on Monge patches. In Proceedings of The 25th International Conference on Artificial Intelligence and Statistics , volume 151 of Proceedings of Machine Learning Research , pp. 4764–4781. PMLR, 2022."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib25",
+      "text": "Lan et al. (2015) Shiwei Lan, Vasileios Stathopoulos, Babak Shahbaba, and Mark Girolami. Markov Chain Monte Carlo From Lagrangian Dynamics. Journal of Computational and Graphical Statistics , 24(2):357–378, 2015. ISSN 10618600, 15372715."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib14",
+      "text": "Gupta et al. (2018) Vineet Gupta, Tomer Koren, and Yoram Singer. Shampoo: Preconditioned Stochastic Tensor Optimization. In International Conference on Machine Learning (ICML) , volume 80 of Proceedings of Machine Learning Research , pp. 1842–1850. PMLR, 2018."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib9",
+      "text": "Fortuin et al. (2022) Vincent Fortuin, Adrià Garriga-Alonso, Sebastian W. Ober, Florian Wenzel, Gunnar Rätsch, Richard E. Turner, Mark van der Wilk, and Laurence Aitchison. Bayesian Neural Network Priors Revisited. In International Conference on Learning Representations, ICLR 2022 , 2022."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib3",
+      "text": "Carvalho et al. (2009) Carlos M. Carvalho, Nicholas G. Polson, and James G. Scott. Handling Sparsity via the Horseshoe. In Proceedings of the Twelth International Conference on Artificial Intelligence and Statistics , volume 5 of Proceedings of Machine Learning Research , pp. 73–80. PMLR, 2009."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib10",
+      "text": "Ghosh et al. (2019) Soumya Ghosh, Jiayu Yao, and Finale Doshi-Velez. Model Selection in Bayesian Neural Networks via Horseshoe Priors. Journal of Machine Learning Research , 20(182):1–46, 2019."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib41",
+      "text": "Popkes et al. (2019) Anna-Lena Popkes, Hiske Overweg, Ari Ercole, Yingzhen Li, Jos’e Miguel Hernández-Lobato, Yordan Zaykov, and Cheng Zhang. Interpretable Outcome Prediction with Sparse Bayesian Neural Networks in Intensive Care. arXiv preprint arXiv:1905.02599 , 2019."
+    }
+  ]
+}

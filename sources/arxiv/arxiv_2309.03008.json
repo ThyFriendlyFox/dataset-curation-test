@@ -1,0 +1,113 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2309.03008",
+  "title": "Sparse 3D Reconstruction via Object-Centric Ray Sampling",
+  "authors": "Llukman Cerkezi, Paolo Favaro",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2309.03008",
+  "html_url": "https://arxiv.org/html/2309.03008",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 602,
+  "text": "The task of reconstructing the 3D surface of an object from multiple calibrated views is a well-established problem with a long history of methods exploring a wide range of 3D representations and optimization methods [1,2,3,4]. Recent approaches have focused their attention on deep learning models [5,6,7,8,9,10,11,12]. In particular, methods based on neural rendering such as NeRF and its variants [7,13,14,15,16], have not only shown impressive view interpolation capabilities, but also the ability to output 3D reconstructions as a byproduct of their training.\n\nNeRF’s neural rendering drastically simplifies the generation of images given a new camera pose. It altogether avoids the complex modeling of the light interaction with surfaces in the scene. A neural renderer learns to output the color of a pixel as a weighted average of 3D point samples from the NeRF model. Current methods choose these samples along the ray defined by the given pixel and the camera center (see Figure 2 left). Because each camera view defines a separate pencil of rays, the 3D samples rarely overlap. Thus, each view will provide updates for mostly independent sets of parameters of the NeRF model, which can lead to data overfitting. In practice, overfitting means that views used for training will be rendered correctly, but new camera views will give unrealistic images. Such overfitting is particularly prominent when training a NeRF on only a sparse set of views with a broad object coverage (e.g., see the 360^{\\circ} camera rig in Figure 1).\n\nIn this work, we address overfitting when working with sparse views by proposing an object-centric sampling scheme that is shared across all views (see Figure 2 right and Figure 3). We design the scheme so that all (visible) views can provide an update for the same 3D points on a given sampling ray. To do so, we introduce a hybrid 3D representation, where we simultaneously update a Multi Layer Perceptron (MLP) based implicit surface model (similarly to a NeRF) and an associated triangle mesh. The MLP model defines an implicit 3D representation of the scene, while the mesh is used to define the sampling rays. These rays are located at each mesh vertex and take the direction of the normal to the mesh. Then, the mesh vertex of the current object surface is updated by querying the MLP model at 3D samples on the corresponding ray. We use a similar deep learning model to associate color to the mesh. We then image the triangle mesh in each camera view via a differentiable renderer. Because of our representation, the queried 3D samples can be shared across multiple views and thus avoid the overfitting shown by NeRF models in our settings.\n\nNotice that a common practice to handle overfitting in NeRF models trained on sparse views is to constrain the 3D reconstruction through object masks. Masks provide a very strong 3D cue. In fact, a (coarse) reconstruction of an object can even be obtained from the masks alone, a technique known as shape from silhouette [17]. We show that our method yields accurate 3D reconstructions even without mask constraints. This confirms experimentally the effectiveness of our sampling scheme in avoiding overfitting.\n\nTo summarize, our contributions are\n\n- • A novel object-centric sampling scheme that efficiently shares samples across multiple views and avoids overfitting; the robustness of our method is such that it does not need additional constraints, such as 2D object masks;\n\n- • A 3D reconstruction method that yields state of the art results with a sparse set of views from a 360-degree camera rig (on the Google’s Scanned Objects [18], Tank and Temples [19] and MVMC Car datasets [9]).",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib12",
+      "text": "Yasutaka Furukawa and Jean Ponce. Accurate, dense, and robust multiview stereopsis. PAMI , 2010."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib13",
+      "text": "Yasutaka Furukawa, Carlos Hernández, et al. Multi-view stereo: A tutorial. Foundations and Trends® in Computer Graphics and Vision , 2015."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib11",
+      "text": "David A Forsyth and Jean Ponce. Computer vision: a modern approach . Prentice Hall Professional Technical Reference, 2002."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib53",
+      "text": "Richard Szeliski. Computer vision: algorithms and applications . Springer Nature, 2022."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib39",
+      "text": "Michael Niemeyer, Lars Mescheder, Michael Oechsle, and Andreas Geiger. Differentiable volumetric rendering: Learning implicit 3d representations without 3d supervision. In CVPR , 2020."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib50",
+      "text": "Vincent Sitzmann, Michael Zollhöfer, and Gordon Wetzstein. Scene representation networks: Continuous 3d-structure-aware neural scene representations. In NeurIPS , 2019."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib35",
+      "text": "Ben Mildenhall, Pratul P. Srinivasan, Matthew Tancik, Jonathan T. Barron, Ravi Ramamoorthi, and Ren Ng. Nerf: Representing scenes as neural radiance fields for view synthesis. In ECCV , 2020."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib21",
+      "text": "Tejas Khot, Shubham Agrawal, Shubham Tulsiani, Christoph Mertz, Simon Lucey, and Martial Hebert. Learning unsupervised multi-view stereopsis via robust photometric consistency. In CVPR , 2019."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib65",
+      "text": "Jason Y. Zhang, Gengshan Yang, Shubham Tulsiani, and Deva Ramanan. NeRS: Neural reflectance surfaces for sparse-view 3d reconstruction in the wild. In NeurIPS , 2021."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib6",
+      "text": "Wenzheng Chen, Huan Ling, Jun Gao, Edward Smith, Jaakko Lehtinen, Alec Jacobson, and Sanja Fidler. Learning to predict 3d objects with an interpolation-based differentiable renderer. In Advances in Neural Information Processing Systems , 2019."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib27",
+      "text": "Lingjie Liu, Jiatao Gu, Kyaw Zaw Lin, Tat-Seng Chua, and Christian Theobalt. Neural sparse voxel fields. In NeurIPS , 2020."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib34",
+      "text": "Ben Mildenhall, Pratul P. Srinivasan, Rodrigo Ortiz-Cayon, Nima Khademi Kalantari, Ravi Ramamoorthi, Ren Ng, and Abhishek Kar. Local light field fusion: Practical view synthesis with prescriptive sampling guidelines. ACM Trans. Graph. , 2019."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib42",
+      "text": "Xuran Pan, Zihang Lai, Shiji Song, and Gao Huang. Activenerf: Learning where to see with uncertainty estimation. In ECCV , 2022."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib3",
+      "text": "Jonathan T. Barron, Ben Mildenhall, Dor Verbin, Pratul P. Srinivasan, and Peter Hedman. Mip-nerf 360: Unbounded anti-aliased neural radiance fields. CVPR , 2022."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib5",
+      "text": "Anpei Chen, Zexiang Xu, Fuqiang Zhao, Xiaoshuai Zhang, Fanbo Xiang, Jingyi Yu, and Hao Su. Mvsnerf: Fast generalizable radiance field reconstruction from multi-view stereo. In ICCV , 2021."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib61",
+      "text": "Lior Yariv, Yoni Kasten, Dror Moran, Meirav Galun, Matan Atzmon, Basri Ronen, and Yaron Lipman. Multiview neural surface reconstruction by disentangling geometry and appearance. NeurIPS , 2020."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib24",
+      "text": "Aldo Laurentini. The visual hull concept for silhouette-based image understanding. PAMI , 1994."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib10",
+      "text": "Laura Downs, Anthony Francis, Nate Koenig, Brandon Kinman, Ryan Hickman, Krista Reymann, Thomas B. McHugh, and Vincent Vanhoucke. Google scanned objects: A high-quality dataset of 3d scanned household items. In International Conference on Robotics and Automation , 2022."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib23",
+      "text": "Arno Knapitsch, Jaesik Park, Qian-Yi Zhou, and Vladlen Koltun. Tanks and temples: Benchmarking large-scale scene reconstruction. ACM Trans. Graph. , 2017."
+    }
+  ]
+}

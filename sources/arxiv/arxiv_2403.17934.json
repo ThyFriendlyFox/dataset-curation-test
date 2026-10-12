@@ -1,0 +1,163 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.17934",
+  "title": "AiOS: All-in-One-Stage Expressive Human Pose and Shape Estimation",
+  "authors": "Qingping Sun, Yanjun Wang, Ailing Zeng, Wanqi Yin, Chen Wei, Wenjia Wang, Haiyi Mei, Chi Sing Leung, Ziwei Liu, Lei Yang, Zhongang Cai",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2403.17934",
+  "html_url": "https://arxiv.org/html/2403.17934",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 688,
+  "text": "Expressive human pose and shape estimation (EHPS) is a rapidly developing area. It plays an important role in human understanding and has broad applications in the animation, gaming, and streaming industries. Unlike human pose and shape estimation (HPS), which focuses solely on the human body, EHPS is designed to jointly estimate human body poses, hand gestures, and facial expressions from the image.\n\nIn mainstream studies, the common approaches involve utilizing parametric human models, such as SMPL-X [1], to represent the articulated mesh model of a human and to regress the parameters for each body part. Drawing from research experience in single-part estimation, such as body pose and shape estimation [2,3,4,5,6,7,8,9,10,11], existing methods [12,13,14,15,16,17,18] employ a multi-stage paradigm. As shown in Fig. 1 a), the process begins by cropping the body parts using bounding boxes detected either by off-the-shelf detection models or provided via ground truth annotations. Following this, distinct models are utilized for the separate reconstruction of each individual body part.\n\nObviously, this design compromises both complexity and accuracy. The images are processed multiple times with each model. The separate parts model blocks the inter-part, inter-human connection and brings inconsistent poses and unnatural artifacts at the connected joints. Recently, OSX [19] and SMPLer-X [17] discard part experts and regress the model in a holistic manner, which alleviates the artifacts. Their paradigm can be abstract to Fig. 1 b), however, they still need to be given a bounding box to crop the image. While their benchmarks show promising results, the accurate ground truth bounding boxes are not attainable in real-world scenarios. RoboSMPLX [18] has demonstrated that the performance drops significantly under noisy boxes. Moreover, CLIFF [7] points out that the cropping operation discards the location information, which degrades the performance.\n\nA direct solution to address the challenges posed by the multi-stage paradigm is to utilize a one-stage framework that directly recovers EHPS from the entire image without requiring additional boxes for cropping. However, current one-stage methods [20,21,22] are proposed for HPS. Both of them use a body center heatmap and mesh parameter map to represent the potential human location and corresponding features. Relying solely on these human-centered global features is insufficient for achieving accurate part-wise regression. Although numerous two-stage HPS methods [4,23] that extract local features in various ways, it is non-trivial to extend to a one-stage model, as most of the representations, like part-attention maps, are designed for a single person.\n\nIn order to tackle the above challenges, we have proposed the first All-in-One-Stage (AiOS) EHPS method. This novel approach is capable of predicting every individual present in an image solely based on a single image input without any additional requirements. Inspired by the achievement of DETR-based [24] methods in various vision tasks [25,26,27,28,29], we designed our pipeline in a DETR [24] style with image feature encoder and various location-aware decoders. We tailored different queries and association strategies to progressively guide the decoder to perceive global and local human features from the entire image.\n\nThree key design features distinguish the AiOS model. First, it is built upon DETR structure, with a CNN backbone, transformer encoders, and decoders, and progressively detects human and decodes person features in an end-to-end manner. Second, we introduced the \"Human-as-Tokens\" design, where humans are conceptualized as a collection of box tokens and joint tokens. With different supervision and location cues, these tokens aggregate both global and local feature representations with cross-attention for enhanced model accuracy in diverse scenarios. Third, using self-attention and cross-attention mechanisms in our model allows for an in-depth analysis of inter-human and intra-human relationships, enhancing performance in crowded and occlusion-heavy environments.\n\nExtensive experiments show that our proposed model has overpass state-of-the-art (SOTA) methods that utilize ground truth bounding boxes and also SOTA methods when the bounding box is not given. Further, our bounding box is accurate enough to improve the other two-stage methods on the AGORA benchmark.\n\nIn summary, our contributions are i) The first one-stage method for EHPS that eliminates the need for extra detection networks; ii) A unified framework to integrate local and global features for whole-body regression; iii) SOTA performance on mainstream benchmarks without ground truth bounding boxes.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib34",
+      "text": "Georgios Pavlakos, Vasileios Choutas, Nima Ghorbani, Timo Bolkart, Ahmed A. Osman, Dimitrios Tzionas, and Michael J. Black. Expressive body capture: 3d hands, face, and body from a single image. In CVPR , 2019."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib15",
+      "text": "Angjoo Kanazawa, Michael J Black, David W Jacobs, and Jitendra Malik. End-to-end recovery of human shape and pose. In CVPR , pages 7122–7131, 2018."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib17",
+      "text": "Nikos Kolotouros, Georgios Pavlakos, Michael J Black, and Kostas Daniilidis. Learning to reconstruct 3d human pose and shape via model-fitting in the loop. In ICCV , pages 2252–2261, 2019."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib16",
+      "text": "Muhammed Kocabas, Chun-Hao P Huang, Otmar Hilliges, and Michael J Black. Pare: Part attention regressor for 3d human body estimation. In ICCV , pages 11127–11137, 2021."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib56",
+      "text": "Hongwen Zhang, Yating Tian, Xinchi Zhou, Wanli Ouyang, Yebin Liu, Limin Wang, and Zhenan Sun. Pymaf: 3d human pose and shape regression with pyramidal mesh alignment feedback loop. In ICCV , 2021."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib21",
+      "text": "Jiefeng Li, Chao Xu, Zhicun Chen, Siyuan Bian, Lixin Yang, and Cewu Lu. Hybrik: A hybrid analytical-neural inverse kinematics solution for 3d human pose and shape estimation. In CVPR , pages 3383–3393. Computer Vision Foundation / IEEE, 2021."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib22",
+      "text": "Zhihao Li, Jianzhuang Liu, Zhensong Zhang, Songcen Xu, and Youliang Yan. Cliff: Carrying location information in full frames into human pose and shape estimation. pages 590–606, 2022."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib44",
+      "text": "Wenjia Wang, Yongtao Ge, Haiyi Mei, Zhongang Cai, Qingping Sun, Yanjun Wang, Chunhua Shen, Lei Yang, and Taku Komura. Zolly: Zoom focal length correctly for perspective-distorted human mesh reconstruction. arXiv preprint arXiv:2303.13796 , 2023."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib10",
+      "text": "Zhiyang Dou, Qingxuan Wu, Cheng Lin, Zeyu Cao, Qiangqiang Wu, Weilin Wan, Taku Komura, and Wenping Wang. Tore: Token reduction for efficient human mesh recovery with transformer. arXiv preprint arXiv:2211.10705 , 2022."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib39",
+      "text": "Qingping Sun, Yi Xiao, Jie Zhang, Shizhe Zhou, Chi-Sing Leung, and Xin Su. A local correspondence-aware hybrid cnn-gcn model for single-image human body reconstruction. IEEE Transactions on Multimedia , 25:4679–4690, 2023."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib45",
+      "text": "Yanjun Wang, Qingping Sun, Wenjia Wang, Jun Ling, Zhongang Cai, Rong Xie, and Li Song. Learning dense uv completion for human mesh recovery. arXiv preprint arXiv:2307.11074 , 2023."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib8",
+      "text": "Vasileios Choutas, Georgios Pavlakos, Timo Bolkart, Dimitrios Tzionas, and Michael J Black. Monocular expressive body regression through body-driven attention. In Computer Vision–ECCV 2020: 16th European Conference, Glasgow, UK, August 23–28, 2020, Proceedings, Part X 16 , pages 20–40. Springer, 2020."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib36",
+      "text": "Yu Rong, Takaaki Shiratori, and Hanbyul Joo. Frankmocap: A monocular 3d whole-body pose estimation system via regression and integration. In IEEE International Conference on Computer Vision Workshops , 2021."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib13",
+      "text": "Yao Feng, Vasileios Choutas, Timo Bolkart, Dimitrios Tzionas, and Michael Black. Collaborative regression of expressive bodies using moderation. In International Conference on 3D Vision (3DV) , pages 792–804, Dec. 2021."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib29",
+      "text": "Gyeongsik Moon, Hongsuk Choi, and Kyoung Mu Lee. Accurate 3d hand pose estimation for whole-body 3d human mesh estimation. In CVPRW , 2022."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib20",
+      "text": "Jiefeng Li, Siyuan Bian, Chao Xu, Zhicun Chen, Lixin Yang, and Cewu Lu. Hybrik-x: Hybrid analytical-neural inverse kinematics for whole-body mesh recovery. arXiv preprint arXiv:2304.05690 , 2023."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib3",
+      "text": "Zhongang Cai, Wanqi Yin, Ailing Zeng, Chen Wei, Qingping Sun, Yanjun Wang, Hui En Pang, Haiyi Mei, Mingyuan Zhang, Lei Zhang, et al. Smpler-x: Scaling up expressive human pose and shape estimation. arXiv preprint arXiv:2309.17448 , 2023."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib31",
+      "text": "Hui En Pang, Zhongang Cai, Lei Yang, Qingyi Tao, Zhonghua Wu, Tianwei Zhang, and Ziwei Liu. Towards robust and expressive whole-body human pose and shape estimation. In Thirty-seventh Conference on Neural Information Processing Systems , 2023."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib23",
+      "text": "Jing Lin, Ailing Zeng, Haoqian Wang, Lei Zhang, and Yu Li. One-stage 3d whole-body mesh recovery with component aware transformer. 2023."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib40",
+      "text": "Yu Sun, Qian Bao, Wu Liu, Yili Fu, Michael J Black, and Tao Mei. Monocular, one-stage, regression of multiple 3d people. In Proceedings of the IEEE/CVF international conference on computer vision , pages 11179–11188, 2021."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib42",
+      "text": "Yu Sun, Wu Liu, Qian Bao, Yili Fu, Tao Mei, and Michael J Black. Putting people in their place: Monocular regression of 3d people in depth. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 13243–13252, 2022."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib41",
+      "text": "Yu Sun, Qian Bao, Wu Liu, Tao Mei, and Michael J Black. Trace: 5d temporal regression of avatars with dynamic cameras in 3d environments. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 8856–8866, 2023."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib52",
+      "text": "Wang Zeng, Wanli Ouyang, Ping Luo, Wentao Liu, and Xiaogang Wang. 3d human mesh regression with dense correspondence. In CVPR , pages 7054–7063, 2020."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib5",
+      "text": "Nicolas Carion, Francisco Massa, Gabriel Synnaeve, Nicolas Usunier, Alexander Kirillov, and Sergey Zagoruyko. End-to-end object detection with transformers. In European conference on computer vision , pages 213–229. Springer, 2020."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib47",
+      "text": "Jie Yang, Ailing Zeng, Shilong Liu, Feng Li, Ruimao Zhang, and Lei Zhang. Explicit box detection unifies end-to-end multi-person pose estimation. arXiv preprint arXiv:2302.01593 , 2023."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib51",
+      "text": "Fangao Zeng, Bin Dong, Yuang Zhang, Tiancai Wang, Xiangyu Zhang, and Yichen Wei. Motr: End-to-end multiple-object tracking with transformer. In European Conference on Computer Vision (ECCV) , 2022."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib59",
+      "text": "Cheng Zou, Bohan Wang, Yue Hu, Junqi Liu, Qian Wu, Yu Zhao, Boxun Li, Chenguang Zhang, Chi Zhang, Yichen Wei, et al. End-to-end human object interaction detection with hoi transformer. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 11825–11834, 2021."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib53",
+      "text": "Aixi Zhang, Yue Liao, Si Liu, Miao Lu, Yongliang Wang, Chen Gao, and Xiaobo Li. Mining the benefits of two-stage and one-stage hoi detection. Advances in Neural Information Processing Systems , 34:17209–17220, 2021."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib46",
+      "text": "Jie Yang, Ailing Zeng, Feng Li, Shilong Liu, Ruimao Zhang, and Lei Zhang. Neural interactive keypoint detection. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 15122–15132, 2023."
+    }
+  ]
+}

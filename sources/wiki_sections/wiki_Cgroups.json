@@ -1,0 +1,90 @@
+{
+  "source_type": "encyclopedia_article",
+  "source_id": "enwiki:Cgroups#rev1362914898",
+  "title": "Cgroups",
+  "authors": "Wikipedia contributors",
+  "year": "2026",
+  "url": "https://en.wikipedia.org/w/index.php?title=Cgroups&oldid=1362914898",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Major evolutions",
+  "word_count": 572,
+  "text": "### Redesigns of v1\n\nRedesign of cgroups started in 2013,[1] with additional changes brought by versions 3.15 and 3.16 of the Linux kernel.[2,3,4]\n\nThe following changes concern the kernel before 4.5/4.6, i.e. when cgroups-v2 were added. In other words they describe how cgroups-v1 had been changed, though most of them have also been inherited into v2 (after all, v1 and v2 share the same codebase).\n\n### Namespace isolation\n\nWhile not technically part of the cgroups work, a related feature of the Linux kernel is namespace isolation, where groups of processes are separated such that they cannot \"see\" resources in other groups. For example, a PID namespace provides a separate enumeration of process identifiers within each namespace. Also available are mount, user, UTS (Unix Time Sharing), network and SysV IPC namespaces.\n\nThe PID namespace provides isolation for the allocation of process identifiers (PIDs), lists of processes and their details. While the new namespace is isolated from other siblings, processes in its \"parent\" namespace still see all processes in child namespaces—albeit with different PID numbers.[5]\n\nNetwork namespace isolates the network interface controllers (physical or virtual), iptables firewall rules, routing tables etc. Network namespaces can be connected with each other using the \"veth\" virtual Ethernet device.[6]\n\n\"UTS\" namespace allows changing the hostname.\n\nMount namespace allows creating a different file system layout, or making certain mount points read-only.[7]\n\nIPC namespace isolates the System V inter-process communication between namespaces.\n\nUser namespace isolates the user IDs between namespaces.[8]\n\nCgroup namespace[9]\n\nNamespaces are created with the \"unshare\" command or syscall, or as \"new\" flags in a \"clone\" syscall.[10]\n\nThe \"ns\" subsystem was added early in cgroups development to integrate namespaces and control groups. If the \"ns\" cgroup was mounted, each namespace would also create a new group in the cgroup hierarchy. This was an experiment that was later judged to be a poor fit for the cgroups API, and removed from the kernel.\n\nLinux namespaces were inspired by the more general namespace functionality used heavily throughout Plan 9 from Bell Labs.[11]\n\n### Conversion to kernfs\n\nKernfs was introduced into the Linux kernel with version 3.14 in March 2014, the main author being Tejun Heo.[12] One of the main motivators for a separate kernfs is the cgroups file system. Kernfs is basically created by splitting off some of the sysfs logic into an independent entity, thus easing for other kernel subsystems the implementation of their own virtual file system with handling for device connect and disconnect, dynamic creation and removal, and other attributes. This does not affect how cgroups is used, but makes maintaining the code easier.[13]\n\n### New features introduced during v1\n\nKernel memory control groups () were merged into version 3.8 () of the Linux kernel mainline.[14,15,16] The kmemcg controller can limit the amount of memory that the kernel can utilize to manage its own internal processes.\n\nSupport for per-group netfilter setup was added in 2014.[17]\n\nThe unified hierarchy was added in 2014. It repurposes of v1's dummy hierarchy to hold all controllers not yet used by others. This changed dummy hierarchy would become the only available hierarchy in v2.[18]\n\n### Changes after v2\n\nUnlike v1, cgroup v2 has only a single process hierarchy and discriminates between processes, not threads.\n\n### cgroup awareness of OOM killer\n\nLinux Kernel 4.19 (October 2018) introduced cgroup awareness of OOM killer implementation which adds an ability to kill a cgroup as a single unit and so guarantee the integrity of the workload.[19]",
+  "references": [
+    {
+      "n": 1,
+      "text": "(2013-08-15). All About the Linux Kernel: Cgroup's Redesign. Linux.com. https://www.linuxfoundation.org/blog/2013/08/all-about-the-linux-kernel-cgroups-redesign/"
+    },
+    {
+      "n": 2,
+      "text": "(2014-06-11). The unified control group hierarchy in 3.16. LWN.net. //lwn.net/Articles/601840/"
+    },
+    {
+      "n": 3,
+      "text": "(2014-04-03). Pull cgroup updates for 3.15 from Tejun Heo. kernel.org. https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=32d01dc7be4e725ab85ce1d74e8f4adc02ad68dd"
+    },
+    {
+      "n": 4,
+      "text": "(2014-06-09). Pull cgroup updates for 3.16 from Tejun Heo. kernel.org. https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=14208b0ec56919f5333dd654b1a7d10765d0ad05"
+    },
+    {
+      "n": 5,
+      "text": "Pavel Emelyanov, Kir Kolyshkin. (19 November 2007). PID namespaces in the 2.6.24 kernel. LWN.net. //lwn.net/Articles/259217/"
+    },
+    {
+      "n": 6,
+      "text": "Jonathan Corbet. (30 January 2007). Network namespaces. LWN.net. //lwn.net/Articles/219794/"
+    },
+    {
+      "n": 7,
+      "text": "Serge E. Hallyn, Ram Pai. (17 September 2007). Applying mount namespaces. IBM developerWorks. https://www.ibm.com/developerworks/linux/library/l-mount-namespaces.html"
+    },
+    {
+      "n": 8,
+      "text": "Michael Kerrisk. (27 February 2013). Namespaces in operation, part 5: User namespaces. lwn.net Linux Info from the Source. //lwn.net/Articles/532593/"
+    },
+    {
+      "n": 9,
+      "text": "LKML: Linus Torvalds: Linux 4.6-rc1. https://lkml.org/lkml/2016/3/26/132/"
+    },
+    {
+      "n": 10,
+      "text": "Janak Desai. (11 January 2006). Linux kernel documentation on unshare. https://www.mjmwired.net/kernel/Documentation/unshare.txt"
+    },
+    {
+      "n": 11,
+      "text": "(1992). The Use of Name Spaces in Plan 9. http://www.cs.bell-labs.com/sys/doc/names.html"
+    },
+    {
+      "n": 12,
+      "text": "(2014-02-03). kernfs, sysfs, driver-core: implement synchronous self-removal. LWN.net. //lwn.net/Articles/584019/"
+    },
+    {
+      "n": 13,
+      "text": "(2014-02-11). Linux kernel source tree: kernel/git/torvalds/linux.git: cgroups: convert to kernfs. kernel.org. https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=2bd59d48ebfb3df41ee56938946ca0dd30887312"
+    },
+    {
+      "n": 14,
+      "text": "(2012-12-18). memcg: kmem controller infrastructure. kernel.org source code. https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=7ae1e1d0f8ac2927ed7e3ca6d15e42d485903459"
+    },
+    {
+      "n": 15,
+      "text": "(2012-12-18). memcg: kmem accounting basic infrastructure. kernel.org source code. https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=510fc4e11b772fd60f2c545c64d4c55abd07ce36"
+    },
+    {
+      "n": 16,
+      "text": "(2012-12-18). memcg: add documentation about the kmem controller. kernel.org. https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=d5bdae7d59451b9d63303f7794ef32bb76ba6330"
+    },
+    {
+      "n": 17,
+      "text": "(2014-04-23). netfilter: x_tables: lightweight process control group matching. http://www.spinics.net/lists/netdev/msg264727.html"
+    },
+    {
+      "n": 18,
+      "text": "(2014-03-13). cgroup: prepare for the default unified hierarchy. https://lkml.org/lkml/2014/3/13/503"
+    },
+    {
+      "n": 19,
+      "text": "Linux_4.19 - Linux Kernel Newbies. https://kernelnewbies.org/Linux_4.19#Memory_management"
+    }
+  ]
+}

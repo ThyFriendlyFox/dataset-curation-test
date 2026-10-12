@@ -1,0 +1,114 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.19096",
+  "title": "SCALE: Constructing Structured Natural Language Comment Trees for Software Vulnerability Detection",
+  "authors": "Xin-Cheng Wen, Cuiyun Gao, Shuzheng Gao, Yang Xiao, Michael R. Lyu",
+  "year": "2024",
+  "categories": [
+    "cs.SE",
+    "cs.CR"
+  ],
+  "url": "https://arxiv.org/abs/2403.19096",
+  "html_url": "https://arxiv.org/html/2403.19096",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 919,
+  "text": "Nowadays, modern software development is significantly afflicted by the prevalence of source code security vulnerabilities [1]. For instance, according to IBM, the year 2023 witnessed a peak in the average cost of data breaches, reaching US$ 4.45 million [2]. Over the past decade, there has been a substantial increase in the quantity of identified Common Vulnerabilities and Exposures (CVEs) [3]. Specifically, during the 2022, the identified CVE number reached 25,227 [4], with a 25.1% increase over the number of vulnerabilities detected in 2021. Therefore, it becomes imperative to develop effective methods for detecting these software vulnerabilities.\n\nConventional Program Analysis (PA)-based vulnerability detection methods heavily rely on user-defined rules and specifications to identify vulnerabilities, such as INFER [5] and CheckMarx [6], which makes them labor-intensive and time-consuming. Recently, DL-based methods have achieved great success as they can reduce the dependence on expert knowledge and offer a broader spectrum of capabilities in detecting various types of software vulnerabilities [7]. Early DL-based methods use Convolutional Neural Networks (CNNs) [8,9], Recurrent Neural Networks (RNNs) [10,11] and Graph Neural Networks (GNNs) [12,13] for supervised training. However, the performance of these models can be largely limited due to the scarcity of vulnerability data [14]. Recently, the advent of pre-trained models has further advanced this field. These models are trained on massive open-source code repositories and have possessed a vast general programming knowledge. The recent studies mainly resort to the pre-training fine-tuning paradigm which injects vulnerability knowledge by further training models on vulnerability datasets. For example, EPVD [15] and SVulD [16] achieve state-of-the-art performance for vulnerability detection. Although achieving promising performance, the effectiveness of the pre-training techniques is still limited, embodied in two aspects:\n\n(1) The pre-trained models tend to fail to infer the semantics of the code statements with complex logic such as those containing multiple operators and pointers. The previous studies [17,18] have shown that the “reasoning gap\" in pre-trained models poses a significant challenge. It means that these models struggle to infer the logic of the source code, such as containing multiple operators and pointers, where a single inference error may result in the opposite prediction. Different from natural language, due to the strict rules and syntax, source code may need multiple abstract symbols in a statement to express a simple intent. For instance, the code snippet shown in Figure 1 from the Qemu [19] project potentially causes a memory leak vulnerability in the net_init_tap() function. In Lines 31-32, the code snippet allocates memory for the arrays of character pointers fds and vhost_fds. However, if any of these error checks failed after the allocation in Lines 34-36, the function would exit without properly deallocating these arrays, leading to a memory leak vulnerability. In this example, the complex logic of the source code in Line 34, is characterized by the use of multiple operators (|| and ->), leading to erroneous predictions. It presents challenges for pre-trained models in detecting such vulnerability patterns.\n\n(2) The pre-trained models are hard to capture the code execution sequences. Since pre-trained models primarily utilize code sequences as input, they are hard to comprehend the inherently non-sequential and various code execution sequences of source code, such as commonly-used if and return statements. For instance, the example shown in Figure 1 contains several if statements and return statements, in which the specific use of if in line 34 and return in line 36 directly causes the vulnerability. These statements necessitate multiple conditional if statements to trigger a return -1. It is challenging for the pre-trained models to predict the vulnerability without well capturing code execution sequences.\n\nTo address the limitations above, in this paper, we propose a S tructured natural language C omment tree-based vulner A bi L ity d E tection framework based on the pre-trained models, named SCALE. The proposed Structured Natural Language Comment Tree (SCT) integrates the semantics of code statements with code execution sequences based on the Abstract Syntax Trees (ASTs). SCALE has three main modules: (1) Comment Tree Construction. SCALE makes the first attempt to incorporate the Large Language Model (LLM)’s general knowledge for comment generation in the vulnerability detection task and further generates the comment tree, which enhances the model’s ability to infer the semantics of code statements. (2) Structured Natural Language Comment Tree Construction, which explicitly involves code execution sequence by combining the code syntax templates with the comment tree. (3) SCT-Enhanced Representation, which incorporates the constructed SCTs for well capturing vulnerability patterns.\n\nTo evaluate SCALE, we use three widely-used datasets in vulnerability detection: FFMPeg+Qemu [12], Reveal [13], and SVulD [16]. We compare SCALE with eleven existing vulnerability detection methods. Experimental results demonstrate that SCALE outperforms the state-of-the-art baseline, with improvements of 2.96%, 13.47%, and 1.17% in terms of F1 score on the three datasets, respectively. Furthermore, SCALE can be applied to different pre-trained models, yielding F1 score performance enhancements ranging from 1.37% to 10.87%. These results underscore the effectiveness of SCALE in enhancing the detection of software vulnerabilities.\n\nIn summary, the major contributions of this paper are summarized as follows:\n\n- (1) To the best of our knowledge, we propose a novel structured natural language comment tree, which enhances the model’s ability to infer code semantics by integrating code comments and code syntax templates.\n\n- (2) We propose SCALE, a novel vulnerability detection framework for well capturing vulnerability patterns by enhancing code representation with the structured natural language comment tree.\n\n- (3) We perform an extensive evaluation on three popular datasets, and the results demonstrate the effectiveness of SCALE in software vulnerability detection.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib43",
+      "text": "McGraw and Potter (2004) Gary McGraw and Bruce Potter. 2004. Software Security Testing. IEEE Secur. Priv. 2, 5 (2004), 81–85."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib31",
+      "text": "IBM (2023) IBM. 2023. Cost of a Data Breach Report 2023. https://www.ibm.com/reports/data-breach"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "CVE (2023) 2023. CVE . https://cve.mitre.org/"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib50",
+      "text": "Statista (2023) Statista. 2023. Common IT vulnerabilities and exposures worldwide 2009-2023. https://www.statista.com/statistics/"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib17",
+      "text": "Facebook (nd) Facebook. [n.d.]. Infer. https://fbinfer.com/."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib32",
+      "text": "Israel (nd) Israel. [n.d.]. Checkmarx. https://www.checkmarx.com/."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib14",
+      "text": "Cheng et al . (2022) Xiao Cheng, Xu Nie, Ningke Li, Haoyu Wangand Zheng Zheng, and Yulei Sui. 2022. How About Bug-Triggering Paths?-Understanding and Characterizing Learning-Based Vulnerability Detectors. IEEE Transactions on Dependable and Secure Computing ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib62",
+      "text": "Wu et al . (2017) Fang Wu, Jigang Wang, Jiqiang Liu, and Wei Wang. 2017. Vulnerability detection with deep learning. In 2017 3rd IEEE international conference on computer and communications (ICCC) . IEEE, 1298–1302."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib63",
+      "text": "Wu et al . (2022) Yueming Wu, Deqing Zou, Shihan Dou, Wei Yang, Duo Xu, and Hai Jin. 2022. VulCNN: An Image-inspired Scalable Vulnerability Detection System. In 44th IEEE/ACM 44th International Conference on Software Engineering, ICSE 2022, Pittsburgh, PA, USA, May 25-27, 2022 . ACM, 2365–2376."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib39",
+      "text": "Li et al . (2022) Zhen Li, Deqing Zou, Shouhuai Xu, Hai Jin, Yawei Zhu, and Zhaoxuan Chen. 2022. SySeVR: A Framework for Using Deep Learning to Detect Software Vulnerabilities. IEEE Trans. Dependable Secur. Comput. 19, 4 (2022), 2244–2258."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib49",
+      "text": "Russell et al . (2018) Rebecca L. Russell, Louis Y. Kim, Lei H. Hamilton, Tomo Lazovich, Jacob Harer, Onur Ozdemir, Paul M. Ellingwood, and Marc W. McConley. 2018. Automated Vulnerability Detection in Source Code Using Deep Representation Learning. In ICMLA . IEEE, 757–762."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib66",
+      "text": "Zhou et al . (2019) Yaqin Zhou, Shangqing Liu, Jing Kai Siow, Xiaoning Du, and Yang Liu. 2019. Devign: Effective Vulnerability Identification by Learning Comprehensive Program Semantics via Graph Neural Networks. In Advances in Neural Information Processing Systems 32: Annual Conference on Neural Information Processing Systems 2019, NeurIPS 2019 . 10197–10207."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib11",
+      "text": "Chakraborty et al . (2020) Saikat Chakraborty, Rahul Krishna, Yangruibo Ding, and Baishakhi Ray. 2020. Deep Learning based Vulnerability Detection: Are We There Yet? CoRR abs/2009.07235 (2020)."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib46",
+      "text": "Peng et al . (2023) Yun Peng, Chaozheng Wang, Wenxuan Wang, Cuiyun Gao, and Michael R. Lyu. 2023. Generative Type Inference for Python. CoRR abs/2307.09163 (2023)."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib64",
+      "text": "Zhang et al . (2023) Junwei Zhang, Zhongxin Liu, Xing Hu, Xin Xia, and Shanping Li. 2023. Vulnerability Detection by Learning From Syntax-Based Execution Paths of Code. IEEE Trans. Software Eng. 49, 8 (2023), 4196–4212."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib44",
+      "text": "Ni et al . (2023) Chao Ni, Xin Yin, Kaiwen Yang, Dehai Zhao, Zhenchang Xing, and Xin Xia. 2023. Distinguishing Look-Alike Innocent and Vulnerable Code by Subtle Semantic Representation Learning and Explanation. CoRR abs/2308.11237 (2023)."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib47",
+      "text": "Prystawski and Goodman (2023) Ben Prystawski and Noah D. Goodman. 2023. Why think step-by-step? Reasoning emerges from the locality of experience. CoRR abs/2304.03843 (2023)."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib57",
+      "text": "Wei et al . (2022) Jason Wei, Xuezhi Wang, Dale Schuurmans, Maarten Bosma, Brian Ichter, Fei Xia, Ed H. Chi, Quoc V. Le, and Denny Zhou. 2022. Chain-of-Thought Prompting Elicits Reasoning in Large Language Models. In NeurIPS ."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib5",
+      "text": "Qem (2023) 2023. Qemu . https://www.qemu.org/"
+    }
+  ]
+}

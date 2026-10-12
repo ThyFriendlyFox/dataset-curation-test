@@ -1,0 +1,119 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.14403",
+  "title": "Adaptive-RAG: Learning to Adapt Retrieval-Augmented Large Language Models through Question Complexity",
+  "authors": "Soyeong Jeong, Jinheon Baek, Sukmin Cho, Sung Ju Hwang, Jong C. Park",
+  "year": "2024",
+  "categories": [
+    "cs.CL",
+    "cs.AI"
+  ],
+  "url": "https://arxiv.org/abs/2403.14403",
+  "html_url": "https://arxiv.org/html/2403.14403",
+  "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+  "section": "Introduction",
+  "word_count": 828,
+  "text": "Recent Large Language Models (LLMs) [1,2,3,4] have shown overwhelming performances across diverse tasks, including question-answering (QA) [5,6]. However, they still generate factually incorrect answers since their knowledge solely relies on their parametric memory [7,8]. Meanwhile, memorizing all the (ever-changing) world knowledge may not be possible. To address this problem, retrieval-augmented LLMs [9,10,11], which incorporate non-parametric knowledge into LLMs with additional retrieval modules, have gained much increasing attention. Specifically, these models access a knowledge base, which serves as an extensive repository of information across various subjects and disciplines, to retrieve information relevant to the given input, and then incorporate the retrieved information into LLMs, which enables them to stay accurate and current with the world knowledge.\n\nA particularly salient application of retrieval-augmented LLMs is to handling QA tasks, whose goal is to provide correct answers in response to user queries, especially those of high complexity. Early work on retrieval-augmented LLMs focuses primarily on single-hop queries [12,13], whose answers are typically found within a single document; therefore, this approach involves retrieving a relevant document based on the query and subsequently integrating this information into QA models to formulate a response. However, unlike this single-hop QA, some queries require connecting and aggregating multiple documents, which are, furthermore, often not answerable through a single-step process of retrieval-and-response. An example query is ‘When did the people who captured Malakoff come to the region where Philipsburg is located?’, which requires four reasoning steps to solve. Therefore, to effectively handle such complex queries, recent studies have concentrated largely on multi-step and multi-reasoning QA, which requires iterative accesses to both LLMs and retrievers multiple times [14,15], at the cost of heavy computational overheads.\n\nYet, we should rethink: In a real-world scenario, are all the requests from users complex? Instead, users might often ask simple and straightforward questions, while only occasionally asking complex ones. Specifically, a query such as ‘Paris is the capital of what?’ is likely to be asked more frequently, compared to the aforementioned multi-step query, and this simpler query might also be easily answered by the LLMs themselves, without accessing external knowledge. In other words, a multi-step QA approach could give rise to unnecessary computational overhead for simple queries, even though it would be vital for complex queries (see Figure 2 (A)). On the other hand, handling complex queries with single-step-retrieval or even non-retrieval strategies would be largely insufficient (Figure 2 (B)). This suggests the need for an adaptive QA system, which can dynamically adjust the operational strategies of retrieval-augmented LLMs based on the query complexity. While some recent approaches are capable of doing this based on the frequency of entities in queries [8] or on the generated outputs from models for multi-step QA [15], they are still suboptimal: the former methods are overly simplistic, failing to consider multi-hop queries; meanwhile, the latter are excessively complex, terminating answer solving steps after several rounds of module access.\n\nIn this work, considering diverse complexity levels of real-world queries, we argue that previous one-size-fits-all approaches might be inadequate to cover all of them. Instead, we propose to select the most suitable strategy from a range of (retrieval-augmented) LLMs, each of which is tailored to the specific complexity of the input query. Notably, a critical step in this process is pre-defining the query complexity, which is instrumental in determining the most fitting model to it. In this work, we operationalize this process with a novel classifier, which is a smaller model trained to predict the complexity level of incoming queries (see Figure 2 (c)). Moreover, we automatically collect its training datasets without human labeling, by leveraging the predicted outcomes (i.e., which models accurately respond to which queries) as well as by capitalizing on the inherent biases in existing datasets (i.e., samples in the datasets are designed either for single-step or for multi-step QA scenarios). This proposed method can offer a robust middle ground among the iterative LLM augmentation methods for complex queries, single-step methods for simpler queries, and even no-retrieval-augmented methods for the most straightforward queries (answerable by LLMs themselves), thus significantly enhancing the overall efficiency and accuracy, as shown in Figure 1. We refer to our framework as Adaptive Retrieval-Augmented Generation (Adaptive-RAG).\n\nWe validate Adaptive-RAG using benchmark open-domain QA datasets, covering a wide range of query complexity from single-hop [16,17,6] to multi-hop [5,18,19] queries. The experimental results show that ours significantly improves the overall accuracy and efficiency, compared to the prior adaptive strategies, on multiple LLMs, such as GPT-3.5 [1] and FLAN-T5 series [20].\n\nOur contributions and findings are threefold:\n\n- • We point out the realistic scenario of queries of varying complexities, and find out that existing retrieval-augmented generation approaches tend to be overly simple or complex.\n\n- • We adapt retrieval-augmented LLMs to the query complexity assessed by the classifier, which enables the utilization of the most suitable approach tailored to each query.\n\n- • We show that our Adaptive-RAG is highly effective and efficient, balancing between the complexity and the simplicity for diverse queries.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib5",
+      "text": "Brown et al. (2020) Tom B. Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, Sandhini Agarwal, Ariel Herbert-Voss, Gretchen Krueger, Tom Henighan, Rewon Child, Aditya Ramesh, Daniel M. Ziegler, Jeffrey Wu, Clemens Winter, Christopher Hesse, Mark Chen, Eric Sigler, Mateusz Litwin, Scott Gray, Benjamin Chess, Jack Clark, Christopher Berner, Sam McCandlish, Alec Radford, Ilya Sutskever, and Dario Amodei. 2020. Language models are few-shot learners . In Advances in Neural Information Processing Systems 33: Annual Conference on Neural Information Processing Systems 2020, NeurIPS 2020, December 6-12, 2020, virtual ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib24",
+      "text": "OpenAI (2023) OpenAI. 2023. GPT-4 technical report . arXiv preprint arXiv:2303.08774 ."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib34",
+      "text": "Touvron et al. (2023) Hugo Touvron, Louis Martin, Kevin Stone, Peter Albert, Amjad Almahairi, Yasmine Babaei, Nikolay Bashlykov, Soumya Batra, Prajjwal Bhargava, Shruti Bhosale, Dan Bikel, Lukas Blecher, Cristian Canton-Ferrer, Moya Chen, Guillem Cucurull, David Esiobu, Jude Fernandes, Jeremy Fu, Wenyin Fu, Brian Fuller, Cynthia Gao, Vedanuj Goswami, Naman Goyal, Anthony Hartshorn, Saghar Hosseini, Rui Hou, Hakan Inan, Marcin Kardas, Viktor Kerkez, Madian Khabsa, Isabel Kloumann, Artem Korenev, Punit Singh Koura, Marie-Anne Lachaux, Thibaut Lavril, Jenya Lee, Diana Liskovich, Yinghai Lu, Yuning Mao, Xavier Martinet, Todor Mihaylov, Pushkar Mishra, Igor Molybog, Yixin Nie, Andrew Poulton, Jeremy Reizenstein, Rashi Rungta, Kalyan Saladi, Alan Schelten, Ruan Silva, Eric Michael Smith, Ranjan Subramanian, Xiaoqing Ellen Tan, Binh Tang, Ross Taylor, Adina Williams, Jian Xiang Kuan, Puxin Xu, Zheng Yan, Iliyan Zarov, Yuchen Zhang, Angela Fan, Melanie Kambadur, Sharan Narang, Aurélien Rodriguez, Robert Stojnic, Sergey Edunov, and Thomas Scialom. 2023. Llama 2: Open foundation and fine-tuned chat models . arXiv preprint arXiv:2307.09288 ."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib1",
+      "text": "Anil et al. (2023) Rohan Anil, Andrew M. Dai, Orhan Firat, Melvin Johnson, Dmitry Lepikhin, Alexandre Passos, Siamak Shakeri, Emanuel Taropa, Paige Bailey, Zhifeng Chen, Eric Chu, Jonathan H. Clark, Laurent El Shafey, Yanping Huang, Kathy Meier-Hellstern, Gaurav Mishra, Erica Moreira, Mark Omernick, Kevin Robinson, Sebastian Ruder, Yi Tay, Kefan Xiao, Yuanzhong Xu, Yujing Zhang, Gustavo Hernández Ábrego, Junwhan Ahn, Jacob Austin, Paul Barham, Jan A. Botha, James Bradbury, Siddhartha Brahma, Kevin Brooks, Michele Catasta, Yong Cheng, Colin Cherry, Christopher A. Choquette-Choo, Aakanksha Chowdhery, Clément Crepy, Shachi Dave, Mostafa Dehghani, Sunipa Dev, Jacob Devlin, Mark Díaz, Nan Du, Ethan Dyer, Vladimir Feinberg, Fangxiaoyu Feng, Vlad Fienber, Markus Freitag, Xavier Garcia, Sebastian Gehrmann, Lucas Gonzalez, and et al. 2023. Palm 2 technical report . arXiv preprint arXiv:2305.10403 ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib43",
+      "text": "Yang et al. (2018) Zhilin Yang, Peng Qi, Saizheng Zhang, Yoshua Bengio, William Cohen, Ruslan Salakhutdinov, and Christopher D. Manning. 2018. HotpotQA: A dataset for diverse, explainable multi-hop question answering . In Proceedings of the 2018 Conference on Empirical Methods in Natural Language Processing , pages 2369–2380, Brussels, Belgium. Association for Computational Linguistics."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib19",
+      "text": "Kwiatkowski et al. (2019) Tom Kwiatkowski, Jennimaria Palomaki, Olivia Redfield, Michael Collins, Ankur Parikh, Chris Alberti, Danielle Epstein, Illia Polosukhin, Jacob Devlin, Kenton Lee, Kristina Toutanova, Llion Jones, Matthew Kelcey, Ming-Wei Chang, Andrew M. Dai, Jakob Uszkoreit, Quoc Le, and Slav Petrov. 2019. Natural questions: A benchmark for question answering research . Transactions of the Association for Computational Linguistics , 7:452–466."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib16",
+      "text": "Kasai et al. (2022) Jungo Kasai, Keisuke Sakaguchi, Yoichi Takahashi, Ronan Le Bras, Akari Asai, Xinyan Yu, Dragomir R. Radev, Noah A. Smith, Yejin Choi, and Kentaro Inui. 2022. Realtime QA: what’s the answer right now? arXiv preprint arXiv:2207.13332 ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib23",
+      "text": "Mallen et al. (2023) Alex Mallen, Akari Asai, Victor Zhong, Rajarshi Das, Daniel Khashabi, and Hannaneh Hajishirzi. 2023. When not to trust language models: Investigating effectiveness of parametric and non-parametric memories . In Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), ACL 2023, Toronto, Canada, July 9-14, 2023 , pages 9802–9822. Association for Computational Linguistics."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib4",
+      "text": "Borgeaud et al. (2022) Sebastian Borgeaud, Arthur Mensch, Jordan Hoffmann, Trevor Cai, Eliza Rutherford, Katie Millican, George van den Driessche, Jean-Baptiste Lespiau, Bogdan Damoc, Aidan Clark, Diego de Las Casas, Aurelia Guy, Jacob Menick, Roman Ring, Tom Hennigan, Saffron Huang, Loren Maggiore, Chris Jones, Albin Cassirer, Andy Brock, Michela Paganini, Geoffrey Irving, Oriol Vinyals, Simon Osindero, Karen Simonyan, Jack W. Rae, Erich Elsen, and Laurent Sifre. 2022. Improving language models by retrieving from trillions of tokens . In International Conference on Machine Learning, ICML 2022, 17-23 July 2022, Baltimore, Maryland, USA , volume 162 of Proceedings of Machine Learning Research , pages 2206–2240. PMLR."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib11",
+      "text": "Izacard et al. (2023) Gautier Izacard, Patrick S. H. Lewis, Maria Lomeli, Lucas Hosseini, Fabio Petroni, Timo Schick, Jane Dwivedi-Yu, Armand Joulin, Sebastian Riedel, and Edouard Grave. 2023. Atlas: Few-shot learning with retrieval augmented language models . J. Mach. Learn. Res. , 24:251:1–251:43."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib33",
+      "text": "Shi et al. (2023) Weijia Shi, Sewon Min, Michihiro Yasunaga, Minjoon Seo, Rich James, Mike Lewis, Luke Zettlemoyer, and Wen-tau Yih. 2023. REPLUG: retrieval-augmented black-box language models . arXiv preprint arXiv:2301.12652 ."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib20",
+      "text": "Lazaridou et al. (2022) Angeliki Lazaridou, Elena Gribovskaya, Wojciech Stokowiec, and Nikolai Grigorev. 2022. Internet-augmented language models through few-shot prompting for open-domain question answering . arXiv preprint arXiv:2203.05115 ."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib31",
+      "text": "Ram et al. (2023) Ori Ram, Yoav Levine, Itay Dalmedigos, Dor Muhlgay, Amnon Shashua, Kevin Leyton-Brown, and Yoav Shoham. 2023. In-context retrieval-augmented language models . Transactions of the Association for Computational Linguistics ."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib27",
+      "text": "Press et al. (2023) Ofir Press, Muru Zhang, Sewon Min, Ludwig Schmidt, Noah A. Smith, and Mike Lewis. 2023. Measuring and narrowing the compositionality gap in language models . In Findings of the Association for Computational Linguistics: EMNLP 2023 ."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib37",
+      "text": "Trivedi et al. (2023) Harsh Trivedi, Niranjan Balasubramanian, Tushar Khot, and Ashish Sabharwal. 2023. Interleaving retrieval with chain-of-thought reasoning for knowledge-intensive multi-step questions . In Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), ACL 2023, Toronto, Canada, July 9-14, 2023 , pages 10014–10037. Association for Computational Linguistics."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib30",
+      "text": "Rajpurkar et al. (2016) Pranav Rajpurkar, Jian Zhang, Konstantin Lopyrev, and Percy Liang. 2016. Squad: 100, 000+ questions for machine comprehension of text . In Proceedings of the 2016 Conference on Empirical Methods in Natural Language Processing, EMNLP 2016, Austin, Texas, USA, November 1-4, 2016 , pages 2383–2392. The Association for Computational Linguistics."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib14",
+      "text": "Joshi et al. (2017) Mandar Joshi, Eunsol Choi, Daniel S. Weld, and Luke Zettlemoyer. 2017. Triviaqa: A large scale distantly supervised challenge dataset for reading comprehension . In Proceedings of the 55th Annual Meeting of the Association for Computational Linguistics, ACL 2017, Vancouver, Canada, July 30 - August 4, Volume 1: Long Papers , pages 1601–1611. Association for Computational Linguistics."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib9",
+      "text": "Ho et al. (2020) Xanh Ho, Anh-Khoa Duong Nguyen, Saku Sugawara, and Akiko Aizawa. 2020. Constructing A multi-hop QA dataset for comprehensive evaluation of reasoning steps . In Proceedings of the 28th International Conference on Computational Linguistics, COLING 2020, Barcelona, Spain (Online), December 8-13, 2020 , pages 6609–6625. International Committee on Computational Linguistics."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib36",
+      "text": "Trivedi et al. (2022b) Harsh Trivedi, Niranjan Balasubramanian, Tushar Khot, and Ashish Sabharwal. 2022b. ♪ MuSiQue: Multihop questions via single-hop question composition . Transactions of the Association for Computational Linguistics , 10:539–554."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib8",
+      "text": "Chung et al. (2022) Hyung Won Chung, Le Hou, Shayne Longpre, Barret Zoph, Yi Tay, William Fedus, Eric Li, Xuezhi Wang, Mostafa Dehghani, Siddhartha Brahma, Albert Webson, Shixiang Shane Gu, Zhuyun Dai, Mirac Suzgun, Xinyun Chen, Aakanksha Chowdhery, Sharan Narang, Gaurav Mishra, Adams Yu, Vincent Y. Zhao, Yanping Huang, Andrew M. Dai, Hongkun Yu, Slav Petrov, Ed H. Chi, Jeff Dean, Jacob Devlin, Adam Roberts, Denny Zhou, Quoc V. Le, and Jason Wei. 2022. Scaling instruction-finetuned language models . arXiv preprint arXiv:2210.11416 ."
+    }
+  ]
+}

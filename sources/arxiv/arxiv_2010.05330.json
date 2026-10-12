@@ -1,0 +1,113 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2010.05330",
+  "title": "Incremental Processing in the Age of Non-Incremental Encoders: An Empirical Assessment of Bidirectional Models for Incremental NLU",
+  "authors": "Brielen Madureira, David Schlangen",
+  "year": "2024",
+  "categories": [
+    "cs.CL"
+  ],
+  "url": "https://arxiv.org/abs/2010.05330",
+  "html_url": "https://arxiv.org/html/2010.05330",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 581,
+  "text": "In “The Story of Your Life”, a science fiction short story by Ted [1], Earth is visited by alien creatures whose writing system does not unfold in time but rather presents full thoughts instantaneously. In our world, however, language does unfold over time, both in speaking and in writing. There is ample evidence [2,3] that it is also processed over time by humans, in an incremental fashion where the interpretation of a full utterance is continuously built up while the utterance is being perceived.\n\nIn Computational Linguistics and Natural Language Processing, this property is typically abstracted away by assuming that the unit to be processed (e.g., a sentence) is available as a whole. The return and subsequent mainstreaming of Recurrent Neural Networks (RNNs), originally introduced by [9] and repopularized i.a. by [10], may have made it seem that time had found a place as a first-class citizen in NLP. However, it was quickly discovered that certain technical issues of this type of model could be overcome, for example in the application of machine translation, by encoding input sequences in reverse temporal order [11].\n\nThis turns out to be a special case of the more general strategy of bidirectional processing, proposed earlier in the form of BiRNNs [12,13] and BiLSTMs [14], which combine a forward and a backward pass over a sequence. More recently, Transformers [15] also function with representations that inherently have no notion of linear order. Atemporal processing has thus become the standard again.\n\nIn this paper, we explore whether we can adapt such bidirectional models to work in incremental processing mode and what the performance cost is of doing so. We first go back and reproduce the work of [16], who compare the performance of LSTMs and BiLSTMs in sequence tagging, extending it with a BERT-based encoder and with a collection of different datasets for tagging and classification tasks. Then we address the following questions:\n\nQ1. If we employ inherently non-incremental models in an incremental system, do we get functional representations that are adequate to build correct and stable output along the way? We examine how bidirectional encoders behave under an incremental interface, revisiting the approach proposed by [17] for POS taggers. After standard training, we modify the testing procedure by allowing the system to see only successively extended prefixes of the input available so far with which they must produce successively extended prefixes of the output, as shown in Figure 1. The evaluation metrics are described in Section 3, and the discussion is anchored on the concepts of timeliness, monotonicity, and decisiveness and their trade-off with respect to the non-incremental quality [17,18]. We show that it is possible to use them as components of an incremental system (e.g. for NLU) with some trade-offs.\n\nQ2. How can we adapt the training regime or the real-time procedure to mitigate the negative effect that the non-availability of right context (i.e., future parts of the signal) has on non-incremental models? To tackle this question, we implement three strategies that help improve the models’ incremental quality: truncated training, delayed output and prophecies (see Section 4).\n\nOur results are relevant for incremental Natural Language Understanding, needed for the design of dialogue systems and more generally interactive systems, e.g. those following the incremental processing model proposed by [19]. These systems rely on the availability of partial results, on which fast decisions can be based. Similarly, simultaneous translation is an area where decisions need to be based on partial input with incomplete syntactical and semantic information.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib7",
+      "text": "Chiang (2002) T. Chiang. 2002. Stories of Your Life and Others . Tom Doherty Associates."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib37",
+      "text": "Marslen-Wilson (1975) William D. Marslen-Wilson. 1975. Sentence perception as an interactive parallel process . Science , 189(4198):226–228."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib54",
+      "text": "Tanenhaus and Brown-Schmidt (2008) Michael K Tanenhaus and Sarah Brown-Schmidt. 2008. Language processing in the natural world. Philosophical Transactions of the Royal Society B: Biological Sciences , 363(1493):1105–1122."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib1",
+      "text": "Aist et al. (2007) Gregory Aist, James Allen, Ellen Campana, Carlos Gomez Gallo, Scott Stoness, Mary Swift, and Michael K. Tanenhaus. 2007. Incremental understanding in human-computer dialogue and experimental evidence for advantages over nonincremental methods. In Proceedings of Decalog 2007, the 11th International Workshop on the Semantics and Pragmatics of Dialogue , Trento, Italy."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib52",
+      "text": "Skantze and Schlangen (2009) Gabriel Skantze and David Schlangen. 2009. Incremental dialogue processing in a micro-domain . In Proceedings of the 12th Conference of the European Chapter of the ACL (EACL 2009) , pages 745–753, Athens, Greece. Association for Computational Linguistics."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib61",
+      "text": "Žilka and Jurčíček (2015) Lukáš Žilka and Filip Jurčíček. 2015. Lectrack: Incremental dialog state tracking with long short-term memory networks. In International Conference on Text, Speech, and Dialogue , pages 174–182. Springer."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib55",
+      "text": "Trinh et al. (2018) Anh Duong Trinh, Robert J Ross, and John D Kelleher. 2018. A multi-task approach to incremental dialogue state tracking. In Proceedings of The 22nd workshop on the Semantics and Pragmatics of Dialogue, SEMDIAL , pages 132–145."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib10",
+      "text": "Coman et al. (2019) Andrei C. Coman, Koichiro Yoshino, Yukitoshi Murase, Satoshi Nakamura, and Giuseppe Riccardi. 2019. An Incremental Turn-Taking Model for Task-Oriented Dialog Systems . In Proc. Interspeech 2019 , pages 4155–4159."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib17",
+      "text": "Elman (1990) Jeffrey L Elman. 1990. Finding structure in time. Cognitive science , 14(2):179–211."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib38",
+      "text": "Mikolov et al. (2010) Tomáš Mikolov, Martin Karafiát, Lukáš Burget, Jan Černockỳ, and Sanjeev Khudanpur. 2010. Recurrent neural network based language model. In Eleventh annual conference of the international speech communication association ."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib53",
+      "text": "Sutskever et al. (2014) Ilya Sutskever, Oriol Vinyals, and Quoc V Le. 2014. Sequence to sequence learning with neural networks. In Advances in neural information processing systems , pages 3104–3112."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib50",
+      "text": "Schuster and Paliwal (1997) Mike Schuster and Kuldip K Paliwal. 1997. Bidirectional recurrent neural networks. IEEE transactions on Signal Processing , 45(11):2673–2681."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib2",
+      "text": "Baldi et al. (1999) Pierre Baldi, Søren Brunak, Paolo Frasconi, Giovanni Soda, and Gianluca Pollastri. 1999. Exploiting the past and the future in protein secondary structure prediction. Bioinformatics , 15(11):937–946."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib24",
+      "text": "Hochreiter and Schmidhuber (1997) Sepp Hochreiter and Jürgen Schmidhuber. 1997. Long short-term memory. Neural computation , 9(8):1735–1780."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib57",
+      "text": "Vaswani et al. (2017) Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N Gomez, Łukasz Kaiser, and Illia Polosukhin. 2017. Attention is all you need. In Advances in neural information processing systems , pages 5998–6008."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib25",
+      "text": "Huang et al. (2015) Zhiheng Huang, Wei Xu, and Kai Yu. 2015. Bidirectional LSTM-CRF models for sequence tagging. arXiv preprint arXiv:1508.01991 ."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib4",
+      "text": "Beuck et al. (2011) Niels Beuck, Arne Köhn, and Wolfgang Menzel. 2011. Decision strategies for incremental POS tagging. In Proceedings of the 18th Nordic Conference of Computational Linguistics (NODALIDA 2011) , pages 26–33."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib31",
+      "text": "Köhn (2018) Arne Köhn. 2018. Incremental natural language processing: Challenges, strategies, and evaluation . In Proceedings of the 27th International Conference on Computational Linguistics , pages 2990–3003, Santa Fe, New Mexico, USA. Association for Computational Linguistics."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib49",
+      "text": "Schlangen and Skantze (2011) David Schlangen and Gabriel Skantze. 2011. A general, abstract model of incremental dialogue processing. Dialogue & Discourse , 2(1):83–111."
+    }
+  ]
+}

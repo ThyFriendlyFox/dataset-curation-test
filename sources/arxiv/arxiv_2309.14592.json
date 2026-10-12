@@ -1,0 +1,145 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2309.14592",
+  "title": "Efficient Post-training Quantization with FP8 Formats",
+  "authors": "Haihao Shen, Naveen Mellempudi, Xin He, Qun Gao, Chang Wang, Mengni Wang",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.AI",
+    "cs.CL"
+  ],
+  "url": "https://arxiv.org/abs/2309.14592",
+  "html_url": "https://arxiv.org/html/2309.14592",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 824,
+  "text": "Quantization is the process of reducing the numeric precision of weights and activations of a neural network to lower the computation costs of inference. INT8 quantization [1,2] is the most widely-accepted choice today due to its ability to deliver high inference performance on modern deep learning hardware while maintaining reasonable model accuracy. It has been particularly effective for computer vision tasks such as object detection and image classification, and has been widely deployed in production both at the data center scale and on resource-constrained edge devices. However, INT8 presents several challenges that arise due to its limited dynamic range. Several quantization techniques have been developed to address these challenges. For example, asymmetric quantization [3,4,5] allocates different numbers of bits for the positive and negative ranges with a non-zero offset, to better represent the distribution of the original values. Non-uniform quantization methods [6,7,8,9,10] attempt to assign more precision to the parts of the data that are deemed more important to reduce quantization errors. Methods that use per-group [11,12] or per-channel [3,4] scaling extend the effective dynamic range by using independent scaling factor for each selected group of elements. The limited dynamic range of INT8 also results in poor representation of outliers that are typically found in activations. This is especially prevalent in Large Language Models (LLMs), where outliers are significantly larger when compared to the rest of the activations. Most common approach for handling outliers is to clip them using threshold values that are either obtained through calibration [13,14] or learned during training [5,15,16,17]. More recently [18,19] have proposed applying mathematical transformations to redistribute the magnitude of outliers between weights and activation tensors to minimize their impact. Despite these advancements, INT8 methods remain ineffective for a wide range of language modeling tasks, where the presence of LayerNorm was shown to amplify the occurrence of outliers [18]. Therefore, a significant percentage of these workloads falls back to using higher precision to preserve model accuracy.\n\nThis paper argues that 8-bit floating-point (FP8) formats are an efficient and more productive alternative to INT8 for deep neural network quantization. We evaluated three different representations (E5M2, E4M3, and E3M4) that offer varying degrees of trade-off between dynamic range and precision. Table 1 shows the details of the binary format and special value encoding. The study focused on the benefits of FP8 formats for post-training quantization as the preferred approach used in production. We developed quantization workflows that generalized across different network architectures, and conducted experiments on 75 networks that cover a wide range of application domains. Our results show that FP8 formats overall provide higher accuracy, better workload coverage compared to INT8 (92.64% vs. 65.87%) and can handle more operations such as LayerNorm and BatchNorm. The data also suggests that E4M3 is better suited for a broad range of NLP models with a coverage of 96.32% compared to E3M4 (92.11%), while E3M4 performs slightly better on computer vision models with 78.95% coverage compared to E4M3 (73.68%). Our contributions are as follows:\n\n- • Propose a unified and scalable FP8 quantization flow that works across application domains and different model sizes. To the best of our knowledge, our work is the first to study this problem across 200+ tasks and 75+ models demonstrating the scalability of our approach.\n\n- • Demonstrate the advantages of FP8 formats over INT8, in terms of workload coverage, model accuracy and suitability for a broader range of operations. Our work is also the first study to showcase accuracy-driven automatic model tuning for quantization.\n\n- • Suggest that E4M3 is better suited for NLP models, whereas E3M4 performs marginally better than E4M3 on computer vision tasks.\n\n## 1.1 Related Work\n\nThere is a growing body of research is studying the use of 8-bit floating-point formats to accelerate deep learning training and inference tasks. Initial studies by [20] and [21] focused on the E5M2 format for training tasks due to its wider dynamic range which is necessary for representing gradient values. [22] subsequently proposed using a combination of two binary formats, E5M2 and E4M3, for training and extended their research to include inference tasks. They also suggested using an exponent bias to shift the numeric range of E4M3 format for handling outliers in activations. Later studies by [23] and [24] have extended this scope to include variable exponent bias and formats with fewer exponent bits, such as E3M4 and E2M5. More recently, [25] presented a generalized training method that employs per-tensor scaling using E5M2 and E4M3 formats. They also extended the inference studies to cover large language models such as GPT-3 (6.7B).\n\nThe rest of this paper is organized as follows. Section 2 discusses the advantages of 8-bit floating point representation in handling outliers. Section. 3 introduces the quantization workflow and components of a standard, extended quantization scheme and a framework for tuning model performance. Section 4 outlines the experimental setup, presents accuracy results, and offers discussion on performance tuning. Section 5 presents the conclusions and future work.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib49",
+      "text": "Vanhoucke et al. (2011) Vanhoucke, V., Senior, A., and Mao, M. Z. Improving the speed of neural networks on cpus. In Deep Learning and Unsupervised Feature Learning Workshop, NIPS 2011 , 2011."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib15",
+      "text": "Han et al. (2015a) Han, S., Mao, H., and Dally, W. J. Deep compression: Compressing deep neural networks with pruning, trained quantization and huffman coding, 2015a. URL https://arxiv.org/abs/1510.00149 ."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib20",
+      "text": "Jacob et al. (2018) Jacob, B., Kligys, S., Chen, B., Zhu, M., Tang, M., Howard, A., Adam, H., and Kalenichenko, D. Quantization and training of neural networks for efficient integer-arithmetic-only inference. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR) , June 2018."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib24",
+      "text": "Krishnamoorthi (2018) Krishnamoorthi, R. Quantizing deep convolutional networks for efficient inference: A whitepaper. CoRR , abs/1806.08342, 2018. URL http://arxiv.org/abs/1806.08342 ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib3",
+      "text": "Bhalgat et al. (2020) Bhalgat, Y., Lee, J., Nagel, M., Blankevoort, T., and Kwak, N. LSQ+: improving low-bit quantization through learnable offsets and better initialization. CoRR , abs/2004.09576, 2020. URL https://arxiv.org/abs/2004.09576 ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib33",
+      "text": "Miyashita et al. (2016) Miyashita, D., Lee, E. H., and Murmann, B. Convolutional neural networks using logarithmic data representation. CoRR , abs/1603.01025, 2016. URL http://arxiv.org/abs/1603.01025 ."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib59",
+      "text": "Zhou et al. (2017) Zhou, A., Yao, A., Guo, Y., Xu, L., and Chen, Y. Incremental network quantization: Towards lossless CNNs with low-precision weights. In International Conference on Learning Representations , 2017. URL https://openreview.net/forum?id=HyQJ-mclg ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib5",
+      "text": "Cai et al. (2017) Cai, Z., He, X., Sun, J., and Vasconcelos, N. Deep learning with low precision by half-wave gaussian quantization. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR) , July 2017."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib13",
+      "text": "Fang et al. (2020) Fang, J., Shafiee, A., Abdel-Aziz, H., Thorsley, D., Georgiadis, G., and Hassoun, J. Near-lossless post-training quantization of deep neural networks via a piecewise linear approximation. CoRR , abs/2002.00104, 2020. URL https://arxiv.org/abs/2002.00104 ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib26",
+      "text": "Li et al. (2020) Li, Y., Dong, X., and Wang, W. Additive powers-of-two quantization: An efficient non-uniform discretization for neural networks. In International Conference on Learning Representations , 2020. URL https://openreview.net/forum?id=BkgXT24tDS ."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib60",
+      "text": "Zhou et al. (2016) Zhou, S., Ni, Z., Zhou, X., Wen, H., Wu, Y., and Zou, Y. Dorefa-net: Training low bitwidth convolutional neural networks with low bitwidth gradients. CoRR , abs/1606.06160, 2016. URL http://arxiv.org/abs/1606.06160 ."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib29",
+      "text": "Mellempudi et al. (2017) Mellempudi, N., Kundu, A., Mudigere, D., Das, D., Kaul, B., and Dubey, P. Ternary neural networks with fine-grained quantization. CoRR , abs/1705.01462, 2017. URL http://arxiv.org/abs/1705.01462 ."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib45",
+      "text": "Sung et al. (2015) Sung, W., Shin, S., and Hwang, K. Resiliency of deep neural networks under quantization. CoRR , abs/1511.06488, 2015. URL http://arxiv.org/abs/1511.06488 ."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib58",
+      "text": "Zhao et al. (2019b) Zhao, R., Hu, Y., Dotzel, J., Sa, C. D., and Zhang, Z. Improving neural network quantization without retraining using outlier channel splitting. CoRR , abs/1901.09504, 2019b. URL http://arxiv.org/abs/1901.09504 ."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib6",
+      "text": "Choi et al. (2018) Choi, J., Wang, Z., Venkataramani, S., Chuang, P. I., Srinivasan, V., and Gopalakrishnan, K. PACT: parameterized clipping activation for quantized neural networks. CoRR , abs/1805.06085, 2018. URL http://arxiv.org/abs/1805.06085 ."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib12",
+      "text": "Esser et al. (2020) Esser, S. K., McKinstry, J. L., Bablani, D., Appuswamy, R., and Modha, D. S. Learned step size quantization. In International Conference on Learning Representations , 2020. URL https://openreview.net/forum?id=rkgO66VKDS ."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib53",
+      "text": "Zhang et al. (2018a) Zhang, D., Yang, J., Ye, D., and Hua, G. Lq-nets: Learned quantization for highly accurate and compact deep neural networks. CoRR , abs/1807.10029, 2018a. URL http://arxiv.org/abs/1807.10029 ."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib51",
+      "text": "Wei et al. (2022) Wei, X., Zhang, Y., Zhang, X., Gong, R., Zhang, S., Zhang, Q., Yu, F., and Liu, X. Outlier suppression: Pushing the limit of low-bit transformer language models. In Oh, A. H., Agarwal, A., Belgrave, D., and Cho, K. (eds.), Advances in Neural Information Processing Systems , 2022. URL https://openreview.net/forum?id=yW5zeRSFdZ ."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib52",
+      "text": "Xiao et al. (2022) Xiao, G., Lin, J., Seznec, M., Demouth, J., and Han, S. Smoothquant: Accurate and efficient post-training quantization for large language models. arXiv preprint arXiv:2211.10438 , 2022."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib50",
+      "text": "Wang et al. (2018) Wang, N., Choi, J., Brand, D., Chen, C.-Y., and Gopalakrishnan, K. Training Deep Neural Networks with 8-bit Floating Point Numbers. In Bengio, S., Wallach, H., Larochelle, H., Grauman, K., Cesa-Bianchi, N., and Garnett, R. (eds.), Advances in Neural Information Processing Systems , volume 31. Curran Associates, Inc., 2018. URL https://proceedings.neurips.cc/paper_files/paper/2018/file/335d3d1cd7ef05ec77714a215134914c-Paper.pdf ."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib30",
+      "text": "Mellempudi et al. (2019) Mellempudi, N., Srinivasan, S., Das, D., and Kaul, B. Mixed Precision Training With 8-bit Floating Point, May 2019. URL http://arxiv.org/abs/1905.12334 . arXiv:1905.12334 [cs, stat]."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib44",
+      "text": "Sun et al. (2019) Sun, X., Choi, J., Chen, C.-Y., Wang, N., Venkataramani, S., Srinivasan, V. V., Cui, X., Zhang, W., and Gopalakrishnan, K. Hybrid 8-bit Floating Point (HFP8) Training and Inference for Deep Neural Networks. In Advances in Neural Information Processing Systems , volume 32. Curran Associates, Inc., 2019. URL https://proceedings.neurips.cc/paper/2019/hash/65fc9fb4897a89789352e211ca2d398f-Abstract.html ."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib35",
+      "text": "Noune et al. (2022) Noune, B., Jones, P., Justus, D., Masters, D., and Luschi, C. 8-bit Numerical Formats for Deep Neural Networks, June 2022. URL http://arxiv.org/abs/2206.02915 . arXiv:2206.02915 [cs]."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib25",
+      "text": "Kuzmin et al. (2022) Kuzmin, A., Van Baalen, M., Ren, Y., Nagel, M., Peters, J., and Blankevoort, T. FP8 Quantization: The Power of the Exponent, August 2022. URL http://arxiv.org/abs/2208.09225 . arXiv:2208.09225 [cs]."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib31",
+      "text": "Micikevicius et al. (2022) Micikevicius, P., Stosic, D., Burgess, N., Cornea, M., Dubey, P., Grisenthwaite, R., Ha, S., Heinecke, A., Judd, P., Kamalu, J., et al. Fp8 formats for deep learning. arXiv preprint arXiv:2209.05433 , 2022."
+    }
+  ]
+}

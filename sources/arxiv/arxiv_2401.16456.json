@@ -1,0 +1,153 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2401.16456",
+  "title": "SHViT: Single-Head Vision Transformer with Memory Efficient Macro Design",
+  "authors": "Seokju Yun, Youngmin Ro",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2401.16456",
+  "html_url": "https://arxiv.org/html/2401.16456",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 866,
+  "text": "Vision Transformers (ViT) have demonstrated impressive performance across various computer vision tasks due to their high model capabilities [1,2,3]. Compared to Convolutional Neural Networks (CNN) [4,5], ViTs excel in modeling long-range dependencies and scale effectively with large amounts of training data and model parameters [6]. Despite these advantages, the lack of inductive bias in vanilla ViTs necessitates more training data, and the global attention module incurs quadratic computational complexity with respect to the image size. To address these challenges, previous research has either combined ViTs with CNNs or introduced cost-efficient attention variants.\n\nRecently, studies addressing problems with real-time constraints have also proposed efficient models following similar strategies. And their strategies can be categorized into two groups: 1) efficient architecture - macro design; and 2) efficient Multi-Head Self-Attention (MHSA) - micro design. Studies exploring architectural design [7,8,9,10,11,12] utilize convolution to handle high-resolution / low-level features and employ attention for low-resolution / high-level features, demonstrating superior performance without complex operations.\n\nHowever, most of these methods mainly focus on which modules to use for aggregating tokens rather than how to construct the tokens (about patchify stem and stage design). On the other hand, efficient MHSA techniques reduce the cost of attention by implementing sparse attention [13,14,15,16,17,9,18] or low-rank approximation [19,20,21,22]. These modules are applied with the commonly adopted multi-head mechanism. Despite all the great progress, redundancies in macro/micro design are still not fully understood or addressed. In this paper, we explore the redundancy at all design levels, and propose memory-efficient solutions.\n\nTo identify computational redundancy in macro design, we concentrate on patch embedding size, observing that most recent efficient models use a 4 \\times 4 patch embedding. We conduct experiments as shown in Fig. 2 to analyze spatial redundancy in traditional macro design and find several intriguing results. First, despite having fewer channels, the early stages exhibit a severe speed bottleneck due to the large number of tokens (at 224 \\times 224, stage1: 3136 tokens; stage2: 784 tokens). Second, using a 3-stage design that processes 196 tokens in the first stage through a 16 \\times 16 patchify stem does not lead to a significant drop in performance. For further comparison, we set up a basic model (Tab. 6 (2)) employing the aforementioned macro design, performing simple token mixing using a 3 \\times 3 depthwise convolution. Compared to the efficient model MobileViT-XS [18], our simple model achieves 1.5% superior accuracy on ImageNet-1k [23], while running 5.0 \\times / 7.6 \\times faster on the A100 GPU / Intel CPU. These results demonstrate that there is considerable spatial redundancy in the early stages, and compared with specialized attention methods, efficient macro design is more crucial for the model to achieve competitive performance within strict latency limits. Note that this observation does not mean the token mixer is trivial.\n\nWe also probe redundancy in micro design, specifically within the MHSA layer. Most efficient MHSA methods have primarily focused on effective spatial token mixing. Due to the efficient macro design, we are able to use compact token representations with increased semantic density. Thus, we turn our focus to the channel (head) redundancy present in attention layers, also crucial aspect overlooked in most previous works. Through comprehensive experiments, we find that there is a noticeable redundancy in multi-head mechanism, particularly in the latter stages. We then propose a novel Single-Head Self-Attention (SHSA) as a competitive alternative that reduces the computational redundancy. In SHSA, self-attention with a single head is applied to just a subset of the input channels, while the others remain unchanged. SHSA layer not only eliminates the computational redundancy derived from multi-head mechanism but also reduces memory access cost by processing partial channels. Also, these efficiencies enable stacking more blocks with a larger width, leading to performance improvement within the same computational budget.\n\nBased on these findings, we introduce a Single-Head Vision Transformer (SHViT) based on memory-efficient design principles, as a new family of networks that run highly fast on diverse devices. Experiments demonstrate that our SHViT achieves state-of-the-art performance for classification, detection, and segmentation tasks in terms of both speed and accuracy, as shown in Fig. 1. For instance, our SHViT-S4 achieves 79.4% top-1 accuracy on ImageNet with throughput of 14283 images/s on an Nvidia A100 GPU and 509 images/s on an Intel Xeon Gold 5218R CPU @ 2.10GHz, outperforming EfficientNet-B0 [24] by 2.3% in accuracy, 69.4% in GPU inference speed, and 90.6% in CPU speed. Also, SHViT-S4 has 1.3% better accuracy than MobileViTv2 \\times 1.0 [21] and is 2.4 \\times faster on iPhone12 mobile device. For object detection and instance segmentation on MS COCO [25] using Mask-RCNN [26] detector, our model significantly outperforms EfficientViT-M4 [27] by 6.2 AP box and 4.9 AP mask with a smaller backbone latency on various devices.\n\nIn summary, our contributions are as follows:\n\n- • We conduct a systematic analysis of the redundancy that has been overlooked in the majority of existing research, and propose memory-efficient design principles to tackle it.\n\n- • We introduce Single-Head ViT(SHViT), which strike a good accuracy-speed tradeoff on a variety of devices such as GPU, CPU, and iPhone mobile device.\n\n- • We carry out extensive experiments on various tasks and validate the high speed and effectiveness of our SHViT.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "Alexey Dosovitskiy, Lucas Beyer, Alexander Kolesnikov, Dirk Weissenborn, Xiaohua Zhai, Thomas Unterthiner, Mostafa Dehghani, Matthias Minderer, Georg Heigold, Sylvain Gelly, et al. An image is worth 16x16 words: Transformers for image recognition at scale. arXiv preprint arXiv:2010.11929 , 2020."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "Nicolas Carion, Francisco Massa, Gabriel Synnaeve, Nicolas Usunier, Alexander Kirillov, and Sergey Zagoruyko. End-to-end object detection with transformers. In Computer Vision–ECCV 2020: 16th European Conference, Glasgow, UK, August 23–28, 2020, Proceedings, Part I 16 , pages 213–229. Springer, 2020."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "Bowen Cheng, Alex Schwing, and Alexander Kirillov. Per-pixel classification is not all you need for semantic segmentation. Advances in Neural Information Processing Systems , 34:17864–17875, 2021."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. Deep residual learning for image recognition. In Proceedings of the IEEE conference on computer vision and pattern recognition , pages 770–778, 2016."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "Zhuang Liu, Hanzi Mao, Chao-Yuan Wu, Christoph Feichtenhofer, Trevor Darrell, and Saining Xie. A convnet for the 2020s. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 11976–11986, 2022."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "Maithra Raghu, Thomas Unterthiner, Simon Kornblith, Chiyuan Zhang, and Alexey Dosovitskiy. Do vision transformers see like convolutional neural networks? Advances in Neural Information Processing Systems , 34:12116–12128, 2021."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "Pavan Kumar Anasosalu Vasu, James Gabriel, Jeff Zhu, Oncel Tuzel, and Anurag Ranjan. Fastvit: A fast hybrid vision transformer using structural reparameterization. In Proceedings of the IEEE/CVF International Conference on Computer Vision , 2023."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "Yanyu Li, Geng Yuan, Yang Wen, Ju Hu, Georgios Evangelidis, Sergey Tulyakov, Yanzhi Wang, and Jian Ren. Efficientformer: Vision transformers at mobilenet speed. Advances in Neural Information Processing Systems , 35:12934–12949, 2022."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "Yanyu Li, Ju Hu, Yang Wen, Georgios Evangelidis, Kamyar Salahi, Yanzhi Wang, Sergey Tulyakov, and Jian Ren. Rethinking vision transformers for mobilenet size and speed. In Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV) , pages 16889–16900, October 2023."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "Benjamin Graham, Alaaeldin El-Nouby, Hugo Touvron, Pierre Stock, Armand Joulin, Hervé Jégou, and Matthijs Douze. Levit: a vision transformer in convnet’s clothing for faster inference. In Proceedings of the IEEE/CVF international conference on computer vision , pages 12259–12269, 2021."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "Muhammad Maaz, Abdelrahman Shaker, Hisham Cholakkal, Salman Khan, Syed Waqas Zamir, Rao Muhammad Anwer, and Fahad Shahbaz Khan. Edgenext: efficiently amalgamated cnn-transformer architecture for mobile vision applications. In Computer Vision–ECCV 2022 Workshops: Tel Aviv, Israel, October 23–27, 2022, Proceedings, Part VII , pages 3–20. Springer, 2023."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "Namuk Park and Songkuk Kim. How do vision transformers work? In International Conference on Learning Representations , 2022."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "Nikita Kitaev, Łukasz Kaiser, and Anselm Levskaya. Reformer: The efficient transformer. In International Conference on Learning Representations , 2020."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "Zizheng Pan, Jianfei Cai, and Bohan Zhuang. Fast vision transformers with hilo attention. Advances in Neural Information Processing Systems , 35:14541–14554, 2022."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "Hongyu Ren, Hanjun Dai, Zihang Dai, Mengjiao Yang, Jure Leskovec, Dale Schuurmans, and Bo Dai. Combiner: Full attention transformer with sparse computation cost. Advances in Neural Information Processing Systems , 34:22470–22482, 2021."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "Wenhai Wang, Enze Xie, Xiang Li, Deng-Ping Fan, Kaitao Song, Ding Liang, Tong Lu, Ping Luo, and Ling Shao. Pyramid vision transformer: A versatile backbone for dense prediction without convolutions. In Proceedings of the IEEE/CVF international conference on computer vision , pages 568–578, 2021."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "Junting Pan, Adrian Bulat, Fuwen Tan, Xiatian Zhu, Lukasz Dudziak, Hongsheng Li, Georgios Tzimiropoulos, and Brais Martinez. Edgevits: Competing light-weight cnns on mobile devices with vision transformers. In Computer Vision–ECCV 2022: 17th European Conference, Tel Aviv, Israel, October 23–27, 2022, Proceedings, Part XI , pages 294–311. Springer, 2022."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "Sachin Mehta and Mohammad Rastegari. Mobilevit: Light-weight, general-purpose, and mobile-friendly vision transformer. In International Conference on Learning Representations , 2022."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "Yinpeng Chen, Xiyang Dai, Dongdong Chen, Mengchen Liu, Xiaoyi Dong, Lu Yuan, and Zicheng Liu. Mobile-former: Bridging mobilenet and transformer. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 5270–5279, 2022."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "Krzysztof Choromanski, Valerii Likhosherstov, David Dohan, Xingyou Song, Andreea Gane, Tamas Sarlos, Peter Hawkins, Jared Davis, Afroz Mohiuddin, Lukasz Kaiser, et al. Rethinking attention with performers. In International Conference on Learning Representations , 2021."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "Sachin Mehta and Mohammad Rastegari. Separable self-attention for mobile vision transformers. arXiv preprint arXiv:2206.02680 , 2022."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib22",
+      "text": "Sinong Wang, Belinda Z Li, Madian Khabsa, Han Fang, and Hao Ma. Linformer: Self-attention with linear complexity. arXiv preprint arXiv:2006.04768 , 2020."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib23",
+      "text": "Jia Deng, Wei Dong, Richard Socher, Li-Jia Li, Kai Li, and Li Fei-Fei. Imagenet: A large-scale hierarchical image database. In 2009 IEEE conference on computer vision and pattern recognition , pages 248–255. Ieee, 2009."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib24",
+      "text": "Mingxing Tan and Quoc Le. Efficientnet: Rethinking model scaling for convolutional neural networks. In International conference on machine learning , pages 6105–6114. PMLR, 2019."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib25",
+      "text": "Tsung-Yi Lin, Michael Maire, Serge Belongie, James Hays, Pietro Perona, Deva Ramanan, Piotr Dollár, and C Lawrence Zitnick. Microsoft coco: Common objects in context. In Computer Vision–ECCV 2014: 13th European Conference, Zurich, Switzerland, September 6-12, 2014, Proceedings, Part V 13 , pages 740–755. Springer, 2014."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib26",
+      "text": "Kaiming He, Georgia Gkioxari, Piotr Dollár, and Ross Girshick. Mask r-cnn. In Proceedings of the IEEE international conference on computer vision , pages 2961–2969, 2017."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib27",
+      "text": "Xinyu Liu, Houwen Peng, Ningxin Zheng, Yuqing Yang, Han Hu, and Yixuan Yuan. Efficientvit: Memory efficient vision transformer with cascaded group attention. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 14420–14430, 2023."
+    }
+  ]
+}

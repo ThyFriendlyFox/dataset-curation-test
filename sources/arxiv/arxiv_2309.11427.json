@@ -1,0 +1,164 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2309.11427",
+  "title": "Generative Pre-Training of Time-Series Data for Unsupervised Fault Detection in Semiconductor Manufacturing",
+  "authors": "Sewoong Lee, JinKyou Choi, Min Su Kim",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.AI"
+  ],
+  "url": "https://arxiv.org/abs/2309.11427",
+  "html_url": "https://arxiv.org/html/2309.11427",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1239,
+  "text": "EVEN at this moment, even in a leading semiconductor company, equipment engineers are verifying process logs with their own eyes on a daily basis whether it is normal or not. In order to reduce and automate this inefficiency, researches about Fault Detection and Classification (FDC) [1,2,3,4,5], time-series classification [6,7,8], or time-series anomaly detection [9,10,11,12] have been conducted. These research areas are closely interconnected as shown in Fig. I.\n\nDespite extensive research efforts, the semiconductor manufacturing industry faces the aforementioned inefficiency due to the following challenges:\n\n- • First, the lack of abnormal data becomes a challenge. In other words, abnormal data may not have been sufficiently obtained at the time of developing the detection model. The objective of the semiconductor manufacturing industry is to minimize defects, leading to the handling of highly biased datasets with scarce anomalies [13]. It is often necessary to develop models that can detect future anomalies even without any abnormal data. In this case, many supervised machine learning methods, such as convolutional neural networks (CNN) [1] or K-Nearest Neighbor (KNN) [14], become inapplicable.\n\n- • Second, the scarcity of data itself acts as a challenge. Previous studies in time series typically involved training data with sample sizes in the double digits [15]. However, with the accelerated advancements in rapid circuit integration technology, in the semiconductor industry, where development timelines are crucial, it is often necessary to commence model development with only a handful of available data. Given these circumstances, acquiring labeled data becomes even more difficult, making unsupervised learning essential [16]. Particularly for precise data labeling, extensive inspection or measurement steps before and after the process are required, leading to increased costs. This conflicts with the fact that fault detection in semiconductor manufacturing is conducted to maximize productivity and profits [17].\n\n- • Last, in conjunction with the aforementioned challenges, the presence of various mixed types of normal time-series data makes the problem even more complex. For instance, semiconductor manufacturing processes require the continuous adjustment of the process conditions [18]. As a result, the definition of a normal time-series can vary. Consequently, datasets can contain mixed types of normality, which makes the use of traditional algorithms such as dynamic time warping (DTW) [19] impossible.\n\nt!](topskip=0pt, botskip=0pt, midskip=0pt)[scale=0.45]lee1.png A illustration of fault detection and classification using time-series anomaly detection in the semiconductor manufacturing industry. This illustrates the relationship between fault, anomaly, and abnormal wafer in the semiconductor manufacturing industry, as well as the stages of anomaly detection and classification.\n\nOne of the most commonly used methods in the current semiconductor manufacturing industry involves utilizing CNNs, such as FDC-CNN [1], to classify normal and abnormal data through supervised learning. They used a combination of feature engineering techniques and supervised learning algorithms to achieve high accuracy in fault detection and classification. Even though it demonstrates good performance when applicable, there are many cases in the real world where it cannot be used due to the high cost of building labeled data. In unsupervised learning, however, even the most recent research [5] attempting unsupervised fault classification on manufacturing data faces the limitation of having to fine-tune the hyperparameters of the anomaly detection model through the fault detection stages, partially using a supervised approach.\n\nAcross various fields, including but not limited to the semiconductor manufacturing industry, a prominent domain exploring the characteristics of time-series data through unsupervised learning is time-series representation. Recently, TS-TCC [20], TST [21], and TS2Vec [22] aimed to develop an unsupervised representation technique for time-series data, which could be used for various tasks such as classification, anomaly detection, and forecasting. Nevertheless, the limitation of unsupervised representation approaches is that they rely on supervised learning methods, such as Support Vector Machines (SVM), when constructing classifiers.\n\nTo tackle the challenge of developing unsupervised time-series classification models, the Robust Temporal Feature Network (RTFN) investigates a deep learning approach [6]. However, RTFN has a limitation in that it can perform unsupervised clustering, but ultimately, in order to extract features for classification, it needs to be embedded into a supervised structure. More recently, a model called the Multimodal Domain Adversarial Network (MDAN) has shown promising performance in time-series classification by incorporating both time-domain and frequency-domain feature representations [8]. However, MDAN has the limitation of requiring a substantial amount of data during the training process for transfer learning from source to target data, and it has been selectively studied only on electrocardiogram or motion sensor data. In contrast, our study aims to address issues in semiconductor manufacturing processes where only limited data is provided or in situations where a mix of various sensors such as gas, electric, pressure, and light emission are present.\n\nTo achieve end-to-end unsupervised classification as shown in Fig. I, unsupervised time-series anomaly detection methods can be utilized. Time-series anomaly detection methods are able to find anomalous subsequences of varied lengths within time-series, which can be either single point or collective points [11]. Nonetheless, solving real-world problems remains challenging. Our study shows the limitations of existing unsupervised time-series anomaly detection methods on datasets of the semiconductor manufacturing industry.\n\nHumans, despite the challenges mentioned earlier, can relatively easily discern anomalies that existing models struggle with. One of the key motivations of this research is that a certain type of deep learning model can detect infinite kinds of potential anomalies of time-series data in semiconductor manufacturing. In other domains such as image processing or Natural Language Processing (NLP), generative pre-training is also proposed to help deep learning with unlabeled data [23] and used to improve performance for image processing tasks [24]. After the Transformer model is suggested [25], the Transformer based model such as Generative Pre-trained Transformers (GPT) [26] was developed and outperformed most of state-of-the-art benchmarks in NLP tasks [27,28,29].\n\nIn this paper, we introduce a novel deep learning architecture, TRACE-GPT: T ime-se R ies A nomaly-detection with C onvolutional E mbedding and G enerative P re-trained T ransformers. We demonstrate that the Transformer decoder can be effective in learning sequential features of semiconductor manufacturing sensor data with temporal convolutional networks. The key contributions of this paper are as follows:\n\n- • We propose a novel deep learning architecture, TRACE-GPT, for unsupervised time-seres anomaly detection in semiconductor manufacturing. We further developed a model that can classify abnormal data by observing unlabeled data, like a human, without any prior knowledge of anomalies or possible anomalies.\n\n- • We introduce a modified version of the Transformer architecture, originally designed for the natural language processing domain, to effectively handle time-series data. The idea behind the Transformer architecture is to predict the next words in a sentence, but we extended it to learn from numerical sequences and predict the next sensor values.\n\n- • In consideration of real-world challenges encountered in the semiconductor manufacturing industry, we evaluated our model on extreme datasets, including the following scenarios: insufficient abnormal data, single-digit-sized training data, unlabeled data, or mixed normal types. We demonstrated that our model outperforms other baselines.\n\nThe structure of this paper is as follows: Section II introduces the related works associated with this study. In Section III, we describe the architecture and methodology of the deep learning model we propose. In Section IV, we provide a detailed explanation of the datasets from the semiconductor manufacturing industry that we conducted experiments on. Section V discusses how we set up the experiments and presents the results based on these datasets. Finally, in Section VI, we summarize the aspects in which we achieved the motivation of our research.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "K. B. Lee, S. Cheon, and C. O. Kim, “A convolutional neural network for fault classification and diagnosis in semiconductor manufacturing processes,” IEEE Trans. Semicond. Manuf. , vol. 30, no. 2, pp. 135–142, 2017."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "S.-K. S. Fan, C.-Y. Hsu, D.-M. Tsai, F. He, and C.-C. Cheng, “Data-driven approach for fault detection and diagnostic in semiconductor manufacturing,” IEEE Trans. on Autom. Sci. Eng. , vol. 17, no. 4, pp. 1925–1936, 2020."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "H. Park, J. E. Choi, D. Kim, and S. J. Hong, “Artificial immune system for fault detection and classification of semiconductor equipment,” Electronics , vol. 10, no. 8, p. 944, 2021."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "F. Zhu, X. Jia, W. Li, M. Xie, L. Li, and J. Lee, “Cross-chamber data transferability evaluation for fault detection and classification in semiconductor manufacturing,” IEEE Trans. Semicond. Manuf. , vol. 36, no. 1, pp. 68–77, 2022."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "L. C. Brito, G. A. Susto, J. N. Brito, and M. A. Duarte, “An explainable artificial intelligence approach for unsupervised fault detection and diagnosis in rotating machinery,” Mech. Syst. Signal Process , vol. 163, p. 108105, 2022."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "Z. Xiao, X. Xu, H. Xing, S. Luo, P. Dai, and D. Zhan, “Rtfn: A robust temporal feature network for time series classification,” Inf. Sci. , vol. 571, pp. 65–86, 2021."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "C.-Y. Hsu and W.-C. Liu, “Multiple time-series convolutional neural network for fault detection and diagnosis and empirical study in semiconductor manufacturing,” J. of Intell. Manuf. , vol. 32, pp. 823–836, 2021."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "L. Xi, Y. Liang, X. Huang, H. Liu, and A. Li, “Unsupervised multimodal domain adversarial network for time series classification,” Inf. Sci. , vol. 624, pp. 147–164, 2023."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "P. Malhotra, A. Ramakrishnan, G. Anand, L. Vig, P. Agarwal, and G. Shroff, “Lstm-based encoder-decoder for multi-sensor anomaly detection,” arXiv preprint arXiv:1607.00148 , 2016."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "J. Audibert, P. Michiardi, F. Guyard, S. Marti, and M. A. Zuluaga, “Usad: Unsupervised anomaly detection on multivariate time series,” in Proc. of the 26th ACM SIGKDD Int. Conf. Knowl. Discov. Data Min. , 2020, pp. 3395–3404."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "A. Geiger, D. Liu, S. Alnegheimish, A. Cuesta-Infante, and K. Veeramachaneni, “Tadgan: Time series anomaly detection using generative adversarial networks,” in 2020 IEEE Int. Conf. on Big Data (Big Data) . IEEE, 2020, pp. 33–43."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "L. Wong, D. Liu, L. Berti-Equille, S. Alnegheimish, and K. Veeramachaneni, “Aer: Auto-encoder with regression for time series anomaly detection,” in 2022 IEEE Int. Conf. on Big Data (Big Data) . IEEE, 2022, pp. 1152–1161."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "C.-Y. Hsu, C.-F. Chien, and Y.-C. Lai, “Main branch decision tree algorithm for yield enhancement with class imbalance,” in Intell. Decis. Technol.: Proc. of the 4th Int. Conf. on Intelligent Decision Technologies (IDT ´ 2012)-Volume 1 . Springer, 2012, pp. 235–244."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "Q. P. He and J. Wang, “Fault detection using the k-nearest neighbor rule for semiconductor manufacturing processes,” IEEE Trans. Semicond. Manuf. , vol. 20, no. 4, pp. 345–354, 2007."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "H. A. Dau, A. Bagnall, K. Kamgar, C.-C. M. Yeh, Y. Zhu, S. Gharghabi, C. A. Ratanamahatana, and E. Keogh, “The ucr time series archive,” IEEE/CAA J. Autom. Sin. , vol. 6, no. 6, pp. 1293–1305, 2019."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "M. Carletti, C. Masiero, A. Beghi, and G. A. Susto, “Explainable machine learning in industry 4.0: Evaluating feature importance in anomaly detection to enable root cause analysis,” in 2019 IEEE Int. Conf. on Systems, Man and Cybernetics (SMC) , 2019, pp. 21–26."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "G. Verdier and A. Ferreira, “Adaptive mahalanobis distance and k k -nearest neighbor rule for fault detection in semiconductor manufacturing,” IEEE Trans. Semicond. Manuf. , vol. 24, no. 1, pp. 59–68, 2010."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "K. Choi, J. Yi, C. Park, and S. Yoon, “Deep learning for anomaly detection in time-series data: review, analysis, and guidelines,” IEEE Access , vol. 9, pp. 120 043–120 065, 2021."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "R. Bellman and R. Kalaba, “On adaptive control processes,” IEEE Trans. Automat. Contr. , vol. 4, no. 2, pp. 1–9, 1959."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "E. Eldele, M. Ragab, Z. Chen, M. Wu, C. K. Kwoh, X. Li, and C. Guan, “Time-series representation learning via temporal and contextual contrasting,” arXiv preprint arXiv:2106.14112 , 2021."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "G. Zerveas, S. Jayaraman, D. Patel, A. Bhamidipaty, and C. Eickhoff, “A transformer-based framework for multivariate time series representation learning,” in Proc. of the 27th ACM SIGKDD Int. Conf. Knowl. Discov. Data Min. , 2021, pp. 2114–2124."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib22",
+      "text": "Z. Yue, Y. Wang, J. Duan, T. Yang, C. Huang, Y. Tong, and B. Xu, “Ts2vec: Towards universal representation of time series,” in Proc. of the AAAI Conf. on Artif. Intell. , vol. 36, no. 8, 2022, pp. 8980–8987."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib23",
+      "text": "D. Erhan, P.-A. Manzagol, Y. Bengio, S. Bengio, and P. Vincent, “The difficulty of training deep architectures and the effect of unsupervised pre-training,” in Artif. Intell. and Stat. PMLR, 2009, pp. 153–160."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib24",
+      "text": "D. Erhan, A. Courville, Y. Bengio, and P. Vincent, “Why does unsupervised pre-training help deep learning?” in Proc. of the thirteenth Int. Conf. on Artif. Intell. and Stat. JMLR Workshop and Conf. Proceedings, 2010, pp. 201–208."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib25",
+      "text": "A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A. N. Gomez, Ł. Kaiser, and I. Polosukhin, “Attention is all you need,” Adv. Neural Inf. Process. Syst. , vol. 30, 2017."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib26",
+      "text": "A. Radford, K. Narasimhan, T. Salimans, I. Sutskever et al. , “Improving language understanding by generative pre-training,” 2018."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib27",
+      "text": "A. Radford, J. Wu, R. Child, D. Luan, D. Amodei, I. Sutskever et al. , “Language models are unsupervised multitask learners,” OpenAI blog , vol. 1, no. 8, p. 9, 2019."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib28",
+      "text": "T. Brown, B. Mann, N. Ryder, M. Subbiah, J. D. Kaplan, P. Dhariwal, A. Neelakantan, P. Shyam, G. Sastry, A. Askell et al. , “Language models are few-shot learners,” Adv. Neural Inf. Process. Syst. , vol. 33, pp. 1877–1901, 2020."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib29",
+      "text": "OpenAI, “Gpt-4 technical report,” 2023."
+    }
+  ]
+}

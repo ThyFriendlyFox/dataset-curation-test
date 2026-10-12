@@ -1,0 +1,88 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.17277",
+  "title": "Relational Network Verification",
+  "authors": "Xieyang Xu, Yifei Yuan, Zachary Kincaid, Arvind Krishnamurthy, Ratul Mahajan, David Walker, Ennan Zhai",
+  "year": "2024",
+  "categories": [
+    "cs.NI"
+  ],
+  "url": "https://arxiv.org/abs/2403.17277",
+  "html_url": "https://arxiv.org/html/2403.17277",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1019,
+  "text": "One of the riskiest network management activities today is changing a running network. Outages can occur during changes because of incorrect change implementation (e.g., accidentally blocking traffic) or latent bugs (e.g., traffic starts traversing a longstanding filter). When changes go wrong, banks go offline, airlines stop flying, emergency services become unreachable, and businesses lose millions of dollars [1,2,3,4,5,6,7]. Since changing a network to alter its security posture, optimize resource usage, or add capacity is unavoidable, we must make changes safer to make networks more reliable.\n\nThe last decade has seen remarkable progress toward verification technologies that can reason about large, real-world networks. These technologies typically tell a user whether a single network snapshot N satisfies specification S. The snapshot may be for an updated network configuration that engineers wish to deploy, and the specification may demand that DNS traffic is never blocked or no packet can reach the high-security zone without traversing the firewall. Indeed, many large networks use these technologies today [8,9,10,11].\n\nSingle-snapshot verification tools, while valuable, do not suffice for keeping networks running reliably as they are updated. Consider a common network change that moves all traffic on link A to link B as a precursor to shutting A for maintenance. The engineer wants to ensure that all traffic on link A is moved, it is moved to link B and nowhere else, and that no other traffic is impacted. To use single-snapshot verification for this change, one must (1) discover all traffic classes on link A, (2) create a specification asserting that the discovered traffic classes traverse link B in the new network, (3) discover all other traffic classes and all their current paths, exactly, (4) create a specification asserting all such other traffic classes continue to follow these discovered paths.\n\nCreating such specifications is almost impossible for most real-world networks [8]. One challenge is scale: The specification needed scales with the size of the network, and, of course, modern networks are enormous and continue to grow. The network in our experiments has on the order of 10^{3} routers, 10^{4} routes per router, and 10^{6} classes of flows with distinct forwarding paths, with up to 10^{4} classes impacted by typical changes. Making matters worse, there is an additional challenge of incomplete information: Networks evolve incrementally over years, and their size and complexity demand that different parts be managed by different teams; any given engineer will have only partial knowledge of a network’s behavior. Creating a detailed specification in these circumstances and maintaining it through successive changes would require otherworldly effort.\n\nThe upshot is that while single-snapshot verification helps ensure coarse, long-term invariants, it is not helpful when it comes to the fine details of many network updates. Yet network engineers must check such details because their violations create congestion-induced outages, security problems, or performance issues. Lacking appropriate tools, network engineers today rely on manually inspecting the impact of changes. Unsurprisingly, manual inspection is time-consuming, tedious, and error-prone, sometimes taking many weeks and multiple attempts to check even simple-seeming changes. See section Section 2 for a representative example.\n\nWe introduce relational network verification and investigate whether it can make network changes more reliable, more efficient, and less dependent on manual audits. Rather than reasoning about the behavior of a single snapshot in isolation, relational network verification reasons about the similarities and differences (i.e., the relationships) between the behavior of two network snapshots.\n\nRelational specifications make it easy to specify \"no change\" for the traffic and paths engineers do not want to modify (and may not even know about). Indeed, the size of a relational network specification is proportional to the complexity of the change rather than that of the network as a whole. If a desired network change is small (e.g., changing link A to link B), the relational specification will also be small. It is no wonder then that engineers already informally use such ideas to communicate their intent in change request tickets. In a sense, relational specifications capture formally the kind of thinking that engineers use, and in a way that allows automatic checking.\n\nRealizing relational network verification requires (1) a formal specification language for compactly describing the intent of a change, and (2) a decision procedure to verify that the pre- and post-change network snapshots adhere to the specification. We develop a tool called Rela with these capabilities. Network engineers use regular expressions to represent paths and simple modifiers such as adding or removing parts of the path to specify change intent. Rela compiles this user-friendly language to a low-level, regular intermediate representation (RIR) based on the theory of regular languages and relations [12]. Our tool combines the generated RIR with data from the pre- and post-change network snapshots, and checks that the pair of snapshots satisfies the RIR specification by reducing the problem to equivalence-checking for finite state automata. The final result is either a \"thumbs up\" (if the network satisfies the specification) or a set of counterexample flows and paths (otherwise).\n\nWe evaluate Rela using data from all complex, high-risk changes to a global backbone network over the last seven months. We find that Rela specs are compact; 93% of the changes need fewer than 10 terms in the language. And even though the network has over 10^{3} routers, validation take under 20 minutes for 80% of the changes. We are now integrating Rela into the change pipeline of this network.\n\nRela barely scratches the surface when it comes to realizing the potential of relational network verification. It focuses on dataplane verification for networks with stateless forwarding, the same context that was targeted by the first wave of single-snapshot verification tools [13]. We expect that relational verification will prove effective in other contexts as well, including stateful forwarding and control planes. We also expect that it can help verify if two parts of the same snapshot are similar (e.g., two geographic regions), modulo a few exceptions [14]. Beyond verification, the compact change specs of Rela may also enable automatic synthesis of network changes. We look forward to exploring these topics in the future.\n\nEthics: This work does not raise any ethical issues.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib5",
+      "text": "Anderson (2014) Mae Anderson. 2014. Time Warner Cable Says Outages Largely Resolved. http://www.seattletimes.com/business/time-warner-cable-says-outages-largely-resolved . (2014). Retrieved June 23, 2021 from http://www.seattletimes.com/business/time-warner-cable-says-outages-largely-resolved"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib31",
+      "text": "Sverdlik (2017) Yevgeniy Sverdlik. 2017. United Says IT Outage Resolved, Dozen Flights Canceled Monday. (2017). Retrieved June 23, 2021 from https://www.datacenterknowledge.com/archives/2017/01/23/united-says-it-outage-resolved-dozen-flights-canceled-monday"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib27",
+      "text": "Ragan (2016) Steve Ragan. 2016. BGP errors are to blame for Monday’s Twitter outage, not DDoS attacks. (2016). Retrieved June 23, 2021 from https://www.csoonline.com/article/3138934/security/bgp-errors-are-to-blame-for-monday-s-twitter-outage-not-ddos-attacks.html"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib28",
+      "text": "Roberts (2018) Deon Roberts. 2018. It’s been a week and customers are still mad at BB&T. (2018). Retrieved June 23, 2021 from https://www.charlotteobserver.com/news/business/banking/article202616124.html"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib34",
+      "text": "Whittaker (2020) Zach Whittaker. 2020. T-Mobile hit by phone calling, text message outage. (2020). Retrieved June 23, 2021 from https://techcrunch.com/2020/06/15/t-mobile-calling-outage/"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib29",
+      "text": "Robuck (2020) Mike Robuck. 2020. Due to a router misconfiguration, Cloudflare suffers short outage on Friday. (2020). Retrieved Feb 23, 2022 from https://www.fiercetelecom.com/telecom/due-to-a-router-misconfiguration-cloudflare-suffers-short-outage-friday"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib30",
+      "text": "Sverdlik (2014) Yevgeniy Sverdlik. 2014. Microsoft Says Config Change Caused Azure Outage. (2014). Retrieved Feb 23, 2022 from https://www.datacenterknowledge.com/archives/2014/11/20/microsoft-says-config-change-caused-azure-outage"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib13",
+      "text": "Brown et al . (2023) Matt Brown, Ari Fogel, Daniel Halperin, Victor Heorhiadi, Ratul Mahajan, and Todd Millstein. 2023. Lessons from the Evolution of the Batfish Configuration Analysis Tool. In Proceedings of SIGCOMM ’23 . ACM, 122–135."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib20",
+      "text": "Jayaraman et al . (2019) Karthick Jayaraman, Nikolaj Bjørner, Jitu Padhye, Amar Agrawal, Ashish Bhargava, Paul-Andre C Bissonnette, Shane Foster, Andrew Helwer, Mark Kasten, Ivan Lee, Anup Namdhari, Haseeb Niaz, Aniruddha Parkhi, Hanukumar Pinnamraju, Adrian Power, Neha Milind Raje, and Parag Sharma. 2019. Validating Datacenters at Scale. In Proceedings of SIGCOMM ’19 . ACM, 200–213."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib6",
+      "text": "Backes et al . (2019) John Backes, Sam Bayless, Byron Cook, Catherine Dodge, Andrew Gacek, Alan J Hu, Temesghen Kahsai, Bill Kocik, Evgenii Kotelnikov, Jure Kukovec, et al . 2019. Reachability analysis for AWS-based networks. In International Conference on Computer Aided Verification . Springer, 231–241."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib37",
+      "text": "Zeng et al . (2014) Hongyi Zeng, Shidong Zhang, Fei Ye, Vimalkumar Jeyakumar, Mickey Ju, Junda Liu, Nick McKeown, and Amin Vahdat. 2014. Libra: Divide and Conquer to Verify Forwarding Tables in Huge Networks. In Proceedings of NSDI 14 . USENIX Association, 87–99."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib19",
+      "text": "Hopcroft et al . (2006) John E. Hopcroft, Rajeev Motwani, and Jeffrey D. Ullman. 2006. Introduction to Automata Theory, Languages, and Computation (3rd Edition) . Addison-Wesley Longman Publishing Co., Inc., USA."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib11",
+      "text": "Beckett and Mahajan (2020) Ryan Beckett and Ratul Mahajan. 2020. Capturing the state of research on network verification. (2020). Retrieved Feb 2, 2024 from https://netverify.fun/2-current-state-of-research/"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib21",
+      "text": "Kakarla et al . (2020) Siva Kesava Reddy Kakarla, Alan Tang, Ryan Beckett, Karthick Jayaraman, Todd Millstein, Yuval Tamir, and George Varghese. 2020. Finding network misconfigurations by automatic template inference. In Proceedings of NSDI 20 . USENIX Association, 999–1013."
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.17611",
+  "title": "Denoising Table-Text Retrieval for Open-Domain Question Answering",
+  "authors": "Deokhyung Kang, Baikjin Jung, Yunsu Kim, Gary Geunbae Lee",
+  "year": "2024",
+  "categories": [
+    "cs.CL",
+    "cs.AI"
+  ],
+  "url": "https://arxiv.org/abs/2403.17611",
+  "html_url": "https://arxiv.org/html/2403.17611",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "1. Introduction",
+  "word_count": 556,
+  "text": "In open-domain question answering (ODQA), a retriever is a system that brings evidence supporting potential answers to the given question from an information source. These pieces of evidence are then used by a reader system, which answers the question in effect. Typically, one would expect the evidence to consist solely of text, but in practice, it is highly likely that it also contains images or tables, necessitating ODQA models to perform multi-hop aggregation of different modalities of information. For example, the OTT-QA [1] dataset sets up a situation where ODQA models must use both tables and text to answer the given question.\n\nThis setting presents practical challenges for conventional retrievers [2,3], as assessing the relevance to the question solely based on a single modality often results in incomplete measurement. At the same time, the size of the table frequently surpasses the token limit of standard pretrained language models [4,5]. To address these challenges, fusion retrieval is presented [1]. They first pre-align a row in a table to their related passages using entity linking, forming a \" fused block \". Then, the retriever identifies relevant fused blocks, and the reader model extracts the answer from the concatenated fused blocks.\n\nWhile fusion retrieval successfully addresses the aforementioned challenges, it still has two limitations.\n\n1) False positive instances for retriever. When training the retriever, the fusion retrieval treats all fused blocks containing answers relevant to the question, as block-level supervision is unavailable in OTT-QA. This leads to false-positive instances, introducing noise during training. Figure 1 depicts two fused blocks. One is bordered in gray, and the other is bordered in blue. Both blocks contain the answer (Sydney) to the question, but only the block bordered in blue is relevant, as this block contains the second-to-last row in the Tooheys Top 10.\n\n2) Neglect to utilize table-level information. Certain questions in OTT-QA require information beyond the scope of a fused block to answer. For instance, to answer the question in Figure 1, the fusion retriever should identify the fused block containing the second-to-last row in the Tooheys Top 10. For this purpose, the retriever should process table-level ranking information across fused blocks. However, the fusion retriever lacks access to such information since the fused block is confined to row-level information. Lack of table-level information leads to the retriever training with incomplete features, causing additional noise in the training process.\n\nIn this paper, we propose the D en o ised T able- Te xt R etriever (DoTTeR), built upon the state-of-the-art fusion retrieval model OTTeR [6], to address the above problems. Our approach comprises two main components: (1) Denoising OTT-QA. We train a false positive detection model that measures question-fused block relevance scores to de-noise the training dataset. We use this model to eliminate potential false positive instances for the retriever by only keeping the block with the highest relevance score for each question. (2) Rank-Aware Table Encoding (RATE). RATE involves a rank-aware encoder that is fine-tuned for locating the minimum and maximum values in numeric columns of a given table. We use the encoder to provide OTTeR with a dense representation of a given table and expect the retriever to replenish such information beyond the scope of a block as a result. Experimental results on OTT-QA show that DoTTeR significantly improves performance in both table-text retrieval and downstream question-answering tasks.",
+  "references": [
+    {
+      "n": 1,
+      "id": "biba.bib1",
+      "text": "Chen et al. (2021) Wenhu Chen and Ming-wei Chang and Eva Schlinger and William Wang and William Cohen. 2021. Open Question Answering over Tables and Text . Proceedings of ICLR 2021. PID https://github.com/wenhuchen/OTT-QA ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib5",
+      "text": "Karpukhin et al. (2020) Vladimir Karpukhin, Barlas Oguz, Sewon Min, Patrick Lewis, Ledell Wu, Sergey Edunov, Danqi Chen, and Wen-tau Yih. 2020. Dense passage retrieval for open-domain question answering. In Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing (EMNLP) , pages 6769–6781."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib14",
+      "text": "Qu et al. (2021) Yingqi Qu, Yuchen Ding, Jing Liu, Kai Liu, Ruiyang Ren, Wayne Xin Zhao, Daxiang Dong, Hua Wu, and Haifeng Wang. 2021. RocketQA: An optimized training approach to dense passage retrieval for open-domain question answering . In Proceedings of the 2021 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies , pages 5835–5847, Online. Association for Computational Linguistics."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib3",
+      "text": "Devlin et al. (2019) Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. 2019. BERT: Pre-training of deep bidirectional transformers for language understanding . In Proceedings of the 2019 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long and Short Papers) , pages 4171–4186, Minneapolis, Minnesota. Association for Computational Linguistics."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib10",
+      "text": "Liu et al. (2019) Yinhan Liu, Myle Ott, Naman Goyal, Jingfei Du, Mandar Joshi, Danqi Chen, Omer Levy, Mike Lewis, Luke Zettlemoyer, and Veselin Stoyanov. 2019. Roberta: A robustly optimized bert pretraining approach. arXiv preprint arXiv:1907.11692 ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib4",
+      "text": "Huang et al. (2022) Junjie Huang, Wanjun Zhong, Qian Liu, Ming Gong, Daxin Jiang, and Nan Duan. 2022. Mixed-modality Representation Learning and Pre-training for Joint Table-and-Text Retrieval in OpenQA . In Findings of the Association for Computational Linguistics: EMNLP 2022 , pages 4117–4129, Abu Dhabi, United Arab Emirates. Association for Computational Linguistics."
+    }
+  ]
+}

@@ -1,0 +1,169 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.19036",
+  "title": "Tessellation and interactive visualization of four-dimensional spacetime geometries",
+  "authors": "Philip Claude Caplan",
+  "year": "2024",
+  "categories": [
+    "cs.CE",
+    "cs.CG"
+  ],
+  "url": "https://arxiv.org/abs/2403.19036",
+  "html_url": "https://arxiv.org/html/2403.19036",
+  "license": "http://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Introduction",
+  "word_count": 1235,
+  "text": "Many physical phenomena exhibit time-dependent features that are challenging to predict when the domain of interest is bounded by complex geometries. Some examples involve predicting the flow physics of a rotating wind turbine (Fig. 1 right) or over an aircraft wing when flaps are deployed (Fig. 1 left). Numerical simulations offer time- and cost-efficient methods for predicting these flows and, within the realm of numerical simulations, spacetime numerical simulations have gained recent attention due to their potential to reduce the overall cost of the computation [1].\n\nSpacetime numerical simulations consist of embedding a three-dimensional (3d) geometry into four-dimensional (4d) space, where the fourth dimension is time (t in Fig. 1). Finite element simulations can then be performed in this coupled space-time domain [1,3,4,5,6,7]. Visualizing the mesh and resulting solution fields associated with these 4d simulations is necessary to be able to both debug meshing techniques and investigate features in the solution. Four-dimensional visualization techniques can be categorized as either projection-based or intersection-based, both of which use a 4d camera to transform the 4d objects into a 3d viewing space which can then be rendered with standard 3d techniques [8]. In projection-based methods, points are transformed to the 3d viewing space using a projection matrix, for example, defined by a perspective projection transformation. This approach is commonly used to visualize a tesseract in which one of the bounding cubes of the tesseract appears smaller [8] since it is further from the observation point. Intersection-based methods (or cross-sections [8]) involve slicing the four-dimensional tetrahedra or pentatopes with a four-dimensional hyperplane. Any mesh edges that cross the hyperplane can be intersected with the plane, thus providing three-dimensional coordinates in the basis of the hyperplane or, equivalently, in the frame of reference of the 4d camera. This also requires tessellating the portion of the cell (tetrahedron or pentatope) that is intersected by the hyperplane. Previous work involves computing these intersections as a pre-processing step, and then rendering the resulting polyhedra [7] or tetrahedra [9]. In the current work, the intersection-based method is preferred over the projection-based approach since it can be used to exactly visualize the geometry at specific times. This concept has been explored by Zhang [10] in the development of a 4d physics game engine. Zhang uses a compute shader to calculate the intersection regions interactively and render simple shapes defined by relatively few tetrahedral elements. The goal, in this work, is to visualize meshes with tens of millions of elements while ensuring interactivity is maintained. Whenever the hyperplane definition is changed (e.g. by user input), the primitives that need to be passed to the rendering system change. While they can be rebuffered to the GPU, this can slow down the rendering of each frame which impacts interactivity. Thus, the primary goal is to develop a system for interactively visualizing four-dimensional meshes, where interactivity is defined (in this work) as achieving a frame rate of 20-30 frames per second for relatively large meshes - about 50 million (M) elements. But, in order to study such techniques, we need meshes to visualize. Thus, a method for generating fully unstructured 4d tetrahedral meshes of moving geometries has also been developed.\n\nWork in unstructured 4d meshing has primarily focused on mesh adaptation [7,11,12] whereby an initial pentatope mesh is adapted via point insertion, edge collapse, edge flips and vertex smoothing, all within the cavity operator framework introduced by Coupez and Loseille [13,14,15,16]. The work of Caplan [7,17] assumes an initial 4d mesh can be obtained, using the Coxeter-Kuhn-Freudenthal triangulation [18] as a starting point, which restricts the simulations to a tesseract domain. An important question remaining from the aforementioned work is: how can we generate an initial mesh for complex, moving geometries?.\n\nExisting work in 4d mesh generation includes extrusion-based [4,19], elasticity-based [20,21] or advancing front [22,23,24,25,26] approaches. For example, Behr [4] creates prisms by extruding an initial spatial mesh - prisms are then subdivided into tetrahedra by inserting vertices along the temporal direction. In elasticity-based approaches, an initial 4d mesh can be modeled as an elastic solid - vertex coordinates can then be moved to conform to the moving domain boundaries (with topology changes) while keeping the mesh topology fixed [21]. The Tent Pitcher algorithm of Üngör and Sheffer [22] (extended to 4d by Mont [25]) is similar to advancing front methods. This method starts from an initial spatial mesh and inserts points in the temporal direction to satisfy constraints on the dihedral angles of the internal mesh faces with respect to the spatial domain. Other techniques locally modify the mesh topology to accommodate the geometry motion [27]. The aforementioned methods have focused primarily on the generation of pentatope meshes but are restricted in the way complex geometries with large movements are handled.\n\nThe current problem definition consists of tetrahedralizing the volume traced by a moving geometry in 4d. The most recent work in this area is that of Anderson et al. [28], in which spacetime meshes of moving geometries are created by dividing the temporal interval of the domain into discrete slabs. Within a single slab, the coordinates of each (surface) mesh vertex from the previous time step are advanced according to the local geometry velocity and, finally, projected to the moving geometry at the next time step. Surface mesh triangles at the initial and terminating temporal planes are then connected to form prisms, maintaining the number of vertices and surface mesh topology from one time step to the next. The prisms are subsequently subdivided to form tetrahedra in 4d, whereby each prism is subdivided into 14 tetrahedra (though the authors note a conformal subdivision into 10 tetrahedra is possible), thus introducing several vertices in between the initial and terminating planes of each time slab. Furthermore, Ko and Sakkalis remark upon the difficulty of projecting to a CAD geometry in the most general settings, since there is no perfect algorithm to solve the problem of orthogonal projection that satisfies high accuracy, robustness and efficient computation time simultaneously [29]. Ko and Sakkalis also mention that care needs to be taken in degenerate cases near singularities.\n\nHere, the goal is to develop a general algorithm for creating fully unstructured spacetime tetrahedral meshes of complex, moving geometries that can finally be used to evaluate the developed interactive visualization system. The proposed method minimizes the addition of vertices in between time steps and avoids projecting to the CAD geometry. Furthermore, the resolution of the geometry (and resulting topology of the surface meshes) is also allowed to change over time, thus demonstrating a fully unstructured spacetime mesh generation algorithm for 3d+t (4d) geometries. It should be noted that the focus here is on producing conforming tessellations of the spacetime geometries so they can be visualized - improving the quality of these meshes for numerical simulations is left for future work. The correctness of the algorithm is verified by measuring the volume of the resulting tetrahedra for simple analytic problems. The tessellation algorithm is also demonstrated on more complex geometries that include sharp features, (e.g. at the tip or trailing edge of a wing) and singularities (e.g. at the poles of a sphere). Finally, these meshes enable the evaluation of several techniques for interactively visualizing a moving geometry, whereby the meshes (either tetrahedral or pentatopal) are intersected with a user-defined hyperplane. Solutions with or without the use of geometry shaders [30] are presented, and the interactivity is investigated by measuring the resulting frame rate.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "M. Yano, An optimization framework for adaptive higher-order discretizations of partial differential equations on anisotropic simplex meshes, PhD thesis, Massachusetts Institute of Technology (2012)."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "M. Wibrow, Wind power and TikZ force , L a T e X Stack Exchange (2014). URL https://tex.stackexchange.com/questions/173560/wind-power-and-tikz-force"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "J. Argyris, D. Scharpf, Finite elements in time and space, Nuclear Engineering and Design 10 (4) (1969) 456–464. doi:10.1016/0029-5493(69)90081-8 ."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "M. Behr, Simplex space-time meshes in finite element simulations, International Journal for Numerical Methods in Fluids 57 (9) (2008) 1421–1434. doi:10.1002/fld.1796 ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "M. Yano, D. L. Darmofal, A fully-unstructured space-time adaptive method for wave propagation, Computer Methods in Applied Mechanics and Engineering (2014)."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "S. Jayasinghe, An adaptive space-time discontinuous Galerkin method for reservoir flows, PhD thesis, Massachusetts Institute of Technology (2018)."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "P. C. Caplan, Four-dimensional anisotropic mesh adaptation for spacetime numerical simulations, PhD thesis, Massachusetts Institute of Technology (2019)."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "M. Cavallo, Higher dimensional graphics: Conceiving worlds in four spatial dimensions and beyond, Computer Graphics Forum 40 (2) (2021) 51–63. doi:10.1111/cgf.142614 ."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "G. B. Ferrín, E. Ruiz-Gironés, X. Roca, Visualization of pentatopic meshes, Tech. rep. (2020)."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "T. Zhang, Hypervis - 4D Renderer & Physics Engine , GitHub repository (2020). URL https://github.com/t-veor/hypervis"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "C. Gruau, Metric generation for anisotropic mesh adaptation with numerical applications to material forming simulation, PhD thesis, École Nationale Supérieure des Mines de Paris (2005)."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "P. Tremblay, 2-d, 3-d and 4-d anisotropic mesh adaptation for the time-continuous space-time finite element method with applications to the incompressible navier-stokes equations, PhD thesis, University of Ottawa (2007)."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "T. Coupez, H. Digonnet, R. Ducloux, Parallel meshing and remeshing, Applied Mathematical Modelling 25 (2) (2000) 153–175, dynamic load balancing of mesh-based applications on parallel. doi:10.1016/S0307-904X(00)00045-7 ."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "T. Coupez, Génération de maillage et adaptation de maillage par optimisation locale, Revue Européenne des Éléments Finis 9 (4) (2000) 403–423. doi:10.1080/12506559.2000.10511454 ."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "A. Loseille, R. Löhner, Cavity-based operators for mesh adaptation, in: 51st AIAA Aerospace Sciences Meeting including the New Horizons Forum and Aerospace Exposition., no. 152, 2013. doi:10.2514/6.2013-152 ."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "A. Loseille, F. Alauzet, V. Menier, Unique cavity-based operator and hierarchical domain partitioning for fast parallel generation of anisotropic meshes, Computer-Aided Design 85 (2017) 53 – 67. doi:10.1016/j.cad.2016.09.008 ."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "P. C. Caplan, R. Haimes, D. L. Darmofal, M. C. Galbraith, Four-dimensional anisotropic mesh adaptation, Computer-Aided Design 129 (2020) 102915. doi:10.1016/j.cad.2020.102915 ."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "H. W. Kuhn, Simplicial approximation of fixed points, Proceedings of the National Academy of Science 61 (1968) 1238–1242. doi:10.1073/pnas.61.4.1238 ."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "M. Neumüller, E. Karabelas, M. Neumüller, E. Karabelas, 6. Generating admissible space-time meshes for moving domains in ( d + 1 ) (d+1) dimensions, De Gruyter, Berlin, Boston, 2019, pp. 185–206. doi:doi:10.1515/9783110548488-006 ."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "D. Hilger, N. Hosters, F. Key, S. Elgeti, M. Behr, A novel approach to fluid-structure interaction simulations involving large translation and contact, in: Isogeometric Analysis and Applications 2018, Springer International Publishing, pp. 39–56. doi:10.1007/978-3-030-49836-8_3 ."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "M. von Danwitz, P. Antony, F. Key, N. Hosters, M. Behr, Four-dimensional elastically deformed simplex space-time meshes for domains with time-variant topology, International Journal for Numerical Methods in Fluids 93 (12) (2021) 3490–3506. doi:10.1002/fld.5042 ."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib22",
+      "text": "A. Üngör, A. Sheffer, Tent-Pitcher: A meshing algorithm for space-time discontinuous Galerkin methods, in: Proceedings of the 9th International Meshing Roundtable, 2000, pp. 111–122."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib23",
+      "text": "J. Erickson, D. Guoy, J. Sullivan, A. Üngör, Building space-time meshes over arbitrary spatial domains, Engineering with Computers 20 (2005) 342–353. doi:10.1007/s00366-005-0303-0 ."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib24",
+      "text": "J. Gopalakrishnan, J. Schöberl, C. Wintersteiger, Mapped tent-pitching schemes for hyperbolic systems (2016). arXiv:1604.01081 ."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib25",
+      "text": "A. D. Mont, Adaptive unstructured spacetime meshing for four-dimensional spacetime discontinuous Galerkin finite element methods, Master’s thesis, University of Illinois at Urbana-Champaign (December 2011)."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib26",
+      "text": "S. Thite, Adaptive spacetime meshing for discontinuous Galerkin methods, Computational Geometry 42 (1) (2007) 20 – 44. doi:10.1016/j.comgeo.2008.07.003 ."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib27",
+      "text": "L. Wang, P.-O. Persson, A high-order discontinuous Galerkin method with unstructured space–time meshes for two-dimensional compressible flows on domains with large deformations, Computers & Fluids 118 (2015) 53–68. doi:10.1016/j.compfluid.2015.05.026 ."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib28",
+      "text": "J. T. Anderson, D. M. Williams, A. Corrigan, Surface and hypersurface meshing techniques for space–time finite element methods, Computer-Aided Design 163 (2023) 103574. doi:10.1016/j.cad.2023.103574 ."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib29",
+      "text": "K. Ko, T. Sakkalis, Orthogonal projection of points in CAD/CAM applications: an overview, Journal of Computational Design and Engineering 1 (2) (2014) 116–127. doi:10.7315/JCDE.2014.012 ."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib30",
+      "text": "D. Wolff, OpenGL 4 Shading Language Cookbook, Packt Publishing, 2018."
+    }
+  ]
+}

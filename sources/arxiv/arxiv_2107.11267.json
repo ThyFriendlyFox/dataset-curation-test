@@ -1,0 +1,113 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2107.11267",
+  "title": "Dense Supervision Propagation for Weakly Supervised Semantic Segmentation on 3D Point Clouds",
+  "authors": "Jiacheng Wei, Guosheng Lin, Kim-Hui Yap, Fayao Liu, Tzu-Yi Hung",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2107.11267",
+  "html_url": "https://arxiv.org/html/2107.11267",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 852,
+  "text": "With the development of 3D sensors, and point cloud data are playing important roles in multimedia applications. Semantic point cloud segmentation is vital for 3D scene understanding, which provides fundamental information for further applications like augmented reality and mobile robots. Recent developments in deep learning-based point cloud analysis methods have made considerable progress in 3D semantic segmentation [1,2,3,4]. However, 3D semantic segmentation requires point-level labels, which are much more expensive and time-consuming than the labels of 3D classification and detection tasks.\n\nRecently, in the realm of circuits and systems for video technology, many efforts have been put into weakly supervised semantic segmentation (WSSS) [5,6,7] on 2D images and achieved remarkable results. However, despite dense labeling on point clouds being even more expensive than dense image labeling, only a few works have been done on 3D WSSS [8,9] and yet there remains a huge performance gap with the state-of-the-art fully supervised methods.\n\nThe existing 3D WSSS methods formulate the problem in different directions. [10] utilize dense 2D segmentation labels to supervise the training in 3D by projecting the 3D predictions onto the corresponding 2D labels. However, each 3D sample is projected to 2D in several views and each projected 2D image needs pixel-level labeling. Thus, this method still requires a large amount of manual labeling. [11] proposes to generate pseudo point-level label using 3D class activation map [12] from subcloud-level annotation, which is similar to the 2D WSSS methods using image-level labels. [13] directly trains a point cloud segmentation network with 10 times fewer labels, which is close to point supervision [14] and scribble supervision [15,16] in 2D WSSS methods. We adopt the 3D WSSS setting from [13] that takes only a small fraction of points to be labeled. In this study, our primary objective is to optimize the use of scarce annotations by intensifying the dense propagation of supervision signals from labeled to unlabeled points. Initially, we employ the cutting-edge point cloud segmentation network, KPConv [4], as our foundational model. To overcome the aforementioned challenges, we introduce a novel two-stage training strategy, incorporating both our cross-sample feature reallocating module (CSFR) and the intra-sample feature reallocating (ISFR) module.\n\nAs depicted in Figure 1, the first stage of our training process draws inspiration from [17,18,19]. Here, we select two samples with at least one overlapping class to serve as an input pair. The CSFR module is designed to facilitate the transfer of analogous features between these two samples. Unlike methods in [17,18,19] which directly incorporate warped features from one sample to detect more active regions, we opt to reconstruct the features using the point correlation of the data pair, instead of mere addition. Consequently, each point in the restructured feature emerges as a weighted aggregate of all points from its counterpart sample. We then deploy a cross-regularization loss to gently enforce weak supervision upon these reallocated features. This approach enables us to effectively channel the gradients, allowing for a dense propagation of supervision from labeled points in one sample to their unlabeled counterparts in the other.\n\nIn the subsequent training stage, our ISFR module facilitates the transmission of supervision from labeled to unlabeled points within each individual sample, once again utilizing feature reallocation based on point correlation. This ensures that supervision is densely transmitted from labeled to unlabeled points within a given sample. Given the potential for non-overlapping classes between input pairs, which could introduce noise during the supervision propagation, our strategy involves training the network using the CSFR module to first acquire general representations. This is followed by employing the ISFR module for fine-tuning in the latter stage. As both modules function based on point correlations, supervision signals are effectively propagated to unlabeled points bearing resemblance in features to labeled ones. It is imperative to note that the primary role of these two modules is to enhance the training of the basic network. They are redundant for generating the final segmentation predictions during the inference phase. These modules indirectly steer the training of the basic segmentation network and remain unused during testing.\n\nCompared to MulPro [8] and MP [9] which focus on exploring the information within the current input sample, our methods leverage to explore the information that contains inter-sample to find more supervision cues for weakly supervised 3D semantic segmentation task.\n\nIn summary, our contributions are:\n\n- • We propose a cross-sample feature reallocating module to reconstruct features and re-route gradients across the input pair based on point correlation. Hence, the supervision signals from labeled points can be propagated to unlabeled points across samples.\n\n- • We propose an intra-sample feature reallocating module to reallocate features within each sample based on point correlation. Then, the supervision signals can be propagated from labeled points to unlabeled points within each point cloud sample.\n\n- • We propose a two-stage training strategy so the cross-sample feature reallocating module and the intra-sample feature reallocating module can both contribute to the performance without interfering with each other.\n\n- • Our weakly supervised methods with only 10% and 1% of the points being labeled can produce compatible results with their fully supervised counterpart in S3DIS and ScanNet datasets.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "L. Han, T. Zheng, L. Xu, and L. Fang, “Occuseg: Occupancy-aware 3d instance segmentation,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2020, pp. 2940–2949."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "C. Choy, J. Gwak, and S. Savarese, “4d spatio-temporal convnets: Minkowski convolutional neural networks,” in Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition , 2019, pp. 3075–3084."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "B. Graham, M. Engelcke, and L. Van Der Maaten, “3d semantic segmentation with submanifold sparse convolutional networks,” in Proceedings of the IEEE conference on computer vision and pattern recognition , 2018, pp. 9224–9232."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "H. Thomas, C. R. Qi, J.-E. Deschaud, B. Marcotegui, F. Goulette, and L. J. Guibas, “Kpconv: Flexible and deformable convolution for point clouds,” in Proceedings of the IEEE/CVF International Conference on Computer Vision , 2019, pp. 6411–6420."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "F. Meng, K. Luo, H. Li, Q. Wu, and X. Xu, “Weakly supervised semantic segmentation by a class-level multiple group cosegmentation and foreground fusion strategy,” IEEE Transactions on Circuits and Systems for Video Technology , vol. 30, no. 12, pp. 4823–4836, 2020."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "F. Lin, H. Xie, C. Liu, and Y. Zhang, “Bilateral temporal re-aggregation for weakly-supervised video object segmentation,” IEEE Transactions on Circuits and Systems for Video Technology , vol. 32, no. 7, pp. 4498–4512, 2022."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "J. Chen, W. Lu, Y. Li, L. Shen, and J. Duan, “Adversarial learning of object-aware activation map for weakly-supervised semantic segmentation,” IEEE Transactions on Circuits and Systems for Video Technology , pp. 1–1, 2023."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "Y. Su, X. Xu, and K. Jia, “Weakly supervised 3d point cloud segmentation via multi-prototype learning,” IEEE Transactions on Circuits and Systems for Video Technology , 2023."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "X. Chang, H. Pan, W. Sun, and H. Gao, “A multi-phase camera-lidar fusion network for 3d semantic segmentation with weak supervision,” IEEE Transactions on Circuits and Systems for Video Technology , pp. 1–1, 2023."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "H. Wang, X. Rong, L. Yang, J. Feng, J. Xiao, and Y. Tian, “Weakly supervised semantic segmentation in 3d graph-structured point clouds of wild scenes,” arXiv preprint arXiv:2004.12498 , 2020."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "J. Wei, G. Lin, K.-H. Yap, T.-Y. Hung, and L. Xie, “Multi-path region mining for weakly supervised 3d semantic segmentation on point clouds,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2020, pp. 4384–4393."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "B. Zhou, A. Khosla, A. Lapedriza, A. Oliva, and A. Torralba, “Learning deep features for discriminative localization,” in Proceedings of the IEEE conference on computer vision and pattern recognition , 2016, pp. 2921–2929."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "X. Xu and G. H. Lee, “Weakly supervised semantic point cloud segmentation: Towards 10x fewer labels,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2020, pp. 13 706–13 715."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "A. Bearman, O. Russakovsky, V. Ferrari, and L. Fei-Fei, “What’s the point: Semantic segmentation with point supervision,” in European conference on computer vision . Springer, 2016, pp. 549–565."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "D. Lin, J. Dai, J. Jia, K. He, and J. Sun, “Scribblesup: Scribble-supervised convolutional networks for semantic segmentation,” in Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition , 2016, pp. 3159–3167."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "B. Wang, G. Qi, S. Tang, T. Zhang, Y. Wei, L. Li, and Y. Zhang, “Boundary perception guidance: A scribble-supervised semantic segmentation approach.” in IJCAI , 2019, pp. 3663–3669."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "G. Sun, W. Wang, J. Dai, and L. Van Gool, “Mining cross-image semantics for weakly supervised semantic segmentation,” in ECCV , 2020."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "W. Liu, C. Zhang, G. Lin, T.-Y. HUNG, and C. Miao, “Weakly supervised segmentation with maximum bipartite graph matching,” in Proceedings of the 28th ACM International Conference on Multimedia , 2020, pp. 2085–2094."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "J. Fan, Z. Zhang, T. Tan, C. Song, and J. Xiao, “Cian: Cross-image affinity net for weakly supervised semantic segmentation,” in Proceedings of the AAAI Conference on Artificial Intelligence , vol. 34, no. 07, 2020, pp. 10 762–10 769."
+    }
+  ]
+}

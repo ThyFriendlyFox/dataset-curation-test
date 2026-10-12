@@ -1,0 +1,138 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.18454",
+  "title": "Scaling Vision-and-Language Navigation With Offline RL",
+  "authors": "Valay Bundele, Mahesh Bhupati, Biplab Banerjee, Aditya Grover",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2403.18454",
+  "html_url": "https://arxiv.org/html/2403.18454",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1185,
+  "text": "Vision-and-language navigation (VLN) is a complex task that requires an agent to navigate through environments based on language instructions, involving visual perception, natural language processing, and sequential decision making. VLN has received considerable attention [1,2,3,4] in recent years due to its potential applications in robotics, autonomous vehicles, and virtual assistants. However, this task poses significant challenges, such as dealing with ambiguity in language instructions, robust perception in dynamic environments, and efficient exploration in large-scale environments.\n\nThe key challenge in VLN is learning a generalizable policy given diverse vision and language inputs, so scaling training data is crucial for the performance of VLN agents. However, collecting and annotating VLN data is difficult, leading to a shortage of domain-specific training data that limits performance in unseen environments. To address this challenge, some works have performed data augmentation by synthesizing new instructions [4] or varying appearance of existing environments [5]. Further, many works use pre-trained models trained on large language and vision datasets using self-supervised objectives [6,7,8,9]. Some works have also acquired extra data through online exploration [7,10,11]. However, exploration can be dangerous in many real-world applications such as robots in safety-critical applications or healthcare problems. Specifically, in VLN, exploration can be dangerous if the agent misunderstands instructions or distribution shifts in visual inputs, leading to collisions with walls or humans. Given these limitations, our work centers on a fundamental question: How can we achieve effective data scaling without resorting to online exploration, a strategy that could pose safety concerns?\n\nTo this end, this work makes the observation that while expert data can be hard to acquire, we often have access to large databases of subotimal offline trajectories. Examples include: 1) Human Navigation Data: In congested urban settings, drivers often take suboptimal routes due to traffic, road closures, or parking constraints, providing a rich source of suboptimal navigation data. 2) Imperfect Simulated Environments: AI agents navigating simulated environments, like a shopping mall, may encounter dynamic obstacles and adjust their paths accordingly. These adaptations, driven by imperfect navigation algorithms, could result in suboptimal trajectories. 3) Transfer Learning Scenarios: Consider a robot model trained in a laboratory setting and then deployed in a real-world hospital. Initially, the robot might follow suboptimal paths as it learns to navigate the unique challenges posed by the hospital’s layout and unexpected obstacles before fine-tuning its navigation strategy. These are just a few illustrative examples, but in reality, a multitude of scenarios can provide suboptimal demonstration data with relative ease. This accessibility to suboptimal data presents a crucial opportunity for advancing VLN research, surpassing the challenges associated with obtaining expert data and propelling progress in the field.\n\nIn recent years, learning from logged demonstration data has become an active area of research within the offline RL community. While many algorithms exist including value-based [12,13,14,15], model-based [16,17], and model-free [18,19] approaches for training agents from logged data, there has been limited work in extending these methods to challenging VLN domains. In this paper, we propose the setting of vision-language navigation with offline RL (VLN-ORL) which trains VLN agents efficiently using offline datasets. Given that most current offline VLN algorithms rely on supervised learning from expert datasets, the key practical goal for VLN-ORL is to design algorithms that seamlessly align with the established VLN architectures and objectives in use today. Therefore, we propose to extend family of approaches based on RL via supervised learning (RvS) [19].\n\nRvS approaches learn an agent policy from a sub-optimal dataset by conditioning the policy on a outcome variable, e.g., returns-to-go or the goal token. At test time, the agent is conditioned on the desired outcome, e.g., expert returns. For VLN, we do not expect to know the goal coordinates at test-time and need to resolve the language instruction to a goal state. Prior work resolves this challenge by learning to map the agent state to a reward function that can be maximized by the agent using an off-the-shelf RL algorithm [20]. However, this assumes the existence of a sufficient number of expert trajectories in the offline dataset, which might not be true. In contrast, we propose an alternate set of assumptions that require knowledge of the goal state only during training, even if it is not achieved by the agent in executing an instruction. We build on this assumption to design a novel reward token which allows flexible conditioning of VLN agents during training and testing.\n\nOur next contribution is to establish the first set of offline RL benchmarks for evaluating VLN algorithms. Specifically, we leverage rollouts of a HAMT policy [11] pre-trained on R2R [21] and RxR [22] datasets and develop several noise models to perturb the agent rollouts and generate suboptimal datasets of varying difficulties. Furthermore, we employ the proposed reward token to condition two recent VLN agents, namely VLN \\circlearrowright BERT and MTVM. Through the utilization of reward-conditioning, we observe a significant performance improvement, with an average increase of approximately 10-15% across most of the generated datasets. Notably, on the Random-policy R2R dataset, which features trajectories generated by a random policy, the performance of VLN \\circlearrowright BERT exhibits a remarkable improvement of approximately 40%. In addition to these results, we evaluate our approach separately on subsets of varying difficulties of the RxR validation sets, revealing that our reward-conditioning technique consistently leads to performance improvements, even in complex and intricate environments. Moreover, our findings indicate that reward-conditioning fosters the development of a more robust model, one that is less sensitive to variations in the training data.\n\nTo summarize, our major contributions are as follows:\n\n- • We introduce a novel problem setup, VLN-ORL, aimed at scaling VLN agents through the utilization of extensive suboptimal demonstration data.\n\n- • We design various noise models for generating suboptimal datasets for R2R [21] and RxR [22] environments.\n\n- • We propose a simple and effective approach for extending any existing VLN agent architecture to train on suboptimal demonstration data via reward-conditioning.\n\n- • We empirically demonstrate that reward-conditioning can significantly improve the performance of VLN agents trained on suboptimal demonstrations, even in complex and intricate environments.\n\nSince we propose using suboptimal datasets for effective data scaling, there may be concerns about the potential introduction of unsafe actions. However, it’s important to note that while imperfect demonstrations may not follow optimal routes, not all of them lead to unsafe actions. The offline RL setting assumes the existence of a logged dataset of imperfect demonstrations. Notably, this dataset is not collected by the learning agent itself; instead, it is assumed to be collected by other agents or behavioral policies. Hence, the agent we are trying to learn is not taking unsafe actions, since it is not even collecting the offline data. More generally, our main contribution in this work is not related to questioning how these imperfect demonstrations would be collected; it is more related to the question of how one can learn a policy from suboptimal offline datasets without any further exploration. This aligns with the common setup in prior works on offline RL [23,24], where the emphasis is placed on learning from historical data without requiring additional exploration during the training phase.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib10",
+      "text": "Fu et al. (2020b) Tsu-Jui Fu, Xin Eric Wang, Matthew F Peterson, Scott T Grafton, Miguel P Eckstein, and William Yang Wang. Counterfactual vision-and-language navigation via adversarial path sampler. In Computer Vision–ECCV 2020: 16th European Conference, Glasgow, UK, August 23–28, 2020, Proceedings, Part VI 16 , pp. 71–86. Springer, 2020b."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib40",
+      "text": "Wang et al. (2019) Xin Wang, Qiuyuan Huang, Asli Celikyilmaz, Jianfeng Gao, Dinghan Shen, Yuan-Fang Wang, William Yang Wang, and Lei Zhang. Reinforced cross-modal matching and self-supervised imitation learning for vision-language navigation. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pp. 6629–6638, 2019."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib30",
+      "text": "Ma et al. (2019) Chih-Yao Ma, Jiasen Lu, Zuxuan Wu, Ghassan AlRegib, Zsolt Kira, Richard Socher, and Caiming Xiong. Self-monitoring navigation agent via auxiliary progress estimation. arXiv preprint arXiv:1901.03035 , 2019."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib8",
+      "text": "Fried et al. (2018) Daniel Fried, Ronghang Hu, Volkan Cirik, Anna Rohrbach, Jacob Andreas, Louis-Philippe Morency, Taylor Berg-Kirkpatrick, Kate Saenko, Dan Klein, and Trevor Darrell. Speaker-follower models for vision-and-language navigation. Advances in Neural Information Processing Systems , 31, 2018."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib25",
+      "text": "Li et al. (2022) Jialu Li, Hao Tan, and Mohit Bansal. Envedit: Environment editing for vision-and-language navigation. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pp. 15407–15417, 2022."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib13",
+      "text": "Hao et al. (2020) Weituo Hao, Chunyuan Li, Xiujun Li, Lawrence Carin, and Jianfeng Gao. Towards learning a generic agent for vision-and-language navigation via pre-training. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pp. 13137–13146, 2020."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib15",
+      "text": "Hong et al. (2021) Yicong Hong, Qi Wu, Yuankai Qi, Cristian Rodriguez-Opazo, and Stephen Gould. Vln bert: A recurrent vision-and-language bert for navigation. In Proceedings of the IEEE/CVF conference on Computer Vision and Pattern Recognition , pp. 1643–1653, 2021."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib12",
+      "text": "Guhur et al. (2021) Pierre-Louis Guhur, Makarand Tapaswi, Shizhe Chen, Ivan Laptev, and Cordelia Schmid. Airbert: In-domain pretraining for vision-and-language navigation. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pp. 1634–1643, 2021."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib46",
+      "text": "Zhu et al. (2020) Fengda Zhu, Yi Zhu, Xiaojun Chang, and Xiaodan Liang. Vision-language navigation with self-supervised auxiliary reasoning tasks. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pp. 10012–10022, 2020."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib28",
+      "text": "Lin et al. (2022a) Bingqian Lin, Yi Zhu, Zicong Chen, Xiwen Liang, Jianzhuang Liu, and Xiaodan Liang. Adapt: Vision-language navigation with modality-aligned action prompts. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pp. 15396–15406, 2022a."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib5",
+      "text": "Chen et al. (2021b) Shizhe Chen, Pierre-Louis Guhur, Cordelia Schmid, and Ivan Laptev. History aware multimodal transformer for vision-and-language navigation. Advances in neural information processing systems , 34:5834–5847, 2021b."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib33",
+      "text": "Peng et al. (2019) Xue Bin Peng, Aviral Kumar, Grace Zhang, and Sergey Levine. Advantage-weighted regression: Simple and scalable off-policy reinforcement learning. arXiv preprint arXiv:1910.00177 , 2019."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib42",
+      "text": "Wu et al. (2019) Yifan Wu, George Tucker, and Ofir Nachum. Behavior regularized offline reinforcement learning. arXiv preprint arXiv:1911.11361 , 2019."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib36",
+      "text": "Siegel et al. (2020) Noah Y Siegel, Jost Tobias Springenberg, Felix Berkenkamp, Abbas Abdolmaleki, Michael Neunert, Thomas Lampe, Roland Hafner, Nicolas Heess, and Martin Riedmiller. Keep doing what worked: Behavioral modelling priors for offline reinforcement learning. arXiv preprint arXiv:2002.08396 , 2020."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib23",
+      "text": "Kumar et al. (2020) Aviral Kumar, Aurick Zhou, George Tucker, and Sergey Levine. Conservative q-learning for offline reinforcement learning. Advances in Neural Information Processing Systems , 33:1179–1191, 2020."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib18",
+      "text": "Kidambi et al. (2020) Rahul Kidambi, Aravind Rajeswaran, Praneeth Netrapalli, and Thorsten Joachims. Morel: Model-based offline reinforcement learning. Advances in neural information processing systems , 33:21810–21823, 2020."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib16",
+      "text": "Janner et al. (2019) Michael Janner, Justin Fu, Marvin Zhang, and Sergey Levine. When to trust your model: Model-based policy optimization. Advances in neural information processing systems , 32, 2019."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib4",
+      "text": "Chen et al. (2021a) Lili Chen, Kevin Lu, Aravind Rajeswaran, Kimin Lee, Aditya Grover, Misha Laskin, Pieter Abbeel, Aravind Srinivas, and Igor Mordatch. Decision transformer: Reinforcement learning via sequence modeling. Advances in neural information processing systems , 34:15084–15097, 2021a."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib7",
+      "text": "Emmons et al. (2021) Scott Emmons, Benjamin Eysenbach, Ilya Kostrikov, and Sergey Levine. Rvs: What is essential for offline rl via supervised learning? arXiv preprint arXiv:2112.10751 , 2021."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib31",
+      "text": "Nair et al. (2022) Suraj Nair, Eric Mitchell, Kevin Chen, Silvio Savarese, Chelsea Finn, et al. Learning language-conditioned robot behavior from offline data and crowd-sourced annotation. In Conference on Robot Learning , pp. 1303–1315. PMLR, 2022."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib2",
+      "text": "Anderson et al. (2018) Peter Anderson, Qi Wu, Damien Teney, Jake Bruce, Mark Johnson, Niko Sünderhauf, Ian Reid, Stephen Gould, and Anton Van Den Hengel. Vision-and-language navigation: Interpreting visually-grounded navigation instructions in real environments. In Proceedings of the IEEE conference on computer vision and pattern recognition , pp. 3674–3683, 2018."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib20",
+      "text": "Ku et al. (2020) Alexander Ku, Peter Anderson, Roma Patel, Eugene Ie, and Jason Baldridge. Room-across-room: Multilingual vision-and-language navigation with dense spatiotemporal grounding. arXiv preprint arXiv:2010.07954 , 2020."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib9",
+      "text": "Fu et al. (2020a) Justin Fu, Aviral Kumar, Ofir Nachum, George Tucker, and Sergey Levine. D4rl: Datasets for deep data-driven reinforcement learning. arXiv preprint arXiv:2004.07219 , 2020a."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib11",
+      "text": "Fujimoto et al. (2019) Scott Fujimoto, Edoardo Conti, Mohammad Ghavamzadeh, and Joelle Pineau. Benchmarking batch deep reinforcement learning algorithms. arXiv preprint arXiv:1910.01708 , 2019."
+    }
+  ]
+}

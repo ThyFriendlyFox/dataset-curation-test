@@ -1,0 +1,98 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.17245",
+  "title": "SPLICE: A Singleton-Enhanced PipeLIne for Coreference REsolution",
+  "authors": "Yilun Zhu, Siyao Peng, Sameer Pradhan, Amir Zeldes",
+  "year": "2024",
+  "categories": [
+    "cs.CL"
+  ],
+  "url": "https://arxiv.org/abs/2403.17245",
+  "html_url": "https://arxiv.org/html/2403.17245",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "1. Introduction",
+  "word_count": 668,
+  "text": "Coreference is a linguistic phenomenon in which two or more expressions (also known as mentions) in a text refer to the same entity (e.g. the Vice President … She). To correctly cluster mentions, the first step is identifying referring expressions, candidates for repeated reference in context. Such mentions include both coreference markables, which are expressions part of a coreference chain, and singletons, which could be referred back to but are not involved in any coreference relations in the given text. From a theoretical linguistic perspective, all mentions are important for coreference resolution because humans understand discourse and entity coherence based on the competing available options [1]. From an empirical perspective, both markables and singletons are important components in the data distribution for cluster linking, with coreference markables corresponding to true positives and singletons corresponding to true negatives [2], while all mentions can be used to improve coreference markable boundary detection.\n\nIn recent years, end-to-end [3,4] and sequence-to-sequence [5] approaches have demonstrated superior performance compared to rule-based [6,7] and entity-based neural approaches [8,9,10,11]. Despite progress achieved by deep learning models, the proposed solutions diverge from discourse theory by not considering all mention candidates, particularly singletons, when learning coreference linking, which also results in limited interpretability of existing models. The major reason that this issue has been overlooked is that the dataset used for training most coreference resolution systems, OntoNotes [12], lacks singleton annotations.\n\nPrevious work on recovering singletons in the data initially used gold syntax annotations from OntoNotes to develop a rule-based algorithm. [6] extracted pronouns and maximal NP projections and incorporated a post-processing step that employed a set of rules to filter out mentions that didn’t align with the annotations, such as numeric mentions. Such approaches have been used as a preprocessing step for several coreference systems [8,13]. Another strategy involves parsing syntax trees to identify all NPs from the corpus [9,11], which was frequently used before the advent of end-to-end systems. The third method aims to generate silver singletons for the corpus. [14] proposed a lifespan model to make distinctions between singleton mentions and coreference markables. More recently, [15] proposed a data augmentation strategy to extract silver mentions (‘pseudo-singletons’) from a mention detector trained on OntoNotes coreference markables. [16] demonstrated that gold singletons and mention-based features can improve coreference scores on OntoGUM, an out-of-domain (OOD) dataset following the OntoNotes scheme.\n\nHowever, these methods exhibit certain limitations. While extracting NP subtrees can achieve a high recall in singleton detection, it concurrently generates a large number of precision errors (spans that are not valid mentions). For example, the span you in Figure 1 is a valid NP but is not a mention candidate for pair matching as it is a generic you. By contrast, the second method is trained to pick up OntoNotes mentions, but falls short due to two reasons: (1) the system is biased towards mentions that resemble coreference markables in OntoNotes, missing atypical ones with semantic and syntactic disparities; (2) evaluating performance of the mention detector is challenging without any gold singletons, meaning we do not know how its performance is impacting downstream coreference scores. Finally, we note that in realistic settings, applications may want access to all entities mentioned in a text, including singletons, meaning their comprehensive detection is desirable.\n\nBased on the necessity of singletons for context understanding and the existing problems of previous research, our paper aims to extract near-gold singletons using datasets with singleton annotations. We demonstrate how to effectively employ these in coreference systems to improve in/out-of-domain performance. The contributions include:\n\n- • A mention detection classifier that extracts mentions from syntactic structures and achieves a recall of \\sim 94% on the OntoNotes development set.\n\n- • A near-gold singleton annotated version of OntoNotes.\n\n- • A pipeline-based neural coreference system, named SPLICE, using singletons, yielding results on par with the end-to-end approach in-domain and a +1.1 boost OOD.\n\n- • Evaluation at different precision and recall levels for mention detection and analysis of the effect of singletons on coreference linking.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib10",
+      "text": "Grosz et al. (1995) Barbara J. Grosz, Aravind K. Joshi, and Scott Weinstein. 1995. Centering: A framework for modeling the local coherence of discourse . Computational Linguistics , 21(2):203–225."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib13",
+      "text": "Kübler and Zhekova (2011) Sandra Kübler and Desislava Zhekova. 2011. Singletons and coreference resolution evaluation . In Proceedings of the International Conference Recent Advances in Natural Language Processing 2011 , pages 261–267, Hissar, Bulgaria. Association for Computational Linguistics."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib15",
+      "text": "Lee et al. (2017) Kenton Lee, Luheng He, Mike Lewis, and Luke Zettlemoyer. 2017. End-to-end neural coreference resolution . In Proceedings of the 2017 Conference on Empirical Methods in Natural Language Processing , pages 188–197, Copenhagen, Denmark. Association for Computational Linguistics."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib16",
+      "text": "Lee et al. (2018) Kenton Lee, Luheng He, and Luke Zettlemoyer. 2018. Higher-order coreference resolution with coarse-to-fine inference . In Proceedings of the 2018 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 2 (Short Papers) , pages 687–692, New Orleans, Louisiana. Association for Computational Linguistics."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib2",
+      "text": "Bohnet et al. (2023) Bernd Bohnet, Chris Alberti, and Michael Collins. 2023. Coreference resolution through a seq2seq transition-based system . Transactions of the Association for Computational Linguistics , 11:212–226."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib21",
+      "text": "Raghunathan et al. (2010) Karthik Raghunathan, Heeyoung Lee, Sudarshan Rangarajan, Nathanael Chambers, Mihai Surdeanu, Dan Jurafsky, and Christopher Manning. 2010. A multi-pass sieve for coreference resolution . In Proceedings of the 2010 Conference on Empirical Methods in Natural Language Processing , pages 492–501, Cambridge, MA. Association for Computational Linguistics."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib14",
+      "text": "Lee et al. (2013) Heeyoung Lee, Angel Chang, Yves Peirsman, Nathanael Chambers, Mihai Surdeanu, and Dan Jurafsky. 2013. Deterministic coreference resolution based on entity-centric, precision-ranked rules . Computational Linguistics , 39(4):885–916."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib25",
+      "text": "Wiseman et al. (2015) Sam Wiseman, Alexander M. Rush, Stuart Shieber, and Jason Weston. 2015. Learning anaphoricity and antecedent ranking features for coreference resolution . In Proceedings of the 53rd Annual Meeting of the Association for Computational Linguistics and the 7th International Joint Conference on Natural Language Processing (Volume 1: Long Papers) , pages 1416–1426, Beijing, China. Association for Computational Linguistics."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib5",
+      "text": "Clark and Manning (2015) Kevin Clark and Christopher D. Manning. 2015. Entity-centric coreference resolution with model stacking . In Proceedings of the 53rd Annual Meeting of the Association for Computational Linguistics and the 7th International Joint Conference on Natural Language Processing (Volume 1: Long Papers) , pages 1405–1415, Beijing, China. Association for Computational Linguistics."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib6",
+      "text": "Clark and Manning (2016a) Kevin Clark and Christopher D. Manning. 2016a. Deep reinforcement learning for mention-ranking coreference models . In Proceedings of the 2016 Conference on Empirical Methods in Natural Language Processing , pages 2256–2262, Austin, Texas. Association for Computational Linguistics."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib7",
+      "text": "Clark and Manning (2016b) Kevin Clark and Christopher D. Manning. 2016b. Improving coreference resolution by learning entity-level distributed representations . In Proceedings of the 54th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) , pages 643–653, Berlin, Germany. Association for Computational Linguistics."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib20",
+      "text": "Pradhan et al. (2013) Sameer Pradhan, Alessandro Moschitti, Nianwen Xue, Hwee Tou Ng, Anders Björkelund, Olga Uryupina, Yuchen Zhang, and Zhi Zhong. 2013. Towards robust linguistic analysis using OntoNotes . In Proceedings of the Seventeenth Conference on Computational Natural Language Learning , pages 143–152, Sofia, Bulgaria. Association for Computational Linguistics."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib26",
+      "text": "Wiseman et al. (2016) Sam Wiseman, Alexander M. Rush, and Stuart M. Shieber. 2016. Learning global features for coreference resolution . In Proceedings of the 2016 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies , pages 994–1004, San Diego, California. Association for Computational Linguistics."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib22",
+      "text": "Recasens et al. (2013) Marta Recasens, Marie-Catherine de Marneffe, and Christopher Potts. 2013. The life and death of discourse entities: Identifying singleton mentions . In Proceedings of the 2013 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies , pages 627–633, Atlanta, Georgia. Association for Computational Linguistics."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib24",
+      "text": "Toshniwal et al. (2021) Shubham Toshniwal, Patrick Xia, Sam Wiseman, Karen Livescu, and Kevin Gimpel. 2021. On generalization in coreference resolution . In Proceedings of the Fourth Workshop on Computational Models of Reference, Anaphora and Coreference , pages 111–120, Punta Cana, Dominican Republic. Association for Computational Linguistics."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib29",
+      "text": "Zhu et al. (2023) Yilun Zhu, Siyao Peng, Sameer Pradhan, and Amir Zeldes. 2023. Incorporating singletons and mention-based features in coreference resolution via multi-task learning for better generalization . In Proceedings of the 13th International Joint Conference on Natural Language Processing and the 3rd Conference of the Asia-Pacific Chapter of the Association for Computational Linguistics (Volume 2: Short Papers) , pages 121–130, Nusa Dua, Bali. Association for Computational Linguistics."
+    }
+  ]
+}

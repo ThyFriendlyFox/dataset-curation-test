@@ -1,0 +1,129 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.19167",
+  "title": "Mitigating Misleading Chain-of-Thought Reasoning with Selective Filtering",
+  "authors": "Yexin Wu, Zhuosheng Zhang, Hai Zhao",
+  "year": "2024",
+  "categories": [
+    "cs.CL",
+    "cs.AI"
+  ],
+  "url": "https://arxiv.org/abs/2403.19167",
+  "html_url": "https://arxiv.org/html/2403.19167",
+  "license": "http://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "1. Introduction",
+  "word_count": 463,
+  "text": "Large language models [1,2,3,4] have exhibited impressive capabilities in various reasoning tasks, including arithmetic and symbolic reasoning, by generating intermediate chain-of-thought (CoT) reasoning steps [5,6,7].\n\nAlthough CoT approaches have shown improvements in reasoning performance and interoperability, there are still two main challenges that hinder the widespread adoption of those approaches: (i) indecomposable questions, which refer to simple questions that cannot be decomposed into smaller sub-questions; (ii) erroneous reasoning chains, which involve mistakes in the logical and commonsense reasoning processes [6,7,8], and may even result in hallucinations [9,10] or unfaithful explanations [11].\n\nThe above imperfect nature of CoT essentially leads to inferior results when using CoT instead of directly predicting answers, especially for small-scale language models prone to generating flawed reasoning chains [10]. Consequently, small-scale language models are unlikely to achieve better reasoning performance with self-generated CoT alone, unless distilling the effective CoT from LLMs to minimize the occurrence of erroneous reasoning chains [14,15,16].\n\nExisting studies have proposed verification methods to improve the correctness of reasoning chains [17,18,19,20,21]. However, they deal with all the questions concerned by CoT in general, without selectively discarding irrelevant CoTs when necessary. Besides, their primary focus lies in refining the reasoning chains, neglecting the entailment relationship between the question and candidate reasoning chain. To bridge the gap, this work aims to tackle both challenges as described above simultaneously.\n\nIn this work, we propose a novel approach called the selective filtering reasoner (SelF-Reasoner) that assesses the entailment relationship between the question and the candidate reasoning chain. SelF-Reasoner proceeds with CoT reasoning when the reasoning chain demonstrates confidence; otherwise opting to predict the answer directly. Figure 1 shows a case when the generated CoT is wrong but the direct prediction can be correct. The SelF-Reasoner is composed of three key components: (i) a reasoner responsible for generating the candidate chain; (ii) an answerer module capable of predicting the final answer directly or extracting it from the question-solution pair; (iii) a CoT Filter designed to discard invalid reasoning chains and enhance the model’s performance by utilizing the effective reasoning chain.\n\nWe implement SelF-Reasoner on the fine-tuned T5 models, revealing that small-scale language models can also benefit from CoT if equipped with our selective filtering mechanism. Experimental results on benchmarks show that our proposed method SelF-Reasoner improves the fine-tuned T5 baseline consistently over the ScienceQA [22], ECQA, and LastLetter tasks. In summary, our main contributions are as follows:\n\n(i) We proposed a selective filtering reasoner (SelF-Reasoner) to perform CoT only as necessary and mitigate the detrimental effects of erroneous reasoning chains.\n\n(ii) Our SelF-Reasoner outperforms the fine-tuned CoT/vanilla baseline on ScienceQA, ECQA, and LastLetter datasets, advancing the effectiveness of CoT in small-scale language models.\n\n(iii) We analyze the obstructions of fine-tuning CoT on language models and conclude common types in invalid generated CoT.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib2",
+      "text": "Brown et al. (2020) Tom B. Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, Sandhini Agarwal, Ariel Herbert-Voss, Gretchen Krueger, Tom Henighan, Rewon Child, Aditya Ramesh, Daniel M. Ziegler, Jeffrey Wu, Clemens Winter, Christopher Hesse, Mark Chen, Eric Sigler, Mateusz Litwin, Scott Gray, Benjamin Chess, Jack Clark, Christopher Berner, Sam McCandlish, Alec Radford, Ilya Sutskever, and Dario Amodei. 2020. Language models are few-shot learners . In Advances in Neural Information Processing Systems 33: Annual Conference on Neural Information Processing Systems 2020, NeurIPS 2020, December 6-12, 2020, virtual ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib28",
+      "text": "Thoppilan et al. (2022) Romal Thoppilan, Daniel De Freitas, Jamie Hall, Noam Shazeer, Apoorv Kulshreshtha, Heng-Tze Cheng, Alicia Jin, Taylor Bos, Leslie Baker, Yu Du, YaGuang Li, Hongrae Lee, Huaixiu Steven Zheng, Amin Ghafouri, Marcelo Menegali, Yanping Huang, Maxim Krikun, Dmitry Lepikhin, James Qin, Dehao Chen, Yuanzhong Xu, Zhifeng Chen, Adam Roberts, Maarten Bosma, Vincent Zhao, Yanqi Zhou, Chung-Ching Chang, Igor Krivokon, Will Rusch, Marc Pickett, Pranesh Srinivasan, Laichee Man, Kathleen Meier-Hellstern, Meredith Ringel Morris, Tulsee Doshi, Renelito Delos Santos, Toju Duke, Johnny Soraker, Ben Zevenbergen, Vinodkumar Prabhakaran, Mark Diaz, Ben Hutchinson, Kristen Olson, Alejandra Molina, Erin Hoffman-John, Josh Lee, Lora Aroyo, Ravi Rajakumar, Alena Butryna, Matthew Lamm, Viktoriya Kuzmina, Joe Fenton, Aaron Cohen, Rachel Bernstein, Ray Kurzweil, Blaise Aguera-Arcas, Claire Cui, Marian Croak, Ed Chi, and Quoc Le. 2022. Lamda: Language models for dialog applications ."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib21",
+      "text": "Rae et al. (2021) Jack W. Rae, Sebastian Borgeaud, Trevor Cai, Katie Millican, Jordan Hoffmann, Francis Song, John Aslanides, Sarah Henderson, Roman Ring, Susannah Young, Eliza Rutherford, Tom Hennigan, Jacob Menick, Albin Cassirer, Richard Powell, George van den Driessche, Lisa Anne Hendricks, Maribeth Rauh, Po-Sen Huang, Amelia Glaese, Johannes Welbl, Sumanth Dathathri, Saffron Huang, Jonathan Uesato, John Mellor, Irina Higgins, Antonia Creswell, Nat McAleese, Amy Wu, Erich Elsen, Siddhant Jayakumar, Elena Buchatskaya, David Budden, Esme Sutherland, Karen Simonyan, Michela Paganini, Laurent Sifre, Lena Martens, Xiang Lorraine Li, Adhiguna Kuncoro, Aida Nematzadeh, Elena Gribovskaya, Domenic Donato, Angeliki Lazaridou, Arthur Mensch, Jean-Baptiste Lespiau, Maria Tsimpoukelli, Nikolai Grigorev, Doug Fritz, Thibault Sottiaux, Mantas Pajarskas, Toby Pohlen, Zhitao Gong, Daniel Toyama, Cyprien de Masson d’Autume, Yujia Li, Tayfun Terzi, Vladimir Mikulik, Igor Babuschkin, Aidan Clark, Diego de Las Casas, Aurelia Guy, Chris Jones, James Bradbury, Matthew Johnson, Blake Hechtman, Laura Weidinger, Iason Gabriel, William Isaac, Ed Lockhart, Simon Osindero, Laura Rimell, Chris Dyer, Oriol Vinyals, Kareem Ayoub, Jeff Stanway, Lorrayne Bennett, Demis Hassabis, Koray Kavukcuoglu, and Geoffrey Irving. 2021. Scaling language models: Methods, analysis & insights from training gopher ."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib3",
+      "text": "Chowdhery et al. (2022) Aakanksha Chowdhery, Sharan Narang, Jacob Devlin, Maarten Bosma, Gaurav Mishra, Adam Roberts, Paul Barham, Hyung Won Chung, Charles Sutton, Sebastian Gehrmann, Parker Schuh, Kensen Shi, Sasha Tsvyashchenko, Joshua Maynez, Abhishek Rao, Parker Barnes, Yi Tay, Noam Shazeer, Vinodkumar Prabhakaran, Emily Reif, Nan Du, Ben Hutchinson, Reiner Pope, James Bradbury, Jacob Austin, Michael Isard, Guy Gur-Ari, Pengcheng Yin, Toju Duke, Anselm Levskaya, Sanjay Ghemawat, Sunipa Dev, Henryk Michalewski, Xavier Garcia, Vedant Misra, Kevin Robinson, Liam Fedus, Denny Zhou, Daphne Ippolito, David Luan, Hyeontaek Lim, Barret Zoph, Alexander Spiridonov, Ryan Sepassi, David Dohan, Shivani Agrawal, Mark Omernick, Andrew M. Dai, Thanumalayan Sankaranarayana Pillai, Marie Pellat, Aitor Lewkowycz, Erica Moreira, Rewon Child, Oleksandr Polozov, Katherine Lee, Zongwei Zhou, Xuezhi Wang, Brennan Saeta, Mark Diaz, Orhan Firat, Michele Catasta, Jason Wei, Kathy Meier-Hellstern, Douglas Eck, Jeff Dean, Slav Petrov, and Noah Fiedel. 2022. Palm: Scaling language modeling with pathways ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib18",
+      "text": "Nye et al. (2022) Maxwell Nye, Anders Johan Andreassen, Guy Gur-Ari, Henryk Michalewski, Jacob Austin, David Bieber, David Dohan, Aitor Lewkowycz, Maarten Bosma, David Luan, et al. 2022. Show your work: Scratchpads for intermediate computation with language models. In Deep Learning for Code Workshop ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib34",
+      "text": "Wei et al. (2022) Jason Wei, Xuezhi Wang, Dale Schuurmans, Maarten Bosma, Ed Chi, Quoc Le, and Denny Zhou. 2022. Chain of thought prompting elicits reasoning in large language models . In Thirty-sixth Conference on Neural Information Processing Systems (NeurIPS 2022) ."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib10",
+      "text": "Kojima et al. (2022) Takeshi Kojima, Shixiang Shane Gu, Machel Reid, Yutaka Matsuo, and Yusuke Iwasawa. 2022. Large language models are zero-shot reasoners . In Thirty-sixth Conference on Neural Information Processing Systems (NeurIPS 2022) ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib35",
+      "text": "Zhang et al. (2022) Zhuosheng Zhang, Aston Zhang, Mu Li, and Alex Smola. 2022. Automatic chain of thought prompting in large language models ."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib30",
+      "text": "Wang et al. (2022a) Boshi Wang, Xiang Deng, and Huan Sun. 2022a. Iteratively prompt pre-trained language models for chain of thought. In Proceedings of the 2022 Conference on Empirical Methods in Natural Language Processing , pages 2714–2730."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib36",
+      "text": "Zhang et al. (2023) Zhuosheng Zhang, Aston Zhang, Mu Li, Hai Zhao, George Karypis, and Alex Smola. 2023. Multimodal chain-of-thought reasoning in language models. arXiv preprint arXiv:2302.00923 ."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib29",
+      "text": "Turpin et al. (2023) Miles Turpin, Julian Michael, Ethan Perez, and Samuel R Bowman. 2023. Language models don’t always say what they think: Unfaithful explanations in chain-of-thought prompting. arXiv preprint arXiv:2305.04388 ."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib1",
+      "text": "Aggarwal et al. (2021) Shourya Aggarwal, Divyanshu Mandowara, Vishwajeet Agrawal, Dinesh Khandelwal, Parag Singla, and Dinesh Garg. 2021. Explanations for CommonsenseQA: New Dataset and Models . In Proceedings of the 59th Annual Meeting of the Association for Computational Linguistics and the 11th International Joint Conference on Natural Language Processing (Volume 1: Long Papers) , pages 3050–3065, Online. Association for Computational Linguistics."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib32",
+      "text": "Wang et al. (2023) Peifeng Wang, Aaron Chan, Filip Ilievski, Muhao Chen, and Xiang Ren. 2023. Pinto: Faithful language reasoning using prompt-generated rationales ."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib11",
+      "text": "Li et al. (2022a) Shiyang Li, Jianshu Chen, Yelong Shen, Zhiyu Chen, Xinlu Zhang, Zekun Li, Hong Wang, Jing Qian, Baolin Peng, Yi Mao, Wenhu Chen, and Xifeng Yan. 2022a. Explanations from large language models make small reasoners better ."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib17",
+      "text": "Magister et al. (2022) Lucie Charlotte Magister, Jonathan Mallinson, Jakub Adamek, Eric Malmi, and Aliaksei Severyn. 2022. Teaching small language models to reason ."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib7",
+      "text": "Ho et al. (2022) Namgyu Ho, Laura Schmid, and Se-Young Yun. 2022. Large language models are reasoning teachers ."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib4",
+      "text": "Cobbe et al. (2021) Karl Cobbe, Vineet Kosaraju, Mohammad Bavarian, Mark Chen, Heewoo Jun, Lukasz Kaiser, Matthias Plappert, Jerry Tworek, Jacob Hilton, Reiichiro Nakano, Christopher Hesse, and John Schulman. 2021. Training verifiers to solve math word problems ."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib37",
+      "text": "Zhao et al. (2023) Ruochen Zhao, Xingxuan Li, Shafiq Joty, Chengwei Qin, and Lidong Bing. 2023. Verify-and-edit: A knowledge-enhanced chain-of-thought framework. arXiv preprint arXiv:2305.03268 ."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib5",
+      "text": "Diao et al. (2023) Shizhe Diao, Pengcheng Wang, Yong Lin, and Tong Zhang. 2023. Active prompting with chain-of-thought for large language models. arXiv preprint arXiv:2302.12246 ."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib26",
+      "text": "Sun et al. (2023) Jiashuo Sun, Yi Luo, Yeyun Gong, Chen Lin, Yelong Shen, Jian Guo, and Nan Duan. 2023. Enhancing chain-of-thoughts prompting with iterative bootstrapping in large language models. arXiv preprint arXiv:2304.11657 ."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib13",
+      "text": "Lightman et al. (2023) Hunter Lightman, Vineet Kosaraju, Yura Burda, Harri Edwards, Bowen Baker, Teddy Lee, Jan Leike, John Schulman, Ilya Sutskever, and Karl Cobbe. 2023. Let’s verify step by step. arXiv preprint arXiv:2305.20050 ."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib14",
+      "text": "Lu et al. (2022a) Pan Lu, Swaroop Mishra, Tony Xia, Liang Qiu, Kai-Wei Chang, Song-Chun Zhu, Oyvind Tafjord, Peter Clark, and Ashwin Kalyan. 2022a. Learn to explain: Multimodal reasoning via thought chains for science question answering. arXiv preprint arXiv:2209.09513 ."
+    }
+  ]
+}

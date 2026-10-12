@@ -1,0 +1,83 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.17607",
+  "title": "Fully-fused Multi-Layer Perceptrons on Intel Data Center GPUs",
+  "authors": "Kai Yuan, Christoph Bauinger, Xiangyi Zhang, Pascal Baehr, Matthias Kirchhart, Darius Dabert, Adrien Tousnakhoff, Pierre Boudier, Michael Paulitsch",
+  "year": "2024",
+  "categories": [
+    "cs.AI"
+  ],
+  "url": "https://arxiv.org/abs/2403.17607",
+  "html_url": "https://arxiv.org/html/2403.17607",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 861,
+  "text": "Multi-Layer Perceptrons (MLPs) [1] play a vital role in today’s Machine Learning (ML) and Artificial Intelligence (AI) landscape next to the prevalent Transformer architecture [2] and Convolutional Neural Networks [3], which are mostly used in the Natural Language Processing and Computer Vision domains. MLPs are used as the main Neural Network architecture for several Machine Learning applications, such as the representation of the solution operator of partial differential equations [4], the density or color function in Neural Radiance Fields (NeRFs) objects [5], and replacing classical ray-tracing with Neural Ray Tracing [6] (see Section II for details). In contrast to the aforementioned architectures, MLPs are characterized by their fully connected layers, where the neuron of every layer is connected to every neuron in the previous and next layer. A key distinguishing factor is that in MLPs, each neuron’s output is independent of its neighbors in the same layer, making it suitable for fully-fusing operations as described in this work.\n\nThe present contribution focuses on the efficient implementation on Intel GPUs of “narrow” MLPs, which consist of an arbitrary number of layers (depth), and a small and constant number of neurons per layer (width). These narrow MLPs are of particular interest since i) they are universal approximators [7], ii) they have several relevant use cases (see Sec. II), and iii) their theoretical peak performance is severely limited by the small width of the layers. More precisely, their small width results in a reduced arithmetic intensity of the requisite matrix-multiplications in each layer for the training and, in particular, the inference. Thus, in a “classic” implementation of MLPs, where necessary operations in each layer are performed in separate compute kernels, the performance of narrow MLPs is typically severely bound by the memory bandwidth of the global memory or the last level cache.\n\nTo alleviate the issues arising from the low arithmetic intensity and the memory bandwidth of the global memory, a common strategy [6] is the fusion of the layers into a single kernel to keep relevant data in faster memories, i.e., the register file, shared memory or faster caches. This approach, termed “fully-fused MLPs”, has been implemented for Nvidia GPUs utilizing Nvidia’s CUDA language [8].\n\nIn this contribution we focus on a SYCL implementation for Intel GPUs of fully-fused MLPs with arbitrary depth and fixed layer width of 2^{i},i\\in\\{4,...,7\\} neurons in each layer. Note that, as indicated above, fixed widths are not limiting the expressive power of the Neural Network as fixed-width MLPs are still universal approximators, i.e., they can approximate any continuous function to any desired accuracy as proven by the Universal Approximation Theory for width-bounded networks [7]. Indeed, in practise MLPs rarely exceed the maximum width of 2^{7} elements supported by this work as networks tend to be deeper to gain more expressiveness rather than wide (see Section II).\n\nOur implementation of fully-fused MLPs is based on Intel’s joint_matrix SYCL extension [9] to utilize the XMX hardware [10] in Intel’s Data Center GPU Max 1550 [11], which is the device targeted with our optimized implementation.\n\nOur method is especially well-suited to optimize the training and inference performance for models that require large data throughput with batch sizes 2^{i},15<i\\in\\mathbb{N}, since those sizes maximize the occupancy of the device. As shown in Section IV-A, our SYCL implementation on Intel hardware has improved performance over an equivalent CUDA implementation (tiny-cuda-nn [8]) for MLPs with width 64 by a factor up to 2.84 in inference and 1.75 in training.\n\nFurthermore, we argue with a roofline analysis (see Section III-C) that our approach to fully-fused MLPs is especially well-suited for the acceleration of the inference and that it significantly increases the arithmetic intensity, and thus the theoretical peak performance, compared to the approach shown in [6] by reducing the accesses to global memory.\n\nTo further show the performance improvements and potential applications for our implementation, we demonstrate the performance on a regression benchmark and the following three applications: Image Compression, Neural Radiance Fields (NeRFs), and Physics-Informed Machine Learning (see Section IV). In all cases, our implementation outperforms the off-the-shelf Intel Extension for PyTorch (IPEX) [12] implementation on the same Intel GPU by up to a factor of 30 and the CUDA PyTorch version on Nvidia’s H100 GPU [13] by up to a factor 19.\n\nSummarised, the contributions of this paper are:\n\n- 1. The first SYCL implementation of fully-fused MLPs applied on Intel GPU’s that support XMX instructions and open-sourced repository of the implementation.\n\n- 2. A roofline model of our implementation and comparison to the roofline of the fully-fused implementation [6]. We argue an improvement of the arithmetic intensity of up to a factor 2.15.\n\n- 3. Demonstrating higher performance on four example applications: regression benchmark, image compression, Neural Radiance Fields, and Physics-Informed Neural Networks. Demonstrating an improvement of up to 1.75x and 2.84x performance increase for training and inference respectively over another fully-fused implementation, and a performance increase of a factor up to 30 over off-the-shelf PyTorch implementations.\n\nThe following sections are structured as follows. First, we outline the applications of MLPs and their impact. Next, the fully-fused MLPs are described. Finally, we demonstrate our results on four example applications, and conclude this paper.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "B. Yegnanarayana, Artificial neural networks . PHI Learning Pvt. Ltd., 2009."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A. N. Gomez, Ł. Kaiser, and I. Polosukhin, “Attention is all you need,” Advances in neural information processing systems , vol. 30, 2017."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "Z. Li, F. Liu, W. Yang, S. Peng, and J. Zhou, “A survey of convolutional neural networks: analysis, applications, and prospects,” IEEE transactions on neural networks and learning systems , 2021."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "S. Cuomo, V. S. Di Cola, F. Giampaolo, G. Rozza, M. Raissi, and F. Piccialli, “Scientific machine learning through physics-informed neural networks: Where we are and what’s next,” Journal of Scientific Computing , vol. 92, no. 88, pp. 1–35, 2022."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "B. Mildenhall, P. P. Srinivasan, M. Tancik, J. T. Barron, R. Ramamoorthi, and R. Ng, “Nerf: Representing scenes as neural radiance fields for view synthesis,” Communications of the ACM , vol. 65, no. 1, pp. 99–106, 2021."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "T. Müller, F. Rousselle, J. Novák, and A. Keller, “Real-time neural radiance caching for path tracing,” arXiv preprint arXiv:2106.12372 , 2021."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "S. Park, C. Yun, J. Lee, and J. Shin, “Minimum width for universal approximation,” arXiv preprint arXiv:2006.08859 , 2020."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "T. Müller, “tiny-cuda-nn,” 4 2021. [Online]. Available: https://github.com/NVlabs/tiny-cuda-nn"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "Intel Corporation. (2023) Programming Intel® XMX using SYCL: Joint Matrix Multiplication. Intel oneAPI Optimization Guide for GPU. [Online]. Available: https://www.intel.com/content/www/us/en/docs/oneapi/optimization-guide-gpu/2024-0/programming-intel-xmx-using-sycl-joint-matrix.html"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "J. Peddie, “The sixth era gpus: Ray tracing and mesh shaders,” in The History of the GPU-New Developments . Springer, 2023, pp. 323–360."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "H. Jiang, “Intel’s ponte vecchio gpu: Architecture, systems & software,” in 2022 IEEE Hot Chips 34 Symposium (HCS) . IEEE Computer Society, 2022, pp. 1–29."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "Intel Corporation, “Intel extension for pytorch,” https://github.com/intel/intel-extension-for-pytorch , 2023, gitHub repository."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "Nvidia Corporation. (2023) H100 Tensor Core GPU. [Online]. Available: {https://www.nvidia.com/en-us/data-center/h100/}"
+    }
+  ]
+}

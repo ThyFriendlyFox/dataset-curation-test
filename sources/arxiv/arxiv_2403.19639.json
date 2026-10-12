@@ -1,0 +1,63 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.19639",
+  "title": "Linear Programming in Isabelle/HOL",
+  "authors": "Julian Parsert",
+  "year": "2024",
+  "categories": [
+    "cs.LO"
+  ],
+  "url": "https://arxiv.org/abs/2403.19639",
+  "html_url": "https://arxiv.org/html/2403.19639",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 945,
+  "text": "Linear programming is a methodology for solving certain types of optimisation problems. Linear programming as a part of operations research also has applications in many areas outside of pure mathematics and computer science. Examples of applications include but are not limited to: finance, transportation, management, etc. In computer science linear programming can be used in, for example, network optimisation and integer transition systems. Finally, our motivation for this work is its use in game theory. One can express a two player zero-sum game using a linear program. Solving this linear program is equivalent to solving the original game. Hence, linear programming can be used to solve two-player zero sum games [1,2].\n\nDue to its large amount of use cases many software suites ship with a solver for linear programs [3,4], including popular software like Microsoft Excel. However, software is known to have bugs and undesirable behaviour and the aforementioned tools most certainly are no exception. Therefore, we believe that formal verification can be a useful tool to increase trust in the results of linear program solvers, especially when they are applied to fault critical areas. In this paper we discuss the use of a proof assistant to formalise the notion of linear programs and an algorithm for solving them. We use the proof assistant Isabelle/HOL. In particular, we formalise an algorithm for solving linear programs based on a previous formalisation of the general simplex method [5]. This algorithm is a reduction that reduces the optimisation problem to a constraint satisfaction problem. Our description of this reduction is stated in such a way that Isabelle’s code generation mechanism can be utilised to generate a formally verified Haskell program which solves linear programs. To summarise, our contributions are as follows:\n\n- • We formalise linear programs using the proof assistant Isabelle/HOL and derive results related to the duality of linear optimisation.\n\n- • We describe an algorithm for solving linear programs and prove its soundness. This algorithm is stated in a way such that Isabelle’s code generation mechanism can be used to obtain a verified executable program.\n\n- • In order to obtain the aforementioned results, we provide translations and equivalences between an Isabelle library for linear polynomials and one for linear algebra. We also provide correctness results for these translations.\n\n- • Using the generated program we solve an example game as a case study to show how games can be solved using linear programming.\n\n## Related Work:\n\nOur work is based on a formalisation of the general simplex algorithm described in [6,5]. However, the general simplex algorithm lacks the ability to optimise a function. Boulmé and Maréchal [7] describe a formalisation and implementation of Coq tactics for linear integer programming and linear arithmetic over rationals. More closely related is the formalisation by Allamigeon et al. [8] which formalises the simplex method and related results in Coq. As part of Flyspeck project Obua and Nipkow [9] created a verification mechanism for linear programs using the HOL computing library and external solvers.\n\n## Outline:\n\nIn Subsection 1.1 we introduce the proof assistant Isabelle/HOL as well as notation which will be used throughout this paper. Subsequently, in Section 2 we give a short overview of linear programming. In Section 3 we describe the formalisation and provide more details on the definitions, algorithms and theorems. In Section 4 we discuss the generated algorithm and some examples. Finally, in Section 5 we make concluding remarks and discuss future work.\n\n## 1.1 Isabelle/HOL and Notation\n\nWe use the proof assistant Isabelle/HOL, which is based on simply typed higher-order logic. On top of the simple type system Isabelle/HOL provides type classes. We will also use Isabelle’s standard option type with the constructors Some and None as well as the sum type denoted “ \\mathrel{\\texttt{+}} ”. While the constructors of the sum type are Inl and Inr, we will use Unsat and Sat instead. We also use \\mathbb{N} and \\mathbb{Q} to denote Isabelle’s natural and rational numbers as well as \\alpha\\ \\texttt{list} and (\\alpha,\\ \\beta)\\ \\texttt{mapping} for polymorphic lists and mappings from \\alpha to \\beta. For a mapping M we use the notation M_{[i]} to denote the value of i in M. We use \\bullet to denote the dot product between a row vector and a column vector. The symbols \\cdot_{v} and \\cdot^{v} describe the vector-matrix and matrix-vector multiplication respectively. The symbols =, \\leq, and \\geq retain their standard semantics for scalars, while we use \\mathrel{=_{pw}}, \\mathrel{\\leq_{pw}}, and \\mathrel{\\geq_{pw}} to denote the respective pointwise orders on vectors. Importantly, we also use a constraint type describing a constraint. The constructors of these are \\mathrel{[=]}, \\mathrel{[\\leq]}, and \\mathrel{[\\geq]}. To see the difference, note that while x\\leq y and x\\mathrel{\\leq_{pw}}A are of type bool, the expression x\\mathrel{[\\leq]}y is of type constraint which is the pair (x,y) in addition with one of the aforementioned constructors. We use [m..<n] and {m..<n} to denote lists and sets of elements from m to n-1, while dropping the “ < ” symbol also includes n. Furthermore, [f\\ x\\.\\ i\\leftarrow L] is a short notation for map f L. The function \\texttt{dim}\\ c, \\texttt{row}\\ A, and \\texttt{col}\\ A return the dimension of a vector c and the number of rows and columns of a matrix A. The zero vector of dimension n is denoted \\texttt{0}_{v}^{n}. Vector and list concatenation are denoted with the operators \\mathrel{\\texttt{@}_{v}} and \\mathrel{\\texttt{@}} while [a] is the singleton list containing a. L!i and V\\ \\$\\ i are list and vector access operators respectively. Both are zero indexed and are only well defined if i<\\texttt{length}\\ L or i<\\texttt{dim}\\ V. The code snippets presented in the remainder of the paper have been formatted for readability omitting brackets, type annotations, etc.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib9",
+      "text": "Michael Maschler, Eilon Solan, and Shmuel Zamir. Game Theory . Cambridge University Press, 2013. doi:10.1017/CBO9780511794216 ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib17",
+      "text": "W.L. Winston and J.B. Goldberg. Operations Research: Applications and Algorithms . Thomson Brooks/Cole, 2004. URL: https://books.google.at/books?id=tg5DAQAAIAAJ ."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib5",
+      "text": "GNU Linear Programming Kit (GLPK). https://www.gnu.org/software/glpk/glpk.html , 2019. Online; accessed 2 Mai 2019."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "Ambros M. Gleixner, Daniel Steffy, and Kati Wolter. Improving the accuracy of linear programming solvers with iterative refinement. Technical Report 12-19, ZIB, Takustr. 7, 14195 Berlin, 2012."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib14",
+      "text": "Mirko Spasić and Filip Marić. Formalization of incremental simplex algorithm by stepwise refinement. In Dimitra Giannakopoulou and Dominique Méry, editors, FM 2012: Formal Methods , pages 434–449, Berlin, Heidelberg, 2012. Springer Berlin Heidelberg."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib8",
+      "text": "Filip Marić, Mirko Spasić, and René Thiemann. An incremental simplex algorithm with unsatisfiable core generation. Archive of Formal Proofs , August 2018. http://isa-afp.org/entries/Simplex.html , Formal proof development."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib3",
+      "text": "Sylvain Boulmé and Alexandre Maréchal. A Coq tactic for equality learning in linear arithmetic. In Jeremy Avigad and Assia Mahboubi, editors, Interactive Theorem Proving , pages 108–125, Cham, 2018. Springer International Publishing."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib1",
+      "text": "Xavier Allamigeon and Ricardo D. Katz. A formalization of convex polyhedra based on the simplex method. In Mauricio Ayala-Rincón and César A. Muñoz, editors, Interactive Theorem Proving , pages 28–45, Cham, 2017. Springer International Publishing."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib10",
+      "text": "Steven Obua and Tobias Nipkow. Flyspeck II: the basic linear programs. Annals of Mathematics and Artificial Intelligence , 56(3):245–272, Aug 2009. doi:10.1007/s10472-009-9168-z ."
+    }
+  ]
+}

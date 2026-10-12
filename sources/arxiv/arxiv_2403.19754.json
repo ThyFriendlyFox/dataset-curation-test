@@ -1,0 +1,73 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.19754",
+  "title": "GOLD: Generalized Knowledge Distillation via Out-of-Distribution-Guided Language Data Generation",
+  "authors": "Mohsen Gholami, Mohammad Akbari, Cindy Hu, Vaden Masrani, Z. Jane Wang, Yong Zhang",
+  "year": "2024",
+  "categories": [
+    "cs.CL"
+  ],
+  "url": "https://arxiv.org/abs/2403.19754",
+  "html_url": "https://arxiv.org/html/2403.19754",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 721,
+  "text": "Large language models (LLMs) have shown outstanding few-shot performance in solving different complex natural language tasks [1]. The term few-shot refers to the ability of the LLM to understand and perform tasks accurately given only a few examples. However, achieving such performance necessitates models with a large number of parameters to generalize and learn distinct tasks. The computational complexity of LLMs hinders their real-world applications for deployment. Moreover, most of the LLMs are not publicly available and users should share their confidential data with LLMs through prompting which is a privacy concern. Therefore, user-specific small models are critical to address efficiency and privacy concerns.\n\nTo circumvent the above challenges, knowledge distillation (KD) from LLMs has been used to prepare small language models (SLMs). There are two main paradigms in KD: data-informed and data-free methods [2,3,4]. Data-informed methods are the conventional KD techniques that use LLMs to label data and train a small language model with the labels [2,3]. Data-free methods, on the other hand, study an extreme case when no human-generated dataset (unlabeled or labeled) is available during distillation. ZeroGen [5] and ProGen [6] are two prior works that proposed data-free knowledge distillation.\n\nZeroGen [5] proposed generating data for classification tasks using LLMs and trained a small model on the generated data. ProGen [6] improved the quality of the generated data by finding important samples via an influence function in the course of data generation. These works are not able to find failure modes of SLMs and steer data generation toward the samples that can improve the generalizability of the model.\n\n[7] showed that distilling knowledge from LLMs via data generation causes irreversible defects in the SLM, where the tails of the original content distribution disappear. LLMs usually tend to generate samples with higher likelihood (known as in-distribution samples) repeatedly [7] which results in poor generalizability of the distilled SLM. Preserving the LLM’s ability to model low-probability events or out-of-distribution (OOD) samples is essential to the fairness of their predictions. Such events are often relevant to marginalized groups and are vital to understand complex systems [8].\n\nUsually, the performance of language models improves when more human-labeled data is available, since a larger dataset covers wider task domains. On the contrary, [9] shows that increasing the amount of generated data with LLMs lowers the performance of the distilled SLM. We argue that vanilla data generation with LLMs is prone to only generate high likelihood samples which negatively affects the SLM performance with increasing the number of samples.\n\nTo this end, we propose GOLD, a data-free KD framework that iteratively finds failure modes of the SLM (i.e., OOD samples) and provides feedback to the LLM (Figure 1) for the next iteration of data generation. Figure 2 shows the overall framework of GOLD. The user provides the task definition with a few samples of the data corresponding to that task. The LLM is then used to generate a training batch of data for the specified task, which is used to update the weights of the SLM. Given the generated train batch, we use prompting to ask LLM to generate a separate batch of OOD data that is significantly different from the train batch in terms of topic and style This OOD batch is then used as our validation set to evaluate the performance of the SLM and accordingly identify its failure modes as a feedback to the LLM. We use the output logits of the SLM to measure the energy values of the validation samples and select the top ones based on their corresponding free energy scores [10,11]. The energy score does not require the labels of the generated sample and therefore is not prone to pick the data with noisy labels as the OOD samples. The selected OOD samples are then used as the feedback to the LLM for the next iteration of data generation. The major contributions of this paper are:\n\n- • Proposing a task-agnostic framework for data generation and KD from LLMs to SLMs that is applicable to any NLP task, even novel tasks.\n\n- • Introducing an iterative OOD-empowered feedback mechanism to improve the generalizability of distilled SLMs.\n\n- • Proposing an energy-based OOD evaluation approach to handle noisy data generated by LLMs.\n\n- • Achieving state-of-the-art results on a variety of classification and sequence-to-sequence downstream tasks in NLP.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib7",
+      "text": "Brown et al. (2020) Tom Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared D Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, et al. 2020. Language models are few-shot learners. Advances in neural information processing systems , 33:1877–1901."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "Agarwal et al. (2023) Rishabh Agarwal, Nino Vieillard, Yongchao Zhou, Piotr Stanczyk, Sabela Ramos, Matthieu Geist, and Olivier Bachem. 2023. Generalized knowledge distillation for auto-regressive language models ."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib11",
+      "text": "Hsieh et al. (2023) Cheng-Yu Hsieh, Chun-Liang Li, Chih-kuan Yeh, Hootan Nakhost, Yasuhisa Fujii, Alex Ratner, Ranjay Krishna, Chen-Yu Lee, and Tomas Pfister. 2023. Distilling step-by-step! outperforming larger language models with less training data and smaller model sizes . In Findings of the Association for Computational Linguistics: ACL 2023 , pages 8003–8017, Toronto, Canada. Association for Computational Linguistics."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib9",
+      "text": "Gu et al. (2023) Yuxian Gu, Li Dong, Furu Wei, and Minlie Huang. 2023. Knowledge distillation of large language models ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib25",
+      "text": "Ye et al. (2022a) Jiacheng Ye, Jiahui Gao, Qintong Li, Hang Xu, Jiangtao Feng, Zhiyong Wu, Tao Yu, and Lingpeng Kong. 2022a. ZeroGen: Efficient zero-shot learning via dataset generation . In Proceedings of the 2022 Conference on Empirical Methods in Natural Language Processing , pages 11653–11669, Abu Dhabi, United Arab Emirates. Association for Computational Linguistics."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib26",
+      "text": "Ye et al. (2022b) Jiacheng Ye, Jiahui Gao, Zhiyong Wu, Jiangtao Feng, Tao Yu, and Lingpeng Kong. 2022b. ProGen: Progressive zero-shot dataset generation via in-context feedback . In Findings of the Association for Computational Linguistics: EMNLP 2022 , pages 3671–3683, Abu Dhabi, United Arab Emirates. Association for Computational Linguistics."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib19",
+      "text": "Shumailov et al. (2023) Ilia Shumailov, Zakhar Shumaylov, Yiren Zhao, Yarin Gal, Nicolas Papernot, and Ross Anderson. 2023. The curse of recursion: Training on generated data makes models forget ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib20",
+      "text": "Taleb (2007) Nassim Nicholas Taleb. 2007. Black swans and the domains of statistics . The American Statistician , 61(3):198–200."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib10",
+      "text": "Gudibande et al. (2023) Arnav Gudibande, Eric Wallace, Charlie Snell, Xinyang Geng, Hao Liu, Pieter Abbeel, Sergey Levine, and Dawn Song. 2023. The false promise of imitating proprietary llms ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib13",
+      "text": "Liu et al. (2020) Weitang Liu, Xiaoyun Wang, John Owens, and Yixuan Li. 2020. Energy-based out-of-distribution detection."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib5",
+      "text": "Akbari et al. (2023) Mohammad Akbari, Amin BANITALEBI DEHKORDI, Tianxi Xu, and Yong Zhang. 2023. System and method for unsupervised multi-model joint reasoning. US Patent App. 18/074,915."
+    }
+  ]
+}

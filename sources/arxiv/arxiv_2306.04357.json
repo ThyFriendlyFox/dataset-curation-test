@@ -1,0 +1,74 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2306.04357",
+  "title": "Dial-MAE: ConTextual Masked Auto-Encoder for Retrieval-based Dialogue Systems",
+  "authors": "Zhenpeng Su, Xing Wu, Wei Zhou, Guangyuan Ma, Songlin Hu",
+  "year": "2024",
+  "categories": [
+    "cs.CL",
+    "cs.AI"
+  ],
+  "url": "https://arxiv.org/abs/2306.04357",
+  "html_url": "https://arxiv.org/html/2306.04357",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 670,
+  "text": "The retrieval-based dialogue system is a popular research topic. Pre-trained language models (PLMs), especially deep bidirectional Transformer Language Models (LMs) like BERT encoder [1,2], have been widely used in dialogue response. Common uses of deep LM are cross-encoder and bi-encoder [3]. Recent works [4,5,6,7,8] on dialogue response retrieval systems are mostly based on cross-encoders, which feed both the dialogue context and response directly into LM and use attention over all tokens to output a relevance score. Although cross-encoders have relatively stronger performances, they need to compute the matches for every possible combination of context-response pairs, which is time-consuming [9]. In practice, cross-encoders are often used for re-ranking after dialogue retrieval. In contrast, another common use of deep LM is the dense encoder, i.e. bi-encoder, which encodes dialogue context and response into the context vector and response vector respectively. The correlations between context and responses are computed using cosine similarity or dot product functions in vector space [9,10]. The bi-encoders have a faster computational speed but usually perform worse than the cross-encoder.\n\nBi-encoders generally underperform compared to cross-encoders due to two main reasons below [7,3,9]. Firstly, bi-encoders encode dialogue context and responses separately, which lacks deep interaction like the cross-encoder [7]. We consider this as a potential information barrier that hinders the performance of bi-encoders, resulting in significant differences between the dense vector representations of the dialogue context and response vectors. Secondly, language models like BERT [2] have not been trained to aggregate complex information into a single dense representation [3]. Although using contrastive learning during the fine-tuning can alleviate the above two issues [9], the discussion regarding their mitigation with post-training remains absent in dialogue response selection. We argue that post-training a PLM specifically tailored for the dense dialogue retrieval is essential for achieving optimal performance.\n\nIn this paper, we focus on the above two issues and propose Dial-MAE (Dial ogue Contextual M asking A uto- E ncoder), a simple and effective post-training method tailored for the bi-encoder to compress dialogue semantic information and enhance the representation of dialogue-dense vectors. Our method provides a stronger foundation for model fine-tuning. Specifically, during the modeling process, we consider both the semantics of the dialogue context and the semantic relevance of the response.\n\nAs shown in Figure 1, we introduce an asymmetric encoder-decoder architecture. With the help of the dialogue context embedding \\mathbf{[CLS]} output by the encoder, the auxiliary task utilizes a weak decoder to reconstruct the masked response text. In other words, we employ the embedding of the dialogue context to directly generate responses. Therefore, even if the encoder side only receives the inputs of dialogue contexts, the output dialogue context embedding still needs to consider the correct response. This enables the dialogue context embedding \\mathbf{[CLS]} to incorporate contextual information. In addition, the encoder is required to directly predict the correct response when encoding the dialogue context, which breaks the information barrier between the context and the response. Therefore, the context and response features output by Dial-MAE are more similar, and our ablation experiments also prove this.\n\nFurthermore, it is noteworthy that, similar to [11,3], we apply asymmetric mask rates to the encoder and decoder. The decoder side has a higher mask rate than the encoder side. Such a design has the following advantage. Since the decoder has limited modeling capacity and high mask rate, the reconstruction on the decoder side is difficult to accomplish only by relying on masked response and rely more on the dialogue embedding output by the encoder, this forces the encoder to sufficiently aggregate the semantics of the dialogue context to aid the decoder in its MLM task [11,3].\n\nOur contributions are as follows:\n\n- 1. We introduce Dial-MAE, a novel post-training method designed for bi-encoders, which utilizes dialogue context embeddings to generate responses, aiming to achieve feature alignment.\n\n- 2. We design a novel asymmetric encoder-decoder architecture to enhance the representational power of dialogue embedding.\n\n- 3. Experimental results show that in dialogue response retrieval, our method achieves state-of-the-art on two benchmarks with faster response speed.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib17",
+      "text": "Vaswani et al. (2017) Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Lukasz Kaiser, and Illia Polosukhin. 2017. Attention is all you need . In Advances in Neural Information Processing Systems 30: Annual Conference on Neural Information Processing Systems 2017, December 4-9, 2017, Long Beach, CA, USA , pages 5998–6008."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib3",
+      "text": "Devlin et al. (2019) Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. 2019. BERT: pre-training of deep bidirectional transformers for language understanding . In Proceedings of the 2019 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, NAACL-HLT 2019, Minneapolis, MN, USA, June 2-7, 2019, Volume 1 (Long and Short Papers) , pages 4171–4186. Association for Computational Linguistics."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib4",
+      "text": "Gao and Callan (2021) Luyu Gao and Jamie Callan. 2021. Condenser: a pre-training architecture for dense retrieval . In Proceedings of the 2021 Conference on Empirical Methods in Natural Language Processing, EMNLP 2021, Virtual Event / Punta Cana, Dominican Republic, 7-11 November, 2021 , pages 981–993. Association for Computational Linguistics."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib6",
+      "text": "Gu et al. (2020) Jia-Chen Gu, Tianda Li, Quan Liu, Zhen-Hua Ling, Zhiming Su, Si Wei, and Xiaodan Zhu. 2020. Speaker-aware BERT for multi-turn response selection in retrieval-based chatbots . In CIKM ’20: The 29th ACM International Conference on Information and Knowledge Management, Virtual Event, Ireland, October 19-23, 2020 , pages 2041–2044. ACM."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib19",
+      "text": "Whang et al. (2021) Taesun Whang, Dongyub Lee, Dongsuk Oh, Chanhee Lee, Kijong Han, Dong-hun Lee, and Saebyeok Lee. 2021. Do response selection models really know what’s next? utterance manipulation strategies for multi-turn response selection . In Thirty-Fifth AAAI Conference on Artificial Intelligence, AAAI 2021, Thirty-Third Conference on Innovative Applications of Artificial Intelligence, IAAI 2021, The Eleventh Symposium on Educational Advances in Artificial Intelligence, EAAI 2021, Virtual Event, February 2-9, 2021 , pages 14041–14049. AAAI Press."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib23",
+      "text": "Xu et al. (2021) Ruijian Xu, Chongyang Tao, Daxin Jiang, Xueliang Zhao, Dongyan Zhao, and Rui Yan. 2021. Learning an effective context-response matching model with self-supervised tasks for retrieval-based dialogues . In Thirty-Fifth AAAI Conference on Artificial Intelligence, AAAI 2021, Thirty-Third Conference on Innovative Applications of Artificial Intelligence, IAAI 2021, The Eleventh Symposium on Educational Advances in Artificial Intelligence, EAAI 2021, Virtual Event, February 2-9, 2021 , pages 14158–14166. AAAI Press."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "Han et al. (2021) Janghoon Han, Taesuk Hong, Byoungjae Kim, Youngjoong Ko, and Jungyun Seo. 2021. Fine-grained post-training for improving retrieval-based dialogue systems . In Proceedings of the 2021 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, NAACL-HLT 2021, Online, June 6-11, 2021 , pages 1549–1558. Association for Computational Linguistics."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib25",
+      "text": "Zhang et al. (2022) Wentao Zhang, Shuang Xu, and Haoran Huang. 2022. Two-level supervised contrastive learning for response selection in multi-turn dialogue . CoRR , abs/2203.00793."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "Lan et al. (2021) Tian Lan, Deng Cai, Yan Wang, Yixuan Su, Xian-Ling Mao, and Heyan Huang. 2021. Exploring dense retrieval for dialogue response selection . CoRR , abs/2110.06612."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib5",
+      "text": "Gao et al. (2022) Luyu Gao, Xueguang Ma, Jimmy Lin, and Jamie Callan. 2022. Tevatron: An efficient and flexible toolkit for dense retrieval . CoRR , abs/2203.05765."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib22",
+      "text": "Xiao et al. (2022) Shitao Xiao, Zheng Liu, Yingxia Shao, and Zhao Cao. 2022. Retromae: Pre-training retrieval-oriented language models via masked auto-encoder . In Proceedings of the 2022 Conference on Empirical Methods in Natural Language Processing, EMNLP 2022, Abu Dhabi, United Arab Emirates, December 7-11, 2022 , pages 538–548. Association for Computational Linguistics."
+    }
+  ]
+}

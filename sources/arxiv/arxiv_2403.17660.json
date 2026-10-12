@@ -1,0 +1,123 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.17660",
+  "title": "CANOS: A Fast and Scalable Neural AC-OPF Solver Robust To N-1 Perturbations",
+  "authors": "Luis Piloto, Sofia Liguori, Sephora Madjiheurem, Miha Zgubic, Sean Lovett, Hamish Tomlinson, Sophie Elster, Chris Apps, Sims Witherspoon",
+  "year": "2024",
+  "categories": [
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2403.17660",
+  "html_url": "https://arxiv.org/html/2403.17660",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1099,
+  "text": "Electricity is delivered from producers to consumers through interconnected networks known as power grids, consisting of large numbers of components interacting through electrical transmission lines. Power is produced at various types of generators, and needs to be transmitted to consumers ranging from heavy industry to residential users. Grid operators are challenged with the task of ensuring that enough power is reliably and economically dispatched across the network to satisfy demand. It is imperative that this is done while maintaining a balance between power injections and withdrawals and satisfying physical constraints, in order to prevent risks such as overloading of equipment, network outages or failure to supply power to consumers. This requires solving a constrained non-linear non-convex optimization problem known as alternating current optimal power flow (AC-OPF). Specifically, solving an AC-OPF problem equates to finding a steady state operating point in a power grid that minimizes the cost of power generation while satisfying operating constraints and meeting power demand. The AC-OPF problem is a cornerstone for a wide range of power systems operations such as unit commitment, security constrained economic dispatch, congestion management and optimal transmission switching. In practice, because the demand, supply and grid specification can vary rapidly over time, the AC-OPF problem should ideally be solved close to real-time and many times throughout the day (every five to fifteen minutes).\n\nRelying on traditional optimization tools to solve such a problem on a real-size grid is often computationally infeasible or unachievable in real-time, which has lead to a range of techniques designed to meet grid operators’ need for practical solutions to the AC-OPF problem at rapid timescales [1]. A common approach is to linearize the problem, resulting in the so-called DC-OPF [2] formulation. This formulation is much less computationally expensive, and scalable methods exist [3]. However, solutions to the DC-OPF problem are known to be infeasible for AC-OPF [4], and can require post-processing in order to make the solutions of practical use. Even then, these solutions are suboptimal due to the approximation of the original problem. In security-constrained economic dispatch, this means market prices do not correctly represent the true system costs [5], potentially leading to higher carbon emissions [6] and tens of billions of dollars annually in excess costs [1]. More advanced approximation techniques such as convexification [7] or implicit linearization [8], though closer to the original formulation, are impacted by similar limitations in which speed of computation is favored over accuracy. Even in cases where such approximate solutions are within the feasible region of the original AC-OPF formulation, their suboptimality results in higher costs and increased carbon emissions. Finding solutions that are close to the AC-OPF solution in near real-time remains an open challenge.\n\nIn the past few years, machine learning (ML) methods have emerged as powerful tools for approximating solutions to constrained optimization problems [9]. Indeed, in the presence of extensive data, ML techniques, and specifically deep learning methods, offer an alternative to traditional approximate solvers. Consequently, previous efforts have proposed deep learning based approaches to power systems problems [10]. Despite their capabilities, ML approaches to constrained optimization problems face their own challenges, since enforcing constraint satisfaction in an end-to-end ML model is non-trivial.\n\nUsing the fact that some variables in the AC-OPF formulation can be derived from other independent variables using power flow equations, works such as [11] and [12] train a deep neural network (DNN) to first approximate only the set of independent decision variables, then derive the remaining ones. The constraint satisfaction problem has been approached with techniques such as combining Lagrangian methods with deep learning [13], and adopting a physics-guided graph convolution neural network which embeds both physical features and operational constraints [14].\n\nIn addition to constraint satisfaction, adaptability to topology variations is critical. In practice, power grids experience topological variations stemming from unpredictable short-term outages (contingencies), planned maintenance, or medium-term development of the grid. As a result, there is a need for ML models that can reliably predict solutions under topological perturbations [15]. Recent work in this direction shows promise, but results on AC-OPF with topological perturbation are generally limited to smaller grids, or do not report constraint satisfaction metrics [16,17,14,18,15,19,20]. An exception is the work of [21], which reports results for N-1 contingency experiments for a large 2,000-bus system, including mean percentage of constraints satisfied. However changes in topology are represented by setting line admittance features to zero, which means that the resulting trained models can only drop lines from the full specification; they cannot easily handle general perturbations such as adding arbitrary new lines.\n\nIn our work, we present a solver that can approximate near-optimal, near-feasible, and robust solutions efficiently. The main contributions of the present work can be summarized as follows:\n\n- 1. We propose CANOS (Constraint-Augmented Neural OPF Solver), a method based on Graph Neural Networks (GNNs) for learning a fast, accurate, scalable, and robust AC-OPF solver.\n\n- 2. We empirically demonstrate CANOS ’ ability to generate accurate solutions (within an optimality gap of 1\\%) and extensively document constraint violation metrics for all relevant constraints.\n\n- 3. We show that CANOS scales to realistic grid sizes containing as many as 10,000 buses, and remains robust under typical topological perturbations used in security-constrained analysis.\n\n- 4. We empirically show that CANOS outperforms DC approximations in terms of accuracy and AC-feasibility.\n\n- 5. We demonstrate that CANOS is fast, running in 33-65 ms without power flow post-processing for grids between 500–10,000 buses, showing sub-linear scaling with grid size.\n\nTo the best of the authors’ knowledge this work is the first to demonstrate a successful application of GNNs to solving AC-OPF on large (10,000-bus) grids with extensively documented feasibility analysis of the solutions and a fully-general handling of topological perturbations. Our model leverages GNNs to handle different topologies without relying on zeroing-out features of existing entities, which means the approach can potentially handle addition of entities and account for more general topological variations that can arise in contexts different from contingency analysis.\n\nThe remainder of this paper is structured as follows. Section II introduces the notation used throughout the manuscript and describes the problem formulation, while Section III describes the data used for training and evaluating our model. In Section IV, we give a brief introduction to the deep learning architecture used in this work, and describe our proposed model in detail. Sections V and VI present the details of our training and evaluation procedures. In Section VII we present, analyse and discuss our empirical findings. Finally, we conclude in Section VIII, discussing the limitations of our approach and avenues for future work. Appendices A - D gather supplementary material.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "M. B. Cain and R. P. O’Neill, “History of optimal power flow and formulations,” 2012."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "B. Stott, J. Jardim, and O. Alsac, “Dc power flow revisited,” IEEE Transactions on Power Systems , vol. 24, pp. 1290–1300, Aug 2009."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "J. Sun and L. Tesfatsion, “Dc optimal power flow formulation and solution using quadprogj,” Working Papers 18221, Iowa State University, Department of Economics, July 2006."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "K. Baker, “Solutions of dc opf are never ac feasible,” in Proceedings of the Twelfth ACM International Conference on Future Energy Systems , e-Energy ’21, (New York, NY, USA), p. 264–268, Association for Computing Machinery, 2021."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "W. Sauer, “Uplift in RTO and ISO markets,” Federal Energy Regulatory Commission, Tech. Rep , 2014."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "C. Winner, J. Garland, C. Crozier, and K. Baker, “Carbon emissions resulting from different power flow models for dispatch,” in 2023 IEEE Power & Energy Society General Meeting (PESGM) , pp. 1–5, 2023."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "J. Lavaei and S. Low, “Convexification of optimal power flow problem,” in 2010 48th Annual Allerton Conference on Communication, Control, and Computing, Allerton 2010 , pp. 223 – 232, 11 2010."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "S. Bolognani and F. Dörfler, “Fast power system analysis via implicit linearization of the power flow manifold,” in 2015 53rd Annual Allerton Conference on Communication, Control, and Computing (Allerton) , pp. 402–409, 2015."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "J. Kotary, F. Fioretto, P. V. Hentenryck, and B. Wilder, “End-to-end constrained optimization learning: A survey,” 2021."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "H. Khaloie, M. Dolanyi, J.-F. Toubeau, and F. Vallee, “Review of machine learning techniques for optimal power flow,” 01 2024."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "A. S. Zamzam and K. Baker, “Learning optimal solutions for extremely fast ac optimal power flow: Preprint,” in the 2020 IEEE International Conference on Communications, Control, and Computing Technologies for Smart Grids (SmartGridComm), Tempe, Arizona 2020 , 11 2020."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "X. Pan, “Deepopf: deep neural networks for optimal power flow,” in Proceedings of the 8th ACM International Conference on Systems for Energy-Efficient Buildings, Cities, and Transportation , BuildSys ’21, (New York, NY, USA), p. 250–251, Association for Computing Machinery, 2021."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "F. Fioretto, T. W. Mak, and P. Van Hentenryck, “Predicting ac optimal power flows: Combining deep learning and lagrangian dual methods,” Proceedings of the AAAI Conference on Artificial Intelligence , vol. 34, pp. 630–637, Apr. 2020."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "M. Gao, J. Yu, Z. Yang, and J. Zhao, “A physics-guided graph convolution neural network for optimal power flow,” IEEE Transactions on Power Systems , vol. 39, no. 1, pp. 380–390, 2024."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "N. Popli, E. Davoodi, F. Capitanescu, and L. Wehenkel, “On the robustness of machine-learnt proxies for security constrained optimal power flow solvers,” Sustainable Energy, Grids and Networks , vol. 37, p. 101265, 2024."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "Y. Chen, S. Lakshminarayana, C. Maple, and H. V. Poor, “A meta-learning approach to the optimal power flow problem under topology reconfigurations,” IEEE Open Access Journal of Power and Energy , vol. 9, pp. 109–120, 2022."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "T. Falconer and L. Mones, “Leveraging power grid topology in machine learning assisted optimal power flow,” IEEE Transactions on Power Systems , vol. 38, no. 3, pp. 2234–2246, 2023."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "S. Liu, C. Wu, and H. Zhu, “Topology-aware graph neural networks for learning feasible and adaptive ac-opf solutions,” IEEE Transactions on Power Systems , vol. 38, no. 6, pp. 5660–5670, 2023."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "A. M. Nakiganda, C. Cheylan, and S. Chatzivasileiadis, “Topology-aware neural networks for fast contingency analysis of power systems,” 2023."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "M. Yang, J. Liu, G. Qiu, T. Liu, and Z. Tang, “Ac optimal power flows: Combining lagrangian dual and physics-guided graph neutral networks,” Authorea Preprints , 2023."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "M. Zhou, M. Chen, and S. H. Low, “Deepopf-ft: One deep neural network for multiple ac-opf problems with flexible topology,” IEEE Transactions on Power Systems , vol. 38, no. 1, pp. 964–967, 2023."
+    }
+  ]
+}

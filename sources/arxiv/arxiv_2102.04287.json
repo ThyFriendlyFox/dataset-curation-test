@@ -1,0 +1,103 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2102.04287",
+  "title": "Operation is the hardest teacher: estimating DNN accuracy looking for mispredictions",
+  "authors": "Antonio Guerriero, Roberto Pietrantuono, Stefano Russo",
+  "year": "2021",
+  "categories": [
+    "cs.SE"
+  ],
+  "url": "https://arxiv.org/abs/2102.04287",
+  "html_url": "https://arxiv.org/html/2102.04287",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 943,
+  "text": "Deep Neural Networks (DNN) are today integral part of many applications, including safety-critical software systems such as in the medical [1] and autonomous driving domains [2]. Testing is a crucial activity in the development of such systems, for both quality/safety reasons to avoid DNN-caused catastrophic failures [3,4], and for cost as well – very large samples may be needed to reliably test a DNN [5,6].\n\nA significant research effort is currently being put on DNN testing. A primary goal is to find adversarial examples causing mispredictions, namely to expose as many failing behaviours as possible [7,8,9,10,11]. Several structural coverage criteria have been proposed to drive the automated generation of test inputs and assess the test adequacy – neuron coverage [7], k-multisection neuron coverage, neuron boundary coverage [8], combinatorial coverage [10]. It has been argued that these criteria may be misleading, because of the low correlation between the number of misclassified inputs in a test set and its coverage [12]. Wu et al. [13] and Kim et al. [14] recently considered discrepancy measures between the training/validation data and test data, to improve fault detection and to have coverage criteria better correlated to failure-inducing inputs.\n\nThe output of this type of failure-finding testing (and then debugging) process is an improved DNN, with higher accuracy. This resembles what is called debug testing in the traditional testing literature [15]. Beside differences in testing DNN-based and conventional software (e.g., the oracle definition), which make DNN testing problematic, a further issue is that the so-obtained testing results are not necessarily related to the accuracy actually experienced in operation. In fact, testing data may be not representative of the actual operational context. This may happen when test data are generated artificially (like in adversarial examples generation) or they differ significantly from input observed in the field. The number of mispredictions and/or the coverage achieved give only an “indirect” (and, for what said, inaccurate) measure of the expected accuracy in operation, and ultimately of the confidence that can be placed in the DNN.\n\nA less investigated research path is testing a DNN with the explicit goal of providing a statistical estimate of its expected accuracy in the operational context. In software reliability engineering, this is a well established practice known as operational testing [16]. The objective is to assess how well a DNN will perform in the intended context using a small yet effective amount of test data. With a cost-effective accuracy estimate, testers can establish a threshold-based release criterion and correct or tune their artificial networks (e.g., adjust the DNN structure or hyper-parameters) until the criterion is met. The reference scenario is the following: a DNN model is trained with a set of data (training dataset) and is meant to operate in a given context (operational context). To test the model, an arbitrarily large set of operational data is available (operational dataset) containing examples whose correct label is unknown: the goal of the tester is to select a small subset of the operational data, to be manually labelled and used as test cases to estimate the accuracy of the model in operation. Due to manual labelling, testers typically look for a trade-off between a good estimate and the labelling cost. This problem has been recently faced by Li et al. [17]. Their selection criterion is to minimise cross-entropy between selected test data and the whole set of unlabelled operational data, so as to have a sample of tests representative of the operational context. As this approach does not explicitly look for failing examples, it does not give much room for improving the DNN accuracy. From this viewpoint, many tests selected are useless, as they are non-failing examples that serve only the purpose of having highly-confident estimates.\n\nGiven the above, we either have a test suite exposing failures but not representative (adversarial-like testing), or representative tests but few failures exposed (operational testing). This paper targets the drawbacks of both strategies together. We present DeepEST (Deep neural networks Enhanced Sampler for operational Testing), an operational testing method for DNN that builds test suites from an operational dataset so as to provide a close and efficient estimate of the expected accuracy and to find, at the same time, a high number of failing examples. Paraphrasing a famous aphorism by O. Wilde (“Experience is the hardest kind of teacher. It gives you the test first and the lesson afterward.”), DeepEST aims to sample, from operational data, many failing tests to learn from while building a set of tests suited for the DNN accuracy estimate.\n\nWith respect to pure operational testing, DeepEST is expected to provide DNN accuracy estimates that are more precise and more efficient (for number of tests required), plus the practical advantage of enabling debug-testing-like scenarios (improving accuracy through debugging/re-training). With respect to adversarial-like testing, DeepEST is able to provide accuracy estimates, enabling evaluation of alternative designs or DNN fine tuning, and establishing a release criterion directly related to what will be observed in operation.\n\nExperiments with various DNN and datasets are presented, which assess DeepEST effectiveness, sensitivity to the number of tests to select from the operational dataset, and dependency on the dataset. As DeepEST can exploit various types of auxiliary information to select tests, the experimental study considers four variants. The results show that all the variants produce accuracy estimates similar to those of the state-of-the-art technique, while detecting from 5 to 30 times more mispredictions, with the same sample size.\n\nThe paper is structured as follows. Section II introdcues sampling-based operational testing concepts used by DeepEST. Section III describes the DeepEST algorithm. Sections IV and V report the experimentation. Section VI discusses related work. Section VII concludes the paper.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "Ziad Obermeyer and Ezekiel J. Emanuel. Predicting the future — big data, machine learning, and clinical medicine. New England Journal of Medicine , 375(13):1216–1219, 2016. PMID: 27682033."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "Mariusz Bojarski et al. End to End Learning for Self-Driving Cars. arXiv:1604.07316, 2016."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "Amir Efrati. Uber finds deadly accident likely caused by software set to ignore objects on road. The Information , May 7, 2018."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "Jack Stewart. Tesla’s autopilot was involved in another deadly car crash. [Online]. Available: https://www.wired.com/story/tesla-autopilot-self-driving-crash-california/, 2018."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "Yuchi Tian, Kexin Pei, Suman Jana, and Baishakhi Ray. DeepTest: Automated testing of deep-neural-network-driven autonomous cars. In 40th International Conference on Software Engineering , ICSE, pages 303–314. ACM, 2018."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "Yaniv Taigman, Ming Yang, Marc’Aurelio Ranzato, and Lior Wolf. DeepFace: Closing the gap to human-level performance in face verification. In IEEE Conference on Computer Vision and Pattern Recognition , CVPR, pages 1701–1708. IEEE, 2014."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "Kexin Pei, Yinzhi Cao, Junfeng Yang, and Suman Jana. Deepxplore: Automated whitebox testing of deep learning systems. Communications of the ACM , 62(11):137–145, 2019."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "Lei Ma, Felix Juefei-Xu, Fuyuan Zhang, Jiyuan Sun, Minhui Xue, Bo Li, Chunyang Chen, Ting Su, Li Li, Yang Liu, Jianjun Zhao, and Yadong Wang. DeepGauge: Multi-Granularity Testing Criteria for Deep Learning Systems. In 33rd ACM/IEEE International Conference on Automated Software Engineering , ASE, pages 120–131. ACM, 2018."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "Mengshi Zhang, Yuqun Zhang, Lingming Zhang, Cong Liu, and Sarfraz Khurshid. DeepRoad: GAN-Based Metamorphic Testing and Input Validation Framework for Autonomous Driving Systems. In 33rd ACM/IEEE International Conference on Automated Software Engineering , ASE, pages 132–142. ACM, 2018."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "Lei Ma, Fuyuan Zhang, Minhui Xue, Bo Li, Yang Liu, Jianjun Zhao, and Yadong Wang. Combinatorial testing for deep learning systems. arxiv.org/abs/1806.07723, 2018."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "Augustus Odena and Ian Goodfellow. TensorFuzz: Debugging neural networks with coverage-guided fuzzing. In 36th International Conference on Machine Learning , volume 97 of Proc. of Machine Learning Research , 2019."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "Zenan Li, Xiaoxing Ma, Chang Xu, and Chun Cao. Structural coverage criteria for neural networks could be misleading. In 41st International Conference on Software Engineering: New Ideas and Emerging Results , ICSE-NIER, pages 89–92. IEEE, 2019."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "Weibin Wu, Hui Xu, Sanqiang Zhong, Michael R. Lyu, and Irwin King. Deep Validation: Toward Detecting Real-World Corner Cases for Deep Neural Networks. In 49th Annual IEEE/IFIP International Conference on Dependable Systems and Networks , DSN, pages 125–137. IEEE, 2019."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "Jinhan Kim, Robert Feldt, and Shin Yoo. Guiding Deep Learning System Testing Using Surprise Adequacy. In 41st International Conference on Software Engineering , ICSE, pages 1039–1049. IEEE, 2019."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "Phyllis G. Frankl, Richard G. Hamlet, Bev Littlewood, and Lorenzo Strigini. Evaluating testing methods by delivered reliability. IEEE Transactions on Software Engineering , 24(8):586–601, 1998."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "Michael R. Lyu, editor. Handbook of Software Reliability Engineering . McGraw-Hill, Inc., Hightstown, NJ, USA, 1996."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "Zenan Li, Xiaoxing Ma, Chang Xu, Chun Cao, Jingwei Xu, and Jian Lü. Boosting Operational DNN Testing Efficiency through Conditioning. In Proc. of the 2019 27th ACM Joint Meeting on European Software Engineering Conference and Symposium on the Foundations of Software Engineering , ESEC/FSE, pages 499–509. ACM, 2019."
+    }
+  ]
+}

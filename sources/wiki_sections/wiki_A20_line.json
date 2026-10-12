@@ -1,0 +1,102 @@
+{
+  "source_type": "encyclopedia_article",
+  "source_id": "enwiki:A20 line#rev1361593491",
+  "title": "A20 line",
+  "authors": "Wikipedia contributors",
+  "year": "2026",
+  "url": "https://en.wikipedia.org/w/index.php?title=A20_line&oldid=1361593491",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Affected programs",
+  "word_count": 690,
+  "text": "Since 1980, the address wrap was internally used by 86-DOS and MS-DOS to implement the DOS CALL 5 entry point at offset +5 to +9 (which emulates the CP/M-80-style CALL 5 BDOS API entry point at offset +5 to +7) in the Program Segment Prefix (PSP) (which partially resembles CP/M-80's zero page).[1,2] This was, in particular, utilized by programs machine-translated from CP/M-80 through assembly language translators[1] like Seattle Computer Products' TRANS86.[3] The CALL 5 handler this entry point refers to resides at the machine's physical address 0x000000C0 (thereby overlapping the four bytes of the interrupt service routine entry point reserved for INT 30h and the first byte of INT 31h in the x86 real mode interrupt vector table).[4,5,6] However, by the design of CP/M-80, which loaded the operating system immediately above the memory available for the application program to run in, the 8080/Z80 16-bit target address stored at offset +6 to +7 in the zero page could deliberately also be interpreted as the size of the first memory segment.[1] In order to emulate this in DOS with its 8086 segment:offset addressing scheme, the far call entry point's 16-bit offset had to match this segment size (i.e. 0xFEF0), which is stored at offset +6 to +7 in the PSP, overlapping parts of the CALL 5.[5,6] The only way to reconcile these requirements was to choose a segment value that, when added to 0xFEF0, results in an address of 0x001000C0, which, on an 8086, wraps around to 0x000000C0.[7,4,6]\n\nA20 had to be disabled for the wraparound to occur and DOS programs using this interface to work. Newer DOS versions which can relocate parts of themselves into the HMA, typically craft a copy of the entry point at FFFF:00D0 in the HMA (which again resolves to physical 0x001000C0), so that the interface can work without regard to the state of A20.[6,8]\n\nOne program known to use the CALL 5 interface is the DOS version of the Small-C compiler.[9] Also, the SPELL utility in Microsoft's Word 3.0 (1987) is one of the programs depending on the CALL 5 interface to be set up correspondingly.[10] Sun Microsystems' PC-NFS (1993) requires the CALL 5 fix-up as well.[8]\n\nAlso, to save program space,[11] a trick was used by some BIOS and DOS programmers, for example, to have one segment that has access to program data (such as from F800:0000 to F800:7FFF, pointing to the physical addresses 0x000F8000–0x000FFFFF), as well as the I/O data (such as the keyboard buffer) that was located in the first memory segment (with addresses F800:8000 to F800:FFFF pointing to the physical addresses 0x00000000 to 0x00007FFF).\n\nThis trick works for as long as the code isn't executed in low memory, the first 64 KB of RAM, a condition that was always true in older DOS versions without load-high capabilities.\n\nWith the DOS kernel relocated into higher memory areas, low memory increasingly became available for programs, causing those depending on the wraparound to fail.[12] The executable loaders in newer versions of DOS attempt to detect some common types of affected programs and either patch them on-the-fly to function also in low memory[13] or load them above the first 64 KB before passing execution on to them.[13] For programs, which are not detected automatically, LOADFIX[14] or MEMMAX -L[14] can be used to force programs to be loaded above the first 64 KB.\n\nThe trick was utilized by IBM/Microsoft Pascal itself as well as by programs compiled with it,[15,16,2,9] including Microsoft's MASM.[9] Other commonly used development utilities using this were executable compressors like Realia's Spacemaker[13] (written by Robert B. K. Dewar in 1982 and used to compress early versions of the Norton Utilities[17,18,19,20]) and Microsoft's EXEPACK[12,13,11,21,9] (written by Reuben Borman in 1985) as well as the equivalent /E[XEPACK] option in Microsoft's LINK 3.02 and higher.[12,11,21] Programs processed with EXEPACK would display a \"Packed file is corrupt\" error message.[11,13,21]\n\nVarious third-party utilities exist to modify compressed executables either replacing the problematic uncompression routine(s) through restubbing, or attempting to expand and restore the original file.\n\nModern Legacy BIOS boot loaders (such as GNU GRUB) use the A20 line.[22] UEFI boot loaders use 32-bit protected mode or 64-bit long mode.",
+  "references": [
+    {
+      "n": 1,
+      "text": "(1980). 86-DOS - Disk Operating System for the 8086 - Programmer's Manual. Seattle Computer Products, Inc.. http://www.patersontech.com/dos/Docs/86_dos_prog.pdf"
+    },
+    {
+      "n": 2,
+      "text": "(1985-04-10). Method and operating system for executing programs in a multi-mode microprocessor. Microsoft. https://patents.google.com/patent/US4779187"
+    },
+    {
+      "n": 3,
+      "text": "(June 1982). Upward migration - Part 1: Translators - Using translation programs to move CP/M-86 programs to CP/M and MS-DOS. BYTE Publications Inc.. https://tech-insider.org/personal-computers/research/acrobat/8206-b.pdf"
+    },
+    {
+      "n": 4,
+      "text": "(1991). DOS 5 für Programmierer: Die endgültige Referenz. Addison Wesley (Deutschland) GmbH."
+    },
+    {
+      "n": 5,
+      "text": "(2000). Format of Program Segment Prefix (PSP). INTER61. http://www.delorie.com/djgpp/doc/rbinter/it/78/13.html"
+    },
+    {
+      "n": 6,
+      "text": "(2011-09-13). Who needs the address wraparound, anyway?. OS/2 Museum. http://www.os2museum.com/wp/who-needs-the-address-wraparound-anyway/"
+    },
+    {
+      "n": 7,
+      "text": "(1985). The Peter Norton Programmer's Guide to the IBM PC.. Microsoft Corporation."
+    },
+    {
+      "n": 8,
+      "text": "(1997-05-01). Caldera OpenDOS Machine Readable Source Kit (M.R.S) 7.01. Caldera, Inc.. https://archive.sundby.com/retro/DR-DOS/dossrc.zip"
+    },
+    {
+      "n": 9,
+      "text": "(2018-03-16). The A20-Gate: It Wasn't WordStar. OS/2 Museum. http://www.os2museum.com/wp/the-a20-gate-it-wasnt-wordstar/"
+    },
+    {
+      "n": 10,
+      "text": "(2018-05-27). Somebody Put a SPELL On Me. PCjs. https://www.pcjs.org/blog/2018/05/27/"
+    },
+    {
+      "n": 11,
+      "text": "(2002-02-02). Treiber dynamisch nachladen (Intra-Segment-Offset-Relokation zum Laden von TSRs in die HMA). https://groups.google.com/d/msg/de.comp.os.msdos/tdvpBoMVN6A/a_zqDxGk22IJ"
+    },
+    {
+      "n": 12,
+      "text": "(1994). Undocumented DOS: A programmer's guide to reserved MS-DOS functions and data structures - expanded to include MS-DOS 6, Novell DOS and Windows 3.1. Addison Wesley Publishing Company. https://archive.org/details/undocumenteddosp00andr_0"
+    },
+    {
+      "n": 13,
+      "text": "(2002-10-07). Re: masm .com (PSP) related trouble. https://groups.google.com/forum/%23!msg/alt.lang.asm/PNOd9zfYow0/vXbab16j4XwJ"
+    },
+    {
+      "n": 14,
+      "text": "(1997-07-30). NWDOS-TIPs — Tips & Tricks rund um Novell DOS 7, mit Blick auf undokumentierte Details, Bugs und Workarounds. MPDOSTIP. http://www.antonis.de/dos/dos-tuts/mpdostip/html/nwdostip.htm"
+    },
+    {
+      "n": 15,
+      "text": "(August 1981). Pascal Compiler. International Business Machines Corporation. http://bitsavers.org/pdf/ibm/pc/languages/IBM_Pascal_Compiler_Aug81.pdf"
+    },
+    {
+      "n": 16,
+      "text": "(1981). NAME ENTX - Microsoft MS-DOS Computer Pascal runtime system control. Microsoft Corp.. http://www.os2museum.com/files/ENTX6L.ASM"
+    },
+    {
+      "n": 17,
+      "text": "Cambridge University Press et al v. Patton et al, Filing 124, Supplemental Initial Disclosures by Cambridge University Press, Oxford University Press, Inc., Sage Publications, Inc. - Cambridge University Press, Oxfort University Press, Inc., and Sage Publications, Inc. v. Mark P. Becker, Georgia State University President, et al, Civil Action No. 1:08-CV-1425-ODE. United States District Court For The Northern District Of Georgia, Atlanta Division. https://docs.justia.com/cases/federal/district-courts/georgia/gandce/1:2008cv01425/150651/124/1.html"
+    },
+    {
+      "n": 18,
+      "text": "Realia, Inc.. (January 1983). If you use DOS, you need this program.. PC Magazine. https://books.google.com/books?id=vy3cBZkjbZgC&pg=RA3-PA417"
+    },
+    {
+      "n": 19,
+      "text": "(1984-03-13). DOS 3.1 ASMB (Another Silly Microsoft Bug). info-ibmpc@USC-ISIB.ARPA. https://people.dsv.su.se/~jpalme/qzkom/ibmpc-8605-000511.html"
+    },
+    {
+      "n": 20,
+      "text": "(2018-04-30). Realia SpaceMaker. OS/2 Museum. http://www.os2museum.com/wp/realia-spacemaker/"
+    },
+    {
+      "n": 21,
+      "text": "(2018-03-23). EXEPACK and the A20-Gate. OS/2 Museum. http://www.os2museum.com/wp/exepack-and-the-a20-gate/"
+    },
+    {
+      "n": 22,
+      "text": "(2021-07-19). A20 Line. OSDev Wiki. http://wiki.osdev.org/A20_Line"
+    }
+  ]
+}

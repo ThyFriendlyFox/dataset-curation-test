@@ -1,0 +1,118 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2311.14097",
+  "title": "ACT-Diffusion: Efficient Adversarial Consistency Training for One-step Diffusion Models",
+  "authors": "Fei Kong, Jinhao Duan, Lichao Sun, Hao Cheng, Renjing Xu, Hengtao Shen, Xiaofeng Zhu, Xiaoshuang Shi, Kaidi Xu",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2311.14097",
+  "html_url": "https://arxiv.org/html/2311.14097",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 676,
+  "text": "Diffusion models, known for their success in image generation [1,2,3,4,5,6], utilize diffusion processes to produce high-quality, diverse images. They also perform tasks like zero-shot inpainting [7] and audio generation [8,9,10]. However, they have a significant drawback: lengthy sampling times. These models generate target distribution samples by iterative denoising a Gaussian noise input, a process that involves gradual noise reduction until samples match the target distribution. This limitation affects their practicality and efficiency in real-world applications.\n\nThe lengthy sampling times of diffusion models have spurred the creation of various strategies to tackle this issue. Several models and techniques have been suggested to enhance the efficiency of diffusion-based image generation [11,12,13]. Recently, consistency models [14] have been introduced to speed up the diffusion models’ sampling process. A consistency function is one that consistently yields the same output along a specific trajectory. To use consistency models, the trajectory from noise to the target sample must be obtained. By fitting the consistency function, the model can generate data within 1 or 2 steps.\n\nThe score-based model [2], an extension of the diffusion model in continuous time, gradually samples from a normal distribution p_{T} to the sample distribution p_{0}. In deterministic sampling, it essentially solves an Ordinary Differential Equation (ODE), with each sample representing an ODE trajectory. Consistency models generate samples using a consistency function that aligns every point on the ODE trajectory with the ODE endpoint. However, deriving the true ODE trajectory is complex. To tackle this, consistency models suggest two methods. The first, consistency distillation, trains a score-based model to obtain the ODE trajectory. The second, consistency training, approximates the trajectory using a conditional one. Compared to distillation, consistency training has a larger error, leading to lower sample quality. The consistency function is trained by equating the model’s output at time t_{n+1} with its output at time t_{n}.\n\nGenerative Adversarial Networks (GANs) [15,16,17], unlike consistency training, can directly minimize the distance between the model’s generated and target distributions via the discriminator, independent of the model’s output at previous time t_{n-1}. Drawing from GANs, we introduce Adversarial Consistency Training. We first theoretically explain the need for large batch sizes in consistency training by showing its equivalence to optimizing the upper bound of the Wasserstein-distance between the model’s generated and target distributions. This upper bound consists of the accumulated consistency training loss \\mathcal{L}^{t_{k}}_{CT}, the distance between sampling distributions, and the accumulated error, all of which increase with t. Hence, a large batch size is crucial to minimize the error from the previous time t. To mitigate the impact of \\mathcal{L}^{t_{k}}_{CT} and accumulated error, we incorporate the discriminator into consistency training, enabling direct reduction of the JS-divergence between the generated and target distributions at each timestep t. Our experiments on CIFAR10 [18], ImageNet 64 \\times 64 [19] and LSUN Cat 256 \\times 256 [20] show that ACT significantly surpasses consistency training while needing less than 1/6 of the original batch size and less than 1/2 of the original model parameters and training steps, leading to considerable resource savings. For comparison, we use 1 NVIDIA GeForce RTX 3090 for CIFAR10, 4 NVIDIA A100 GPUs for ImageNet 64 \\times 64 and 8 NVIDIA A100 GPUs for LSUN Cat 256 \\times 256, while consistency training requires 8, 64, 64 A100 GPUs for CIFAR10, ImageNet 64 \\times 64 and LSUN Cat 256 \\times 256, respectively.\n\nOur contributions are summarized as follows:\n\n- • We demonstrate that consistency training is equivalent to optimizing the upper bound of the W-distance. By analyzing this upper bound, we have identified one reason why consistency training requires a larger batch size.\n\n- • Following our analysis, we propose Adversarial Consistency Training (ACT) to directly optimize the JS divergence between the sampling distribution and the target distribution at each timestep t, by incorporating a discriminator into the consistency training process.\n\n- • Experimental results demonstrate that the proposed ACT significantly outperforms the original consistency training with only less than 1/6 of the original batch size and less than 1/2 of the training steps. This leads to a substantial reduction in resource consumption.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib19",
+      "text": "Jonathan Ho, Ajay Jain, and Pieter Abbeel. Denoising diffusion probabilistic models. In Advances in Neural Information Processing Systems , pages 6840–6851, 2020."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib44",
+      "text": "Yang Song, Jascha Sohl-Dickstein, Diederik P. Kingma, Abhishek Kumar, Stefano Ermon, and Ben Poole. Score-based generative modeling through stochastic differential equations. In International Conference on Learning Representations , 2021b."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib43",
+      "text": "Yang Song and Stefano Ermon. Generative modeling by estimating gradients of the data distribution. In Advances in Neural Information Processing Systems , pages 11895–11907, 2019."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib53",
+      "text": "Chenxi Yuan, Jinhao Duan, Nicholas J Tustison, Kaidi Xu, Rebecca A Hubbard, and Kristin A Linn. Remind: Recovery of missing neuroimaging using diffusion models with application to alzheimer’s disease. medRxiv , pages 2023–08, 2023a."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib12",
+      "text": "Jinhao Duan, Fei Kong, Shiqi Wang, Xiaoshuang Shi, and Kaidi Xu. Are diffusion models vulnerable to membership inference attacks? In International Conference on Machine Learning , 2023."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib31",
+      "text": "Yixin Liu, Kai Zhang, Yuan Li, Zhiling Yan, Chujie Gao, Ruoxi Chen, Zhengqing Yuan, Yue Huang, Hanchi Sun, Jianfeng Gao, et al. Sora: A review on background, technology, limitations, and opportunities of large vision models. arXiv preprint arXiv:2402.17177 , 2024."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib32",
+      "text": "Andreas Lugmayr, Martin Danelljan, Andres Romero, Fisher Yu, Radu Timofte, and Luc Van Gool. Repaint: Inpainting using denoising diffusion probabilistic models. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 11461–11471, 2022."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib36",
+      "text": "Vadim Popov, Ivan Vovk, Vladimir Gogoryan, Tasnima Sadekova, and Mikhail Kudinov. Grad-tts: A diffusion probabilistic model for text-to-speech. In International Conference on Machine Learning , pages 8599–8608, 2021."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib25",
+      "text": "Zhifeng Kong, Wei Ping, Jiaji Huang, Kexin Zhao, and Bryan Catanzaro. Diffwave: A versatile diffusion model for audio synthesis. In International Conference on Learning Representations , 2021."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib24",
+      "text": "Fei Kong, Jinhao Duan, RuiPeng Ma, Hengtao Shen, Xiaofeng Zhu, Xiaoshuang Shi, and Kaidi Xu. An efficient membership inference attack for the diffusion model by proximal initialization. arXiv preprint arXiv:2305.18355 , 2023."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib4",
+      "text": "Ricky T. Q. Chen, Jens Behrmann, David Duvenaud, and J&ouml;rn-Henrik Jacobsen. Residual flows for invertible generative modeling. In Conference on Neural Information Processing Systems , pages 9913–9923, 2019."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib29",
+      "text": "Xingchao Liu, Chengyue Gong, and Qiang Liu. Flow straight and fast: Learning to generate and transfer data with rectified flow. In International Conference on Learning Representations , 2022."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib57",
+      "text": "Hongkai Zheng, Weili Nie, Arash Vahdat, Kamyar Azizzadenesheli, and Anima Anandkumar. Fast sampling of diffusion models via operator learning. International Conference on Machine Learning , 2023."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib45",
+      "text": "Yang Song, Prafulla Dhariwal, Mark Chen, and Ilya Sutskever. Consistency models. Computing Research Repository , abs/2303.01469, 2023."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib3",
+      "text": "Andrew Brock, Jeff Donahue, and Karen Simonyan. Large scale gan training for high fidelity natural image synthesis. In International Conference on Learning Representations , 2019."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib55",
+      "text": "Han Zhang, Zizhao Zhang, Augustus Odena, and Honglak Lee. Consistency regularization for generative adversarial networks. In International Conference on Learning Representations , 2020."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib15",
+      "text": "Ian Goodfellow, Jean Pouget-Abadie, Mehdi Mirza, Bing Xu, David Warde-Farley, Sherjil Ozair, Aaron Courville, and Yoshua Bengio. Generative adversarial nets. In Advances in neural information processing systems , 2014."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib26",
+      "text": "Alex Krizhevsky, Geoffrey Hinton, et al. Learning multiple layers of features from tiny images, 2009."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib7",
+      "text": "Jia Deng, Wei Dong, Richard Socher, Li-Jia Li, Kai Li, and Li Fei-Fei. Imagenet: A large-scale hierarchical image database. In 2009 IEEE conference on computer vision and pattern recognition , pages 248–255. Ieee, 2009."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib51",
+      "text": "Fisher Yu, Ari Seff, Yinda Zhang, Shuran Song, Thomas Funkhouser, and Jianxiong Xiao. Lsun: Construction of a large-scale image dataset using deep learning with humans in the loop. arXiv preprint arXiv:1506.03365 , 2015."
+    }
+  ]
+}

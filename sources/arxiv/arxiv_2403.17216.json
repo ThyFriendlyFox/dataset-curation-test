@@ -1,0 +1,63 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.17216",
+  "title": "Ontology Completion with Natural Language Inference and Concept Embeddings: An Analysis",
+  "authors": "Na Li, Thomas Bailleux, Zied Bouraoui, Steven Schockaert",
+  "year": "2024",
+  "categories": [
+    "cs.CL"
+  ],
+  "url": "https://arxiv.org/abs/2403.17216",
+  "html_url": "https://arxiv.org/html/2403.17216",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 820,
+  "text": "Ontologies, in the context of artificial intelligence, are essentially sets of rules which describe how the concepts from a given domain are related. They generalise taxonomies by expressing these relationships using logical connectives, which makes it possible to describe conceptual relationships in a more precise way. Throughout this paper, we will use the common description logic syntax for encoding ontology rules. For instance, an ontology might contain the following rules:\n\nIn this syntax, rules are formulated as concept inclusions X\\sqsubseteq Y, which encode that every instance of the concept X is also an instance of the concept Y. The connective \\sqcap corresponds to intersection and \\exists r.C is the set of concepts that are related through the relation r to some concept from C. For instance, (1) expresses the knowledge that every scientist who is located somewhere in the UK is called a ‘‘UK scientist’’. We consider the problem of predicting missing rules in a given ontology. While this can be studied from multiple angles [2], we consider the setting where only the rules are given, meaning that we cannot learn rules from examples. We focus on methods that exploit the fact that the concepts involved are natural language terms, about which we have prior knowledge that can be exploited. Two main classes of methods have been studied for this setting.\n\nFirst, we can simply treat the problem of predicting missing rules as a Natural Language Inference (NLI) problem. Given a candidate rule such as (1), we then first need a verbalisation of the premise and hypothesis. For instance, the left-hand side of the concept inclusion might be translated to the premise “a biologist who lives in the UK” and the right-hand side might be translated to the hypothesis “a UK Scientist”. While some care is needed about how the premise and hypothesis are formulated (e.g. how concept names referring the multi-word expressions are tokenised), this approach is intuitive and conceptually straightforward. [3] implemented this strategy by fine-tuning a BERT [4] model on the rules from a given ontology. This strategy crucially relies on the knowledge which is captured by the pre-trained NLI model. However, this can be a problem for specialised ontologies, which may use concept names that do not refer to well-known natural language terms, or which use such terms with a meaning that is more specific than their standard meaning.\n\nThe second approach relies on pre-trained concept embeddings, e.g. obtained from standard word embeddings [5,6] or distilled from pre-trained language models [7,8]. Essentially, pre-trained concept embeddings provide prior knowledge about the similarity structure of the concepts. To see why such knowledge can be useful for predicting missing rules, note that ontologies often contain large numbers of “parallel rules”, i.e. concept inclusions which express essentially the same knowledge for a number of related concepts, as in the case of (1)–(3). In the concept embedding space, concepts with a similar meaning will appear clustered together. This means in particular that the embedding of the concepts \\mathsf{Biologist}, \\mathsf{Geologist} and \\mathsf{Chemist} will be similar. Based on this observation, for any concept X whose embedding is also similar to that of \\mathsf{Biologist}, \\mathsf{Geologist} and \\mathsf{Chemist}, we can plausibly infer that there should be a counterpart to (1)–(3) for X. For instance, we would expect that the embedding of \\mathsf{Physicist} would also be similar and we can thus plausibly infer the following concept inclusion:\n\nNote that the justification for this inference comes purely from our prior knowledge about the relatedness of the concepts \\mathsf{Biologist}, \\mathsf{Geologist}, \\mathsf{Chemist} and \\mathsf{Physician}. In particular, the concept \\mathsf{UKScientist} does not play any role in this process. This strategy can thus also be used if the concept in the head of the rule has a meaning which only makes sense within the context of the given ontology. However, its main drawback is that it can only be applied if suitable parallel rules are present. As such, we can expect this approach to be complementary to NLI based strategies. [9] developed an embedding based method for ontology completion which uses a Graph Neural Network (GNN) to implement the aforementioned intuition.\n\nWhile previous work has shown the feasibility of ontology completion, the strengths and weaknesses of existing methods are poorly understood. To address this, we make the following contributions:\n\n- • We introduce a benchmark for evaluating ontology completion methods. While previous work has focused on distinguishing held-out rules from randomly corrupted rules, our benchmark is specifically designed to include manually validated hard negatives.\n\n- • We thoroughly analyse the performance of NLI based approaches, comparing the BERT based models from [3] with Large language models (LLMs). We similarly analyse the performance of concept embedding based methods, experimenting with different strategies for encoding the problem as a graph, different GNN architectures and different concept embeddings.\n\n- • We show that both types of methods are highly complementary. In particular, we find that simple hybrid strategies outperform any of the individual approaches.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "Baader et al. (2009) Franz Baader, Ian Horrocks, and Ulrike Sattler. 2009. Description logics . In Steffen Staab and Rudi Studer, editors, Handbook on Ontologies , International Handbooks on Information Systems, pages 21–43. Springer."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib38",
+      "text": "Ozaki (2020) Ana Ozaki. 2020. Learning description logic ontologies: Five approaches. where do they stand? Künstliche Intell. , 34(3):317–327."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib9",
+      "text": "Chen et al. (2023) Jiaoyan Chen, Yuan He, Yuxia Geng, Ernesto Jiménez-Ruiz, Hang Dong, and Ian Horrocks. 2023. Contextual semantic embeddings for ontology subsumption prediction . World Wide Web (WWW) , 26(5):2569–2591."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib13",
+      "text": "Devlin et al. (2019) Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. 2019. BERT: Pre-training of deep bidirectional transformers for language understanding . In Proceedings of the 2019 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long and Short Papers) , pages 4171–4186, Minneapolis, Minnesota. Association for Computational Linguistics."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib35",
+      "text": "Mikolov et al. (2013) Tomas Mikolov, Wen-tau Yih, and Geoffrey Zweig. 2013. Linguistic regularities in continuous space word representations . In Proceedings of the 2013 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies , pages 746–751, Atlanta, Georgia. Association for Computational Linguistics."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib40",
+      "text": "Pennington et al. (2014) Jeffrey Pennington, Richard Socher, and Christopher Manning. 2014. GloVe: Global vectors for word representation . In Proceedings of the 2014 Conference on Empirical Methods in Natural Language Processing (EMNLP) , pages 1532–1543, Doha, Qatar. Association for Computational Linguistics."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib29",
+      "text": "Li et al. (2021) Na Li, Zied Bouraoui, José Camacho-Collados, Luis Espinosa Anke, Qing Gu, and Steven Schockaert. 2021. Modelling general properties of nouns by selectively averaging contextualised embeddings . In Proceedings of the Thirtieth International Joint Conference on Artificial Intelligence, IJCAI 2021, Virtual Event / Montreal, Canada, 19-27 August 2021 , pages 3850–3856. ijcai.org."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib32",
+      "text": "Liu et al. (2021a) Fangyu Liu, Ivan Vulić, Anna Korhonen, and Nigel Collier. 2021a. Fast, effective, and self-supervised: Transforming masked language models into universal lexical and sentence encoders . In Proceedings of the 2021 Conference on Empirical Methods in Natural Language Processing , pages 1442–1459, Online and Punta Cana, Dominican Republic. Association for Computational Linguistics."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib30",
+      "text": "Li et al. (2019) Na Li, Zied Bouraoui, and Steven Schockaert. 2019. Ontology completion using graph convolutional networks . In The Semantic Web - ISWC 2019 - 18th International Semantic Web Conference, Auckland, New Zealand, October 26-30, 2019, Proceedings, Part I , volume 11778 of Lecture Notes in Computer Science , pages 435–452. Springer."
+    }
+  ]
+}

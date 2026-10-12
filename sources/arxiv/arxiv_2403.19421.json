@@ -1,0 +1,166 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.19421",
+  "title": "Scaling up ridge regression for brain encoding in a massive individual fMRI dataset",
+  "authors": "Sana Ahmadi, Pierre Bellec, Tristan Glatard",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.AI",
+    "q-bio.NC",
+    "q-bio.QM"
+  ],
+  "url": "https://arxiv.org/abs/2403.19421",
+  "html_url": "https://arxiv.org/html/2403.19421",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 849,
+  "text": "The human brain is a computing system with billions of neurons as computing units. Cognitive neuroscience aims to discover functional principles of brain organization by leveraging large-scale neuroimaging data. One of the key methods used for this purpose is brain encoding [1], in which a model predicts brain responses directly from rich stimuli such as natural images or videos, using the internal representations of an artificial neural network as a feature space for prediction.\n\nAmong the regression methods used in brain encoding to predict brain activity, ridge regression [2] has become popular and well-accepted [3,4,5,6,7,8,9,10,11,12] due to its two key features: 1) ridge regression tends to be generalizable to new stimuli and avoids overfitting, and 2) efficient implementations of ridge regression are available [13] which are less computationally intensive than other approaches.\n\nFor brain encoding of visual tasks, ridge regression is often applied to the activations produced by various neural networks architecturesin response to visual stimuli, such as convolutional neural networks (CNN) and transformers [14,15,16,17,18,19,20]. For instance, in [12], the authors compared the activation of CNN units with brain response to a dynamic visual stimulus (movie frames) and found that these representations were able to accurately predict fMRI data collected with human subjects watching movies.\n\nEven though linear algebra optimizations exist for ridge regression [13], the training process still requires compute-intensive matrix computations over the whole dataset. This computational cost is especially substantial for brain encoding models trained separately for each spatial measurement sample (voxel), as the number of voxels can range from tens to hundreds of thousands in a full brain fMRI acquisition with high spatial resolution. Thus, full brain encoding using ridge regression remains a challenge, even with modern computational resources.\n\nFurthermore, the computational requirements of ridge regression are exacerbated by the need to train brain encoding tasks on large datasets. Indeed, finding the correlation between the huge feature space of natural images and brain activity requires to explore a large space of visual stimuli [21]. Over the past few years, the quantity and quality of fMRI datasets have increased rapidly in terms of the number of human subjects, the number of scanning hours available for each subject, as well as spatio-temporal resolution. In particular, datasets such as BOLD5000 [22], Natural Scenes Dataset (NSD) [23] provide so-called deep fMRI datasets, with long scanning time for a few subjects and an extensive stimuli space to properly estimate the generalization of brain encoding to different types of stimuli, e.g. images from many different categories. Training purely individual brain models also by-pass the challenges of modelling inter-individual variations in brain organization, which is substantial [24]. As a consequence of increased spatial resolution and volume of time samples available for a single subject with the advance of simultaneous multislice fMRI REF, there is thus an urgent need to understand the efficiency of various implementations of ridge regression for brain encoding with large fMRI datasets.\n\nThe CNeuroMod research group [25] has released the largest fMRI dataset for individual brain modeling currently available, featuring up to 200 hours of fMRI data per subject (N=6). The CNeuromod dataset provides an opportunity to train complex brain encoding models based on artificial neural networks, but also raises substantially the computational costs of brain encoding. This work investigates several parallelization techniques for ridge regression, using the CNeuroMod Friends dataset to predict brain activity from video stimuli. We focus on a standard brain encoding pipeline using an established pretrained network (VGG16), and we used the scikit-learn library [26] for brain encoding, that provides efficient implementations of various machine-learning models, including ridge regression.\n\nWe benchmarked the efficiency of different types of parallelization, namely multi-threading (multiple cores on a single CPU) and multi-processing (distributing computations across multiple CPUs in a high performance computing environment). For multi-threading, scikit-learn can leverage the BLAS (Basic Linear Algebra Subprograms) specification for linear algebra implemented using the open-source OpenBLAS library [27] or the proprietary Intel oneAPI Math Kernel Library (MKL) [28]. Both of these linear algebra libraries support multi-threading on a single CPU. Moreover, scikit-learn models rely on the Joblib library to interface with various parallelization backends including Dask [29], which can be used to distribute computations across multiple compute nodes. Specifically, we utilized scikit-learn’s MultiOutput regressor, which by default trains individual ridge regression models for each target variable (here, each location in the brain) independently. The MultiOutput however comes with substantial overhead, as it introduces many redundant computations across brain targets. To reduce the amount of redundant computations happening with MultiOutput ridge regression, we also modified MultiOutput to train a series of model on batches of brain targets, using one compute node per batch and multi-threading execution within each batch. We conducted a theoretical complexity analysis to motivate the choice of this approach. We also repeated our benchmark for both MultiOutput and the batch MultiOutput by assessing the efficiency of parallelization with varying number of threads per node and the number of compute nodes.\n\nTaken together, this study will provide concrete guidelines for practitioners who want to run brain encoding efficiently with ridge regression and large fMRI datasets, using high-performance computing infrastructure and CPUs.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "T. Naselaris, K. Kay, S. Nishimoto, J. Gallant, Encoding and decoding in fmri. neuroimage, Technometrics 56 (2011) 400–410."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "A. Hoerl, R. Kennard, Ridge regression: applications to nonorthogonal problems, Technometrics 12 (1970) 69–82."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "L. Wehbe, A. Ramdas, R. Steorts, C. Shalizi, Regularized brain reading with shrinkage and smoothing., The annals of applied statistics (2015) 1997."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "A. Pasquiou, Y. Lakretz, J. Hale, B. Thirion, C. Pallier, Neural language models are not born equal to fit brain data, but training helps, arXiv preprint arXiv:2207.03380 (2022)."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "C. Conwell, J. Prince, A. G., T. Konkle, Large-scale benchmarking of diverse artificial vision models in prediction of 7t human neuroimaging data, bioRxiv (2022)."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "A. Goldstein, E. Ham, S. Nastase, Z. Zada, A. Dabush, B. Aubrey, M. Schain, H. Gazula, A. Feder, W. Doyle, S. Devore, Correspondence between the layered structure of deep language models and temporal structure of natural language processing in the human brain., bioRxiv (2022)."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "S. Oota, J. Arora, V. Rowtula, M. Gupta, R. Bapi, Visio-linguistic brain encoding., preprint arXiv:2204.08261 (2022)."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "S. Kumar, T. Sumers, T.R.and Yamakoshi, A. Goldstein, U. Hasson, K. Norman, T. Griffiths, R. Hawkins, S. Nastase, Reconstructing the cascade of language processing in the brain using the internal computations of a transformer-based language model., bioRxiv (2022)."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "M. Lescroart, J. Gallant, Human scene-selective areas represent 3d configurations of surfaces, Neuron 101 (2019) 178–192."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "A. Kell, D. Yamins, E. Shook, S. Norman-Haignere, J. McDermott, A task-optimized neural network replicates human auditory behavior, predicts brain responses, and reveals a cortical processing hierarchy., Neuron 98 (2018) 630–644."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "S. Jain, A. Huth, Incorporating context into language encoding models for fmri, Advances in neural information processing systems (2018) 31."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "H. Wen, J. Shi, Y. Zhang, K. Lu, J. Cao, Z. Liu, Neural encoding and decoding with deep learning for dynamic natural vision, Cerebral Cortex 28(12)) (2018) 4136–4160."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "T. D. la Tour, M. Eickenberg, A. O. Nunez-Elizalde, J. L. Gallant, Feature-space selection with banded ridge regression, NeuroImage 264 (2022) 119728."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "K. Seeliger, L. Ambrogioni, Y. Güçlütürk, L. van den Bulk, U. Güçlü, M. van Gerven, End-to-end neural system identification with neural information flow., PLOS Computational Biology 17(2) (2021)."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "K. Kay, T. Naselaris, R. Prenger, J. Gallant, Identifying natural images from human brain activity, Nature 452 (2008) 352–355."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "K. Kay, T. Naselaris, R. Prenger, J. Gallant, Reconstructing visual experiences from brain activity evoked by natural movies., Current Biology 21 (2011) 1641–1646."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "T. Horikawa, S. Aoki, M. Tsukamoto, Y. Kamitani, Characterization of deep neural network features by decodability from human brain activity., Scientific data (2019) 190012."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "R. Beliy, G. Gaziv, A. Hoogi, F. Strappini, T. Golan, M. Irani, From voxels to pixels and back: Self-supervision in natural-image reconstruction from fmri., In Advances in Neural Information Processing Systems (2019) 6517–6527."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "K. Qiao, J. Chen, L. Wang, C. Zhang, L. Zeng, L. Tong, B. Yan, Category decoding of visual stimuli from human brain activity using a bidirectional recurrent neural network to simulate bidirectional information flows in human visual cortices, Frontiers in neuroscience (2019)."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "G. Shen, K. Dwivedi, K. Majima, T. Horikawa, Y. Kamitani, End-to-end deep image reconstruction from human brain activity., Frontiers in computational neuroscience 13 (2019) 21."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "T. Naselaris, E. Allen, K. Kay, Extensive sampling for complete models of individual brains. current opinion in behavioral sciences, bioRxiv 40 (2021) 45–51."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib22",
+      "text": "N. Chang, J. Pyles, A. Marcus, A. Gupta, M. Tarr, E. Aminoff, Bold5000: a public fmri dataset while viewing 5000 visual images., Scientific data (2019) 1–18."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib23",
+      "text": "E. Allen, G. St-Yves, Y. Wu, J. Breedlove, L. Dowdle, B. Caron, F. Pestilli, I. Charest, J. Hutchinson, T. Naselaris, K. Kay, A massive 7t fmri dataset to bridge cognitive and computational neuroscience., bioRxiv (2021)."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib24",
+      "text": "C. ratton, T. Laumann, A. Nielsen, D. Greene, E. Gordon, A. Gilmore, S. Nelson, R. Coalson, A. Snyder, B. Schlaggar, N. Dosenbach, Functional brain networks are dominated by stable group and individual factors, not cognitive or daily variation., Neuron (2018) 439–452."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib25",
+      "text": "Cneuromod, Cneuromod dataset, https://www.cneuromod.ca/gallery/datasets/ , 2021."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib26",
+      "text": "F. Pedregosa, G. Varoquaux, A. Gramfort, V. Michel, B. Thirion, O. Grisel, M. Blondel, P. Prettenhofer, R. Weiss, V. Dubourg, et al., Scikit-learn: Machine learning in python, the Journal of machine Learning research 12 (2011) 2825–2830."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib27",
+      "text": "Z. Xianyi, W. Qian, Z. Yunquan, Model-driven level 3 blas performance optimization on loongson 3a processor., IEEE 18th international conference on parallel and distributed systems (2012) 1–18."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib28",
+      "text": "E. Wang, Q. Zhang, B. Shen, G. Zhang, X. Lu, Q. Wu, Y. Wang, Intel math kernel library. in high-performance, Computing on the Intel® Xeon Phi™ (2014) 167–188."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib29",
+      "text": "M. Rocklin, Dask: Parallel computation with blocked algorithms and task scheduling, In Proceedings of the 14th python in science conferenc 130 (2015) 136."
+    }
+  ]
+}

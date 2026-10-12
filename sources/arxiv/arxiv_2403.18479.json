@@ -1,0 +1,143 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.18479",
+  "title": "Lightweight Embeddings for Graph Collaborative Filtering",
+  "authors": "Xurong Liang, Tong Chen, Lizhen Cui, Yang Wang, Meng Wang, Hongzhi Yin",
+  "year": "2024",
+  "categories": [
+    "cs.IR"
+  ],
+  "url": "https://arxiv.org/abs/2403.18479",
+  "html_url": "https://arxiv.org/html/2403.18479",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1044,
+  "text": "In e-commerce and social media applications, the success of recommender systems (RSs) in predicting preferred items for users [1,2,3,4,5,6] has attracted immense revenue. Classic RSs deploy factorization-based methods [7,8] or multilayer perceptrons (MLPs) [9] for predicting user-item affinity via collaborative filtering. Recent advances in graph neural networks (GNNs) [1,10,11] further facilitate graph-based collaborative filtering [10,11], which propagates collaborative signals through connected nodes to model user-item interactions. To date, GNN-based recommenders are arguably one of the most popular variants of collaborative filtering methods in both academia [10,11] and industry [12,13].\n\nWhile GNN-based recommenders bring in promising performance and versatility, they still struggle to bypass a long-standing challenge carried over from conventional RSs -- that is, the scalability of embedding representations. In the very basic form of ID-based recommendation where the only entities to represent are users and items, each entity corresponds to an individual embedding vector that can be looked up from the embedding table based on a unique feature value (e.g., ID). With the sheer volume of users and items in e-commerce sites, the embedding table inevitably introduces a huge number of parameters that render a recommender hard to scale. The embedding parameters are at the scope of tens of millions in common benchmark datasets [14,15,16] and even thousands of billions in industry-level applications [17]. Thus, to keep enjoying the performance benefits of GNN-based recommenders at scale, improving the parameter efficiency of embeddings is the key.\n\nTo alleviate the excessive parameterization in the embedding layer of RSs, one mainstream research direction focuses on parameter sharing, in which all entity embeddings are drawn from a parameter pool with only a fraction of the footprint of the full embedding table. As a typical way of parameter sharing, compositional embeddings are facilitated via a set of meta-embedding vectors, where some hash functions are handcrafted to map each entity to a unique set of meta-embeddings based on their feature value (i.e., user/item IDs in common RSs) [18,19,20,21,22]. Then, an entity embedding is composed with those meta-embeddings, e.g., by performing sum pooling [23]. As each entity is assigned a distinct set of meta-embeddings, their final compositional embeddings naturally avoid collisions and can be easily used for subsequent recommendation tasks.\n\nNevertheless, in these methods, it is noticed that the mapping from entities to their corresponding meta-embeddings is solely based on the hash functions given [23,24], which in turn makes all entities’ meta-embedding assignments a predefined and fixed decision. Although this narrows the optimization target of this lightweight embedding paradigm down to just the meta-embeddings, such an assignment mapping unfortunately retains minimal semantic association between entities since it is solely determined by the user/item IDs that are mutually independent. That is to say, even two dissimilar entities, e.g., a user and her disliked item, might have two similar meta-embedding compositions where most meta-embeddings are the same, resulting in a misleadingly high affinity between their composed embeddings. Similarly, two highly correlated entities can hardly preserve such correlations in their embeddings if they diverge heavily in meta-embedding assignments. In the meantime, most compositional embedding schemes allocate a unanimous weight to all meta-embeddings [16,25] with no mechanisms to differentiate their contributions in an entity’s compositional embedding, indulging the homogeneity of entity embeddings. As a result, risks are incubated in terms of insufficient embedding expressiveness and suboptimal recommendation performance, and they are likely to deteriorate in GNN-based collaborative filtering where user/item links are explicitly accounted for message passing.\n\nTo this end, a more flexible compositional embedding scheme that not only accounts for the semantic connections among entities, but also provides a more nuanced, weighted composition of assigned meta-embeddings for each entity, is highly anticipated. Ideally, this involves learning the right meta-embedding assignments as a parallel goal to the optimization of meta-embeddings. However, this also means selecting a subset of meta-embeddings for every entity, translating into a typical combinatorial optimization problem that is known to be NP-hard. At the same time, for each entity embedding, any update on either its meta-embedding assignments or the meta-embedding themselves will incur changes in its expressiveness. Given the strong entanglement between the two, simultaneously learning them is prone to instability during optimization and heavily constrained recommendation efficacy.\n\nIn this paper, to achieve the desiderata of parameter-efficient embeddings with GNN-based recommenders, we propose our work L ightweight E mbeddings for G raph C ollaborative F iltering (LEGCF). Specifically, to remedy the defects of predefined hash function methods, we propose a more adaptive assignment scheme by introducing a learnable, real-valued assignment matrix, of which each row encodes which (selection) and how (weighting) every meta-embedding is involved in the composition of one entity’s embedding. To learn the assignment matrix while preserving the semantic relationships among entities, we make use of GNNs’ ability to propagate messages between associated nodes. Specifically, we construct an expanded message passing graph that additionally considers the weighted connections between entities and meta-embeddings, and frame a representation similarity constraint as an objective function that can be elegantly and quickly solved in a closed form via matrix pseudo-inverse. This not only transforms the combinatorial optimization task into inferring the relevance of different meta-embeddings to each entity, but also decouples it from the gradient-based update of meta-embedding weights. Furthermore, in LEGCF, dynamic pruning is enabled for the assignment matrix, such that it can be efficiently stored as a sparse matrix with a negligible memory footprint.\n\nWe summarize our main contributions as follows:\n\n- • We point out the deficiencies of existing embedding parameter sharing methods when they are applied in GNN-based recommenders. Instead of using predefined meta-embedding assignments, we highlight the necessity of a flexible meta-embedding assignment mechanism that can preserve entity-wise semantic correlations and differentiate the nuanced contributions of each entity’s assigned meta-embeddings.\n\n- • To achieve the desiderata, we propose a novel lightweight embedding framework dedicated to GNN-based recommenders, namely LEGCF. On top of learning all meta-embeddings, LEGCF adaptively learns weighted meta-embedding assignment for each entity. A novel, closed-form solution is derived from the similarity among graph-propagated embeddings, so as to facilitate an alternate optimization scheme.\n\n- • We conduct extensive experiments on three benchmark datasets. The results have demonstrated LEGCF’s advantageous accuracy amid its top-tier parameter efficiency among state-of-the-art lightweight baselines, and verified its smallest performance compromise compared with GNN-based recommenders using a full (40 \\times larger) embedding table.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib54",
+      "text": "Wu et al . (2023) Shiwen Wu, Fei Sun, Wentao Zhang, Xu Xie, and Bin Cui. 2023. Graph Neural Networks in Recommender Systems: A Survey. Comput. Surveys (2023)."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib66",
+      "text": "Zhang et al . (2020b) Shuai Zhang, Lina Yao, Aixin Sun, and Yi Tay. 2020b. Deep Learning based Recommender System: A Survey and New Perspectives. Comput. Surveys 52 (2020)."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib70",
+      "text": "Zheng et al . (2023) Ruiqi Zheng, Liang Qu, Bin Cui, Yuhui Shi, and Hongzhi Yin. 2023. AutoML for Deep Recommender Systems: A Survey. TOIS (2023)."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib64",
+      "text": "Zhang et al . (2021) Junwei Zhang, Min Gao, Junliang Yu, Lei Guo, Jundong Li, and Hongzhi Yin. 2021. Double-scale self-supervised hypergraph learning for group recommendation. In CIKM ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib49",
+      "text": "Wang et al . (2017) Hao Wang, Yanmei Fu, Qinyong Wang, Hongzhi Yin, Changying Du, and Hui Xiong. 2017. A location-sentiment-aware recommender system for both home-town and out-of-town users. In KDD ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib67",
+      "text": "Zhao et al . (2023) Wayne Xin Zhao, Kun Zhou, Junyi Li, Tianyi Tang, Xiaolei Wang, Yupeng Hou, Yingqian Min, Beichen Zhang, Junjie Zhang, Zican Dong, et al . 2023. A survey of large language models. arXiv preprint arXiv:2303.18223 (2023)."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib41",
+      "text": "Rendle (2010) Steffen Rendle. 2010. Factorization Machines. In ICDM ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib24",
+      "text": "Koren et al . (2009) Yehuda Koren, Robert Bell, and Chris Volinsky. 2009. Matrix Factorization Techniques for Recommender Systems. Computer 42, 8 (2009)."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib16",
+      "text": "He et al . (2017) Xiangnan He, Lizi Liao, Hanwang Zhang, Liqiang Nie, Xia Hu, and Tat-Seng Chua. 2017. Neural Collaborative Filtering. In WWW ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib51",
+      "text": "Wang et al . (2019) Xiang Wang, Xiangnan He, Meng Wang, Fuli Feng, and Tat-Seng Chua. 2019. Neural graph collaborative filtering. In SIGIR ."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib15",
+      "text": "He et al . (2020) Xiangnan He, Kuan Deng, Xiang Wang, Yan Li, YongDong Zhang, and Meng Wang. 2020. LightGCN: Simplifying and Powering Graph Convolution Network for Recommendation. In SIGIR ."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib62",
+      "text": "Ying et al . (2018) Rex Ying, Ruining He, Kaifeng Chen, Pong Eksombatchai, William L Hamilton, and Jure Leskovec. 2018. Graph convolutional neural networks for web-scale recommender systems. In SIGKDD ."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "Gurukar et al . (2022) Saket Gurukar, Nikil Pancha, Andrew Zhai, Eric Kim, Samson Hu, Srinivasan Parthasarathy, Charles Rosenberg, and Jure Leskovec. 2022. MultiBiSage: A Web-Scale Recommendation System Using Multiple Bipartite Graphs at Pinterest. VLDB 16, 4 (2022)."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib4",
+      "text": "Chen et al . (2021) Tong Chen, Hongzhi Yin, Yujia Zheng, Zi Huang, Yang Wang, and Meng Wang. 2021. Learning elastic embeddings for customizing on-device recommenders. In SIGKDD ."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib55",
+      "text": "Xia et al . (2022) Xin Xia, Hongzhi Yin, Junliang Yu, Qinyong Wang, Guandong Xu, and Quoc Viet Hung Nguyen. 2022. On-Device Next-Item Recommendation with Self-Supervised Knowledge Distillation. In SIGIR ."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib30",
+      "text": "Liang et al . (2023) Xurong Liang, Tong Chen, Quoc Viet Hung Nguyen, Jianxin Li, and Hongzhi Yin. 2023. Learning Compact Compositional Embeddings via Regularized Pruning for Recommendation. In ICDM ."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib36",
+      "text": "Mudigere et al . (2022) Dheevatsa Mudigere et al . 2022. Software-hardware co-design for fast and scalable training of deep learning recommendation models. In Proceedings of the 49th Annual International Symposium on Computer Architecture . 993–1011."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib53",
+      "text": "Weinberger et al . (2009) Kilian Weinberger, Anirban Dasgupta, John Langford, Alex Smola, and Josh Attenberg. 2009. Feature hashing for large scale multitask learning. In ICML ."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib63",
+      "text": "Zhang et al . (2020a) Caojin Zhang, Yicun Liu, Yuanpu Xie, Sofia Ira Ktena, Alykhan Tejani, Akshay Gupta, Pranay Kumar Myana, Deepak Dilipkumar, Suvadip Paul, Ikuhiro Ihara, Prasang Upadhyaya, Ferenc Huszar, and Wenzhe Shi. 2020a. Model Size Reduction Using Frequency Based Double Hashing for Recommender Systems. In RecSys ."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib56",
+      "text": "Yan et al . (2021a) Bencheng Yan, Pengjie Wang, Jinquan Liu, Wei Lin, Kuang-Chih Lee, Jian Xu, and Bo Zheng. 2021a. Binary code based hash embedding for web-scale applications. In CIKM ."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib7",
+      "text": "Das et al . (2007) Abhinandan S Das, Mayur Datar, Ashutosh Garg, and Shyam Rajaram. 2007. Google news personalization: scalable online collaborative filtering. In WWW ."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib9",
+      "text": "Desai et al . (2021) Aditya Desai, Yanzhou Pan, Kuangyuan Sun, Li Chou, and Anshumali Shrivastava. 2021. Semantically constrained memory allocation (scma) for embedding in efficient recommendation systems. arXiv preprint arXiv:2103.06124 (2021)."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib43",
+      "text": "Shi et al . (2020b) Hao-Jun Michael Shi, Dheevatsa Mudigere, Maxim Naumov, and Jiyan Yang. 2020b. Compositional Embeddings Using Complementary Partitions for Memory-Efficient Recommendation Systems. SIGKDD (2020)."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib27",
+      "text": "Li et al . (2021) Yang Li, Tong Chen, Peng-Fei Zhang, and Hongzhi Yin. 2021. Lightweight self-attentive sequential recommendation. In CIKM ."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib28",
+      "text": "Lian et al . (2020a) Defu Lian, Haoyu Wang, Zheng Liu, Jianxun Lian, Enhong Chen, and Xing Xie. 2020a. LightRec: A Memory and Search-Efficient Recommender System. In WWW ."
+    }
+  ]
+}

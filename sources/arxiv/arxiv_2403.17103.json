@@ -1,0 +1,98 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.17103",
+  "title": "Animal Avatars: Reconstructing Animatable 3D Animals from Casual Videos",
+  "authors": "Remy Sabathier, Niloy J. Mitra, David Novotny",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2403.17103",
+  "html_url": "https://arxiv.org/html/2403.17103",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 664,
+  "text": "Building poseable reconstructions of animals captured by consumer imaging devices is a valuable technology with numerous applications in augmented and virtual reality. Among many possible animal species, the reconstruction of canines is of particular interest primarily due to their important role in the lives of their two-legged friends.\n\nWhile it is nowadays possible to reliably reconstruct rigid scenes captured from a moving vantage point [1], the reconstruction of non-rigid shapes is significantly less constrained and, as such, a more challenging problem. Here, many recent works focused on generic animal reconstruction from multi-view (videos) [2,3,4] or single-view 2D image supervision [5] without prior knowledge of the animal shape. While the latter demonstrated impressive progress, the challenging nature of the problem limits the applicability to scenarios with simple deformations and good multi-view test-time coverage.\n\nTo better constrain the non-rigid 3D reconstruction, inspired by state-of-the-art methods for Human 3D reconstruction [6,7], we leverage a known category template. Specifically, we use the SMAL template introduced by Zuffi et al. [8] - a quadruped-equivalent of the seminal SMPL parametric human model [6]. The template has been used to enable single-view 3D dog reconstruction trained on an extensive collection of dog images semi-manually annotated with SMAL poses [9,10,11]. While this approach provides a clear state-of-the-art in monocular 3D dog-shape reconstruction, the inherent ambiguity of single-view reconstruction provides many challenges.\n\nTo further increase our chances of successful reconstruction, besides leveraging the SMAL model, we turn our attention towards reconstructing casual video captures of dogs, which was first explored in [12]. Indeed, videos provide a stronger multi-view supervision which significantly simplifies the 3D shape fitting problem. However, regardless of monocular [9,10] or multi-view conditioning [12], we observed a common failure mode in existing methods when animals are viewed from non-frontal views. This issue arises because fitting relies on sparse joint-reprojection constraints that mainly cover front-facing parts, offering limited supervision for rear and side views.\n\nHence, our first contribution is to replace the sparse keypoint supervision with a denser alternative. Specifically, we exploit Continuous Surface Embeddings [13] (CSE), which annotate each vertex of the CSE dog mesh with a unique descriptor. Furthermore, CSE provides a pre-trained deep image-to-CSE predictor, that labels image pixels with their corresponding CSE descriptor and transitively with the matching mesh vertex. In this work, in an one-time process, we first transform CSE descriptors to the SMAL mesh by means of a semi-manual non-rigid aligment. This then enables a stronger keypoint loss providing reprojection constraints for all points on the animal’s body, even in rear views.\n\nSecondly, we enhance fits by exploiting the inherent smoothness of animal movements over time. Previous attempts incorporated this knowledge by enforcing temporal smoothness on the deformation coefficients of the SMAL template. However, we found this approach flawed because the coefficients have to represent both the smooth animal motion and the camera motion, which is often non-smooth due to the unstable camera operator. Instead, we propose to represent the SMAL deformation as a combination of accurate Structure-from-Motion camera and optimized animal motion, allowing for proper temporal regularization. Importantly, SfM also provides intrinsic parameters of each camera (focal length), which facilitates more accurate shape fitting through loss terms that require rendering.\n\nFinally, we are the first to enable texturing of the SMAL mesh by leveraging it as a scaffold for an implicit duplex-mesh neural radiance field, which can be rendered while accounting for body deformations. Our approach involves defining implicit shape and color functions on a subset of the 3D domain bounded by enlarged and downsized versions of the mesh template. This allows for articulation of the corresponding implicit surface by posing the boundary meshes similarly to the original mesh.\n\nWe evaluate the color and 3D shape-fitting accuracy on the CoP3D dataset [14], containing crowd-sourced “turntable” videos of dogs captured by smartphone cameras, achieving performance superior to template-based [9,10] and template-free [15] baselines. We also compare our pose estimation quality on the recent APTv2 dataset [16] and report results superior compared to video-based methods dog-specific [15].",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib38",
+      "text": "Schönberger, J.L., Frahm, J.M.: Structure-from-Motion Revisited. In: IEEE Conf. Comput. Vis. Pattern Recog. (2016)"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib17",
+      "text": "Kokkinos, F., Kokkinos, I.: Learning monocular 3d reconstruction of articulated categories from motion. In: IEEE Conf. Comput. Vis. Pattern Recog. pp. 1737–1746 (June 2021)"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib48",
+      "text": "Yang, G., Sun, D., Jampani, V., Vlasic, D., Cole, F., Chang, H., Ramanan, D., Freeman, W.T., Liu, C.: LASR: Learning Articulated Shape Reconstruction from a Monocular Video. In: IEEE Conf. Comput. Vis. Pattern Recog. (2021), _eprint: 2105.02976"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib50",
+      "text": "Yang, G., Vo, M., Neverova, N., Ramanan, D., Vedaldi, A., Joo, H.: Banmo: Building animatable 3d neural models from many casual videos. In: IEEE Conf. Comput. Vis. Pattern Recog. (2022)"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib46",
+      "text": "Wu, S., Li, R., Jakab, T., Rupprecht, C., Vedaldi, A.: MagicPony: Learning articulated 3d animals in the wild. In: IEEE Conf. Comput. Vis. Pattern Recog. (2023)"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib24",
+      "text": "Loper, M., Mahmood, N., Romero, J., Pons-Moll, G., and, M.J.B.: SMPL: A skinned multi- person linear model. ACM Trans. Graph. (2015)"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib6",
+      "text": "Dong, Z., Chen, X., Yang, J., Black, M.J., Hilliges, O., Geiger, A.: AG3D: Learning to Generate 3D Avatars from 2D Image Collections. In: Int. Conf. Comput. Vis. (2023)"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib56",
+      "text": "Zuffi, S., Kanazawa, A., Jacobs, D.W., Black, M.J.: 3d menagerie: Modeling the 3d shape and pose of animals. IEEE Conf. Comput. Vis. Pattern Recog. pp. 5524–5532 (2016)"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib36",
+      "text": "Rueegg, N., Zuffi, S., Schindler, K., Black, M.J.: BARC: Learning to regress 3D dog shape from images by exploiting breed information. In: IEEE Conf. Comput. Vis. Pattern Recog. pp. 3876–3884 (2022)"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib37",
+      "text": "Rüegg, N., Tripathi, S., Schindler, K., Black, M.J., Zuffi, S.: BITE: Beyond priors for improved three-D dog pose estimation. In: IEEE Conf. Comput. Vis. Pattern Recog. pp. 8867–8876 (Jun 2023)"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib7",
+      "text": "Ehsani, K., Bagherinezhad, H., Redmon, J., Mottaghi, R., Farhadi, A.: Who let the dogs out? modeling dog behavior from visual data. IEEE Conf. Comput. Vis. Pattern Recog. pp. 4051–4060 (2018)"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib2",
+      "text": "Biggs, B., Roddick, T., Fitzgibbon, A., Cipolla, R.: Creatures great and smal: Recovering the shape and motion of animals from video. In: Asian Conf. Comput. Vis. pp. 3–19. Springer (2018)"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib28",
+      "text": "Neverova, N., Novotný, D., Vedaldi, A.: Continuous Surface Embeddings. In: Adv. Neural Inform. Process. Syst. (2020)"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib39",
+      "text": "Sinha, S., Shapovalov, R., Reizenstein, J., Rocco, I., Neverova, N., Vedaldi, A., Novotny, D.: Common pets in 3d: Dynamic new-view synthesis of real-life deformable categories. IEEE Conf. Comput. Vis. Pattern Recog. (2023)"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib51",
+      "text": "Yang, G., Wang, C., Reddy, N.D., Ramanan, D.: Reconstructing animatable categories from videos. In: IEEE Conf. Comput. Vis. Pattern Recog. (2023)"
+    },
+    {
+      "n": 16,
+      "id": "bib.bib52",
+      "text": "Yang, Y., Deng, Y., Xu, Y., Zhang, J.: Aptv2: Benchmarking animal pose estimation and tracking with a large-scale dataset and beyond (2023)"
+    }
+  ]
+}

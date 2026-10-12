@@ -1,0 +1,103 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2212.08251",
+  "title": "Task-Adaptive Saliency Guidance for Exemplar-free Class Incremental Learning",
+  "authors": "Xialei Liu, Jiang-Tian Zhai, Andrew D. Bagdanov, Ke Li, Ming-Ming Cheng",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2212.08251",
+  "html_url": "https://arxiv.org/html/2212.08251",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 766,
+  "text": "Deep neural networks achieve state-of-the-art performance on many computer vision tasks. However, most of these tasks consider a static world in which tasks are well-defined, stationary, and all training data is available in a single training session. The real world consists of dynamically changing environments and data distributions, which – especially given the computational burden of training large CNNs – has led to renewed interest in learning new tasks incrementally while avoiding catastrophic forgetting [1,2].\n\nClass Incremental Learning (CIL) [3,4] is a scenario that considers the possibility of adding new classes to already-trained models. Most CIL methods rely on a memory buffer to store exemplars from past tasks [5,6,7,8]. In this paper, we consider Exemplar-Free Class Incremental Learning (EFCIL), which is a more challenging setting in which no data from previous tasks is retained. This is a realistic scenario and of great interest due to privacy concerns or restrictions on the long-term storage of data. The inability to retain examples from past tasks, however, significantly exacerbates the problem of catastrophic forgetting.\n\nThere are several recent works that consider the EFCIL problem. DeepInversion [9] inverts trained networks from random noise to generate images as exemplars and mixes them with current task samples for training. SDC [10] updates prototypes of each learned class by hypothesizing that semantic drift of classes from previous tasks can be approximated and estimated using new data. Other previous works propose representation learning methods for overcoming catastrophic forgetting [11,12]. As pointed out in IL2A [11], learning better representations can reduce representation bias when transferred to new tasks. Incorporating self-supervised learning tasks, such as Barlow Twins [13] and rotation prediction [12], has also been proposed to achieve more stable representations and alleviate forgetting.\n\nCNNs naturally learn to attend to features that are discriminative for the tasks they are trained to solve. Catastrophic forgetting also occurs in EFCIL due to the model’s attention to salient features drifting to features specific to the new task. Standard regularization approaches do little to prevent this saliency drift when learning new tasks. One direct method of regularizing saliency is to apply distillation on saliency maps of old samples [14]. However, this is complicated by the inability to save samples from previous tasks in the EFCIL setting. Another method is to apply saliency distillation between current task samples and previous task attention [15]. This method however suffers from the semantic gap between current and old classes when enforcing saliency consistency.\n\nA lack of saliency regularization may lead to attention drifting toward the background in future tasks causing forgetting. Besides, simply applying distillation on attention [15] fails to offer plasticity and is susceptible to attention forgetting, which is a crucial factor of knowledge forgetting. In comparison, our Task-Adaptive Saliency Supervision (TASS) approach aims at keeping saliency focused on incrementally learned tasks (for more details, see Section 4), while maintaining its plasticity and stability. It improves many previous EFCIL methods with higher performance by supervising their attention, as shown in Figure 1.\n\nSpecifically, TASS integrates three components to address this issue. Firstly, we apply dilated boundary maps to prevent saliency drift across object boundaries at intermediate layers. Since saliency drift typically occurs across tasks, encouraging the model to focus on significant foreground regions through dilated boundary supervision reduces the likelihood of saliency shifting toward the background, allowing the model to adaptively select attention areas within the foreground that are relevant to the task. Secondly, to simultaneously enhance the stability of the model’s attention across tasks, we add a task-agnostic low-level auxiliary supervision task to the class-incremental framework, which is closely related to our core EFCIL task since image classification has been shown to help models localize the most salient areas within an image. Finally, we propose a module to inject saliency noise into certain feature channels and train the network to denoise them, helping the network further resist attention drift across tasks.\n\nThe main contributions of this work are: (i) We provide new insight into task-adaptive saliency supervision under EFCIL settings; we also show the negative effect of methods with no or trivial saliency supervision, which illustrates the superiority of our method and motivates the need for saliency drift mitigation in EFCIL. (ii) We propose the Task-Adaptive Saliency Supervision (TASS) with three components that combine to mitigate the saliency drift problem. (iii) We show that TASS can be easily integrated into other state-of-the-art methods, such as MUC [16], IL2A [11], PASS [12], SSRE [17], leading to significant performance gains. (iv) Our experiments demonstrate that TASS outperforms all existing EFCIL methods and even several exemplar-based methods on the CIFAR-100, Tiny-ImageNet, and ImageNet-Subset EFCIL benchmarks.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib14",
+      "text": "Ian J Goodfellow, Mehdi Mirza, Da Xiao, Aaron Courville, and Yoshua Bengio. An empirical investigation of catastrophic forgetting in gradient-based neural networks. arXiv preprint arXiv:1312.6211 , 2013."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib37",
+      "text": "Michael McCloskey and Neal J Cohen. Catastrophic interference in connectionist networks: The sequential learning problem. In Psychology of learning and motivation , pages 109–165. Elsevier, 1989."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib1",
+      "text": "Eden Belouadah, Adrian Popescu, and Ioannis Kanellos. A comprehensive study of class incremental learning algorithms for visual tasks. Neural Networks , 135:38–54, 2021."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib36",
+      "text": "Marc Masana, Xialei Liu, Bartłomiej Twardowski, Mikel Menta, Andrew D Bagdanov, and Joost van de Weijer. Class-incremental learning: survey and performance evaluation on image classification. IEEE TPAMI , 2022."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib2",
+      "text": "Francisco M Castro, Manuel J Marín-Jiménez, Nicolás Guil, Cordelia Schmid, and Karteek Alahari. End-to-end incremental learning. In ECCV , 2018."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib10",
+      "text": "Arthur Douillard, Matthieu Cord, Charles Ollion, Thomas Robert, and Eduardo Valle. Podnet: Pooled outputs distillation for small-tasks incremental learning. In ECCV , 2020."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib40",
+      "text": "Sylvestre-Alvise Rebuffi, Alexander Kolesnikov, Georg Sperl, and Christoph H Lampert. icarl: Incremental classifier and representation learning. In CVPR , 2017."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib45",
+      "text": "Yue Wu, Yinpeng Chen, Lijuan Wang, Yuancheng Ye, Zicheng Liu, Yandong Guo, and Yun Fu. Large scale incremental learning. In CVPR , 2019."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib50",
+      "text": "Hongxu Yin, Pavlo Molchanov, Jose M Alvarez, Zhizhong Li, Arun Mallya, Derek Hoiem, Niraj K Jha, and Jan Kautz. Dreaming to distill: Data-free knowledge transfer via deepinversion. In CVPR , 2020."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib51",
+      "text": "Lu Yu, Bartlomiej Twardowski, Xialei Liu, Luis Herranz, Kai Wang, Yongmei Cheng, Shangling Jui, and Joost van de Weijer. Semantic drift compensation for class-incremental learning. In CVPR , 2020."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib56",
+      "text": "Fei Zhu, Zhen Cheng, Xu-yao Zhang, and Cheng-lin Liu. Class-incremental learning via dual augmentation. NeurIPS , 2021a."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib57",
+      "text": "Fei Zhu, Xu-Yao Zhang, Chuang Wang, Fei Yin, and Cheng-Lin Liu. Prototype augmentation and self-supervision for incremental learning. In CVPR , 2021b."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib39",
+      "text": "Quang Pham, Chenghao Liu, and Steven Hoi. Dualnet: Continual learning, fast and slow. NeurIPS , 2021."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib11",
+      "text": "Sayna Ebrahimi, Suzanne Petryk, Akash Gokul, William Gan, Joseph E. Gonzalez, Marcus Rohrbach, and trevor darrell. Remembering for the right reasons: Explanations reduce catastrophic forgetting. In ICLR , 2021."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib9",
+      "text": "Prithviraj Dhar, Rajat Vikram Singh, Kuan-Chuan Peng, Ziyan Wu, and Rama Chellappa. Learning without memorizing. In CVPR , 2019."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib31",
+      "text": "Yu Liu, Sarah Parisot, Gregory Slabaugh, Xu Jia, Ales Leonardis, and Tinne Tuytelaars. More classifiers, less forgetting: A generic multi-classifier paradigm for incremental learning. In ECCV . Springer, 2020b."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib58",
+      "text": "Kai Zhu, Wei Zhai, Yang Cao, Jiebo Luo, and Zheng-Jun Zha. Self-sustaining representation expansion for non-exemplar class-incremental learning. In CVPR , 2022."
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "source_type": "encyclopedia_article",
+  "source_id": "enwiki:Automatic vectorization#rev1344433529",
+  "title": "Automatic vectorization",
+  "authors": "Wikipedia contributors",
+  "year": "2026",
+  "url": "https://en.wikipedia.org/w/index.php?title=Automatic_vectorization&oldid=1344433529",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Techniques",
+  "word_count": 723,
+  "text": "An example would be a program to multiply two vectors of numeric data. A scalar approach would be something like:\n\nThis could be vectorized to look something like:\n\nHere, c[i:i+3] represents the four array elements from c[i] to c[i+3] and the vector processor can perform four operations for a single vector instruction. Since the four vector operations complete in roughly the same time as one scalar instruction, the vector approach can run up to four times faster than the original code.\n\nThere are two distinct compiler approaches: one based on the conventional vectorization technique and the other based on loop unrolling.\n\n### Loop-level automatic vectorization\n\nThis technique, used for conventional vector machines, tries to find and exploit SIMD parallelism at the loop level. It consists of two major steps as follows.\n\nFind an innermost loop that can be vectorized\n\nTransform the loop and generate vector codes\n\nIn the first step, the compiler looks for obstacles that can prevent vectorization. A major obstacle for vectorization is true data dependency shorter than the vector length. Other obstacles include function calls and short iteration counts.\n\nOnce the loop is determined to be vectorizable, the loop is stripmined by the vector length and each scalar instruction within the loop body is replaced with the corresponding vector instruction. Below, the component transformations for this step are shown using the above example.\n\nAfter stripmining\n\nAfter loop distribution using temporary arrays\n\nAfter replacing with vector codes\n\n### Basic block level automatic vectorization\n\nThis relatively new technique specifically targets modern SIMD architectures with short vector lengths.[1] Although loops can be unrolled to increase the amount of SIMD parallelism in basic blocks, this technique exploits SIMD parallelism within basic blocks rather than loops. The two major steps are as follows.\n\nThe innermost loop is unrolled by a factor of the vector length to form a large loop body.\n\nIsomorphic scalar instructions (that perform the same operation) are packed into a vector instruction if dependencies do not prevent doing so.\n\nTo show step-by-step transformations for this approach, the same example is used again.\n\nAfter loop unrolling (by the vector length, assumed to be 4 in this case)\n\nAfter packing\n\nAfter code generation\n\nHere, sA1, sB1, ... represent scalar variables and vA, vB, and vC represent vector variables.\n\nMost automatically vectorizing commercial compilers use the conventional loop-level approach except the IBM XL Compiler,[2] which uses both.\n\n### In the presence of control flow\n\nThe presence of if-statements in the loop body requires the execution of instructions in all control paths to merge the multiple values of a variable. One general approach is to go through a sequence of code transformations: predication → vectorization(using one of the above methods) → remove vector predicates → remove scalar predicates.[3] If the following code is used as an example to show these transformations;\n\nAfter predication\n\nwhere (P) denotes a predicate guarding the statement.\n\nAfter vectorization\n\nAfter removing vector predicates\n\nAfter removing scalar predicates\n\n### Reducing vectorization overhead in the presence of control flow\n\nHaving to execute the instructions in all control paths in vector code has been one of the major factors that slow down the vector code with respect to the scalar baseline. The more complex the control flow becomes and the more instructions are bypassed in the scalar code, the larger the vectorization overhead becomes. To reduce this vectorization overhead, vector branches can be inserted to bypass vector instructions similar to the way scalar branches bypass scalar instructions.[4] Below, AltiVec predicates are used to show how this can be achieved.\n\nScalar baseline (original code)\n\nAfter vectorization in the presence of control flow\n\nAfter inserting vector branches\n\nThere are two things to note in the final code with vector branches; First, the predicate defining instruction for vPA is also included within the body of the outer vector branch by using vec_any_gt. Second, the profitability of the inner vector branch for vPB depends on the conditional probability of vPB having false values in all fields given vPA has false values in all fields.\n\nConsider an example where the outer branch in the scalar baseline is always taken, bypassing most instructions in the loop body. The intermediate case above, without vector branches, executes all vector instructions. The final code, with vector branches, executes both the comparison and the branch in vector mode, potentially gaining performance over the scalar baseline.",
+  "references": [
+    {
+      "n": 1,
+      "text": "Larsen, S.. (2000). Exploiting superword level parallelism with multimedia instruction sets. ACM SIGPLAN Notices. doi:10.1145/358438.349320"
+    },
+    {
+      "n": 2,
+      "text": "(June 2004). Code Optimization with IBM XL Compilers. http://www.ess.uci.edu/esmf/ibm_compiler_docs/xl_optimization.pdf"
+    },
+    {
+      "n": 3,
+      "text": "Shin, J.. (2005). Proceedings of the international symposium on Code generation and optimization. doi:10.1109/CGO.2005.33"
+    },
+    {
+      "n": 4,
+      "text": "Shin, J.. (2007). Proceedings of the 16th International Conference on Parallel Architecture and Compilation Techniques. doi:10.1109/PACT.2007.41"
+    }
+  ]
+}

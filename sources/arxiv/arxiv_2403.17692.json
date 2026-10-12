@@ -1,0 +1,72 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.17692",
+  "title": "Manifold-Guided Lyapunov Control with Diffusion Models",
+  "authors": "Amartya Mukherjee, Thanin Quartz, Jun Liu",
+  "year": "2024",
+  "categories": [
+    "cs.CV",
+    "cs.LG",
+    "math.DG",
+    "math.OC",
+    "stat.CO"
+  ],
+  "url": "https://arxiv.org/abs/2403.17692",
+  "html_url": "https://arxiv.org/html/2403.17692",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "INTRODUCTION",
+  "word_count": 808,
+  "text": "One of the longstanding challenges in nonlinear systems and control is the construction of Lyapunov functions. While Lyapunov functions can essentially be characterized by solutions to partial differential equations (PDEs) and neural network solutions to such PDEs can effectively provide Lyapunov functions [1], solving PDEs for each system can still be time-consuming. Another challenge in computing neural Lyapunov functions is the inclusion of a satisfiability modulo theories (SMT) solver for counterexample-guided training. Verifying that a neural network satisfies all the conditions necessary to be a Lyapunov function is often computationally expensive and significantly increases the training time of such methods. Additionally, the neural Lyapunov function only aids in the verification of a single control system, thus failing to take into account possible uncertainties in the model parameters or the ability to generalize into systems with slightly different dynamics. This could pose difficulties when testing the controller in real-life systems.\n\nGenerative models, such as diffusion models [2,3], map inputs from a noisy space to the data space. In more recent works, diffusion models have learned to transform noisy inputs or boundary conditions into solutions for PDEs, including the Poisson equation and the Navier-Stokes equation, without incorporating any information about the PDEs into their loss function [4,5]. Furthermore, denoising diffusion restoration models (DDRMs) [6,7] can restore clean data in linear inverse problems using a pre-trained diffusion model, eliminating the need for fine-tuning.\n\nIn this paper, we investigate the potential of using pre-trained generative diffusion models to generate Lyapunov functions and stabilizing controllers for nonlinear systems. More specifically, we aim to train a diffusion model, G, that generates pairs of asymptotically stable vector fields and their corresponding Lyapunov functions. This simplifies the control problem to finding a controller such that the closed-loop system possesses a Lyapunov-stable vector field, indicating it falls within the range of G. The Lyapunov function produced by G further assists in verifying stability for the control problem. This approach offers several advantages over existing learning-based methods for Lyapunov functions (e.g., [8,9]): (a) it can significantly reduce the computational effort required to identify a stabilizing controller, (b) it has the capability to generalize to control problems not encountered in the training data, and (c) it can offer stability guarantees with the generated Lyapunov functions.\n\nWe propose M anifold G uided L yapunov C ontrol (MGLC), a novel approach to feedback control problems based on diffusion models. We assume that the stabilized controlled system is drawn from a manifold \\mathcal{M} that contains asymptotically stable dynamical systems. We also introduce a manifold \\mathcal{W} that contains all possible configurations of the dynamical system with different control functions. This simplifies the control problem to finding points where \\mathcal{M} and \\mathcal{W} intersect. We train a diffusion model with pairs of asymptotically stable vector fields and their Lyapunov functions to estimate \\mathcal{M} and incorporate the control design process into the reverse diffusion process. At every time step, we estimate the projection of our vector field into \\mathcal{M} by computing Tweedie’s estimate, and we update the parameters of the controller to minimize a loss function that reduces the distance between our vector field between the two vector fields.\n\nOur proposed solution to this problem significantly reduces the computational cost of finding a Lyapunov function. Rather than training a neural network for a specific system, often facilitated by an SMT solver for generating counterexamples [10], we use a pre-trained diffusion model to directly output a Lyapunov function that verifies the convergence of our system. As a result, this approach will be useful for solving a large class of control problems rather than a single control problem, thus facilitating zero-shot control, where we achieve stabilization of unseen systems. We introduce theoretical guarantees that our reverse diffusion sampling method will converge to the manifold \\mathcal{M}, thus concluding that we have derived a stabilizing controller. We train the generator on a dataset of pairs of asymptotically stable vector fields and their Lyapunov functions. Finally, we test our method on four control problems whose dynamics are not in the dataset and are therefore unseen.\n\n## Notation\n\nDenote X as the discretization of the domain into a grid and f(X,u(X)) as the vector field f projected onto the grid X with controller u(\\cdot). We use \\psi=(\\psi_{1},...,\\psi_{n}) to refer to the learnable parameters for a controller u^{(\\psi)}(\\cdot), where n is the number of learnable parameters. Subsequently, \\psi_{t} are the parameters of the control system at time step t in the denoising diffusion process. Therefore, x_{t}:=f(X,u^{(\\psi_{t})}(X)) denotes the projection of the vector field f(\\cdot,u^{(\\psi_{t})}(\\cdot)) on the gridpoints X at time step t in the denoising diffusion process, where the parameters of the controller are \\psi_{t}. Lastly, x_{0|t}:=E[x_{0}|x_{t}] refers to the estimate of the asymptotically stable vector field x_{0} conditioned on the vector field at time step t, x_{t}. This estimate is computed using Tweedie’s formula, which we will formally define in Section 2.2.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib12",
+      "text": "Jun Liu, Yiming Meng, Maxwell Fitzsimmons, and Ruikun Zhou. Physics-informed neural network lyapunov functions: Pde characterization, learning, and verification. arXiv preprint arXiv:2312.09131 , 2023."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib8",
+      "text": "Jonathan Ho, Ajay Jain, and Pieter Abbeel. Denoising diffusion probabilistic models. Advances in neural information processing systems , 33:6840–6851, 2020."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib20",
+      "text": "Yang Song, Jascha Sohl-Dickstein, Diederik P Kingma, Abhishek Kumar, Stefano Ermon, and Ben Poole. Score-based generative modeling through stochastic differential equations. arXiv preprint arXiv:2011.13456 , 2020."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib2",
+      "text": "Rucha Apte, Sheel Nidhan, Rishikesh Ranade, and Jay Pathak. Diffusion model based data generation for partial differential equations. ICML workshop on Synergy of Scientific and Machine Learning Modeling , 2023."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib15",
+      "text": "Oded Ovadia, Eli Turkel, Adar Kahana, and George Em Karniadakis. Ditto: Diffusion-inspired temporal transformer operator. arXiv preprint arXiv:2307.09072 , 2023."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib10",
+      "text": "Bahjat Kawar, Michael Elad, Stefano Ermon, and Jiaming Song. Denoising diffusion restoration models. In Advances in Neural Information Processing Systems , 2022."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib14",
+      "text": "Naoki Murata, Koichi Saito, Chieh-Hsin Lai, Yuhta Takida, Toshimitsu Uesaka, Yuki Mitsufuji, and Stefano Ermon. GibbsDDRM: A partially collapsed gibbs sampler for solving blind inverse problems with denoising diffusion restoration. In International Conference on Machine Learning , 2023."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib3",
+      "text": "Ya-Chien Chang, Nima Roohi, and Sicun Gao. Neural lyapunov control. Advances in neural information processing systems , 32, 2019."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib23",
+      "text": "Ruikun Zhou, Thanin Quartz, Hans De Sterck, and Jun Liu. Neural lyapunov control of unknown nonlinear systems with stability guarantees. Advances in Neural Information Processing Systems , 35:29113–29125, 2022."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib1",
+      "text": "Daniele Ahmed, Andrea Peruffo, and Alessandro Abate. Automated and sound synthesis of lyapunov functions with smt solvers. In Proc. of TACAS , pages 97–114. Springer, 2020."
+    }
+  ]
+}

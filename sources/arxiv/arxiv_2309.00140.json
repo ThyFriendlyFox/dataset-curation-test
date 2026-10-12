@@ -1,0 +1,121 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2309.00140",
+  "title": "Improving vision-inspired keyword spotting using dynamic module skipping in streaming conformer encoder",
+  "authors": "Alexandre Bittar, Paul Dixon, Mohammad Samragh, Kumari Nishu, Devang Naik",
+  "year": "2023",
+  "categories": [
+    "cs.SD",
+    "cs.CV",
+    "cs.LG",
+    "eess.AS"
+  ],
+  "url": "https://arxiv.org/abs/2309.00140",
+  "html_url": "https://arxiv.org/html/2309.00140",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 609,
+  "text": "Recent advances in deep learning have given rise to numerous end-to-end automatic speech recognition (ASR) models [1,2,3,4,5,6,7,8] typically trained with encoder-decoder architectures on vast amounts of data. Although capable of approaching human-like ASR performance, such models usually involve substantial memory and power requirements to be stored or to process long audio streams of data directly on portable devices. More efficient approaches using smaller models with limited vocabulary can alternatively be used to solve the simpler task of accurately spotting a set of selected keywords or key-phrases in streaming audio. Such detections can then trigger additional processing from larger ASR-like models, so that the heavy computations only happen on desired audio portions. This paper focuses on improving both the performance and the efficiency of keyword spotting (KWS) models by borrowing techniques from ASR and computer vision.\n\nSimilarities between keyword spotting and object localization have already led to a variety of vision-inspired KWS approaches [9,10,11,12]. Indeed, an audio segment can be treated as a 1D-image making computer vision methods applicable. The task of object localization is typically solved using bounding boxes [13,14,15]. Precisely localizing keywords can be crucial both for privacy and efficiency considerations, as the ASR model should only be triggered by the lighter KWS model when desired. The base framework for this paper is that of recent work by Samragh et al. [12]. From the encoded speech representations of a fully convolutional BC-ResNet [16] backbone, their KWS model yields three types of keyword predictions, namely detection, classification and localization. Using the same general pipeline, we focus on improving the encoder by taking inspiration from ASR models while retaining streaming and low-memory constraints.\n\nThe conformer [17] architecture, which combines convolution and attention based modules, constitutes a state-of-the-art choice of model for ASR. On top of its proven representational capabilities for speech, the conformer also uses residual connections in a way that allows the inclusion of gates to dynamically skip modules. Recent work by Peng et al. [18] has shown that binary gates can be added inside a Transformer-based ASR architecture to dynamically adjust the network’s depth and reduce the average number of computations while retaining the same word error-rate. We extend their input-dependent dynamic depth (I3D) method to the conformer by placing local gates to skip feedforward, convolution and attention modules based on characteristics of the input to the module itself. Skipping modules still requires the full model to be loaded and does not noticeably impact the user-perceived latency, nevertheless, it improves the efficiency and can lead to considerable power savings.\n\nIn this paper, we replace the BC-ResNet encoder used in the vision-inspired KWS framework of [12] with an I3D-gated conformer that can process streaming audio. Considering the following goals, we aim to:\n\n- 1. Improve keyword detection and localization while reducing the memory footprint using the conformer.\n\n- 2. Minimize computations and lower the power consumption at inference using the I3D method.\n\nWe apply this method to (i) Librispeech [19] top-1000 most frequent words, and to (ii) the Google speech commands (GSC) [20] with added background noise. The former represents the task of detecting occurrences of specific words in continuous speech and is used to assess the encoder’s detection and localization capabilities. The latter simulates an audio stream of background noise over which short speech commands are placed in isolation. This allows us to showcase the efficiency benefits of using I3D gates as we expect the model to be able to skip even more processing on non-speech audio regions. Our experiments show that the proposed gating mechanism can skip on average 30%, 42%, and 97% of the encoder modules when processing continuous speech, isolated keywords and background noise respectively.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bibx1",
+      "text": "Alec Radford et al. “Robust speech recognition via large-scale weak supervision” In International Conference on Machine Learning , 2023, pp. 28492–28518 PMLR"
+    },
+    {
+      "n": 2,
+      "id": "bib.bibx2",
+      "text": "Yu Zhang et al. “Google USM: Scaling automatic speech recognition beyond 100 languages” In arXiv preprint , 2023 arXiv: 2303.01037"
+    },
+    {
+      "n": 3,
+      "id": "bib.bibx3",
+      "text": "Yu Zhang et al. “Bigssl: Exploring the frontier of large-scale semi-supervised learning for automatic speech recognition” In IEEE Journal of Selected Topics in Signal Processing 16.6 IEEE, 2022, pp. 1519–1532"
+    },
+    {
+      "n": 4,
+      "id": "bib.bibx4",
+      "text": "Qiantong Xu et al. “Self-training and pre-training are complementary for speech recognition” In International Conference on Acoustics, Speech and Signal Processing (ICASSP) , 2021, pp. 3030–3034 IEEE"
+    },
+    {
+      "n": 5,
+      "id": "bib.bibx5",
+      "text": "Yu-An Chung et al. “W2v-bert: Combining contrastive learning and masked language modeling for self-supervised speech pre-training” In Automatic Speech Recognition and Understanding Workshop (ASRU) , 2021, pp. 244–250 IEEE"
+    },
+    {
+      "n": 6,
+      "id": "bib.bibx6",
+      "text": "William Chan et al. “SpeechStew: Simply mix all available speech recognition data to train one large neural network” In arXiv preprint , 2021 arXiv: 2104.02133"
+    },
+    {
+      "n": 7,
+      "id": "bib.bibx7",
+      "text": "Bo Li et al. “Scaling end-to-end models for large-scale multilingual asr” In Automatic Speech Recognition and Understanding Workshop (ASRU) , 2021, pp. 1011–1018 IEEE"
+    },
+    {
+      "n": 8,
+      "id": "bib.bibx8",
+      "text": "Yu Zhang et al. “Pushing the limits of semi-supervised learning for automatic speech recognition” In arXiv preprint , 2020 arXiv: 2010.10504"
+    },
+    {
+      "n": 9,
+      "id": "bib.bibx9",
+      "text": "Yael Segal, Tzeviya Fuchs and Joseph Keshet “SpeechYOLO: Detection and Localization of Speech Objects” In Interspeech , 2019, pp. 4210–4214 DOI: 10.21437/Interspeech.2019-1749"
+    },
+    {
+      "n": 10,
+      "id": "bib.bibx10",
+      "text": "Bo Wei et al. “End-to-End Transformer-Based Open-Vocabulary Keyword Spotting with Location-Guided Local Attention.” In Interspeech , 2021, pp. 361–365 DOI: 10.21437/Interspeech.2021-1335"
+    },
+    {
+      "n": 11,
+      "id": "bib.bibx11",
+      "text": "Zhiyuan Zhao, Chuanxin Tang, Chengdong Yao and Chong Luo “An anchor-free detector for continuous speech keyword spotting” In arXiv preprint , 2022 arXiv: 2208.04622"
+    },
+    {
+      "n": 12,
+      "id": "bib.bibx12",
+      "text": "Mohammad Samragh et al. “I see what you hear: a vision-inspired method to localize words” In International Conference on Acoustics, Speech and Signal Processing (ICASSP) , 2023, pp. 1–5 IEEE"
+    },
+    {
+      "n": 13,
+      "id": "bib.bibx13",
+      "text": "Wei Liu et al. “Ssd: Single shot multibox detector” In Computer Vision–ECCV 2016: 14th European Conference, Amsterdam, The Netherlands, October 11–14, 2016, Proceedings, Part I 14 , 2016, pp. 21–37 Springer"
+    },
+    {
+      "n": 14,
+      "id": "bib.bibx14",
+      "text": "Joseph Redmon and Ali Farhadi “YOLOv3: An incremental improvement” In arXiv preprint , 2018 arXiv: 1804.02767"
+    },
+    {
+      "n": 15,
+      "id": "bib.bibx15",
+      "text": "Xingyi Zhou, Dequan Wang and Philipp Krähenbühl “Objects as points” In arXiv preprint , 2019 arXiv: 1904.07850"
+    },
+    {
+      "n": 16,
+      "id": "bib.bibx16",
+      "text": "Byeonggeun Kim, Simyung Chang, Jinkyu Lee and Dooyong Sung “Broadcasted residual learning for efficient keyword spotting” In arXiv preprint , 2021 arXiv: 2106.04140"
+    },
+    {
+      "n": 17,
+      "id": "bib.bibx17",
+      "text": "Anmol Gulati et al. “Conformer: Convolution-augmented Transformer for Speech Recognition” In Interspeech , 2020, pp. 5036–5040 DOI: 10.21437/Interspeech.2020-3015"
+    },
+    {
+      "n": 18,
+      "id": "bib.bibx18",
+      "text": "Yifan Peng, Jaesong Lee and Shinji Watanabe “I3D: Transformer architectures with input-dependent dynamic depth for speech recognition” In International Conference on Acoustics, Speech and Signal Processing (ICASSP) , 2023, pp. 1–5 IEEE"
+    },
+    {
+      "n": 19,
+      "id": "bib.bibx19",
+      "text": "Vassil Panayotov, Guoguo Chen, Daniel Povey and Sanjeev Khudanpur “Librispeech: an ASR corpus based on public domain audio books” In International conference on acoustics, speech and signal processing (ICASSP) , 2015, pp. 5206–5210 IEEE DOI: 10.1109/ICASSP.2015.7178964"
+    },
+    {
+      "n": 20,
+      "id": "bib.bibx20",
+      "text": "Pete Warden “Speech commands: A dataset for limited-vocabulary speech recognition” In arXiv preprint , 2018 arXiv: 1804.03209"
+    }
+  ]
+}

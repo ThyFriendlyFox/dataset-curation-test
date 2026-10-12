@@ -1,0 +1,113 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2312.03459",
+  "title": "F3-Pruning: A Training-Free and Generalized Pruning Strategy towards Faster and Finer Text-to-Video Synthesis",
+  "authors": "Sitong Su, Jianzhi Liu, Lianli Gao, Jingkuan Song",
+  "year": "2023",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2312.03459",
+  "html_url": "https://arxiv.org/html/2312.03459",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introductions",
+  "word_count": 774,
+  "text": "Text-to-Video (T2V) synthesis aims to generate high-quality and temporally coherent videos semantically aligned with text inputs. In the early stage of T2V, traditional generative models like GAN [1] are trained on datasets of limited scale. Hence, the synthesized videos are restricted by limited semantics and low quality [2,3]. To tackle this challenge, recent T2V models utilize large and powerful generative models transformer or diffusion models to train on large-scale datasets [4,5]. Alternately, other recent T2V models [6,7,8] build upon large-scale T2I models [9,10,11] by introducing temporal information, which are also based on transformers or diffusion models. Despite extraordinary progress in video quality and zero-shot generalization ability, inferring such large models incurs huge costs.\n\nNevertheless, previous inference acceleration methods for transformer or diffusion models either incorporate costly retraining or cannot be generally applied to both two models. Specifically, for transformers-based models, several works are dedicated towards a more efficient transformer [12,13,14]. Whereas, these works focus on discriminative tasks without considering synthesis quality. Other works like [15,16,17] prune weights or tokens with costly retraining or finetuning. Differently, ToMe merges tokens without training, which however introduces time-consuming manipulation in inference. For diffusion-based models, traditional diffusion acceleration speeds up the denoising process [18], which is limited by the trade-off between video quality and efficiency. Other methods like knowledge distillation [7] or diffusion model pruning [19] also incorporate extra training costs. All of the above works are specially designed for one specific model, thus hampering their applicability to different T2V models.\n\nTo address the issue, instead of retraining we investigate the inference process of a classic transformer-based model CogVideo [6] and a typical diffusion-based model Tune-A-Video [8] to search for the common points. Regardless of model types, the above two models both establish attention between text to each frame, within frames and cross frames to respectively model text-visual alignment, visual quality and temporal coherence as shown in Fig. 2 (a). We respectively name these three modules as Cross-modal Attention(CA), Self Attention(SA) and Temporal Attention(TA). Note that, CA, SA and TA are widely adopted in recent T2V models.\n\nTherefore, we statistically analyze the attention values distribution of the three modules during the inference process as shown in Fig. 3. At the bottom of Fig. 3, there are attention maps visualization respectively for CogVideo and Tune-A-Video. The diagonal line of the map refers to SA while the other parts represent TA. As observed, TA is full of values approaching zero, which indicates there exist plenty of non-contributory and redundant parts getting involved in temporal modeling. The redundancy can also be verified by visual results in the first row of Fig. 1 that the motion of the lion is restricted. Moreover, the histograms in Fig. 3 demonstrate the relationship between summed attention values called Aggregate Attention Score(AAS) and network layers or denoising timesteps. As shown, the AAS of TA keeps declining while that of CA or SA increases with the generation process goes. It implies that the importance of generation is gradually transferred from temporal information to visual quality and text-visual alignment. And TA plays a less important role in the late stage of generation. In summary, in the inference stage of both transformers and diffusion models, there exists redundancy in temporal attention modules.\n\nInspired by the above observation, we propose a training-free and generalized pruning strategy called F 3 -Pruning to prune redundant and less important temporal attention weights as shown in Fig. 2 (b). Instead of designing intrinsic pruning criteria, we claim that attention values could reasonably represent the saliency of corresponding attention weights. Besides, considering the sparsity of TA values, TA values are aggregated into Aggregate Attention Scores (AAS) as pruning criteria rather than complicated comparisons. As demonstrated in Fig. 2 (b), our F 3 -Pruning is applied over network layers or denoising timesteps with the pruning criteria to cut off TA weights whose AAS are ranked below a specific ratio. With F 3 -Pruning, redundant TA is released and redistributed to SA or CA to further promote video quality and text-visual alignment with coherence.\n\nOur contributions could be summarized as follows:\n\n1) We explore the inference process of two mainstream T2V models using transformer and diffusion, which reveals the redundancy of temporal attention in both models.\n\n2) We propose a training-free and generalized pruning strategy called F 3 -Pruning to prune redundant temporal attention weights, which both speeds up T2V inference and assures video quality.\n\n3) Extensive experiments on three datasets prove the effectiveness, efficacy and generalization of F 3 -Pruning. Particularly, F 3 -Pruning applied to CogVideo on UCF-101 dataset not only speeds up CogVideo by 1.35x but also significantly improves video quality metric FVD by 22%.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib10",
+      "text": "Goodfellow et al. (2014) Goodfellow, I. J.; Pouget-Abadie, J.; Mirza, M.; Xu, B.; Warde-Farley, D.; Ozair, S.; Courville, A. C.; and Bengio, Y. 2014. Generative Adversarial Networks. CoRR ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib18",
+      "text": "Li et al. (2018) Li, Y.; Min, M. R.; Shen, D.; Carlson, D. E.; and Carin, L. 2018. Video Generation From Text. In AAAI , 7065–7072."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib27",
+      "text": "Pan et al. (2017) Pan, Y.; Qiu, Z.; Yao, T.; Li, H.; and Mei, T. 2017. To Create What You Tell: Generating Videos from Captions. In ACM MM , 1789–1798."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib13",
+      "text": "Ho et al. (2022b) Ho, J.; Salimans, T.; Gritsenko, A. A.; Chan, W.; Norouzi, M.; and Fleet, D. J. 2022b. Video Diffusion Models. In NeurIPS ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib42",
+      "text": "Wu et al. (2022a) Wu, C.; Liang, J.; Ji, L.; Yang, F.; Fang, Y.; Jiang, D.; and Duan, N. 2022a. NÜWA: Visual Synthesis Pre-training for Neural visUal World creAtion. In ECCV , 720–736."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib14",
+      "text": "Hong et al. (2023) Hong, W.; Ding, M.; Zheng, W.; Liu, X.; and Tang, J. 2023. CogVideo: Large-scale Pretraining for Text-to-Video Generation via Transformers. In ICLR ."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib12",
+      "text": "Ho et al. (2022a) Ho, J.; Chan, W.; Saharia, C.; Whang, J.; Gao, R.; Gritsenko, A. A.; Kingma, D. P.; Poole, B.; Norouzi, M.; Fleet, D. J.; and Salimans, T. 2022a. Imagen Video: High Definition Video Generation with Diffusion Models. CoRR , abs/2210.02303."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib43",
+      "text": "Wu et al. (2022b) Wu, J. Z.; Ge, Y.; Wang, X.; Lei, W.; Gu, Y.; Hsu, W.; Shan, Y.; Qie, X.; and Shou, M. Z. 2022b. Tune-A-Video: One-Shot Tuning of Image Diffusion Models for Text-to-Video Generation. CoRR , abs/2212.11565."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib3",
+      "text": "Ding et al. (2021) Ding, M.; Yang, Z.; Hong, W.; Zheng, W.; Zhou, C.; Yin, D.; Lin, J.; Zou, X.; Shao, Z.; Yang, H.; and Tang, J. 2021. CogView: Mastering Text-to-Image Generation via Transformers. In NeurIPS ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib34",
+      "text": "Saharia et al. (2022a) Saharia, C.; Chan, W.; Saxena, S.; Li, L.; Whang, J.; Denton, E. L.; Ghasemipour, K.; Gontijo Lopes, R.; Karagol Ayan, B.; Salimans, T.; et al. 2022a. Photorealistic text-to-image diffusion models with deep language understanding. NeurIPS , 35: 36479–36494."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib32",
+      "text": "Rombach et al. (2022a) Rombach, R.; Blattmann, A.; Lorenz, D.; Esser, P.; and Ommer, B. 2022a. High-resolution image synthesis with latent diffusion models. In CVPR ."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib7",
+      "text": "Dosovitskiy et al. (2020) Dosovitskiy, A.; Beyer, L.; Kolesnikov, A.; Weissenborn, D.; Zhai, X.; Unterthiner, T.; Dehghani, M.; Minderer, M.; Heigold, G.; Gelly, S.; et al. 2020. An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale. In ICLR ."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib24",
+      "text": "Mehta and Rastegari (2021) Mehta, S.; and Rastegari, M. 2021. MobileViT: Light-weight, General-purpose, and Mobile-friendly Vision Transformer. In ICLR ."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib25",
+      "text": "Meng et al. (2022) Meng, L.; Li, H.; Chen, B.-C.; Lan, S.; Wu, Z.; Jiang, Y.-G.; and Lim, S.-N. 2022. Adavit: Adaptive vision transformers for efficient image recognition. In CVPR , 12309–12318."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib23",
+      "text": "Mao et al. (2021) Mao, J.; Xue, Y.; Niu, M.; Bai, H.; Feng, J.; Liang, X.; Xu, H.; and Xu, C. 2021. Voxel Transformer for 3D Object Detection. In ICCV , 3144–3153."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib41",
+      "text": "Wei et al. (2023) Wei, S.; Ye, T.; Zhang, S.; Tang, Y.; and Liang, J. 2023. Joint Token Pruning and Squeezing Towards More Aggressive Compression of Vision Transformers. CVPR ."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib31",
+      "text": "Rao et al. (2021) Rao, Y.; Zhao, W.; Liu, B.; Lu, J.; Zhou, J.; and Hsieh, C. 2021. DynamicViT: Efficient Vision Transformers with Dynamic Token Sparsification. In NeurIPS , 13937–13949."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib22",
+      "text": "Lu et al. (2022) Lu, C.; Zhou, Y.; Bao, F.; Chen, J.; Li, C.; and Zhu, J. 2022. Dpm-solver: A fast ode solver for diffusion probabilistic model sampling in around 10 steps. NeurIPS ."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib8",
+      "text": "Fang, Ma, and Wang (2023) Fang, G.; Ma, X.; and Wang, X. 2023. Structural Pruning for Diffusion Models. CoRR , abs/2305.10924."
+    }
+  ]
+}

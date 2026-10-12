@@ -1,0 +1,88 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2312.07330",
+  "title": "Learned representation-guided diffusion models for large-image generation",
+  "authors": "Alexandros Graikos, Srikar Yellapragada, Minh-Quan Le, Saarthak Kapse, Prateek Prasanna, Joel Saltz, Dimitris Samaras",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2312.07330",
+  "html_url": "https://arxiv.org/html/2312.07330",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 815,
+  "text": "Diffusion models produce high-quality and diverse samples across a spectrum of generative tasks [1,2]. This leap forward has been enabled by the simultaneous curation of large-scale multi-modal datasets [3] and the development of efficient conditioning mechanisms [4,5]. The key to unlocking the models’ capabilities is to integrate auxiliary information during training and inference [6,1,7].\n\nLarge-scale human-annotated datasets are mostly limited to image-caption pairs, collected from easily accessible online repositories and labeled by non-expert annotators. However, in domains such as digital histopathology and remote sensing, where gigapixel scale images provide vast amounts of unlabeled data, annotation proves challenging. Moreover, the process requires expert knowledge and is more difficult at a finer scale, i.e., captioning large crops of the gigapixel image is simpler than captioning smaller patches. Based on our estimates (see supplemental), annotating the entire TCGA-BRCA dataset with captions would take \\approx 40,000 hours of pathologist’s time. Replicating the impressive results of diffusion models in these domains has been limited by the scarcity of fine-grained per-image conditioning, vital for high-quality image synthesis [8].\n\nModern-day self-supervised learning (SSL) representations [9] encode rich semantic and visual information. Features from trained self-supervised models serve as compact image representations and are widely used to perform discriminative downstream tasks successfully [10,11,12], proving that these compressed representations indeed encode useful semantic information about the images. We hypothesize that such SSL representations are already expressive enough to act as proxies to fine-grained human labels. If this is true, these representations should be able to condition the training of effective diffusion models in these domains. In this novel approach, we utilize self-supervised feature extractors as image annotators; these features provide necessary per-image conditioning signals at the highest resolutions, required for diffusion model training.\n\nOur experiments show that conditioning with expressive self-supervised features leads to precise control over the image content. The SSL features are adept at identifying complex patterns and structures in the images, while the diffusion model learns to translate them into visual components accurately (Fig. 3). This motivates us to perform large-image synthesis by locally controlling the appearance using SSL conditioning and dictating the global structure through the spatial arrangement of the conditions.\n\nOur approach synthesizes large images in a patch-based manner, using a single image diffusion model at the highest resolution. We represent a large image as a grid of SSL embeddings, where each serves as a representation of a large image neighborhood. The whole image is then synthesized by generating consistent patches that capture both the local properties, as given by the local patch conditioning, and the spatial arrangement of the conditioning features. If we change this spatial arrangement, we are, in fact, editing how semantic elements are arranged globally in the large image. This strategy enables the controllable generation of images of virtually any size without significantly increased computation compared to the base patch-level model.\n\nTo generate a large image, our approach requires the patch diffusion model and the spatially-arranged conditioning. We can start with a reference large image as source and extract SSL embeddings from non-overlapping segments, enabling our method to synthesize a variation of the original image (Fig. 1).\n\nUtilizing SSL embeddings as conditions allows us to have the necessary control over image generation, at the expense of an explainable and easy-to-use conditioning mechanism. Nevertheless, we argue that since generating images from learned embeddings is agnostic to the embedding source, there are simple ways to combine control over generated images with explainability. We propose training auxiliary models to transform higher-level conditioning signals, such as text captions, to the learned patch representations. To demonstrate this versatility, we introduce text-to-large-image synthesis by training an auxiliary model to sample a spatial arrangement of embeddings from a text description.\n\nWe train patch-level diffusion models using self-supervised features as conditioning on digital histopathology (TCGA [13]) and satellite image (NAIP [14]) datasets. We perform extensive evaluations and demonstrate the advantages of SSL conditioning and our large-image generation framework on synthesis and classification tasks. Our model achieves exceptional patch-level and large-image quality, the ability to improve classifiers through data augmentation even when synthesizing out-of-distribution data, and effective fusion of diffusion and SSL features for downstream applications. Finally, we are the first to perform text-to-large image synthesis, which should be of significant community interest as vision-language models (VLMs) for pathology and satellite images gain traction.\n\nIn summary, our contributions are as follows:\n\n- • We develop a novel method to train diffusion models with self-supervised learning features as conditioning and generate high-quality images in the histopathology and satellite image domains.\n\n- • We present a framework for large-image synthesis, based on self-supervised guided diffusion, that maintains contextual integrity and image realism over large areas.\n\n- • We demonstrate the applicability of our model in various classification tasks and showcase its unique ability to augment out-of-distribution datasets.\n\n- • We introduce text-to-large image generation for digital histopathology and satellite images, highlighting the versatility of our approach.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib8",
+      "text": "Prafulla Dhariwal and Alexander Nichol. Diffusion models beat gans on image synthesis. Advances in neural information processing systems , 34:8780–8794, 2021."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib24",
+      "text": "Haohe Liu, Zehua Chen, Yi Yuan, Xinhao Mei, Xubo Liu, Danilo Mandic, Wenwu Wang, and Mark D Plumbley. Audioldm: Text-to-audio generation with latent diffusion models. arXiv preprint arXiv:2301.12503 , 2023."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib41",
+      "text": "Christoph Schuhmann, Romain Beaumont, Richard Vencu, Cade Gordon, Ross Wightman, Mehdi Cherti, Theo Coombes, Aarush Katta, Clayton Mullis, Mitchell Wortsman, et al. Laion-5b: An open large-scale dataset for training next generation image-text models. Advances in Neural Information Processing Systems , 35:25278–25294, 2022."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib36",
+      "text": "Aditya Ramesh, Prafulla Dhariwal, Alex Nichol, Casey Chu, and Mark Chen. Hierarchical text-conditional image generation with clip latents. arXiv preprint arXiv:2204.06125 , 1(2):3, 2022."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib38",
+      "text": "Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, and Björn Ommer. High-resolution image synthesis with latent diffusion models. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 10684–10695, 2022."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib29",
+      "text": "Alexander Quinn Nichol and Prafulla Dhariwal. Improved denoising diffusion probabilistic models. In International Conference on Machine Learning , pages 8162–8171. PMLR, 2021."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib15",
+      "text": "Jonathan Ho and Tim Salimans. Classifier-free diffusion guidance. arXiv preprint arXiv:2207.12598 , 2022."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib30",
+      "text": "Alexander Quinn Nichol, Prafulla Dhariwal, Aditya Ramesh, Pranav Shyam, Pamela Mishkin, Bob Mcgrew, Ilya Sutskever, and Mark Chen. Glide: Towards photorealistic image generation and editing with text-guided diffusion models. In International Conference on Machine Learning , pages 16784–16804. PMLR, 2022."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib5",
+      "text": "Mathilde Caron, Hugo Touvron, Ishan Misra, Hervé Jégou, Julien Mairal, Piotr Bojanowski, and Armand Joulin. Emerging properties in self-supervised vision transformers. In Proceedings of the IEEE/CVF international conference on computer vision , pages 9650–9660, 2021."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib6",
+      "text": "Richard J Chen, Chengkuan Chen, Yicong Li, Tiffany Y Chen, Andrew D Trister, Rahul G Krishnan, and Faisal Mahmood. Scaling vision transformers to gigapixel images via hierarchical self-supervised learning. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 16144–16155, 2022."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib46",
+      "text": "Xiyue Wang, Sen Yang, Jun Zhang, Minghui Wang, Jing Zhang, Wei Yang, Junzhou Huang, and Xiao Han. Transformer-based unsupervised contrastive learning for histopathological image classification. Medical image analysis , 81:102559, 2022."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib11",
+      "text": "Alexandre Filiot, Ridouane Ghermi, Antoine Olivier, Paul Jacob, Lucas Fidon, Alice Mac Kain, Charlie Saillard, and Jean-Baptiste Schiratti. Scaling self-supervised learning for histopathology with masked image modeling. medRxiv , pages 2023–07, 2023."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib4",
+      "text": "JN Cancer Genome Atlas Research Network et al. The cancer genome atlas pan-cancer analysis project. Nat. Genet , 45(10):1113–1120, 2013."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib44",
+      "text": "USGS. National agriculture imagery program (NAIP), 2023. https://www.usgs.gov/centers/eros/science/usgs-eros-archive-aerial-photography-national-agriculture-imagery-program-naip ."
+    }
+  ]
+}
