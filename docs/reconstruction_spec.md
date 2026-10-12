@@ -36,6 +36,24 @@ so the two variants are always aligned.
 6. Reference lists in steps 6–7: a line `References:` followed by `[n] <reference text>` lines, copied
    verbatim from the source's `references`.
 
+## Conventions learned in the trial
+
+* **Citations used as nouns** ("[9] showed…", "Chapter 4 of [3]"): uncited drafts say "prior work showed…",
+  "another source" — never invent author names. Step 5 puts `[citation needed]` in that same spot.
+* **Quotations** (`> ` lines, inline quotes): early outlines may use a placeholder such as
+  `[quote: Hilbert's statement of problem 10]`; from the rough draft on, paste them verbatim.
+* **Formulas / TeX / code** are kept exactly as in the source once they appear. `\{0,...,m-1\}`,
+  `T[1.\,.i]` or `a[0]` are not citations.
+* **Page locators** after markers (": 2", ": 264") appear only in the revised draft.
+* **Source artifacts** (odd spacing, a duplicated date) are kept in the final; drafts may write them plainly.
+* Step 3 (`partial_draft`) may reuse the first half of step 4 verbatim; the second half stays as bullets.
+
+## Checking
+
+Run `python3 scripts/validate_reconstruction.py sources/reconstructed/<name>.json` and fix every
+failure before finishing. It checks step names, marker placement, `[citation needed]` counts,
+verbatim references, and numbers that do not occur in the final.
+
 ## Output format
 
 One JSON file per row at `sources/reconstructed/<source file name>`:

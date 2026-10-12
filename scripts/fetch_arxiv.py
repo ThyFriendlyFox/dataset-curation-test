@@ -19,10 +19,18 @@ def clean(s):
 def main(aid, sec_re="introduction"):
     oai = requests.get("https://oaipmh.arxiv.org/oai", headers=UA, timeout=60, params={
         "verb": "GetRecord", "identifier": f"oai:arXiv.org:{aid}", "metadataPrefix": "arXiv"}).text
-    meta = BeautifulSoup(oai, "xml").find("arXiv")
+    try:
+        row = extract(aid, BeautifulSoup(oai, "xml").find("arXiv"), sec_re)
+    except ValueError as e:
+        sys.exit(str(e))
+    json.dump(row, sys.stdout, indent=2, ensure_ascii=False)
+
+
+def extract(aid, meta, sec_re="introduction"):
+    """Build the source row for one paper from its OAI-PMH arXiv metadata element; ValueError if unusable."""
     lic = meta.license.text if meta.license else ""
     if not ALLOWED.search(lic):
-        sys.exit(f"{aid}: license not CC BY/BY-SA/CC0: {lic!r}")
+        raise ValueError(f"{aid}: license not CC BY/BY-SA/CC0: {lic!r}")
     html = None
     for url in (f"https://arxiv.org/html/{aid}", f"https://ar5iv.labs.arxiv.org/html/{aid}"):
         r = requests.get(url, headers=UA, timeout=60)
@@ -30,12 +38,12 @@ def main(aid, sec_re="introduction"):
             html, src_url = r.text, url
             break
     if html is None:
-        sys.exit(f"{aid}: no HTML rendering available")
+        raise ValueError(f"{aid}: no HTML rendering available")
     soup = BeautifulSoup(html, "lxml")
     sec = next((s for s in soup.select("section.ltx_section")
-                if re.search(sec_re, s.find(re.compile("^h[1-6]$")).get_text(), re.I)), None)
+                if s.find(re.compile("^h[1-6]$")) and re.search(sec_re, s.find(re.compile("^h[1-6]$")).get_text(), re.I)), None)
     if sec is None:
-        sys.exit(f"{aid}: no section matching {sec_re!r}")
+        raise ValueError(f"{aid}: no section matching {sec_re!r}")
     bib = {li["id"]: clean(li.get_text(" ")) for li in soup.select("li.ltx_bibitem")}
     num = {}
     # Replace each citation group with [n,...] markers keyed by first appearance.
@@ -63,14 +71,14 @@ def main(aid, sec_re="introduction"):
     refs = [{"n": n, "id": b, "text": re.sub(r"^\[?\d+\]?\s*", "", bib.get(b, "")) or None}
             for b, n in sorted(num.items(), key=lambda kv: kv[1])]
     authors = [clean(f"{a.forenames.text if a.forenames else ''} {a.keyname.text}") for a in meta.find_all("author")]
-    json.dump({
+    return {
         "source_type": "research_paper", "source_id": f"arXiv:{aid}",
         "title": clean(meta.title.text), "authors": ", ".join(authors),
         "year": meta.created.text[:4], "categories": meta.categories.text.split(),
         "url": f"https://arxiv.org/abs/{aid}", "html_url": src_url, "license": lic,
         "section": clean(sec.find(re.compile("^h[1-6]$")).get_text(" ")),
         "word_count": len(text.split()), "text": text, "references": refs,
-    }, sys.stdout, indent=2, ensure_ascii=False)
+    }
 
 
 if __name__ == "__main__":

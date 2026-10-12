@@ -10,7 +10,11 @@ import mwparserfromhell as mwp
 CITE_FIELDS = ("author", "last", "last1", "first", "first1", "title", "journal", "work", "website",
                "publisher", "date", "year", "volume", "issue", "pages", "doi", "url", "isbn")
 DROP_SECTIONS = re.compile(r"^(see also|references|notes|footnotes|further reading|external links|bibliography|sources|citations)$", re.I)
-KEEP_INLINE = {"lang", "nowrap", "math", "mvar", "var", "code", "tt", "abbr", "small", "sic"}
+# Templates whose visible text must survive (others — infoboxes, navboxes, maintenance tags — are dropped)
+FIRST_PARAM = {"nowrap", "nobr", "math", "mvar", "var", "code", "tt", "abbr", "small", "sic", "mono", "kbd", "samp",
+               "em", "strong", "smallcaps", "visible anchor", "bigmath", "val", "not a typo", "proper name", "tmath"}
+LAST_PARAM = {"lang"}
+QUOTE = {"quote", "blockquote", "cquote", "quotation", "quote box", "block quote"}
 
 
 def _format_cite(code):
@@ -75,8 +79,21 @@ def convert(wikitext):
     for t in code.filter_templates(recursive=False):
         name = str(t.name).strip().lower()
         try:
-            if name in KEEP_INLINE and t.params:
-                code.replace(t, str(t.params[-1].value))
+            pos = [p for p in t.params if not p.showkey]
+            named = {str(p.name).strip(): str(p.value).strip() for p in t.params if p.showkey}
+            if name in QUOTE:
+                text = named.get("text") or named.get("quote") or (str(pos[0].value).strip() if pos else "")
+                who = named.get("author") or named.get("sign") or (str(pos[1].value).strip() if len(pos) > 1 else "")
+                code.replace(t, "\n\n" + "".join("⟦Q⟧ " + l for l in text.split("\n") if l.strip())
+                             + (f" — {who}" if who else "") + "\n\n")
+            elif name in FIRST_PARAM and pos:
+                code.replace(t, str(pos[0].value))
+            elif name in LAST_PARAM and pos:
+                code.replace(t, str(pos[-1].value))
+            elif name == "convert" and len(pos) >= 2:
+                code.replace(t, f"{pos[0].value} {pos[1].value}")
+            elif name == "frac" and pos:
+                code.replace(t, "/".join(str(p.value) for p in pos))
             else:
                 code.remove(t)
         except ValueError:
@@ -88,7 +105,7 @@ def convert(wikitext):
                 code.remove(link)
         except ValueError:
             pass
-    text = code.strip_code(normalize=True, collapse=True).replace("⟦H2⟧", "##").replace("⟦H3⟧", "###")
+    text = code.strip_code(normalize=True, collapse=True).replace("⟦H2⟧", "##").replace("⟦H3⟧", "###").replace("⟦Q⟧", ">")
     text = re.sub(r"\{\|.*?\|\}", "", text, flags=re.S)  # leftover tables
     blocks, skip = [], False
     for line in text.split("\n"):
