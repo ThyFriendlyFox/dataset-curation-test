@@ -1,0 +1,69 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2310.08056",
+  "title": "Learning from Label Proportions: Bootstrapping Supervised Learners via Belief Propagation",
+  "authors": "Shreyas Havaldar, Navodita Sharma, Shubhi Sareen, Karthikeyan Shanmugam, Aravindan Raghuveer",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.AI"
+  ],
+  "url": "https://arxiv.org/abs/2310.08056",
+  "html_url": "https://arxiv.org/html/2310.08056",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 906,
+  "text": "Learning from Label Proportions (henceforth LLP) has seen renewed interest in recent times due to the rising concerns of privacy and leakage of sensitive information [1,2,3,4,5,6]. In the LLP binary classification setting, all the training instances are aggregated into bags and only the aggregated label count for a bag is available, i.e. proportion of 1 ’s in a bag. Features of all instances are available. This can be seen as a form of weak supervision compared to providing instance-level labels. The main goal is learn an instance wise predictor that performs very well on the test distribution.\n\nThere are two sources of information that can help in predicting the instance wise label on the training set. One is the bag level label proportions that are provided. The other source of information is indirect and comes from the fact that any smooth true classifier would likely assign similar labels to instances with similar covariates or feature vectors. Covariate information of instances belonging to the bags are explicitly given. Some of the current methods [5,1] propose to fit the average soft scores over a bag, predicted by a deep neural network (DNN) classifier, to the given bag label proportion. There is another class of approaches that seek to train a classifier on instance level loss obtained using some form of pseudo labeling [7,3].\n\nOur work builds on the idea of forming pseudo labels per instance. Our key observation is that one could utilize two types of information: bag level constraints and covariate similarity information in an explicit way. To realize this, we take inspiration from coding theory for communication systems [8,9], where one of the fundamental problems is to decode an unknown message string sent by the encoder using only parity checks over groups of bits from the message. Parity checks provide redundancy that battles against noise/corruptions in the channel. The state of the art codes [8] are decoded using Belief Propagation [10] on a factor graph where message bits are variable nodes (whose \"label\" is to be learnt) and parity checks form factor nodes (that constrain the sum of bits in the parity checks to be odd or even). Sum-product belief propagation is used to learn the marginal soft score on the each of the message bits.\n\nMotivated by the above connection, we propose a novel iterative algorithm that has two stages: We use an existing embedding to learn pseudo-labels and then use the learnt pseudo labels to refine embeddings and we iterate this procedure with new embeddings. Our central approach is described in Figure 1. We outline our contributions in detail below:\n\n1) We draw a parallel between the LLP problem and the parity recovery problem for pseudo labeling. The labels of instances are bits of the message and parity checks are the bag level counts (more general than just parity). We adapt this analogy naturally to form a Gibbs distribution that enforces the bag constraints. To obtain further redundancy, we exploit covariate information, where, for every pair of instances that are in the K -nearest neighborhood of each other, we force their binary labels to be similar, i.e. another \" parity constraint \" is added to the Gibbs distribution. As can be seen in a cartoon depiction in step 1 of Fig. 1, the nearest neighbors induce similar labels (colors). Then, we do a sum product Belief Propagation (BP) to obtain marginal pseudo labels. To the best of our knowledge, ours is the first work at making this connection between the information theoretic approach of recovering messages from parity and the LLP problem.\n\n2) Our novelty in the second stage is to utilize thresholded soft pseudo labels to provide full supervision to learn a new embedding. However, we observe that after marginalization thresholded soft labels may violate bag constraints. Therefore, we use a novel Deep Neural Network architecture that has an 1) instance head giving rise to an instance level loss involving the thresholded soft pseudo label and 2) bag level head formed by pooling the penultimate layers’s representations of instances within a bag giving rise to a loss between bag proportions and predicted bag level proportion. We call the final loss as Aggregate Embedding loss. This loss is used to train the penultimate layer embedding.\n\n3) We iterate the above two steps by using the embedding obtained in the previous step as features. We show that our iterative two stage algorithm, finally produces instance level predictions that outperform a number of LLP baselines including DLLP [1] by wide margins. Improvements obtained are upto 15% on standard UCI classification datasets. We outperform the baselines by upto \\textbf{0.8}\\% on a large, challenging Criteo dataset and upto 7% on image datasets. Our methods mostly outperform most baselines in the large bag regime (upto 15% gains for bag size \\geq 512) where supervision is very weak. It is worth noting that on bag size of 2048 there are only a maximum of ~ 20 bags on the datasets and yet our method does not display significant degradation in performance. Our ablations show that remarkably 1 -NN achieves most of the gains relative to using k -NNs in the pseudo labeling step (Section A.1.1). We find that reducing percentage of KNN constraints (to 50\\%) registers a significant drop in test metrics underscoring the importance of ’parity checks’ from covariate nearness (Section 6.2) We provide many other ablations that validate different components of our approach (Section 6 and Section A.1).",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib3",
+      "text": "Ardehaly & Culotta (2017) Ehsan Mohammady Ardehaly and Aron Culotta. Co-training for demographic classification using deep learning from label proportions. In 2017 IEEE International Conference on Data Mining Workshops (ICDMW) , pp. 1017–1024. IEEE, 2017."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib5",
+      "text": "Busa-Fekete et al. (2023) Robert Istvan Busa-Fekete, Heejin Choi, Travis Dick, Claudio Gentile, et al. Easy learning from label proportions. arXiv preprint arXiv:2302.03115 , 2023."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib47",
+      "text": "Zhang et al. (2022) Jianxin Zhang, Yutong Wang, and Clayton Scott. Learning from label proportions by learning with label noise. Advances in Neural Information Processing Systems , 35:26933–26942, 2022."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib17",
+      "text": "Kobayashi et al. (2022) Ryoma Kobayashi, Yusuke Mukuta, and Tatsuya Harada. Risk consistent multi-class learning from label proportions. arXiv preprint arXiv:2203.12836 , 2022."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib45",
+      "text": "Yu et al. (2014) Felix X. Yu, Krzysztof Choromanski, Sanjiv Kumar, Tony Jebara, and Shih-Fu Chang. On learning from label proportions. arXiv preprint arXiv:1402.5902 , 2014."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "Chen et al. (2023) Lin Chen, Thomas Fu, Amin Karbasi, and Vahab Mirrokni. Learning from aggregated data: Curated bags versus random bags. arXiv preprint arXiv:2305.09557 , 2023."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib22",
+      "text": "Liu et al. (2021) Jiabin Liu, Bo Wang, Xin Shen, Zhiquan Qi, and Yingjie Tian. Two-stage training for learning from label proportions. arXiv preprint arXiv:2105.10635 , 2021."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib23",
+      "text": "MacKay (2003) David JC MacKay. Information theory, inference and learning algorithms . Cambridge university press, 2003."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib20",
+      "text": "Kschischang et al. (2001) Frank R Kschischang, Brendan J Frey, and H-A Loeliger. Factor graphs and the sum-product algorithm. IEEE Transactions on information theory , 47(2):498–519, 2001."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib30",
+      "text": "Pearl (1988) Judea Pearl. Probabilistic reasoning in intelligent systems: networks of plausible inference . Morgan kaufmann, 1988."
+    }
+  ]
+}

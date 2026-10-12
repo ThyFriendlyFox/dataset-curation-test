@@ -1,0 +1,104 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2310.17918",
+  "title": "Knowing What LLMs DO NOT Know: A Simple Yet Effective Self-Detection Method",
+  "authors": "Yukun Zhao, Lingyong Yan, Weiwei Sun, Guoliang Xing, Chong Meng, Shuaiqiang Wang, Zhicong Cheng, Zhaochun Ren, Dawei Yin",
+  "year": "2024",
+  "categories": [
+    "cs.CL",
+    "cs.AI"
+  ],
+  "url": "https://arxiv.org/abs/2310.17918",
+  "html_url": "https://arxiv.org/html/2310.17918",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 603,
+  "text": "With the significant improvements in large language models (LLMs) such as PaLM [1], ChatGPT [2], GPT-4 [3], LLAMA 2 [4], and Vicuna [5], LLMs have been applied in various natural language tasks. Unfortunately, LLMs still produce unexpected falsehoods [6,7], i.e., they are unaware of what they do not know and generate responses indiscriminately. For example, ChatGPT generates falsehoods for a knowledge quiz and math problem, as shown in Table 1. These intermittent errors can severely hinder the LLMs’ reliability in practice, which makes detecting what they do not know an important research problem [8,9,10].\n\nThere are two main paradigms to detect non-factuality: the calibration-based and the self-detection methods. The first class of methods calibrates the model confidence to better detect falsehoods of the generations (See Figure 1 (a)). Among them, [11] train auxiliary calibrators, [9] and [12] improve the calibration through fine-tuning the language model. We propose a self-detection method that does not require further fine-tuning.\n\nThe self-detection methods directly leverage the LLMs themselves to detect whether they hallucinate (See Figure 1 (b)). For example, [10] prompt the LLMs to predict the confidence score on whether their responses are true, and [13] directly utilizes the token probabilities of the generations as the confidence score; [14] and [15] detect the falsehoods by sampling answers with a high temperature and examining self-consistency between them. However, the performance of these works is limited as LLMs tend to be overconfident about their own outputs and these work would be less effective after the models are trained more aligned [3,2,16].\n\nIn this paper, we consider detecting non-factuality as that a model does not know which knowledge is related to the question or does not understand the queried question, outputting the non-factual response. A model is expected to provide correct and consistent answers regardless of the ways the questions are verbalized. Therefore, if it responds drastically differently to the different verbalizations, we consider the model does not know the question.\n\nBuilt on the above hypothesis, we propose a novel self-detection method that includes 1) examining the divergence of the LLM’s behaviors on different verbalized questions and 2) examining whether the verbalization of the question is typical in the LLM as shown in Figure 2. Specifically, for the first component, we first diversify the queried question to several semantically equivalent verbalizations. Then, we examine the divergence between the answers corresponding to the questions. For the second component, we use the negative log-likelihood of the verbalized question as the indicator of atypicality in the language model. Concurrent work [17] has also mentioned rephrasing the original question to alternatives and checking the consistency of the answers with the original answer. In contrast, we further propose to examine the representativeness of the input for the model and examine the divergence in the answer distribution. Our self-detection method is applicable for continually upgrading LLMs.\n\nTo verify the effectiveness of our method, we conducted extensive experiments on GPT-4, ChatGPT, Vicuna, and Llama 2 across three types of tasks: factoid question answering, commonsense reasoning, and arithmetic reasoning tasks. The experimental results demonstrate the superior performance of our self-detection method.\n\nIn summary, our contributions are as follows:\n\n- • We show existing LLMs intermittently retain the verbalization-sensitive problem, generating drastically contradicting responses to the questions with the same semantics but verbalized differently.\n\n- • We introduce a self-detection suit that relies solely on an LLM itself, enabling a light detection of whether an LLM is unknown for a question.\n\n- • We prob what an LLM knows and does not know and show a correlation between the unknown to the popularity, the reasoning steps, and the formulations.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib8",
+      "text": "Chowdhery et al. (2022) Aakanksha Chowdhery, Sharan Narang, Jacob Devlin, Maarten Bosma, Gaurav Mishra, Adam Roberts, Paul Barham, Hyung Won Chung, Charles Sutton, Sebastian Gehrmann, et al. 2022. Palm: Scaling language modeling with pathways. arXiv preprint arXiv:2204.02311 ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib36",
+      "text": "Ouyang et al. (2022) Long Ouyang, Jeffrey Wu, Xu Jiang, Diogo Almeida, Carroll Wainwright, Pamela Mishkin, Chong Zhang, Sandhini Agarwal, Katarina Slama, Alex Ray, et al. 2022. Training language models to follow instructions with human feedback. In NeurIPS , pages 27730–27744."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib34",
+      "text": "OpenAI (2023) OpenAI. 2023. Gpt-4 technical report. ArXiv , abs/2303.08774."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib50",
+      "text": "Touvron et al. (2023) Hugo Touvron, Louis Martin, Kevin Stone, Peter Albert, Amjad Almahairi, Yasmine Babaei, Nikolay Bashlykov, Soumya Batra, Prajjwal Bhargava, Shruti Bhosale, et al. 2023. Llama 2: Open foundation and fine-tuned chat models. arXiv preprint arXiv:2307.09288 ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib7",
+      "text": "Chiang et al. (2023) Wei-Lin Chiang, Zhuohan Li, Zi Lin, Ying Sheng, Zhanghao Wu, Hao Zhang, Lianmin Zheng, Siyuan Zhuang, Yonghao Zhuang, Joseph E. Gonzalez, Ion Stoica, and Eric P. Xing. 2023. Vicuna: An open-source chatbot impressing gpt-4 with 90%* chatgpt quality ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib4",
+      "text": "Bang et al. (2023) Yejin Bang, Samuel Cahyawijaya, Nayeon Lee, Wenliang Dai, Dan Su, Bryan Wilie, Holy Lovenia, Ziwei Ji, Tiezheng Yu, Willy Chung, et al. 2023. A multitask, multilingual, multimodal evaluation of chatgpt on reasoning, hallucination, and interactivity. arXiv preprint arXiv:2302.04023 ."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib27",
+      "text": "Li et al. (2023) Junyi Li, Xiaoxue Cheng, Wayne Xin Zhao, Jian-Yun Nie, and Ji-Rong Wen. 2023. Halueval: A large-scale hallucination evaluation benchmark for large language models. In EMNLP , pages 6449–6464."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib16",
+      "text": "Hendrycks et al. (2021) Dan Hendrycks, Nicholas Carlini, John Schulman, and Jacob Steinhardt. 2021. Unsolved problems in ml safety. arXiv preprint arXiv:2109.13916 ."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib28",
+      "text": "Lin et al. (2022) Stephanie Lin, Jacob Hilton, and Owain Evans. 2022. Teaching models to express their uncertainty in words. TMLR ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib22",
+      "text": "Kadavath et al. (2022) Saurav Kadavath, Tom Conerly, Amanda Askell, Tom Henighan, Dawn Drain, Ethan Perez, Nicholas Schiefer, Zac Hatfield Dodds, Nova DasSarma, Eli Tran-Johnson, et al. 2022. Language models (mostly) know what they know. arXiv preprint arXiv:2207.05221 ."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib32",
+      "text": "Mielke et al. (2022) Sabrina J Mielke, Arthur Szlam, Emily Dinan, and Y-Lan Boureau. 2022. Reducing conversational agents’ overconfidence through linguistic calibration. TACL , 10:857–872."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib21",
+      "text": "Jiang et al. (2021) Zhengbao Jiang, Jun Araki, Haibo Ding, and Graham Neubig. 2021. How can we know when language models know? on the calibration of language models for question answering. TACL , 9:962–977."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib47",
+      "text": "Si et al. (2023) Chenglei Si, Zhe Gan, Zhengyuan Yang, Shuohang Wang, Jianfeng Wang, Jordan Boyd-Graber, and Lijuan Wang. 2023. Prompting gpt-3 to be reliable. In ICLR ."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib51",
+      "text": "Wang et al. (2023) Xuezhi Wang, Jason Wei, Dale Schuurmans, Quoc Le, Ed Chi, and Denny Zhou. 2023. Self-consistency improves chain of thought reasoning in language models. In ICLR ."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib31",
+      "text": "Manakul et al. (2023) Potsawee Manakul, Adian Liusie, and Mark JF Gales. 2023. Selfcheckgpt: Zero-resource black-box hallucination detection for generative large language models. In EMNLP , pages 9004–9017."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib57",
+      "text": "Zhao et al. (2023) Yao Zhao, Misha Khalman, Rishabh Joshi, Shashi Narayan, Mohammad Saleh, and Peter J Liu. 2023. Calibrating sequence likelihood improves conditional language generation. In ICLR ."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib56",
+      "text": "Zhang et al. (2023) Jiaxin Zhang, Zhuohang Li, Kamalika Das, Bradley A Malin, and Sricharan Kumar. 2023. Sac3: Reliable hallucination detection in black-box language models via semantic-aware cross-check consistency. arXiv preprint arXiv:2311.01740 ."
+    }
+  ]
+}

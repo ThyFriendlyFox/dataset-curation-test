@@ -1,0 +1,124 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.15123",
+  "title": "Quantification using Permutation-Invariant Networks based on Histograms",
+  "authors": "Olaya PÃ©rez-Mon, Alejandro Moreo, Juan JosÃ© del Coz, Pablo GonzÃ¡lez",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "stat.ML"
+  ],
+  "url": "https://arxiv.org/abs/2403.15123",
+  "html_url": "https://arxiv.org/html/2403.15123",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1037,
+  "text": "In many real-world applications [1,2,3,4,5,6], predicting the class of each individual example in a dataset is of little concern, since the real interest lies in the aggregate level, i.e., in estimating the prevalence of the classes in a bag of examples. Quantification, also known as class prevalence estimation, is the supervised learning task that tackles this particular problem [7]. Quantification has already proven useful in a wide variety of fields, providing answers to questions as for example: what is the percentage of positive, neutral, and negative reviews for a specific product of a given company? [5] or what is the percentage of plankton organisms belonging to each of the phytoplankton species in this water sample? [3].\n\nThis learning problem can be formalized as follows. Let \\mathcal{Y}=\\{c_{j}\\}_{j=1}^{l} be the classes of interest, the goal is to learn a quantifier: q:\\mathbb{N}^{\\mathcal{X}}\\rightarrow\\Delta^{l-1}, i.e., a functional q\\in\\mathcal{Q} that, given a test bag B=\\{\\mathbf{x}_{i}\\}_{i=1}^{m} in which \\mathbf{x}_{i}\\in\\mathcal{X} is a vector of features representing a data example, returns a vector of class prevalence estimations q(B)\\in\\Delta^{l-1}, where \\Delta^{l-1}=\\{(p_{1},\\ldots,p_{l})\\mid p_{j}\\in[0,1],\\sum_{j=1}^{l}p_{j}=1\\} represents the probability simplex, i.e., the domain of all vectors representing probability distributions over \\mathcal{Y}. We will use \\mathbf{p}_{B}\\in\\Delta^{l-1} to indicate the true prevalence values of a bag B, and \\hat{\\mathbf{p}}_{B}^{A}\\in\\Delta^{l-1} to indicate the estimated prevalence values predicted by the quantification algorithm A, so that p_{B}(c_{j}) and \\hat{p}_{B}^{A}(c_{j}) are the true and the predicted class prevalence, for class c_{j}, respectively.\n\nAt first glance, quantification seems a task very similar to classification in spirit. Indeed, the most straightforward solution to the quantification problem, called Classify & Count (CC) in the literature, comes down to first learning a hard classifier h:\\mathcal{X}\\rightarrow\\mathcal{Y} using a training dataset D=\\{(\\mathbf{x}_{i},y_{i})\\}_{i=1}^{n} drawn from \\mathcal{X}\\times\\mathcal{Y}, to then issue label predictions for all examples in the test bag B, and finally counting the number of times each class has been attributed. However, it has been observed that CC gives rise to biased estimators of class prevalence [8]. The reason is that h is biased towards the training prevalence and therefore tends to underestimate (resp. overestimate) the true prevalence of a class when this class becomes more prevalent (resp. less prevalent) in the test bag B than it was in the training set D. Noticeably, most quantification algorithms rely on the predictions of a classifier which are subsequently post-processed using information from D and B. This post-processing is necessary since, in quantification, we assume to face a shift in the data distribution (i.e., that the prevalence of the classes may differ between D and B).\n\nThis particular shift is generally known as “label shift\" or “prior probability shift\" [11], according to which the prior distribution P(Y) can change between training and deployment conditions, while the class-conditional densities P(X|Y) are assumed stationary. The fact that CC is not suitable for quantification under prior probability shift conditions has led to the development of a myriad of methods designed specifically for quantification, which is by now recognized as a task on its own right (see, e.g., [12,13] for an overview).\n\nOne of the main advantages of adopting deep neural network architectures (DNNs) for quantification is that DNNs allow the learning process to handle bags of examples (labeled by their class prevalence values) instead of individual examples (labeled by class). Following this intuition, a change in the learning paradigm with respect to the traditional one was first proposed in [14]. In this paper, we offer an in-depth exploration of the implications of this change of paradigm, by analyzing the main advantages and limitations with respect to traditional approaches to quantification. Conversely, traditional quantification methods adopt an asymmetric approach in which a classifier is trained to infer the class of the individual examples and in which the label predictions are used to estimate the prevalence of the classes in the bag. This way, the training labels (class labels attached to the example) and the labels to be predicted (class prevalence values attached to the bag) are not homologous. In contrast, following the approach proposed in [14], we can reframe the quantification problem as a symmetric supervised learning task in which the training set consists of a collection of bags containing examples labeled at the aggregate level (i.e., without individual class labels). This formulation posits the quantification problem as a multivariate regression task, in which the labels provided for training and the labels we need to predict become homologous. Throughout this paper, we will demonstrate further advantages of this formulation. Among them, and in contrast to traditional quantification methods, the quantifier becomes capable of optimizing any specific loss function.\n\nWith this aim, our paper investigates the application of DNNs to the symmetric quantification problem. The paper begins by addressing a central issue that arises when making predictions for entire bags rather than for individual examples, namely, how to represent bags in a permutation-invariant manner [15,16,17]. Two influential DNN architectures have been proposed for set processing: DeepSets [18] and SetTransformers [19]. The former employs a pooling layer like max, average, or median, to summarize each bag, while the latter uses a transformer architecture without positional encoding. These approaches were designed as universal approximation functions for set-based problems. Here, we propose a new architecture, called HistNetQ, relying on histogram-based layers. The rationale why histograms seem promising is two-fold: histograms are naturally geared towards representing densities and convey more information than plain statistics (like the mean, or median). We will show that histogram-based layers can be seen as a generalization of the pooling layers proposed in [18,14].\n\nThe contributions of this paper are three-fold. First, we analyze the symmetric approach of [14] for quantification, discussing its strengths and limitations. Secondly, we empirically assess the suitability of previously proposed permutation-invariant layers to the quantification problem. Finally, we propose HistNetQ, a new permutation-invariant architecture based on differentiable histograms, specifically useful for quantification tasks.\n\nOur experiments show two main results: i) HistNetQ outperforms not only traditional quantification methods and previous general-purpose DNN architectures for set processing but also state-of-the-art quantification-specific DNN methods [20,14] in the LeQua [21] competition, the only competition entirely devoted to quantification held to date, ii) HistNetQ proves competitive also under the asymmetric approach too, that is, when a set of training bags is not available and must be generated from D via sampling.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "Beijbom et al. [2015] Oscar Beijbom, Judy Hoffman, Evan Yao, Trevor Darrell, Alberto Rodriguez-Ramirez, Manuel Gonzalez-Rivero, and Ove Hoegh Guldberg. Quantification in-the-wild: data-sets and baselines. arXiv:1510.04811 [cs] , November 2015. arXiv: 1510.04811."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "Forman [2006] George Forman. Quantifying trends accurately despite classifier error and class imbalance. In Proceedings of the 12th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining (KDD 2006) , pages 157–166, Philadelphia, US, 2006. doi: 10.1145/1150402.1150423 ."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "González et al. [2019] Pablo González, Alberto Castaño, Emily E Peacock, Jorge Díez, Juan José Del Coz, and Heidi M Sosik. Automatic plankton quantification using deep features. Journal of Plankton Research , 41(4):449–463, 2019."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "Hopkins and King [2010] Daniel Hopkins and Gary King. A method of automated nonparametric content analysis for social science. American Journal of Political Science , 54(1):229–247, 2010."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "Moreo and Sebastiani [2022] Alejandro Moreo and Fabrizio Sebastiani. Tweet sentiment quantification: An experimental re-evaluation. PLOS ONE , 17(9):1–23, 09 2022. doi: 10.1371/journal.pone.0263449 ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "Dias et al. [2022] Fabio Felix Dias, Moacir Antonelli Ponti, and Rosane Minghim. A classification and quantification approach to generate features in soundscape ecology using neural networks. Neural Computing and Applications , 34(3):1923–1937, 2022."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "González et al. [2017] Pablo González, Jorge Díez, Nitesh Chawla, and Juan José del Coz. Why is quantification an interesting learning problem? Progress in Artificial Intelligence , 6(1):53–58, 2017. ISSN 2192-6360. doi: 10.1007/s13748-016-0103-3 ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "Forman [2008] George Forman. Quantifying counts and costs via classification. Data Mining and Knowledge Discovery , 17(2):164–206, October 2008. ISSN 1573-756X. doi: 10.1007/s10618-008-0097-y ."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "González-Castro et al. [2013] Víctor González-Castro, Rocío Alaiz-Rodríguez, and Enrique Alegre. Class distribution estimation based on the Hellinger distance. Information Sciences , 218:146–164, January 2013. ISSN 0020-0255. doi: 10.1016/j.ins.2012.05.028 ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "Kawakubo et al. [2016] Hideko Kawakubo, Marthinus Christoffel Du Plessis, and Masashi Sugiyama. Computationally efficient class-prior estimation under class balance change using energy distance. IEICE TRANSACTIONS on Information and Systems , 99(1):176–186, 2016."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "Quionero-Candela et al. [2009] Joaquin Quionero-Candela, Masashi Sugiyama, Anton Schwaighofer, and Neil D. Lawrence. Dataset Shift in Machine Learning . The MIT Press, Cambridge, MA, 2009."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "González et al. [2017] Pablo González, Alberto Castaño, Nitesh V Chawla, and Juan José Del Coz. A review on quantification learning. ACM Computing Surveys (CSUR) , 50(5):1–40, 2017."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "Esuli et al. [2023] Andrea Esuli, Alessandro Fabris, Alejandro Moreo, and Fabrizio Sebastiani. Learning to Quantify . Springer, Cham, CH, 2023. ISBN 978-3-031-20466-1. doi: 10.1007/978-3-031-20467-8 ."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "Qi et al. [2021] Lei Qi, Mohammed Khaleel, Wallapak Tavanapong, Adisak Sukul, and David Peterson. A framework for deep quantification learning. In Machine Learning and Knowledge Discovery in Databases: European Conference, ECML PKDD 2020, Ghent, Belgium, September 14–18, 2020, Proceedings, Part I , pages 232–248. Springer, 2021."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "Edwards and Storkey [2017] Harrison Edwards and Amos J. Storkey. Towards a neural statistician. In 5th International Conference on Learning Representations, ICLR 2017, Toulon, France, April 24-26, 2017, Conference Track Proceedings , 2017."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "Murphy et al. [2019] Ryan L. Murphy, Balasubramaniam Srinivasan, Vinayak A. Rao, and Bruno Ribeiro. Janossy pooling: Learning deep permutation-invariant functions for variable-size inputs. In 7th International Conference on Learning Representations, ICLR 2019, May 6-9, 2019 , New Orleans, LA, USA, 2019. OpenReview.net."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "Wagstaff et al. [2019] Edward Wagstaff, Fabian Fuchs, Martin Engelcke, Ingmar Posner, and Michael A Osborne. On the limitations of representing functions on sets. In International Conference on Machine Learning , pages 6487–6494. PMLR, 2019."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "Zaheer et al. [2017] Manzil Zaheer, Satwik Kottur, Siamak Ravanbakhsh, Barnabas Poczos, Russ R Salakhutdinov, and Alexander J Smola. Deep sets. Advances in neural information processing systems , 30, 2017."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "Lee et al. [2019] Juho Lee, Yoonho Lee, Jungtaek Kim, Adam Kosiorek, Seungjin Choi, and Yee Whye Teh. Set transformer: A framework for attention-based permutation-invariant neural networks. In International conference on machine learning , pages 3744–3753. PMLR, 2019."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "Esuli et al. [2018] Andrea Esuli, Alejandro Moreo, and Fabrizio Sebastiani. A recurrent neural network for sentiment quantification. In Proceedings of the 27th ACM International Conference on Information and Knowledge Management (CIKM 2018) , pages 1775–1778, Torino, IT, 2018. doi: 10.1145/3269206.3269287 ."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "Esuli et al. [2022] Andrea Esuli, Alejandro Moreo, Fabrizio Sebastiani, and Gianluca Sperduti. A detailed overview of LeQua@CLEF 2022: Learning to quantify. In Proceedings of the Working Notes of CLEF 2022 - Conference and Labs of the Evaluation Forum, Bologna, Italy, September 5th-8th, 2022 , volume 3180 of CEUR Workshop Proceedings , pages 1849–1868, Bologna, Italy, 2022. CEUR-WS.org."
+    }
+  ]
+}

@@ -1,0 +1,223 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2112.06502",
+  "title": "DGL-GAN: Discriminator Guided Learning for GAN Compression",
+  "authors": "Yuesong Tian, Li Shen, Xiang Tian, Dacheng Tao, Zhifeng Li, Wei Liu, Yaowu Chen",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2112.06502",
+  "html_url": "https://arxiv.org/html/2112.06502",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1031,
+  "text": "## Introduction\n\nGANs firstly proposed in [1] have been prevalent for computer vision tasks, see, e.g., image generation [2,3,4,5,6,7], image editing [8,9,10,11,12], image denoising [13,14], and the references therein. For the noise-to-image generation, two of the most representative vanilla GANs are StyleGAN series [2,3,15] and BigGAN [4], which can generate diverse photo-realistic images from random noise by using a huge number of parameters and large scale high-quality training datasets. Roughly speaking, StyleGAN2 contains 30.37 M parameters on Flickr-Faces-HQ (FFHQ) [2], and BigGAN contains 70.33 M parameters on ImageNet [16]. Deploying such large-scale GANs on computational resource-limited devices is an urgent and challenging task, which largely impedes its broader applications.\n\nTo make GANs easy to be deployed on computational resource limited devices, extensive works have been proposed to obtain lightweight GANs. The mainstreaming approach is to inherit the model compression techniques developed for image-classification task to compress GANs, such as weight pruning [17], weight quantization [18], channel pruning [19,20,21,22], lightweight GAN architecture search/design [23,24,25,26], evolutionary compression [27,28], and knowledge distillation (KD) [29,30,31,32,33,34,35,36]. However, most of the above works focus on compressing conditional (cycle) GANs for image-to-image generation tasks, scarce works have been proposed for compressing vanilla GANs except recent works [20,21,30,11,37,38]. The difficulties of compressing vanilla GANs mainly lie in four aspects:\n\n- (a) The existing pretrained generator is sensitive to the reduction of parameters. Several compression methods [20,11] conduct pruning on the pretrained generator and further tune it. However, pruning the pretrained generator will inevitably degrade the quality of synthesized images, because every pixel in the synthesized image relates to all channels of convolutional kernels or intermediate features in the generator, also pointed out in [30]. To illustrate that, we mask 1/8 parameters of the convolutional kernels in the pretrained StyleGAN2 [3] and generate images with it, presented in Fig. 2, where the quality of images is intensely affected.\n\n- (b) An individual input lacks the corresponding ground truth in noise-to-image generation task. What we want to emphasize is that the ground truth for a vanilla GAN is a distribution of real images, rather than an individual image, which means that a certain latent code sent to the generator may not have the corresponding ground truth. To illustrate that, we send the same latent code z to two independently trained generators of StyleGAN2 and obtain the synthesized images, shown in Fig. 3. The images are distinct, yet the two generators are with similar performance, i.e., Fréchet Inception Distance (FID). Thus, given that an individual input lacks the corresponding ground truth, aligning the intermediate or output feature maps of the student generator with that of the teacher generator may not be feasible. We need to revisit KD technique in GANs.\n\n- (c) The role of a pretrained GAN model in compressing vanilla GANs is unknown. Given the above point, ground truth is absent for an individual input, which means that directly imitating the teacher generator in the feature space or the logits of the teacher discriminator may not be feasible, verified by our experiments in Section 4.3. How to effectively leverage the knowledge of teacher GANs is mysterious.\n\n- (d) Non-convex non-concave Minimax structure of GAN increases the difficulty of the compression. The non-convex non-concave minimax structure causes unstable training of GANs [39,40], imposing an additional challenge on the compression. Directly introducing teacher GANs, especially the teacher discriminator, could aggravate the instability of training student GANs since the pretrained teacher discriminator is too strong to provide appropriate supervision for student generator, which has also been demonstrated via experiments in Section 4.3.\n\nGiven the sensitivity of the pretrained generator to the reduction of parameters, we directly train a compressed generator from scratch, rather than tuning from the pretrained generator [20,11]. We expect that directly training a compressed generator with the specific knowledge distillation mechanism we introduce will alleviate the sensitivity to parameters. Taking difficulty (b) and difficulty (c) into account, what we want to introduce from the teacher GAN is the information about the distribution. rather than an individual synthesized image. Directly obtaining the distribution from the teacher generator is highly non-trivial, due to the high dimension of images. However, the teacher discriminator implicitly contains the information about distribution. Recall the optimal formulation of the discriminator in [1],\n\nwhere p_{d} is the distribution of the real datasets and p_{g} is the distribution of synthesized images. Supposed that the teacher discriminator reaches or approaches the optimal formulation in Eq. (1) and the teacher generator achieves a superior performance than the student generator (regarding certain divergence metrics, e.g., FID), compared with the student discriminator, the teacher discriminator may contain a better synthesized distribution. A natural question arises, does the teacher discriminator is more suitable for distilling student GANs than the teacher generator? In this work, we answer the above question from empirical perspectives. Specifically, we propose to only exploit the teacher discriminator as the additional source of the supervision signal for the student generator. Moreover, to alleviate the instability caused by the minimax objective function, we propose a two-stage training strategy to stabilize the optimization process.\n\nIn a word, our framework only utilizes the teacher discriminator and trains a narrow generator from scratch, with a two-stage training strategy to stabilize the optimization process, denoted as D iscriminator G uided L earning approach and abbreviated as DGL-GAN, aiming at compressing large-scale vanilla GANs and making inference efficient. Our contributions can be summarized as,\n\n- • Motivated by the intuition that the teacher discriminator may contain some useful information about distribution about real images and fake images, we merely exploit the adversarial interaction between the teacher discriminator and student generator to facilitate student generator, which is simple yet effective.\n\n- • We validate DGL-GAN on two representative large-scale vanilla GANs, e.g., StyleGAN2 and BigGAN. DGL-GAN achieves state-of-the-art in compressing both StyleGAN2 and BigGAN. With DGL-GAN, the compressed StyleGAN2 achieves comparable Fréchet Inception Distance (FID) [41] using only 1/3 parameters on FFHQ, and the compressed BigGAN achieves comparable Inception Score (IS) [39] using only 1/4 parameters on ImageNet.\n\n- • Not confined to compressed vanilla GANs, DGL-GAN also facilitates the performance of original uncompressed StyleGAN2, achieving a new state-of-the-art performance on FFHQ (FID 2.65), even surpassing StyleGAN3 [15].",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "(1) Goodfellow, I., Pouget-Abadie, J., Mirza, M., Xu, B., Warde-Farley, D., Ozair, S., Courville, A., Bengio, Y.: Generative adversarial nets. In: Advances in Neural Information Processing Systems, pp. 2672–2680 (2014)"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "(2) Karras, T., Laine, S., Aila, T.: A style-based generator architecture for generative adversarial networks. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, pp. 4401–4410 (2019)"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "(3) Karras, T., Laine, S., Aittala, M., Hellsten, J., Lehtinen, J., Aila, T.: Analyzing and improving the image quality of stylegan. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, pp. 8110–8119 (2020)"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "(4) Brock, A., Donahue, J., Simonyan, K.: Large scale gan training for high fidelity natural image synthesis. arXiv preprint arXiv:1809.11096 (2018)"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "(5) Sauer, A., Schwarz, K., Geiger, A.: Stylegan-xl: Scaling stylegan to large diverse datasets. In: ACM SIGGRAPH 2022 Conference Proceedings, pp. 1–10 (2022)"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "(6) Sauer, A., Karras, T., Laine, S., Geiger, A., Aila, T.: Stylegan-t: Unlocking the power of gans for fast large-scale text-to-image synthesis. arXiv preprint arXiv:2301.09515 (2023)"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "(7) Kang, M., Zhu, J.-Y., Zhang, R., Park, J., Shechtman, E., Paris, S., Park, T.: Scaling up gans for text-to-image synthesis. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, pp. 10124–10134 (2023)"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "(8) Shen, Y., Gu, J., Tang, X., Zhou, B.: Interpreting the latent space of gans for semantic face editing. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, pp. 9243–9252 (2020)"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "(9) Kim, H., Choi, Y., Kim, J., Yoo, S., Uh, Y.: Stylemapgan: Exploiting spatial dimensions of latent in gan for real-time image editing. arXiv preprint arXiv:2104.14754 (2021)"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "(10) Li, M., Jin, Y., Zhu, H.: Surrogate gradient field for latent space manipulation. arXiv preprint arXiv:2104.09065 (2021)"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "(11) Lin, J., Zhang, R., Ganz, F., Han, S., Zhu, J.-Y.: Anycost gans for interactive image synthesis and editing. arXiv preprint arXiv:2103.03243 (2021)"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "(12) Zhuang, P., Koyejo, O., Schwing, A.G.: Enjoy your editing: Controllable gans for image editing via latent space navigation. arXiv preprint arXiv:2102.01187 (2021)"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "(13) Kaneko, T., Harada, T.: Noise robust generative adversarial networks. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, pp. 8404–8414 (2020)"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "(14) Dutta, P., Power, B., Halpert, A., Ezequiel, C., Subramanian, A., Chatterjee, C., Hari, S., Prindle, K., Vaddina, V., Leach, A., et al.: 3d conditional generative adversarial networks to enable large-scale seismic image enhancement. arXiv preprint arXiv:1911.06932 (2019)"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "(15) Karras, T., Aittala, M., Laine, S., Härkönen, E., Hellsten, J., Lehtinen, J., Aila, T.: Alias-free generative adversarial networks. arXiv preprint arXiv:2106.12423 (2021)"
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "(16) Deng, J., Dong, W., Socher, R., Li, L.-J., Li, K., Fei-Fei, L.: Imagenet: A large-scale hierarchical image database. In: 2009 IEEE Conference on Computer Vision and Pattern Recognition, pp. 248–255 (2009). Ieee"
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "(17) Chen, X., Zhang, Z., Sui, Y., Chen, T.: {GAN}s can play lottery tickets too. In: International Conference on Learning Representations (2021). https://openreview.net/forum?id=1AoMhc_9jER"
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "(18) Wang, P., Wang, D., Ji, Y., Xie, X., Song, H., Liu, X., Lyu, Y., Xie, Y.: Qgan: Quantized generative adversarial networks. arXiv preprint arXiv:1901.08263 (2019)"
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "(19) Wang, H., Gui, S., Yang, H., Liu, J., Wang, Z.: Gan slimming: All-in-one gan compression by a unified optimization framework. In: European Conference on Computer Vision, pp. 54–73 (2020). Springer"
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "(20) Liu, Y., Shu, Z., Li, Y., Lin, Z., Perazzi, F., Kung, S.-Y.: Content-aware gan compression. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, pp. 12156–12166 (2021)"
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "(21) Hou, L., Yuan, Z., Huang, L., Shen, H., Cheng, X., Wang, C.: Slimmable generative adversarial networks. arXiv preprint arXiv:2012.05660 (2020)"
+    },
+    {
+      "n": 22,
+      "id": "bib.bib22",
+      "text": "(22) Shen, Y., Shen, L., Huang, H.-Z., Wang, X., Liu, W.: Cpot: Channel pruning via optimal transport. arXiv preprint arXiv:2005.10451 (2020)"
+    },
+    {
+      "n": 23,
+      "id": "bib.bib23",
+      "text": "(23) Tian, Y., Shen, L., Shen, L., Su, G., Li, Z., Liu, W.: Alphagan: Fully differentiable architecture search for generative adversarial networks. IEEE Transactions on Pattern Analysis and Machine Intelligence, 1–1 (2021). https://doi.org/10.1109/TPAMI.2021.3099829"
+    },
+    {
+      "n": 24,
+      "id": "bib.bib24",
+      "text": "(24) Liu, B., Zhu, Y., Song, K., Elgammal, A.: Towards faster and stabilized {gan} training for high-fidelity few-shot image synthesis. In: International Conference on Learning Representations (2021). https://openreview.net/forum?id=1Fqg133qRaI"
+    },
+    {
+      "n": 25,
+      "id": "bib.bib25",
+      "text": "(25) Belousov, S.: Mobilestylegan: A lightweight convolutional neural network for high-fidelity image synthesis. arXiv preprint arXiv:2104.04767 (2021)"
+    },
+    {
+      "n": 26,
+      "id": "bib.bib26",
+      "text": "(26) Wang, J., Shu, H., Xia, W., Yang, Y., Wang, Y.: Coarse-to-fine searching for efficient generative adversarial networks. arXiv preprint arXiv:2104.09223 (2021)"
+    },
+    {
+      "n": 27,
+      "id": "bib.bib27",
+      "text": "(27) Li, J., Zhang, J., Gong, X., Lu, S.: Evolutionary generative adversarial networks with crossover based knowledge distillation. arXiv preprint arXiv:2101.11186 (2021)"
+    },
+    {
+      "n": 28,
+      "id": "bib.bib28",
+      "text": "(28) Wang, C., Xu, C., Yao, X., Tao, D.: Evolutionary generative adversarial networks. IEEE Transactions on Evolutionary Computation 23 (6), 921–934 (2019)"
+    },
+    {
+      "n": 29,
+      "id": "bib.bib29",
+      "text": "(29) Aguinaldo, A., Chiang, P.-Y., Gain, A., Patil, A., Pearson, K., Feizi, S.: Compressing gans using knowledge distillation. arXiv preprint arXiv:1902.00159 (2019)"
+    },
+    {
+      "n": 30,
+      "id": "bib.bib30",
+      "text": "(30) Yu, C., Pool, J.: Self-supervised generative adversarial compression. Advances in Neural Information Processing Systems 33 (2020)"
+    },
+    {
+      "n": 31,
+      "id": "bib.bib31",
+      "text": "(31) Chen, H., Wang, Y., Shu, H., Wen, C., Xu, C., Shi, B., Xu, C., Xu, C.: Distilling portable generative adversarial networks for image translation. In: Proceedings of the AAAI Conference on Artificial Intelligence, vol. 34, pp. 3585–3592 (2020)"
+    },
+    {
+      "n": 32,
+      "id": "bib.bib32",
+      "text": "(32) Li, M., Lin, J., Ding, Y., Liu, Z., Zhu, J.-Y., Han, S.: Gan compression: Efficient architectures for interactive conditional gans. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, pp. 5284–5294 (2020)"
+    },
+    {
+      "n": 33,
+      "id": "bib.bib33",
+      "text": "(33) Jin, Q., Ren, J., Woodford, O.J., Wang, J., Yuan, G., Wang, Y., Tulyakov, S.: Teachers do more than teach: Compressing image-to-image models. arXiv preprint arXiv:2103.03467 (2021)"
+    },
+    {
+      "n": 34,
+      "id": "bib.bib34",
+      "text": "(34) Li, S., Lin, M., Wang, Y., Xu, M., Huang, F., Wu, Y., Shao, L., Ji, R.: Learning efficient gans via differentiable masks and co-attention distillation. arXiv preprint arXiv:2011.08382 (2020)"
+    },
+    {
+      "n": 35,
+      "id": "bib.bib35",
+      "text": "(35) Fu, Y., Chen, W., Wang, H., Li, H., Lin, Y., Wang, Z.: Autogan-distiller: Searching to compress generative adversarial networks. arXiv preprint arXiv:2006.08198 (2020)"
+    },
+    {
+      "n": 36,
+      "id": "bib.bib36",
+      "text": "(36) Zhang, H., Goodfellow, I., Metaxas, D., Odena, A.: Self-attention generative adversarial networks. arXiv preprint arXiv:1805.08318 (2018)"
+    },
+    {
+      "n": 37,
+      "id": "bib.bib37",
+      "text": "(37) Li, S., Wu, J., Xiao, X., Chao, F., Mao, X., Ji, R.: Revisiting discriminator in gan compression: A generator-discriminator cooperative compression scheme. In: Thirty-Fifth Conference on Neural Information Processing Systems (2021)"
+    },
+    {
+      "n": 38,
+      "id": "bib.bib38",
+      "text": "(38) Kang, M., Yoo, H., Kang, E., Ki, S., Lee, H.E., Han, B.: Information-theoretic gan compression with variational energy-based model. Advances in Neural Information Processing Systems 35 , 18241–18255 (2022)"
+    },
+    {
+      "n": 39,
+      "id": "bib.bib39",
+      "text": "(39) Salimans, T., Goodfellow, I., Zaremba, W., Cheung, V., Radford, A., Chen, X.: Improved techniques for training gans. In: Advances in Neural Information Processing Systems, pp. 2234–2242 (2016)"
+    },
+    {
+      "n": 40,
+      "id": "bib.bib40",
+      "text": "(40) Sun, R., Fang, T., Schwing, A.: Towards a better global loss landscape of gans. Advances in Neural Information Processing Systems 33 (2020)"
+    },
+    {
+      "n": 41,
+      "id": "bib.bib41",
+      "text": "(41) Heusel, M., Ramsauer, H., Unterthiner, T., Nessler, B., Hochreiter, S.: Gans trained by a two time-scale update rule converge to a local nash equilibrium. In: Advances in Neural Information Processing Systems, pp. 6626–6637 (2017)"
+    }
+  ]
+}

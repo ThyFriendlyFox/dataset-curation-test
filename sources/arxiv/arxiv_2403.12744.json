@@ -1,0 +1,63 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.12744",
+  "title": "Instructing Large Language Models to Identify and Ignore Irrelevant Conditions",
+  "authors": "Zhenyu Wu, Chao Shen, Meng Jiang",
+  "year": "2024",
+  "categories": [
+    "cs.CL"
+  ],
+  "url": "https://arxiv.org/abs/2403.12744",
+  "html_url": "https://arxiv.org/html/2403.12744",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 696,
+  "text": "Math word problem (MWP) solving is a task of developing algorithms to generate a reasoning path towards an unknown quantity based on a problem description. This task is challenging as it requires mathematical understanding and multi-step reasoning abilities. Chain-of-thought (CoT) prompting methods were able to guide large language models (LLMs) to perform complex multi-step reasoning [1,2]. Adding demonstrations created manually [3] or retrieved from a large training set [4] in CoT prompts enabled few-shot in-context learning and improved accuracy. However, [5] found that existing CoT prompting methods could be seriously confused by irrelevant conditions which are specifications or data presented in a problem that are unrelated to the solution [6]. For example, as shown in Figure 1a, the third condition “ The height of Mary is 5 feet. ” was irrelevant to the final question and misled the reasoning and prediction. [5] added a plain instruction “ Feel free to ignore irrelevant conditions in the problem description. ” in the prompts, but the LLMs could not effectively ignore them in the problem solving process because they were not identified or specified in the instruction.\n\nImproving the reasoning on MWPs that have irrelevant conditions is non-trivial. Self-consistency [7] was proposed to repeatedly solve a problem multiple times (e.g., 10 times) and employ a majority vote strategy to determine the most consistent answer as the final answer. However, it was computationally expensive and still confused by the irrelevant conditions. Moreover, the demonstrations would have to be re-designed to obtain the few-shot learning ability of identifying and ignoring the irrelevance, compared to those in [3,8].\n\nIn this paper, we propose a novel approach, I 3 C, to instruct LLMs to explicitly I dentify and I gnore I rrelevant C onditions in the mathematical reasoning process. It creates effective instructions that can be added to any CoT prompts to improve their generated reasoning paths. Unlike self-consistency, I 3 C does not prompt LLMs multiple times. Its advanced variant, I 3 C-Select, uses the most confusing problems and their generated reasoning paths as demonstrations for few-shot learning.\n\nFirst, we quantify the semantic relevance of each condition c_{i} in a MWP Q=[\\{c_{i}\\},q]. Specifically, we use a language model like SimCSE [9] to encode the conditions \\{c_{i}\\} and question sentence q. The semantic relevance is lower if the condition’s encoding is more distant from the encodings of question and other conditions, as shown in Figure 1b. Then we identify a set of irrelevant condition candidates, like c_{2} and c_{3} in this example, and we denote them by \\{c^{\\text{(irr)}}_{k}\\}.\n\nNext we use an LLM to verify if the candidates are indeed irrelevant. For each candidate c^{\\text{(irr)}}_{k}, the verification prompt is a natural language question consisted of itself, Q, and q. The verification output usually has the explicit answers “ … is (not) relevant to … ”, denoted by v^{\\text{(irr)}}_{k}.\n\nFinally we put all the verification outputs \\{v^{\\text{(irr)}}_{k}\\} to create a novel instruction which helps the LLM to i dentify and i gnore i rrelevant c onditions in the problem description, so-called I 3 C. The I 3 C instruction is a plug-and-play module and can be added to any CoT prompting methods to help LLMs avoid confusion and improve generated reasoning paths.\n\nTo enable few-shot in-context learning, we further develop I 3 C-Select, which uses pairs of problems and their corresponding generated reasoning paths to automatically construct effective demonstrations. Specifically, it defines the confusion score of each problem in the training set: the score is higher, if the semantic relevance of its conditions is lower; and the problems with the highest confusion scores are selected.\n\nExperiments on GPT-3.5-Turbo demonstrate that adding the I 3 C instruction to CoT prompting methods improves their performance. For example, adding I 3 C instruction to Manual-CoT improves the accuracy by +8.1 on AddSub, +8.1 on SVAMP, +6.0 on GSM8K, +5.1 on SingleEq, +5.1 on GSM-IC2-1K, +2.8 on AQuA, +9.2 on MATH, and +7.8 on GSM-ICM-1K.\n\nMoreover, I 3 C-Select beats existing prompting methods by a striking margin on eight MWP datasets. Specifically, I 3 C-Select boosts the performance of Complex-CoT method by +11.7 on GSM-IC2-1K, +11.1 on GSM-ICM-1K, +12.6 on AQuA, +8.2 on MATH, and +10.0 on GSM8K.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib12",
+      "text": "Kojima et al. (2022) Takeshi Kojima, Shixiang (Shane) Gu, Machel Reid, Yutaka Matsuo, and Yusuke Iwasawa. 2022. Large language models are zero-shot reasoners . In Advances in Neural Information Processing Systems , volume 35, pages 22199–22213. Curran Associates, Inc."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib24",
+      "text": "Wang et al. (2023a) Lei Wang, Wanyu Xu, Yihuai Lan, Zhiqiang Hu, Yunshi Lan, Roy Ka-Wei Lee, and Ee-Peng Lim. 2023a. Plan-and-solve prompting: Improving zero-shot chain-of-thought reasoning by large language models . In Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) , pages 2609–2634, Toronto, Canada. Association for Computational Linguistics."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib28",
+      "text": "Wei et al. (2022) Jason Wei, Xuezhi Wang, Dale Schuurmans, Maarten Bosma, brian ichter, Fei Xia, Ed Chi, Quoc V Le, and Denny Zhou. 2022. Chain-of-thought prompting elicits reasoning in large language models . In Advances in Neural Information Processing Systems , volume 35, pages 24824–24837. Curran Associates, Inc."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib3",
+      "text": "Fu et al. (2023) Yao Fu, Hao Peng, Ashish Sabharwal, Peter Clark, and Tushar Khot. 2023. Complexity-based prompting for multi-step reasoning . In The Eleventh International Conference on Learning Representations ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib23",
+      "text": "Shi et al. (2023) Freda Shi, Xinyun Chen, Kanishka Misra, Nathan Scales, David Dohan, Ed Chi, Nathanael Schärli, and Denny Zhou. 2023. Large language models can be easily distracted by irrelevant context. In Proceedings of the 40th International Conference on Machine Learning , ICML’23. JMLR.org."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib10",
+      "text": "Kellogg (2016) Ronald T. Kellogg. 2016. Fundamentals of cognitive psychology, 3rd ed. Sage Publications, Inc."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib26",
+      "text": "Wang et al. (2023b) Xuezhi Wang, Jason Wei, Dale Schuurmans, Quoc V Le, Ed H. Chi, Sharan Narang, Aakanksha Chowdhery, and Denny Zhou. 2023b. Self-consistency improves chain of thought reasoning in language models . In The Eleventh International Conference on Learning Representations ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib30",
+      "text": "Zhang et al. (2023) Zhuosheng Zhang, Aston Zhang, Mu Li, and Alex Smola. 2023. Automatic chain of thought prompting in large language models . In The Eleventh International Conference on Learning Representations ."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib5",
+      "text": "Gao et al. (2021) Tianyu Gao, Xingcheng Yao, and Danqi Chen. 2021. SimCSE: Simple contrastive learning of sentence embeddings . In Proceedings of the 2021 Conference on Empirical Methods in Natural Language Processing , pages 6894–6910, Online and Punta Cana, Dominican Republic. Association for Computational Linguistics."
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.15510",
+  "title": "Privacy-Preserving End-to-End Spoken Language Understanding",
+  "authors": "Yinggui Wang, Wei Huang, Le Yang",
+  "year": "2024",
+  "categories": [
+    "cs.CR",
+    "cs.LG",
+    "eess.AS"
+  ],
+  "url": "https://arxiv.org/abs/2403.15510",
+  "html_url": "https://arxiv.org/html/2403.15510",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1041,
+  "text": "Voice-controlled IoT devices and smart home assistants are gaining popularity in people’s lives, and spoken language understanding (SLU) has become one of the main enabling technologies to achieve human-machine interaction between users and devices [1]. For example, SLU can be found in the in-car voice system of Tesla electricity vehicles (EVs), the voice assistant of Apple phones and Xiaomi’s smart home ecology. Figure 1 (a) shows how these systems work in general.\n\nThere are certain privacy risks associated with these IOT devices [2]. Due to their limited storage space, some vendors choose to deploy only the encoder of the model at the client side and transmit the output of the encoder to the server side for performing tasks such as prediction and classification, which gives opportunities for malicious attackers to take advantage of. Recent end-to-end SLU systems predict user intent directly from speech [3] (see also Figure 1 (b)). This approach circumvents the conversion of speech to text, and to a certain extent, it avoids privacy leakage caused by text theft. However, strictly speaking, end-to-end SLU systems are still subject to certain risks of privacy breach. As depicted in Figure 1 (c), the recognition model may be vulnerable to being stolen by an untrusted third party and used to deduce the sensitive information about the user. In other words, to maintain sensitive user information, the SLU systems need to be able to infer the user’s intent from the masked voice only, while the specific voice content, identity information and other user-sensitive attributes should be dispensed.\n\nWith the increasing public concern about the protection of personal privacy information and higher requirements of national standards on the protection of biological information, significant efforts have been invested to address the problem of user privacy leakage. The utilization of cryptography, multi-party secure computing, differential privacy, and federation learning has been widely investigated [4]. However, these methods have their own drawbacks. For example, using cryptography or differential privacy has a great impact on the classification accuracy of the model. Besides, the voice data being more complex leads to less efficient computation for multi-party secure computation, while under the federated learning, the end-side computation capability is limited. With the increasing refinement of deep learning methods, various new schemes are developed with adversarial training and disentangled representation being the more popular choices.\n\nThe current privacy-preserving intention understanding algorithms normally protect the voice print information of the speaker only, leaving the content information unprotected. From the perspective of privacy protection, this is not satisfactory. Intent understanding is usually used in the smart home and human-computer interaction scenarios, both of which use voice as the control signal. In those cases, wake-up words are sometimes used as a prompt for issuing instructions. When judging whether the speaker’s voice contains wake-up words, the system needs to record voice in real time, and then deduces the intent when it finds that there are wake-up words in the recorded voice. Nevertheless, the intent of the voice may also be recognized directly without using wake-up words. In this case, the recording will be longer than usual. If the speaker mentions something involving privacy during this time, the content of the voice would involve privacy information. Therefore, the privacy-preserving intention understanding algorithm needs to protect both the voice print and content information at the same time.\n\nInspired by the adversarial training [5] and disentangled representations [6], this paper proposes a novel model integrating hidden layer separation and adversarial training. Figure 2 illustrates the developed privacy-preserving framework for SLU. First, we note that under the multi-task training, the information of the three tasks in consideration (i.e., SLU, automatic speech recognition (ASR) and identity recognition (IR)) in the encoder and hidden layers of the model would be entangled. This results in the attackers being potentially capable of inferring sensitive information for ASR as well as IR from the hidden layer output. We thus propose to partition the hidden layer of the model into several parts. The SLU task uses only one part of the hidden layer during training, while some other parts are reserved for ASR and IR processing. We further notice that there is some information similarity across the three considered tasks. The developed model is then augmented with the shared part in the hidden layer for the three tasks and the cosine similarity is utilized to impose isolation of the individual parts for the three tasks. With the above hidden layer separation, the information for SLU, ASR and IR are no longer mixed together. Instead, they occupy a separated part of the hidden layer. Specifically, only a specific part of the hidden layer contains useful information for SLU, but that part does not contain or contains only little information valuable for ASR and IR. This achieves the purpose of protecting privacy.\n\nTo further enhance the privacy preservation ability of the proposed model, two approaches are employed in the inference of the model. We 1) use robust ASR and IR attackers to reason about sensitive information, and we 2) train ASR and IR attackers from scratch under the premise of freezing the privatizer (encoder) and observe whether sensitive information can be recovered.\n\nWe verify the validity of the model framework using different datasets. Experimental results show that our framework not only guarantees the accuracy of the SLU task, but also reduces the success rate of attackers to close to that of a random guess. It also has better privacy protection than the popular adversarial training methods currently available.\n\nThe main contributions of this paper are:\n\n- • We demonstrate the potential vulnerability of deep learning-based SLU models, where a malicious attacker can accurately reason about sensitive user attributes from a model without privacy protection.\n\n- • To solve the above problem, this paper proposes a privacy-preserving framework that combines hidden layer separation with adversarial training. It partitions the hidden layer where multiple information is mixed together, so that the SLU task is carried only in a specific portion of the hidden layer, and redundant sensitive information is removed from that part for the purpose of privacy preservation.\n\n- • By verifying the security of the proposed framework using both pre-trained robust attackers and re-trained test scenarios, experiments show that our framework balances efficiency and privacy protection well.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib7",
+      "text": "Coucke et al. [2018] Alice Coucke, Alaa Saade, Adrien Ball, Théodore Bluche, Alexandre Caulier, David Leroy, Clément Doumouro, Thibault Gisselbrecht, Francesco Caltagirone, Thibaut Lavril, et al. Snips voice platform: an embedded spoken language understanding system for private-by-design voice interfaces. arXiv preprint arXiv:1805.10190 , 2018."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib5",
+      "text": "Atlam and Wills [2020] Hany F Atlam and Gary B Wills. Iot security, privacy, safety and ethics. Digital twin technologies and smart cities , pages 123–149, 2020."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib16",
+      "text": "Serdyuk et al. [2018] Dmitriy Serdyuk, Yongqiang Wang, Christian Fuegen, Anuj Kumar, Baiyang Liu, and Yoshua Bengio. Towards end-to-end spoken language understanding. In 2018 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP) , pages 5754–5758. IEEE, 2018."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib24",
+      "text": "Xu et al. [2021] Runhua Xu, Nathalie Baracaldo, and James Joshi. Privacy-preserving machine learning: Methods, challenges and directions. arXiv preprint arXiv:2108.04417 , 2021."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib19",
+      "text": "Timm Koppelmann et al. [2021] Alexandru Nelus Timm Koppelmann, Lea Schönherr, Dorothea Kolossa, and Rainer Martin. Privacy-preserving feature extraction for cloud-based wake word verification. Interspeech , 2021."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib2",
+      "text": "Aloufi et al. [2020b] Ranya Aloufi, Hamed Haddadi, and David Boyle. Privacy-preserving voice analysis via disentangled representations. In Proceedings of the 2020 ACM SIGSAC Conference on Cloud Computing Security Workshop , pages 1–14, 2020."
+    }
+  ]
+}

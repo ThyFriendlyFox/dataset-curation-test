@@ -1,0 +1,101 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.15108",
+  "title": "Active Learning for Regression based on Wasserstein distance and GroupSort Neural Networks",
+  "authors": "Benjamin Bobbia, Matthias Picard",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "math.ST",
+    "stat.ML",
+    "stat.TH"
+  ],
+  "url": "https://arxiv.org/abs/2403.15108",
+  "html_url": "https://arxiv.org/html/2403.15108",
+  "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+  "section": "Introduction",
+  "word_count": 1131,
+  "text": "Collecting data is a significant challenge in machine learning, and more generally in statistics. The amount of data necessary to get a sharp estimation of a function can get unreasonably high, especially when the task involves high-dimensional objects. In various applications, extracting and gathering enough unlabeled data is not a big challenge. However, labeling them can be a very costly and time-consuming process. In fields such as statistical physics, we would often need to run complex simulations or call an expert to label data manually. Hence we want to be able to get a satisfying estimation with a more compact set of labeled data. Among the proposed solutions, we can mention few-shot learning [1] and transfer learning [2]. Those solutions leverage from another model previously trained on a similar task to simplify our model’s training. To dodge the issue, we can also resort to generative adversarial models [3] or diffusion models [4]: the idea is to augment a dataset using generated data, these approaches need to learn not only the targeted task but how to create new data and criticize them to prevent the addition of incoherent points into the pool. In this paper, we will take another approach called active learning. In this framework, we can call an “oracle” that has the ability to label samples of our data with a certain cost. The keystone of this learning procedure is to find the most relevant samples that both maximize the performances of the estimator and minimize the query cost.\n\n## 1.1 Active Learning framework and notations\n\nWe are interested in performing active learning for a regression task using pool-based sampling. We consider an unknown function h from \\mathbb{R}^{d} to \\mathbb{R}. We aim to estimate h given a sample (X_{i},Y_{i})_{i=1}^{n} of i.i.d copies of the random variables (X,Y)\\in\\mathbb{R}^{d}\\times\\mathbb{R} with Y=h(X). We call P_{X} the unknown distribution of X. In our framework, not all values Y_{i} are observed for every value X_{i}. The sample (X_{i},Y_{i})_{i=1}^{n} can be divided into two subsets K and U (respectively for known and unknown values of h(X)) such that for all X_{i}\\in K the value of h(X_{i})=Y_{i} is observed but not for X_{i}\\in U. The most natural setup which requires active learning is when K (of size n_{K}) is significantly smaller than U (of size n_{U}) and not large enough to allow a fairly good estimation of h. Finally, \\hat{h} denotes an estimator of h. In this paper, the estimator \\hat{h} is chosen to belong to one class of neural networks. However, the methodology developed here focuses mainly on the query step. Hence it can be adapted to other classes of estimators \\hat{h}.\n\nThe error made by \\hat{h} is measured with a strictly convex loss function l from \\mathbb{R}^{2} to [0,+\\infty). The estimator of h is chosen as a minimum of the expected error risk:\n\nObviously, since the probability measure P_{X} is unknown, the explicit computation of \\mathcal{R}_{P_{X}}(\\hat{h}) is hopeless. Hence, we are going to define \\hat{h} minimizing the empirical counterpart of the expected error risk:\n\nwhere \\mathbb{P}_{n} denotes the empirical measure of (X_{1},\\dots,X_{n}):\n\nSince most values Y_{i} are unobserved, \\mathcal{R}_{\\mathbb{P}_{n}}(\\hat{h}) is uncomputable. Hence our purpose is to find out a batch B\\subset U with a fixed size n_{B} providing the best improvement of the estimation of h on K\\cup B compared to the estimation using only K. After choosing B, we would need to send it to the oracle to label it. In pool-based active learning, the idea is to accomplish this task by leveraging our pool of unlabelled data U. During the past years, several options to identify the best batch to query have been explored: the first method proposed by [5] consisted in querying the points with the highest prediction uncertainty (uncertainty-based sampling). Numerous derived strategies were investigated: targeting points with the highest expected error [6], expected variance [7], or cross-entropy [8] when selecting the batch. Other approaches like query-by-committee [9] or greedy sampling [10] tried not only to focus on the reduction of the model error but also on the prospect of adding diversity in the choice of B to get a pool more representative of the underlying distribution. We refer to the monography [11] and the survey [12] for overall information about active learning and details on query strategies. A more recent idea that has shown some good results is to directly create a representativeness-based model by selecting B using probability distribution matching [13]. The aim is to label the samples that will minimize the distance between P_{X} and \\mathbb{P}_{K\\cup B}. This means that we achieve a selection of the best empirical representation of P_{X} among empirical measures of size n_{K}+n_{B} (according to the chosen distance). Afterward, we send the batch B to the oracle to get the value of h(X_{i}) for X_{i}\\in B and learn \\hat{h} as the minimum of:\n\nThis process can be iterated as long as there is still enough unlabelled data and enough budget.\n\nIn the following, the difference between probability distributions is measured using the Wasserstein distance, which has already proven efficient in classification tasks [13].\n\n## 1.2 The Wasserstein distance\n\nLet P and Q two probability measures on a metric space (\\mathcal{X},c). For p\\in[1,\\infty[, the Wasserstein distance of order p between P and Q is defined as\n\nNote that the Wasserstein distance is a proper distance only on the subset of probability measures P such that there exists a point x_{0}\\in\\mathcal{X} where \\int_{\\mathcal{X}}c(x,x_{0})^{p}P(\\mathrm{d}x)<\\infty. In our active learning framework, this is not an issue: since we are focusing on using the 1-Wasserstein distance, this condition only requires assuming that P_{X} has a finite expectation. The first-order Wasserstein distance is of main interest since it can be expressed as a supremum over all 1-Lipschitz functions with respect to the distance c using the following proposition:\n\nLet P and Q two probability measures on the same space \\mathcal{X}, and c a cost function. The 1-order Wasserstein distance is defined as\n\nWhere the supremum is taken over all 1- Lipschitz functions with respect to the cost c, namely |\\varphi(x)-\\varphi(y)|\\leq c(x,y) for all x,y\\in\\mathcal{X}.\n\nThe present formulation is a dual formula holding only for the 1-order Wasserstein distance. It is much more interpretable and easier to compute than the original definition. In the present work, we are only working with this formulation. Hence we can regard it as a definition.\n\nEven if the proper value of a Wasserstein distance cannot be interpreted by itself, it characterizes the weak convergence of probability distributions (see e.g. [14]), which guaranty the convergence of our method. Moreover, the existence of large deviation bounds and generally good behavior with respect to Lipschitz functions may help to provide a rate of convergence [15] but we let this for future works. We can also refer to the monography [16] for other useful examples of its use in statistics.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bibx21",
+      "text": "Li et al., 2006 Li, F.-F., Fergus, R., and Perona, P. (2006). One-shot learning of object categories. IEEE Trans. Pattern Anal. Mach. Intell. , 28(4):594–611."
+    },
+    {
+      "n": 2,
+      "id": "bib.bibx5",
+      "text": "Ben-David et al., 2010 Ben-David, S., Blitzer, J., Crammer, K., Kulesza, A., Pereira, F., and Vaughan, J. (2010). A theory of learning from different domains. Machine Learning , 79:151–175."
+    },
+    {
+      "n": 3,
+      "id": "bib.bibx15",
+      "text": "Goodfellow et al., 2014 Goodfellow, I., Pouget-Abadie, J., Mirza, M., Xu, B., Warde-Farley, D., Ozair, S., Courville, A., and Bengio, Y. (2014). Generative adversarial nets. In Ghahramani, Z., Welling, M., Cortes, C., Lawrence, N., and Weinberger, K., editors, Advances in Neural Information Processing Systems , volume 27. Curran Associates, Inc."
+    },
+    {
+      "n": 4,
+      "id": "bib.bibx32",
+      "text": "Trabucco et al., 2023 Trabucco, B., Doherty, K., Gurinas, M., and Salakhutdinov, R. (2023). Effective data augmentation with diffusion models."
+    },
+    {
+      "n": 5,
+      "id": "bib.bibx20",
+      "text": "Lewis and Gale, 1994 Lewis, D. D. and Gale, W. A. (1994). A sequential algorithm for training text classifiers. In Croft, B. W. and van Rijsbergen, C. J., editors, SIGIR ’94 , pages 3–12, London. Springer London."
+    },
+    {
+      "n": 6,
+      "id": "bib.bibx24",
+      "text": "Roy and McCallum, 2001 Roy, N. and McCallum, A. (2001). Toward optimal active learning through sampling estimation of error reduction. In International Conference on Machine Learning ."
+    },
+    {
+      "n": 7,
+      "id": "bib.bibx35",
+      "text": "Zhang and Oles, 2000 Zhang, T. and Oles, F. J. (2000). A probability analysis on the value of unlabeled data for classification problems. In Proc. 17th International Conf. on Machine Learning , pages 1191–1198. Morgan Kaufmann, San Francisco, CA."
+    },
+    {
+      "n": 8,
+      "id": "bib.bibx26",
+      "text": "Shannon, 2001 Shannon, C. E. (2001). A mathematical theory of communication. SIGMOBILE Mob. Comput. Commun. Rev. , 5(1):3–55."
+    },
+    {
+      "n": 9,
+      "id": "bib.bibx10",
+      "text": "Burbidge et al., 2007 Burbidge, R., Rowland, J. J., and King, R. D. (2007). Active learning for regression based on query by committee. In Yin, H., Tino, P., Corchado, E., Byrne, W., and Yao, X., editors, Intelligent Data Engineering and Automated Learning - IDEAL 2007 , pages 209–218, Berlin, Heidelberg. Springer Berlin Heidelberg."
+    },
+    {
+      "n": 10,
+      "id": "bib.bibx34",
+      "text": "Wu et al., 2019 Wu, D., Lin, C.-T., and Huang, J. (2019). Active learning for regression using greedy sampling. Information Sciences , 474:90–105."
+    },
+    {
+      "n": 11,
+      "id": "bib.bibx25",
+      "text": "Settles, 2012 Settles, B. (2012). Active Learning . Synthesis Lectures on Artificial Intelligence and Machine Learning Series. Morgan & Claypool."
+    },
+    {
+      "n": 12,
+      "id": "bib.bibx23",
+      "text": "Ren et al., 2020 Ren, P., Xiao, Y., Chang, X., Huang, P.-Y., Li, Z., Chen, X., and Wang, X. (2020). A survey of deep active learning. arXiv preprint arXiv:2009.00236 ."
+    },
+    {
+      "n": 13,
+      "id": "bib.bibx27",
+      "text": "Shui et al., 2020 Shui, C., Zhou, F., Gagné, C., and Wang, B. (2020). Deep active learning: Unified and principled method for query and training. In International Conference on Artificial Intelligence and Statistics , pages 1308–1318. PMLR."
+    },
+    {
+      "n": 14,
+      "id": "bib.bibx11",
+      "text": "Cédric, 2009 Cédric, V. (right 2009). Optimal transport : old and new / Villani Cédric . Grundlehren der mathematischen Wissenschaften. Springer, Berlin."
+    },
+    {
+      "n": 15,
+      "id": "bib.bibx13",
+      "text": "Fournier and Guillin, 2015 Fournier, N. and Guillin, A. (2015). On the rate of convergence in Wasserstein distance of the empirical measure. Probability Theory and Related Fields , 162(3-4):707."
+    },
+    {
+      "n": 16,
+      "id": "bib.bibx22",
+      "text": "Panaretos and Zemel, 2020 Panaretos, V. M. and Zemel, Y. (2020). An invitation to statistics in wasserstein space."
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.14001",
+  "title": "Evaluating Unsupervised Dimensionality Reduction Methods for Pretrained Sentence Embeddings",
+  "authors": "Gaifan Zhang, Yi Zhou, Danushka Bollegala",
+  "year": "2024",
+  "categories": [
+    "cs.CL"
+  ],
+  "url": "https://arxiv.org/abs/2403.14001",
+  "html_url": "https://arxiv.org/html/2403.14001",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "1. Introduction",
+  "word_count": 822,
+  "text": "Sentence embedding models represent a given input sentence using a fixed dimensional vector, which is independent of the length of the input sentence [1,2]. Sentence embeddings have significantly improved performance in numerous downstream NLP tasks such as information retrieval [3,4], question answering [5], and machine translation [6] to name a few [7]. However, compared to static word embeddings [8,9], which typically have a smaller number of dimensions (ca. 50-300), sentence embeddings produced by PLMs are usually high dimensional (ca. 1024-4096). This is problematic due to several reasons as described next.\n\nFirst, storing pre-computed sentence embeddings requires larger memory/disk space. For example, in dense retrieval systems [3,10], documents must be pre-embedded and stored in order to efficiently process queries at retrieval time. Therefore, the storage requirements increase linearly with the number of documents in the collection. Although it is efficient to store all the embeddings in memory to reduce the search latency as opposed to reading from a disk-based storage, this is not possible due to the high dimensionality of the sentence/document embeddings. Moreover, training deep learning models with high-dimensional sentence embeddings is problematic because GPUs have limited memory buffers. This requires carefully selecting training data batches and results in latency overheads when transferring sentence embeddings back-and-forth between GPUs.\n\nSecond, the computation time of the inner-products between two sentence embeddings increases linearly with the dimensionality of the embedding. For example, in dense retrieval, we must compute the inner-product (or equivalently cosine similarity if the embeddings are \\ell_{2} normalised) between the query embedding and each of the document embeddings to rank the documents that are relevant to a query [11,10]. This is prohibitively expensive when a large number of documents must be ranked within millisecond order retrieval times.\n\nGiven this trade-off between the dimensionality and the accuracy of sentence embeddings, in this paper, we consider the following question: Can we reduce the dimensionality of pre-computed sentence embeddings without significantly sacrificing the performance in downstream tasks that use those dimensionality-reduced sentence embeddings? Although a diverse set of dimensionality reduction methods have been proposed, from a real-world large-scale application perspective, dimensionality reduction methods that satisfy the following properties are desirable: (a) In contrast to training lower-dimensional sentence embeddings from scratch or training lower-dimensional student models via distillation [12], we would prefer dimensionality reduction methods that are computationally lightweight such that they can be applied in a post-processing stage to reduce the dimensionality of pre-computed sentence embeddings. Distillation-based methods require additional training data for training the student model, as well as a larger memory to load the teacher model. Moreover, the inference time required by the student model, which will be used after distillation must also be taken into account. On the other hand, dimensionality reduction methods are particularly desirable when we have a large and continuously growing number of sentences as in the case of dense information retrieval. (b) We would prefer unsupervised dimensionality reduction methods over supervised ones such that no labelled data are required for a specific downstream task [13]. Such labelled instances might not be available in specialised domains and in larger quantities. This helps us to produce dimensionality-reduced sentence embeddings that are independent of a particular task, thus more likely to generalise well to multiple different tasks.\n\nWe present a novel analysis of unsupervised dimensionality reduction methods for sentence embeddings: truncated Singular Value Decomposition [14], Principal Component Analysis [15], Kernel PCA [16], Gaussian Random Projections [17] and Autoencoders [18]. Lower-dimensional projections can be learnt in an inductive setting (uses only the train sentences to learn the projection), or in a transductive setting (uses unlabelled test sentences in addition to the train sentences). The inductive setting is desirable in scenarios where we have a continuous stream of test sentences such as in dense retrieval, whereas the transductive setting is sufficient when the test sentences are fixed and known in advance during projection learning time.\n\nWe use six popular sentence encoders in three tasks: semantic textual similarity (STS) measurement [19], entailment prediction [20], and TREC question-type classification [21]. In particular, semantic textual similarity is a popular NLP task that is frequently used to measure the accuracy of sentence embeddings [19]. The ability to recognise textual entailment is also considered a fundamental task for evaluating natural language understanding [22,23]. Moreover, question classification is a sentence classification task, which requires an accurate sentence representation to obtain good accuracy [24]. Overall, PCA proves to be the most effective method for sentence embedding compression. Previous research has demonstrated the effectiveness of PCA for various compression tasks [25,26], but we are the first to conduct a systematic study specifically for sentence embedding compression.\n\nOur experimental results show that in both transductive as well as inductive settings, we can use PCA to reduce the dimensionality of diverse sentence embeddings by ca. 50\\% within a 1\\% loss in performance in the target tasks. Interestingly, reducing dimensionality improves accuracy for some sentence encoders such as all-mpnet-base-v2 for STS and msmarco-roberta-base-v2 for TREC.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib46",
+      "text": "Reimers and Gurevych (2019a) Nils Reimers and Iryna Gurevych. 2019a. Sentence-BERT: Sentence embeddings using Siamese BERT-networks. In Proceedings of the 2019 Conference on Empirical Methods in Natural Language Processing and the 9th International Joint Conference on Natural Language Processing (EMNLP-IJCNLP) , pages 3980–3990, Hong Kong, China. Association for Computational Linguistics."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib17",
+      "text": "Gao et al. (2021a) Tianyu Gao, Xingcheng Yao, and Danqi Chen. 2021a. SimCSE: Simple contrastive learning of sentence embeddings. In Proceedings of the 2021 Conference on Empirical Methods in Natural Language Processing , pages 6894–6910, Online and Punta Cana, Dominican Republic. Association for Computational Linguistics."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib28",
+      "text": "Kong et al. (2022) Weize Kong, Swaraj Khadanga, Cheng Li, Shaleen Kumar Gupta, Mingyang Zhang, Wensong Xu, and Michael Bendersky. 2022. Multi-aspect dense retrieval . In Proceedings of the 28th ACM SIGKDD Conference on Knowledge Discovery and Data Mining , KDD ’22, page 3178–3186, New York, NY, USA. Association for Computing Machinery."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib41",
+      "text": "Palangi et al. (2016) Hamid Palangi, Li Deng, Yelong Shen, Jianfeng Gao, Xiaodong He, Jianshu Chen, Xinying Song, and Rabab Ward. 2016. Deep sentence embedding using long short-term memory networks: Analysis and application to information retrieval . IEEE/ACM Trans. Audio, Speech and Lang. Proc. , 24(4):694–707."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib23",
+      "text": "Hao et al. (2019) Yu Hao, Xien Liu, Ji Wu, and Ping Lv. 2019. Exploiting sentence embedding for medical question answering. In Proceedings of the Thirty-Third AAAI Conference on Artificial Intelligence and Thirty-First Innovative Applications of Artificial Intelligence Conference and Ninth AAAI Symposium on Educational Advances in Artificial Intelligence , AAAI’19/IAAI’19/EAAI’19. AAAI Press."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib57",
+      "text": "Wang et al. (2017) Rui Wang, Andrew Finch, Masao Utiyama, and Eiichiro Sumita. 2017. Sentence embedding for neural machine translation domain adaptation. In Proceedings of the 55th Annual Meeting of the Association for Computational Linguistics (Volume 2: Short Papers) , pages 560–566, Vancouver, Canada. Association for Computational Linguistics."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib9",
+      "text": "Choi et al. (2021) Hyunjin Choi, Judong Kim, Seongho Joe, and Youngjune Gwon. 2021. Evaluation of bert and albert sentence embedding performance on downstream nlp tasks. In 2020 25th International Conference on Pattern Recognition (ICPR) , pages 5482–5487."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib42",
+      "text": "Pennington et al. (2014) Jeffery Pennington, Richard Socher, and Christopher D. Manning. 2014. Glove: global vectors for word representation. In Proc. of EMNLP , pages 1532–1543."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib38",
+      "text": "Mikolov et al. (2013) Tomas Mikolov, Kai Chen, and Jeffrey Dean. 2013. Efficient estimation of word representation in vector space. In Proc. of International Conference on Learning Representations ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib40",
+      "text": "Nigam et al. (2019) Priyanka Nigam, Yiwei Song, Vijai Mohan, Vihan Lakshman, Weitian, Ding, Ankit Shingavi, Choon Hui Teo, Hao Gu, and Bing Yin. 2019. Semantic Product Search."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib37",
+      "text": "Menon et al. (2022) Aditya Menon, Sadeep Jayasumana, Ankit Singh Rawat, Seungyeon Kim, Sashank Reddi, and Sanjiv Kumar. 2022. In defense of dual-encoders for neural ranking. In Proceedings of the 39th International Conference on Machine Learning , volume 162 of Proceedings of Machine Learning Research , pages 15376–15400. PMLR."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib2",
+      "text": "Anil et al. (2018) Rohan Anil, Gabriel Pereyra, Alexandre Passos, Robert Ormandi, George E. Dahl, and Geoffrey E. Hinton. 2018. Large scale distributed neural network training through online distillation. In International Conference on Learning Representations ."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib61",
+      "text": "Zhao et al. (2022) Xuandong Zhao, Zhiguo Yu, Ming Wu, and Lei Li. 2022. Compressing sentence representation for semantic retrieval via homomorphic projective distillation. arXiv preprint arXiv:2203.07687 ."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib43",
+      "text": "Petersen and Petersen (2012) Kaare Brandt Petersen and Michael Syskind Petersen. 2012. The Matrix Cookbook . Online."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib1",
+      "text": "Andrews (2016) Martin Andrews. 2016. Compressing word embeddings. In International Conference on Neural Information Processing , pages 413–422. Springer."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib51",
+      "text": "Schölkopf et al. (1998) Bernhard Schölkopf, Alexander Smola, and Klaus-Robert Müller. 1998. Nonlinear Component Analysis as a Kernel Eigenvalue Problem. Neural Computation , 10(5):1299–1319."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib5",
+      "text": "Bingham and Mannila (2001) Ella Bingham and Heikki Mannila. 2001. Random projection in dimensionality reduction: applications to image and text data. In Proceedings of the seventh ACM SIGKDD international conference on Knowledge discovery and data mining , pages 245–250."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib56",
+      "text": "Vincent et al. (2008) Pascal Vincent, Hugo Larochelle, Yoshua Bengio, and Pierre-Antonie Manzagol. 2008. Extracting and composing robust features with denoising autoencoders. In ICML’08 , pages 1096 – 1103."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib6",
+      "text": "Cer et al. (2017) Daniel Cer, Mona Diab, Eneko Agirre, Inigo Lopez-Gazpio, and Lucia Specia. 2017. Semeval-2017 task 1: Semantic textual similarity-multilingual and cross-lingual focused evaluation. arXiv preprint arXiv:1708.00055 ."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib35",
+      "text": "Marelli et al. (2014) Marco Marelli, Stefano Menini, Marco Baroni, Luisa Bentivogli, Raffaella Bernardi, and Roberto Zamparelli. 2014. A SICK cure for the evaluation of compositional distributional semantic models. In Proceedings of the Ninth International Conference on Language Resources and Evaluation (LREC’14) , pages 216–223, Reykjavik, Iceland. European Language Resources Association (ELRA)."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib24",
+      "text": "Hovy et al. (2001) Eduard Hovy, Laurie Gerber, Ulf Hermjakob, Chin-Yew Lin, and Deepak Ravichandran. 2001. Toward semantics-based answer pinpointing . In Proceedings of the First International Conference on Human Language Technology Research ."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib16",
+      "text": "Dzikovska et al. (2013) Myroslava Dzikovska, Rodney Nielsen, Chris Brew, Claudia Leacock, Danilo Giampiccolo, Luisa Bentivogli, Peter Clark, Ido Dagan, and Hoa Trang Dang. 2013. SemEval-2013 task 7: The joint student response analysis and 8th recognizing textual entailment challenge. In Second Joint Conference on Lexical and Computational Semantics (*SEM), Volume 2: Proceedings of the Seventh International Workshop on Semantic Evaluation (SemEval 2013) , pages 263–274, Atlanta, Georgia, USA. Association for Computational Linguistics."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib60",
+      "text": "Yokote et al. (2012) Ken-ichi Yokote, Danushka Bollegala, and Mitsuru Ishizuka. 2012. Similarity is not entailment – jointly learning similarity transformations for textual entailment. In Proc. of the National Conference on Artificial Intelligence (AAAI) , pages 1720 – 1726."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib33",
+      "text": "Li and Roth (2002) Xin Li and Dan Roth. 2002. Learning question classifiers . In COLING 2002: The 19th International Conference on Computational Linguistics ."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib44",
+      "text": "Raunak et al. (2019) Vikas Raunak, Vivek Gupta, and Florian Metze. 2019. Effective dimensionality reduction for word embeddings. In Proceedings of the 4th Workshop on Representation Learning for NLP (RepL4NLP-2019) , pages 235–243."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib45",
+      "text": "Reddy et al. (2020) G Thippa Reddy, M Praveen Kumar Reddy, Kuruva Lakshmanna, Rajesh Kaluri, Dharmendra Singh Rajput, Gautam Srivastava, and Thar Baker. 2020. Analysis of dimensionality reduction techniques on big data. IEEE Access , 8:54776–54788."
+    }
+  ]
+}

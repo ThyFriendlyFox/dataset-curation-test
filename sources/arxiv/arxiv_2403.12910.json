@@ -1,0 +1,100 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.12910",
+  "title": "Yell At Your Robot: Improving On-the-Fly from Language Corrections",
+  "authors": "Lucy Xiaoyang Shi, Zheyuan Hu, Tony Z. Zhao, Archit Sharma, Karl Pertsch, Jianlan Luo, Sergey Levine, Chelsea Finn",
+  "year": "2024",
+  "categories": [
+    "cs.RO",
+    "cs.AI",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2403.12910",
+  "html_url": "https://arxiv.org/html/2403.12910",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 898,
+  "text": "Complex robotic tasks may require sequencing multiple individual primitives. For example, packing multiple items into a bag, as shown in Figure 1, requires grasping each object in turn, maneuvering it near the bag opening, and inserting it. An appealing framework for addressing such multi-stage tasks is via hierarchical abstraction, where a high-level policy commands specific behaviors that are then performed by the low-level policy [1,2,3,4]. One intuitive method for parameterizing such policies is via language, with a high-level policy selecting among possible language instructions at each stage [5,6]. Unfortunately, as the number of stages in a task increases, there are more points of failure – if every stage needs to succeed, the overall probability of failure goes up exponentially. However, a robust high-level policy can compensate for low-level failures, deploying corrections and adjustments as needed. Therefore, successful completion of such multi-stage tasks depends critically on the ability to train such high-level policies in a way that is robust, aware of the limitations of the low-level primitives, and well adapted to the dynamics of the problem.\n\nUnfortunately, this is difficult to do in a scalable way. Complete end-to-end on-robot demonstrations of long-horizon tasks provide “gold standard” supervision, because they allow the high level to be fully aware of the intricacies of low-level control, but they are costly and time consuming to collect at scale because the tasks are so long. Knowledge transfer from other sources, such as large language models (e.g., as in works that use LLMs or VLMs for planning [6,7,8]) provides an appealing alternative, but this knowledge is not grounded in robotic behaviors, leaving the high-level policy relatively brittle because it does not know which skills are more or less effective for this particular robot and in this particular situation. Other modes of indirect supervision, such as language-only supervision [9] or human videos [10,11,12] similarly provide indirect supervision. Therefore, the challenge of training robust high-level policies can be seen as the challenge of obtaining scalable and high-quality training data for the high level.\n\nWhat if instead of requiring extensive demonstration supervision for such high-level policies, we could instead train them with natural feedback from humans in the form of language corrections? Such feedback is natural for humans to provide, and might even be gathered naturally in the course of the robot’s day-to-day work, as it attempts the desired tasks and receives feedback from human users. Our key insight in this work is that this sort of language feedback can be readily incorporated into hierarchical policies when the high-level policy outputs language commands, and in fact this procedure can be seen as a high-level analogue of the widely used DAgger [13,14] algorithm – a technique where the robot iteratively incorporates feedback from a human supervisor, typically in the form of low-level motor actions – but over the action space of a high-level instruction policy, i.e., over language instructions. By incorporating language corrections, the high-level policy is equipped to correct mistakes made by both the low-level policy and the high-level policy. This facilitates robust recovery from failures, which is critical for the success in long-horizon tasks.\n\nBased on this insight, we propose Yell At Your Robot (YAY Robot), a system for improving robot post-training through natural language feedback. Unlike previous efforts that focus on post-hoc action relabeling or one-time correction [15,16], YAY Robot aims for a more organic integration of language into policy improvement through: (a) on-the-fly adaptation to language feedback, and (b) continuous improvement from user interaction.\n\nFirst, we enable robots to adapt their behaviors to diverse, often contextual language commands in real time. We use an end-to-end Language-Conditioned Behavior Cloning (LCBC) policy to learn a variety of skills specified through language within a single neural network, facilitating versatile low-level behaviors in response to diverse language inputs. As a result, users can interact with our system using free-form language, ranging from low-level commands like “move the sponge a little lower” or “turn your right gripper towards me” to high-level preferences such as “I want more M&M’s in my trail mix bag”.\n\nMoreover, robots should improve from user feedback over time, avoiding perpetual corrections and learning to handle complex, long-horizon tasks more effectively without frequent interventions. Hence, we learn a high-level policy to mimic human instruction patterns and assimilate human feedback. As illustrated in Figure 1, our high-level policy generates language instructions for the low-level LCBC policy autonomously. When users choose to intervene, their commands temporarily override the high-level policy and directly feed into the low-level policy, allowing for immediate adaptation from the robot. After user interactions, the high-level policy is finetuned on human language interventions to enhance its ability to predict better instructions and corrections in the future.\n\nThe primary contribution of our work is YAY Robot, a learning-based system for long-horizon tasks that allows robots to both (a) incorporate language corrections on-the-fly and (b) continuously improve from this feedback. In our experiments, we consider three bi-manual multi-stage manipulation tasks: packing three items into a ziploc bag, making a bag of trail mix by scooping ingredients, and cleaning gummies off a plate. By leveraging human corrections on-the-fly, our approach leads to real-time improvement from 15% to 50%. Moreover, incorporating these corrections into high-level policy training increases performance from 15% to 45%. Crucially, YAY Robot allows users to guide robots naturally and intuitively, representing a step towards enabling end-users to directly teach robots through natural language in everyday scenarios.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib36",
+      "text": "Jianlan Luo, Charles Xu, Xinyang Geng, Gilbert Feng, Kuan Fang, L. Tan, S. Schaal, and S. Levine. Multi-stage cable routing through hierarchical imitation learning. Ieee Transactions On Robotics , 2023. doi: 10.48550/arXiv.2307.08927 ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib68",
+      "text": "Fan Xie, A. Chowdhury, M. Clara De Paolis Kaluza, Linfeng Zhao, Lawson L. S. Wong, and Rose Yu. Deep imitation learning for bimanual robotic manipulation. Neural Information Processing Systems , 2020."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib69",
+      "text": "Jianjun Yu, Jie Jia, Guoyu Zuo, Xuchen Li, Yilin Cao, and Zihao Zhang. Multi-step tasks learning based on bayesian segmentation and dynamic movement primitive. In 2021 IEEE 11th Annual International Conference on CYBER Technology in Automation, Control, and Intelligent Systems (CYBER) , pages 265–270. IEEE, 2021."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib18",
+      "text": "Anqing Duan, R. Camoriano, Diego Ferigo, Yanlong Huang, Daniele Calandriello, L. Rosasco, and D. Pucci. Learning to sequence multiple tasks with competing constraints. In 2019 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS) , pages 2672–2678. IEEE, 2019."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib8",
+      "text": "Anthony Brohan, Noah Brown, Justice Carbajal, Yevgen Chebotar, Joseph Dabis, Chelsea Finn, K. Gopalakrishnan, Karol Hausman, Alexander Herzog, Jasmine Hsu, Julian Ibarz, Brian Ichter, A. Irpan, Tomas Jackson, Sally Jesmonth, Nikhil J. Joshi, Ryan C. Julian, Dmitry Kalashnikov, Yuheng Kuang, Isabel Leal, Kuang-Huei Lee, S. Levine, Yao Lu, U. Malla, D. Manjunath, Igor Mordatch, Ofir Nachum, Carolina Parada, Jodilyn Peralta, Emily Perez, Karl Pertsch, Jornell Quiambao, Kanishka Rao, M. Ryoo, Grecia Salazar, P. Sanketi, Kevin Sayed, Jaspiar Singh, S. Sontakke, Austin Stone, Clayton Tan, Huong Tran, Vincent Vanhoucke, Steve Vega, Q. Vuong, F. Xia, Ted Xiao, Peng Xu, Sichun Xu, Tianhe Yu, and Brianna Zitkovich. Rt-1: Robotics transformer for real-world control at scale. Robotics: Science And Systems , 2022. doi: 10.48550/arXiv.2212.06817 ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib1",
+      "text": "Michael Ahn, Anthony Brohan, Noah Brown, Yevgen Chebotar, Omar Cortes, Byron David, Chelsea Finn, K. Gopalakrishnan, Karol Hausman, Alexander Herzog, Daniel Ho, Jasmine Hsu, Julian Ibarz, Brian Ichter, A. Irpan, Eric Jang, Rosario Jauregui Ruano, Kyle Jeffrey, Sally Jesmonth, N. Joshi, Ryan C. Julian, Dmitry Kalashnikov, Yuheng Kuang, Kuang-Huei Lee, S. Levine, Yao Lu, Linda Luu, Carolina Parada, P. Pastor, Jornell Quiambao, Kanishka Rao, Jarek Rettinghouse, D. Reyes, P. Sermanet, Nicolas Sievers, Clayton Tan, Alexander Toshev, Vincent Vanhoucke, F. Xia, Ted Xiao, Peng Xu, Sichun Xu, and Mengyuan Yan. Do as i can, not as i say: Grounding language in robotic affordances. Conference On Robot Learning , 2022."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib24",
+      "text": "Wenlong Huang, Chen Wang, Ruohan Zhang, Yunzhu Li, Jiajun Wu, and Li Fei-Fei. Voxposer: Composable 3d value maps for robotic manipulation with language models. arXiv preprint arXiv:2307.05973 , 2023."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib23",
+      "text": "Wenlong Huang, Pieter Abbeel, Deepak Pathak, and Igor Mordatch. Language models as zero-shot planners: Extracting actionable knowledge for embodied agents. arXiv preprint arXiv:2201.07207 , 2022."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib17",
+      "text": "Danny Driess, F. Xia, Mehdi S. M. Sajjadi, Corey Lynch, Aakanksha Chowdhery, Brian Ichter, Ayzaan Wahid, Jonathan Tompson, Q. Vuong, Tianhe Yu, Wenlong Huang, Yevgen Chebotar, P. Sermanet, Daniel Duckworth, S. Levine, Vincent Vanhoucke, Karol Hausman, Marc Toussaint, Klaus Greff, Andy Zeng, Igor Mordatch, and Peter R. Florence. Palm-e: An embodied multimodal language model. International Conference On Machine Learning , 2023. doi: 10.48550/arXiv.2303.03378 ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib44",
+      "text": "Russell Mendonca, Shikhar Bahl, and Deepak Pathak. Structured world models from human videos. Robotics: Science And Systems , 2023. doi: 10.15607/RSS.2023.XIX.012 ."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib5",
+      "text": "Shikhar Bahl, Russell Mendonca, Lili Chen, Unnat Jain, and Deepak Pathak. Affordances from human videos as a versatile representation for robotics. Computer Vision And Pattern Recognition , 2023. doi: 10.1109/CVPR52729.2023.01324 ."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib58",
+      "text": "Aravind Sivakumar, Kenneth Shaw, and Deepak Pathak. Robotic telekinesis: Learning a robotic hand imitator by watching humans on youtube. Robotics: Science And Systems , 2022. doi: 10.15607/rss.2022.xviii.023 ."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib52",
+      "text": "Stéphane Ross, Geoffrey J. Gordon, and J. Bagnell. A reduction of imitation learning and structured prediction to no-regret online learning. International Conference On Artificial Intelligence And Statistics , 2010."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib28",
+      "text": "Michael Kelly, Chelsea Sidrane, K. Driggs-Campbell, and Mykel J. Kochenderfer. Hg-dagger: Interactive imitation learning with human experts. Ieee International Conference On Robotics And Automation , 2018. doi: 10.1109/ICRA.2019.8793698 ."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib35",
+      "text": "Huihan Liu, Alice Chen, Yuke Zhu, Adith Swaminathan, Andrey Kolobov, and Ching-An Cheng. Interactive robot learning from verbal correction. arXiv preprint arXiv: 2310.17555 , 2023."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib12",
+      "text": "Yuchen Cui, Siddharth Karamcheti, Raj Palleti, Nidhya Shivakumar, Percy Liang, and Dorsa Sadigh. ”no, to the right” - online language corrections for robotic manipulation via shared autonomy. Ieee/acm International Conference On Human-robot Interaction , 2023. doi: 10.1145/3568162.3578623 ."
+    }
+  ]
+}

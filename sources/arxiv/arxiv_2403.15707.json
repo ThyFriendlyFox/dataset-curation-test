@@ -1,0 +1,86 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.15707",
+  "title": "Role of Locality and Weight Sharing in Image-Based Tasks: A Sample Complexity Separation between CNNs, LCNs, and FCNs",
+  "authors": "Aakash Lahoti, Stefani Karp, Ezra Winston, Aarti Singh, Yuanzhi Li",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.AI",
+    "cs.CV",
+    "stat.ML"
+  ],
+  "url": "https://arxiv.org/abs/2403.15707",
+  "html_url": "https://arxiv.org/html/2403.15707",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1204,
+  "text": "Convolutional Neural Networks (CNNs) exhibit state-of-the-art performance across computer vision tasks, including Image Classification, Object Detection, and Out of Distribution Detection ([1,2,3]). This efficacy is commonly attributed to the biases of locality and weight sharing encoded into CNNs’ short convolutions. The rationale is that these biases align with the properties of vision tasks, where local and mobile signals determine the output ([4,5]). In contrast, Locally Connected Neural Networks (LCNs) encode only locality, while Fully Connected Neural Networks (FCNs) encode neither locality nor weight sharing, thus resulting in a larger sample complexity compared to CNNs.\n\nPrevious works have attempted to quantify the statistical benefit of these architectural biases in CNNs. For example, [6], [7] and [8] derived Empirical Risk Minimization (ERM) bounds for CNNs which are tighter than that for FCNs. However, they do not provide separating lower bounds for FCNs on the same task, and cannot rule out the possibility that FCNs can adaptively yield better bounds when the input satisfies locality and translation invariance. In fact, as noted in [9], without taking the training algorithm into consideration, standard lower bound techniques cannot be used to show a separation between the three models. This is because an algorithm can simulate CNNs and LCNs within FCNs. Thus, if the algorithm is unconstrained, the minimax lower bound for FCNs cannot be greater than any upper bound for CNNs or LCNs.\n\nRecently, [9] established a sample complexity separation between CNNs and FCNs that were trained on the restricted class of equivariant algorithms like gradient descent. [10] further extended this line of work to show a separation between FCNs, LCNs and CNNs. However, the data models employed in these works are not truly reflective of the locality and translation invariance of vision tasks. Typically in such tasks, the output is determined by some local pattern, also known as “signal”. For example, a cat within images labeled “cat”. Often, this signal is embedded within uninformative background, also known as “noise”, and can freely translate within the image, i.e. it can appear in any patch within the image, without changing the label (as illustrated in figure 1). In contrast, in both [9] and [10], the data model considered is as follows: the input \\mathbf{x}\\sim\\mathcal{N}(0,I_{4d}), and the label is given by f({\\bm{x}}), and g({\\bm{x}}) respectively,\n\nBoth of these data models fail to capture the aforementioned desiderata of a model for a vision task. Additionally, they lack the requisite structure to demonstrate how sample complexity varies with the “degree” of locality and translation invariance within the input, or establish conditions on the input under which the differences between CNNs, LCNs, and FCNs are more pronounced.\n\nFurthermore, it is worth noting that the driving force for their separation results is the interaction between two halves of the input. Specifically, their lower bound selects “hard instances” from the class of functions {\\mathcal{H}}=\\{{\\bm{x}}_{1:d}^{\\top}{\\mathbf{U}}{\\bm{x}}_{d+1:2d}\\}, where {\\mathbf{U}} is a d\\times d orthonormal matrix, learning which results in a lower bound of \\Omega(d^{2}). While the interaction between the patches is an interesting phenomenon, it is not the primary characteristic of locality and translation invariance found in images.\n\nWe introduce the Dynamic Signal Distribution (DSD) task, which is inspired by the setting in [12], as our data model for vision tasks. The input {\\bm{x}}\\in{\\mathbb{R}}^{kd} is comprised of k consecutive patches, each of dimension d. From amongst these k patches, one of them is randomly filled with a noisy signed signal. The remaining patches are filled with isotropic Gaussian noise of variance \\sigma^{2}. The binary label is set as the sign of the signal, so that all images with the same signal in any one of the patches have the same label. By encapsulating concepts of signal, noise, locality, and translation invariance, the DSD task offers a higher fidelity to the complexities found in real-world vision tasks.\n\nOn this task, we establish a sample complexity separation of \\Omega(\\sigma^{2}k^{2}d) vs \\tilde{O}(\\sigma^{2}k(k+d)) samples between FCNs and LCNs, as well as a separation of \\Omega(\\sigma^{2}kd) vs \\tilde{O}(\\sigma^{2}(k+d)) samples between LCNs and CNNs. Our analysis indicates that due to no architectural biases, FCNs incur a multiplicative cost factor of k for each of the two reasons: identifying the location of the k patches, and learning the signal vector for each patch. The factor of d arises due to learning the signal which is d dimensional. For LCNs, we can eliminate the k cost for identification of the patches since the location of all the patches is baked into the architecture. Finally for CNNs both these costs are removed as the architecture not only localizes all the patches, it also allows the signal to be jointly learnt across all patches via weight sharing. It is noteworthy that both the LCN and the CNN upper bound feature a k+d factor instead of the expected factor of d. This is an artifact of the gradient descent analysis, and is suggestive of being a potential cost for the algorithmic efficiency of gradient descent.\n\nOur approach diverges from [9,10], because in our task, the marginal over the input is not a \\mathbf{0} -mean Gaussian, but a mixture of k Gaussians, which is not an orthogonally invariant distribution. As a consequence, for deriving lower bounds, we cannot apply the Benedek-Itai bound from [13] as done in [9], nor can we directly use Fano’s Theorem as done in [10] owing to the absence of the semi-metricness of l_{2} loss under an invariant distribution, and analyzing the expected risk under a mixture of Gaussians is analytically difficult. Instead, we utilize a novel technique that leverages the randomness of the training algorithm to break the original minimax lower-bound problem into k simpler problems using a simulation-style argument. In case of FCNs, we prove sample complexity lower bounds for the k the simpler problems using a novel boosting technique to derive a reduction to the Gaussian mean estimation problem on the unit sphere. To prove sample complexity lower bounds for the simpler problems in the case of LCNs, we prove a variant of Fano’s Theorem that can be used for randomized algorithms. Distinctively, our variant does not require the semi-metric property to hold on the entire space of output functions, as is needed in the \"Fano’s Theorem for Random Estimators\" developed in [10].\n\nOur sample complexity upper bounds depend on the analysis of an equivariant gradient descent style algorithm on LCNs and CNNs. This is unlike the separation proved in [10], where they use covering number-based arguments for ERM analysis. The advantage of doing a gradient descent analysis over an ERM analysis is two fold: First, it demonstrates a sample complexity separation for computationally-efficient (poly time) equivariant algorithms. This distinction is crucial because while a separation may exist for computationally inefficient algorithms, the separation might disappear under constraints of computational efficiency. Second, for a valid separation, it is important to ensure that both the upper and lower bounds are derived for equivariant algorithms since non-equivariant algorithms could potentially be more sample-efficient than their equivariant counterparts. Furthermore, our approach differs significantly from [12], which analyzes population gradients by assuming enough (\\text{poly}(k,d)) samples at each iteration to yield a representational gap between CNNs and CNTKs (Convolutional Neural Tangent Kernels). Since we are interested in sample complexity separation, we adopt a more direct analysis of empirical gradients.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib9",
+      "text": "Liu et al. (2022) Zhuang Liu, Hanzi Mao, Chao-Yuan Wu, Christoph Feichtenhofer, Trevor Darrell, and Saining Xie. A convnet for the 2020s. CoRR , abs/2201.03545, 2022. URL https://arxiv.org/abs/2201.03545 ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib4",
+      "text": "Fang et al. (2022) Yuxin Fang, Wen Wang, Binhui Xie, Quan Sun, Ledell Wu, Xinggang Wang, Tiejun Huang, Xinlong Wang, and Yue Cao. Eva: Exploring the limits of masked visual representation learning at scale, 2022."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib15",
+      "text": "Wang et al. (2022) Haoqi Wang, Zhizhong Li, Litong Feng, and Wayne Zhang. Vim: Out-of-distribution with virtual-logit matching, 2022."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib5",
+      "text": "Gens & Domingos (2014) Robert Gens and Pedro M. Domingos. Deep symmetry networks. In NIPS , 2014. URL https://api.semanticscholar.org/CorpusID:267009 ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib12",
+      "text": "Marcus (2018) Gary Marcus. Deep learning: A critical appraisal. CoRR , abs/1801.00631, 2018. URL http://arxiv.org/abs/1801.00631 ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib14",
+      "text": "Vardi et al. (2022) Gal Vardi, Ohad Shamir, and Nathan Srebro. The sample complexity of one-hidden-layer neural networks, 2022."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib2",
+      "text": "Du et al. (2018) Simon S Du, Yining Wang, Xiyu Zhai, Sivaraman Balakrishnan, Russ R Salakhutdinov, and Aarti Singh. How many samples are needed to estimate a convolutional neural network? In S. Bengio, H. Wallach, H. Larochelle, K. Grauman, N. Cesa-Bianchi, and R. Garnett (eds.), Advances in Neural Information Processing Systems , volume 31. Curran Associates, Inc., 2018. URL https://proceedings.neurips.cc/paper_files/paper/2018/file/03c6b06952c750899bb03d998e631860-Paper.pdf ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib10",
+      "text": "Long & Sedghi (2020) Philip M. Long and Hanie Sedghi. Generalization bounds for deep convolutional neural networks, 2020."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib8",
+      "text": "Li et al. (2021) Zhiyuan Li, Yi Zhang, and Sanjeev Arora. Why are convolutional nets more sample-efficient than fully-connected nets? In International Conference on Learning Representations , 2021. URL https://openreview.net/forum?id=uCY5MuAxcxU ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib16",
+      "text": "Wang & Wu (2023) Zihao Wang and Lei Wu. Theoretical analysis of inductive biases in deep convolutional networks, 2023."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib17",
+      "text": "Zhang et al. (2008) Weiwei Zhang, Jian Sun, and Xiaoou Tang. Cat head detection - how to effectively exploit shape and texture features. In European Conference on Computer Vision , 2008. URL https://api.semanticscholar.org/CorpusID:2441648 ."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib7",
+      "text": "Karp et al. (2021) Stefani Karp, Ezra Winston, Yuanzhi Li, and Aarti Singh. Local signal adaptivity: Provable feature learning in neural networks beyond kernels. In A. Beygelzimer, Y. Dauphin, P. Liang, and J. Wortman Vaughan (eds.), Advances in Neural Information Processing Systems , 2021. URL https://openreview.net/forum?id=oAjn5-AgSd ."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib1",
+      "text": "Benedek & Itai (1991) Gyora M. Benedek and Alon Itai. Learnability with respect to fixed distributions. Theor. Comput. Sci. , 86:377–390, 1991. URL https://api.semanticscholar.org/CorpusID:33054388 ."
+    }
+  ]
+}

@@ -1,0 +1,133 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.08381",
+  "title": "Tackling the Singularities at the Endpoints of Time Intervals in Diffusion Models",
+  "authors": "Pengze Zhang, Hubery Yin, Chen Li, Xiaohua Xie",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2403.08381",
+  "html_url": "https://arxiv.org/html/2403.08381",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 612,
+  "text": "Diffusion models, generating samples from initial noise by learning a reverse diffusion process, have achieved remarkable success in multi-modality content generation, such as image generation [1,2,3,4,5,6], audio generation [2,7,8], and video generation [9]. These achievements owe much to several fundamental theoretical research, namely Denoising Diffusion Probabilistic Modeling (DDPM) [10,11], Stochastic Differential Equations (SDE) [12], and Ordinary Differential Equations (ODE) [12,13]. These approaches are all based on the assumption that the reverse diffusion process shares the same functional form as the forward process. Although an indirect validation of this assumption is given by Song et al. [12], it heavily relies on the existence of solutions to the Kolmogorov forward and backward equations [14], which encounters singularities at the endpoints of time intervals where t=0 and t=1.\n\nThe singularity issue is not only a gap in the theoretical formulation of current diffusion models, but also affects the quality of the content they generate. Current applications simply ignore singularity points in their implementation [15,16,17] and restrict the time interval to [\\varepsilon_{1},1-\\varepsilon_{2}]. As a result, the average brightness of the generated images typically hovers around 0 [18,19] (normalizing brightness to [-1,1]). For example, as shown in Fig. 1, existing pre-trained diffusion models, such as Stable Diffusion 1.5 (SD-1.5) [16] and Stable Diffusion 2.0-base (SD-2.0-base), fail in generating images with pure white or black backgrounds. To address this challenge, Guttenberg et al. [18] add extra offset noise during the training process to allow the network could learn the overall brightness changes of the image. Unfortunately, the offset noise usually disrupts the pre-defined marginal probability distribution and further invalidates the original sampling formula. Lin et al. [19] re-scales the noise schedule to enforce a zero terminal signal-to-noise ratio, and employ the v -prediction technique [20] to circumvent the issue of division by zero at t=1. However, this method only supports models in v -prediction manner and requires substantial training to fine-tune the entire model. Therefore, it is advantageous to devise a plug-and-play method which effectively deals with the singularity issue for any practicable diffusion model without extra training efforts.\n\nIn this paper, we begin with a theoretical exploration of the singularity issue at the endpoints of time intervals in diffusion model, and then devise a novel plug-and-play module to address the accompanying average brightness problem in image generation. Through establishing mathematical error bounds rigorously, we first prove the approximate Gaussian characteristics of the reverse diffusion process at all sampling time steps, especially where the singularity issue appears. Following this, we conduct a thorough analysis of this approximation in the vicinity of singularities, and arrive at two significant conclusions: 1) by computing the limit of ‘zero divided by zero’ at t=1, we confirm the corresponding initial singularity is removable; 2) the singularity at t=0 is an inherent property of diffusion models, thus we should adhere to this form rather than simply avoiding the singularity. Following the aforementioned theoretical analysis, we propose the SingDiffusion method, specifically tailored to address the challenge of sampling during the initial singularity. Especially, this method can seamlessly integrate into existing sampling processes in a plug-and-play manner without requiring additional training efforts.\n\nAs demonstrated in Fig. 1 and experiments in the appendix, our novel plug-and-play initial sampling step can effectively resolve the average brightness issue. It can be easily applied to a wide range of diffusion models, including the SD-1.5 and SD-2.0-base with \\epsilon -prediction, SD-2.0 with v -prediction, and various pre-trained models available on the CIVITAI website, thanks to its one-time training strategy. Furthermore, our method can generally enhance the generative capabilities of these pre-trained diffusion models in notably improving the FID [21] scores at the same CLIP [22] level on the COCO dataset [23].",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib5",
+      "text": "Prafulla Dhariwal and Alexander Nichol. Diffusion models beat gans on image synthesis. Advances in Neural Information Processing Systems (NeurIPS) , pages 8780–8794, 2021."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib26",
+      "text": "Alexander Quinn Nichol, Prafulla Dhariwal, Aditya Ramesh, Pranav Shyam, Pamela Mishkin, Bob Mcgrew, Ilya Sutskever, and Mark Chen. GLIDE: Towards photorealistic image generation and editing with text-guided diffusion models. In International Conference on Machine Learning (ICML) , pages 16784–16804, 2022."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib30",
+      "text": "Aditya Ramesh, Mikhail Pavlov, Gabriel Goh, Scott Gray, Chelsea Voss, Alec Radford, Mark Chen, and Ilya Sutskever. Zero-shot text-to-image generation. In International Conference on Machine Learning (ICML) , pages 8821–8831, 2021."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib35",
+      "text": "Chitwan Saharia, William Chan, Saurabh Saxena, Lala Li, Jay Whang, Emily Denton, Seyed Kamyar Seyed Ghasemipour, Raphael Gontijo-Lopes, Burcu Karagol Ayan, Tim Salimans, Jonathan Ho, David J. Fleet, and Mohammad Norouzi. Photorealistic text-to-image diffusion models with deep language understanding. In Advances in Neural Information Processing Systems (NeurIPS) , pages 36479–36494, 2022b."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib4",
+      "text": "Andrew Campbell, Joe Benton, Valentin De Bortoli, Tom Rainforth, George Deligiannidis, and Arnaud Doucet. A continuous time framework for discrete denoising models. In Advances in Neural Information Processing Systems (NeurIPS) , 2022."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib46",
+      "text": "Pengze Zhang, Hubery Yin, Chen Li, and Xiaohua Xie. Formulating discrete probability flow through optimal transport. In Advances in Neural Information Processing Systems (NeurIPS) , 2023b."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib18",
+      "text": "Zhifeng Kong, Wei Ping, Jiaji Huang, Kexin Zhao, and Bryan Catanzaro. Diffwave: A versatile diffusion model for audio synthesis. In International Conference on Learning Representations (ICLR) , 2021."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib28",
+      "text": "Vadim Popov, Ivan Vovk, Vladimir Gogoryan, Tasnima Sadekova, and Mikhail Kudinov. Grad-tts: A diffusion probabilistic model for text-to-speech. In International Conference on Machine Learning (ICML) , pages 8599–8608, 2021."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib14",
+      "text": "Jonathan Ho, Tim Salimans, Alexey A. Gritsenko, William Chan, Mohammad Norouzi, and David J. Fleet. Video diffusion models. In ICLR Workshop on Deep Generative Models for Highly Structured Data , 2022."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib38",
+      "text": "Jascha Sohl-Dickstein, Eric Weiss, Niru Maheswaranathan, and Surya Ganguli. Deep unsupervised learning using nonequilibrium thermodynamics. In International Conference on Machine Learning (ICML) , pages 2256–2265, 2015."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib13",
+      "text": "Jonathan Ho, Ajay Jain, and Pieter Abbeel. Denoising diffusion probabilistic models. Advances in Neural Information Processing Systems (NeurIPS) , pages 6840–6851, 2020."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib40",
+      "text": "Yang Song, Jascha Sohl-Dickstein, Diederik P Kingma, Abhishek Kumar, Stefano Ermon, and Ben Poole. Score-based generative modeling through stochastic differential equations. In International Conference on Learning Representations (ICLR) , 2021b."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib39",
+      "text": "Jiaming Song, Chenlin Meng, and Stefano Ermon. Denoising diffusion implicit models. In International Conference on Learning Representations (ICLR) , 2021a."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib1",
+      "text": "Brian D.O. Anderson. Reverse-time diffusion equation models. Stochastic Processes and their Applications , pages 313–326, 1982."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib42",
+      "text": "Patrick von Platen, Suraj Patil, Anton Lozhkov, Pedro Cuenca, Nathan Lambert, Kashif Rasul, Mishig Davaadorj, and Thomas Wolf. Diffusers: State-of-the-art diffusion models. https://github.com/huggingface/diffusers , 2022."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib31",
+      "text": "Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, and Björn Ommer. High-resolution image synthesis with latent diffusion models. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 10684–10695, 2022."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib27",
+      "text": "Dustin Podell, Zion English, Kyle Lacey, Andreas Blattmann, Tim Dockhorn, Jonas Müller, Joe Penna, and Robin Rombach. Sdxl: improving latent diffusion models for high-resolution image synthesis. arXiv preprint arXiv:2307.01952 , 2023."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib9",
+      "text": "Nicholas Guttenberg. Diffusion with offset noise. https://www.crosslabs.org/blog/diffusion-with-offset-noise , 2023."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "Shanchuan Lin, Bingchen Liu, Jiashi Li, and Xiao Yang. Common diffusion noise schedules and sample steps are flawed. arXiv preprint arXiv:2305.08891 , 2023."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib36",
+      "text": "Tim Salimans and Jonathan Ho. Progressive distillation for fast sampling of diffusion models. In International Conference on Learning Representations (ICLR) , 2022."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib11",
+      "text": "Martin Heusel, Hubert Ramsauer, Thomas Unterthiner, Bernhard Nessler, and Sepp Hochreiter. Gans trained by a two time-scale update rule converge to a local nash equilibrium. Advances in Neural Information Processing Systems (NeurIPS) , 2017."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib29",
+      "text": "Alec Radford, Jong Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry, Amanda Askell, Pamela Mishkin, Jack Clark, et al. Learning transferable visual models from natural language supervision. In International Conference on Machine Learning (ICML) , pages 8748–8763, 2021."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib20",
+      "text": "Tsung-Yi Lin, Michael Maire, Serge Belongie, James Hays, Pietro Perona, Deva Ramanan, Piotr Dollár, and C Lawrence Zitnick. Microsoft coco: Common objects in context. In European Conference on Computer Vision (ECCV) , pages 740–755, 2014."
+    }
+  ]
+}

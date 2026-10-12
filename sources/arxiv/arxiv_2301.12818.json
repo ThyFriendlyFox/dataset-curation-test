@@ -1,0 +1,88 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2301.12818",
+  "title": "Private, Anonymous, Collateralizable Commitments vs. MEV",
+  "authors": "Conor McMenamin, Vanesa Daza, Xavier Salleras",
+  "year": "2024",
+  "categories": [
+    "cs.CR"
+  ],
+  "url": "https://arxiv.org/abs/2301.12818",
+  "html_url": "https://arxiv.org/html/2301.12818",
+  "license": "http://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Introduction",
+  "word_count": 717,
+  "text": "Miner-/maximal-extractable value (MEV) losses on Ethereum are upwards of \\$500M [1,2], with actual losses across all blockchains likely in the billions. These losses are being incurred by protocol users. If genuine protocol users are losing money, this diverts funds away from protocols to extractors, entities solely interested in investing in extraction techniques, while standing as a clear deterrent to prospective users. This is a direct consequence of users announcing an intent to do something (adding an unencrypted transaction to the mempool) before that action is executed on-chain. In the two primary sources of MEV, decentralized exchange (DEX) and auctions (liquidation auctions, non-fungible token auctions, etc.), this intent typically reveals some combination of order price, order size, sender identity, trading history, and account balances. All of these pieces of information allow extractors to extract value from players in a blockchain.\n\nAlthough some protocols have emerged in literature to hide some of this information [3,4,5,6,7,8,9], no satisfactory decentralized solution has been found. One emergent technology which effectively hides transaction information on public blockchains is that of zero-knowledge mixers as used in [10,9]. These allow players to join an anonymity set and send/commit to send transactions by (only) revealing membership in a set. Unfortunately, existing solutions require players to join anonymity sets in advance of proving membership, and for many other players to join the set to adequately hide identity. If protocols have disjoint anonymity sets, which all of the listed protocols do, this requires a player to restrict tokens to one of these protocols in advance of using the tokens. Furthermore, on-boarding and off-boarding into these anonymity sets require costly on-chain operations (merkle-tree additions, proof-verification), serving as bottlenecks to prospective protocols based on these anonymity sets.\n\n## I-A Our Contribution\n\nIn this paper, we address the limitations of single-use anonymity sets, and their potentially costly waiting times for collateral to be usable. We propose an improved variant of single-use collateralized commitments, as used in [9,11], with a dynamic variation where collateral can be locked instantaneously for its required purpose, with commitments possible for almost any transaction, while effectively keeping that transaction private (no information about the purpose of the transaction itself is leaked) and anonymous (there is no way to learn the identity of the user initiation such transaction). These crucial improvements have immediate consequences for MEV, minimizing MEV opportunities as they currently occur in DEXs, auctions, and beyond.\n\nWe describe Private, Anonymous, Collateralizable Commitments (PACCs), a commitment protocol based on smart contract wallets (SCWs) and Zero-Knowledge Proofs (ZKPs). PACCs can be used to convince a prospective block builder or relayer that the user generating the PACC has enough funds to pay required fees, that its wallet is committed to performing certain actions, and importantly, that the wallet loses some amount of collateral if this commitment is broken. Our protocol performs expensive computing operations off-chain (i.e. computing ZKPs), only requiring few additional mapping checks when compared to transactions being sent from basic externally owned accounts (EOA), as in Ethereum [12]. Mappings are gas-efficient storage structures implemented on smart contract-enabled blockchains, and are used in our construction to enforce commitments.\n\nWe outline the properties of PACCs (Section VI), and demonstrate how they can be applied to effectively eliminate MEV as it is known in DEXs, liquidations and auctions. PACCs shift MEV to censorship, which is still a concern. However, we believe censorship can be made arbitrarily expensive [13,14] by forcing protocols to accept commitments for long enough (we introduce a parameter \\Delta for this long enough in the model assumption of Section IV), and by making all transactions practically indistinguishable, something which PACCs achieves.\n\nFurthermore, we implement a PACCs proof-of-concept allowing us to gather information about our solution (e.g. smart contract gas consumption, computing times), that proves its feasibility.\n\n## I-B Organization of the Paper\n\nSection II analyzes previous work related to the information hiding in the context of MEV-protection. Section III introduces the cryptographic primitives needed to formally reason about PACCs. Section IV defines the PACC protocol, and Section V explains the proof-of-concept we implemented, along with the benchmarks we performed. Some general properties of PACCs are outlined in Section VI. Section VI-A demonstrates the potential of PACCs in protecting against MEV, specifically with respect to decentralized finance.\n\nWe conclude, with some further discussion on PACCs, in Section VII.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib31",
+      "text": "Kaihua Qin, Liyi Zhou, and Arthur Gervais. Quantifying Blockchain Extractable Value: How dark is the forest? In 2022 IEEE Symposium on Security and Privacy (SP) , pages 198–214, 2022."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib14",
+      "text": "Flashbots. https://explore.flashbots.net . Accessed: 11/03/2024."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "Carsten Baum, Bernardo David, and Tore Frederiksen. P2DEX: Privacy-Preserving Decentralized Cryptocurrency Exchange. In Kazue Sako and Nils Ole Tippenhauer, editors, Applied Cryptography and Network Security , pages 163–194. Springer International Publishing, 2021."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib10",
+      "text": "Theodoros Constantinides and John Cartlidge. Block Auction: A General Blockchain Protocol for Privacy-Preserving and Verifiable Periodic Double Auctions. In 2021 IEEE International Conference on Blockchain (Blockchain) , pages 513–520, United States, 2021. IEEE Computer Society."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib22",
+      "text": "Mahimna Kelkar, Fan Zhang, Steven Goldfeder, and Ari Juels. Order-Fairness for Byzantine Consensus. In Daniele Micciancio and Thomas Ristenpart, editors, Advances in Cryptology - CRYPTO 2020 , pages 451–480, Cham, 2020. Springer International Publishing."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib17",
+      "text": "Hisham S. Galal and Amr M. Youssef. Publicly Verifiable and Secrecy Preserving Periodic Auctions. In Matthew Bernhard, Andrea Bracciali, Lewis Gudgeon, Thomas Haines, Ariah Klages-Mundt, Shin’ichiro Matsuo, Daniel Perez, Massimiliano Sala, and Sam Werner, editors, Financial Cryptography and Data Security. FC 2021 International Workshops , pages 348–363, Berlin, Heidelberg, 2021. Springer Berlin Heidelberg."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib1",
+      "text": "Avi Asayag, Gad Cohen, Ido Grayevsky, Maya Leshkowitz, Ori Rottenstreich, Ronen Tamari, and David Yakira. Helix: A Fair Blockchain Consensus Protocol Resistant to Ordering Manipulation. IEEE Transactions on Network and Service Management , 18(2):1584–1597, 2021."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib2",
+      "text": "Carsten Baum, James Hsin-yu Chiang, Bernardo David, and Tore Kasper Frederiksen. Eagle: Efficient privacy preserving smart contracts. https://eprint.iacr.org/2022/1435 , 2022. Accessed: 02/03/2024."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib26",
+      "text": "Conor McMenamin, Vanesa Daza, Matthias Fitzi, and Padraic O’Donoghue. FairTraDEX: A Decentralised Exchange Preventing Value Extraction. In Proceedings of the 2022 ACM CCS Workshop on Decentralized Finance and Security , DeFi’22, page 39–46, New York, NY, USA, 2022. Association for Computing Machinery."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib20",
+      "text": "Kobi Gurkan, Koh Wei Jie, and Barry Whitehat. Community Proposal: Semaphore: Zero-Knowledge Signaling on Ethereum, 2020. Accessed: 25/02/2024."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib24",
+      "text": "LibSubmarine. https://libsubmarine.org/ . Accessed: 03/03/2024."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib8",
+      "text": "Vitalik Buterin. Ethereum: A next-generation smart contract and decentralized application platform. https://ethereum.org/en/whitepaper/ , 2014. Accessed: 01/03/2024."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib32",
+      "text": "Alvaro Revuelta. Statistical analysis on Ethereum k-consecutive block proposal probabilities and case study. https://alrevuelta.github.io/posts/ethereum-mev-multiblock . Accessed: 03/03/2024."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib15",
+      "text": "Elijah Fox, Mallesh Pai, and Max Resnick. Censorship Resistance in On-Chain Auctions. https://arxiv.org/abs/2301.13321 , 2023. Accessed: 12/03/2024."
+    }
+  ]
+}

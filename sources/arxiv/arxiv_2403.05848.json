@@ -1,0 +1,204 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.05848",
+  "title": "tLaSDI: Thermodynamics-informed latent space dynamics identification",
+  "authors": "Jun Sur Richard Park, Siu Wun Cheung, Youngsoo Choi, Yeonjong Shin",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "math.DS"
+  ],
+  "url": "https://arxiv.org/abs/2403.05848",
+  "html_url": "https://arxiv.org/html/2403.05848",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 976,
+  "text": "## Introduction\n\nFor centuries, scientific research relied on established experiments, theories, and computational methods. First principles in physics, such as Newton’s laws, Maxwell’s equations, and the laws of thermodynamics, guided scientific exploration and fueled technological advancements in various disciplines. These principles were often derived or conceptualized by experimental or observational data. Leveraging advanced computing along with the first principles has played a pivotal role in understanding complex physical phenomena and solving challenging scientific and engineering problems. With the advent of machine learning, a data-driven scientific computing approach has drawn huge attention. The idea is to harness available data for scientific computing to complement or advance data-free approaches. Many novel methods have been proposed in this regard, e.g. [1,2,3,4,5].\n\nThe reduced order models (ROMs) identify intrinsic low-dimensional structures for economically representing the solution in a high-dimensional space and formulate an underlying physical process for the simplified representation. ROMs have achieved significant success in many challenging physical models such as Navier-Stokes equations [6,7], Burgers’ equation [8,9,10], the Euler equations [11,12], shallow water equations [13,14], and Boltzmann transport problems [15]. There are two major types of ROMs in building the latent dynamics. One is intrusive and the other is non-intrusive. The projection-based ROM is a typical intrusive approach that requires invasive changes to the source code of the high-fidelity physics solver, which is not always feasible. Yet, since the projection-based approach exploits the underlying physics, it yields robust extrapolation ability. On the contrary, the non-intrusive ROM (e.g. dynamic mode decomposition [16]) does not require access to the source code, which at the same time, makes it challenging to encode underlying physical laws into the model. Thus, non-intrusive ROMs are typically regarded as black-box as it is not interpretable with existing scientific knowledge [17,18,19]. In building the latent space, there are two major constructions. One is the linear subspace (LS) and the other is the nonlinear manifold (NM). The LS can be efficiently constructed by the singular value decomposition on the solution snapshot matrices. However, it is limited by the assumption that the intrinsic solution space falls into a subspace with a small dimension, i.e., the solution space has a small Kolmogorov n-width. To address this limitation, the NM is proposed [20,21,22,23], which uses autoencoder for better representation ability and reconstruction accuracy.\n\nThe present work proposes a non-intrusive NM ROM method that possesses thermodynamic structures, namely, thermodynamics-informed latent space dynamics identification (tLaSDI). The general equation for the non-equilibrium reversible-irreversible coupling (GENERIC) formalism [24,25,26] describes a general dynamical system beyond the equilibrium, which comprises of the reversible and irreversible components. The generators for the reversible and irreversible dynamics satisfy certain conditions, which ensure the first and second principles of thermodynamics. tLaSDI uses the GENERIC formalism to design the latent dynamics and identifies the latent variables through an autoencoder [27,28]. A distinct feature is that the latent dynamics obey the first and second laws of thermodynamics through the GENERIC formalism and thus yield energy and entropy functions in the latent space. In particular, GENERIC formalism informed NNs (GFINNs) [29] are employed as our design choice for the latent dynamics. GFINNs are NN-based models that exactly preserve the required structures with universal approximation properties. Consequently, tLaSDI preserves the thermodynamic laws in the latent dynamics without invasive changes in the source codes. In addition, we establish an abstract error estimate of the ROM approximation (Theorem 2), which characterizes all the error components in terms of the encoder, decoder, and latent dynamics. Based on the estimate, we derive a new loss formulation on which the encoder, decoder, and thermodynamic-informed latent dynamics are simultaneously trained.\n\nThe idea of imposing thermodynamic structures in latent dynamics is not new [30,31,32,33,34,35]. Perhaps, the most relevant work to tLaSDI is [33], which proposed an NN approach to design the latent dynamics from the GENERIC formalism. However, there are several major differences. One is the choice of the models for the latent dynamics. [33] employs an NN-based model that does not satisfy the structural conditions exactly by construction, rather relies on an additional penalty term to enforce them. Another is the loss formulation. The standard loss consists of two terms - one matches the forward step prediction of the latent dynamics and the other deviates from the autoencoder. The proposed new loss function introduces additional two loss terms that involve Jacobian, which turns out to bring significant improvements in generalization ability. The last one is the way the latent variables and dynamics are trained. [33] learns the latent variables separately, independent of latent dynamics. The latent dynamics are then trained later to fit the fixed latent variables. This separate training approach has been adopted in the literature, e.g., see [34,17]. In contrast, tLaSDI uses the simultaneous training approach that trains the latent variables and their dynamics at the same time. This strategy has been employed in the literature as well, e.g., see [36,37,18,19,32].\n\nSeveral numerical experiments are reported to demonstrate the performance of tLaSDI and verify the effectiveness of the new loss function. Results show that tLaSDI exhibits robust extrapolation ability, which pure data-driven approaches typically lack. Also, it is empirically observed that the latent entropy function manifests a correlated behavior aligned with the full-state solution. For the parametric Burgers’ equation, the rate of entropy production has the largest value at the final time when the solution exhibits the stiffest behavior. In contrast, the entropy production rate for the heat equation behaves the opposite as it saturates as time goes on, which aligns with the solution behavior of the heat equation. See Figures 7 and 8.\n\nThe rest of the paper is organized as follows. Section 2 describes the problem setup and some preliminaries. The proposed method, tLaSDI, is presented in Section 3 along with the new loss formulation. Section 4 is devoted to the abstract error estimate. Numerical examples are presented in Section 5 before the conclusions in Section 6.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "Bongard and Lipson (2007) Bongard, J., Lipson, H.: Automated reverse engineering of nonlinear dynamical systems. Proceedings of the National Academy of Sciences 104 (24), 9943–9948 (2007)"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "Schmidt and Lipson (2009) Schmidt, M., Lipson, H.: Distilling free-form natural laws from experimental data. science 324 (5923), 81–85 (2009)"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "Brunton et al. (2016) Brunton, S.L., Proctor, J.L., Kutz, J.N.: Discovering governing equations from data by sparse identification of nonlinear dynamical systems. Proceedings of the national academy of sciences 113 (15), 3932–3937 (2016)"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "Raissi and Karniadakis (2018) Raissi, M., Karniadakis, G.E.: Hidden physics models: Machine learning of nonlinear partial differential equations. Journal of Computational Physics 357 , 125–141 (2018)"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "Wu and Xiu (2020) Wu, K., Xiu, D.: Data-driven deep learning of partial differential equations in modal space. Journal of Computational Physics 408 , 109307 (2020)"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "Xiao et al. (2014) Xiao, D., Fang, F., Buchan, A.G., Pain, C.C., Navon, I.M., Du, J., Hu, G.: Non-linear model reduction for the Navier–Stokes equations using residual DEIM method. Journal of Computational Physics 263 , 1–18 (2014)"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "Burkardt et al. (2006) Burkardt, J., Gunzburger, M., Lee, H.-C.: POD and CVT-based reduced-order modeling of Navier–Stokes flows. Computer Methods in Applied Mechanics and Engineering 196 (1-3), 337–355 (2006)"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "Choi and Carlberg (2019) Choi, Y., Carlberg, K.: Space–time least-squares Petrov–Galerkin projection for nonlinear model reduction. SIAM Journal on Scientific Computing 41 (1), 26–58 (2019)"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "Choi et al. (2020) Choi, Y., Coombs, D., Anderson, R.: SNS: a solution-based nonlinear subspace method for time-dependent model order reduction. SIAM Journal on Scientific Computing 42 (2), 1116–1146 (2020)"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "Carlberg et al. (2018) Carlberg, K., Choi, Y., Sargsyan, S.: Conservative model reduction for finite-volume models. Journal of Computational Physics 371 , 280–314 (2018)"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "Copeland et al. (2022) Copeland, D.M., Cheung, S.W., Huynh, K., Choi, Y.: Reduced order models for lagrangian hydrodynamics. Computer Methods in Applied Mechanics and Engineering 388 , 114259 (2022)"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "Cheung et al. (2022) Cheung, S.W., Choi, Y., Copeland, D.M., Huynh, K.: Local lagrangian reduced-order modeling for rayleigh-taylor instability by solution manifold decomposition. preprint arXiv:2201.07335 (2022)"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "Zhao et al. (2014) Zhao, P., Liu, C., Feng, X.: POD-DEIM based model order reduction for the spherical shallow water equations with Turkel-Zwas finite difference discretization. Journal of Applied Mathematics (2014)"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "Stefanescu and Navon (2013) Stefanescu, R., Navon, I.M.: POD/DEIM nonlinear model order reduction of an adi implicit shallow water equations model. Journal of Computational Physics 237 , 95–114 (2013)"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "Choi et al. (2021) Choi, Y., Brown, P., Arrighi, B., Anderson, R., Huynh, K.: Space-time reduced order model for large-scale linear dynamical systems with application to Boltzmann transport problems. Journal of Computational Physics 424 , 109845 (2021)"
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "Schmid (2010) Schmid, P.J.: Dynamic mode decomposition of numerical and experimental data. Journal of fluid mechanics 656 , 5–28 (2010)"
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "Fries et al. (2022) Fries, W.D., He, X., Choi, Y.: LaSDI: Parametric latent space dynamics identification. Computer Methods in Applied Mechanics and Engineering 399 , 115436 (2022)"
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "He et al. (2023) He, X., Choi, Y., Fries, W.D., Belof, J.L., Chen, J.-S.: gLaSDI: Parametric physics-informed greedy latent space dynamics identification. Journal of Computational Physics, 112267 (2023)"
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "Bonneville et al. (2024) Bonneville, C., Choi, Y., Ghosh, D., Belof, J.L.: GPLaSDI: Gaussian process-based interpretable latent space dynamics identification through deep autoencoder. Computer Methods in Applied Mechanics and Engineering 418 , 116535 (2024)"
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "Lee and Carlberg (2020) Lee, K., Carlberg, K.T.: Model reduction of dynamical systems on nonlinear manifolds using deep convolutional autoencoders. Journal of Computational Physics 404 , 108973 (2020)"
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "Lee and Carlberg (2021) Lee, K., Carlberg, K.T.: Deep conservation: A latent-dynamics model for exact satisfaction of physical conservation laws. In: Proceedings of the AAAI Conference on Artificial Intelligence, vol. 35, pp. 277–285 (2021)"
+    },
+    {
+      "n": 22,
+      "id": "bib.bib22",
+      "text": "Kim et al. (2020) Kim, Y., Choi, Y., Widemann, D., Zohdi, T.: Efficient nonlinear manifold reduced order model. preprint arXiv:2011.07727 (2020)"
+    },
+    {
+      "n": 23,
+      "id": "bib.bib23",
+      "text": "Kim et al. (2022) Kim, Y., Choi, Y., Widemann, D., Zohdi, T.: A fast and accurate physics-informed neural network reduced order model with shallow masked autoencoder. Journal of Computational Physics, 110841 (2022)"
+    },
+    {
+      "n": 24,
+      "id": "bib.bib24",
+      "text": "Grmela and Öttinger (1997) Grmela, M., Öttinger, H.C.: Dynamics and thermodynamics of complex fluids. i. development of a general formalism. Physical Review E 56 (6), 6620 (1997)"
+    },
+    {
+      "n": 25,
+      "id": "bib.bib25",
+      "text": "Öttinger and Grmela (1997) Öttinger, H.C., Grmela, M.: Dynamics and thermodynamics of complex fluids. ii. illustrations of a general formalism. Physical Review E 56 (6), 6633 (1997)"
+    },
+    {
+      "n": 26,
+      "id": "bib.bib26",
+      "text": "Öttinger (2005) Öttinger, H.C.: Beyond Equilibrium Thermodynamics. John Wiley & Sons, Hoboken, NJ (2005)"
+    },
+    {
+      "n": 27,
+      "id": "bib.bib27",
+      "text": "DeMers and Cottrell (1992) DeMers, D., Cottrell, G.: Non-linear dimensionality reduction. Advances in neural information processing systems 5 (1992)"
+    },
+    {
+      "n": 28,
+      "id": "bib.bib28",
+      "text": "Hinton and Salakhutdinov (2006) Hinton, G.E., Salakhutdinov, R.R.: Reducing the dimensionality of data with neural networks. science 313 (5786), 504–507 (2006)"
+    },
+    {
+      "n": 29,
+      "id": "bib.bib29",
+      "text": "Zhang et al. (2022) Zhang, Z., Shin, Y., Karniadakis, G.E.: GFINNs: Generic formalism informed neural networks for deterministic and stochastic dynamical systems. Philosophical Transactions of the Royal Society A 380 (2229), 20210207 (2022)"
+    },
+    {
+      "n": 30,
+      "id": "bib.bib30",
+      "text": "Öttinger (2015) Öttinger, H.C.: Preservation of thermodynamic structure in model reduction. Physical Review E 91 (3), 032147 (2015)"
+    },
+    {
+      "n": 31,
+      "id": "bib.bib31",
+      "text": "Yu et al. (2021) Yu, H., Tian, X., Weinan, E., Li, Q.: Onsagernet: Learning stable and interpretable dynamics using a generalized onsager principle. Physical Review Fluids 6 (11), 114402 (2021)"
+    },
+    {
+      "n": 32,
+      "id": "bib.bib32",
+      "text": "Chen et al. (2023) Chen, X., Soh, B.W., Ooi, Z.-E., Vissol-Gaudin, E., Yu, H., Novoselov, K.S., Hippalgaonkar, K., Li, Q.: Constructing custom thermodynamics using deep learning. Nature Computational Science, 1–20 (2023)"
+    },
+    {
+      "n": 33,
+      "id": "bib.bib33",
+      "text": "Hernandez et al. (2021) Hernandez, Q., Badias, A., Gonzalez, D., Chinesta, F., Cueto, E.: Deep learning of thermodynamics-aware reduced-order models from data. Computer Methods in Applied Mechanics and Engineering 379 , 113763 (2021)"
+    },
+    {
+      "n": 34,
+      "id": "bib.bib34",
+      "text": "Moya et al. (2022) Moya, B., Badias, A., Gonzalez, D., Chinesta, F., Cueto, E.: Physics perception in sloshing scenes with guaranteed thermodynamic consistency. IEEE Transactions on Pattern Analysis and Machine Intelligence 45 (2), 2136–2150 (2022)"
+    },
+    {
+      "n": 35,
+      "id": "bib.bib35",
+      "text": "Masi and Stefanou (2022) Masi, F., Stefanou, I.: Multiscale modeling of inelastic materials with thermodynamics-based artificial neural networks (tann). Computer Methods in Applied Mechanics and Engineering 398 , 115190 (2022)"
+    },
+    {
+      "n": 36,
+      "id": "bib.bib36",
+      "text": "Champion et al. (2019) Champion, K., Lusch, B., Kutz, J.N., Brunton, S.L.: Data-driven discovery of coordinates and governing equations. Proceedings of the National Academy of Sciences 116 (45), 22445–22451 (2019)"
+    },
+    {
+      "n": 37,
+      "id": "bib.bib37",
+      "text": "Vijayarangan et al. (2024) Vijayarangan, V., Uranakara, H.A., Barwey, S., Galassi, R.M., Malik, M.R., Valorani, M., Raman, V., Im, H.G.: A data-driven reduced-order model for stiff chemical kinetics using dynamics-informed training. Energy and AI 15 , 100325 (2024)"
+    }
+  ]
+}

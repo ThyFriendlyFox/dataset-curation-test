@@ -1,0 +1,63 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.12776",
+  "title": "Automated Data Curation for Robust Language Model Fine-Tuning",
+  "authors": "Jiuhai Chen, Jonas Mueller",
+  "year": "2024",
+  "categories": [
+    "cs.CL"
+  ],
+  "url": "https://arxiv.org/abs/2403.12776",
+  "html_url": "https://arxiv.org/html/2403.12776",
+  "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+  "section": "Introduction",
+  "word_count": 532,
+  "text": "Large Language Models (LLMs) pretrained on internet-scale text corpora have shown remarkable capabilities in generating helpful human-like text [1,2]. However, the efficacy of LLMs in specialized domains or tasks hinges on the process of instruction tuning (i.e. supervised fine-tuning, or alignment), where pretrained models are further trained using datasets that well-represent the domain [3]. Here we consider sequence-to-sequence training datasets of (prompt, target response) pairs. After training, we feed the LLM new prompts from the same domain and want it to produce responses that resemble expected targets.\n\nSince billion parameter LLMs indiscriminately absorb patterns/information across a dataset, the quality of the instruction tuning data is paramount to effective fine-tuning [4,5,6]. Unfortunately, most real-world instruction tuning datasets are noisy, containing examples that are low-quality in various ways: the target response may be inaccurate, poorly written, the prompt may be nonsensical/incomplete/vague, or the two may be unrelated due to data processing mistakes. Such flawed training data leads to fine-tuned models whose outputs are incorrect, irrelevant, biased, poorly formatted, or flawed in other ways. Finding and fixing low-quality data manually is challenging in large datasets.\n\nWhile most machine learning research iterates over modeling strategies (architectures, loss functions, training algorithms, …) for a fixed dataset to produce better results, the emerging science of data-centric AI asks how we can systematically iterate on the dataset while holding the modeling strategy fixed to produce better results [7]. Success in real-world AI projects typically requires both approaches. Since many existing fine-tuning algorithms have been proposed [8], we follow the spirit of data-centric AI and propose CLEAR, a comprehensive and automated data curation pipeline to enhance the effectiveness of instruction tuning datasets for any LLM and fine-tuning algorithm.\n\nOur CLEAR pipeline involves two stages: Auto-Filter and Auto-Correct which together offer a holistic solution to improving data quality for fine-tuning. The Auto-Filter stage removes data that is confidently low-quality from the dataset without any LLM fine-tuning. It is already able to significantly improve the dataset, such that we can produce better fine-tuned LLMs without any extra LLM fine-tuning computation. For settings where one is able to fine-tune the LLM more than once, the Auto-Correct stage uses the current fine-tuned LLM to revise certain examples that can be confidently improved. Fine-tuning the LLM again on this corrected dataset yields improved performance.\n\nAlgorithmic modifications to a dataset are generally harmful unless done with extreme care. Filtering too much data limits the number of examples to learn from, and editing data can introduce various biases or amplify flaws in existing model outputs. Thus, all data modifications in CLEAR are conservatively applied based on careful measures of confidence. Specifically, we rely on BSDetector [9], a method that can be used with any LLM to obtain trustworthy confidence scores for its own outputs as well as estimating the confidence that given outputs (e.g. target responses) are good. CLEAR only filters data that is confidently identified as low-quality, and only revises data where the LLM-corrected response is confidently identified as better than the current dataset response. Our experiments reveal this careful treatment of confidence to be vital for developing a universal data filtering + correction solution that remains effective across diverse instruction-tuning datasets without any manual modifications.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "Brown et al. (2020) Tom B. Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, Sandhini Agarwal, Ariel Herbert-Voss, Gretchen Krueger, Tom Henighan, Rewon Child, Aditya Ramesh, Daniel M. Ziegler, Jeffrey Wu, Clemens Winter, Christopher Hesse, Mark Chen, Eric Sigler, Mateusz Litwin, Scott Gray, Benjamin Chess, Jack Clark, Christopher Berner, Sam McCandlish, Alec Radford, Ilya Sutskever, and Dario Amodei. 2020. Language models are few-shot learners . In Advances in Neural Information Processing Systems 33: Annual Conference on Neural Information Processing Systems 2020, NeurIPS 2020, December 6-12, 2020, virtual ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib25",
+      "text": "Touvron et al. (2023) Hugo Touvron, Thibaut Lavril, Gautier Izacard, Xavier Martinet, Marie-Anne Lachaux, Timothée Lacroix, Baptiste Rozière, Naman Goyal, Eric Hambro, Faisal Azhar, Aurélien Rodriguez, Armand Joulin, Edouard Grave, and Guillaume Lample. 2023. Llama: Open and efficient foundation language models . CoRR , abs/2302.13971."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib30",
+      "text": "Wei et al. (2022) Jason Wei, Maarten Bosma, Vincent Y. Zhao, Kelvin Guu, Adams Wei Yu, Brian Lester, Nan Du, Andrew M. Dai, and Quoc V. Le. 2022. Finetuned language models are zero-shot learners . In The Tenth International Conference on Learning Representations, ICLR 2022, Virtual Event, April 25-29, 2022 . OpenReview.net."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib35",
+      "text": "Zhou et al. (2023a) Chunting Zhou, Pengfei Liu, Puxin Xu, Srini Iyer, Jiao Sun, Yuning Mao, Xuezhe Ma, Avia Efrat, Ping Yu, Lili Yu, Susan Zhang, Gargi Ghosh, Mike Lewis, Luke Zettlemoyer, and Omer Levy. 2023a. LIMA: less is more for alignment . CoRR , abs/2305.11206."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib31",
+      "text": "Xu et al. (2023) Can Xu, Qingfeng Sun, Kai Zheng, Xiubo Geng, Pu Zhao, Jiazhan Feng, Chongyang Tao, and Daxin Jiang. 2023. Wizardlm: Empowering large language models to follow complex instructions . CoRR , abs/2304.12244."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib13",
+      "text": "Kong et al. (2023) Kezhi Kong, Jiuhai Chen, John Kirchenbauer, Renkun Ni, C. Bayan Bruss, and Tom Goldstein. 2023. GOAT: A global transformer on large-scale graphs . In International Conference on Machine Learning, ICML 2023, 23-29 July 2023, Honolulu, Hawaii, USA , volume 202 of Proceedings of Machine Learning Research , pages 17375–17390. PMLR."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib18",
+      "text": "Mazumder et al. (2022) Mark Mazumder, Colby Banbury, Xiaozhe Yao, Bojan Karlaš, William Gaviria Rojas, Sudnya Diamos, Greg Diamos, Lynn He, Alicia Parrish, Hannah Rose Kirk, et al. 2022. Dataperf: Benchmarks for data-centric ai development. arXiv preprint arXiv:2207.10062 ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib33",
+      "text": "Zhang et al. (2023) Shengyu Zhang, Linfeng Dong, Xiaoya Li, Sen Zhang, Xiaofei Sun, Shuhe Wang, Jiwei Li, Runyi Hu, Tianwei Zhang, Fei Wu, et al. 2023. Instruction tuning for large language models: A survey. arXiv preprint arXiv:2308.10792 ."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib4",
+      "text": "Chen and Mueller (2023) Jiuhai Chen and Jonas Mueller. 2023. Quantifying uncertainty in answers from any language model via intrinsic and extrinsic confidence assessment . CoRR , abs/2308.16175."
+    }
+  ]
+}

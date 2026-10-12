@@ -1,0 +1,149 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2105.00417",
+  "title": "Formalizing Stack Safety as a Security Property",
+  "authors": "Sean Noble Anderson, Roberto Blanco, Leonidas Lampropoulos, Benjamin C. Pierce, Andrew Tolmach",
+  "year": "2024",
+  "categories": [
+    "cs.PL",
+    "cs.CR"
+  ],
+  "url": "https://arxiv.org/abs/2105.00417",
+  "html_url": "https://arxiv.org/html/2105.00417",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1176,
+  "text": "Functions in high-level languages (and related abstractions such as procedures, methods, etc.) are units of computation that invoke one another to define larger computations in a modular way. At a low level, each function activation manages its own local variables, spilled temporaries, etc., as well as information about the caller to which it will return. The call stack is the fundamental data structure used to implement functions, aided by an Application Binary Interface (ABI) that defines how registers are shared between activations.\n\nFrom a security perspective, attacks on the call stack are attacks on the function abstraction itself. Indeed, the stack is an ancient [1] and perennial [2,3,4,5,6,7] target for low-level attacks, sometimes involving control-flow hijacking via corrupting the return address, sometimes memory corruption more generally.\n\nThe variety in attacks on the stack is mirrored in the range of software and hardware protections that aim to prevent them, including stack canaries [8], bounds checking [9,10,11], split stacks [12], shadow stacks [13,14], capabilities [15,16,17,18,19], and hardware tagging [20,21]. But enforcement mechanisms can be brittle, successfully eliminating one attack while leaving room for others. To avoid an endless game of whack-a-mole, we seek formal properties of safe behavior that can be proven, or at least rigorously tested. Such properties can be used as the specification against which enforcement can be validated—even enforcement mechanisms that do not fulfill a property can benefit from the ability to articulate why and when they may fail.\n\nMany of the mechanisms listed above are fundamentally ill-suited for offering formal guarantees: they may impede attackers, but they do not provide universal protection. Shadow stacks, for instance, aim to “restrict the flexibility available in creating gadget chains” [14], not to categorically rule out attacks. Other mechanisms, such as SoftBound [9] and code-pointer integrity [12], do aim for stronger guarantees, but not formal ones. To our knowledge, the sole line of work making a formal claim to protect stack safety is the study of secure calling conventions by Skorstengaard et al. [18] and Georges et al. [19].\n\nSome of the other mechanisms listed above should also be amenable to strong formal guarantees. In particular, Roessler and DeHon [20] present an array of tag-based micro-policies [22] for stack safety that aim to offer universal protection. But the reasoning involved can be subtle: they include micro-policy optimizations, Lazy Tagging and Lazy Clearing (likely to be deployed together, which we hereafter refer to as Lazy Tagging and Clearing, or LTC). LTC allows function activations to write improperly into one another’s stack frames, but ensures that the owner of the corrupted memory cannot access it afterward, avoiding expensive clearings of the stack frame. Under this policy, one function activation can corrupt another’s memory—just not in ways that affect observable behavior. Therefore, LTC would not fulfill Georges et al.’s property (adapted to the tagged setting). But LTC does arguably enforce stack safety, or as Roessler and DeHon describe it informally, a sort of data-flow integrity tied to the stack. A looser, more observational definition of stack safety is needed to fit this situation.\n\nWe propose here a formal characterization of stack safety based on the intuition of protecting function activations from each other and using the tools of language-based security [23] to treat function activations as security principals. We decompose stack safety into a family of properties describing the integrity and confidentiality of the caller’s local state and the callee’s behavior during (and after) the callee’s execution, together with the well-bracketed control flow (WBCF) property articulated by Skorstengaard et al. [18].\n\nOur properties are stated abstractly in the hope that they can also be applied to other enforcement mechanisms besides LTC. However, it does not seem feasible to give a universal definition of stack safety that applies to all architectures and compilers. While many security properties can be described purely at the level of a high-level programming language and translated to a target machine by a secure compiler, stack safety cannot be defined in this way, since ‘‘the stack’’ is not explicitly present in the definitions of most source languages but rather is implicit in the semantics of features such as calls and returns. But neither can stack safety be described coherently as a purely low-level property; indeed, at the lowest level, the specification of a “well-behaved stack” is almost vacuous. The ISA is not concerned with such questions as whether a caller’s frame should be readable or writable to its callee. Those are the purview of high-level languages built atop the hardware stack.\n\nThus, any low-level treatment of stack safety must begin by asking: which high-level features are supported in a given setting using the stack, and how does their presence influence the expectation of well-bracketed control flow, confidentiality, and integrity? We begin with a simple system with very few features, then move to a more realistic one supporting tail-call elimination, argument passing on the stack, and callee-save registers. Our properties are factored so that the basic structure of each of our five properties remains constant while the presence or absence of different features leads to subtler differences in how they behave.\n\nWe demonstrate the usefulness of our properties for distinguishing between correct and incorrect enforcement using QuickChick [25,26], a property-based random testing tool for Coq. Indeed, we find that the published version of LTC is flawed in a way that undermines both integrity and confidentiality; after correcting this flaw, LTC satisfies all of our properties. Further, we modify LTC to protect the features of our more realistic system and apply random testing to validate this extended protection mechanism against the extended properties.\n\nIn summary, we offer the following contributions:\n\n- • We give a novel characterization of stack safety as a conjunction of security properties—confidentiality and integrity for callee and caller—plus well-bracketed control-flow. The properties are parameterized over a notion of external observation, allowing them to characterize lazy enforcement mechanisms.\n\n- • We extend these core definitions to describe a realistic setting with argument passing on the stack, callee-saves registers, and tail-call elimination. The model is modular enough that adding these features is straightforward.\n\n- • We validate a published enforcement mechanism, Lazy Tagging and Clearing, via property-based random testing, find that it falls short, and propose and validate a fix.\n\nThe following section offers a brief overview of our framework and assumptions. Section III walks through a function call in a simple example machine, discusses informally how each of our properties applies to it, and motivates the properties from a security perspective. Section IV formalizes the machine model, its security semantics, and the stack safety properties built on these. Section V describes how to support an extended set of features. Section VII describes the micro-policies that we test, Section VIII the testing framework itself, and Sections IX and X related and future work.\n\nThe accompanying artifact contains formal definitions (in Coq) of our properties, plus our testing framework. It does not include proofs, since we use Coq primarily for the QuickChick testing library and to ensure that our definitions are unambiguous. Formal proofs are left as future work.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib2",
+      "text": "A. One, “Smashing the stack for fun and profit,” Phrack , vol. 7, no. 49, November 1996. [Online]. Available: http://www.phrack.com/issues.html?issue=49&id=14"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib3",
+      "text": "MITRE Corporation, “Common weakness enumeration:2022 top 25 most dangerous software weaknesses,” https://cwe.mitre.org/top25/archive/2022/2022_cwe_top25.html , 2022."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib4",
+      "text": "V. van der Veen, N. dutt-Sharma, L. Cavallaro, and H. Bos, “Memory errors: The past, the present, and the future,” in Research in Attacks, Intrusions, and Defenses - 15th International Symposium, RAID 2012, Amsterdam, The Netherlands, September 12-14, 2012. Proceedings , ser. Lecture Notes in Computer Science, D. Balzarotti, S. J. Stolfo, and M. Cova, Eds., vol. 7462. Springer, 2012, pp. 86–106. [Online]. Available: https://doi.org/10.1007/978-3-642-33338-5_5"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib5",
+      "text": "L. Szekeres, M. Payer, T. Wei, and D. Song, “Sok: Eternal war in memory,” in 2013 IEEE Symposium on Security and Privacy, SP 2013, Berkeley, CA, USA, May 19-22, 2013 . IEEE Computer Society, 2013, pp. 48–62. [Online]. Available: https://doi.org/10.1109/SP.2013.13"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib6",
+      "text": "H. Hu, S. Shinde, S. Adrian, Z. L. Chua, P. Saxena, and Z. Liang, “Data-oriented programming: On the expressiveness of non-control data attacks,” in IEEE Symposium on Security and Privacy, SP 2016, San Jose, CA, USA, May 22-26, 2016 . IEEE Computer Society, 2016, pp. 969–986. [Online]. Available: https://doi.org/10.1109/SP.2016.62"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib7",
+      "text": "M. Miller, “Trends, challenges, and strategic shifts in the software vulnerability mitigation landscape,” https://github.com/Microsoft/MSRC-Security-Research/blob/master/presentations/2019_02_BlueHatIL/ , 2019."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib8",
+      "text": "Chromium Projects, “Chromium security:memory safety,” https://www.chromium.org/Home/chromium-security/memory-safety/ ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib9",
+      "text": "C. Cowan, C. Pu, D. Maier, H. Hintony, J. Walpole, P. Bakke, S. Beattie, A. Grier, P. Wagle, and Q. Zhang, “Stackguard: Automatic adaptive detection and prevention of buffer-overflow attacks,” in Proceedings of the 7th Conference on USENIX Security Symposium - Volume 7 , ser. SSYM’98. USA: USENIX Association, 1998, p. 5."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib10",
+      "text": "S. Nagarakatte, J. Zhao, M. M. K. Martin, and S. Zdancewic, “SoftBound: highly compatible and complete spatial memory safety for C,” in ACM SIGPLAN Conference on Programming Language Design and Implementation (PLDI) . ACM, 2009, pp. 245–258. [Online]. Available: http://repository.upenn.edu/cgi/viewcontent.cgi?article=1941&context=cis_reports"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib11",
+      "text": "——, “CETS: compiler enforced temporal safety for C,” in 9th International Symposium on Memory Management . ACM, 2010, pp. 31–40. [Online]. Available: http://acg.cis.upenn.edu/papers/ismm10_cets.pdf"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib12",
+      "text": "J. Devietti, C. Blundell, M. M. K. Martin, and S. Zdancewic, “HardBound: Architectural support for spatial safety of the C programming language,” in 13th International Conference on Architectural Support for Programming Languages and Operating Systems , 2008, pp. 103–114. [Online]. Available: http://acg.cis.upenn.edu/papers/asplos08_hardbound.pdf"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib13",
+      "text": "V. Kuznetsov, L. Szekeres, M. Payer, G. Candea, R. Sekar, and D. Song, “Code-pointer integrity,” in Proceedings of the 11th USENIX Conference on Operating Systems Design and Implementation , ser. OSDI’14. USA: USENIX Association, 2014, p. 147–163."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib14",
+      "text": "T. H. Dang, P. Maniatis, and D. Wagner, “The performance cost of shadow stacks and stack canaries,” in Proceedings of the 10th ACM Symposium on Information, Computer and Communications Security , ser. ASIA CCS ’15. New York, NY, USA: Association for Computing Machinery, 2015, p. 555–566. [Online]. Available: https://doi.org/10.1145/2714576.2714635"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib15",
+      "text": "V. Shanbhogue, D. Gupta, and R. Sahita, “Security analysis of processor instruction set architecture for enforcing control-flow integrity,” in Proceedings of the 8th International Workshop on Hardware and Architectural Support for Security and Privacy , ser. HASP ’19. New York, NY, USA: Association for Computing Machinery, 2019. [Online]. Available: https://doi.org/10.1145/3337167.3337175"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib16",
+      "text": "J. Woodruff, R. N. Watson, D. Chisnall, S. W. Moore, J. Anderson, B. Davis, B. Laurie, P. G. Neumann, R. Norton, and M. Roe, “The cheri capability model: Revisiting risc in an age of risk,” in Proceeding of the 41st Annual International Symposium on Computer Architecuture , ser. ISCA ’14. IEEE Press, 2014, p. 457–468."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib17",
+      "text": "D. Chisnall, C. Rothwell, R. N. Watson, J. Woodruff, M. Vadera, S. W. Moore, M. Roe, B. Davis, and P. G. Neumann, “Beyond the pdp-11: Architectural support for a memory-safe c abstract machine,” in Proceedings of the Twentieth International Conference on Architectural Support for Programming Languages and Operating Systems , ser. ASPLOS ’15. New York, NY, USA: Association for Computing Machinery, 2015, p. 117–130. [Online]. Available: https://doi.org/10.1145/2694344.2694367"
+    },
+    {
+      "n": 17,
+      "id": "bib.bib18",
+      "text": "L. Skorstengaard, D. Devriese, and L. Birkedal, “Reasoning about a machine with local capabilities: Provably safe stack and return pointer management,” ACM Trans. Program. Lang. Syst. , vol. 42, no. 1, Dec. 2019. [Online]. Available: https://doi.org/10.1145/3363519"
+    },
+    {
+      "n": 18,
+      "id": "bib.bib19",
+      "text": "——, “Stktokens: Enforcing well-bracketed control flow and stack encapsulation using linear capabilities,” J. Funct. Program. , vol. 31, p. e9, 2021. [Online]. Available: https://doi.org/10.1017/S095679682100006X"
+    },
+    {
+      "n": 19,
+      "id": "bib.bib20",
+      "text": "A. L. Georges, A. Trieu, and L. Birkedal, “Le temps des cerises: Efficient temporal stack safety on capability machines using directed capabilities,” Proc. ACM Program. Lang. , vol. 6, no. OOPSLA1, apr 2022. [Online]. Available: https://doi.org/10.1145/3527318"
+    },
+    {
+      "n": 20,
+      "id": "bib.bib1",
+      "text": "N. Roessler and A. DeHon, “Protecting the stack with metadata policies and tagged hardware,” in 2018 IEEE Symposium on Security and Privacy, SP 2018, Proceedings, 21-23 May 2018, San Francisco, California, USA . IEEE Computer Society, 2018, pp. 478–495. [Online]. Available: https://doi.org/10.1109/SP.2018.00066"
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "R. Gollapudi, G. Yuksek, D. Demicco, M. Cole, G. N. Kothari, R. H. Kulkarni, X. Zhang, K. Ghose, A. Prakash, and Z. Umrigar, “Control flow and pointer integrity enforcement in a secure tagged architecture,” in 2023 2023 IEEE Symposium on Security and Privacy (SP) (SP) . Los Alamitos, CA, USA: IEEE Computer Society, may 2023, pp. 1780–1795. [Online]. Available: https://doi.ieeecomputersociety.org/10.1109/SP46215.2023.00102"
+    },
+    {
+      "n": 22,
+      "id": "bib.bib22",
+      "text": "A. Azevedo de Amorim, M. Dénès, N. Giannarakis, C. Hriţcu, B. C. Pierce, A. Spector-Zabusky, and A. Tolmach, “Micro-policies: Formally verified, tag-based security monitors,” in 36th IEEE Symposium on Security and Privacy (Oakland S&P) . IEEE, May 2015."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib23",
+      "text": "A. Sabelfeld and A. C. Myers, “Language-based information-flow security,” IEEE Journal on selected areas in communications , vol. 21, no. 1, pp. 5–19, 2003."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib24",
+      "text": "A. Azevedo de Amorim, C. Hritcu, and B. C. Pierce, “The meaning of memory safety,” in Principles of Security and Trust - 7th International Conference, POST 2018, Held as Part of the European Joint Conferences on Theory and Practice of Software, ETAPS 2018, Thessaloniki, Greece, April 14-20, 2018, Proceedings , ser. Lecture Notes in Computer Science, L. Bauer and R. Küsters, Eds., vol. 10804. Springer, 2018, pp. 79–105. [Online]. Available: https://doi.org/10.1007/978-3-319-89722-6_4"
+    },
+    {
+      "n": 25,
+      "id": "bib.bib25",
+      "text": "M. Dénès, C. Hritcu, L. Lampropoulos, Z. Paraskevopoulou, and B. C. Pierce, “QuickChick: Property-based testing for Coq (abstract),” in VSL , 2014. [Online]. Available: http://www.easychair.org/smart-program/VSL2014/index.html"
+    },
+    {
+      "n": 26,
+      "id": "bib.bib26",
+      "text": "L. Lampropoulos and B. C. Pierce, QuickChick: Property-Based Testing in Coq , ser. Software Foundations series, volume 4. Electronic textbook, Aug. 2018, version 1.0. http://www.cis.upenn.edu/~bcpierce/sf ."
+    }
+  ]
+}

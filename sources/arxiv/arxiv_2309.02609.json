@@ -1,0 +1,85 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2309.02609",
+  "title": "Directionality-Aware Mixture Model Parallel Sampling for Efficient Linear Parameter Varying Dynamical System Learning",
+  "authors": "Sunan Sun, Haihui Gao, Tianyu Li, Nadia Figueroa",
+  "year": "2024",
+  "categories": [
+    "cs.RO",
+    "cs.SY",
+    "eess.SY"
+  ],
+  "url": "https://arxiv.org/abs/2309.02609",
+  "html_url": "https://arxiv.org/html/2309.02609",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 624,
+  "text": "Safe integration of robots into human workspaces requires the ability to adapt and replan in response to changing environments and constraints. Traditional path planning approaches, assuming a known environment and robot dynamics, face challenges when confronted with uncertainties and perturbations during operation [1,2,3]. In contrast, Dynamical System (DS)-based motion policies leverage redundancy of solutions in dynamic environments, embedding an infinite set of feasible solutions in a single control law to overcome environmental uncertainties and perturbations [4]. Furthermore, stability conditions can be introduced as constraints in the learning of DS, providing a closed-form analytical solution to trajectory planning [5,6].\n\nOur focus is on learning stable, time-independent motion policies from limited demonstrations, emphasizing i) state-space coverage, ii) minimal training data, iii) model accuracy, and iv) computational efficiency for online and incremental learning. While recent neural network (NN) based formulations for stable DS motion policies show promising results in encoding highly non-linear trajectories; as adopting normalizing flows [7], euclideanizing flows [8] or via contrastive learning [9]; such NN-based methods require many trajectories and substantial computation time to reach stable solutions. Interestingly, the seminal works on the Linear Parameter Varying Dynamical System (LPV-DS) formulation and its Gaussian Mixture Model (GMM) based learning frameworks [6,10,4] can achieve objectives i-ii), but face the challenge of preserving high reproduction accuracy without compromising computational speed.\n\nWhile GMM is useful at clustering sparse points, it fails to produce physically-meaningful representation of trajectory data. In the applications of trajectory planning/control, trajectories have inherent directionality; however, GMMs do not explicitly model directionality. Despite its fast inference via standard Gibbs sampling, a GMM struggles to encapsulate the intrinsic motion and dynamic nature of trajectory data, resulting in erroneous DS. To alleviate these issues, Physically Consistent (PC)-GMM was proposed [10]; a state-of-the-art statistical model tailored to the LPV-DS framework. By applying a distance-dependent Chinese Restaurant Process (DD-CRP) prior [11], PC-GMM integrates a distance metric of directionality by computing the pair-wise cosine similarity between every observation. Considering the directionality as side-information, PC-GMM produces more informative clustering results and DS. However, PC-GMM suffers from slow inference due to the DD-CRP requiring the computation of the similarity matrix, resulting in memory inefficiency and exponential increase in computation time wrt. the data size. Moreover, the online learning of PC-GMM is hard to achieve because the inference with the DD-CRP prior necessitates incremental updates [11], ruling out the possibility of parallel computation as such updates are strictly sequential.\n\nIn tackling the aforementioned challenges, we introduce the Directionality-Aware Mixture Model (DAMM). Inspired by relevant work on clustering spherical data on Riemannian manifolds [12], the DAMM formulation incorporates directional information using a proper Riemannian metric on the directional data manifold, inherently capturing the directionality within trajectories and producing physically-meaningful DS (Section III-A). We then introduce a new parallel Markov chain Monte Carlo (MCMC) sampling scheme tailored to the DAMM formulation, that is capable of achieving online performance (Section III-C).\n\nWe evaluate our approach through extensive empirical validation, including benchmark comparisons on LASA datasets [13] and the PC-GMM dataset [10] (including 2D and 3D real trajectories) against PC-GMM and baseline methods (Section IV). We demonstrate that the DAMM-based LPV-DS framework exhibits enhanced capabilities in producing improved DS across various metrics, and faster learning speed than its predecessors by order of magnitude. We further validate our approach in the real robot experiments (Section IV-C), where a single batch trajectory of 500 observations can be learned in <500ms, making our approach, to the best of our knowledge, the first DS learning framework that can be estimated in near real-time scale. The schematic of DAMM-based LPV-DS in a typical robotic control workflow is shown in Fig. 1. In the next section, we revisit the LPV-DS formulation, and give a brief overview of unit sphere geometry and Gibbs sampling.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "A. Ude, “Trajectory generation from noisy positions of object features for teaching robot paths,” Robotics and Autonomous Systems , vol. 11, no. 2, pp. 113–127, 1993."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "J.-H. Hwang, R. Arkin, and D.-S. Kwon, “Mobile robots at your fingertip: Bezier curve on-line trajectory generation for supervisory control,” vol. 2, 11 2003, pp. 1444 – 1449 vol.2."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "J. Aleotti and S. Caselli, “Robust trajectory learning and approximation for robot programming by demonstration,” Robotics and Autonomous Systems , vol. 54, no. 5, pp. 409–413, 2006."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "A. Billard, S. Mirrazavi, and N. Figueroa, Learning for Adaptive and Reactive Robot Control: A Dynamical Systems Approach . The MIT Press, 2022."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "E. Gribovskaya, S.-M. Khansari-Zadeh, and A. Billard, “Learning non-linear multivariate dynamics of motion in robotic manipulators,” IJRR , vol. 30, no. 1, pp. 80–117, 2011."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "S. M. Khansari-Zadeh and A. Billard, “Learning stable non-linear dynamical systems with gaussian mixture models,” IEEE Transactions on Robotics , vol. 27, no. 5, pp. 943–957, 2011."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "J. Urain, M. Ginesi, D. Tateo, and J. Peters, “Imitationflow: Learning deep stable stochastic dynamic systems by normalizing flows,” in 2020 IEEE/RSJ IROS , 2020, pp. 5231–5237."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "M. A. Rana, A. Li, D. Fox, B. Boots, F. Ramos, and N. Ratliff, “Euclideanizing flows: Diffeomorphic reduction for learning stable dynamical systems,” in Proc. of the 2nd Conference on Learning for Dynamics and Control , vol. 120. PMLR, Jun 2020, pp. 630–639."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "R. Pérez-Dattari and J. Kober, “Stable motion primitives via imitation and contrastive learning,” IEEE Transactions on Robotics , vol. 39, no. 5, pp. 3909–3928, 2023."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "N. Figueroa and A. Billard, “A physically-consistent bayesian non-parametric mixture model for dynamical system learning,” in Proc. of The 2nd Conference on Robot Learning , vol. 87. PMLR, 2018, pp. 927–948."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "D. Blei and P. Frazier, “Distance dependent chinese restaurant processes,” Journal of Machine Learning Research , vol. 12, pp. 2461–2488, 08 2011."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "J. Straub, J. Chang, O. Freifeld, and J. Fisher III, “A Dirichlet Process Mixture Model for Spherical Data,” in Proceedings of the Eighteenth International Conference on Artificial Intelligence and Statistics , ser. Proceedings of Machine Learning Research, vol. 38. PMLR, 09–12 May 2015, pp. 930–938."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "S. M. Khansari-Zadeh and A. Billard, “Learning control lyapunov function to ensure stability of dynamical system-based robot reaching motions,” Robotics and Autonomous Systems , vol. 62, no. 6, pp. 752–765, 2014."
+    }
+  ]
+}

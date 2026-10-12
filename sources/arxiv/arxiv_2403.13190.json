@@ -1,0 +1,68 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.13190",
+  "title": "3D Semantic MapNet: Building Maps for Multi-Object Re-Identification in 3D",
+  "authors": "Vincent Cartillier, Neha Jain, Irfan Essa",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2403.13190",
+  "html_url": "https://arxiv.org/html/2403.13190",
+  "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+  "section": "Introduction",
+  "word_count": 764,
+  "text": "Imagine a home assistant robot asked to tidy up a house after an event or a party. Such an agent needs to have complete context of what objects belong where, what was added, and is missing. It also needs to know where all the objects are now, were before, and create a map of how the scene has changed in order to restore it back to its normal state. This example illustrates a broadly useful skill for embodied agents interacting with human environments – the ability to represent the world as a set of dynamic objects that persist over time. This is foundational to linking user commands to entities in the world that are not currently in the field of view, answering questions about the location of objects (e.g. where did I leave my phone?), and reasoning about likely events that have changed the state of the world (e.g. someone must be home because a new coat is on the rack).\n\nWithin the context of this longer-term goal, we study the task of 3D multi-object detection and re-identification in an indoor space. An embodied agent (a virtual robot or an egocentric AI assistant) is equipped with an RGB-D camera with known pose (extracted via a localization system). The agent is provided two tours (represented as camera trajectories) of an environment under different layouts. Between the two layouts, objects may have been added, removed, moved, or be unchanged. The agent needs to detect 3D bounding boxes and match them between the two layouts (as illustrated in Fig. 1). This is a challenging and realistic problem that goes beyond the classical 2D or 3D object detection formulation. First, the agent must localize objects in 3D in varied poses and contexts from passive egocentric views (it does not control how an object is framed). Second, it must match instances across layouts despite large changes in pose or relationships to surrounding objects (e.g. a lamp may be moved across the room, breaking inter-object contextual relationships). Third, object instances across tours may have differing degree of observation (i.e. an object seen from multiple sides in the first tour might only be seen from one in the second).\n\nOur approach, called 3D Semantic MapNet (3D-SMNet), consists of two natural components following the structure of the task –\n\n- (1) a 3D object detector that takes as input an RGB-D video with known poses and outputs an object-based map. The map (Fig. 1 (c)) stores a set of object instances, each defined by its 3D bounding-box centroid, orientation and dimensions, class label, and a feature descriptor used for the re-identification phase. The object-map for each layout are then passed to\n\n- (2) a matching module that estimates correspondences between two sets of 3D bounding boxes, based on appearance, geometry, and context (Fig. 1 (d)).\n\nTo benchmark the current state of the field on this task, we take a straight-forward approach of instantiating these components with recent prior works as (1) a VoteNet [1] detector and (2) a modified SuperGlue [2] optimal matching layer. To improve performance on added and removed objects, we introduce a novel scene-adaptive mechanism for identifying unmatchable objects.\n\nWe conduct experiments using photo-realistic scans of building-scale environments (homes, offices, churches) in the Matterport3D (MP3D) dataset [3] using the Habitat simulation platform [4,5], which allows access to agent state, navigation trajectories, RGB-D renderings, etc. The scans in MP3D are ‘monolithic’, i.e. the entire environment is stored as a single textured mesh and individual objects can not be moved or removed. To overcome this problem, we use the Google-Scanned-Objects (GSO) [6] and YCB objects [7] datasets, which cumulatively consist of over 1,000 3D scans of objects from different semantic categories that can be inserted in MP3D environments. We create an automated infrastructure to generate paired egocentric tours of initial/modified layouts of MP3D scenes populated with different objects from GSO and YCB; we expect this infrastructure to be broadly useful beyond this task. We conduct extensive experiments in this generated dataset to quantify the impact of model choices in 3DSMNet against competitive baselines.\n\nTo further demonstrate the usefulness of our approach and data generation infrastructure, we show zero-shot transfer results to scans of real environment rearrangements from the Replica [8], Active Vision [9], and RIO [10] datasets. We adapt our task to these environments and show 3D-SMNet outperforms competitive baselines. Finally, we show that jointly training on real and generated data results in significant improvements for re-identification in the RIO environments – improving matching accuracy by +10\\% on real environments compared to when the system is trained on real data alone.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib25",
+      "text": "Charles R Qi, Or Litany, Kaiming He, and Leonidas J Guibas. Deep hough voting for 3d object detection in point clouds. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 9277–9286, 2019."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib27",
+      "text": "Paul-Edouard Sarlin, Daniel DeTone, Tomasz Malisiewicz, and Andrew Rabinovich. Superglue: Learning feature matching with graph neural networks. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 4938–4947, 2020."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib9",
+      "text": "Angel Chang, Angela Dai, Thomas Funkhouser, Maciej Halber, Matthias Niessner, Manolis Savva, Shuran Song, Andy Zeng, and Yinda Zhang. Matterport3d: Learning from rgb-d data in indoor environments. arXiv preprint arXiv:1709.06158 , 2017."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib28",
+      "text": "Manolis Savva, Abhishek Kadian, Oleksandr Maksymets, Yili Zhao, Erik Wijmans, Bhavana Jain, Julian Straub, Jia Liu, Vladlen Koltun, Jitendra Malik, Devi Parikh, and Dhruv Batra. Habitat: A Platform for Embodied AI Research. In ICCV , 2019."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib33",
+      "text": "Andrew Szot, Alex Clegg, Eric Undersander, Erik Wijmans, Yili Zhao, John Turner, Noah Maestre, Mustafa Mukadam, Devendra Chaplot, Oleksandr Maksymets, Aaron Gokaslan, Vladimir Vondrus, Sameer Dharur, Franziska Meier, Wojciech Galuba, Angel Chang, Zsolt Kira, Vladlen Koltun, Jitendra Malik, Manolis Savva, and Dhruv Batra. Habitat 2.0: Training home assistants to rearrange their habitat. In NeurIPS , 2021."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib26",
+      "text": "Google Research. Google-scanned-objects, 2020."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib8",
+      "text": "Berk Calli, Arjun Singh, Aaron Walsman, Siddhartha Srinivasa, Pieter Abbeel, and Aaron M Dollar. The ycb object and model set: Towards common benchmarks for manipulation research. In 2015 international conference on advanced robotics (ICAR) , pages 510–517. IEEE, 2015."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib32",
+      "text": "Julian Straub, Thomas Whelan, Lingni Ma, Yufan Chen, Erik Wijmans, Simon Green, Jakob J. Engel, Raul Mur-Artal, Carl Ren, Shobhit Verma, Anton Clarkson, Mingfei Yan, Brian Budge, Yajie Yan, Xiaqing Pan, June Yon, Yuyang Zou, Kimberly Leon, Nigel Carter, Jesus Briales, Tyler Gillingham, Elias Mueggler, Luis Pesqueira, Manolis Savva, Dhruv Batra, Hauke M. Strasdat, Renzo De Nardi, Michael Goesele, Steven Lovegrove, and Richard Newcombe. The Replica dataset: A digital replica of indoor spaces. arXiv preprint arXiv:1906.05797 , 2019."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib2",
+      "text": "Phil Ammirato, Patrick Poirson, Eunbyung Park, Jana Košecká, and Alexander C Berg. A dataset for developing and benchmarking active vision. In 2017 IEEE International Conference on Robotics and Automation (ICRA) , pages 1378–1385. IEEE, 2017."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib35",
+      "text": "Johanna Wald, Armen Avetisyan, Nassir Navab, Federico Tombari, and Matthias Nießner. Rio: 3d object instance re-localization in changing indoor environments. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 7658–7667, 2019."
+    }
+  ]
+}

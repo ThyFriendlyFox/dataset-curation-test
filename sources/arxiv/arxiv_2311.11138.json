@@ -1,0 +1,68 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2311.11138",
+  "title": "Estimating Uncertainty in Landslide Segmentation Models",
+  "authors": "Savinay Nagendra, Chaopeng Shen, Daniel Kifer",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2311.11138",
+  "html_url": "https://arxiv.org/html/2311.11138",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1070,
+  "text": "Landslides are one of the most widespread hazards, with 300M people exposed and 66M people in high-risk areas [1]. Globally, landslides causes thousands of deaths each year (\\approx 4,164 in 2017 alone [2]) and the displacement of communities and destruction of roads and habitable lands. Moreover, climate change is projected to induce more frequent extreme rainfalls and wildfires, which are expected to result in more landslides and landslide-related casualties [3,4].\n\nLong-term efforts to mitigate the impacts of landslides require evaluating landslide susceptibility. Planning and prediction capabilities can be greatly assisted by a large-scale database of satellite images of landslide events, with accurate location information. In the US, the United States Geological Survey (USGS) maintains a database of landslide reports with approximate locations and times (but no images). However, even this kind of dataset, the most extensive of its kind, is incomplete and imprecise in location because it only gives an approximate location. While each entry can be verified manually – either in-person or by examining satellite imagery, it presents both an opportunity and a challenge for scalability and coverage: “our current ability to understand landslide hazards at the national scale is limited, in part because spatial data on landslide occurrence across the U.S. varies greatly in quality, accessibility, and extent” [5].\n\nGiven the increasing availability of high-resolution satellite images, a path is now open to collect information about space-visible landslide events using satellite images. Several recent efforts [6,7] have considered the use of deep learning for landslide segmentation (also known as landslide mapping) – identifying the pixels in a satellite image that correspond to landslides. However, due to the difficulty of labeling the training data, each study focused on on a single small region and had limited testing data (for instance, one study only had 3 testing images [7]).\n\nThere are two types of tasks. The multi-image task takes a current image (post-event image) and an earlier image (pre-event image) with the goal of identifying the landslide in the post-event image (hence it deals with image pairs). The single-image task simply takes one image and identifies the landslides (if any exist) in the image. It is useful when high quality recent pre-event images are not available (for example, due to cloud cover).\n\nManually labeling training data does not scale as it is a challenging problem even for humans (see Figure 1 for an example). Landslides are usually not the salient features in an image and there are often “distractor” objects (like roads) with similar color and texture. We found that manual annotation required training the labelers, who had to carefully examine each satellite image and compare it to the pre-event image. This process takes a human annotator several minutes per image.\n\nAutomated and semi-automated approaches for constructing landslide databases appear more promising as one could take an initial dataset, train landslide segmentation models and use them to segment additional satellite images. These new images could be fed back into the training data, models could be retrained, etc. However, if auto-segmented images are fed back into this training loop, one risks propagating errors – models trained on the new data will learn to make the same mistakes as the previous models while possibly adding new mistakes of their own. Thus human curators must play a role in detecting and correcting errors.\n\nThe key to making such an approach work is to accurately assess the pixel-level confidence of the segmentation models – for each pixel, how confident is the model that this is a landslide pixel? Accurate confidence estimates can allow curators to prioritize the images they need to check, and contours of the uncertainty maps can be used to suggest alternative segmentations for an image (providing regions that can be added to or removed from an existing polygon).\n\nTypical segmentation models provide a score for every pixel. These scores are then thresholded – values above the threshold are labeled as landslide and values below are labeled as background. In principle, these pre-threshold values can be used as confidence measures but in practice there is much room for improvement. In this paper, we compare three methods (which do not change the underlying model architecture) for measuring per-pixel uncertainty:\n\n- • Pre-Threshold values – these serve as a useful baseline and are computationally the fastest.\n\n- • Monte-Carlo Dropout [8] – this method is applicable to all models that are trained with dropout [9] (since dropout is a useful regularization technique, we consider it a training technique rather than an architectural change).\n\n- • Test-Time Augmentation (TTA) [10] – for a test image, we prepare multiple augmented images (rotated, flipped, etc.). A pixel’s confidence score is the average of the pre-threshold values it receives from each of the augmented images. This technique makes the uncertainty scores robust in the sense that they are now (approximately) invariant to augmentations. To the best of our knowledge, this technique has not been used before in the remote sensing domain.\n\nWe evaluate the confidence scores in three different ways. (1) We create calibration plots which are used to evaluate whether the confidence scores appear to act like probabilities – e.g., of all of the pixels having confidence 0.8 of being landslide, are 80% (or above) of them actually landslide pixels? The next two measures evaluate how well the landslide confidence scores order the pixels. (2) Area Under the Curve (AUC) can be interpreted as the probability that a randomly chosen landslide pixel has a larger landslide-confidence score than a randomly chosen non-landslide pixel. (3) We also consider an adaptation of AUC to typical segmentation metrics like Intersection Over Union (IOU) – if we take a confidence map for an image and sweep out all possible values of the threshold, what is the largest IOU that can be achieved for the image (we call this image-specific thresholding).\n\nWe find that across a variety of segmentation models, Test-Time Augmentation consistently outperforms the other methods in all three metrics.\n\nThis paper is organized as follows. We describe our landslide dataset in Section 3. Our evaluation uses 4 standard deep learning architectures, so in Section 4, we explain what they are and present a brief comparison of their accuracies. In Section 5, we describe the three techniques (for generating confidence maps) that are being evaluated for each of the deep learning architectures. In Section 6, we describe our evaluation criteria. Results appear in Section 7. We present conclusions in Section 8.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib4",
+      "text": "M. Dilley, R.S. Chen, U. Deichmann, A. Lerner-Lam, M. Arnold, J. Agwe, P. Buys, O. Kjekstad, Bradfield Lyon, and Greg Yetman. Natural disaster hotspots: A global risk analysis. World Bank Disaster Risk Management Series , 5:1–132, 01 2005."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib27",
+      "text": "Dave Petley. An analysis of fatal landslides, and the resultant deaths, in 2017, Apr 2018."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib31",
+      "text": "Thomas Stocker, Lisa Alexander, and Myles Allen. Climate change 2013: the physical science basis: final draft underlying scientific-technical assessment: Working Group I contribution to the IPCC fifth assessment report . WMO, IPCC Secretariat, 2013."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib5",
+      "text": "E. M. Fischer and R. Knutti. Anthropogenic contribution to global occurrenceof heavy-precipitation andhigh-temperature extremes. Nature Climate Change , 5(6):560–564, 2015."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib10",
+      "text": "Eric S Jones, Benjamin B Mirus, Robert G Schmitt, Rex L Baum, Jonathan W Godt, Dalia B Kirschbaum, Thomas A Stanley, and Kevin E. MCCoy. Summary metadata - landslide inventories across the united states, 2019."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib8",
+      "text": "Omid Ghorbanzadeh, Thomas Blaschke, Khalil Gholamnia, Sansar Raj Meena, Dirk Tiede, and Jagannath Aryal. Evaluation of different machine learning methods and deep-learning convolutional neural networks for landslide detection. Remote Sensing , 11(2):196, 2019."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib13",
+      "text": "Tao Lei, Yuxiao Zhang, Zhiyong Lv, Shuying Li, Shigang Liu, and Asoke K. Nandi. Landslide inventory mapping from bitemporal images using deep convolutional neural networks. IEEE Geoscience and Remote Sensing Letters , 16(6):982–986, 2019."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib7",
+      "text": "Yarin Gal and Zoubin Ghahramani. Dropout as a bayesian approximation: Representing model uncertainty in deep learning. In international conference on machine learning , pages 1050–1059, 2016."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib30",
+      "text": "Nitish Srivastava, Geoffrey Hinton, Alex Krizhevsky, Ilya Sutskever, and Ruslan Salakhutdinov. Dropout: A simple way to prevent neural networks from overfitting. Journal of Machine Learning Research , 15:1929–1958, 2014."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib33",
+      "text": "Guotai Wang, Wenqi Li, Michael Aertsen, Jan Deprest, Sébastien Ourselin, and Tom Vercauteren. Aleatoric uncertainty estimation with test-time augmentation for medical image segmentation with convolutional neural networks. Neurocomputing , 338:34–45, 2019."
+    }
+  ]
+}

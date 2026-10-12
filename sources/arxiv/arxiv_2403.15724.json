@@ -1,0 +1,59 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.15724",
+  "title": "PEaCE: A Chemistry-Oriented Dataset for Optical Character Recognition on Scientific Documents",
+  "authors": "Nan Zhang, Connor Heaton, Sean Timothy Okonsky, Prasenjit Mitra, Hilal Ezgi Toraman",
+  "year": "2024",
+  "categories": [
+    "cs.CL",
+    "cs.AI"
+  ],
+  "url": "https://arxiv.org/abs/2403.15724",
+  "html_url": "https://arxiv.org/html/2403.15724",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "1. Introduction",
+  "word_count": 1202,
+  "text": "For documents that are available only as scans, before text processing and natural language processing can be applied, we must convert the images that represent the text in these documents into digital characters before they can be processed to understand their content. In order to do so, Optical Character Recognition (OCR) is widely used to extract texts from images in various real-world applications [1,2] and can complement other data extraction pipelines [3,4]. Extracting text from images of both scientific texts (e.g., math and physics formulae) and generic printed English plays a vital role in data extraction of scientific articles. A model that is capable in both realms is necessary. Important information in scientific documents is often presented in the form of tables, making data extraction even more difficult.\n\nHowever, existing open-source OCR models and datasets tend to focus on either scientific texts or generic printed English. Thus, their performance on the documents that contain both is suboptimal. For example, Pix2tex [5], a pre-trained model that achieves competitive performance on images of math formulae, is less capable on images containing printed English texts. Tesseract is commonly used to extract vanilla printed English, but it cannot be fine-tuned directly on images of scientific texts, because it outputs plain text strings without formatting for contents such as superscript and subscript [6].\n\nFurthermore, simply combining a vanilla printed English and scientific training corpora is unlikely to yield strong performance on records that are a hybrid of the domains for two reasons. First, there will likely be inconsistencies in the way labels from each corpus are presented - records from the scietific corpus may contain L a T e X formatting not present in the vanilla printed English corpus. While this may be able to be rectified, a second issue still remains - the model will be presented with records containing each type of text separately, but will never be presented with records containing both types of text. That is, a model trained on such a corpus will never see scientific text interspersed with vanilla printed English.\n\nIn this work, we seek to address the inability of existing tools to format text including super/subscripts and other special characters in academic and scientific papers. Such text is predominantly printed in English, but often have specially-formatted and important characters. For example, a document may contain mentions of chemical compounds such as Na_{2}CO_{3}. An OCR model needs to recognize both subscripts, and also discern the values in the subscripts as they denote important physical properties of the compound.\n\nAlthough one may assume it reasonable to segment the text by plain English/special characters and apply domain-specific models on each resulting group, we believe doing so is not the ideal solution. First, doing so would introduce redundant computation into the pipeline. That is, each segment of the image would have to be analyzed twice - once in order to classify the textual content, and again to synthesize it. Furthermore, in doing so, a model would not be able to leverage the temporal dependency in the text. For example, the text “ Na_{2}CO_{3}\\;(Sodium\\;carbonate) ” would get segmented into “ Na ”, “ 2 ”, “ CO ”, “ 3 ”, and “ (Sodium\\;carbonate) ”, and the model would need to synthesize each segment in isolation. We believe a stronger model can be learned processing the entire record at once, leveraging the temporal dependency between the chemical compound, Na_{2}CO_{3}, and its name in English, Sodium\\;carbonate.\n\nNougat, a newly released model, can perform OCR on entire pages of academic documents, including parsing tables, but struggles significantly in parsing tables from documents published in PubMed [7]. As the authors describe, PubMed papers often present tables as embedded images. So they could not access the ground-truth text present therein without an expensive annotation process. As such, the model often fails to recognize tables in such documents, and when tables are recognized, they are rarely parsed correctly. PubMed hosts a large portion of papers in the life-sciences and biomedical domains, leaving a significant portion of the academic community unaddressed or under-addressed.\n\nWe aim to address the above shortcomings by proposing a new data resource, since there does not exist an OCR dataset that contains images of both scientific texts and printed English to the best of our knowledge. Thus, we introduce PEaCE (P rinted E nglish a nd C hemical E quations) dataset, containing synthetic and real-world images of text from academic articles, with a particular focus on chemistry papers. Each record in PEaCE is intended to resemble a cell in a table that may appear in an academic document (a handful of words across two or three lines), and the code we release exposes parameters that make it easy for researchers to generate records of any length and format they desire. A model trained on PEaCE could then be combined with a state-of-the-art (SOTA) table parsing model such as Multi-Type-TD-TSR [8] to parse the content of tables identified in scientific documents, addressing the market Nougat cannot.\n\nPEaCE has two parts: 1) synthetic records and 2) real-world records. The synthetic portion of the dataset contains 1M images of printed English text, 100k images of numerical artifacts, and 100k images of (pseudo-)chemical equations, subset in mutually exclusive training/dev/test splits. The real-world test set comprises 319 carefully curated records and assesses the performance of OCR models on text from actual chemistry scholarly papers. Figure 1 shows a data instance from the real-world test set of PEaCE. All labels in PEaCE are L a T e X markup as it is a versatile typesetting tool that can express the multitude of non-alphanumeric characters often found in academic papers such as “ \\sum ”, “ + ”, and “ \\mathbb{R} ”, and can format super/subscripts. Given that the real-world records contain corruption not found in synthetic records, we propose three transformations - pixelation, bolding, and white-space padding - to mimic these artifacts.\n\nWe explore how two different versions of the Vision Transformer (ViT) perform when trained on PEaCE, and our findings can be summarized in three folds. First, although all models perform well on the synthetic tests sets, they exhibit a sharp decline in performance on the real-world test set. This reinforces our motivation for proposing PEaCE, as existing datasets to not reveal this shortcoming. Then, we observe that the patch size parameter has a significant impact on resulting performance, with smaller patches leading to better performance. Further, we see that models trained in a multi-domain setting, i.e. both PEaCE and im2latex-100k, yield better performance in each domain than a model trained on a single domain. Finally, we also observe that our proposed image transformations improves performance in two of our three test datasets.\n\nThis paper mainly contributes the following:\n\n- 1. We propose a novel dataset that contains images of both scientific texts and printed English for training and testing OCR models on articles from the hard sciences, with an emphasis on Chemistry.\n\n- 2. We demonstrate how models that perform well on related datasets perform significantly worse on our PEaCE real-world dataset, highlighting the value of this new resource.\n\n- 3. We present a set of quantitative evaluations to show the effect of patch size, multi-domain training, and image transformations.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib18",
+      "text": "Memon et al. (2020) Jamshed Memon, Maira Sami, Rizwan Ahmed Khan, and Mueen Uddin. 2020. Handwritten optical character recognition (ocr): A comprehensive systematic literature review (slr). IEEE Access , 8:142642–142668."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib31",
+      "text": "Ye et al. (2018) Yibin Ye, Shenggao Zhu, Jing Wang, Qi Du, Yezhang Yang, Dandan Tu, Lanjun Wang, and Jiebo Luo. 2018. A unified scheme of text localization and structured data extraction for joint ocr and data mining. In 2018 IEEE International Conference on Big Data (Big Data) , pages 2373–2382. IEEE."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib32",
+      "text": "Zhang et al. (2022) Nan Zhang, Shomir Wilson, and Prasenjit Mitra. 2022. STAPI: An automatic scraper for extracting iterative title-text structure from web documents . In Proceedings of the Thirteenth Language Resources and Evaluation Conference , pages 3461–3470, Marseille, France. European Language Resources Association."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib28",
+      "text": "Wang et al. (2020) Shirly Wang, Matthew BA McDermott, Geeticka Chauhan, Marzyeh Ghassemi, Michael C Hughes, and Tristan Naumann. 2020. Mimic-extract: A data extraction, preprocessing, and representation pipeline for mimic-iii. In Proceedings of the ACM conference on health, inference, and learning , pages 222–235."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib2",
+      "text": "Blecher (2020) Lukas Blecher. 2020. GitHub - lukas-blecher/LaTeX-OCR: pix2tex: Using a ViT to convert images of equations into LaTeX code. — github.com. https://github.com/lukas-blecher/LaTeX-OCR . [Accessed 06-Oct-2022]."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib24",
+      "text": "Smith (2007) R. Smith. 2007. An overview of the tesseract ocr engine . In Ninth International Conference on Document Analysis and Recognition (ICDAR 2007) , volume 2, pages 629–633."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib3",
+      "text": "Blecher et al. (2023) Lukas Blecher, Guillem Cucurull, Thomas Scialom, and Robert Stojnic. 2023. Nougat: Neural optical understanding for academic documents. arXiv preprint arXiv:2308.13418 ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib10",
+      "text": "Fischer et al. (2021) Pascal Fischer, Alen Smajic, Alexander Mehler, and Giuseppe Abrami. 2021. Multi-type-td-tsr – extracting tables from document images using a multi-stage pipeline for table detection and table structure recognition: from ocr to structured table representations ."
+    }
+  ]
+}

@@ -1,0 +1,150 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2301.11118",
+  "title": "Dual Box Embeddings for the Description Logic EL++",
+  "authors": "Mathias Jackermeier, Jiaoyan Chen, Ian Horrocks",
+  "year": "2024",
+  "categories": [
+    "cs.AI",
+    "cs.LG",
+    "cs.LO"
+  ],
+  "url": "https://arxiv.org/abs/2301.11118",
+  "html_url": "https://arxiv.org/html/2301.11118",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 702,
+  "text": "Ontologies are a widely used formalism to represent general knowledge about a domain [1]. They are usually specified in the Web Ontology Language (OWL) [2] standard developed by W3C, and have been widely adopted in many domains such as the Semantic Web [3], healthcare [4], bioinformatics [5], and geoinformatics [6]. OWL allows for the expression of a variety of statements, ranging from simple relational facts to specifying concept hierarchies and complex logical relationships, and is underpinned by Description Logic (DL) [7] to define its formal semantics.\n\nAlthough many real-world OWL ontologies have been developed and used with great success, such as the Gene Ontology GO [8] and the food ontology FoodOn [9], both maintaining these existing OWL ontologies and creating new ontologies has proved challenging and relies mostly on manual labor carried out by experts. Common ontology curation tasks include completing missing subsumptions between concepts (or membership relations between individuals and concepts) and identifying missing logical restrictions between concepts. Symbolic logical reasoning algorithms such as HermiT [10] and ELK [11] help address this problem by deductively inferring implicit knowledge from the precise semantics of an ontology, but this classical reasoning is often too rigid for real-world OWL ontologies — especially in the presence of incomplete or noisy data — and cannot derive knowledge that is only probable from the given ontology.\n\nAt the same time, there has been growing interest in representation learning-based methods for completing Knowledge Graphs (KGs) [12], i.e. relational facts in the form of RDF triples <Subject, Predicate, Object>. Most of these approaches first learn structure-preserving embeddings of the entities and relations (predicates) of a KG in a latent vector space and then use them to score the likelihood of novel facts [13]. For example, the classic method TransE [14] maps entities and relations to vectors such that translating the subject embedding by the relation embedding approximately yields the object embedding.\n\nSimilar embedding-based techniques as for KGs have been developed for inductive reasoning in ontologies, which promises to complement classical deductive reasoning for ontology curation tasks. Some approaches such as OPA2Vec [15] and OWL2Vec* [16] rely on exploiting textual meta information (e.g., concept labels and comments) to model similarities between entities, but do not retain the semantics defined by the underlying DL. Other approaches aim to directly embed the logical information of an OWL ontology in the latent space [17,18,19,20], mostly targeting the OWL 2 EL profile [21], whose semantics are defined according to the DL \\mathcal{EL^{++}} [22]. Prominent examples include ELEm [17] and its extension EmEL ++ [18], which model concepts as high-dimensional balls, but fail to faithfully capture concept conjunction, since the intersection of two balls is no longer a ball. This led to the development of the state-of-the-art methods BoxEL [20] and ELBE [19], which instead represent concepts as boxes (i.e., axis-aligned hyperrectangles). However, all of these approaches still rely on TransE [14] to model roles (i.e., binary relations) as simple translations, which is unable to capture one-to-many, many-to-one, or many-to-many relationships [23,24], and is limited in its ability to faithfully represent inclusion relationships between roles. Furthermore, these current works focus on the basic task of predicting subsumptions between named concepts, without considering complex concepts defined with logical operators or complex logical relationships in evaluation.\n\nIn this paper, we propose Box {}^{\\textsf{2}} EL, a novel OWL ontology embedding method targeting the semantics of \\mathcal{EL^{++}}, which has been widely adopted in many real-life large-scale ontologies [25,5]. To address the aforementioned limitations of existing approaches, we instead draw inspiration from BoxE [26] and represent both relations and concepts as boxes, while modeling interactions between concepts via a bumping mechanism. We not only demonstrate how Box {}^{\\textsf{2}} EL overcomes the shortcomings of previous methods, but also prove that it is sound, i.e., faithfully captures the semantics of the underlying DL, which shows its theoretical correctness and supports interpretable inference for ontology completion. We evaluate our method in the two different inductive reasoning settings of concept subsumption prediction — involving both named and complex concepts — and role assertion (link) prediction, and on approximating deductive reasoning. Our results demonstrate that the theoretical advantages of our approach manifest themselves in practice and lead to state-of-the-art performance across a variety of datasets.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib38",
+      "text": "Staab and Studer (2010) Steffen Staab and Rudi Studer. 2010. Handbook on ontologies . Springer Science & Business Media."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib14",
+      "text": "Grau et al . (2008) Bernardo Cuenca Grau, Ian Horrocks, Boris Motik, Bijan Parsia, Peter Patel-Schneider, and Ulrike Sattler. 2008. OWL 2: The next Step for OWL. Journal of Web Semantics 6, 4 (2008), 309–322."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib17",
+      "text": "Héder (2014) Mihály Héder. 2014. Semantic Web for the Working Ontologist, Second edition: Effective modeling in RDFS and OWL . Knowl. Eng. Rev. 29, 3 (2014), 404–405."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib35",
+      "text": "Schulz et al . (2009) Stefan Schulz, Boontawee Suntisrivaraporn, Franz Baader, and Martin Boeker. 2009. SNOMED Reaching Its Adolescence: Ontologists’ and Logicians’ Health Check. International Journal of Medical Informatics 78 (April 2009), S86–S94."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib18",
+      "text": "Hoehndorf et al . (2011) Robert Hoehndorf, Michel Dumontier, Anika Oellrich, Sarala Wimalaratne, Dietrich Rebholz-Schuhmann, Paul Schofield, and Georgios V. Gkoutos. 2011. A Common Layer of Interoperability for Biomedical Ontologies Based on OWL EL. Bioinformatics 27, 7 (April 2011), 1001–1008."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib47",
+      "text": "Zhai et al . (2010) Xiaofang Zhai, Lei Huang, and Zhifeng Xiao. 2010. Geo-spatial query based on extended SPARQL. In 2010 18th International Conference on Geoinformatics . 1–4."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib6",
+      "text": "Baader et al . (2005c) Franz Baader, Ian Horrocks, and Ulrike Sattler. 2005c. Description logics as ontology languages for the semantic web. In Mechanizing mathematical reasoning . Springer, 228–248."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib3",
+      "text": "Ashburner et al . (2000) Michael Ashburner, Catherine A Ball, Judith A Blake, David Botstein, Heather Butler, J Michael Cherry, Allan P Davis, Kara Dolinski, Selina S Dwight, Janan T Eppig, et al . 2000. Gene ontology: tool for the unification of biology. Nature genetics 25, 1 (2000), 25–29."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib11",
+      "text": "Dooley et al . (2018) Damion M. Dooley, Emma J. Griffiths, Gurinder S. Gosal, Pier L. Buttigieg, Robert Hoehndorf, Matthew C. Lange, Lynn M. Schriml, Fiona S. L. Brinkman, and William W. L. Hsiao. 2018. FoodOn: A Harmonized Food Ontology to Increase Global Food Traceability, Quality Control and Data Integration. npj Science of Food 2, 1 (Dec. 2018), 23."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib13",
+      "text": "Glimm et al . (2014) Birte Glimm, Ian Horrocks, Boris Motik, Giorgos Stoilos, and Zhe Wang. 2014. HermiT: An OWL 2 Reasoner. Journal of Automated Reasoning 53, 3 (2014), 245–269."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib20",
+      "text": "Kazakov et al . (2014) Yevgeny Kazakov, Markus Krötzsch, and František Simančík. 2014. The Incredible ELK. Journal of Automated Reasoning 53, 1 (2014), 1–61."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib19",
+      "text": "Hogan et al . (2021) Aidan Hogan, Eva Blomqvist, Michael Cochez, Claudia d’Amato, Gerard de Melo, Claudio Gutierrez, Sabrina Kirrane, José Emilio Labra Gayo, Roberto Navigli, Sebastian Neumaier, et al . 2021. Knowledge graphs. ACM Computing Surveys (CSUR) 54, 4 (2021), 1–37."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib41",
+      "text": "Wang et al . (2017) Quan Wang, Zhendong Mao, Bin Wang, and Li Guo. 2017. Knowledge graph embedding: A survey of approaches and applications. IEEE Transactions on Knowledge and Data Engineering 29, 12 (2017), 2724–2743."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib8",
+      "text": "Bordes et al . (2013) Antoine Bordes, Nicolas Usunier, Alberto Garcia-Duran, Jason Weston, and Oksana Yakhnenko. 2013. Translating Embeddings for Modeling Multi-relational Data. In Advances in Neural Information Processing Systems , Vol. 26."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib36",
+      "text": "Smaili et al . (2019) Fatima Zohra Smaili, Xin Gao, and Robert Hoehndorf. 2019. OPA2Vec: Combining formal and informal content of biomedical ontologies to improve similarity-based prediction. Bioinformatics 35, 12 (2019), 2133–2140."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib10",
+      "text": "Chen et al . (2021) Jiaoyan Chen, Pan Hu, Ernesto Jimenez-Ruiz, Ole Magnus Holter, Denvar Antonyrajah, and Ian Horrocks. 2021. OWL2Vec*: Embedding of OWL ontologies. Machine Learning 110, 7 (2021), 1813–1845."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib23",
+      "text": "Kulmanov et al . (2019) Maxat Kulmanov, Wang Liu-Wei, Yuan Yan, and Robert Hoehndorf. 2019. EL Embeddings: Geometric Construction of Models for the Description Logic EL++. In Proceedings of the Twenty-Eighth International Joint Conference on Artificial Intelligence . 6103–6109."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib26",
+      "text": "Mondal et al . (2021) Sutapa Mondal, Sumit Bhatia, and Raghava Mutharaju. 2021. EmEL++: Embeddings for ℰ ​ ℒ + ⁣ + \\mathcal{EL^{++}} Description Logic. In Proceedings of the AAAI 2021 Spring Symposium on Combining Machine Learning and Knowledge Engineering (CEUR Workshop Proceedings, Vol. 2846) ."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib32",
+      "text": "Peng et al . (2022) Xi Peng, Zhenwei Tang, Maxat Kulmanov, Kexin Niu, and Robert Hoehndorf. 2022. Description Logic EL++ Embeddings with Intersectional Closure. arXiv:2202.14018"
+    },
+    {
+      "n": 20,
+      "id": "bib.bib45",
+      "text": "Xiong et al . (2022) Bo Xiong, Nico Potyka, Trung-Kien Tran, Mojtaba Nayyeri, and Steffen Staab. 2022. Faithful Embeddings for ℰ ​ ℒ + ⁣ + \\mathcal{EL^{++}} Knowledge Bases. In Proceedings of the 21st International Semantic Web Conference , Vol. 13489. 22–38."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib22",
+      "text": "Krötzsch (2012) Markus Krötzsch. 2012. OWL 2 Profiles: An Introduction to Lightweight Ontology Languages. In Reasoning Web. Semantic Technologies for Advanced Query Answering. Reasoning Web 2012 . Vol. 7487. 112–183."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib4",
+      "text": "Baader et al . (2005a) Franz Baader, Sebastian Brandt, and Carsten Lutz. 2005a. Pushing the EL envelope. In Proceedings of the Nineteenth International Joint Conference on Artificial Intelligence , Vol. 5. 364–369."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib43",
+      "text": "Wang et al . (2014) Zhen Wang, Jianwen Zhang, Jianlin Feng, and Zheng Chen. 2014. Knowledge graph embedding by translating on hyperplanes. In Proceedings of the AAAI conference on artificial intelligence , Vol. 28."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib24",
+      "text": "Lin et al . (2015) Yankai Lin, Zhiyuan Liu, Maosong Sun, Yang Liu, and Xuan Zhu. 2015. Learning Entity and Relation Embeddings for Knowledge Graph Completion. In Proceedings of the Twenty-Ninth AAAI Conference on Artificial Intelligence . 2181–2187."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib37",
+      "text": "Smith et al . (2007) Barry Smith, Michael Ashburner, Cornelius Rosse, Jonathan Bard, William Bug, Werner Ceusters, Louis J Goldberg, Karen Eilbeck, Amelia Ireland, Christopher J Mungall, et al . 2007. The OBO Foundry: coordinated evolution of ontologies to support biomedical data integration. Nature biotechnology 25, 11 (2007), 1251–1255."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib2",
+      "text": "Abboud et al . (2020) Ralph Abboud, İsmail İlkan Ceylan, Thomas Lukasiewicz, and Tommaso Salvatori. 2020. BoxE: A Box Embedding Model for Knowledge Base Completion. In Advances in Neural Information Processing Systems , Vol. 33. 9649–9661."
+    }
+  ]
+}

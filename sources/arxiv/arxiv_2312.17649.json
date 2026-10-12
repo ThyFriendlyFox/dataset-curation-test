@@ -1,0 +1,103 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2312.17649",
+  "title": "Investigating the Effects of Sparse Attention on Cross-Encoders",
+  "authors": "Ferdinand Schlatt, Maik FrÃ¶be, Matthias Hagen",
+  "year": "2024",
+  "categories": [
+    "cs.IR"
+  ],
+  "url": "https://arxiv.org/abs/2312.17649",
+  "html_url": "https://arxiv.org/html/2312.17649",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 495,
+  "text": "Pre-trained transformer-based language models (PLMs) are important components of modern retrieval and re-ranking pipelines as they help to mitigate the vocabulary mismatch problem of lexical systems [1,2]. Especially cross-encoders are effective [3,4,5,6] but less efficient than bi-encoders or other classic machine learning-based approaches with respect to inference run time, memory footprint, and energy consumption [7]. The run time issue is particularly problematic for practical applications as searchers often expect results after a few hundred milliseconds [8]. To increase the efficiency but maintain the effectiveness of cross-encoders, previous studies have, for instance, investigated reducing the number of token interactions by applying sparse attention patterns [9,10].\n\nSparse attention PLMs restrict the attention of most tokens to local windows, thereby reducing token interactions and improving efficiency [11]. Which tokens have local attention is a task-specific decision. For instance, cross-encoders using the Longformer model [12] apply normal global attention to query tokens but local attention to document tokens. The underlying idea is that a document token does not require the context of the entire document to determine whether it is relevant to a query—within a document, most token interactions are unnecessary, and a smaller context window suffices (cf. Figure 1 (b) for a visualization).\n\nPreviously, sparse attention has been applied to cross-encoders to be able to re-rank long documents without cropping or splitting them [9,10]. However, the impact of sparsity on effectiveness has not been investigated in detail. To close this gap, we explore the limits of sparse cross-encoders and try to clarify which token interactions are (un)necessary. As mechanisms to reduce token interactions, we investigate local attention window sizes and disabling attention between sub-sequences (e.g., between the query and the passage or document). Our analyses are based on the following two assumptions.\n\n(1) Cross-encoders create contextualized embeddings that encode query and passage or document semantics. We hypothesize that the contextualized embeddings of passage or document tokens do not actually need to encode fine-grained semantics. Rather, an overall “gist” in the form of small local context windows is sufficient to estimate relevance well.\n\n(2) Cross-encoders allow queries and documents to exchange information via symmetric attention. We hypothesize that full symmetry is unnecessary as we view the query–document relevance relationship as asymmetric: for ranking, it should suffice to determine whether a result is relevant to a query, not vice versa. To further reduce token interactions, we propose a novel configurable asymmetric cross-attention pattern with varying amounts of interaction between [CLS], query, and passage or document tokens (cf. Figure 1 (d)).\n\nIn experiments on re-ranking tasks from the TREC Deep Learning tracks [13,14,15,16] and the TIREx benchmark [17], our new model’s effectiveness is consistently on par with previous (sparse) cross-encoder models, even with a local window size of only four tokens and asymmetric attention. Further efficiency analyses for sequences with 174 / 4096 tokens show that our sparsification techniques reduce the memory requirements by at least 22% / 59% and yield inference times that are at least 1% / 43% faster.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib84",
+      "text": "Zhang, Y., Long, D., Xu, G., Xie, P.: HLATR: Enhance Multi-stage Text Retrieval with Hybrid List Aware Transformer Reranking. arXiv (2022), doi: 10.48550/arXiv.2205.10569"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib61",
+      "text": "Qu, Y., Ding, Y., Liu, J., Liu, K., Ren, R., Zhao, W.X., Dong, D., Wu, H., Wang, H.: RocketQA: An Optimized Training Approach to Dense Passage Retrieval for Open-Domain Question Answering. In: Proceedings of NAACL-HLT 2021, pp. 5835–5847 (2021), doi: 10.18653/v1/2021.naacl-main.466"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib81",
+      "text": "Xiong, L., Xiong, C., Li, Y., Tang, K.F., Liu, J., Bennett, P.N., Ahmed, J., Overwijk, A.: Approximate Nearest Neighbor Negative Contrastive Learning for Dense Text Retrieval. In: Proceedings of ICLR 2021 (2021)"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib52",
+      "text": "MacAvaney, S., Nardini, F.M., Perego, R., Tonellotto, N., Goharian, N., Frieder, O.: Efficient Document Re-Ranking for Transformers by Precomputing Term Representations. In: Proceedings of SIGIR 2020, pp. 49–58 (2020), doi: 10.1145/3397271.3401093"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib57",
+      "text": "Nogueira, R., Yang, W., Cho, K., Lin, J.: Multi-Stage Document Ranking with BERT. arXiv (2019), doi: 10.48550/arXiv.1910.14424"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib55",
+      "text": "Nogueira, R., Cho, K.: Passage Re-ranking with BERT. arXiv (2020), doi: 10.48550/arXiv.1901.04085"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib68",
+      "text": "Scells, H., Zhuang, S., Zuccon, G.: Reduce, Reuse, Recycle: Green Information Retrieval Research. In: Proceedings of SIGIR 2022, pp. 2825–2837 (2022), doi: 10.1145/3477495.3531766"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib2",
+      "text": "Arapakis, I., Bai, X., Cambazoglu, B.B.: Impact of Response Latency on User Behavior in Web Search. In: Proceedings of SIGIR 2014, pp. 103–112 (2014), doi: 10.1145/2600428.2609627"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib70",
+      "text": "Sekulić, I., Soleimani, A., Aliannejadi, M., Crestani, F.: Longformer for MS MARCO Document Re-ranking Task. In: Proceedings of TREC 2020, NIST Special Publication, vol. 1266 (2020)"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib44",
+      "text": "Jiang, J.Y., Xiong, C., Lee, C.J., Wang, W.: Long Document Ranking with Query-Directed Sparse Transformer. In: Findings of EMNLP 2020, pp. 4594–4605 (2020), doi: 10.18653/v1/2020.findings-emnlp.412"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib72",
+      "text": "Tay, Y., Dehghani, M., Bahri, D., Metzler, D.: Efficient Transformers: A Survey. ACM Computing Surveys 55 , 109:1–109:28 (2023), doi: 10.1145/3530811"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib3",
+      "text": "Beltagy, I., Peters, M.E., Cohan, A.: Longformer: The Long-Document Transformer. arXiv (2020), doi: 10.48550/arXiv.2004.05150"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib28",
+      "text": "Craswell, N., Mitra, B., Yilmaz, E., Campos, D., Voorhees, E.M.: Overview of the TREC 2019 Deep Learning Track. In: Proceedings TREC 2019, NIST Special Publication, vol. 500-331 (2019)"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib26",
+      "text": "Craswell, N., Mitra, B., Yilmaz, E., Campos, D.: Overview of the TREC 2020 Deep Learning Track. In: Proceedings TREC 2020, NIST Special Publication, vol. 1266 (2020)"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib27",
+      "text": "Craswell, N., Mitra, B., Yilmaz, E., Campos, D., Lin, J.: Overview of the TREC 2021 Deep Learning Track. In: Proceedings TREC 2021, NIST Special Publication, vol. 500-335 (2021)"
+    },
+    {
+      "n": 16,
+      "id": "bib.bib29",
+      "text": "Craswell, N., Mitra, B., Yilmaz, E., Campos, D., Voorhess, J.L.E.M., Soboroff, I.: Overview of the TREC 2022 Deep Learning Track. In: Proceedings TREC 2022, NIST Special Publication, vol. 500-338 (2022)"
+    },
+    {
+      "n": 17,
+      "id": "bib.bib36",
+      "text": "Fröbe, M., Reimer, J.H., MacAvaney, S., Deckers, N., Reich, S., Bevendorff, J., Stein, B., Hagen, M., Potthast, M.: The Information Retrieval Experiment Platform. In: Proceedings of SIGIR 2023, pp. 2826–2836 (2023), doi: 10.1145/3539618.3591888"
+    }
+  ]
+}

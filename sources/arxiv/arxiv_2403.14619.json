@@ -1,0 +1,158 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.14619",
+  "title": "ClusteringSDF: Self-Organized Neural Implicit Surfaces for 3D Decomposition",
+  "authors": "Tianhao Wu, Chuanxia Zheng, Tat-Jen Cham, Qianyi Wu",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2403.14619",
+  "html_url": "https://arxiv.org/html/2403.14619",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 733,
+  "text": "The vision community has rapidly improved 3D reconstruction and novel view synthesis (NVS) results with various neural implicit representations, such as the Occupancy networks [1], DeepSDF [2], Scene Representation Network [3], Neural Radiance Fields (NeRF) [4], and Light Field Network (LFN) [5]. Despite their remarkable performance, these systems ignore one critical fact: that the world is composed of individual 3D objects. It is significant for multiple downstream applications, such as Augmented and Virtual Reality (AR & VR) [6,7], autonomous driving [8] and embodied AI [9,10], to decompose and be able to interact with these 3D assets within a complex scene.\n\nAt the same time, segmentation has undergone improvements [11,12,13,14] on 2D images in recent years. However, recognizing and decomposing multiple 3D assets in a complex 3D scene is still a major challenge. This is largely due to the complexity of processing and fusing 2D segmentation maps from multiple views into a consistent 3D representation, especially when working with 3D instances. The accuracy of instance segmentation results, although potentially high, pertains exclusively to the current single view. However, labels assigned to each unique object in the scene do not remain consistent across views [15].\n\nIn this paper, we aim to tackle the problem of object-centered 3D reconstruction, wherein the goal is to simultaneously enable 3D scene reconstruction, as well as 3D assets decomposition or segmentation. Unlike previous approaches [16,17,18] that rely on ground-truth annotations, our method leverages unaligned 2D segmentation results obtained from pre-trained models, fusing them to be consistent in the 3D representation. Our key motivation is that, annotating precisely consistent 3D labels is challenging, while the robust 2D segmentation models are widely available in the current vision zoo. Although recent research [19,20,21,22,23,24] have already focused on this area and have yielded good results in distilling 2D labels or features in 3D space, they are mostly built upon a holistic NeRF [4] for all instances within a scene. A potential weakness lies in the disconnect between segmentation results and 3D reconstruction results, because the embedding features for semantic/instance rendering are derived from independent MLPs that do not necessarily correlate with the underlying RGB or depth. This separation makes it more difficult for the segmentation module to learn geometric details of the objects through radiance and density.\n\nIn contrast, neural implicit surface representations [25,26,27,28,17] that express 3D scenes as signed distance functions (SDFs) have the potential capability to resolve this segmentation challenge. This is achieved by decomposing each instance as an independent object-level surface, and then further fusing all these 3D assets into a whole 3D scene (Fig. 2). However, these SDF-based methods require precisely consistent labels for supervision, and currently, there is no proper solution to fuse the 2D information that is inconsistent across different views.\n\nTo address these aforementioned challenges, we propose a new neural implicit surface representation method, named ClusteringSDF, which is built upon ObjectSDF++ [18], to lift the inconsistent 2D segmentation into consistent 3D assets. While ObjectSDF++ [18] volume-renders object opacity masks and directly matches them to ground-truth labels, we replace this component entirely with our novel clustering method, so as to achieve segment assignments purely with the machine-generated 2D labels. The crucial idea behind our ClusteringSDF is to merge the predicted individual SDF channels from the implicit network, and treat them as SDF probability distributions or SDF features. Instead of simply assigning each pixel to a specific predetermined SDF channel, the objective of ClusteringSDF is to bring SDF distributions belonging to the same object closer, while concurrently separating those from different objects. The determination of whether pixels belong to the same object depends on their labels in the current view. Compared against NeRF-based segmentation methods that predict radiance field densities, ClusteringSDF renders neural implicit surfaces, where the gradients are concentrated around surface regions, leading to faster training and sharper segmented results.\n\nIn summary, our main contributions are as follows:\n\n- • A novel self-organized approach for fusing 2D machine-generated instance/ semantic labels in 3D via neural implicit surface representation while simultaneously enabling holistic 3D reconstruction;\n\n- • A novel clustering mechanism for aligning these multi-view inconsistent labels, resulting in coherent 3D segment representations. Instead of computing similarity between each pair of pixels as contrastive loss, our method achieves high-efficient clustering by constraining the clustering centers within a simplex through normalization;\n\n- • Without ground-truth labels as supervision, our ClusteringSDF maintains the object-compositional representations of the scene and its objects.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib21",
+      "text": "Mescheder, L., Oechsle, M., Niemeyer, M., Nowozin, S., Geiger, A.: Occupancy networks: Learning 3d reconstruction in function space. In: Proceedings of the IEEE/CVF conference on computer vision and pattern recognition. pp. 4460–4470 (2019)"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib26",
+      "text": "Park, J.J., Florence, P., Straub, J., Newcombe, R., Lovegrove, S.: Deepsdf: Learning continuous signed distance functions for shape representation. In: Proceedings of the IEEE/CVF conference on computer vision and pattern recognition (CVPR). pp. 165–174 (2019)"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib30",
+      "text": "Sitzmann, V., Zollhöfer, M., Wetzstein, G.: Scene representation networks: Continuous 3d-structure-aware neural scene representations. Advances in Neural Information Processing Systems 32 (2019)"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib22",
+      "text": "Mildenhall, B., Srinivasan, P.P., Tancik, M., Barron, J.T., Ramamoorthi, R., Ng, R.: Nerf: Representing scenes as neural radiance fields for view synthesis. Communications of the ACM 65 (1), 99–106 (2021)"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib29",
+      "text": "Sitzmann, V., Rezchikov, S., Freeman, B., Tenenbaum, J., Durand, F.: Light field networks: Neural scene representations with single-evaluation rendering. Advances in Neural Information Processing Systems (NeurIPS) 34 , 19313–19325 (2021)"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "Deng, N., He, Z., Ye, J., Duinkharjav, B., Chakravarthula, P., Yang, X., Sun, Q.: Fov-nerf: Foveated neural radiance fields for virtual reality. IEEE Transactions on Visualization and Computer Graphics 28 (11), 3854–3864 (2022)"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib16",
+      "text": "Li, C., Li, S., Zhao, Y., Zhu, W., Lin, Y.: Rt-nerf: Real-time on-device neural radiance fields towards immersive ar/vr rendering. In: Proceedings of the 41st IEEE/ACM International Conference on Computer-Aided Design. pp. 1–9 (2022)"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib17",
+      "text": "Li, Z., Li, L., Zhu, J.: Read: Large-scale neural scene rendering for autonomous driving. In: Proceedings of the AAAI Conference on Artificial Intelligence. vol. 37, pp. 1522–1529 (2023)"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib18",
+      "text": "Liang, S., Huang, C., Tian, Y., Kumar, A., Xu, C.: Av-nerf: Learning neural fields for real-world audio-visual scene synthesis. Advances in Neural Information Processing Systems 36 (2024)"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib2",
+      "text": "Byravan, A., Humplik, J., Hasenclever, L., Brussee, A., Nori, F., Haarnoja, T., Moran, B., Bohez, S., Sadeghi, F., Vujatovic, B., et al.: Nerf2real: Sim2real transfer of vision-guided bipedal motion skills using neural radiance fields. In: 2023 IEEE International Conference on Robotics and Automation (ICRA). pp. 9362–9369. IEEE (2023)"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib45",
+      "text": "Zhou, X., Girdhar, R., Joulin, A., Krähenbühl, P., Misra, I.: Detecting twenty-thousand classes using image-level supervision. In: European Conference on Computer Vision. pp. 350–368. Springer (2022)"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib3",
+      "text": "Cheng, B., Misra, I., Schwing, A.G., Kirillov, A., Girdhar, R.: Masked-attention mask transformer for universal image segmentation. In: Proceedings of the IEEE/CVF conference on computer vision and pattern recognition. pp. 1290–1299 (2022)"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib12",
+      "text": "Kirillov, A., Mintun, E., Ravi, N., Mao, H., Rolland, C., Gustafson, L., Xiao, T., Whitehead, S., Berg, A.C., Lo, W.Y., et al.: Segment anything. arXiv preprint arXiv:2304.02643 (2023)"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib40",
+      "text": "Xu, J., Liu, S., Vahdat, A., Byeon, W., Wang, X., De Mello, S.: Open-vocabulary panoptic segmentation with text-to-image diffusion models. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 2955–2966 (2023)"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib34",
+      "text": "Ulku, I., Akagündüz, E.: A survey on deep learning-based architectures for semantic segmentation on 2d images. Applied Artificial Intelligence 36 (1), 2032924 (2022)"
+    },
+    {
+      "n": 16,
+      "id": "bib.bib44",
+      "text": "Zhi, S., Laidlow, T., Leutenegger, S., Davison, A.J.: In-place scene labelling and understanding with implicit scene representation. In: Proceedings of the IEEE/CVF International Conference on Computer Vision. pp. 15838–15847 (2021)"
+    },
+    {
+      "n": 17,
+      "id": "bib.bib37",
+      "text": "Wu, Q., Liu, X., Chen, Y., Li, K., Zheng, C., Cai, J., Zheng, J.: Object-compositional neural implicit surfaces. In: European Conference on Computer Vision. pp. 197–213. Springer (2022)"
+    },
+    {
+      "n": 18,
+      "id": "bib.bib38",
+      "text": "Wu, Q., Wang, K., Li, K., Zheng, J., Cai, J.: Objectsdf++: Improved object-compositional neural implicit surfaces. In: Proceedings of the IEEE/CVF International Conference on Computer Vision. pp. 21764–21774 (2023)"
+    },
+    {
+      "n": 19,
+      "id": "bib.bib15",
+      "text": "Kundu, A., Genova, K., Yin, X., Fathi, A., Pantofaru, C., Guibas, L.J., Tagliasacchi, A., Dellaert, F., Funkhouser, T.: Panoptic neural fields: A semantic object-aware neural scene representation. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 12871–12881 (2022)"
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "Mascaro, R., Teixeira, L., Chli, M.: Diffuser: Multi-view 2d-to-3d label diffusion for semantic scene segmentation. In: 2021 IEEE International Conference on Robotics and Automation (ICRA). pp. 13589–13595. IEEE (2021)"
+    },
+    {
+      "n": 21,
+      "id": "bib.bib10",
+      "text": "Kerr, J., Kim, C.M., Goldberg, K., Kanazawa, A., Tancik, M.: Lerf: Language embedded radiance fields. In: Proceedings of the IEEE/CVF International Conference on Computer Vision. pp. 19729–19739 (2023)"
+    },
+    {
+      "n": 22,
+      "id": "bib.bib35",
+      "text": "Wang, B., Chen, L., Yang, B.: Dm-nerf: 3d scene geometry decomposition and manipulation from 2d images. arXiv preprint arXiv:2208.07227 (2022)"
+    },
+    {
+      "n": 23,
+      "id": "bib.bib28",
+      "text": "Siddiqui, Y., Porzi, L., Bulò, S.R., Müller, N., Nießner, M., Dai, A., Kontschieder, P.: Panoptic lifting for 3d scene understanding with neural fields. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 9043–9052 (2023)"
+    },
+    {
+      "n": 24,
+      "id": "bib.bib1",
+      "text": "Bhalgat, Y., Laina, I., Henriques, J.F., Zisserman, A., Vedaldi, A.: Contrastive lift: 3d object instance segmentation by slow-fast contrastive fusion. arXiv preprint arXiv:2306.04633 (2023)"
+    },
+    {
+      "n": 25,
+      "id": "bib.bib42",
+      "text": "Yariv, L., Kasten, Y., Moran, D., Galun, M., Atzmon, M., Ronen, B., Lipman, Y.: Multiview neural surface reconstruction by disentangling geometry and appearance. Advances in Neural Information Processing Systems 33 , 2492–2502 (2020)"
+    },
+    {
+      "n": 26,
+      "id": "bib.bib25",
+      "text": "Oechsle, M., Peng, S., Geiger, A.: Unisurf: Unifying neural implicit surfaces and radiance fields for multi-view reconstruction. In: Proceedings of the IEEE/CVF International Conference on Computer Vision. pp. 5589–5599 (2021)"
+    },
+    {
+      "n": 27,
+      "id": "bib.bib41",
+      "text": "Yariv, L., Gu, J., Kasten, Y., Lipman, Y.: Volume rendering of neural implicit surfaces. Advances in Neural Information Processing Systems 34 , 4805–4815 (2021)"
+    },
+    {
+      "n": 28,
+      "id": "bib.bib36",
+      "text": "Wang, P., Liu, L., Liu, Y., Theobalt, C., Komura, T., Wang, W.: Neus: Learning neural implicit surfaces by volume rendering for multi-view reconstruction. arXiv preprint arXiv:2106.10689 (2021)"
+    }
+  ]
+}

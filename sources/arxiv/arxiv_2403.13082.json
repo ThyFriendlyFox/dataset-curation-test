@@ -1,0 +1,184 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.13082",
+  "title": "Pruning for Improved ADC Efficiency in Crossbar-based Analog In-memory Accelerators",
+  "authors": "Timur Ibrayev, Isha Garg, Indranil Chakraborty, Kaushik Roy",
+  "year": "2024",
+  "categories": [
+    "cs.ET",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2403.13082",
+  "html_url": "https://arxiv.org/html/2403.13082",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1060,
+  "text": "The rapid advancements in Deep Neural Networks (DNNs) have resulted in their ubiquitous use and incredible performance on many tasks, such as visual and natural language processing [1,2,3,4]. However, the overparameterization of neural networks demands increased computational and storage requirements [5]. To tackle these issues, different hardware solutions have been proposed in the form of domain-specific accelerators [6,7,8,9,10,11,12,13,14,15,16,17].\n\nThese works leverage the high dependence of neural networks on linear and convolutional operations by converting and performing both these operations in the form of more efficient matrix-vector multiplication (MVM).\n\nResistive crossbar-based analog in-memory computing offers an attractive way to improve DNN inference by implementing such highly efficient MVM units, which improve efficiency by combining storage and processing elements [18]. By storing each DNN weight as the value of a multi-state device at each cross point of the crossbar array, the crossbar-based mapping thus, offers high storage density and enables high data reuse. Applying inputs as analog signals to the rows of the crossbar performs an in-place analog dot product with stored weights, enabling highly efficient parallel in-situ MVM computations.\n\nHowever, analog computations pose considerable challenges, such as having a high peripheral overheads stemming from the need to use ADCs [18,19,20]. This is because, while ADCs are essential to communicate across multiple crossbar-based analog primitives, they can constitute up to 80% of total energy and 70% of the processing core area [7]. This diminishes the potential efficiency benefits offered by the crossbars and necessitates design techniques that target ADC-specific inefficiencies.\n\nA well studied way of improving efficiency is pruning [21], wherein insignificant weights are zeroed out. For traditional hardware, such as GPUs, pruning methods were proposed to induce unstructured sparsity (individual weights in DNNs) [5,22,23,24] or structured sparsity (filters, channels, layers in DNNs) [25,26,27,28,29]. Hardware solutions for crossbar-based architectures were proposed to make use of the resulting sparse DNNs [13,14,15,16,17]. However, the required substantial changes to the architecture components necessitate algorithmic approaches inducing sparsity specifically for crossbars. Consequently, various structured pruning methods were proposed for crossbar structures, such as crossbar rows [30], crossbar columns [31,32,30], or entire crossbars [31,33,30]. However, these methods mainly aim at reducing the number of crossbars required to map trained DNNs, which does not directly address ADC-specific inefficiencies. Moreover, such pruning requires modifications to the underlying mapping scheme (i.e. determining weights that are grouped together to a crossbar) and overlooks the plausibility of utilizing unstructured sparsity patterns.\n\nIn this work, we propose a pruning method that improves ADC efficiency in crossbar-based accelerators while maintaining accuracy. The proposed method results in sparse DNN with three key properties that work together to improve both accuracy and efficiency. We abbreviate these as the D, U, and B properties. The D property focuses on efficiency at the cost of accuracy and the U and B properties work to amortize the drop in accuracy without harming efficiency as shown in Fig. 1.\n\nThe ADC energy is dictated by its bit precision. If the same ADC is re-utilized by all the individual columns of a crossbar for efficiency, the bit precision requirement of the ADC depends only on the sparsity of the least sparse column in the crossbar. To ensure that pruning-induced sparsity translates to reduced ADC bit-precision, we restrict the allowed sparsity levels of the least sparse column to powers of 2. We term this the Discretization property (D) and illustrate it by weight distributions shown in the two leftmost columns of Fig. 1.\n\nThe D property defines the base sparsity level of the crossbar but does not enforce any constraints on the pruning patterns. If the sparsity of the least sparse column in a crossbar achieves any of the discretized levels, the locations of zeros in a column are irrelevant. As a result, unstructured sparsity is more favorable than rigidly structured sparsity, as it attains higher compression ratios with lower accuracy drops due to the freedom in sparsity patterns. Hence, the lack of structural constraints on DNN weights provides a way to amortize the drop in accuracy resulting from the aggressive removal of weights encouraged by D property. This is termed as the Unstructured property (U) and can be observed from two crossbar sparsity patterns shown in Fig. 1.\n\nAfter lifting the restrictions on the pruning patterns of individual columns in the crossbars by the property U, we target the amount of sparsity across columns. D dictates the base sparsity of the crossbar (i.e. the sparsity of the least sparse column), and the remaining columns will have greater or equal sparsity. However, the lower the sparsity (the number of zeroed-out weights) in the remaining columns, the better the accuracy, without any need for increased ADC precision. Hence, we demand all columns to get as close as possible to the least sparse columns, encouraging balanced sparsity across crossbar columns as can be seen from the two rightmost columns in Fig. 1. We term this the Balanced property (B).\n\nThe desired DUB sparsity is achieved by our approach as the combination of a training scheme (preparing weights) and a post-training pruning scheme (zeroing out weights). This is because, while sparsity with D property is enforced during pruning, U and B properties are attained as a result of DNN training. Our method achieves this by regularizing the variance of L_{0} norms of neighboring columns within the same crossbar. Our proposed implementation allows the regularization to be directly used in end-to-end gradient-based training. This, in turn, allows the optimization process to decide different degrees of pruning tolerable by each crossbar dynamically and eliminates the need to pre-determine them before the training. Furthermore, the proposed approach only requires information about crossbar sizes, allowing it to be applicable without the need for detailed information about the underlying crossbar-based architecture.\n\nTo summarize, this work makes the following contributions:\n\n- • We identify three key properties that enable pruning in crossbars to reduce ADC energy without sacrificing accuracy.\n\n- • We propose a training method that minimizes the variance of L_{0} norms of columns in the same crossbar to achieve both unstructured and balanced sparsity in order to amortize the accuracy drop.\n\n- • We prune each individual crossbar to ensure that sparsity translates to hardware efficiency by restricting sparsity levels to powers of 2.\n\n- • We evaluate the accuracy-energy trade-offs of the proposed method on convolutional layers of VGG11 and ResNet18 models trained on CIFAR10 and ImageNet, respectively.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "K. Simonyan and A. Zisserman, “Very deep convolutional networks for large-scale image recognition,” ICLR , 2015."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "K. He, X. Zhang, S. Ren, and J. Sun, “Deep residual learning for image recognition,” in IEEE CVPR , 2016, pp. 770–778."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "E. Frantar and D. Alistarh, “SparseGPT: Massive language models can be accurately pruned in one-shot,” in ICML , vol. 202. PMLR, 23–29 Jul 2023, pp. 10 323–10 337."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "Z. Zong, G. Song, and Y. Liu, “Detrs with collaborative hybrid assignments training,” in IEEE/CVF ICCV , 2023, pp. 6748–6758."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "S. Han, H. Mao, and W. J. Dally, “Deep compression: Compressing deep neural networks with pruning, trained quantization and huffman coding,” ICLR , 2016."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "F. Akopyan, J. Sawada, A. Cassidy, R. Alvarez-Icaza, J. Arthur, P. Merolla, N. Imam, Y. Nakamura, P. Datta, G.-J. Nam et al. , “Truenorth: Design and tool flow of a 65 mw 1 million neuron programmable neurosynaptic chip,” IEEE TCAD , vol. 34, no. 10, pp. 1537–1557, 2015."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "A. Shafiee, A. Nag, N. Muralimanohar, R. Balasubramonian, J. P. Strachan, M. Hu, R. S. Williams, and V. Srikumar, “Isaac: A convolutional neural network accelerator with in-situ analog arithmetic in crossbars,” ACM SIGARCH Computer Architecture News , vol. 44, no. 3, 2016."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "P. Chi, S. Li, C. Xu, T. Zhang, J. Zhao, Y. Liu, Y. Wang, and Y. Xie, “Prime: A novel processing-in-memory architecture for neural network computation in reram-based main memory,” ACM SIGARCH Computer Architecture News , vol. 44, no. 3, pp. 27–39, 2016."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "L. Song, X. Qian, H. Li, and Y. Chen, “Pipelayer: A pipelined reram-based accelerator for deep learning,” in 2017 IEEE HPCA . IEEE, 2017, pp. 541–552."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "A. Ankit, I. E. Hajj, S. R. Chalamalasetti, G. Ndu, M. Foltin, R. S. Williams, P. Faraboschi, W.-m. W. Hwu, J. P. Strachan, K. Roy et al. , “Puma: A programmable ultra-efficient memristor-based accelerator for machine learning inference,” in ASPLOS , 2019, pp. 715–731."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "A. Ankit, I. El Hajj, S. R. Chalamalasetti, S. Agarwal, M. Marinella, M. Foltin, J. P. Strachan, D. Milojicic, W.-M. Hwu, and K. Roy, “Panther: A programmable architecture for neural network training harnessing energy-efficient reram,” IEEE Transactions on Computers , vol. 69, no. 8, pp. 1128–1142, 2020."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "W. Wan, R. Kubendran, C. Schaefer, S. B. Eryilmaz, W. Zhang, D. Wu, S. Deiss, P. Raina, H. Qian, B. Gao et al. , “A compute-in-memory chip based on resistive random-access memory,” Nature , vol. 608, no. 7923, pp. 504–512, 2022."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "T.-H. Yang, H.-Y. Cheng, C.-L. Yang, I.-C. Tseng, H.-W. Hu, H.-S. Chang, and H.-P. Li, “Sparse reram engine: Joint exploration of activation and weight sparsity in compressed neural networks,” in ISCA , 2019, pp. 236–249."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "Z. Chen, X. Chen, and J. Gu, “15.3 a 65nm 3t dynamic analog ram-based computing-in-memory macro and cnn accelerator with retention enhancement, adaptive analog sparsity and 44tops/w system energy efficiency,” in 2021 IEEE ISSCC , vol. 64. IEEE, 2021, pp. 240–242."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "M. Ali, I. Chakraborty, U. Saxena, A. Agrawal, A. Ankit, and K. Roy, “A 35.5-127.2 tops/w dynamic sparsity-aware reconfigurable-precision compute-in-memory sram macro for machine learning,” IEEE Solid-State Circuits Letters , vol. 4, pp. 129–132, 2021."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "D. E. Kim, A. Ankit, C. Wang, and K. Roy, “Samba: Sparsity aware in-memory computing based machine learning accelerator,” IEEE Transactions on Computers , 2023."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "C. Ogbogu, M. Soumen, B. K. Joardar, J. R. Doppa, D. Heo, K. Chakrabarty, and P. P. Pande, “Energy-efficient reram-based ml training via mixed pruning and reconfigurable adc,” in 2023 IEEE/ACM ISLPED . IEEE, 2023, pp. 1–6."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "K. Roy, I. Chakraborty, M. Ali, A. Ankit, and A. Agrawal, “In-memory computing in emerging memory technologies for machine learning: an overview,” in 2020 57th ACM/IEEE DAC . IEEE, 2020, pp. 1–6."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "I. Chakraborty, M. Ali, A. Ankit, S. Jain, S. Roy, S. Sridharan, A. Agrawal, A. Raghunathan, and K. Roy, “Resistive crossbars as approximate hardware building blocks for machine learning: Opportunities and challenges,” Proceedings of the IEEE , vol. 108, no. 12, pp. 2276–2310, 2020."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "S. Huang, A. Ankit, P. Silveira, R. Antunes, S. R. Chalamalasetti, I. El Hajj, D. E. Kim, G. Aguiar, P. Bruel, S. Serebryakov et al. , “Mixed precision quantization for reram-based dnn inference accelerators,” in 2021 26th ASP-DAC . IEEE, 2021, pp. 372–377."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "D. Blalock, J. J. Gonzalez Ortiz, J. Frankle, and J. Guttag, “What is the state of neural network pruning?” in Proceedings of Machine Learning and Systems , I. Dhillon, D. Papailiopoulos, and V. Sze, Eds., vol. 2, 2020, pp. 129–146."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib22",
+      "text": "S. Han, J. Pool, J. Tran, and W. J. Dally, “Learning both weights and connections for efficient neural network,” in NeurIPS , 2015."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib23",
+      "text": "T. Zhang, S. Ye, K. Zhang, J. Tang, W. Wen, M. Fardad, and Y. Wang, “A systematic dnn weight pruning framework using alternating direction method of multipliers,” in ECCV , 2018, pp. 184–199."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib24",
+      "text": "N. Rathi, P. Panda, and K. Roy, “Stdp-based pruning of connections and weight quantization in spiking neural networks for energy-efficient recognition,” IEEE TCAD , vol. 38, no. 4, pp. 668–677, 2018."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib25",
+      "text": "W. Wen, C. Wu, Y. Wang, Y. Chen, and H. Li, “Learning structured sparsity in deep neural networks,” NeurIPS , vol. 29, pp. 2074–2082, 2016."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib26",
+      "text": "H. Li, A. Kadav, I. Durdanovic, H. Samet, and H. P. Graf, “Pruning filters for efficient convnets,” ICLR , 2017."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib27",
+      "text": "I. Garg, P. Panda, and K. Roy, “A low effort approach to structured cnn design using pca,” IEEE Access , vol. 8, pp. 1347–1360, 2019."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib28",
+      "text": "L. Yang, Z. He, and D. Fan, “Harmonious coexistence of structured weight pruning and ternarization for deep neural networks,” in AAAI , vol. 34, no. 04, 2020, pp. 6623–6630."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib29",
+      "text": "S. A. Aketi, S. Roy, A. Raghunathan, and K. Roy, “Gradual channel pruning while training using feature relevance scores for convolutional neural networks,” IEEE Access , vol. 8, pp. 171 924–171 932, 2020."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib30",
+      "text": "C. Chu, Y. Wang, Y. Zhao, X. Ma, S. Ye, Y. Hong, X. Liang, Y. Han, and L. Jiang, “Pim-prune: fine-grain dcnn pruning for crossbar-based process-in-memory architecture,” in ACM/IEEE DAC . IEEE, 2020."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib31",
+      "text": "L. Liang, L. Deng, Y. Zeng, X. Hu, Y. Ji, X. Ma, G. Li, and Y. Xie, “Crossbar-aware neural network pruning,” IEEE Access , vol. 6, pp. 58 324–58 337, 2018."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib32",
+      "text": "J. Lin, Z. Zhu, Y. Wang, and Y. Xie, “Learning the sparsity for reram: Mapping and pruning sparse neural network for reram based accelerator,” in Proceedings of the 24th Asia and South Pacific Design Automation Conference , 2019, pp. 639–644."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib33",
+      "text": "A. Ankit, T. Ibrayev, A. Sengupta, and K. Roy, “Trannsformer: Clustered pruning on crossbar-based architectures for energy-efficient neural networks,” IEEE Transactions on Computer-Aided Design of Integrated Circuits and Systems , vol. 39, no. 10, pp. 2361–2374, 2019."
+    }
+  ]
+}

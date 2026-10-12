@@ -1,0 +1,88 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2402.00591",
+  "title": "Sandra -- A Neuro-Symbolic Reasoner Based On Descriptions And Situations",
+  "authors": "Nicolas Lazzari, Stefano De Giorgis, Aldo Gangemi, Valentina Presutti",
+  "year": "2024",
+  "categories": [
+    "cs.AI"
+  ],
+  "url": "https://arxiv.org/abs/2402.00591",
+  "html_url": "https://arxiv.org/html/2402.00591",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 984,
+  "text": "Reasoning on perspectives is relevant in many contexts and applications. In very rigorous domains such as medicine or jurisprudence, the same case can be interpreted through more than one description: a patient’s situation can be analyzed through different diagnostic hypotheses; a legal state of affairs can be interpreted by applying different, possibly conflicting, norms. In storytelling techniques, spin doctors can frame the same topic in different ways to support alternative political scenarios: “ Conservatives claim that we need relief from taxes vs. Democrats claim that taxes are investments for us. ” [1].\n\nInformally, a set of facts (situation) can be described through more than one - potentially conflicting - perspective, which can be inferred even in presence of partial data. This paper proposes a method and a neuro-symbolic reasoner, named sandra, able to infer all perspectives that are plausible descriptions for a given situation.\n\nAssociating different plausible descriptions to a situation requires the capability to reason at both the intensional and the extensional level, i.e., with both concepts and facts, posing a challenge on how to formally represent the knowledge required, as well as on the reasoning technique to apply.\n\nFrom a knowledge representation perspective, the Description and Situation (DnS) [2] ontology design pattern addresses this problem. DnS provides a formalization of frame semantics, generalizing over Fillmore’s [3] and Minsky’s [4] proposals. It has been largely used in many ontology projects (mainly using its OWL formalization) [5,6,7,8]. DnS defines a general vocabulary for n-ary relations, introducing the concepts of description and situation. A situation is a set of facts, as it is described by an observer, involving a set of entities. In Figure 1 a situation involving three entities is represented: Bob, ENCOM, and Laptop. A description is a perspective (a theory, a schema) defining concepts that can classify, hence interpret, the entities observed in a situation. In Figure 1 two descriptions are represented, Commerce buy and Contest winning. With DnS, both descriptions and situations are formalized as first-order entities in an ontology, therefore potentially enabling reasoning over them both at the intensional (description) and extensional (situation) level, in the same domain of discourse. In DnS terms, we say that a situation s satisfies a description d, when d is a plausible or correct interpretation of s. In Figure 1 both descriptions (Commerce buy and Contest winning) are satisfied by the situation s_{1} involving Bob, ENCOM, and Laptop, even if they are conceptually incompatible. A perspective-based reasoner shall be able to detect this conceptual difference and yet infer both satisfies relations.\n\nTo the best of our knowledge, this behaviour is unobtainable with existing logic-based reasoners. Within a traditional logic approach, conflicting concepts (such as Commerce buy and Contest winning) are correctly modelled as disjoint classes. Therefore, classifying the situation from the example of Figure 1 in both descriptions would lead to an inconsistency. Furthermore, no classification would be provided if the extensional data available is partial. Fuzzy reasoners, such as [9], may be more tolerant but would show the same problem (inconsistency) adding an issue of possible undecidability. Logic-based representations and reasoning have also benefits: a clear, formal model of descriptions is defined and the inference is always sound and complete with respect to that model. At the same time, the data representing situations must be structured and compliant with such model, requiring significant effort.\n\nNeural Network models are a solution to both obtaining an approximate classification, and being able to inject any type of data (images, text, etc.), not only structured data. Nevertheless, they may need a large sample including both descriptions and situations, and the results may be incompatible with the formal model, for example it might happen that only some of the plausible descriptions are retrieved. In short, logic reasoning lacks inconsistency and partial-data-tolerant deductions, while neural network models lack the completeness of deductive inference.\n\nNeuro-symbolic methods, such as [10,11,12], combine important benefits of logic-based and approximate reasoning, and (very important) they can ingest unstructured data. Nevertheless, they rely on the same consistency assumption, which is undesirable in a perspective-reasoning scenario.\n\nThe approach proposed in this research (sandra) relies on the neuro-symbolic paradigm but addresses this issue. It formalizes and implements the inference of the satisfies relation between situations and descriptions and, at the same time, it provides a probability score and a deductive, interpretable inference.\n\nIt includes: (i) a theoretical framework formalizing DnS in a differentiable and probabilistic fashion, which we prove to be correct with respect to DnS. It creates a vector space V isomorphic to a DnS-based ontology (defining a set of descriptions); (ii) the implementation of a neuro-symbolic architecture, where the neural network is constrained to position any detected situation (from any source type) in one or more subspaces of V, each corresponding to a description defined in the ontology. The intuition is that this constraint makes the network less prone to noise. Our formulation allows efficient inference in the DnS domain. Our hypothesis is that by constraining the representation learning process to a DnS-based ontology we can perform perspective-based reasoning without performance loss or increase of computational complexity.\n\nTo evaluate our hypothesis we experiment our method on two different tasks: visual reasoning on the I-RAVEN benchmark [13] and domain generalization on Fashion-MNIST [14]. For each task, we asses the influence of adding sandra to a standard baseline model and find increased performances with polynomial complexity.\n\nOur contribution can be summarized as follows: 1. A correct differentiable probabilistic formalization of DnS; 2. A neuro-symbolic reasoner that combines deductive and inductive reasoning to classify arbitrary situations extracted by a neural network into the descriptions (perspectives) that can plausibly interpret them.\n\nThe rest of the paper provides a formalization of DnS (Section 2) and of our method (Section 3). Section 4 describes our experiments and results, which are further discussed, along with future work in Section 5. Section 6 discusses relevant related work, while Section 7 concludes the paper.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib33",
+      "text": "Vossen and Fokkens [2022] Piek Vossen and Antske Fokkens. Creating a More Transparent Internet . Studies in Natural Language Processing. Cambridge University Press, 2022."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib10",
+      "text": "Gangemi and Mika [2003] Aldo Gangemi and Peter Mika. Understanding the semantic web through descriptions and situations. In OTM Confederated International Conferences” On the Move to Meaningful Internet Systems” , pages 689–706. Springer, 2003."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib9",
+      "text": "Fillmore and others [2006] Charles J Fillmore et al. Frame semantics. Cognitive linguistics: Basic readings , 34:373–400, 2006."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib25",
+      "text": "Minsky [1974] Marvin Minsky. A framework for representing knowledge, 1974."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib30",
+      "text": "Scherp et al. [2009] Ansgar Scherp, Thomas Franz, Carsten Saathoff, and Steffen Staab. F–a model of events based on the foundational ontology dolce+dns ultralight. In Proceedings of the Fifth International Conference on Knowledge Capture , K-CAP ’09, page 137–144, New York, NY, USA, 2009. Association for Computing Machinery."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "Boyan Brodaric and Femke Reitsma and Yi Qiang [2008] Boyan Brodaric and Femke Reitsma and Yi Qiang. SKIing with DOLCE : toward an e-Science knowledge infrastructure. In Carola Eschenbach and Michael Gruninger, editor, Frontiers in Artificial Intelligence and Applications , volume 183, pages 208–219. IOS Press, 2008."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib27",
+      "text": "Porzel and Cangalovic [2020] Robert Porzel and Vanja Sophie Cangalovic. What say you: An ontological representation of imperative meaning for human-robot interaction. In Joint Ontology Workshops , 2020."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib4",
+      "text": "Bikakis et al. [2021] Antonis Bikakis, Beatrice Markhoff, Alessandro Mosca, Stephane Jean, Eero Hyvönen, Francesco Beretta, Antonis Bikakis, Eero Hyvonen, Stéphane Jean, Beatrice Markhoff, and Alessandro Mosca. A challenge for historical research: Making data fair using a collaborative ontology management environment (ontome). Semant. Web , 12(2):279–294, jan 2021."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib19",
+      "text": "Kamide [2022] Norihiro Kamide. Reasoning with inconsistency-tolerant fuzzy description logics. In Ana Paula Rocha, Luc Steels, and H. Jaap van den Herik, editors, Proceedings of the 14th International Conference on Agents and Artificial Intelligence, ICAART 2022, Volume 3, Online Streaming, February 3-5, 2022 , pages 63–74. SCITEPRESS, 2022."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib23",
+      "text": "Manhaeve et al. [2018] Robin Manhaeve, Sebastijan Dumancic, Angelika Kimmig, Thomas Demeester, and Luc De Raedt. Deepproblog: Neural probabilistic logic programming. Advances in neural information processing systems , 31, 2018."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib12",
+      "text": "Geh et al. [2023] Renato Lui Geh, Jonas Gonçalves, Igor Cataneo Silveira, Denis Deratani Mauá, and Fabio Gagliardi Cozman. dpasp: A comprehensive differentiable probabilistic answer set programming environment for neurosymbolic learning and reasoning. arXiv preprint arXiv:2308.02944 , 2023."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib31",
+      "text": "van Krieken et al. [2022] Emile van Krieken, Thiviyan Thanapalasingam, Jakub M Tomczak, Frank van Harmelen, and Annette ten Teije. A-nesi: A scalable approximate method for probabilistic neurosymbolic inference. arXiv preprint arXiv:2212.12393 , 2022."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib18",
+      "text": "Hu et al. [2021] Sheng Hu, Yuqing Ma, Xianglong Liu, Yanlu Wei, and Shihao Bai. Stratified rule-aware network for abstract visual reasoning. In Proceedings of the AAAI Conference on Artificial Intelligence , volume 35, pages 1567–1574, 2021."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib34",
+      "text": "Xiao et al. [2017] Han Xiao, Kashif Rasul, and Roland Vollgraf. Fashion-mnist: a novel image dataset for benchmarking machine learning algorithms. arXiv preprint arXiv:2308.02944 , 2017."
+    }
+  ]
+}

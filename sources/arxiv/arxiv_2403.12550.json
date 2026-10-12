@@ -1,0 +1,133 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.12550",
+  "title": "RGBD GS-ICP SLAM",
+  "authors": "Seongbo Ha, Jiung Yeon, Hyeonwoo Yu",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2403.12550",
+  "html_url": "https://arxiv.org/html/2403.12550",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 802,
+  "text": "Visual Simultaneous Localization and Mapping (SLAM) is an algorithm that constructs maps of unknown environments while localizing poses of vision sensors simultaneously. As the influence of 3D visual SLAM in the fields of robotics, Virtual Reality (VR), and Augmented Reality (AR) has increased, higher rendering performance and more accurate trajectory are required. Thus, 3D reconstruction methods such as Signed Distance Field (SDF), and Truncated Signed Distance Field (TSDF) are utilized for traditional dense visual SLAM [1,2,3,4,5,6].\n\nRecently, coordinate-based 3D Implicit Neural Representation (INR) [7] has been proposed for representing spatial information using neural radiance fields, showcasing high novel view synthesis capabilities and high-fidelity spatial representation prowess. Various approaches [8,9,10,11,12,13] have been attempted to utilize INR for the real-time SLAM mapping process. However, INR requires computationally intensive raycasting to synthesize images, thus the rendering process in INR-based SLAM incurs significant time overhead, slowing down map optimization and rendering-loss based tracking. In contrast, coordinate-based 3D explicit representation such as 3D Gaussian Splatting (3DGS) [14] represents the 3D space using 3D Gaussians as primitives, allowing for rendering speeds faster than NeRF using the rasterization method [15]. This rapid rendering capability of 3DGS results in fast optimization of 3D spatial information, making it suitable for dense representation in SLAM [16,17,18,19].\n\nAlthough 3DGS-based SLAM methods take advantages of the high-speed rendering, they fail to address the fundamental issue: the inability to directly utilize 3D explicit representations and the indirect tracking of 3D space through 2D image rendering. Even with the majority of current 3DGS-based SLAM [11,16,17,18,19] utilizing RGB-D data, the use of explicit representations is overlooked. For example, INR-based methods [8,10,11] and 3DGS-based methods [16,18,19] employ photometric-error based techniques, which estimate the optimal pose by iteratively minimizing the error between rendered and observed 2D images. However, due to limitations in tracking speed and performance, decoupled approaches [12,13,17] have been proposed incorporating well-crafted visual odometries [20,21] into the tracking process. Although decoupled methods exhibit better performances in tracking by separating mapping and tracking processes, they require additional computational resources for the independent stages. Moreover, these methods need to store features in 3D space, unrelated to the 3D GS map.\n\nThere exists a method that allows Gaussian, an explicit representation, to be directly used for tracking. The well-known Generalized Iterative Closest Point (G-ICP) [22,23] from the 3D scan matching family is simple yet efficient for fast tracking of 3D point clouds. During preprocessing, it only requires computing Gaussians for the current frame and the map. Given that the map in 3DGS utilizes Gaussians as an explicit representation in 3D space, using G-ICP for tracking allows for the direct utilization of the 3DGS map without the need for post-processing. Furthermore, the Gaussians of the current frame computed during tracking with G-ICP can also be directly utilized as an explicit representation in the 3DGS map, without additional computations.\n\nTherefore, we propose a dense representation SLAM framework that integrates G-ICP and 3DGS, allowing them to complement each other by sharing explicit representations. Unlike traditional methods, our approach actively leverages 3D information through the utilization of G-ICP for tracking. The proposed method is a coupled approach that shares a single map during tracking and mapping processes, while maintaining fast tracking speed akin to decoupled approaches. Previous works using decoupled methods [12,13,17] require separate maps containing ORB feature information for tracking, along with additional resources and computations needed to obtain ORB features. Moreover, the values obtained during tracking are not utilized in mapping. Our approach exploits the covariance of each point computed during the G-ICP-based tracking process as the initial state of the 3DGS mapping. Meanwhile, the 3D Gaussians in the 3DGS map are also mutually used as 3D points and their covariances which are essential for G-ICP-based tracking, discarding the necessity to recalculate the covariances of the map. This is possible because the covariances of points computed during the G-ICP process and the 3D Gaussians representing the map commonly contain information about the surrounding space. In other words, G-ICP and 3DGS can share the same Gaussian world. Therefore, our system minimizes unnecessary computations and facilitates efficient system configuration by mutually utilizing the key elements, Gaussians, between tracking and mapping processes. To ensure optimal performance in tracking and mapping sharing information between G-ICP and 3DGS, we also introduce several techniques such as scale alignment. To summarize, our contributions are as follows:\n\n- • We present a real-time dense representation SLAM that combines G-ICP and 3DGS, achieving extremely high speed of the entire system (up to 107 FPS) and superior quality of the map.\n\n- • By incorporating G-ICP for tracking, our system utilizes 3D information actively and significantly reduces the time required for the tracking process.\n\n- • Reduction of computational cost and facilitating rapid convergence of primitives of 3DGS is achieved by sharing the covariances of G-ICP and 3DGS with scale aligning techniques.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib27",
+      "text": "Newcombe, R.A., Izadi, S., Hilliges, O., Molyneaux, D., Kim, D., Davison, A.J., Kohi, P., Shotton, J., Hodges, S., Fitzgibbon, A.: Kinectfusion: Real-time dense surface mapping and tracking. In: 2011 10th IEEE international symposium on mixed and augmented reality. pp. 127–136. Ieee (2011)"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib10",
+      "text": "Dai, A., Nießner, M., Zollhöfer, M., Izadi, S., Theobalt, C.: Bundlefusion: Real-time globally consistent 3d reconstruction using on-the-fly surface reintegration. ACM Transactions on Graphics (ToG) 36 (4), 1 (2017)"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib30",
+      "text": "Prisacariu, V.A., Kähler, O., Golodetz, S., Sapienza, M., Cavallari, T., Torr, P.H., Murray, D.W.: Infinitam v3: A framework for large-scale 3d reconstruction with loop closure. arXiv preprint arXiv:1708.00783 (2017)"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib3",
+      "text": "Bylow, E., Sturm, J., Kerl, C., Kahl, F., Cremers, D.: Real-time camera tracking and 3d reconstruction using signed distance functions. In: Robotics: Science and Systems. vol. 2, p. 2 (2013)"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib42",
+      "text": "Whelan, T., Johannsson, H., Kaess, M., Leonard, J.J., McDonald, J.: Robust real-time visual odometry for dense rgb-d mapping. In: 2013 IEEE International Conference on Robotics and Automation. pp. 5724–5731. IEEE (2013)"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib5",
+      "text": "Canelhas, D.R., Stoyanov, T., Lilienthal, A.J.: Sdf tracker: A parallel algorithm for on-line pose estimation and scene reconstruction from depth images. In: 2013 IEEE/RSJ International Conference on Intelligent Robots and Systems. pp. 3671–3676. IEEE (2013)"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib23",
+      "text": "Mildenhall, B., Srinivasan, P.P., Tancik, M., Barron, J.T., Ramamoorthi, R., Ng, R.: Nerf: Representing scenes as neural radiance fields for view synthesis. Communications of the ACM 65 (1), 99–106 (2021)"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib39",
+      "text": "Sucar, E., Liu, S., Ortiz, J., Davison, A.J.: imap: Implicit mapping and positioning in real-time. In: Proceedings of the IEEE/CVF International Conference on Computer Vision. pp. 6229–6238 (2021)"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib45",
+      "text": "Yang, X., Li, H., Zhai, H., Ming, Y., Liu, Y., Zhang, G.: Vox-fusion: Dense tracking and mapping with voxel-based neural implicit representation. In: 2022 IEEE International Symposium on Mixed and Augmented Reality (ISMAR). pp. 499–507. IEEE (2022)"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib47",
+      "text": "Zhu, Z., Peng, S., Larsson, V., Xu, W., Bao, H., Cui, Z., Oswald, M.R., Pollefeys, M.: Nice-slam: Neural implicit scalable encoding for slam. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 12786–12796 (2022)"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib32",
+      "text": "Sandström, E., Li, Y., Van Gool, L., Oswald, M.R.: Point-slam: Dense neural point cloud-based slam. In: Proceedings of the IEEE/CVF International Conference on Computer Vision. pp. 18433–18444 (2023)"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib8",
+      "text": "Chung, C.M., Tseng, Y.C., Hsu, Y.C., Shi, X.Q., Hua, Y.H., Yeh, J.F., Chen, W.C., Chen, Y.T., Hsu, W.H.: Orbeez-slam: A real-time monocular visual slam with orb features and nerf-realized mapping. In: 2023 IEEE International Conference on Robotics and Automation (ICRA). pp. 9400–9406. IEEE (2023)"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib18",
+      "text": "Kong, X., Liu, S., Taher, M., Davison, A.J.: vmap: Vectorised object mapping for neural field slam. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 952–961 (2023)"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib15",
+      "text": "Kerbl, B., Kopanas, G., Leimkühler, T., Drettakis, G.: 3d gaussian splatting for real-time radiance field rendering. ACM Transactions on Graphics 42 (4) (2023)"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib43",
+      "text": "Wu, G., Yi, T., Fang, J., Xie, L., Zhang, X., Wei, W., Liu, W., Tian, Q., Wang, X.: 4d gaussian splatting for real-time dynamic scene rendering. arXiv preprint arXiv:2310.08528 (2023)"
+    },
+    {
+      "n": 16,
+      "id": "bib.bib44",
+      "text": "Yan, C., Qu, D., Wang, D., Xu, D., Wang, Z., Zhao, B., Li, X.: Gs-slam: Dense visual slam with 3d gaussian splatting. arXiv preprint arXiv:2311.11700 (2023)"
+    },
+    {
+      "n": 17,
+      "id": "bib.bib12",
+      "text": "Huang, H., Li, L., Cheng, H., Yeung, S.K.: Photo-slam: Real-time simultaneous localization and photorealistic mapping for monocular, stereo, and rgb-d cameras. arXiv preprint arXiv:2311.16728 (2023)"
+    },
+    {
+      "n": 18,
+      "id": "bib.bib14",
+      "text": "Keetha, N., Karhade, J., Jatavallabhula, K.M., Yang, G., Scherer, S., Ramanan, D., Luiten, J.: Splatam: Splat, track & map 3d gaussians for dense rgb-d slam. arXiv preprint arXiv:2312.02126 (2023)"
+    },
+    {
+      "n": 19,
+      "id": "bib.bib22",
+      "text": "Matsuki, H., Murai, R., Kelly, P.H., Davison, A.J.: Gaussian splatting slam. arXiv preprint arXiv:2312.06741 (2023)"
+    },
+    {
+      "n": 20,
+      "id": "bib.bib26",
+      "text": "Mur-Artal, R., Tardós, J.D.: Orb-slam2: An open-source slam system for monocular, stereo, and rgb-d cameras. IEEE transactions on robotics 33 (5), 1255–1262 (2017)"
+    },
+    {
+      "n": 21,
+      "id": "bib.bib4",
+      "text": "Campos, C., Elvira, R., Rodríguez, J.J.G., Montiel, J.M., Tardós, J.D.: Orb-slam3: An accurate open-source library for visual, visual–inertial, and multimap slam. IEEE Transactions on Robotics 37 (6), 1874–1890 (2021)"
+    },
+    {
+      "n": 22,
+      "id": "bib.bib33",
+      "text": "Segal, A., Haehnel, D., Thrun, S.: Generalized-icp. In: Robotics: science and systems. vol. 2, p. 435. Seattle, WA (2009)"
+    },
+    {
+      "n": 23,
+      "id": "bib.bib17",
+      "text": "Koide, K., Yokozuka, M., Oishi, S., Banno, A.: Voxelized gicp for fast and accurate 3d point cloud registration. In: 2021 IEEE International Conference on Robotics and Automation (ICRA). pp. 11054–11059. IEEE (2021)"
+    }
+  ]
+}

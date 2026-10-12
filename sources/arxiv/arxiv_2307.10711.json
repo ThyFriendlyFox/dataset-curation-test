@@ -1,0 +1,125 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2307.10711",
+  "title": "AdjointDPM: Adjoint Sensitivity Method for Gradient Backpropagation of Diffusion Probabilistic Models",
+  "authors": "Jiachun Pan, Jun Hao Liew, Vincent Y. F. Tan, Jiashi Feng, Hanshu Yan",
+  "year": "2024",
+  "categories": [
+    "cs.CV",
+    "cs.AI",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2307.10711",
+  "html_url": "https://arxiv.org/html/2307.10711",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 700,
+  "text": "Diffusion Probabilistic Models (DPMs) constitute a family of generative models that diffuse data distributions into white Gaussian noise and then revert the stochastic diffusion process to synthesize new contents [1,2]. DPM-based methods have recently achieved state-of-the-art performances in generating various types of contents, such as images [3,4,5], videos [6,7,8], and audio data [9,10]. To promote the development of downstream tasks, several pre-trained high-performance models, such as Stable Diffusion (SD) [4], have been made publicly available. Based on these public large-scale models, researchers have developed many algorithms for creative applications [11,12,13,14,15,16,17]. For example, a line of customization algorithms of DPMs, such as Textural-Inversion [11] and DreamBooth [14], have been proposed to adapt DPMs for generating images/videos that share certain styles or identities. Researchers also have proposed some guidance algorithms [18,19] to make the generation process more controllable.\n\nA ubiquitous problem in customization and guidance applications is the optimization of the diffusion models’ parameters so that the final generated contents satisfy certain properties. For example, to customize models for certain styles, we need to optimize the model weights to minimize the style distance between the generated images and the reference. Alternatively, concerning the guidance of sampling, we need to adjust the intermediate noisy states via the gradients of the guidance loss computed on the final generated data. Generally, the parameters to optimize include the conditional text embeddings, the network weights, and the noisy states, as they all affect the sampling trajectories. We formulate this optimization problem as follows. Denote the DPM as \\Phi(\\cdot,\\cdot,\\epsilon_{\\theta}), which generates samples by iteratively calling a function \\epsilon_{\\theta}. The desired properties can be defined by the loss function L(\\cdot) computed based on the generated contents \\mathbf{x}_{0}=\\Phi(\\mathbf{x}_{T},c,\\epsilon_{\\theta}). We aim to minimize the loss by optimizing the variables \\psi, including the weights \\theta, conditioning signals c, or initial noise \\mathbf{x}_{T}, i.e.,\n\nTo solve the optimization problem (1), an effective backpropagation (BP) technique is required to compute the gradient of the loss function L(\\mathbf{x}_{0}) with respect to the optimization variables. [2] showed that the DPM sampling process is equivalent to solving a probability-flow ODE. Thus, many efficient sampling methods have been developed using adaptive ODE solvers. The sampling process involves recursive calls to the denoising UNet \\epsilon_{\\theta}(\\mathbf{x}_{t},t,c) for multiple iterations. Using naïve gradient BP requires intermediate state storage for all iterations, resulting in significant GPU memory consumption. To overcome this problem, we propose AdjointDPM, a novel gradient BP technique based on the adjoint sensitivity method [20]. AdjointDPM computes the gradient by solving a backward ODE that only needs to store the intermediate state at the time point of function evaluation, resulting in constant memory usage. Moreover, we reparameterize the diffusion generation process to a simple non-stiff ODE using exponential integration, which helps reduce discretization errors in both the forward and reverse processes of gradient computation.\n\nWe evaluate the effectiveness of AdjointDPM by applying it to several interesting tasks, involving optimizing the initial/intermediate noisy states, network weights, and conditioning text prompts, respectively. 1) Guided sampling. Under the supervision of fine-grained vision classifiers, AdjointDPM can guide the Stable Diffusion to synthesize images of certain breeds of animals. 2) Security auditing of image generation systems. AdjointDPM successfully finds a set of initial noise whose corresponding output images contain NSFW (n ot s afe f or w ork) content, but can sneakily bypass the moderation filters. This triggers an alert about the potential security issues of existing AI generation systems. 3) Stylization via a single reference image. AdjointDPM can finetune a Stable Diffusion model for stylization defined by the Gram Matrix [21] of a reference image. The stylizing capability of the fine-tuned model can generalize to different objects. All the empirical results demonstrate the flexibility and general applicability of AdjointDPM. We summarize the main contributions of this paper as follows:\n\n- 1. We propose a novel gradient backpropagation method of DPMs by applying the adjoint sensitivity method to the sampling process of diffusion models.\n\n- 2. To the best of our knowledge, AdjointDPM is the first general gradient backpropagation method that can be used for all types of parameters of DPMs, including network weights, conditioning text prompts, and intermediate noisy states.\n\n- 3. AdjointDPM can be used for several creative applications and outperforms other baselines.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib13",
+      "text": "Ho et al. (2020) Jonathan Ho, Ajay Jain, and Pieter Abbeel. Denoising diffusion probabilistic models. In Advances in Neural Information Processing Systems , volume 33, 2020."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib35",
+      "text": "Song et al. (2021) Yang Song, Jascha Sohl-Dickstein, Diederik P Kingma, Abhishek Kumar, Stefano Ermon, and Ben Poole. Score-based generative modeling through stochastic differential equations. In International Conference on Learning Representations , 2021."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib32",
+      "text": "Saharia et al. (2022) Chitwan Saharia, William Chan, Saurabh Saxena, Lala Li, Jay Whang, Emily L Denton, Kamyar Ghasemipour, Raphael Gontijo Lopes, Burcu Karagol Ayan, Tim Salimans, et al. Photorealistic text-to-image diffusion models with deep language understanding. In Advances in Neural Information Processing Systems , volume 35, 2022."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib30",
+      "text": "Rombach et al. (2022) Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, and Björn Ommer. High-resolution image synthesis with latent diffusion models. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pp. 10684–10695, 2022."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib28",
+      "text": "Ramesh et al. (2022) Aditya Ramesh, Prafulla Dhariwal, Alex Nichol, Casey Chu, and Mark Chen. Hierarchical Text-Conditional Image Generation with CLIP Latents, April 2022. arXiv:2204.06125 [cs]."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib3",
+      "text": "Blattmann et al. (2023) Andreas Blattmann, Robin Rombach, Huan Ling, Tim Dockhorn, Seung Wook Kim, Sanja Fidler, and Karsten Kreis. Align your Latents: High-Resolution Video Synthesis with Latent Diffusion Models, April 2023. arXiv:2304.08818 [cs]."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib43",
+      "text": "Zhou et al. (2022) Daquan Zhou, Weimin Wang, Hanshu Yan, Weiwei Lv, Yizhe Zhu, and Jiashi Feng. MagicVideo: Efficient Video Generation With Latent Diffusion Models, November 2022. arXiv:2211.11018 [cs]."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib14",
+      "text": "Ho et al. (2022) Jonathan Ho, William Chan, Chitwan Saharia, Jay Whang, Ruiqi Gao, Alexey Gritsenko, Diederik P Kingma, Ben Poole, Mohammad Norouzi, David J Fleet, et al. Imagen video: High definition video generation with diffusion models. arXiv preprint arXiv:2210.02303 , 2022."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib19",
+      "text": "Liu et al. (2023a) Haohe Liu, Zehua Chen, Yi Yuan, Xinhao Mei, Xubo Liu, Danilo Mandic, Wenwu Wang, and Mark D. Plumbley. AudioLDM: Text-to-Audio Generation with Latent Diffusion Models, February 2023a. arXiv:2301.12503 [cs, eess]."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib33",
+      "text": "Schneider (2023) Flavio Schneider. ArchiSound: Audio Generation with Diffusion, January 2023. arXiv:2301.13267 [cs, eess]."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib8",
+      "text": "Gal et al. (2022) Rinon Gal, Yuval Alaluf, Yuval Atzmon, Or Patashnik, Amit H. Bermano, Gal Chechik, and Daniel Cohen-Or. An Image is Worth One Word: Personalizing Text-to-Image Generation using Textual Inversion, August 2022. arXiv:2208.01618 [cs]."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib5",
+      "text": "Daras & Dimakis (2022) Giannis Daras and Alex Dimakis. Multiresolution textual inversion. In NeurIPS 2022 Workshop on Score-Based Methods , 2022."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib16",
+      "text": "Kawar et al. (2023) Bahjat Kawar, Shiran Zada, Oran Lang, Omer Tov, Huiwen Chang, Tali Dekel, Inbar Mosseri, and Michal Irani. Imagic: Text-Based Real Image Editing with Diffusion Models, March 2023. arXiv:2210.09276 [cs]."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib31",
+      "text": "Ruiz et al. (2022) Nataniel Ruiz, Yuanzhen Li, Varun Jampani, Yael Pritch, Michael Rubinstein, and Kfir Aberman. DreamBooth: Fine Tuning Text-to-Image Diffusion Models for Subject-Driven Generation. Technical report, August 2022. arXiv:2208.12242 [cs]."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib7",
+      "text": "Fei et al. (2023) Zhengcong Fei, Mingyuan Fan, and Junshi Huang. Gradient-Free Textual Inversion, April 2023. arXiv:2304.05818 [cs]."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib39",
+      "text": "Wen et al. (2023) Yuxin Wen, Neel Jain, John Kirchenbauer, Micah Goldblum, Jonas Geiping, and Tom Goldstein. Hard Prompts Made Easy: Gradient-Based Discrete Optimization for Prompt Tuning and Discovery, February 2023. arXiv:2302.03668 [cs]."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib24",
+      "text": "Molad et al. (2023) Eyal Molad, Eliahu Horwitz, Dani Valevski, Alex Rav Acha, Yossi Matias, Yael Pritch, Yaniv Leviathan, and Yedid Hoshen. Dreamix: Video Diffusion Models are General Video Editors, February 2023. arXiv:2302.01329 [cs]."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib2",
+      "text": "Bansal et al. (2023) Arpit Bansal, Hong-Min Chu, Avi Schwarzschild, Soumyadip Sengupta, Micah Goldblum, Jonas Geiping, and Tom Goldstein. Universal Guidance for Diffusion Models, February 2023. arXiv:2302.07121 [cs]."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib12",
+      "text": "Ho & Salimans (2021) Jonathan Ho and Tim Salimans. Classifier-free diffusion guidance. In NeurIPS 2021 Workshop on Deep Generative Models and Downstream Applications , 2021."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib4",
+      "text": "Chen et al. (2018) Ricky T. Q. Chen, Yulia Rubanova, Jesse Bettencourt, and David K Duvenaud. Neural ordinary differential equations. In Advances in Neural Information Processing Systems , volume 31, 2018."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib9",
+      "text": "Gatys et al. (2015) LA Gatys, AS Ecker, and M Bethge. A neural algorithm of artistic style. Nature Communications , 2015."
+    }
+  ]
+}

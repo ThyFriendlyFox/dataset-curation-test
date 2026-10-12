@@ -1,0 +1,133 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.13291",
+  "title": "An Analysis on Matching Mechanisms and Token Pruning for Late-interaction Models",
+  "authors": "Qi Liu, Gang Guo, Jiaxin Mao, Zhicheng Dou, Ji-Rong Wen, Hao Jiang, Xinyu Zhang, Zhao Cao",
+  "year": "2024",
+  "categories": [
+    "cs.IR"
+  ],
+  "url": "https://arxiv.org/abs/2403.13291",
+  "html_url": "https://arxiv.org/html/2403.13291",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1133,
+  "text": "Document ranking has always been one of the most important tasks in information retrieval. This task aims to rank documents according to their relevance to a given query. To achieve a good performance in terms of both effectiveness and efficiency, document ranking consists of two stages. The first stage is to retrieve thousands of documents to form a candidate set from a large corpus which may consist of millions or even billions of documents efficiently. Then in the second stage, the system usually uses a more sophisticated ranking model to re-rank the retrieved candidates to further boost the retrieval effectiveness.\n\nTraditional Bag-of-Words (BoW) retrieval models (e.g., BM25 [1]) rely on sparse representations and exact matches between a query and documents to rank documents. While these methods are efficient, robust, and interpretable, the inverted index and the dependence on exact match signals may lead to the vocabulary mismatch problem [2] which may limit the overall retrieval effectiveness.\n\nRecently, deep learning and pre-trained language models (PLMs) such as BERT [3], RoBERTa [4] and [5,6,7] have made impressive improvements in many fields. In information retrieval, researchers have also leveraged the contextualized representation learned by PLMs to tackle the vocabulary mismatch problem and improve retrieval effectiveness. Some recent studies [8,9,10,11,12] leverage neural models to expand terms for original documents by modifying the term frequency or directly re-computing the term weight used in the traditional retrieval models. Other works [13,14,15,16,17], known as dense retrieval, represent queries and documents as one or more dense vector(s) and solve the vocabulary mismatch problem by performing soft matching in the vector space. The dense retrieval models have become promising alternatives to the traditional retrieval models because by using the approximate nearest neighbor search (ANNs) algorithm, they can achieve a good trade-off between retrieval effectiveness and efficiency.\n\nFor BERT-based retrieval models, the cross-encoder architecture [18] shown in Figure 1(a) makes thorough interaction between all query tokens and all document tokens in every transformer layer. Although such a full-interaction architecture can achieve a good ranking performance, it imposes a high time cost which prevents it from being used as a first-stage retrieval model. To solve this problem, some studies [13,19,14] propose to use a bi-encoder architecture to independently encode queries and documents into dense vectors, and the architecture is illustrated in Figure 1(b). Because there is no interaction between the query tokens and document tokens, we can pre-compute the embeddings for documents. When doing retrieval, the model only needs to encode the query and then search for the matching documents with the help of ANNs algorithms (e.g., Faiss [20]), within an acceptable latency for the first stage retrieval. However [15] have theoretically proved and empirically demonstrated that using multiple vectors to represent documents is more effective than a single-vector representation. Therefore, recent studies [21,16,17] employ multiple vectors to represent a document in the first-stage retrieval and enhance the interaction between queries and documents. This late-interaction architecture is shown in Figure 1(c). Combining the advantages of cross-encoders and bi-encoders, [16] proposed a soft late-interaction model named ColBERT, and [17] proposed a hard late-interaction model named COIL. These two models are more effective than the bi-encoders and much more efficient than the cross-encoders so they can be used as first-stage retrieval models.\n\nAlthough the above late-interaction models achieve a good balance between retrieval effectiveness and efficiency, their matching mechanisms are underinvestigated, which may undermine their interpretability and robustness, especially when compared to the traditional BoW-based retrieval models. Moreover, late-interaction models require to use all token embeddings to represent documents, leading to a significant increase in storage requirements and a decrease in efficiency. Therefore, it’s important to understand their matching mechanisms and investigate whether and how we can leverage such matching mechanisms to reduce storage overhead and enhance efficiency. Specifically, in this paper, we propose several heuristic pruning methods according to the analysis of the matching mechanism, and study the following research questions:\n\n- • RQ1: How do the late-interaction models work and perform matching at the token level?\n\n- • RQ2: What are the differences in performance among various models when applying pruning?\n\n- • RQ3: How do different pruning methods and pruning ratios affect the effectiveness and efficiency of retrieval models?\n\nRegarding RQ1, in this study, we first investigate how late-interaction models compute the relevance score for the query-document pair to understand the matching process of late-interaction models. We find that the computation of the relevance score heavily relies on the co-occurrence signals and the important words in documents. Such behaviors are very similar to the traditional BoW-based retrieval models in which we can safely ignore words that provide little information for relevance estimation, and use some weighting scheme, such as IDF, to emphasize the important words in the documents.\n\nInspired by the matching mechanisms of traditional retrieval models and the similarity between late-interaction models and traditional retrieval models, we further ask: can we achieve comparable effectiveness when only using the important words in documents to compute the relevance score? Therefore, we propose and evaluate several simple document token pruning strategies, which prune document tokens based on their positions, IDF values, and attention scores, to improve storage efficiency. Furthermore, we study query token pruning methods that reduce the query latency in the retrieval stage.\n\nTo address RQ2 and RQ3, we conduct extensive experiments on a popular ad-hoc search benchmark (i.e., the MS MARCO dataset [22]) and a popular zero-shot retrieval dataset (i.e., BEIR [23]) for different late-interaction models and different pruning strategies. Subsequently, we provide a thorough analysis of the results.\n\nWe believe the investigation of the matching mechanism can help us better understand these late-interaction models and the exploration of token pruning strategies is beneficial for reducing the storage overhead and query latency with minimal performance loss. In summary, our contributions are as follows:\n\n- • To dig into the matching process of late-interaction models, we systematically analyze how ColBERT and COIL rank the documents based on the sum-of-max scoring function and find that it heavily depends on the informative words in documents.\n\n- • We propose several simple but effective document token pruning methods and query token pruning methods for late-interaction models to improve efficiency.\n\n- • We conduct extensive experiments on both in-domain and out-of-domain datasets to compare the effectiveness of the different pruning methods on different neural retrieval models.\n\nThe rest of this paper is organized as follows. Section 2 briefly reviews the related work. Section 3 gives a detailed analysis of the late-interaction models and further proposes several methods of document tokens pruning and query tokens pruning. Section 4 and Section 5 describe the experiment settings and the empirical results, respectively. Section 6 discusses the main findings in this paper and significant implications. Finally, we conclude this paper and list some potential limitations and future work directions in Section 7.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib41",
+      "text": "Robertson et al . (2009) Stephen Robertson, Hugo Zaragoza, et al . 2009. The probabilistic relevance framework: BM25 and beyond. Foundations and Trends® in Information Retrieval 3, 4 (2009), 333–389."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib17",
+      "text": "Furnas et al . (1987) George W. Furnas, Thomas K. Landauer, Louis M. Gomez, and Susan T. Dumais. 1987. The vocabulary problem in human-system communication. Commun. ACM 30, 11 (1987), 964–971."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib13",
+      "text": "Devlin et al . (2018) Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. 2018. Bert: Pre-training of deep bidirectional transformers for language understanding. arXiv preprint arXiv:1810.04805 (2018)."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib30",
+      "text": "Liu et al . (2019) Yinhan Liu, Myle Ott, Naman Goyal, Jingfei Du, Mandar Joshi, Danqi Chen, Omer Levy, Mike Lewis, Luke Zettlemoyer, and Veselin Stoyanov. 2019. Roberta: A robustly optimized bert pretraining approach. arXiv preprint arXiv:1907.11692 (2019)."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib39",
+      "text": "Radford et al . (2019) Alec Radford, Jeffrey Wu, Rewon Child, David Luan, Dario Amodei, and Ilya Sutskever. 2019. Language models are unsupervised multitask learners. OpenAI blog 1, 8 (2019), 9."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib48",
+      "text": "Yang et al . (2019) Zhilin Yang, Zihang Dai, Yiming Yang, Jaime Carbonell, Russ R Salakhutdinov, and Quoc V Le. 2019. Xlnet: Generalized autoregressive pretraining for language understanding. Advances in neural information processing systems 32 (2019)."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib25",
+      "text": "Lan et al . (2019) Zhenzhong Lan, Mingda Chen, Sebastian Goodman, Kevin Gimpel, Piyush Sharma, and Radu Soricut. 2019. ALBERT: A Lite BERT for Self-supervised Learning of Language Representations. In International Conference on Learning Representations ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib11",
+      "text": "Dai and Callan (2019) Zhuyun Dai and Jamie Callan. 2019. Context-aware sentence/passage term importance estimation for first stage retrieval. arXiv preprint arXiv:1910.10687 (2019)."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib12",
+      "text": "Dai and Callan (2020) Zhuyun Dai and Jamie Callan. 2020. Context-aware document term weighting for ad-hoc search. In Proceedings of The Web Conference 2020 . 1897–1907."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib5",
+      "text": "Bai et al . (2020) Yang Bai, Xiaoguang Li, Gang Wang, Chaoliang Zhang, Lifeng Shang, Jun Xu, Zhaowei Wang, Fangshan Wang, and Qun Liu. 2020. SparTerm: Learning Term-based Sparse Representation for Fast Text Retrieval. arXiv preprint arXiv:2010.00768 (2020)."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib32",
+      "text": "Mallia et al . (2021) Antonio Mallia, Omar Khattab, Torsten Suel, and Nicola Tonellotto. 2021. Learning passage impacts for inverted indexes. In Proceedings of the 44th International ACM SIGIR Conference on Research and Development in Information Retrieval . 1723–1727."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib15",
+      "text": "Formal et al . (2021b) Thibault Formal, Benjamin Piwowarski, and Stéphane Clinchant. 2021b. SPLADE: Sparse lexical and expansion model for first stage ranking. In Proceedings of the 44th International ACM SIGIR Conference on Research and Development in Information Retrieval . 2288–2292."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib51",
+      "text": "Zhan et al . (2020b) Jingtao Zhan, Jiaxin Mao, Yiqun Liu, Min Zhang, and Shaoping Ma. 2020b. RepBERT: Contextualized text embeddings for first-stage retrieval. arXiv preprint arXiv:2006.15498 (2020)."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib23",
+      "text": "Karpukhin et al . (2020) Vladimir Karpukhin, Barlas Oguz, Sewon Min, Patrick Lewis, Ledell Wu, Sergey Edunov, Danqi Chen, and Wen-tau Yih. 2020. Dense Passage Retrieval for Open-Domain Question Answering. In Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing (EMNLP) . 6769–6781."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib31",
+      "text": "Luan et al . (2021) Yi Luan, Jacob Eisenstein, Kristina Toutanova, and Michael Collins. 2021. Sparse, Dense, and Attentional Representations for Text Retrieval. Transactions of the Association for Computational Linguistics 9 (2021), 329–345."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib24",
+      "text": "Khattab and Zaharia (2020) Omar Khattab and Matei Zaharia. 2020. Colbert: Efficient and effective passage search via contextualized late interaction over bert. In Proceedings of the 43rd International ACM SIGIR conference on research and development in Information Retrieval . 39–48."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib18",
+      "text": "Gao et al . (2021) Luyu Gao, Zhuyun Dai, and Jamie Callan. 2021. COIL: Revisit Exact Lexical Match in Information Retrieval with Contextualized Inverted List. In Proceedings of the 2021 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies . 3030–3042."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib33",
+      "text": "Nogueira and Cho (2019) Rodrigo Nogueira and Kyunghyun Cho. 2019. Passage Re-ranking with BERT. arXiv preprint arXiv:1901.04085 (2019)."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib47",
+      "text": "Xiong et al . (2020) Lee Xiong, Chenyan Xiong, Ye Li, Kwok-Fung Tang, Jialin Liu, Paul N Bennett, Junaid Ahmed, and Arnold Overwijk. 2020. Approximate Nearest Neighbor Negative Contrastive Learning for Dense Text Retrieval. In International Conference on Learning Representations ."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib22",
+      "text": "Johnson et al . (2019) Jeff Johnson, Matthijs Douze, and Hervé Jégou. 2019. Billion-scale similarity search with gpus. IEEE Transactions on Big Data (2019)."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "Humeau et al . (2019) Samuel Humeau, Kurt Shuster, Marie-Anne Lachaux, and Jason Weston. 2019. Poly-encoders: Architectures and Pre-training Strategies for Fast and Accurate Multi-sentence Scoring. In International Conference on Learning Representations ."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib6",
+      "text": "Bajaj et al . (2018) Payal Bajaj, Daniel Campos, Nick Craswell, Li Deng, Jianfeng Gao, Xiaodong Liu, Rangan Majumder, Andrew McNamara, Bhaskar Mitra, Tri Nguyen, Mir Rosenberg, Xia Song, Alina Stoica, Saurabh Tiwary, and Tong Wang. 2018. MS MARCO: A Human Generated MAchine Reading COmprehension Dataset. arXiv preprint arXiv:1611.09268 (2018)."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib44",
+      "text": "Thakur et al . (2021) Nandan Thakur, Nils Reimers, Andreas Rücklé, Abhishek Srivastava, and Iryna Gurevych. 2021. BEIR: A Heterogeneous Benchmark for Zero-shot Evaluation of Information Retrieval Models. In Thirty-fifth Conference on Neural Information Processing Systems Datasets and Benchmarks Track (Round 2) ."
+    }
+  ]
+}

@@ -1,0 +1,123 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2311.11125",
+  "title": "SecondPose: SE(3)-Consistent Dual-Stream Feature Fusion for Category-Level Pose Estimation",
+  "authors": "Yamei Chen, Yan Di, Guangyao Zhai, Fabian Manhardt, Chenyangguang Zhang, Ruida Zhang, Federico Tombari, Nassir Navab, Benjamin Busam",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2311.11125",
+  "html_url": "https://arxiv.org/html/2311.11125",
+  "license": "http://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Introduction",
+  "word_count": 804,
+  "text": "Category-level pose estimation involves estimating the complete 9 degrees-of-freedom (DoF) object pose, encompassing 3D rotation, 3D translation, and 3D metric size, for arbitrary objects within a known set of categories. This task has garnered significant research interest due to its essential role in various applications, including the AR/VR industry [1,2,3,4], robotics [5,6,7], and scene understanding [8,9,10]. In contrast to traditional instance-level pose estimation methods [11,12], which rely on specific 3D CAD models for each target object, the category-level approach necessitates greater adaptability to accommodate inherent shape diversity within each category. Effectively addressing intra-class shape variations has thus become a central focus, crucial for real-world applications where objects within a category may exhibit significant differences in shape while sharing the same general category label.\n\nMean Shape vs. Semantic Priors. One common approach to handle intra-class shape variation involves using explicit mean shapes as prior knowledge [13,14,15]. These methods typically consist of two functional modules: one for reconstructing the target object by slightly deforming the mean shape and another for regressing the 9D pose based on the reconstructed object [14,13] or enhanced intermediate features [15]. These methods assume that the mean shape can perfectly encapsulate the structural information of objects within each category, thus achieving reconstruction of the target object with minimal deformation is feasible. However, this assumption does not hold in reality. Objects within the same category, such as chairs, may have fundamental structural differences, leading to the failure of such methods.\n\nRecently, self-supervised learning with large vision models has experienced a significant leap forward, among which DINOv2 [16], due to its exceptional performance in providing semantically consistent patch-wise features, has gained great attention. In particular, various methods [17] utilize semantic features from DINOv2 as essential priors to understand the object. In the field of pose estimation, compared to category-specific mean shapes, DINOv2 demonstrates superior generalization capabilities in object representation across each category, thanks to its large-scale training data and advanced training strategy. ZSP [18] directly leverage DINOv2 features for zero-shot construction of semantic correspondences between objects under different camera viewpoints, and then estimates the pose with RANSAC. POPE [19] and CNOS [20] harness DINOv2 to refine the object detection, thus implicitly boosting the accuracy of pose estimation. However, to our knowledge, currently there exists no method that explores how to fuse DINOv2 features with object-specific features to directly enhance the performance of category-level pose estimation.\n\nIn this paper, we present SecondPose, a novel method that fuses SE (3)- Con sistent D ual-stream features to enhance category-level Pose estimation. Leveraging DINOv2’s patch-wise SE(3)-consistent semantic features, we extract two types of SE(3)-invariant geometric features—pair-wise distance and pair-wise angles—to encapsulate object-specific cues. We hierarchically aggregate geometric features within support regions of increasing radius to encode local-to-global object structure information. These features are then point-aligned with DINOv2 features to establish a unified object representation that is consistent under SE(3) transformations. Specifically, given an RGB-D image capturing the target object, we first back-project the depth map to generate the respective point cloud, which is then fed into our Geometric and Semantic Streams (Fig. 2.A-B) to extract the corresponding features for our dual-stream fusion (Fig. 2.C). The fused features denoted as SECOND are finally fed into an off-the-shelf pose estimator [21] (Fig. 2.D) to regress the 9D pose.\n\nSE(3)-Consistent Fusion vs. Direct Fusion. Alternatively, one could think of directly concatenating DINOv2 features with the back-projected point in a point-wise manner, without extracting SE(3)-invariant geometric features. However, our instead proposed SE(3)-consistent fusion holds two important advantages over such a straightforward approach. First, while DINOv2 is trained solely with RGB images, the incorporation of geometric features from the point cloud enriches it with valuable local-to-global 3D structural information. This enrichment proves particularly advantageous in handling diverse object shapes within a given category. Second, our SE(3)-consistent object representation modifies the underlying pose estimation process from { point cloud \\longrightarrow canonical space } to { point cloud \\longrightarrow SE(3)-consistent representation \\longrightarrow canonical space }. In this optimized pipeline, the second stage – transitioning from our object representation to the human-defined canonical space – is consistent under SE(3) transformations. (approximately invariant, see Fig. 4) This consistency significantly simplifies the pose estimation process, as the pose estimator only needs to operate within the second stage. Further, this streamlined approach not only enhances the accuracy of pose estimation but also contributes to the efficiency of the overall method.\n\nTo summarize, our main contributions are threefold:\n\n- 1. We present SecondPose, the first method to directly fuse object-specific hierarchical geometric features with semantic DINOv2 features for category-level pose estimation.\n\n- 2. Our SE(3)-consistent dual-stream feature fusion strategy yields a unified object representation that is robust under SE(3) transformations, better suited for down-stream pose estimation.\n\n- 3. Extensive evaluation proves that our SE(3)-consistent fusion strategy significantly boosts pose estimation performance even under severe occlusion and clutter, enabling real-world applications.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib30",
+      "text": "Eric Marchand, Hideaki Uchiyama, and Fabien Spindler. Pose estimation for augmented reality: a hands-on survey. IEEE transactions on visualization and computer graphics , 22(12):2633–2651, 2015."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib38",
+      "text": "David Joseph Tan, Nassir Navab, and Federico Tombari. 6d object pose estimation with depth images: A seamless approach for robotic interaction and augmented reality. arXiv preprint arXiv:1709.01459 , 2017."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib40",
+      "text": "Henning Tjaden, Ulrich Schwanecke, and Elmar Schomer. Real-time monocular pose estimation of 3d objects using temporally consistent local color histograms. In Proceedings of the IEEE International Conference on Computer Vision (ICCV) , Oct 2017."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib55",
+      "text": "Chenyangguang Zhang, Yan Di, Ruida Zhang, Guangyao Zhai, Fabian Manhardt, Federico Tombari, and Xiangyang Ji. Ddf-ho: Hand-held object reconstruction via conditional directed distance field. arXiv preprint arXiv:2308.08231 , 2023."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib52",
+      "text": "Guangyao Zhai, Dianye Huang, Shun-Cheng Wu, HyunJun Jung, Yan Di, Fabian Manhardt, Federico Tombari, Nassir Navab, and Benjamin Busam. Monograspnet: 6-dof grasping with a single rgb image. In IEEE International Conference on Robotics and Automation . IEEE, 2023."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib51",
+      "text": "Guangyao Zhai, Xiaoni Cai, Dianye Huang, Yan Di, Fabian Manhardt, Federico Tombari, Nassir Navab, and Benjamin Busam. Sg-bot: Object rearrangement via coarse-to-fine robotic imagination on scene graphs. arXiv preprint arXiv:2309.12188 , 2023."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib54",
+      "text": "Guangyao Zhai, Yu Zheng, Ziwei Xu, Xin Kong, Yong Liu, Benjamin Busam, Yi Ren, Nassir Navab, and Zhengyou Zhang. Da 2 dataset: Toward dexterity-aware dual-arm grasping. RA-L , 7(4):8941–8948, 2022."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib1",
+      "text": "Benjamin Busam, Marco Esposito, Simon Che’Rose, Nassir Navab, and Benjamin Frisch. A stereo vision approach for cooperative robotic movement therapy. In Proceedings of the IEEE International Conference on Computer Vision Workshops , pages 127–135, 2015."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib7",
+      "text": "Yan Di, Chenyangguang Zhang, Ruida Zhang, Fabian Manhardt, Yongzhi Su, Jason Rambach, Didier Stricker, Xiangyang Ji, and Federico Tombari. U-red: Unsupervised 3d shape retrieval and deformation for partial point clouds. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 8884–8895, 2023."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib53",
+      "text": "Guangyao Zhai, Evin Pinar Örnek, Shun-Cheng Wu, Yan Di, Federico Tombari, Nassir Navab, and Benjamin Busam. Commonscenes: Generating commonsense 3d indoor scenes with scene graphs. In NeurIPS , 2023."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib6",
+      "text": "Yan Di, Fabian Manhardt, Gu Wang, Xiangyang Ji, Nassir Navab, and Federico Tombari. So-pose: Exploiting self-occlusion for direct 6d pose estimation. In Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV) , pages 12396–12405, October 2021."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib21",
+      "text": "Yann Labbé, Justin Carpentier, Mathieu Aubry, and Josef Sivic. Cosypose: Consistent multi-view multi-object 6d pose estimation. In Computer Vision–ECCV 2020: 16th European Conference, Glasgow, UK, August 23–28, 2020, Proceedings, Part XVII 16 , pages 574–591. Springer, 2020."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib24",
+      "text": "Jiehong Lin, Zewei Wei, Changxing Ding, and Kui Jia. Category-level 6d object pose and size estimation using self-supervised deep prior deformation networks. In European Conference on Computer Vision , pages 19–34. Springer, 2022."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib39",
+      "text": "Meng Tian, Marcelo H Ang, and Gim Hee Lee. Shape prior deformation for categorical 6d object pose and size estimation. In European Conference on Computer Vision , pages 530–546. Springer, 2020."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib57",
+      "text": "Ruida Zhang, Yan Di, Zhiqiang Lou, Fabian Manhardt, Federico Tombari, and Xiangyang Ji. Rbp-pose: Residual bounding box projection for category-level pose estimation, 2022."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib32",
+      "text": "Maxime Oquab, Timothée Darcet, Theo Moutakanni, Huy V. Vo, Marc Szafraniec, Vasil Khalidov, Pierre Fernandez, Daniel Haziza, Francisco Massa, Alaaeldin El-Nouby, Russell Howes, Po-Yao Huang, Hu Xu, Vasu Sharma, Shang-Wen Li, Wojciech Galuba, Mike Rabbat, Mido Assran, Nicolas Ballas, Gabriel Synnaeve, Ishan Misra, Herve Jegou, Julien Mairal, Patrick Labatut, Armand Joulin, and Piotr Bojanowski. Dinov2: Learning robust visual features without supervision, 2023."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib56",
+      "text": "Junyi Zhang, Charles Herrmann, Junhwa Hur, Luisa Polania Cabrera, Varun Jampani, Deqing Sun, and Ming-Hsuan Yang. A tale of two features: Stable diffusion complements dino for zero-shot semantic correspondence. arXiv preprint arXiv:2305.15347 , 2023."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib12",
+      "text": "Walter Goodwin, Sagar Vaze, Ioannis Havoutis, and Ingmar Posner. Zero-shot category-level object pose estimation. In European Conference on Computer Vision , pages 516–532. Springer, 2022."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib10",
+      "text": "Zhiwen Fan, Panwang Pan, Peihao Wang, Yifan Jiang, Dejia Xu, Hanwen Jiang, and Zhangyang Wang. Pope: 6-dof promptable pose estimation of any object, in any scene, with one reference. arXiv preprint arXiv:2305.15727 , 2023."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib31",
+      "text": "Van Nguyen Nguyen, Thibault Groueix, Georgy Ponimatkin, Vincent Lepetit, and Tomas Hodan. Cnos: A strong baseline for cad-based novel object segmentation. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 2134–2140, 2023."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib27",
+      "text": "Jiehong Lin, Zewei Wei, Yabin Zhang, and Kui Jia. Vi-net: Boosting category-level 6d object pose estimation via learning decoupled rotations on the spherical representations. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 14001–14011, 2023."
+    }
+  ]
+}

@@ -1,0 +1,143 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.15652",
+  "title": "Parametric Encoding with Attention and Convolution Mitigate Spectral Bias of Neural Partial Differential Equation Solvers",
+  "authors": "Mehdi Shishehbor, Shirin Hosseinmardi, Ramin Bostanabad",
+  "year": "2024",
+  "categories": [
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2403.15652",
+  "html_url": "https://arxiv.org/html/2403.15652",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1013,
+  "text": "Partial differential equations (PDEs) are ubiquitously used to describe various systems and physical phenomena such as the climate [1] and turbulence [2]. Traditional numerical approaches such as the finite element method (FEM) have long been used to solve PDEs [3] but these methods have some limitations (e.g., high implementation costs or dependency of the obtained solution to the discretization) [4,5] that hamper their usage for compute-intensive applications such as uncertainty quantification. To address this challenge, surrogates such as Gaussian processes (GPs) [6] and deep neural networks (DNNs) are increasingly used [7,8].\n\nA major issue in building accurate surrogates is that their accuracy heavily relies on the size of their training dataset. Physics-informed neural networks (PINNs) have shown great promise in tackling this issue by infusing domain knowledge or constraints into the learning process. As explained in Section 2, the loss function of a PINN differs from conventional DNNs in that it includes additional terms to ensure that the model’s prediction satisfies the PDE as well as the initial and boundary conditions [9] (IC and BCs). Despite their success, vanilla PINNs (vPINN) with multi-layer perceptron (MLP) or fully-connected feed-forward (FCFF) architectures suffer from some major challenges such as spectral bias [4,10,11,12] which refers to the tendency of these models to preferentially learn lower-frequency components of a function.\n\nSpectral bias in FCFF networks stems from the fact that such networks have shared parameters whose values affect the model’s output everywhere in the domain. This issue is exacerbated when the input space is low-dimensional which is also the case in vPINN since their inputs typically represent time and/or space [10]. Among the various types of PDEs tackled by vPINN the so-called stiff PDEs pose a unique challenge since their solutions can change rapidly over a small spatial domain or temporal window due to, e.g., interplay of multiple scales, high sensitivity to IC/BCs, or conflicting BCs that give rise to discontinuities [13].\n\nThe training process of vPINN, which must satisfy the PDE residuals and IC/BCs simultaneously, is similar to multi-task learning where the network’s loss function is comprised of a (weighted) sum of multiple terms where each term measures the ability of the network in learning a particular task. Such multi-term loss functions also challenge training accurate vPINN since the network minimize one term better than the others; resulting in an overall sub-optimal solution [14]. This challenge is further exacerbated by spectral bias since the scale and gradient of the IC/BC loss terms is typically quite different than those of the PDE residuals. While approaches for automatically satisfying IC/BCs have been developed [15,16,17,18,19], they typically complicate the training dynamics and can produce models whose prediction errors considerably increase as the distance between the query point and the IC/BCs increases [20].\n\nAs detailed in Section 2, recent works have found some success in addressing the above challenges by developing novel neural architectures and training mechanisms. In this paper, we build on these works and introduce Parametric Grid Convolutional Attention Networks (PGCANs) that increase the ability of vPINN in learning high-frequency solution features without resulting in over-fitted models. As demonstrated with a host of experiments in Section 5, PGCANs particularly improve the performance of existing technologies in approximating PDE solutions with high gradients. Our models achieve these attractive features using three primary ingredients. Motivated by encoding practices adopted in neural rendering [21], the first ingredient of PGCAN is an encoding scheme that projects the spatiotemporal inputs into a higher-dimensional feature space. For encoding, we use a parametric multi-cell grid (with trainable features located at its vertices) as it provides a structured representation of the spatiotemporal scales. Such a representation enables capturing localized features in the PDE solution and reduces spectral bias since not all the model parameters contribute to the predictions made for an arbitrary query point.\n\nThe second ingredient of PGCAN are convolution layers which locally combine the feature values of adjacent vertices of the grid. In sharp contrast to neural rendering works where the models are trained on labeled data [22,23], we argue that in the context of solving PDE systems encoders with convolved features are superior to their counterparts since convolution layers (1) help to propagate the information from IC/BCs into the domain, (2) reduce the number of required grid cells (and hence trainable parameters), and (3) avoid overfitting which typically manifests as a salt-and-pepper noise in predictions of DNNs that leverage parametric grids as encoders.\n\nThe third ingredient of our approach is a self-attention mechanism inspired by [24,25] which enables PGCAN to more effectively learn complex solution characteristics (e.g., high-frequency or large gradients) by assigning more attention (i.e., weight) to the features of the grid cell where such characteristics appear.\n\nWe summarize our contributions as follows: (1) We propose a novel architecture that uniquely merges parametric grid encoding with self-attention mechanisms, a fusion designed to significantly enhance the precision of PDE solutions and mitigate spectral bias. (2) Develop a versatile model capable of effectively solving a wide spectrum of PDEs, ranging from simple to highly challenging scenarios. (3) Proposing a framework for assessing spectral bias in models by comparing the Power Spectral Density (PSD) of their errors.\n\nThe rest of our paper is organized as follows. We provide some technical background and review the relevant works in Section 2. We introduce our approach in Section 3 and then in Section 4 develop the directional PSD-based metric for assessing the spectral bias of DNNs when they are used to solve PDEs. We compare the performance of PGCAN against competing methods on a host of PDE systems in Section 5 where we also study the spectral bias of these methods. We provide concluding remarks and future research directions in Section 6.\n\n## 1.1 Nomenclature\n\nUnless otherwise stated, throughout the paper we denote scalars, vectors, and matrices or tensors of dimensions greater than two with regular, bold lower-case, and bold upper-case letters, respectively (e.g., x,\\boldsymbol{x}, and \\boldsymbol{X}). Vectors are by default column vectors. Scalars sampled from matrices or higher-dimension tensors are indicated by the parentheses containing the corresponding indices. (e.g., X(i,j) is a scalar sampled from \\boldsymbol{X}\\in\\mathbb{R}^{n_{i}\\times n_{j}}).",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "Washington and Parkinson (2005) Washington, W.M., Parkinson, C.L.: An Introduction to Three-Dimensional Climate Modeling, 2nd edn. (2005)"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "Reynolds (1976) Reynolds, W.C.: Computation of turbulent flows. Annual Review of Fluid Mechanics 8 (1), 183–208 (1976)"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "Meng et al. (2022) Meng, C., Seo, S., Cao, D., Griesemer, S., Liu, Y.: When physics meets machine learning: A survey of physics-informed machine learning. arXiv preprint arXiv:2203.16797 (2022)"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "Cuomo et al. (2022) Cuomo, S., Di Cola, V.S., Giampaolo, F., Rozza, G., Raissi, M., Piccialli, F.: Scientific machine learning through physics–informed neural networks: Where we are and what’s next. Journal of Scientific Computing 92 (3), 88 (2022)"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "Wang et al. (2022) Wang, H., Planas, R., Chandramowlishwaran, A., Bostanabad, R.: Mosaic flows: A transferable deep learning framework for solving pdes on unseen domains. Computer Methods in Applied Mechanics and Engineering 389 , 114424 (2022) https://doi.org/10.1016/j.cma.2021.114424"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "Yousefpour et al. (2023) Yousefpour, A., Foumani, Z.Z., Shishehbor, M., Mora, C., Bostanabad, R.: Gp+: A python library for kernel-based learning via gaussian processes. arXiv preprint arXiv:2312.07694 (2023)"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "Blechschmidt and Ernst (2021) Blechschmidt, J., Ernst, O.G.: Three ways to solve partial differential equations with neural networks—a review. GAMM-Mitteilungen 44 (2), 202100006 (2021)"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "Mora et al. (2024) Mora, C., Yousefpour, A., Hosseinmardi, S., Bostanabad, R.: Neural networks with kernel-weighted corrective residuals for solving partial differential equations. arXiv preprint arXiv:2401.03492 (2024)"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "Raissi et al. (2019) Raissi, M., Perdikaris, P., Karniadakis, G.E.: Physics-informed neural networks: A deep learning framework for solving forward and inverse problems involving nonlinear partial differential equations. Journal of Computational physics 378 , 686–707 (2019)"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "Kang et al. (2023) Kang, N., Lee, B., Hong, Y., Yun, S.-B., Park, E.: Pixel: Physics-informed cell representations for fast and accurate pde solvers. In: Proceedings of the AAAI Conference on Artificial Intelligence, vol. 37, pp. 8186–8194 (2023)"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "Wang et al. (2021) Wang, S., Wang, H., Perdikaris, P.: On the eigenvector bias of fourier feature networks: From regression to solving multi-scale pdes with physics-informed neural networks. Computer Methods in Applied Mechanics and Engineering 384 , 113938 (2021)"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "Rahaman et al. (2019) Rahaman, N., Baratin, A., Arpit, D., Draxler, F., Lin, M., Hamprecht, F., Bengio, Y., Courville, A.: On the spectral bias of neural networks. In: International Conference on Machine Learning, pp. 5301–5310 (2019). PMLR"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "Sharma et al. (2023) Sharma, P., Evans, L., Tindall, M., Nithiarasu, P.: Stiff-pdes and physics-informed neural networks. Archives of Computational Methods in Engineering, 1–30 (2023)"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "Daw et al. (2022) Daw, A., Bu, J., Wang, S., Perdikaris, P., Karpatne, A.: Mitigating propagation failures in pinns using evolutionary sampling (2022)"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "Lagari et al. (2020) Lagari, P.L., Tsoukalas, L.H., Safarkhani, S., Lagaris, I.E.: Systematic construction of neural forms for solving partial differential equations inside rectangular domains, subject to initial, boundary and interface conditions. International Journal on Artificial Intelligence Tools 29 (05), 2050009 (2020)"
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "Lagaris et al. (1998) Lagaris, I.E., Likas, A., Fotiadis, D.I.: Artificial neural networks for solving ordinary and partial differential equations. IEEE transactions on neural networks 9 (5), 987–1000 (1998)"
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "Dong and Ni (2021) Dong, S., Ni, N.: A method for representing periodic functions and enforcing exactly periodic boundary conditions with deep neural networks. Journal of Computational Physics 435 , 110242 (2021)"
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "McFall and Mahan (2009) McFall, K.S., Mahan, J.R.: Artificial neural network method for solution of boundary value problems with exact satisfaction of arbitrary boundary conditions. IEEE Transactions on Neural Networks 20 (8), 1221–1233 (2009)"
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "Berg and Nyström (2018) Berg, J., Nyström, K.: A unified deep artificial neural network approach to partial differential equations in complex geometries. Neurocomputing 317 , 28–41 (2018)"
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "Karnakov et al. (2024) Karnakov, P., Litvinov, S., Koumoutsakos, P.: Solving inverse problems in physics by optimizing a discrete loss: Fast and accurate learning without neural networks. PNAS Nexus (2024) https://doi.org/10.1093/pnasnexus/pgae005"
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "Tewari et al. (2022) Tewari, A., Thies, J., Mildenhall, B., Srinivasan, P., Tretschk, E., Yifan, W., Lassner, C., Sitzmann, V., Martin-Brualla, R., Lombardi, S., Simon, T., Theobalt, C., Nießner, M., Barron, J.T., Wetzstein, G., Zollhöfer, M., Golyanik, V.: Advances in neural rendering. Computer Graphics Forum 41 (2), 703–735 (2022) https://doi.org/10.1111/cgf.14507"
+    },
+    {
+      "n": 22,
+      "id": "bib.bib22",
+      "text": "Müller et al. (2022) Müller, T., Evans, A., Schied, C., Keller, A.: Instant neural graphics primitives with a multiresolution hash encoding. arXiv preprint arXiv:2201.05989 (2022)"
+    },
+    {
+      "n": 23,
+      "id": "bib.bib23",
+      "text": "Dong et al. (2022) Dong, W., Lao, Y., Kaess, M., Koltun, V.: Ash: A modern framework for parallel spatial hashing in 3d perception. IEEE Transactions on Pattern Analysis and Machine Intelligence, 1–18 (2022) https://doi.org/10.1109/TPAMI.2022.3214347"
+    },
+    {
+      "n": 24,
+      "id": "bib.bib24",
+      "text": "Wang et al. (2021) Wang, S., Teng, Y., Perdikaris, P.: Understanding and mitigating gradient flow pathologies in physics-informed neural networks. SIAM Journal on Scientific Computing 43 (5), 3055–3081 (2021)"
+    },
+    {
+      "n": 25,
+      "id": "bib.bib25",
+      "text": "McClenny and Braga-Neto (2020) McClenny, L., Braga-Neto, U.: Self-adaptive physics-informed neural networks using a soft attention mechanism. arXiv preprint arXiv:2009.04544 (2020)"
+    }
+  ]
+}

@@ -1,0 +1,130 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2309.17189",
+  "title": "RTFS-Net: Recurrent Time-Frequency Modelling for Efficient Audio-Visual Speech Separation",
+  "authors": "Samuel Pegg, Kai Li, Xiaolin Hu",
+  "year": "2024",
+  "categories": [
+    "cs.SD",
+    "cs.CV",
+    "eess.AS"
+  ],
+  "url": "https://arxiv.org/abs/2309.17189",
+  "html_url": "https://arxiv.org/html/2309.17189",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 701,
+  "text": "The ‘cocktail party problem’ [1,2,3] describes our ability to focus on a single speaker’s voice amidst numerous overlapping voices in a noisy environment. While humans effortlessly tackle this problem, replicating this ability in machines remains a longstanding challenge in the field of signal-processing. Audio-only Speech Separation (AOSS) methods [4,5,6], solely utilizing the mixed-speaker audio signal, face limitations in scenarios with strong background noise, reverberation, or heavy voice overlap. To overcome these issues, researchers turned to a multi-modal approach: Audio-visual Speech Separation (AVSS) [7,8,9]. AVSS methods integrate additional visual cues into the paradigm and can be generally split into two main classifications: Time-domain (T-domain) and Time-Frequency domain (TF-domain) methods, each with their own benefits and challenges.\n\nT-domain methods [10,9,11,12] work on the long, uncompressed and high-dimensional audio features returned by the 1D convolutional encoder design proposed by [13]. This approach facilitates fine-grained, high quality audio separation, but the high parameter count and computational complexity leads to extended training periods, intensive GPU usage and slow inference speeds. On the other hand, TF-domain methods [14,15,7] apply their algorithms on the complex 2D representation yielded by the Short-Time Fourier Transform (STFT). Typically, the STFT uses large windows and hop lengths to compress the data, resulting in more computationally efficient separation methods. However, from a historical perspective, all TF-domain methods have been substantially outperformed by T-domain methods. Based on our research, this gap in performance stems from three critical factors.\n\nFirstly, while some attempts have been made [16,8] to model amplitude and phase separately, no TF-domain AVSS methods explore the independent and tailored modelling of the two acoustic dimensions (time and frequency) in order to exploit this domain’s advantage over T-domain methods. Indeed, recent research by [17] and [18] in the AOSS domain have capitalized on this advantage and outperformed their T-domain counterparts by large margins. However, their usage of large LSTM [19] and transformer [20] architectures leads to a heavy computational burden, making them an unattractive solution in the AVSS space. Secondly, while existing AVSS studies [9,12] have explored various audio-visual fusion strategies, they neglect using visual features from multiple receptive fields to increase model performance. This type of visual information serves as important ā priōrī knowledge crucial for accurately extracting the target speaker’s voice. Thirdly, TF-domain AVSS studies [16,8,7] often overlook the underlying complex nature of the features, and hence lose critical amplitude and phase information when extracting the target speaker’s voice from the audio mixture. This degrades the reconstruction performance of the inverse STFT (iSTFT) and leads to poorer model performance.\n\nIn this work, we propose a novel TF-domain AVSS method: Recursive Time-Frequency Separation Network (RTFS-Net, Figure 1) that provides a computationally efficient solution to the cocktail party problem using an STFT based audio encoder, a high-fidelity pretrained video encoder and a series of recursive RTFS Blocks to perform target speaker extraction. Our contributions are threefold:\n\n- 1. Our RTFS Blocks tackle the first issue by projecting the features to a compressed subspace. There, we explicitly model both acoustic dimensions individually, then in tandem before subsequently applying an attentional mechanism (TF-AR) to restore the dimensions with minimal information loss, allowing us to reap the benefits of independent time-frequency processing without bearing a substantial computational cost.\n\n- 2. Our Cross-dimensional Attention Fusion (CAF) Block provides a low parameter, computationally efficient solution to the second issue by aggregating the multi-modal information through a multi-head attention strategy in order to optimally fuse the visual cues of the target speaker into the audio features, facilitating high quality separation.\n\n- 3. Our Spectral Source Separation (S^{3}) Block addresses the third issue by explicitly reconstructing the plural features of the target speaker, achieving a higher quality separation without increasing computational cost.\n\nWe conducted comprehensive experimental evaluations on three widely used datasets: LRS2 [14], LRS3 [21] and VoxCeleb2 [22], to demonstrate the value of each contribution. To the best of our knowledge, RTFS-Net is the first TF-domain AVSS method to outperform all contemporary T-domain methods, achieving this while also exhibiting a clear advantage by reducing computational complexity by 83% and reducing the parameter count by 90%. We additionally provide a Web page where sample results can be listened to, and our code will be open-sourced after publication for reproducibility purposes.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib5",
+      "text": "Bronkhorst (2000) Adelbert Bronkhorst. The cocktail party phenomenon: A review of research on speech intelligibility in multiple-talker conditions. Acta Acustica united with Acustica , 86:117–128, 01 2000."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib11",
+      "text": "Haykin & Chen (2005) Simon Haykin and Zhe Chen. The Cocktail Party Problem. Neural Computation , 17(9):1875–1902, 09 2005. ISSN 0899-7667."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib7",
+      "text": "Cherry (2005) E. Colin Cherry. Some Experiments on the Recognition of Speech, with One and with Two Ears. The Journal of the Acoustical Society of America , 25(5):975–979, 06 2005. ISSN 0001-4966."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib24",
+      "text": "Luo & Mesgarani (2019) Yi Luo and Nima Mesgarani. Conv-tasnet: Surpassing ideal time–frequency magnitude masking for speech separation. IEEE/ACM Transactions on Audio, Speech, and Language Processing , 27(8):1256–1266, 2019."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib27",
+      "text": "Luo et al. (2020) Yi Luo, Zhuo Chen, and Takuya Yoshioka. Dual-path rnn: efficient long sequence modeling for time-domain single-channel speech separation. In ICASSP 2020-2020 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP) , pp. 46–50. IEEE, 2020."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib33",
+      "text": "Subakan et al. (2021) Cem Subakan, Mirco Ravanelli, Samuele Cornell, Mirko Bronzi, and Jianyuan Zhong. Attention is all you need in speech separation. In ICASSP 2021-2021 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP) , pp. 21–25. IEEE, 2021."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib10",
+      "text": "Gao & Grauman (2021) Ruohan Gao and Kristen Grauman. Visualvoice: Audio-visual speech separation with cross-modal consistency. In 2021 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pp. 15490–15500. IEEE, 2021."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib16",
+      "text": "Lee et al. (2021) Jiyoung Lee, Soo-Whan Chung, Sunok Kim, Hong-Goo Kang, and Kwanghoon Sohn. Looking into your speech: Learning cross-modal affinity for audio-visual speech separation. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pp. 1336–1345. IEEE, 2021."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib18",
+      "text": "Li et al. (2022) Kai Li, Fenghua Xie, Hang Chen, Kexin Yuan, and Xiaolin Hu. An audio-visual speech separation model inspired by cortico-thalamo-cortical circuits. arXiv preprint arXiv:2212.10744 , 2022."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib39",
+      "text": "Wu et al. (2019) Jian Wu, Yong Xu, Shi-Xiong Zhang, Lian-Wu Chen, Meng Yu, Lei Xie, and Dong Yu. Time domain audio visual speech separation. In 2019 IEEE Automatic Speech Recognition and Understanding Workshop (ASRU) , pp. 667–673, 2019."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib28",
+      "text": "Martel et al. (2023) Héctor Martel, Julius Richter, Kai Li, Xiaolin Hu, and Timo Gerkmann. Audio-Visual Speech Separation in Noisy Environments with a Lightweight Iterative Model. In Proc. Interspeech 2023 , pp. 1673–1677, 2023."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib20",
+      "text": "Lin et al. (2023) Jiuxin Lin, Xinyu Cai, Heinrich Dinkel, Jun Chen, Zhiyong Yan, Yongqing Wang, Junbo Zhang, Zhiyong Wu, Yujun Wang, and Helen Meng. Av-sepformer: Cross-attention sepformer for audio-visual target speaker extraction. In ICASSP 2023-2023 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP) , pp. 1–5. IEEE, 2023."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib23",
+      "text": "Luo & Mesgarani (2018) Yi Luo and Nima Mesgarani. Tasnet: time-domain audio separation network for real-time, single-channel speech separation. In 2018 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP) , pp. 696–700. IEEE, 2018."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib1",
+      "text": "Afouras et al. (2018a) Triantafyllos Afouras, Joon Son Chung, Andrew Senior, Oriol Vinyals, and Andrew Zisserman. Deep audio-visual speech recognition. IEEE Transactions on Pattern Analysis and Machine Intelligence , 44(12):8717–8727, 2018a."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib4",
+      "text": "Alfouras et al. (2018) T Alfouras, JS Chung, and A Zisserman. The conversation: deep audio-visual speech enhancement. In Interspeech , volume 2018, 2018."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib3",
+      "text": "Afouras et al. (2020) Triantafyllos Afouras, Andrew Owens, Joon Son Chung, and Andrew Zisserman. Self-supervised learning of audio-visual objects from video. In Proceedings of the European Conference on Computer Vision (ECCV) , pp. 208–224. Springer, 2020."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib25",
+      "text": "Luo & Yu (2023) Yi Luo and Jianwei Yu. Music source separation with band-split rnn. IEEE/ACM Transactions on Audio, Speech, and Language Processing , 31:1893–1901, 2023. doi: 10.1109/TASLP.2023.3271145 ."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib38",
+      "text": "Wang et al. (2023) Zhong-Qiu Wang, Samuele Cornell, Shukjae Choi, Younglo Lee, Byeong-Yeol Kim, and Shinji Watanabe. Tf-gridnet: Making time-frequency domain models great again for monaural speaker separation. In ICASSP 2023-2023 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP) , pp. 1–5. IEEE, 2023."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib13",
+      "text": "Hochreiter & Schmidhuber (1997) Sepp Hochreiter and Jürgen Schmidhuber. Long short-term memory. Neural Computation , 9(8):1735–1780, 1997."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib35",
+      "text": "Vaswani et al. (2017) Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N Gomez, Łukasz Kaiser, and Illia Polosukhin. Attention is all you need. Advances in Neural Information Processing Systems (NeurIPS) , 30, 2017."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib2",
+      "text": "Afouras et al. (2018b) Triantafyllos Afouras, Joon Son Chung, and Andrew Zisserman. Lrs3-ted: a large-scale dataset for visual speech recognition, 2018b."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib8",
+      "text": "Chung et al. (2018) J Chung, A Nagrani, and A Zisserman. Voxceleb2: Deep speaker recognition. In Interspeech , 2018."
+    }
+  ]
+}

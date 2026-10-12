@@ -1,0 +1,73 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2206.08662",
+  "title": "PICO: Pipeline Inference Framework for Versatile CNNs on Diverse Mobile Devices",
+  "authors": "Xiang Yang, Zikang Xu, Qi Qi, Jingyu Wang, Haifeng Sun, Jianxin Liao, Song Guo",
+  "year": "2024",
+  "categories": [
+    "cs.DC"
+  ],
+  "url": "https://arxiv.org/abs/2206.08662",
+  "html_url": "https://arxiv.org/html/2206.08662",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 990,
+  "text": "Recent years witness an explosive growth of mobile devices. The huge number of mobile devices provides a large volume of data (images, videos, etc.). Meanwhile, versatile convolution neural networks (CNN) with pre-trained parameters become powerful tools to make intelligent decisions using these raw data (CNN inference). Embedding CNN with mobile devices enables many intelligent applications to become reality, such as smart home, intelligent factory, and even automatic driving [1,2].\n\nOne obstacle to the embedding is the resource-limited mobile devices. Compared with datacenter, the computing capability of mobile devices is not enough to perform CNN inference alone. But on the contrary, the current wireless network is not prepared for transmitting the massive volume of raw data collected by these mobile devices. For example, an autopilot camera could capture more than 700 MB video record every second [3], and uploading all the video data to the datacenter will bring significant network latency. Moreover, uploading data from user devices to the cloud always brings concern about privacy [3].\n\nBenefitted from the spatial independence of convolution operation, the input and output (feature) of convolutional (conv) layers can be split into several small tiles and executed on different devices. As a consequence, cooperative CNN inference on multiple mobile devices gains the attention of researchers recently [4,5,6]. During inference procedure, the data source (camera, sensors, etc.) captures raw data and splits it into tiles. These tiles are distributed to multiple nearby mobile devices through a wireless network and executed independently using one or several layers. Then the data source is responsible to gather all the output tiles and stitch them to obtain the result. The procedure will be iterated multiple times until all layers are executed. Cooperative inference also protects user privacy since all the data stay in local. Moreover, the closer to the data source, the lower network latency it suffers. Compared with other strategies such as model compression and parameter pruning [7,8,9], cooperative inference neither losses the inference accuracy nor requires re-train the model.\n\nHowever, despite all these benefits, there still leave some challenges that are not completely solved in previous works. Although the input feature can be parallel executed, (1) the parallelism introduces redundant calculation due to the property of CNN. The scalar in the output feature of one conv layer is calculated through a dot product with the conv kernel and a subregion of input feature. For most cases, the kernel size is bigger than 1\\times 1, so that the input tiles of partitioned input feature will overlap with each other to guarantee the scalars at the edge of output tiles are correct. Moreover, the overlapped part will increase recursively when devices execute multiple layers during one iteration in the inference procedure, but the communication is expensive for mobile devices. As a consequence, the executed layers need to be carefully chosen. However, (2) the structures of many CNNs are directed acyclic graphs (DAG) rather than chains. ResNet34 [10] uses skip-connection technology that allows a layer to directly connects to another deeper layer. The structure of InceptionV3 [11] contains multiple branches to capture more information from the input feature. These complex structures lead to a huge number of possible choices. Previous works mainly focused on the chain structure [4,5,6], which is much easier than DAG. Compared with datacenter, (3) the computing resources of mobile devices are diverse, the heterogeneous environment also hinders the optimization for cooperative inference.\n\nIn this paper, we explore previous works about parallelizing the CNN inference and propose a pipeline cooperation (PICO) framework for accelerating the inference on diverse mobile devices. Fig. 1 plots a diagrammatic sketch of our framework. PICO divides the entire CNN graph and mobile devices into 3 stages. These stages compose an efficient inference pipeline. Since each stage owns a small segment of original CNN and a subset of mobile devices, both communication overhead and the redundant calculation can be significantly reduced. There are two import metrics for pipeline: latency and period. The first term is the sum of inference latencies of all stages and the last term is the longest latency among stages. Obviously decreasing the period tends to increase the latency. Our optimization goal is to minimize the redundant calculation and period (maximize throughput) meanwhile to keep the latency of the pipeline under a certain value.\n\nWe first formulate the pipeline inference, then we analyze the complexity of the optimization problem and find that it is NP-Hard to directly obtain the optimal result. Based on our analysis, PICO uses a two-step optimization to maximize the throughput. In the first step, we orchestrate the CNN graph into a sequence of pieces. These pieces have the minimum redundant calculation inside and compose the original CNN graph in a chain structure. Then we choose the best partition for these pieces and devices to construct the inference pipeline. The algorithms used in the above procedures are based on dynamic programming.\n\nIn our experiment we use 2\\sim 8 Raspberry-Pi devices to evaluate PICO framework. The throughput can be improved by 1.8\\sim 6.8\\times under different CPU frequencies and number of devices.\n\nIn a nutshell, we make the following contributions:\n\n- • We present a pipeline cooperation (PICO) framework to accelerate CNN inference with diverse mobile devices.\n\n- • We propose an algorithm to split the complex CNN graph structure into more fine-grained pieces.\n\n- • We propose an algorithm to decide the optimal stage settings for inference pipeline which maximize the throughput.\n\n- • We apply our technique on a cluster consisting of Raspberry-Pi-based hardware and evaluate image recognition and object detection CNN models.\n\nThe rest of this paper is organized as follows: Section II provides background information of CNN and different parallelization strategies in mobile devices. Section III formulates the inference process and gives a cost model for further optimization. Section IV and V describe our approach to find near-optimal parallelization. Section VI presents the results of our evaluation. Section VII details the related work and Section VIII concludes.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "G. Kour and R. Saabne, “Real-time segmentation of on-line handwritten arabic script,” in Frontiers in Handwriting Recognition (ICFHR) . IEEE, 2014."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "——, “Fast classification of handwritten on-line arabic characters,” in Soft Computing and Pattern Recognition (SoCPaR) . IEEE, 2014."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "Z. Zhou, X. Chen, E. Li, L. Zeng, K. Luo, and J. Zhang, “Edge intelligence: Paving the last mile of artificial intelligence with edge computing,” Proceedings of the IEEE , 2019."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "J. Mao, X. Chen, K. W. Nixon, C. Krieger, and Y. Chen, “Modnn: Local distributed mobile computing system for deep neural network,” in Design, Automation & Test in Europe Conference & Exhibition (DATE) . IEEE, 2017."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "Z. Zhao, K. M. Barijough, and A. Gerstlauer, “Deepthings: Distributed adaptive deep learning inference on resource-constrained iot edge clusters,” IEEE Transactions on Computer-Aided Design of Integrated Circuits and Systems , 2018."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "L. Zhou, M. H. Samavatian, A. Bacha, S. Majumdar, and R. Teodorescu, “Adaptive parallel execution of deep neural networks on heterogeneous edge devices,” in Proceedings of the 4th ACM/IEEE Symposium on Edge Computing , 2019."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "J. Li, Q. Qi, J. Wang, C. Ge, Y. Li, Z. Yue, and H. Sun, “Oicsr: Out-in-channel sparsity regularization for compact deep neural networks,” in Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition , 2019."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "Y. He, P. Liu, Z. Wang, Z. Hu, and Y. Yang, “Filter pruning via geometric median for deep convolutional neural networks acceleration,” in Proceedings of the IEEE International Conference on Computer Vision , 2019."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "A. Howard, M. Sandler, G. Chu, L.-C. Chen, B. Chen, M. Tan, W. Wang, Y. Zhu, R. Pang, V. Vasudevan et al. , “Searching for mobilenetv3,” in Proceedings of the IEEE International Conference on Computer Vision , 2019."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "K. He, X. Zhang, S. Ren, and J. Sun, “Deep residual learning for image recognition,” in IEEE conference on computer vision and pattern recognition (CVPR) , 2016."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "C. Szegedy, S. Ioffe, V. Vanhoucke, and A. Alemi, “Inception-v4, inception-resnet and the impact of residual connections on learning,” in AAAI , 2017."
+    }
+  ]
+}

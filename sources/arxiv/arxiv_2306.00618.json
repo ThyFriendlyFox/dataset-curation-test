@@ -1,0 +1,200 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2306.00618",
+  "title": "Effective Structured Prompting by Meta-Learning and Representative Verbalizer",
+  "authors": "Weisen Jiang, Yu Zhang, James T. Kwok",
+  "year": "2024",
+  "categories": [
+    "cs.CL",
+    "cs.AI",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2306.00618",
+  "html_url": "https://arxiv.org/html/2306.00618",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 654,
+  "text": "In recent years, large pre-trained language models have achieved great success in solving a variety of downstream tasks [1,2,3,4,5,6,7,8,9,10]. Though fine-tuning the whole model [1,2] is effective and widely-used, optimizing and storing all the task-specific parameters can be compute- and memory-expensive when the model is large (e.g., GPT-3 [8] contains 100+ billion parameters). To alleviate this issue, many approaches have been proposed. Examples include adapter tuning [11,12,13] and prompt learning [14,15,8,9,16,17,18,19,20]. However, prompt learning is more preferable due to its effectiveness and also that it can be easily plugged into a pre-trained MLM without invasive modification [17,21,22,23].\n\nPrompt learning formulates the downstream task as a cloze-style MLM problem. It is useful for few-shot tasks due to its effectiveness, parameter-efficiency, and plug-and-play nature [14,8,20]. Specifically, prompt learning wraps an input text with a discrete prompt (e.g., “ Topic is [MASK] ”) and feeds it to the MLM to predict a token at the [MASK] position. A verbalizer [9,24,25] then maps the predicted token to the label. However, designing an effective prompt requires a good understanding of the downstream tasks.\n\nRecently, prompt tuning [9,16,26] proposes to wrap the input embedding with a continuous prompt. To reduce the number of parameters to be learned, the MLM is kept frozen. The continuous prompt can be further combined with discrete tokens to form a template [16,27,24].\n\nPrompt tuning can be sensitive to initialization [9]. Recently, a number of approaches have been proposed to alleviate this problem [9,28,29]. In particular, MetaPrompting [30] is the state-of-the-art that uses meta-learning [31,32,33] to learn a meta-initialization for all task-specific prompts. However, MetaPrompting suffers from three problems. 1. When the tasks are complex, it is challenging to obtain good prompts for all tasks and samples from a single meta-initialized prompt. 2. MetaPrompting uses a hand-crafted verbalizer. However, selecting good label tokens for the hand-crafted verbalizer is labor-intensive and not scalable for a large label set. 3. MetaPrompting requires expensive tuning the whole MLM. Figure 1 shows a large gap in meta-testing accuracies with and without MLM tuning (experimental details are in Section 4).\n\nIn this paper, we use a pool of multiple prompts [28,34,35] to extract task knowledge from meta-training tasks, and then construct instance-dependent prompts as weighted combinations of all the prompts in the pool via attention [36]. The attention’s query vector is the instance’s feature embedding. The prompt pool is the shared meta-knowledge and learned by the MAML algorithm [33]. Specifically, given a task with a support set and a query set, the base learner takes the meta-parameter and the support set to build a task-specific prompt pool, then the meta-learner optimizes the meta-parameter on the query set. Meta-learning a prompt pool is more flexible than meta-learning only a single prompt initialization (as in MetaPrompting), and allows better adaptation of complex tasks. Moreover, as only the prompt pool is tuned, it is much more parameter-efficient than MetaPrompting (with 1000\\times fewer parameters).\n\nWe also propose a novel soft verbalizer called representative verbalizer (RepVerb), which constructs label embeddings by averaging feature embeddings of the corresponding training samples. Unlike manually-designed verbalizers, RepVerb does not incur human effort for label token selection. Moreover, as RepVerb does not require learning any additional parameters, empirical results in Section 4.2 demonstrate that RepVerb is more effective than the soft verbalizers in WARP [21], DART [26], ProtoVerb [10]. Besides, the feature embedding learned by RepVerb is more discriminative.\n\nThe whole procedure, which combines meta-learning the structured prompts and RepVerb, is called MetaPrompter in the sequel. Experiments are performed on six widely used classification data sets. Results demonstrate that RepVerb outperforms existing soft verbalizers, and is also beneficial to other prompt-based methods such as MetaPrompting. Moreover, MetaPrompter achieves better performance than the recent state-of-the-arts.\n\nOur contributions are summarized as follows: 1. We propose a parameter-efficient algorithm MetaPrompter for effective structured prompting. 2. We propose a simple and effective soft verbalizer (RepVerb). 3. Experimental results demonstrate the effectiveness and parameter-efficiency of MetaPrompter.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib23",
+      "text": "Howard & Ruder (2018) Howard, J. and Ruder, S. Universal language model fine-tuning for text classification. In Annual Meeting of the Association for Computational Linguistics , 2018."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib9",
+      "text": "Devlin et al. (2019) Devlin, J., Chang, M.-W., Lee, K., and Toutanova, K. BERT: Pre-training of deep bidirectional transformers for language understanding. In North American Chapter of the Association for Computational Linguistics , 2019."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib65",
+      "text": "Yang et al. (2019) Yang, Z., Dai, Z., Yang, Y., Carbonell, J., Salakhutdinov, R. R., and Le, Q. V. XLNet: Generalized autoregressive pretraining for language understanding. In Neural Information Processing Systems , 2019."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib7",
+      "text": "Conneau & Lample (2019) Conneau, A. and Lample, G. Cross-lingual language model pretraining. In Neural Information Processing Systems , 2019."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib55",
+      "text": "Song et al. (2020) Song, K., Tan, X., Qin, T., Lu, J., and Liu, T.-Y. MPNet: Masked and permuted pre-training for language understanding. In Neural Information Processing Systems , 2020."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib16",
+      "text": "Guo et al. (2020) Guo, J., Xu, L., and Chen, E. Jointly masked sequence-to-sequence model for non-autoregressive neural machine translation. In Annual Meeting of the Association for Computational Linguistics , 2020."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib46",
+      "text": "Raffel et al. (2020) Raffel, C., Shazeer, N., Roberts, A., Lee, K., Narang, S., Matena, M., Zhou, Y., Li, W., and Liu, P. J. Exploring the limits of transfer learning with a unified text-to-text transformer. Journal of Machine Learning Research , 2020."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib4",
+      "text": "Brown et al. (2020) Brown, T., Mann, B., Ryder, N., Subbiah, M., Kaplan, J. D., Dhariwal, P., Neelakantan, A., Shyam, P., Sastry, G., Askell, A., Agarwal, S., Herbert-Voss, A., Krueger, G., Henighan, T., Child, R., Ramesh, A., Ziegler, D., Wu, J., Winter, C., Hesse, C., Chen, M., Sigler, E., Litwin, M., Gray, S., Chess, B., Clark, J., Berner, C., McCandlish, S., Radford, A., Sutskever, I., and Amodei, D. Language models are few-shot learners. In Neural Information Processing Systems , 2020."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib31",
+      "text": "Lester et al. (2021) Lester, B., Al-Rfou, R., and Constant, N. The power of scale for parameter-efficient prompt tuning. In Empirical Methods in Natural Language Processing , 2021."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib8",
+      "text": "Cui et al. (2022) Cui, G., Hu, S., Ding, N., Huang, L., and Liu, Z. Prototypical verbalizer for prompt-based few-shot tuning. In Annual Meeting of the Association for Computational Linguistics , 2022."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib22",
+      "text": "Houlsby et al. (2019) Houlsby, N., Giurgiu, A., Jastrzebski, S., Morrone, B., De Laroussilhe, Q., Gesmundo, A., Attariyan, M., and Gelly, S. Parameter-efficient transfer learning for NLP. In International Conference on Machine Learning , 2019."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib35",
+      "text": "Lin et al. (2020) Lin, Z., Madotto, A., and Fung, P. Exploring versatile generative language model via parameter-efficient transfer learning. In Empirical Methods in Natural Language Processing , 2020."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib24",
+      "text": "Hu et al. (2022a) Hu, E. J., Shen, Y., Wallis, P., Allen-Zhu, Z., Li, Y., Wang, S., Wang, L., and Chen, W. LoRA: Low-rank adaptation of large language models. In International Conference on Learning Representations , 2022a."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib45",
+      "text": "Radford et al. (2019) Radford, A., Wu, J., Child, R., Luan, D., Amodei, D., and Sutskever, I. Language models are unsupervised multitask learners. OpenAI Blog, 2019."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib53",
+      "text": "Shin et al. (2020) Shin, T., Razeghi, Y., Logan IV, R. L., Wallace, E., and Singh, S. AutoPrompt: Eliciting knowledge from language models with automatically generated prompts. In Empirical Methods in Natural Language Processing , 2020."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib38",
+      "text": "Liu et al. (2021) Liu, X., Zheng, Y., Du, Z., Ding, M., Qian, Y., Yang, Z., and Tang, J. GPT understands, too. Preprint arXiv:2103.10385, 2021."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib34",
+      "text": "Li & Liang (2021) Li, X. L. and Liang, P. Prefix-tuning: Optimizing continuous prompts for generation. In Annual Meeting of the Association for Computational Linguistics , 2021."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib39",
+      "text": "Liu et al. (2022b) Liu, X., Ji, K., Fu, Y., Tam, W., Du, Z., Yang, Z., and Tang, J. P-Tuning: Prompt tuning can be comparable to fine-tuning across scales and tasks. In Annual Meeting of the Association for Computational Linguistics , 2022b."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib44",
+      "text": "Prasad et al. (2022) Prasad, A., Hase, P., Zhou, X., and Bansal, M. GrIPS: Gradient-free, edit-based instruction search for prompting large language models. Preprint arXiv:2203.07281, 2022."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib36",
+      "text": "Liu et al. (2022a) Liu, J., Shen, D., Zhang, Y., Dolan, W. B., Carin, L., and Chen, W. What makes good in-context examples for GPT-3? In Proceedings of Deep Learning Inside Out , 2022a."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib17",
+      "text": "Hambardzumyan et al. (2021) Hambardzumyan, K., Khachatrian, H., and May, J. WARP: Word-level adversarial reprogramming. In Annual Meeting of the Association for Computational Linguistics , 2021."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib20",
+      "text": "He et al. (2022) He, Y., Zheng, S., Tay, Y., Gupta, J., Du, Y., Aribandi, V., Zhao, Z., Li, Y., Chen, Z., and Metzler, D. HyperPrompt: Prompt-based task-conditioning of transformers. In International Conference on Machine Learning , 2022."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib56",
+      "text": "Sun et al. (2022) Sun, T., He, Z., Qian, H., Zhou, Y., Huang, X., and Qiu, X. BBTv2: Towards a gradient-free future with large language models. In Empirical Methods in Natural Language Processing , 2022."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib10",
+      "text": "Ding et al. (2022) Ding, N., Hu, S., Zhao, W., Chen, Y., Liu, Z., Zheng, H.-T., and Sun, M. OpenPrompt: An open-source framework for prompt-learning. In Annual Meeting of the Association for Computational Linguistics , 2022."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib25",
+      "text": "Hu et al. (2022b) Hu, S., Ding, N., Wang, H., Liu, Z., Wang, J., Li, J., Wu, W., and Sun, M. Knowledgeable prompt-tuning: Incorporating knowledge into prompt verbalizer for text classification. In Annual Meeting of the Association for Computational Linguistics , 2022b."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib67",
+      "text": "Zhang et al. (2022) Zhang, N., Li, L., Chen, X., Deng, S., Bi, Z., Tan, C., Huang, F., and Chen, H. Differentiable prompt makes pre-trained language models better few-shot learners. In International Conference on Learning Representations , 2022."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib51",
+      "text": "Schick & Schütze (2021) Schick, T. and Schütze, H. Exploiting cloze-questions for few-shot text classification and natural language inference. In European Chapter of the Association for Computational Linguistics , 2021."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib33",
+      "text": "Li et al. (2022) Li, J., Tang, T., Nie, J.-Y., Wen, J.-R., and Zhao, X. Learning to transfer prompts for text generation. In North American Chapter of the Association for Computational Linguistics , 2022."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib61",
+      "text": "Vu et al. (2022) Vu, T., Lester, B., Constant, N., Al-Rfou, R., and Cer, D. SPoT: Better frozen model adaptation through soft prompt transfer. In Annual Meeting of the Association for Computational Linguistics , 2022."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib21",
+      "text": "Hou et al. (2022) Hou, Y., Dong, H., Wang, X., Li, B., and Che, W. MetaPrompting: Learning to learn better prompts. In International Conference on Computational Linguistics , 2022."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib2",
+      "text": "Bengio et al. (1991) Bengio, Y., Bengio, S., and Cloutier, J. Learning a synaptic learning rule. In International Joint Conference on Neural Networks , 1991."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib57",
+      "text": "Thrun & Pratt (1998) Thrun, S. and Pratt, L. Learning to learn: Introduction and overview. In Learning to Learn . 1998."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib12",
+      "text": "Finn et al. (2017) Finn, C., Abbeel, P., and Levine, S. Model-agnostic meta-learning for fast adaptation of deep networks. In International Conference on Machine Learning , 2017."
+    },
+    {
+      "n": 34,
+      "id": "bib.bib62",
+      "text": "Wang et al. (2022a) Wang, Z., Zhang, Z., Ebrahimi, S., Sun, R., Zhang, H., Lee, C.-Y., Ren, X., Su, G., Perot, V., Dy, J., and Pfister, T. DualPrompt: Complementary prompting for rehearsal-free continual learning. In European Conference on Computer Vision , 2022a."
+    },
+    {
+      "n": 35,
+      "id": "bib.bib63",
+      "text": "Wang et al. (2022b) Wang, Z., Zhang, Z., Lee, C.-Y., Zhang, H., Sun, R., Ren, X., Su, G., Perot, V., Dy, J., and Pfister, T. Learning to prompt for continual learning. In IEEE Conference on Computer Vision and Pattern Recognition , 2022b."
+    },
+    {
+      "n": 36,
+      "id": "bib.bib59",
+      "text": "Vaswani et al. (2017) Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., Kaiser, L., and Polosukhin, I. Attention is all you need. In Neural Information Processing Systems , 2017."
+    }
+  ]
+}

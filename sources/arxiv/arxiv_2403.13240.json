@@ -1,0 +1,123 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.13240",
+  "title": "SumTra: A Differentiable Pipeline for Few-Shot Cross-Lingual Summarization",
+  "authors": "Jacob Parnell, Inigo Jauregi Unanue, Massimo Piccardi",
+  "year": "2024",
+  "categories": [
+    "cs.CL"
+  ],
+  "url": "https://arxiv.org/abs/2403.13240",
+  "html_url": "https://arxiv.org/html/2403.13240",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 640,
+  "text": "Cross-lingual summarization (XLS) aims to take a document written in a given source language and generate a summary in a chosen target language, providing the speakers of the latter with the ability to concisely understand the content of documents written in foreign languages. However, XLS is a challenging task due to the limited training data which are typically available. Unlike in monolingual summarization, naturally-occurring cross-lingual document-summary pairs are rare, and dedicated XLS human annotation is demanding since it requires uncommon skills of the annotators [1]. This has often led to the reuse of existing multilingual data with post-hoc alignments for cross-lingual use [2,3].\n\nGiven the constraints in dedicated training resources, most recent approaches have focused on employing existing multilingual LMs [4,5,6], pretrained in the typical unsupervised manner over large corpora, and fine-tuning them with the limited XLS resources available for the chosen language pairs [7,8]. However, these multilingual models suffer from well-known limitations. On the one hand, the uneven pretraining of multilingual LMs across languages often results in poor knowledge transfer to low-resource languages [9,3]. On the other hand, the superposition of too many languages in a single model can result in a degradation of cross-lingual performance in the downstream task (i.e., language interference) [10]. In addition, it is not trivial to reuse the abundant, existing monolingual summarization data, since fine-tuning a multilingual LM with monolingual data often compromises its ability to generate text in a language different from the input’s [11,3] —a problem known as “catastrophic forgetting” [12]. The above issues compound in the impossibility of achieving a satisfactory zero-shot and few-shot XLS performance out of conventional multilingual LMs.\n\nFor this reason, this work revisits the summarize-and-translate approach to XLS [13], with the main aim of fully leveraging the existing monolingual summarization resources (i.e., training data, pretrained models) to obtain a performing zero-shot XLS pipeline. Specifically, we propose combining 1) a monolingual summarizer trained with abundant resources in the source language with 2) a pretrained machine translation model that translates into the target language. If the quality of both models is high, such a pipeline should be able to achieve a significant zero-shot performance. Yet, it can also suffer from model misalignment and error propagation. Therefore, we modify the summarizer to output “soft” predictions, ensuring that the pipeline remains fully differentiable end-to-end [14,15,16]. This allows fine-tuning it to improve the coupling of the models, alleviate error propagation, and obtain summaries that are closer to the ideal, joint summarization/translation of the XLS task. For immediacy, we refer to the proposed pipeline as SumTra.\n\nIn particular, in this paper we focus on the less explored English-to-many XLS task (most work to date has focused on many-to-English [17,2,8,18] or specific language pairs such as English-to-Chinese [19,17,20,21]. We believe that this is a valuable contribution as it provides access to summaries of the multitude of existing English documents for speakers of other languages around the world. To this aim, we have carried out experiments over two widely used XLS datasets (CrossSum [3] and WikiLingua [2]), with a range of language pairs spanning high-, medium-, and low-resource languages. The results show a strong quantitative performance for the zero-shot pipeline, and a competitive edge over comparable multilingual language model baselines with up to 1000-shot fine-tuning.\n\nOverall, our paper makes the following contributions:\n\n- • A summarize-and-translate pipeline that leverages contemporary state-of-the-art language models (and their resources) for the summarization and translation steps.\n\n- • A fully differentiable approach through the use of “soft” summaries, making the pipeline fine-tunable end-to-end.\n\n- • A novel objective function that incorporates a back-translation loss over the summarization module to ground the generation of the intermediate summaries to the target language reference.\n\n- • A comparative experimental evaluation of the proposed approach over two popular cross-lingual summarization datasets spanning two diverse domains, including an extensive qualitative, ablation, and sensitivity analysis.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib37",
+      "text": "Wang et al. (2022b) Jiaan Wang, Fandong Meng, Duo Zheng, Yunlong Liang, Zhixu Li, Jianfeng Qu, and Jie Zhou. 2022b. A survey on cross-lingual summarization . Transactions of the Association for Computational Linguistics , 10:1304–1323."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib12",
+      "text": "Ladhak et al. (2020) Faisal Ladhak, Esin Durmus, Claire Cardie, and Kathleen McKeown. 2020. WikiLingua: A new benchmark dataset for cross-lingual abstractive summarization . In Findings of the Association for Computational Linguistics: EMNLP 2020 , pages 4034–4048, Online. Association for Computational Linguistics."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "Bhattacharjee et al. (2022) Abhik Bhattacharjee, Tahmid Hasan, Wasi Uddin Ahmad, Yuan-Fang Li, Yong-Bin Kang, and Rifat Shahriyar. 2022. Crosssum: Beyond english-centric cross-lingual abstractive text summarization for 1500+ language pairs ."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib18",
+      "text": "Liu et al. (2020) Yinhan Liu, Jiatao Gu, Naman Goyal, Xian Li, Sergey Edunov, Marjan Ghazvininejad, Mike Lewis, and Luke Zettlemoyer. 2020. Multilingual denoising pre-training for neural machine translation . Transactions of the Association for Computational Linguistics , 8:726–742."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib29",
+      "text": "Tang et al. (2021) Yuqing Tang, Chau Tran, Xian Li, Peng-Jen Chen, Naman Goyal, Vishrav Chaudhary, Jiatao Gu, and Angela Fan. 2021. Multilingual translation from denoising pre-training . In Findings of the Association for Computational Linguistics: ACL-IJCNLP 2021 , pages 3450–3466, Online. Association for Computational Linguistics."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib39",
+      "text": "Xue et al. (2021) Linting Xue, Noah Constant, Adam Roberts, Mihir Kale, Rami Al-Rfou, Aditya Siddhant, Aditya Barua, and Colin Raffel. 2021. mT5: A massively multilingual pre-trained text-to-text transformer . In Proceedings of the 2021 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies , pages 483–498, Online. Association for Computational Linguistics."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib24",
+      "text": "Perez-Beltrachini and Lapata (2021) Laura Perez-Beltrachini and Mirella Lapata. 2021. Models and datasets for cross-lingual summarisation . In Proceedings of the 2021 Conference on Empirical Methods in Natural Language Processing , pages 9408–9423, Online and Punta Cana, Dominican Republic. Association for Computational Linguistics."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib19",
+      "text": "Ma et al. (2021) Shuming Ma, Li Dong, Shaohan Huang, Dongdong Zhang, Alexandre Muzio, Saksham Singhal, Hany Hassan Awadalla, Xia Song, and Furu Wei. 2021. Deltalm: Encoder-decoder pre-training for language generation and translation by augmenting pretrained multilingual encoders ."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "Joshi et al. (2020) Pratik Joshi, Sebastin Santy, Amar Budhiraja, Kalika Bali, and Monojit Choudhury. 2020. The state and fate of linguistic diversity and inclusion in the NLP world . In Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics , pages 6282–6293, Online. Association for Computational Linguistics."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib25",
+      "text": "Pfeiffer et al. (2022) Jonas Pfeiffer, Naman Goyal, Xi Lin, Xian Li, James Cross, Sebastian Riedel, and Mikel Artetxe. 2022. Lifting the curse of multilinguality by pre-training modular transformers . In Proceedings of the 2022 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies , pages 3479–3495, Seattle, United States. Association for Computational Linguistics."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib32",
+      "text": "Vu et al. (2022) Tu Vu, Aditya Barua, Brian Lester, Daniel Cer, Mohit Iyyer, and Noah Constant. 2022. Overcoming catastrophic forgetting in zero-shot cross-lingual generation . In Proceedings of the 2022 Conference on Empirical Methods in Natural Language Processing , pages 9279–9300, Abu Dhabi, United Arab Emirates. Association for Computational Linguistics."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib31",
+      "text": "van de Ven and Tolias (2019) Gido M. van de Ven and Andreas S. Tolias. 2019. Three scenarios for continual learning ."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib34",
+      "text": "Wan et al. (2010) Xiaojun Wan, Huiying Li, and Jianguo Xiao. 2010. Cross-language document summarization based on machine translation quality prediction . In Proceedings of the 48th Annual Meeting of the Association for Computational Linguistics , pages 917–926, Uppsala, Sweden. Association for Computational Linguistics."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib28",
+      "text": "Subramanian et al. (2017) Sandeep Subramanian, Sai Rajeswar, Francis Dutil, Chris Pal, and Aaron Courville. 2017. Adversarial generation of natural language . In Proceedings of the 2nd Workshop on Representation Learning for NLP , pages 241–251, Vancouver, Canada. Association for Computational Linguistics."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib11",
+      "text": "Kumar et al. (2021) Sachin Kumar, Eric Malmi, Aliaksei Severyn, and Yulia Tsvetkov. 2021. Controlled text generation as continuous optimization with multiple constraints . In Advances in Neural Information Processing Systems , volume 34, pages 14542–14554. Curran Associates, Inc."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib30",
+      "text": "Unanue et al. (2023) Inigo Jauregi Unanue, Gholamreza Haffari, and Massimo Piccardi. 2023. T3L: Translate-and-test transfer learning for cross-lingual text classification . Transactions of the Association for Computational Linguistics , 11:1147–1161."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib42",
+      "text": "Zhu et al. (2019) Junnan Zhu, Qian Wang, Yining Wang, Yu Zhou, Jiajun Zhang, Shaonan Wang, and Chengqing Zong. 2019. NCLS: Neural cross-lingual summarization . In Proceedings of the 2019 Conference on Empirical Methods in Natural Language Processing and the 9th International Joint Conference on Natural Language Processing (EMNLP-IJCNLP) , pages 3054–3064, Hong Kong, China. Association for Computational Linguistics."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib5",
+      "text": "Chi et al. (2021) Zewen Chi, Li Dong, Shuming Ma, Shaohan Huang, Saksham Singhal, Xian-Ling Mao, Heyan Huang, Xia Song, and Furu Wei. 2021. mT6: Multilingual pretrained text-to-text transformer with translation pairs . In Proceedings of the 2021 Conference on Empirical Methods in Natural Language Processing , pages 1671–1683, Online and Punta Cana, Dominican Republic. Association for Computational Linguistics."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib1",
+      "text": "Ayana et al. (2018) Ayana, Shi-qi Shen, Yun Chen, Cheng Yang, Zhi-yuan Liu, and Mao-song Sun. 2018. Zero-shot cross-lingual neural headline generation . IEEE/ACM Transactions on Audio, Speech, and Language Processing , 26(12):2319–2327."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib2",
+      "text": "Bai et al. (2021) Yu Bai, Yang Gao, and Heyan Huang. 2021. Cross-lingual abstractive summarization with limited parallel resources . In Proceedings of the 59th Annual Meeting of the Association for Computational Linguistics and the 11th International Joint Conference on Natural Language Processing (Volume 1: Long Papers) , pages 6910–6924, Online. Association for Computational Linguistics."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib16",
+      "text": "Liang et al. (2022) Yunlong Liang, Fandong Meng, Chulun Zhou, Jinan Xu, Yufeng Chen, Jinsong Su, and Jie Zhou. 2022. A variational hierarchical model for neural cross-lingual summarization . In Proceedings of the 60th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) , pages 2088–2099, Dublin, Ireland. Association for Computational Linguistics."
+    }
+  ]
+}

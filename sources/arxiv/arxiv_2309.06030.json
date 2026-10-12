@@ -1,0 +1,83 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2309.06030",
+  "title": "Federated Learning for Large-Scale Scene Modeling with Neural Radiance Fields",
+  "authors": "Teppei Suzuki",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2309.06030",
+  "html_url": "https://arxiv.org/html/2309.06030",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 678,
+  "text": "Neural radiance fields (NeRF) [1] have emerged to represent scenes for view synthesis and have been used as maps for many robotics applications, such as vision-based localization, navigation, and SLAM [2,3,4,5,6,7]. Although these studies have been evaluated in relatively small-scale scenes, we believe that such NeRF-based robotics applications will be available to the systems operated in large-scale environments, such as self-driving cars and delivery drones. In addition, since NeRF can lift arbitrary 2D information to 3D (e.g., semantic labels [8], and feature vectors [9]), it will facilitate a higher-level environmental recognition and understanding in robotics applications.\n\nNowadays, a large number of vehicles are on the road, and in the near future, many unmanned aerial vehicles, such as delivery drones, will be in the sky. In such a world, we envision the system to continuously build and maintain an earth-scale NeRF-based map using data collected from vehicles and drones in a life-long learning manner and to leverage the map created and maintained with such a system.\n\nLarge-scale scene modeling with NeRF has been studied in recent years [10,11]. These methods divide a large-scale environment into many small areas and model the small areas with multiple NeRF models. Although this pipeline efficiently models a large-scale scene in a distributed training manner, it has three problems in realizing our envisioned system: (i) The existing pipelines need to collect data in a server once, but they need high communication costs to collect data from clients on a server and need a large number of memory budgets to save the earth-scale data; (ii) these pipelines require tremendously large computational resources for training a large number of models to cover an earth-scale environment; and (iii) they can only update the model for each pre-divided area for the maintenance of the NeRF-based map, and if the training data is collected only in a part of the area, the model may suffer from the forgetting problem [3].\n\nTo develop a more scalable and maintainable method, we propose the federated learning pipeline for large-scale modeling with NeRF, as depicted in Fig. 1. Federated learning (FL) [12] is a data-decentralizing training protocol that enables clients, such as mobile devices, to collaboratively train a model while keeping the training data decentralized. Since FL does not need to aggregate data collected by clients on the server, it can alleviate the communication cost problem and the data storage problem. FL also alleviates the computational resource problem because it can leverage the resources of clients (millions or more in our scenario, and then their overall FLOPS will be much larger than those of supercomputers).\n\nTo train NeRF in a federated learning manner, we tailor the model aggregation pipeline, which allows the global model to be locally updated based on the client data, avoiding the forgetting problem and improving maintainability. Specifically, we cache the outputs of each local model as the 3D voxel grid, and then the global model is updated by aggregating cached representation based on the clients’ pose in the global coordinate. This pipeline does not affect the outputs of the global model beyond the region modeled by the local models. In addition, to align the inaccurate global pose of clients due to sensor noise, we propose the global pose alignment step before the aggregation step, which is inspired by the vision-based localization using NeRF [2,7,13].\n\nOur contribution is summarized below:\n\n- • We propose the federated learning pipeline for large-scale scene modeling with NeRF. By caching the outputs of each local model as the voxel grid, we realize the local update of the global model.\n\n- • We also propose the global pose alignment. To alleviate the sensor noise in the clients’ pose in the global coordinate, we align the global pose of each client before the aggregation step by minimizing the difference between the RGB and depth images rendered by the global and local models.\n\n- • We assess the effectiveness of our training pipeline on the Mill19 dataset [11], which contains thousands of HD images collected from drone footage over 100,000m 2 of terrain near an industrial complex.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "B. Mildenhall, P. P. Srinivasan, M. Tancik, J. T. Barron, R. Ramamoorthi, and R. Ng, “Nerf: Representing scenes as neural radiance fields for view synthesis,” Communications of the ACM , vol. 65, no. 1, pp. 99–106, 2021."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "L. Yen-Chen, P. Florence, J. T. Barron, A. Rodriguez, P. Isola, and T.-Y. Lin, “inerf: Inverting neural radiance fields for pose estimation,” in 2021 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS) . IEEE, 2021, pp. 1323–1330."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "E. Sucar, S. Liu, J. Ortiz, and A. J. Davison, “imap: Implicit mapping and positioning in real-time,” in Proceedings of the IEEE/CVF International Conference on Computer Vision , 2021, pp. 6229–6238."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "Z. Zhu, S. Peng, V. Larsson, W. Xu, H. Bao, Z. Cui, M. R. Oswald, and M. Pollefeys, “Nice-slam: Neural implicit scalable encoding for slam,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2022, pp. 12 786–12 796."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "M. Adamkiewicz, T. Chen, A. Caccavale, R. Gardner, P. Culbertson, J. Bohg, and M. Schwager, “Vision-only robot navigation in a neural radiance world,” IEEE Robotics and Automation Letters , vol. 7, no. 2, pp. 4606–4613, 2022."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "O. Kwon, J. Park, and S. Oh, “Renderable neural radiance map for visual navigation,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2023, pp. 9099–9108."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "D. Maggio, M. Abate, J. Shi, C. Mario, and L. Carlone, “Loc-nerf: Monte carlo localization using neural radiance fields,” in 2023 IEEE International Conference on Robotics and Automation (ICRA) . IEEE, 2023, pp. 4018–4025."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "A. Kundu, K. Genova, X. Yin, A. Fathi, C. Pantofaru, L. J. Guibas, A. Tagliasacchi, F. Dellaert, and T. Funkhouser, “Panoptic neural fields: A semantic object-aware neural scene representation,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2022, pp. 12 871–12 881."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "S. Kobayashi, E. Matsumoto, and V. Sitzmann, “Decomposing nerf for editing via feature field distillation,” Advances in Neural Information Processing Systems , vol. 35, pp. 23 311–23 330, 2022."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "M. Tancik, V. Casser, X. Yan, S. Pradhan, B. Mildenhall, P. P. Srinivasan, J. T. Barron, and H. Kretzschmar, “Block-nerf: Scalable large scene neural view synthesis,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2022, pp. 8248–8258."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "H. Turki, D. Ramanan, and M. Satyanarayanan, “Mega-nerf: Scalable construction of large-scale nerfs for virtual fly-throughs,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2022, pp. 12 922–12 931."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "B. McMahan, E. Moore, D. Ramage, S. Hampson, and B. A. y Arcas, “Communication-efficient learning of deep networks from decentralized data,” in Artificial intelligence and statistics . PMLR, 2017, pp. 1273–1282."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "Y. Lin, T. Müller, J. Tremblay, B. Wen, S. Tyree, A. Evans, P. A. Vela, and S. Birchfield, “Parallel inversion of neural radiance fields for robust pose estimation,” in 2023 IEEE International Conference on Robotics and Automation (ICRA) . IEEE, 2023, pp. 9377–9384."
+    }
+  ]
+}

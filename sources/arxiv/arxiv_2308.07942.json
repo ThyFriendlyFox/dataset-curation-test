@@ -1,0 +1,65 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2308.07942",
+  "title": "Inductive Knowledge Graph Completion with GNNs and Rules: An Analysis",
+  "authors": "Akash Anil, VÃ­ctor GutiÃ©rrez-Basulto, YazmÃ­n IbaÃ±Ã©z-GarcÃ­a, Steven Schockaert",
+  "year": "2024",
+  "categories": [
+    "cs.AI",
+    "cs.LG",
+    "cs.SI"
+  ],
+  "url": "https://arxiv.org/abs/2308.07942",
+  "html_url": "https://arxiv.org/html/2308.07942",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "1. Introduction",
+  "word_count": 646,
+  "text": "Knowledge Graphs (KGs) store graph-like factual knowledge using triples of the form (x,r,y), indicating that entities x and y are related through a relation type r. They provide the backbone of several NLP related tasks, ranging from question answering [1,2] to recommendation systems [3,4]. The aim of Knowledge Graph completion is to find plausible triples which are missing from a given KG. Standard KG completion models are best suited for densely connected static knowledge graphs. To encourage the study of KG completion methods that can be applied more widely, [5] introduced the task of inductive KG completion (where the usual setting is then referred to as transductive). In the inductive setting, we have one knowledge graph for training and a separate knowledge graph for testing. Similar as for the transductive setting, the main evaluation task consists in answering link prediction queries of the form (x,r,?), which require us to identify entities y that make (x,r,y) a valid triple. Crucially, in the inductive setting, the entities in the training and test KGs are different, so the model has to make predictions about entities that were not seen during training. We would thus expect that capturing inference patterns becomes crucial, which suggests that rule-based methods should be a natural fit for this setting. However, the literature on inductive KG completion is dominated by GNN models.\n\nThe aim of this paper is to analyse the reasons why rule-based methods underperform, and to suggest strategies for mitigating the underlying issues. We focus on NBFNet [6], as a state-of-the-art GNN model, and AnyBURL [7], as a state-of-the-art rule-based method. We start from the observation that standard rule-based methods have two key limitations, irrespective of the quality of the learned rules:\n\nFor a link prediction query of the form (x,r,?), rule-based methods only assign a non-zero confidence to entities that can be linked to x by a rule. This means that the majority of entities will typically receive a confidence of 0. Rule-based methods thus make no attempt to rank entities which do not seem plausible.\n\nFor most rule-based methods, the confidence in an answer candidate is essentially based on the confidence of a single rule. Intuitively, however, the more (ground) rules predict an answer candidate y, the more confident we should be.\n\nWe analyse the effect of these issues by comparing the performance of AnyBURL and NBFNet with a hybrid approach. To address limitation L1, we simply rank the entities that receive a confidence of 0 with a different method, which is essentially used as a tie breaker. By comparing the performance of this hybrid method with the standard AnyBURL set-up, we can evaluate the impact of ignoring zero-confidence entities on the overall performance. To address L2, we essentially want to combine the confidence scores of all the ground rules that predict a given answer candidate. Doing this effectively is challenging, however, because we need to distinguish between cases where different rules provide independent evidence and cases where different variations of the same argument are found [8,9]. To address this challenge, we experiment with a GNN-based strategy for aggregating the evidence provided by different rules. Since the graphs involved are small, this strategy largely keeps the interpretability advantage of rule-based methods.\n\nBy combining the strategies for addressing L1 and L2, we achieve results which are close to those of NBFNet. As a final variant, we use NBFNet to re-rank the entities predicted by AnyBURL. When also using NBFNet for re-ranking the zero-confidence entities, we end up with a hybrid strategy which consistently outperforms the standard NBFNet, although without the interpretability advantage of rule-based methods. Note that in this variant, AnyBURL is only used to partition to set of candidate answers into those with zero confidence and those that can be predicted by some rule. The fact that this variant outperforms NBFNet suggests that the latter is prone to learning spurious correlations.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib6",
+      "text": "Chen et al. (2019) Yu Chen, Lingfei Wu, and Mohammed J. Zaki. 2019. Bidirectional attentive memory networks for question answering over knowledge bases . In Proceedings of the 2019 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, NAACL-HLT 2019, Minneapolis, MN, USA, June 2-7, 2019 , pages 2913–2923. Association for Computational Linguistics."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib12",
+      "text": "Hu et al. (2022) Zhiwei Hu, Víctor Gutiérrez-Basulto, Zhiliang Xiang, Xiaoli Li, Ru Li, and Jeff Z. Pan. 2022. Type-aware embeddings for multi-hop reasoning over knowledge graphs . In Proceedings of the Thirty-First International Joint Conference on Artificial Intelligence, IJCAI 2022, Vienna, Austria, 23-29 July 2022 , pages 3078–3084. ijcai.org."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib35",
+      "text": "Yang et al. (2022) Yuhao Yang, Chao Huang, Lianghao Xia, and Chenliang Li. 2022. Knowledge graph contrastive learning for recommendation. In SIGIR , pages 1434–1443, Madrid, Spain. ACM."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib43",
+      "text": "Zou et al. (2022) Ding Zou, Wei Wei, Xian-Ling Mao, Ziyang Wang, Minghui Qiu, Feida Zhu, and Xin Cao. 2022. Multi-level cross-view contrastive learning for knowledge-aware recommender system. In SIGIR , pages 1358–1368, Madrid, Spain. ACM."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib28",
+      "text": "Teru et al. (2020) Komal K. Teru, Etienne G. Denis, and William L. Hamilton. 2020. Inductive relation prediction by subgraph reasoning . In Proceedings of the 37th International Conference on Machine Learning, ICML 2020, 13-18 July 2020, Virtual Event , volume 119 of Proceedings of Machine Learning Research , pages 9448–9457. PMLR."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib42",
+      "text": "Zhu et al. (2021) Zhaocheng Zhu, Zuobai Zhang, Louis-Pascal A. C. Xhonneux, and Jian Tang. 2021. Neural bellman-ford networks: A general graph neural network framework for link prediction . In Advances in Neural Information Processing Systems 34: Annual Conference on Neural Information Processing Systems 2021, NeurIPS 2021, December 6-14, 2021, virtual , pages 29476–29490."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib19",
+      "text": "Meilicke et al. (2019) Christian Meilicke, Melisachew Wudage Chekol, Daniel Ruffinelli, and Heiner Stuckenschmidt. 2019. Anytime bottom-up rule learning for knowledge graph completion . In Proceedings of the Twenty-Eighth International Joint Conference on Artificial Intelligence, IJCAI 2019, Macao, China, August 10-16, 2019 , pages 3137–3143. ijcai.org."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib22",
+      "text": "Ott et al. (2021) Simon Ott, Christian Meilicke, and Matthias Samwald. 2021. SAFRAN: an interpretable, rule-based link prediction method outperforming embedding models . In 3rd Conference on Automated Knowledge Base Construction, AKBC 2021, Virtual, October 4-8, 2021 ."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib2",
+      "text": "Betz et al. (2022) Patrick Betz, Christian Meilicke, and Heiner Stuckenschmidt. 2022. Supervised knowledge aggregation for knowledge graph completion . In The Semantic Web - 19th International Conference, ESWC 2022, Hersonissos, Crete, Greece, May 29 - June 2, 2022, Proceedings , volume 13261 of Lecture Notes in Computer Science , pages 74–92. Springer."
+    }
+  ]
+}

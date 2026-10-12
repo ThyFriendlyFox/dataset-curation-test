@@ -1,0 +1,125 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.14731",
+  "title": "Reversible Jump Attack to Textual Classifiers with Modification Reduction",
+  "authors": "Mingze Ni, Zhensu Sun, Wei Liu",
+  "year": "2024",
+  "categories": [
+    "cs.CR",
+    "cs.CL",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2403.14731",
+  "html_url": "https://arxiv.org/html/2403.14731",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 914,
+  "text": "## Introduction\n\nNLP models are known to be vulnerable in various applications, including machine translation [1,2,3], sentiment analysis [4,5], and text summarization [2]. Attackers can exploit these weaknesses, creating adversarial examples that compromise the performance of targeted NLP systems. This growing susceptibility presents significant security challenges for AI models.\n\nTextual attacks on NLP models are classified into character [6,7], word [8,9], and sentence-level [10] attacks. Character-level attacks are easily countered due to noticeable misspellings [11], while sentence-level attacks often yield complex, hard-to-read text [12]. Word-level attacks are gaining preference for their effectiveness and subtlety, as they involve replacing words with carefully chosen substitutes [13,14,15]. Consequently, our focus is on conducting word-level adversarial attacks.\n\nCrafting optimal adversarial examples involves navigating the interplay of successful attacks, controlled imperceptibility. The predominant strategies for this can be classified into optimization algorithms and hierarchical search methods. Within the realm of optimization, Genetic Attack (GA) [8,9] and Particle Swarm Optimization (PSO) [4] stand out as evolutionary approaches, focusing on optimizing attack effectiveness within embedding spaces and sememe-based thesauri, respectively. However, these methods face two primary challenges: 1) low efficiency in the optimization process due to the expansive search space, such as GloVe [16], and 2) Compromised semantic integrity, as even synonym-based word substitutions can cause sentence-level semantics inconsistency. On the other hand, Hierarchical search crafts adversarial examples by orderly substituting words based on word saliency rank (WSR) [17,18,5]. It first identifies target words using WSR, then employs a Masked Language Model or thesaurus for substitutions. These hierarchical attacking methods have several drawbacks: 1) the first drawback of this approach is the difficulty of presetting the number of perturbed words (NPW) for large datasets with many tokens since the optimal NPW varies with different target texts [19]; 2) the WSR-based methods will significantly reduce the searching domain by only attacking the combination of victim words ordered by the WSR. For a clear illustration, Fig 1 showcases the drawbacks of optimization-based GA and hierarchical PWWS attacks. GA’s replacement of ‘thriller’ with ‘science’ sacrifices semantic quality, while PWWS, despite altering three words, fails to fool the classifier.\n\nTo address the above problems, we propose two novel black-box and word-level antagonistic algorithms: Reversible Jump Attacks (RJA) and MH Modification Reduction (MMR). For RJA, we employ the Reversible Jump sampler (RJS) and propose three variables from a target distribution: the number of perturbed words (NPW), victim words, and substitutions from Masked Language Models (MLM) and HowNet [20]. The target distribution for RJS for evaluating the quality of the adversarial candidates is regularized by a strong penalty of semantic (dis)similarity. The NPW can be cross-dimensionally searched via RJS to adjust for different textual inputs according to their word saliency and overall performance. Given these three factors, adversarial candidates are only accepted based on an acceptance probability from RJS. By running such a process iteratively, we will obtain the successful candidates with the highest semantic similarity. Therefore, RJA efficiently searches threat-level attacks inside a domain larger than WSR without presetting an NPW and sacrificing much semantics for imperceptibility.\n\nThe other algorithm is Metropolis-Hasting Modification Reduction (MMR) which tends to restore the manipulations from RJA (i.e., reverse back to the original words) and then update the existing substitutions to maintain the attacking performance. Specifically, given an adversarial candidate, MMR first stochastically proposes a new candidate by restoring the attacked words. It applies a customized acceptance probability, calculated by comparing the overall performance between the new and current candidates, to determine the acceptance of the new candidate. After restoring some attacked words, MMR uses MH algorithm to update the substitutions of the current attacked words to preserve the attacking performance. By combining RJA and MMR, we proposed an integrated RJA-MMR as our final model. Specifically, RJA utilizes a Reverse Jump sampler [21], a Markov Chain Monte Carlo (MCMC) family member, to sample the dimensional jumping vectors to perform a cross-dimensional search for the optimal attacking performance constrained by semantic similarity. Intuitively, RJA and MMR agree on attacking performance improvement but disagree on NPW. By iteratively running these two antagonistic algorithms, attackers can boost the attack performance with only a small number of perturbations. The attack performance is illustrated by an example in Fig 1, where RJA-MMR outperforms the optimizing attack (Genetic attack) and hierarchical attack (PWWS).\n\nOur main contributions from this work are as follows:\n\n- • We design a highly effective adversarial attack method, Reversible Jump Attack (RJA), which utilizes the Reversible Jump algorithm to generate adversarial examples with an adaptive number of perturbed words. The algorithm enables our attack method to have an enlarged search domain by jumping across the dimensions.\n\n- • We propose Metropolis-Hasting Modification Reduction (MMR), which applies Metropolis-Hasting (MH) algorithm to construct an acceptance probability and use it to restore the attacked victim words to improve the imperceptibility with attacking performance reserved. MMR is functional with RJA and empirically proven effective in the adversarial examples generated by other attacking algorithms.\n\n- • We evaluate our attack method on real-world public datasets. Our results show that methods achieved the best performance in terms of attack performance, imperceptibility and examples’ fluency.\n\nThe rest of this paper is structured as follows. We first review adversarial attacks for NLP models and the Markov Chain Monte Carlo methods in NLP in Section 2. Then we detail our proposed method in Section 3. We evaluate the performance of the proposed method through empirical analysis in Section 4. We conclude the paper with suggestions for future work in Section 5.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib45",
+      "text": "Ni et al (2022) Ni M, Wang C, Zhu T, et al (2022) Attacking neural machine translations via hybrid attention learning. Machine Learning 111(11):3977–4002"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib4",
+      "text": "Cheng et al (2020) Cheng M, Yi J, Chen PY, et al (2020) Seq2sick: Evaluating the robustness of sequence-to-sequence models with adversarial examples. In: Proceedings of the AAAI Conference on Artificial Intelligence, pp 3601–3608"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib59",
+      "text": "Tan et al (2020) Tan S, Joty S, Kan MY, et al (2020) It’s morphin’ time! Combating linguistic discrimination with inflectional perturbations. In: Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics. Association for Computational Linguistics, Online, pp 2920–2935"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib64",
+      "text": "Zang et al (2020) Zang Y, Qi F, Yang C, et al (2020) Word-level textual adversarial attacking as combinatorial optimization. In: Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics, pp 6066–6080"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib63",
+      "text": "Yang et al (2021) Yang X, Liu W, Bailey J, et al (2021) Bigram and unigram based text attack via adaptive monotonic heuristic search. In: Proceedings of the AAAI Conference on Artificial Intelligence, pp 706–714"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib20",
+      "text": "Iyyer et al (2018a) Iyyer M, Wieting J, Gimpel K, et al (2018a) Adversarial example generation with syntactically controlled paraphrase networks. In: Proceedings of the 2018 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long Papers), pp 1875–1885"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib52",
+      "text": "Ribeiro et al (2018) Ribeiro MT, Singh S, Guestrin C (2018) Semantically equivalent adversarial rules for debugging nlp models. In: Proceedings of the 56th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers). Association for Computational Linguistics, Melbourne, Australia, pp 856–865"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib1",
+      "text": "Alzantot et al (2018) Alzantot M, Sharma Y, Elgohary A, et al (2018) Generating natural language adversarial examples. In: Proceedings of the 2018 Conference on Empirical Methods in Natural Language Processing, pp 2890–2896"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib23",
+      "text": "Jia et al (2019) Jia R, Raghunathan A, Göksel K, et al (2019) Certified robustness to adversarial word substitutions. In: Proceedings of the 2019 Conference on Empirical Methods in Natural Language Processing and the 9th International Joint Conference on Natural Language Processing (EMNLP-IJCNLP), pp 4129–4142"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib22",
+      "text": "Jia and Liang (2017) Jia R, Liang P (2017) Adversarial examples for evaluating reading comprehension systems. In: Proceedings of the 2017 Conference on Empirical Methods in Natural Language Processing. Association for Computational Linguistics, Copenhagen, Denmark, pp 2021–2031"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib8",
+      "text": "Ebrahimi et al (2018) Ebrahimi J, Rao A, Lowd D, et al (2018) Hotflip: White-box adversarial examples for text classification. In: Proceedings of the 56th Annual Meeting of the Association for Computational Linguistics (Volume 2: Short Papers), pp 31–36"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib11",
+      "text": "Gan and Ng (2019) Gan WC, Ng HT (2019) Improving the robustness of question answering systems to question paraphrasing. In: Proceedings of the 57th Annual Meeting of the Association for Computational Linguistics, pp 6065–6075"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib67",
+      "text": "Zhang et al (2020) Zhang W, Sheng QZ, Alhazmi AAF, et al (2020) Adversarial attacks on deep-learning models in natural language processing. ACM Transactions on Intelligent Systems and Technology (TIST) 11:1 – 41"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib12",
+      "text": "Garg and Ramakrishnan (2020) Garg S, Ramakrishnan G (2020) Bae: Bert-based adversarial examples for text classification. In: Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing (EMNLP), pp 6174–6181"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib31",
+      "text": "Li et al (2020) Li L, Ma R, Guo Q, et al (2020) Bert-attack: Adversarial attack against bert using bert. In: Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing (EMNLP), pp 6193–6202"
+    },
+    {
+      "n": 16,
+      "id": "bib.bib47",
+      "text": "Pennington et al (2014) Pennington J, Socher R, Manning CD (2014) Glove: Global vectors for word representation. In: Empirical Methods in Natural Language Processing (EMNLP), pp 1532–1543"
+    },
+    {
+      "n": 17,
+      "id": "bib.bib51",
+      "text": "Ren et al (2019) Ren S, Deng Y, He K, et al (2019) Generating natural language adversarial examples through probability weighted word saliency. In: Proceedings of the 57th annual meeting of the association for computational linguistics, pp 1085–1097"
+    },
+    {
+      "n": 18,
+      "id": "bib.bib30",
+      "text": "Li et al (2021) Li D, Zhang Y, Peng H, et al (2021) Contextualized perturbation for textual adversarial attack. In: Proceedings of the 2021 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, pp 5053–5069"
+    },
+    {
+      "n": 19,
+      "id": "bib.bib37",
+      "text": "Michel et al (2019) Michel P, Li X, Neubig G, et al (2019) On evaluation of adversarial perturbations for sequence-to-sequence models. arXiv preprint arXiv:190306620"
+    },
+    {
+      "n": 20,
+      "id": "bib.bib6",
+      "text": "Dong and Dong (2003) Dong Z, Dong Q (2003) Hownet-a hybrid language and knowledge resource. In: International Conference on Natural Language Processing and Knowledge Engineering, 2003. Proceedings. 2003, IEEE, pp 820–824"
+    },
+    {
+      "n": 21,
+      "id": "bib.bib14",
+      "text": "Green (1995a) Green PJ (1995a) Reversible jump markov chain monte carlo computation and bayesian model determination. Biometrika 82:711–732"
+    }
+  ]
+}

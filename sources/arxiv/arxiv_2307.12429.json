@@ -1,0 +1,128 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2307.12429",
+  "title": "SwIPE: Efficient and Robust Medical Image Segmentation with Implicit Patch Embeddings",
+  "authors": "Yejia Zhang, Pengfei Gu, Nishchal Sapkota, Danny Z. Chen",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2307.12429",
+  "html_url": "https://arxiv.org/html/2307.12429",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 803,
+  "text": "Segmentation is a critical task in medical image analysis. Known approaches mainly utilize discrete data representations (e.g., rasterized label masks) with convolutional neural networks (CNNs) [1,2,3,4] or Transformers [5,6] to classify image entities in a bottom-up manner. While undeniably effective, this paradigm suffers from two primary limitations. (1) These approaches have limited spatial flexibility and poor computational scaling. Retrieving predictions at higher resolutions would require either increasing the input size, which decreases performance and incurs quadratic or cubic memory increases, or interpolating output predictions, which introduces discretization artifacts. (2) Per-pixel or voxel learning inadequately models object shapes/boundaries, which are central to both robust computer vision methods and our own visual cortical pathways [7]. This often results in predictions with unrealistic object shapes and locations [8], especially in settings with limited annotations and out-of-distribution data.\n\nInstead of segmenting structures with discrete grids, we explore the use of Implicit Neural Representations (INRs) which employ continuous representations to compactly capture coordinate-based signals (e.g., objects in images). INRs represent object shapes with a parameterized function f_{\\theta}:(\\textbf{p},\\textbf{z})\\rightarrow[0,1] that maps continuous spatial coordinates \\textbf{p}=(x,y,z), x,y,z\\in[-1,1] and a shape embedding vector z to occupancy scores. This formulation enables direct modeling of object contours as the decision boundary of f_{\\theta}, superior memory efficiency [9], and smooth predictions at arbitrary resolutions that are invariant to input size. INRs have been adopted in the vision community for shape reconstruction [10,11,12,13], texture synthesis [14], novel view synthesis [15], and segmentation [16]. Medical imaging studies have also used INRs to learn organ templates [17], synthesize cell shapes [18], and reconstruct radiology images [19].\n\nThe adoption of INRs for medical image segmentation, however, has been limited where most existing approaches directly apply pipelines designed for 3D reconstruction to images. These works emphasize either global embeddings z or point-wise ones. OSSNet [20] encodes a global embedding from an entire volume and an auxiliary local image patch to guide voxel-wise occupancy prediction. Although global shape embeddings facilitate overall shape coherence, they neglect the fine-grained details needed to delineate local boundaries. The local patches partially address this issue but lack contextual understanding beyond the patches and neglect mid-scale information. In an effort to enhance local acuity and contextual modeling, IFA [16], IOSNet [21], and NUDF [22] each extract a separate embedding for every input coordinate by concatenating point-wise features from multi-scale CNN feature maps. Although more expressive, point-wise features still lack sufficient global contextual understanding and suffer from the same unconstrained prediction issues observed in discrete segmentation methods. Moreover, these methods use components designed for shape reconstruction—a domain where synthetic data is abundant and the modeling of texture, multi-class discrimination, and multi-scale contexts are less crucial.\n\nTo address these limitations, we propose SwIPE (S egmentation w ith I mplicit P atch E mbeddings) which learns continuous representations of foreground shapes at the patch level. By decomposing objects into parts (i.e., patches), we aim to enable both accurate local boundary delineation and global shape coherence. This also improves model generalizability and training efficiency since local curvatures often reoccur across classes or images. SwIPE first encodes an image into descriptive patch embeddings and then decodes the point-wise occupancies using these embeddings. To avoid polarization of patch embeddings toward either local or global features in the encoding step, we introduce a context aggregation mechanism that fuses multi-scale feature maps and propose a Multi-stage Embedding Attention (MEA) module to dynamically extract relevant features from all scales. This is driven by the insight that different object parts necessitate variable focus on either global/abstract (important for object interiors) or local/fine-grained information (essential around object boundaries). To enhance global shape coherence across patches in the decoding step, we augment local embeddings with global information and propose Stochastic Patch Overreach (SPO) to improve continuity around patch boundaries. Comprehensive evaluations are conducted on two tasks (2D polyp and 3D abdominal organ segmentation) across four datasets. SwIPE outperforms the best-known implicit methods (+6.7% & +4.5% F1 on polyp and abdominal, resp.) and beats task-specific discrete approaches (+2.5% F1 on polyp) with 10x fewer parameters. We also demonstrate SwIPE’s superior model & data efficiency in terms of network size & annotation budgets, and greater robustness to data shifts across image resolutions and datasets. Our main contributions are as follows.\n\n- 1. Away from discrete representations, we are the first to showcase the merits of patch-based implicit neural representations for medical image segmentation.\n\n- 2. We propose a new efficient attention mechanism, Multi-stage Embedding Attention (MEA), to improve contextual understanding during the encoding step, and Stochastic Patch Overreach (SPO) to address boundary continuities during occupancy decoding.\n\n- 3. We perform detailed evaluations of SwIPE and its components on two tasks (2D polyp segmentation and 3D abdominal organ segmentation). We not only outperform state-of-the-art implicit and discrete methods, but also yield improved data & model efficiency and better robustness to data shifts.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib12",
+      "text": "Isensee, F., Jaeger, P., Kohl, S., Petersen, J., Maier-Hein, K.H.: nnU-Net: A self-configuring method for deep learning-based biomedical image segmentation. Nature Methods 18 (2), 203–211 (2021)"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib6",
+      "text": "Fan, D., Ji, G., Zhou, T., Chen, G., Fu, H., Shen, J., Shao, L.: PraNet: Parallel reverse attention network for polyp segmentation. In: MICCAI. pp. 263–273. Springer (2020)"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib26",
+      "text": "Ronneberger, O., Fischer, P., Brox, T.: U-Net: Convolutional networks for biomedical image segmentation. In: MICCAI. pp. 234–241. Springer (2015)"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib8",
+      "text": "Gu, P., Zheng, H., Zhang, Y., Wang, C., Chen, D.: kCBAC-Net: Deeply supervised complete bipartite networks with asymmetric convolutions for medical image segmentation. In: MICCAI. pp. 337–347. Springer (2021)"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib10",
+      "text": "Hatamizadeh, A., Tang, Y., Nath, V., Yang, D., Myronenko, A., Landman, B., Roth, H., Xu, D.: UNETR: Transformers for 3D medical image segmentation. In: IEEE/CVF Winter Conference on Applications of Computer Vision (WACV). pp. 574–584 (2022)"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib9",
+      "text": "Hassani, A., Walton, S., Shah, N., Abuduweili, A., Li, J., Shi, H.: Escaping the big data paradigm with compact Transformers. ArXiV:2104.05704 (2021)"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib23",
+      "text": "Pasupathy, A.: The neural basis of image segmentation in the primate brain. Neuroscience 296 , 101–109 (2015)"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib24",
+      "text": "Raju, A., Miao, S., Jin, D., Lu, L., Huang, J., Harrison, A.P.: Deep implicit statistical shape models for 3D medical image delineation. In: Proceedings of the AAAI Conference on Artificial Intelligence. vol. 36, pp. 2135–2143 (2022)"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib5",
+      "text": "Dupont, E., Goliński, A., Alizadeh, M., Teh, Y.W., Doucet, A.: COIN: COmpression with Implicit Neural representations. arXiv preprint arXiv:2103.03123 (2021)"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib4",
+      "text": "Chibane, J., Alldieck, T., Pons-Moll, G.: Implicit functions in feature space for 3D shape reconstruction and completion. CVPR pp. 6968–6979 (2020)"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib22",
+      "text": "Park, J., Florence, P., Straub, J., Newcombe, R., Lovegrove, S.: DeepSDF: Learning continuous signed distance functions for shape representation. CVPR pp. 165–174 (2019)"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib19",
+      "text": "Mescheder, L., Oechsle, M., Niemeyer, M., Nowozin, S., Geiger, A.: Occupancy networks: Learning 3D reconstruction in function space. CVPR pp. 4455–4465 (2018)"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib3",
+      "text": "Chabra, R., Lenssen, J.E., Ilg, E., Schmidt, T., Straub, J., Lovegrove, S., Newcombe, R.: Deep local shapes: Learning local SDF priors for detailed 3D reconstruction. In: ECCV. pp. 608–625. Springer (2020)"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib21",
+      "text": "Oechsle, M., Mescheder, L., Niemeyer, M., Strauss, T., Geiger, A.: Texture fields: Learning texture representations in function space. In: ICCV. pp. 4531–4540 (2019)"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib20",
+      "text": "Mildenhall, B., Srinivasan, P., Tancik, M., Barron, J., Ramamoorthi, R., Ng, R.: NeRF: Representing scenes as neural radiance fields for view synthesis. In: ECCV (2020)"
+    },
+    {
+      "n": 16,
+      "id": "bib.bib11",
+      "text": "Hu, H., Chen, Y., Xu, J., Borse, S., Cai, H., Porikli, F., Wang, X.: Learning implicit feature alignment function for semantic segmentation. In: ECCV. pp. 487–505. Springer (2022)"
+    },
+    {
+      "n": 17,
+      "id": "bib.bib31",
+      "text": "Yang, J., Wickramasinghe, U., Ni, B., Fua, P.: ImplicitAtlas: Learning deformable shape templates in medical imaging. In: CVPR. pp. 15861–15871 (2022)"
+    },
+    {
+      "n": 18,
+      "id": "bib.bib29",
+      "text": "Wiesner, D., Suk, J., Dummer, S., Svoboda, D., Wolterink, J.M.: Implicit neural representations for generative modeling of living cell shapes. In: MICCAI. pp. 58–67. Springer (2022)"
+    },
+    {
+      "n": 19,
+      "id": "bib.bib27",
+      "text": "Shen, L., Pauly, J., Xing, L.: NeRP: Implicit neural representation learning with prior embedding for sparsely sampled image reconstruction. IEEE Transactions on Neural Networks and Learning Systems (2022)"
+    },
+    {
+      "n": 20,
+      "id": "bib.bib25",
+      "text": "Reich, C., Prangemeier, T., Cetin, O., Koeppl, H.: OSS-Net: Memory efficient high resolution semantic segmentation of 3D medical data. In: British Machine Vision Conference (2021)"
+    },
+    {
+      "n": 21,
+      "id": "bib.bib16",
+      "text": "Khan, M., Fang, Y.: Implicit neural representations for medical imaging segmentation. In: MICCAI (2022)"
+    },
+    {
+      "n": 22,
+      "id": "bib.bib28",
+      "text": "Sørensen, K., Camara, O., Backer, O., Kofoed, K., Paulsen, R.: NUDF: Neural unsigned distance fields for high resolution 3D medical image segmentation. ISBI pp. 1–5 (2022)"
+    }
+  ]
+}

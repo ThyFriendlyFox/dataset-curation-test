@@ -1,0 +1,146 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.14602",
+  "title": "ReNoise: Real Image Inversion Through Iterative Noising",
+  "authors": "Daniel Garibi, Or Patashnik, Andrey Voynov, Hadar Averbuch-Elor, Daniel Cohen-Or",
+  "year": "2024",
+  "categories": [
+    "cs.CV",
+    "cs.GR",
+    "cs.LG",
+    "eess.IV"
+  ],
+  "url": "https://arxiv.org/abs/2403.14602",
+  "html_url": "https://arxiv.org/html/2403.14602",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 476,
+  "text": "Large-scale text-to-image diffusion models have revolutionized the field of image synthesis [1,2,3,4]. In particular, many works have shown that these models can be employed for various types of image manipulation [5,6,7,8,9,10,11,12,13,14,15]. To edit real images, many of these techniques often require the inversion of the image into the domain of the diffusion model. That is, given a real image z_{0}, one has to find a Gaussian noise z_{T}, such that denoising z_{T} with the pretrained diffusion model reconstructs the given real image z_{0}. The importance of this task for real image manipulation has prompted many efforts aimed at achieving accurate reconstruction [16,17,18,19].\n\nThe diffusion process consists of a series of denoising steps \\{\\epsilon_{\\theta}(z_{t},t)\\}_{t=T}^{1}, which form a trajectory from the Gaussian noise to the model distribution (see Figure 2). Each denoising step is computed by a trained network, typically implemented as a UNet, which predicts z_{t-1} from z_{t} [4]. The output of the model at each step forms a direction from z_{t} to z_{t-1} [20]. These steps are not invertible, in the sense that the model was not trained to predict z_{t} from z_{t-1}. Thus, the problem of inverting a given image is a challenge, and particularly for real images, as they are not necessarily in the model distribution (see Figure 3).\n\nIn this paper, we present an inversion method with a high quality-to-operation ratio, which achieves superior reconstruction accuracy for the same number of UNet operations. We build upon the commonly used approach of reversing the diffusion sampling process, which is based on the linearity assumption that the direction from z_{t} to z_{t+1} can be approximated by the negation of the direction from z_{t} to z_{t-1} [21,22] (see Figure 2). To enhance this approximation, we employ the fixed-point iteration methodology [23]. Specifically, given z_{t}, we begin by using the common approximation to get an initial estimate for z_{t+1}, denoted by z_{t+1}^{(0)}. Then, we iteratively renoise z_{t}, following the direction implied by z_{t+1}^{(k)} to obtain z_{t+1}^{(k+1)}. After repeating this renoising process several times, we apply an averaging on z_{t+1}^{(k)} to form a more accurate direction from z_{t} to z_{t+1}.\n\nWe show that this approach enables longer strides along the inversion trajectory while improving image reconstruction. Therefore, our method can also be effective with diffusion models trained to generate images using a small number of denoising steps [24,25]. Furthermore, despite the need to repeatedly renoise in each step of the inversion process, the longer strides lead to a more favorable tradeoff of UNet operations for reconstruction quality.\n\nThrough extensive experiments, we demonstrate the effectiveness of our method in both image reconstruction and inversion speed. We validate the versatility of our approach across different samplers and models, including recent time-distilled diffusion models (e.g., SDXL-Turbo [25]). Importantly, we demonstrate that the editability of the inversion achieved by our method allows a wide range of text-driven image manipulations (see Figure 1).",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib40",
+      "text": "Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, and Björn Ommer. High-resolution image synthesis with latent diffusion models, 2022."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib41",
+      "text": "Chitwan Saharia, William Chan, Saurabh Saxena, Lala Li, Jay Whang, Emily Denton, Seyed Kamyar Seyed Ghasemipour, Burcu Karagol Ayan, S. Sara Mahdavi, Rapha Gontijo Lopes, Tim Salimans, Jonathan Ho, David J Fleet, and Mohammad Norouzi. Photorealistic text-to-image diffusion models with deep language understanding, 2022."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib38",
+      "text": "Aditya Ramesh, Prafulla Dhariwal, Alex Nichol, Casey Chu, and Mark Chen. Hierarchical text-conditional image generation with clip latents, 2022."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib20",
+      "text": "Jonathan Ho, Ajay Jain, and Pieter Abbeel. Denoising diffusion probabilistic models, 2020."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib17",
+      "text": "Amir Hertz, Ron Mokady, Jay Tenenbaum, Kfir Aberman, Yael Pritch, and Daniel Cohen-Or. Prompt-to-prompt image editing with cross attention control, 2022."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib35",
+      "text": "Gaurav Parmar, Krishna Kumar Singh, Richard Zhang, Yijun Li, Jingwan Lu, and Jun-Yan Zhu. Zero-shot image-to-image translation. In Special Interest Group on Computer Graphics and Interactive Techniques Conference Conference Proceedings . ACM, 2023."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib48",
+      "text": "Narek Tumanyan, Michal Geyer, Shai Bagon, and Tali Dekel. Plug-and-play diffusion features for text-driven image-to-image translation. pages 1921–1930, 2023."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib30",
+      "text": "Chenlin Meng, Yutong He, Yang Song, Jiaming Song, Jiajun Wu, Jun-Yan Zhu, and Stefano Ermon. Sdedit: Guided image synthesis and editing with stochastic differential equations, 2022."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "Tim Brooks, Aleksander Holynski, and Alexei A. Efros. Instructpix2pix: Learning to follow image editing instructions, 2023."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib8",
+      "text": "Omri Avrahami, Dani Lischinski, and Ohad Fried. Blended diffusion for text-driven editing of natural images. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 18208–18218, 2022b."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib7",
+      "text": "Omri Avrahami, Ohad Fried, and Dani Lischinski. Blended latent diffusion. arXiv preprint arXiv:2206.02779 , 2022a."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib23",
+      "text": "Bahjat Kawar, Shiran Zada, Oran Lang, Omer Tov, Huiwen Chang, Tali Dekel, Inbar Mosseri, and Michal Irani. Imagic: Text-based real image editing with diffusion models. In Conference on Computer Vision and Pattern Recognition 2023 , 2023."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib15",
+      "text": "Songwei Ge, Taesung Park, Jun-Yan Zhu, and Jia-Bin Huang. Expressive text-to-image generation with rich text. In Proceedings of the IEEE/CVF International Conference on Computer Vision , 2023."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib36",
+      "text": "Or Patashnik, Daniel Garibi, Idan Azuri, Hadar Averbuch-Elor, and Daniel Cohen-Or. Localizing object-level shape variations with text-to-image diffusion models. In Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV) , 2023."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib6",
+      "text": "Yuval Alaluf, Daniel Garibi, Or Patashnik, Hadar Averbuch-Elor, and Daniel Cohen-Or. Cross-image attention for zero-shot appearance transfer, 2023."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib32",
+      "text": "Ron Mokady, Amir Hertz, Kfir Aberman, Yael Pritch, and Daniel Cohen-Or. Null-text inversion for editing real images using guided diffusion models, 2022."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib31",
+      "text": "Daiki Miyake, Akihiro Iohara, Yu Saito, and Toshiyuki Tanaka. Negative-prompt inversion: Fast image inversion for editing with text-guided diffusion models, 2023."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib16",
+      "text": "Ligong Han, Song Wen, Qi Chen, Zhixing Zhang, Kunpeng Song, Mengwei Ren, Ruijiang Gao, Anastasis Stathopoulos, Xiaoxiao He, Yuxiao Chen, Di Liu, Qilong Zhangli, Jindong Jiang, Zhaoyang Xia, Akash Srivastava, and Dimitris Metaxas. Improving tuning-free real image editing with proximal guidance, 2023."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib21",
+      "text": "Inbar Huberman-Spiegelglas, Vladimir Kulikov, and Tomer Michaeli. An edit friendly ddpm noise space: Inversion and manipulations, 2023."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib45",
+      "text": "Yang Song, Jascha Sohl-Dickstein, Diederik P Kingma, Abhishek Kumar, Stefano Ermon, and Ben Poole. Score-based generative modeling through stochastic differential equations. In International Conference on Learning Representations , 2020."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib12",
+      "text": "Prafulla Dhariwal and Alex Nichol. Diffusion models beat gans on image synthesis, 2021."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib44",
+      "text": "Jiaming Song, Chenlin Meng, and Stefano Ermon. Denoising diffusion implicit models, 2022."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib10",
+      "text": "R.L. Burden, J.D. Faires, and A.M. Burden. Numerical Analysis . Cengage Learning, 2015."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib28",
+      "text": "Simian Luo, Yiqin Tan, Suraj Patil, Daniel Gu, Patrick von Platen, Apolinário Passos, Longbo Huang, Jian Li, and Hang Zhao. Lcm-lora: A universal stable-diffusion acceleration module. arXiv preprint arXiv:2311.05556 , 2023b."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib43",
+      "text": "Axel Sauer, Dominik Lorenz, Andreas Blattmann, and Robin Rombach. Adversarial diffusion distillation, 2023."
+    }
+  ]
+}

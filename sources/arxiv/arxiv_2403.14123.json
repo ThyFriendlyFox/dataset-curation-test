@@ -1,0 +1,80 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.14123",
+  "title": "AI and Memory Wall",
+  "authors": "Amir Gholami, Zhewei Yao, Sehoon Kim, Coleman Hooper, Michael W. Mahoney, Kurt Keutzer",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.AR",
+    "cs.DC"
+  ],
+  "url": "https://arxiv.org/abs/2403.14123",
+  "html_url": "https://arxiv.org/html/2403.14123",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 919,
+  "text": "The amount of compute needed to train Large Language Models (LLMs) has recently been growing at a rate of 750 \\times /2yrs. This exponential trend has been the main driver for AI accelerators that focus on increasing the peak compute power of hardware, often at the expense of simplifying other parts such as memory hierarchy.\n\nHowever, these trends miss an emerging challenge with training and serving AI models: memory and communication bottlenecks. In fact, several AI applications are becoming bottlenecked by intra/inter-chip and communication across/to AI accelerators, rather than compute. This is not a new phenomena, and several works in the past observed and warned about this issue. One of the earliest observations of this dates back to 1990 when Ousterhout concluded the following after analyzing the factors impacting operating system’s performance [1]:\n\nLater in 1995, William Wulf and Sally Mckee further echoed this prediction and coined the term ‘‘memory wall’’. Their argument for this followed a simple but elegant reasoning. The time to complete an operation is dependent on how fast we can perform the arithmetic as well as how fast we can feed data to the arithmetic units of hardware. In the simplest case, the data is either available in the cache, or needs to be fetched from DRAM. With this assumption, even if 80\\% of data is readily available in cache, and only 20\\% needs to be fetched from DRAM, the time to complete the operation will be completely limited by DRAM if it takes more than 5 cycles to fetch the 20\\% cache-miss data from it. This means that no matter how fast the hardware could perform arithmetics per second, the problem will be entirely limited by DRAM bandwidth. They predicted that the diverging speed of improvement of how fast computations can be performed versus how fast data can be fetched is going to create a “memory wall” issue [3,4]. Based on this they concluded:\n\nSeveral later works also reported a similar observation [5,6,4,7,8,9].\n\nIn this work, we re-examined this trend by studying more recent data, with a particular focus on hardware used to train AI models, as well as the characteristics of the computations used for training/serving them. 30 years after, the above observations and predictions could not be further correct. Despite many innovations in memory technology, the trend shows that the “memory wall” is increasingly becoming the dominant bottleneck for a range of AI tasks.\n\nWe first start by analyzing how peak compute of server-grade AI hardware has changed since 1998 when Yann Lecun trained the famous Lenet-5 model on MNIST data [10]. We can see that the peak compute of the hardware has increased by 60,000 \\times over the past 20 years, as opposed to a 100 \\times increase for DRAM or a 30 \\times increase for interconnect bandwidth.\n\nThe memory wall problem involves both the limited capacity, the bandwidth of memory transfer, as well as its latency (which has been even harder to improve [11] than bandwidth). This entails different levels of memory data transfer. For example, data transfer between compute logic and on-chip memory, or between compute logic and DRAM memory, or across different processors on different sockets. In all these cases, the capacity and the speed of data transfer has been significantly lagging behind hardware compute capabilities.\n\nNow, if we study the trend of recent AI models, and in particular LLMs, we notice that practitioners, motivated by neural scaling law [12], have been scaling the amount of data, model size, and compute needed to train recent models at unprecedented levels. Even though compute / floating-point operations (FLOPs) needed to train these recent models has increased by a factor of 750 \\times /2yrs in the 2018-2022 time frame (see Figure 3), compute is not necessarily the bottleneck, especially for model serving.\n\nFirst, the LLM sizes have scaled at a rate of 410 \\times /2yrs in that time frame, exceeding memory available on single chip. One might hope that we can use distributed-memory parallelism by scaling-out the training/serving to multiple accelerators to avoid the single hardware’s limited memory capacity and bandwidth. However, distributing the work over multiple processes can also face the memory wall problem: the communication bottleneck of moving data between neural network (NN) accelerators, which is even slower and less efficient than on-chip data movement. Similar to the single system memory case, we have not been able to overcome the technological challenges to scale the network bandwidth.\n\nSecond, even when the model fits within a single chip, intra-chip memory transfers from/to registers, L2 cache, global memory, etc. are still increasingly becoming the bottleneck. Thanks to the recent advancements in specialized compute units, such as Tensor cores, the arithmetic operations for a large set of computations can finish in a few cycles. Therefore, to keep these arithmetic units utilized at all times one needs to rapidly feed them large amounts of data, and that is where the chip memory bandwidth becomes the bottleneck.\n\nAs one can see in Figure 1, over the past 20 years, peak server hardware FLOPS has been scaling at 3.0 \\times /2yrs, outpacing the growth of DRAM and interconnect bandwidth, which have only scaled at 1.6 and 1.4 times every 2 years, respectively. This disparity has made memory, rather than compute, increasingly become a bottleneck, even for cases when the model can fit within a single chip.\n\nNext, we perform a detailed case study for Transformers which helps better showcase the interplay between FLOPs, Memory Operations (MOPs), and end-to-end runtime by considering common models used today.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib30",
+      "text": "J. Ousterhout, “Why aren’t operating systems getting faster as fast as hardware?” in USENIX Summer Conference, 1990 , 1990."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib41",
+      "text": "S. Williams, A. Waterman, and D. Patterson, “Roofline: an insightful visual performance model for multicore architectures,” Communications of the ACM , vol. 52, no. 4, pp. 65–76, 2009."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib42",
+      "text": "W. A. Wulf and S. A. McKee, “Hitting the memory wall: Implications of the obvious,” ACM SIGARCH computer architecture news , vol. 23, no. 1, pp. 20–24, 1995."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib25",
+      "text": "S. A. McKee, “Reflections on the memory wall,” in Proceedings of the 1st Conference on Computing Frontiers , ser. CF ’04. New York, NY, USA: Association for Computing Machinery, 2004, p. 162."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib12",
+      "text": "J. L. Hennessy and D. A. Patterson, Computer architecture: a quantitative approach . Elsevier, 2011."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib31",
+      "text": "D. Patterson, T. Anderson, N. Cardwell, R. Fromm, K. Keeton, C. Kozyrakis, R. Thomas, and K. Yelick, “A case for intelligent ram,” IEEE micro , vol. 17, no. 2, pp. 34–44, 1997."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib36",
+      "text": "D. Sites, “It’s the memory, stupid!” Microprocessor Report , pp. 18–24, 1996."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib40",
+      "text": "M. V. Wilkes, “The memory wall and the cmos end-point,” ACM SIGARCH Computer Architecture News , vol. 23, no. 4, pp. 4–6, 1995."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib24",
+      "text": "J. McCalpin, “Stream: Sustainable memory bandwidth in high performance computers,” http://www. cs. virginia. edu/stream/ , 2006."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib22",
+      "text": "Y. LeCun, L. Bottou, Y. Bengio, P. Haffner et al. , “Gradient-based learning applied to document recognition,” Proceedings of the IEEE , vol. 86, no. 11, pp. 2278–2324, 1998."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib32",
+      "text": "D. A. Patterson, “Latency lags bandwith,” Communications of the ACM , vol. 47, no. 10, pp. 71–75, 2004."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib14",
+      "text": "J. Hoffmann, S. Borgeaud, A. Mensch, E. Buchatskaya, T. Cai, E. Rutherford, D. de Las Casas, L. A. Hendricks, J. Welbl, A. Clark, T. Hennigan, E. Noland, K. Millican, G. van den Driessche, B. Damoc, A. Guy, S. Osindero, K. Simonyan, E. Elsen, O. Vinyals, J. Rae, and L. Sifre, “An empirical analysis of compute-optimal large language model training,” in Advances in Neural Information Processing Systems , vol. 35, 2022, pp. 30 016–30 030."
+    }
+  ]
+}

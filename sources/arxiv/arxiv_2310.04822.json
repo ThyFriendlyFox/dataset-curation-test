@@ -1,0 +1,133 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2310.04822",
+  "title": "Combining Sampling- and Gradient-based Planning for Contact-rich Manipulation",
+  "authors": "Filippo Rozzi, Loris Roveda, Kevin Haninger",
+  "year": "2024",
+  "categories": [
+    "cs.RO"
+  ],
+  "url": "https://arxiv.org/abs/2310.04822",
+  "html_url": "https://arxiv.org/html/2310.04822",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 900,
+  "text": "Contact-rich manipulation tasks such as door opening and gear mating involve significant environmental dynamics and constraints, which discretely switch during the task as contact conditions change. Manipulation methods which can maintain safety (e.g. limits on contact force and actuation) and robustness (variation in contact geometry or dynamics) are needed which are suited to discontinuous dynamics.\n\nGradient-based optimization methods are popular for contact planning, with a range of formulations from contact implicit [1,2,3,4] to hybrid contact modes [5,6]. Sampling-based methods have also been used for higher-level contact mode planning [7,8] and continuous planning [9].\n\nThe tradeoffs between sampling and gradient-based planners has led to recent interest in combining them, such as adding gradient steps to the sampling-based Cross-Entropy Method (CEM) [10,11]. In contact, recent work has compared the variance of gradient-based and gradient-free policy learning in contact [12]. This raises the question if a planning method can effectively use both sampling and gradients, where sampling may address the initialization sensitivity of gradient-based methods [13], while gradient-based methods can provide explicit safety constraints. This paper proposes a planning method which leverages CEM and interior-point optimization for contact-rich planning.\n\n## 1.1 Related works\n\nModel-based planning for contact-rich robotic tasks finds the action sequence that minimizes a cumulative cost function, according to learned, parametrized, or simulated dynamics. Usually, optimized actions are executed with model predictive control (MPC), replanning at each time step. The problem can be formulated using complementary conditions for contact constraints [14,1], where sequential quadratic [2] or interior-point [3] solvers can be used. This contact-implicit trajectory optimization allows planning of contact mode and trajectory in one problem with multiple contacts and Coulomb constraints [4,3,13]. Alternatively, hybrid dynamics can be written with dynamics for each contact mode [5,6].\n\nThe contact planning problem is challenging, typically needing relaxations [9,3], linearization [4,13], or quasi-static assumptions [6] to achieve acceptable solve times. The resulting problems can be sensitive to initialization [13], and in general gradient-based methods can suffer from local minima or poor convergence on non-smooth problems, e.g. Newton’s method convergence rate scales with the condition number of the Hessian [15].\n\nOn the other hand, population-based sampling planners can parallelize well and do not need gradients, such as Random-Sampling Shooting [16], Model Predictive Path Integral Control [17], and the Cross-Entropy Method (CEM) [18]. Sampling-based planners have been used in contact planning, for higher-level mode initialization of a contact-implicit [7] and reachability planner [8]. Sampling can also be used for the continuous planning, where Rapidly-exploring random trees have been applied to relaxed contact models [9].\n\nThese zeroth-order optimizers maintain a sampling distribution action sequences [19], which is sampled from then updated at each iteration, assigning a higher probability to higher reward action sequences. By adding temporally correlated actions and memory, CEM can be improved in both sample-efficiency and reward performance [20]. CEM can also be applied to interaction dynamics learned from an ensemble of Neural Networks [21] to realize online planning.\n\nHowever, CEM, like all sampling-based planners, suffers from scalability as the dimension of the action space or planning horizon grows, requiring more samples for convergence and having increasing reward variance [10,22]. Additionally, sampling with general state constraints requires either rejection sampling [23] or smoothing [9], raising challenges for efficient handling of contact constraints.\n\nRecent work has combined zeroth-order and first-order planning methods. Authors in [10,11] proposed a combined planner that performs first-order gradient updates on the sampled trajectories. While this improves CEM performance, these methods still show scalability issues with high dimensional planning problems and don’t handle constraints. For policy learning in contact, recent work [12] has shown that first order methods can have higher variance than zeroth order methods at higher stiffness and in longer planning horizons.\n\n## 1.2 Paper contribution\n\nTo address poor convergence and local minima problems of gradient-based optimizers when dynamics are discontinuous, we propose a hybrid planner that uses both sampling- and gradient-based MPC. Contact is modelled with hybrid dynamics, where dynamics are switched according to contact mode. A particle filter is used to estimate the hybrid state online, providing a belief of current mode for the planner. The particle filter provide weights and particles to a CEM planner, which is used to initialize the action and state trajectory, modified to normalize sample cost by the weight and minimizing expected cost over the belief in mode. A gradient-based optimizer is then used, enforcing explicit constraints on the robot trajectory, as seen in Figure 2.\n\nCompared to the work of [20], this CEM rolls out trajectories on a hybrid system, leveraging the contact mode belief provided by the filter to weight the computed samples costs. Compared to other combined sampling- and gradient-based planning approaches [10,11], this method can enforce explicit constraints on the robot trajectory and handles hybrid dynamics. Our method is also validated experimentally, showing the feasibility of the approach with a real contact task as seen in Figure 1. The ability to estimate contact mode online, as well as safely respond with changes in control is validated.\n\nThis paper first introduces the dynamic models used, estimation of contact mode. Then, planning framework is introduced and studied in simulation. Finally, experiments are used to validate the approach, comparing the proposed planner to only MPC and only CEM. We find that the CEM initialization helps with discontinuous dynamics, reducing the mean and variance of the total solve time, even from just one iteration, as compared to a pure gradient-based MPC for contact.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "M. Anitescu and F. A. Potra, “Formulating Dynamic Multi-rigid-body Contact Problems with Friction as Solvable Linear Complementarity Problems,” Nonlinear Dynamics , vol. 14, pp. 231–247, 1997."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "M. Posa, C. Cantu, and R. Tedrake, “A direct method for trajectory optimization of rigid bodies through contact,” The International Journal of Robotics Research , vol. 33, no. 1, pp. 69–81, 2014."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "S. Le Cleac’h, T. A. Howell, S. Yang, C.-Y. Lee, J. Zhang, A. Bishop, M. Schwager, and Z. Manchester, “Fast contact-implicit model predictive control,” IEEE Transactions on Robotics , 2024."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "A. Aydinoglu and M. Posa, “Real-time multi-contact model predictive control via admm,” in 2022 International Conference on Robotics and Automation (ICRA) . IEEE, 2022, pp. 3414–3421."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "W. Jin and M. Posa, “Task-driven hybrid model reduction for dexterous manipulation,” IEEE Transactions on Robotics , 2024."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "F. R. Hogan and A. Rodriguez, “Reactive planar non-prehensile manipulation with hybrid model predictive control,” The International Journal of Robotics Research , vol. 39, no. 7, pp. 755–773, Jun. 2020."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "C. Chen, P. Culbertson, M. Lepert, M. Schwager, and J. Bohg, “TrajectoTree: Trajectory Optimization Meets Tree Search for Planning Multi-contact Dexterous Manipulation,” in 2021 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS) , Sep. 2021, pp. 8262–8268."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "A. Wu, S. Sadraddini, and R. Tedrake, “R3T: Rapidly-exploring Random Reachable Set Tree for Optimal Kinodynamic Planning of Nonlinear Hybrid Systems,” in 2020 IEEE International Conference on Robotics and Automation (ICRA) , May 2020, pp. 4245–4251."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "T. Pang, H. T. Suh, L. Yang, and R. Tedrake, “Global planning for contact-rich manipulation via local smoothing of quasi-dynamic contact models,” IEEE Transactions on Robotics , 2023."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "H. Bharadhwaj, K. Xie, and F. Shkurti, “Model-predictive control via cross-entropy and gradient-based optimization,” in Learning for Dynamics and Control . PMLR, 2020, pp. 277–286."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "K. Huang, S. Lale, U. Rosolia, Y. Shi, and A. Anandkumar, “CEM-GD: Cross-Entropy Method with Gradient Descent Planner for Model-Based Reinforcement Learning,” in arXiv . arXiv, Dec. 2021, p. arXiv:2112.07746."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "H. J. T. Suh, T. Pang, and R. Tedrake, “Bundled gradients through contact via randomized smoothing,” IEEE Robotics and Automation Letters , vol. 7, no. 2, pp. 4000–4007, 2022."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "A. Ö. Önol, R. Corcodel, P. Long, and T. Padır, “Tuning-Free Contact-Implicit Trajectory Optimization,” in 2020 IEEE International Conference on Robotics and Automation (ICRA) , May 2020, pp. 1183–1189."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "D. E. Stewart, “Rigid-Body Dynamics with Friction and Impact,” SIAM Review , vol. 42, no. 1, pp. 3–39, Jan. 2000."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "J. B. Rawlings, D. Q. Mayne, and M. Diehl, Model Predictive Control: Theory, Computation, and Design . Nob Hill Publishing Madison, 2017, vol. 2."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "A. Nagabandi, G. Kahn, R. S. Fearing, and S. Levine, “Neural network dynamics for model-based deep reinforcement learning with model-free fine-tuning,” CoRL , vol. abs/1708.02596, 2017."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "G. Williams, N. Wagener, B. Goldfain, P. Drews, J. M. Rehg, B. Boots, and E. A. Theodorou, “Information theoretic MPC for model-based reinforcement learning,” in 2017 IEEE International Conference on Robotics and Automation (ICRA) , May 2017, pp. 1714–1721."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "R. Y. Rubinstein, “Optimization of computer simulation models with rare events,” European Journal of Operational Research , vol. 99, no. 1, pp. 89–112, May 1997."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "M. Okada and T. Taniguchi, “Variational inference MPC for bayesian model-based reinforcement learning,” CoRL , vol. abs/1907.04202, 2019."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "C. Pinneri, S. Sawant, S. Blaes, J. Achterhold, J. Stueckler, M. Rolinek, and G. Martius, “Sample-efficient cross-entropy method for real-time planning,” in Conference on Robot Learning . PMLR, 2021, pp. 1049–1065."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "L. Roveda, J. Maskani, P. Franceschi, A. Abdi, F. Braghin, L. M. Tosatti, and N. Pedrocchi, “Model-based reinforcement learning variable impedance control for human-robot collaboration,” Journal of Intelligent & Robotic Systems , pp. 1–17, 2020."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib22",
+      "text": "K. Chua, R. Calandra, R. McAllister, and S. Levine, “Deep reinforcement learning in a handful of trials using probabilistic dynamics models,” Advances in neural information processing systems , vol. 31, 2018."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib23",
+      "text": "B. Ichter, J. Harrison, and M. Pavone, “Learning Sampling Distributions for Robot Motion Planning,” in 2018 IEEE International Conference on Robotics and Automation (ICRA) . Brisbane, QLD: IEEE, May 2018, pp. 7087–7094."
+    }
+  ]
+}

@@ -1,0 +1,83 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2306.02371",
+  "title": "I^3 Retriever: Incorporating Implicit Interaction in Pre-trained Language Models for Passage Retrieval",
+  "authors": "Qian Dong, Yiding Liu, Qingyao Ai, Haitao Li, Shuaiqiang Wang, Yiqun Liu, Dawei Yin, Shaoping Ma",
+  "year": "2024",
+  "categories": [
+    "cs.IR"
+  ],
+  "url": "https://arxiv.org/abs/2306.02371",
+  "html_url": "https://arxiv.org/html/2306.02371",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 748,
+  "text": "Passage retrieval is fundamental in modern information retrieval (IR) systems, typically serving as a preceding stage of reranking. The aim of passage retrieval is to find relevant passages from a large corpus for a given query, which is crucial to the final ranking performance [1,2,3,4,5]. Conventional methods for passage retrieval (e.g., BM25 [6]) usually consider lexical matching between the terms of query and passage. In recent years, neural retrievers based on pre-trained language models (PLMs) have prospered and achieved the state-of-the-art performance.\n\nIn particular, existing PLM-based IR models can be broadly categorized into cross-encoders [7], dual-encoders [1] and late-interaction encoders [8,9], as shown in Figures 1 (a), 1 (b) and 1 (c), respectively. Without considering the fine-grained interactions between the tokens of query and passage, the major merit of dual-encoders is their high efficiency in inference. Yet, their effectiveness is usually considered sub-optimal compared with cross-encoders or other interaction-based models. Cross-encoders take the concatenation of query and passage as input to perform full interaction that effectively captures relevance features. As query-passage interactions are important factors in relevance modeling [10], cross-encoders usually have superior ranking performance. However, their applications are limited to small collections (e.g., the top passages retrieved by dual-encoders) due to their high inference latency. To combine the merits of both methods, late-interaction encoders adopt separate query/passage encoding and apply lightweight interaction schemes (i.e., late interactions) between the vectors of query and passage. They are usually more effective than dual-encoders for passage retrieval and less computationally expensive than cross-encoders.\n\nDespite their effectiveness, late-interaction models are still sub-optimal for passage retrieval on large corpus, mainly due to two problems. First, effective late-interaction models usually relies on token-level representations of passages to allow subsequent token-level interactions [9,11], where the storage cost of such multi-vector passage representation is enormous. Second, compared to dual-encoders, which adopts simple dot-product operation between single-vector representations of queries and passages, late-interaction models still requires extra computation for each query-passage pair. Such cost could be magnified by the scale of massive corpus and eventually cause unacceptable efficiency degeneration [12]. As such, existing late-interaction methods can hardly be applied to real-world scenarios that require low inference latency and storage cost.\n\nTo address these limitations and explore a better solution w.r.t. effectiveness and efficiency for passage retrieval, we propose a novel yet practical paradigm that I ncorporates I mplicit I nteraction (\\textrm{I}^{3}) in dual-encoders. Unlike existing interaction schemes that requires explicit query text as input, the implicit interaction is conducted between a passage and the pseudo-query vectors generated from the passage. Note that the generated pseudo-query vectors are implicit (i.e., latent) without explicit textual interpretation. Such implicit interaction paradigm is appealing, as 1) it is fully decoupled from actual query, and thus allows high online efficiency with offline caching of passage vectors, and 2) compared with using an off-the-shelf generative model [13] to explicitly generate textual pseudo-query, our pseudo-query is represented by latent vectors that are jointly optimized with the dual-encoder backbone, which is more expressive for the downstream retrieval task.\n\nTo conduct implicit interaction, we propose a novel model architecture as shown in Figure 1 (d). It advances vanilla dual-encoders with two auxiliary modules. First, we introduce a lightweight generative module namely query reconstructor to generate pseudo-query vectors for a given passage. Next, we apply a query-passage interactor that takes the concatenation of the passage vectors and the generated pseudo-query vectors as input, to perform implicit interaction. The interactor outputs query-aware passage vectors for each passage, which can be pre-computed and cached before deploying the model for online inference. The final query-passage relevance scores can be computed with simple dot-product operation, which gives our model the same high efficiency and low storage cost as dual-encoders. The superior balance between effectiveness and efficiency makes our model more attractive in real-world applications. We summarize our main contributions as follows:\n\n- • We propose a novel PLM-based retrieval model, namely \\textrm{I}^{3} retriever, which incorporates implicit interaction in dual-encoders.\n\n- • We introduce two modules in \\textrm{I}^{3} retriever that are jointly trained with query and passage encoders in an end-to-end manner, i.e., query reconstructor and query-passage interactor. The query reconstructor is able to generate pseudo-queries for the query-passage interactor, which subsequently encodes query-aware information in the final passage vectors.\n\n- • We conduct comprehensive evaluation on large scale datasets. The results show that \\textrm{I}^{3} is able to achieve superior performance w.r.t both effectiveness and efficiency for passage retrieval. We also conduct a thorough study to clarify the effects of implicit interaction.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib25",
+      "text": "Karpukhin et al . (2020) Vladimir Karpukhin, Barlas Oğuz, Sewon Min, Patrick Lewis, Ledell Wu, Sergey Edunov, Danqi Chen, and Wen-tau Yih. 2020. Dense passage retrieval for open-domain question answering. arXiv preprint arXiv:2004.04906 (2020)."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib63",
+      "text": "Xie et al . (2023) Xiaohui Xie, Qian Dong, Bingning Wang, Feiyang Lv, Ting Yao, Weinan Gan, Zhijing Wu, Xiangsheng Li, Haitao Li, Yiqun Liu, et al . 2023. T2Ranking: A large-scale Chinese Benchmark for Passage Ranking. arXiv preprint arXiv:2304.03679 (2023)."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib4",
+      "text": "Cheng et al . (2023) Anfeng Cheng, Yiding Liu, Weibin Li, Qian Dong, Shuaiqiang Wang, Zhengjie Huang, Shikun Feng, Zhicong Cheng, and Dawei Yin. 2023. Layout-aware Webpage Quality Assessment. arXiv preprint arXiv:2301.12152 (2023)."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib27",
+      "text": "Li et al . (2023c) Canjia Li, Xiaoyang Wang, Dongdong Li, Yiding Liu, Yu Lu, Shuaiqiang Wang, Zhicong Cheng, Simiu Gu, and Dawei Yin. 2023c. Pretrained Language Model based Web Search Ranking: From Relevance to Satisfaction. arXiv preprint arXiv:2306.01599 (2023)."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib69",
+      "text": "Zou et al . (2022) Lixin Zou, Weixue Lu, Yiding Liu, Hengyi Cai, Xiaokai Chu, Dehong Ma, Daiting Shi, Yu Sun, Zhicong Cheng, Simiu Gu, et al . 2022. Pre-trained language model-based retrieval and ranking for Web search. ACM Transactions on the Web 17, 1 (2022), 1–36."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib51",
+      "text": "Robertson et al . (2009) Stephen Robertson, Hugo Zaragoza, et al . 2009. The probabilistic relevance framework: BM25 and beyond. Foundations and Trends® in Information Retrieval 3, 4 (2009), 333–389."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib41",
+      "text": "Nogueira and Cho (2019) Rodrigo Nogueira and Kyunghyun Cho. 2019. Passage Re-ranking with BERT. arXiv preprint arXiv:1901.04085 (2019)."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib17",
+      "text": "Gao et al . (2021) Luyu Gao, Zhuyun Dai, and Jamie Callan. 2021. COIL: Revisit exact lexical match in information retrieval with contextualized inverted list. arXiv preprint arXiv:2104.07186 (2021)."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib26",
+      "text": "Khattab and Zaharia (2020) Omar Khattab and Matei Zaharia. 2020. Colbert: Efficient and effective passage search via contextualized late interaction over bert. In Proceedings of the 43rd International ACM SIGIR conference on research and development in Information Retrieval . 39–48."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib18",
+      "text": "Guo et al . (2016) Jiafeng Guo, Yixing Fan, Qingyao Ai, and W Bruce Croft. 2016. A deep relevance matching model for ad-hoc retrieval. In Proceedings of the 25th ACM international on conference on information and knowledge management . 55–64."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib53",
+      "text": "Santhanam et al . (2022) Keshav Santhanam, Omar Khattab, Jon Saad-Falcon, Christopher Potts, and Matei Zaharia. 2022. ColBERTv2: Effective and Efficient Retrieval via Lightweight Late Interaction. In Proceedings of the 2022 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies . 3715–3734."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib29",
+      "text": "Li et al . (2023b) Haitao Li, Qingyao Ai, Jingtao Zhan, Jiaxin Mao, Yiqun Liu, Zheng Liu, and Zhao Cao. 2023b. Constructing Tree-based Index for Efficient and Effective Dense Retrieval. arXiv preprint arXiv:2304.11943 (2023)."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib42",
+      "text": "Nogueira et al . (2019a) Rodrigo Nogueira, Jimmy Lin, and AI Epistemic. 2019a. From doc2query to docTTTTTquery. Online preprint 6 (2019)."
+    }
+  ]
+}

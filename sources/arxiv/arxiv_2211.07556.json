@@ -1,0 +1,183 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2211.07556",
+  "title": "Utilizing Synthetic Data in Supervised Learning for Robust 5-DoF Magnetic Marker Localization",
+  "authors": "Mengfan Wu, Thomas Langerak, Otmar Hilliges, Juan Zarate",
+  "year": "2024",
+  "categories": [
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2211.07556",
+  "html_url": "https://arxiv.org/html/2211.07556",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1222,
+  "text": "Tracking the three-dimensional position and orientation of objects hidden from view is crucial for numerous applications. For instance, in Human-Computer Interaction (HCI), where the users’ own body might occuled their hands, it involves decoding gesture input and delivering force feedback [1,2,3,4,5,6,7,8]. In healthcare, tracking plays a vital role in guiding medical instruments such as capsules and catheters [9,10,11,12,13]. Similarly, in robotics, tracking is used for tasks such as magnetomicrometry [14] and tracking multi-arm robots [15]. Magnetic tracking enables the precise localization of objects hidden from view by utilizing magnetic markers. This is accomplished by measuring the magnetic fields around these markers with Hall sensors. The widespread interest in this technology is driven by its ability to permeate through various materials, including human tissues, without interference.\n\nHowever, tracking magnetic markers is not a straightforward task. Existing research distinguishes between active and passive magnetic markers. Active markers emit a magnetic signal through an integrated power source like a battery, offering a higher signal-to-noise ratio and the advantage of frequency filtering. However, tracking active emitters requires either a wired connection to the tracked object or a battery-powered circuitry [3,16]. Hashi et al. have proposed a solution to overcome this limitation with semi-passive markers [17]. While the tracked elements are passive, they respond with a resonant signal when excited by a nearby source. In contrast, passive magnetic localization is simpler, requiring only the target to be equipped with a permanent magnet, eliminating the need for tethered connections or active electronics on the moving elements [5,18,19]. Our work primarily focuses on passive magnetic localization due to its simplicity and robustness; however, future work could potentially extend the ideas presented here to other types of magnetic markers.\n\nTo track a magnetic marker we need to map magnetic signals, measured by one or more Hall sensors, to a marker’s 5-degree-of-freedom (5DoF) position and orientation (rotation). The most straightforward approach involves directly interpolating the reading intensity within the sensor array. In [20,21], this approach is employed to track a stylus and a gaming object in a two-dimensional plane. In more complex configurations (e.g., [22,3,4]), multiple sensors with known spatial arrangements create an over-constrained system of equations, ensuring a unique solution for the magnet’s state. These triangulation methods are fast but are not robust to sensor noise and limited to positional degrees of freedom.\n\nA more robust approach, that also infers rotation, involves minimizing the difference between a theoretical magnetic field model, based on a magnetic model, and the sensor readings. To achieve this, several non-linear optimization algorithms have been proposed [23,24]. In [19], the authors implemented an analytical computation of gradients to expedite the optimization process. In [25], their algorithm decouples the marker’s orientation from its position, enhancing calculation speed and providing guarantees regarding global minima. Nonetheless, these iterative approaches come with significant challenges. Firstly, gradient-descent algorithms are computationally demanding, leading to a trade-off between tracking precision and frequency. Secondly, iterative non-convex optimization can be susceptible to the non-uniqueness of the solution, potentially converging to wrong local minima. These challenges make these methods highly dependent on their initialization.\n\nFurthermore, these methods assume that the magnetic model, that predicts the theoretical magnetic field, is valid. All the mentioned methods employ the first term of the multi-pole series expansion derived from Maxwell’s equations. The magnetic dipole approximation assumes all magnets to be spherical, providing the simplest explicit expression for the magnetic field concerning distance to the source. However, this approach has significant limitation. For non-spherical magnets, reliable results are only obtained when the magnets are far from the sensor [26]. Crucially, in gradient descent optimization process, a small magnetic field approximation error can lead to substantial positional discrepancies.\n\nRecently, machine learning (ML) has emerged as a valuable approach to circumvent the computational burden of iterative methods. Machine learning, especially Neural Networks (NN), excels in approximating non-linearities through sequential multiply-addition operations. Additionally, it doesn’t require initial estimates, often achieving reliable results with a single inference. While inference is rapid, creating a large and representative dataset for training to generalize well to unseen samples can be a challenging and time-consuming process.\n\nIn [27,11], ML is utilized to predict the locations of tracked magnets using input from magnetic sensors. The data for training the neural network is collected in-vivo by placing magnets at various known locations and gathering sensor readings. The data collection process is lengthy and not scalable to new scenarios and markers. [28] employ a neural network to track a magnetic marker, though they train on synthetic data generated by the dipole model. While they eliminate the need for iterative gradient-based solutions, they do not address the limitations of the underlying model, retaining inaccuracies for non-spherical or closely located magnets. Recently, authors in [16] and [29] demonstrate the use of neural networks trained on synthetic data to track active markers. Although we share conceptual goals with these works, their results apply exclusively to active emitters and do not consistently outperform methods based on iterative optimization.\n\nTo address the data limitation challenge, we employ Finite Element Methods (FEM) to simulate the complete set of Maxwell’s equations. FEM is computationally intensive, particularly when employing a fine mesh for accurate results. Therefore, it is unsuitable for real-time modeling. However, FEM can be leveraged to generate noise-free synthetic datasets for training machine learning models. In various other fields, the use of FEM-generated synthetic datasets has successfully trained neural networks, although not for magnetic tracking. Examples include mechanical deformations [30], elastoplasticity [31], material inspection [32], and nano-structures [33]. To further reduce computation time while increasing dataset size, we focus on axis-symmetric markers. We enable this approach by introducing a coordinate transformation algorithm that capitalizes on our markers’ symmetric properties, converting FEM-simulation results from 2D to 3D.\n\nTo evaluate the efficacy of our system, we evaluate our method in both simulation and experiments. In simulation we find that our method outperforms iterative methods. We also compare our FEM-based approach, to a method that is trained on magnetic-dipole generated data, where our method significantly outperforms the baseline. In real-world experiments we assess various cylindrical magnets with 5 degrees of freedom using a lower-power portable Nvidia Jetson Nano, where sensing and tracking are performed in parallel. We achieve an averaged error of 4 mm and an orientation error of less than 8 degrees, with an interactive rate of 75 Hz when using 8 sensors.\n\nIn summary, our work contributes significantly to the magnetic tracking literature in five key ways: i) We propose a supervised learning approach that enables real-time tracking of arbitrary axis-symmetric magnets using Neural Networks, overcoming the computational limitations of previous iterative solutions by approximating the inverse function of the magnetic field. ii) To address the challenge of data limitation, we leverage Finite Element Methods (FEM) to simulate Maxwell’s equations, generating noise-free synthetic datasets for training machine learning models. iii) We introduce a coordinate transformation algorithm that capitalizes on our markers’ symmetric properties, converting FEM-simulation results from 2D to 3D, enabling accurate high-resolution magnetic field data for training neural networks. iv) Due to the computational efficiency of our approach, we enable low-power and portable applications. We demonstrate this by using a Nvidia Jetson Nano. v) We demonstrate the validity of our approach with in-silico and real-world evaluations. These contributions collectively enable more accurate and efficient magnetic tracking solutions, offering the potential for the development of truly portable tracking devices.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib8",
+      "text": "Xinying Han, Hiroaki Seki, Yoshitsugu Kamiya, and Masatoshi Hikizu. Wearable handwriting input device using magnetic field. In SICE Annual Conference 2007 , pages 365–368. IEEE, 2007."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib20",
+      "text": "Yinghong Ma, Zhi-Hong Mao, Wenyan Jia, Chengliu Li, Jiawei Yang, and Mingui Sun. Magnetic hand tracking for human-computer interface. IEEE Transactions on Magnetics , 47(5):970–973, 2011."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib6",
+      "text": "Ke-Yu Chen, Shwetak N Patel, and Sean Keller. Finexus: Tracking precise motions of multiple fingertips using magnetic sensing. In Proceedings of the 2016 CHI Conference on Human Factors in Computing Systems , pages 1504–1514, 2016."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib22",
+      "text": "Jess McIntosh, Paul Strohmeier, Jarrod Knibbe, Sebastian Boring, and Kasper Hornbæk. Magnetips: Combining fingertip tracking and haptic feedback for around-device interaction. In Proceedings of the 2019 CHI Conference on Human Factors in Computing Systems , pages 1–12, 2019."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib14",
+      "text": "Thomas Langerak, Juan José Zárate, David Lindlbauer, Christian Holz, and Otmar Hilliges. Omni: Volumetric sensing and actuation of passive magnetic tools for dynamic haptic feedback. 2020."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib4",
+      "text": "Dongyao Chen, Mingke Wang, Chenxi He, Qing Luo, Yasha Iravantchi, Alanson Sample, Kang G Shin, and Xinbing Wang. Magx: Wearable, untethered hands tracking with passive magnets. In Proceedings of the 27th Annual International Conference on Mobile Computing and Networking , pages 269–282, 2021."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib15",
+      "text": "Thomas Langerak, Juan José Zárate, Velko Vechev, David Lindlbauer, Daniele Panozzo, and Otmar Hilliges. Optimal control for electromagnetic haptic guidance systems. In Proceedings of the 33rd Annual ACM Symposium on User Interface Software and Technology , pages 951–965, 2020."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib1",
+      "text": "Aline Abler, Juan Zárate, Thomas Langerak, Velko Vechev, and Otmar Hilliges. Hedgehog: Handheld spherical pin array based on a central electromagnetic actuator. In 2021 IEEE World Haptics Conference (WHC) , pages 133–138. IEEE, 2021."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib12",
+      "text": "Sascha Krueger, Holger Timinger, Ruediger Grewer, and Joern Borgert. Modality-integrated magnetic catheter tracking for x-ray vascular interventions. Physics in Medicine & Biology , 50(4):581, 2005."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib28",
+      "text": "Marco Salerno, Rocco Rizzo, Edoardo Sinibaldi, and Arianna Menciassi. Force calculation for localized magnetic driven capsule endoscopes. In 2013 IEEE International Conference on Robotics and Automation , pages 5354–5359. IEEE, 2013."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib36",
+      "text": "Zhenglong Sun, Luc Maréchal, and Shaohui Foong. Passive magnetic-based localization for precise untethered medical instrument tracking. Computer methods and programs in biomedicine , 156:151–161, 2018."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib37",
+      "text": "Addisu Z Taddese, Piotr R Slawinski, Marco Pirotta, Elena De Momi, Keith L Obstein, and Pietro Valdastri. Enhanced real-time pose estimation for closed-loop robotic manipulation of magnetically actuated capsule endoscopes. The International journal of robotics research , 37(8):890–911, 2018."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib19",
+      "text": "Xiongbiao Luo, Chaoyang Shi, Hui-Qing Zeng, Henry C. Ewurum, Ying Wan, Yingying Guo, Seang Pagnha, Xiao-Bin Zhang, Yan-Ping Du, and Xiangjian He. Evolutionarily optimized electromagnetic sensor measurements for robust surgical navigation. IEEE Sensors Journal , 19(22):10859–10868, 2019."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib39",
+      "text": "Cameron Roy Taylor, Shriya S Srinivasan, Seong Ho Yeon, MK O’donnell, TJ Roberts, and Hugh M Herr. Magnetomicrometry. Science robotics , 6(57):eabg0656, 2021."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib33",
+      "text": "Shuang Song, Han Ge, Jiaole Wang, and Max Q-H Meng. Real-time multi-object magnetic tracking for multi-arm continuum robots. IEEE Transactions on Instrumentation and Measurement , 70:1–9, 2021."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib24",
+      "text": "Farshid Salemi Parizi, Eric Whitmire, and Shwetak Patel. Auraring: Precise electromagnetic finger tracking. Proceedings of the ACM on Interactive, Mobile, Wearable and Ubiquitous Technologies , 3(4):1–28, 2019."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib9",
+      "text": "Shuichiro Hashi, Masaharu Toyoda, Shin Yabukami, Kazushi Ishiyama, Yasuo Okazaki, and Ken Ichi Arai. Wireless magnetic motion capture system for multi-marker detection. IEEE transactions on magnetics , 42(10):3279–3281, 2006."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib32",
+      "text": "Donghoon Son, Sehyuk Yim, and Metin Sitti. A 5-d localization method for a magnetically manipulated untethered robot using a 2-d array of hall-effect sensors. IEEE/ASME Transactions on Mechatronics , 21(2):708–716, 2015."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib38",
+      "text": "Cameron R Taylor, Haley G Abramson, and Hugh M Herr. Low-latency tracking of multiple permanent magnets. IEEE Sensors Journal , 19(23):11458–11468, 2019."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib13",
+      "text": "Han-Chih Kuo, Rong-Hao Liang, Long-Fei Lin, and Bing-Yu Chen. Gaussmarbles: spherical magnetic tangibles for interacting with portable physical constraints. In Proceedings of the 2016 CHI Conference on Human Factors in Computing Systems , pages 4228–4232, 2016."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib17",
+      "text": "Rong-Hao Liang, Kai-Yin Cheng, Chao-Huai Su, Chien-Ting Weng, Bing-Yu Chen, and De-Nian Yang. Gausssense: attachable stylus sensing using magnetic sensor grid. In Proceedings of the 25th annual ACM symposium on User interface software and technology , pages 319–326, 2012."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib5",
+      "text": "Ke-Yu Chen, Kent Lyons, Sean White, and Shwetak Patel. utrack: 3d input using two magnetic sensors. In Proceedings of the 26th annual ACM symposium on User interface software and technology , pages 237–244, 2013."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib10",
+      "text": "Chao Hu, Max Qinghu Meng, and M. Mandal. Efficient magnetic localization and orientation technique for capsule endoscopy. In 2005 IEEE/RSJ International Conference on Intelligent Robots and Systems , pages 628–633, 2005."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib40",
+      "text": "Trung Duc Than, Gursel Alici, Hao Zhou, and Weihua Li. A review of localization systems for robotic endoscopic capsules. IEEE Transactions on Biomedical Engineering , 59(9):2387–2399, 2012."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib41",
+      "text": "Masoud Yousefi, Hossein Nejat Pishkenari, and Aria Alasty. A fast and robust magnetic localization technique based on elimination of the orientation variables from the optimization. IEEE Sensors Journal , 21(19):21885–21892, 2021."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib25",
+      "text": "Andrew J. Petruska and Jake J. Abbott. Optimal permanent-magnet geometries for dipole field approximation. IEEE Transactions on Magnetics , 49(2):811–819, 2013."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib30",
+      "text": "Nordine Sebkhi, Nazmus Sahadat, Sinan Hersek, Arpan Bhavsar, Shayan Siahpoushan, Maysam Ghoovanloo, and Omer T. Inan. A deep neural network-based permanent magnet localization for tongue tracking. IEEE Sensors Journal , 19(20):9324–9331, 2019."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib35",
+      "text": "Shijian Su, Sishen Yuan, Mengya Xu, Huxin Gao, Xiaoxiao Yang, and Hongliang Ren. Amagposenet: Real-time 6-dof magnet pose estimation by dual-domain few-shot learning from prior model. IEEE Transactions on Industrial Informatics , 2023."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib29",
+      "text": "Ai-ichiro Sasaki and Eisuke Ohta. Magnetic-field-based position sensing using machine learning. IEEE Sensors Journal , 20(13):7292–7302, 2020."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib23",
+      "text": "Andrea Mendizabal, Pablo Márquez-Neila, and Stéphane Cotin. Simulation of hyperelastic materials in real-time using deep learning. Medical image analysis , 59:101569, 2020."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib7",
+      "text": "Ehsan Haghighat, Maziar Raissi, Adrian Moure, Hector Gomez, and Ruben Juanes. A deep learning framework for solution and discovery in solid mechanics. arXiv preprint arXiv:2003.02751 , 2020."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib26",
+      "text": "Grzegorz Psuj. Multi-sensor data integration using deep learning for characterization of defects in steel elements. Sensors , 18(1):292, 2018."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib21",
+      "text": "Itzik Malkiel, Michael Mrejen, Achiya Nagler, Uri Arieli, Lior Wolf, and Haim Suchowski. Plasmonic nanostructure design and characterization via deep learning. Light: Science & Applications , 7(1):1–8, 2018."
+    }
+  ]
+}

@@ -1,0 +1,93 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2305.07766",
+  "title": "NL2TL: Transforming Natural Languages to Temporal Logics using Large Language Models",
+  "authors": "Yongchao Chen, Rujul Gandhi, Yang Zhang, Chuchu Fan",
+  "year": "2024",
+  "categories": [
+    "cs.CL"
+  ],
+  "url": "https://arxiv.org/abs/2305.07766",
+  "html_url": "https://arxiv.org/html/2305.07766",
+  "license": "http://creativecommons.org/publicdomain/zero/1.0/",
+  "section": "Introduction",
+  "word_count": 837,
+  "text": "Temporal Logic (TL) has been widely used as a mathematically precise language to specify requirements in many engineering domains such as robotics [1], electronics design [2], autonomous driving [3]. TL can capture the complex spatial, temporal, and logical requirements of both human languages and environmental constraints, and can be transformed into executable actions or control inputs for robots [4,5,6,7,8].\n\nUnlike many robotics works that try to use end-to-end black-box models to infer robotic behaviors directly from natural language (NL) [9], using structured TL as the intermediate has a twofold benefit – the TL can be used for direct planning, and the TL representation can be used to identify specific sources of failure and provide automatic feedback to a non-expert user [5]. However, TL has a steep learning curve. Communicating one’s goals and constraints through NL is much more intuitive to a non-expert. Therefore, a model able to transform NL instructions into TL is a missing but crucial component for interactive robots and engineering designs.\n\nCurrently, there is no general tool to perform automated translations between TL and NL that takes the following requirements into consideration:\n\n- • Cross-domain generalization. Although TL is used in many engineering domains, current NL-to-TL approaches largely constrain their training data to a single domain. These datasets mostly lack plentiful corpus richness of NL-TL and have their own specified formats of Atomic Propositions (AP). Then the models fail to generalize to other domains [8], even though the structure of TL itself is not dependent on the domain and should be generic.\n\n- • Variability of NL instructions. Past work often constructs synthetic data algorithmically, requiring limited forms of the NL input. Real-world NL utterances cannot be encoded into a small set of rules. Models trained on such homogeneous data fail to generalize to new sentence structures [10].\n\nOne big bottleneck in the NL-to-TL problem is the lack of data. Although modern statistical methods can outperform rule-based methods [11], they typically require a huge dataset. This data is expensive and difficult to collect since strong expertise of annotators is needed [10]. As outlined above, constraining the domain or form of the NL instructions relieves the pressure of dataset, but also unavoidably undermines the generalizability [10,12].\n\nTo supplement the data creation process and simultaneously overcome the need for a huge dataset, we propose to use pre-trained LLMs. We utilize GPT-3 [13] to assist dataset creation and finetune T5 models [14] to be specialized in NL-to-TL transformation.\n\nAnother aspect of our approach is to use ‘lifted’ versions of NL and TL for finetuning our model, which greatly enhances generalizability. In previous work, models trained on full NL-to-TL transformation often include converting specific individual actions into APs. For example, the AP \"a response is created in Slack\" might be formalized as \"create_Slack\". As a result, each work has to regularize its own content and style of APs, affecting generalization. Instead of taking this approach, we hide all the APs in our data during finetuning, acquiring a lifted model on lifted NL-to-TL transformation. For the final ground application from full NL into full TL, two methods are proposed, either by combining the lifted model with AP recognition or further transfer learning in one specific domain. For further transfer learning into specific domains, we compare the models with/without pre-training on lifted NL-TL and show its significance.\n\nIn this paper, we present two key contributions:\n\n- • Constructing a cross-domian NL-TL dataset. We generate a dataset of 15K lifted NL-TL pairs using a novel GPT-3-assisted framework. Ablation studies are conducted to show the significance of each part of the framework for dataset construction. In addition, we collect and clean previous datasets (13K) from two varied domains, adapting original full NL-TL pairs into lifted versions. In this way, we publish a dataset of 28K lifted NL-TL pairs. Ablation studies show that the newly created data are indispensable since purely training on the collected data fails to work across domains.\n\n- • Finetuning a lifted NL-to-TL model on T5 using our data, and demonstrating the improvement in performance compared to former state-of-the-art methods. For application in full NL-to-STL transformation, two methods are proposed. We compare our model to Seq2Seq models and direct few-shot learning by GPT-3, across five domains. The experimental results show that our methods achieve better accuracy (>95% across all domains) and are more data-efficient (<10% domain specific data). We also do the ablation study by training a Seq2Seq model with lifted NL-to-TL dataset, revealing that T5’s superior model capacity is essential.\n\nGPT-4 [15] comes out when approaching the end of this work. To compare the accuracy of direct GPT-4 few-shot end-to-end translation with our finetuned model, we did an ad-hoc test on ChatGPT Plus version with 100 samples in each domain. Here we can not test on more samples since we do not have access to GPT-4 API and ChatGPT Plus version has access limitation per hour. The results show that GPT-4 achieves an accuracy of 77.7% over 300 samples, much lower than our model but higher than GPT-3.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib29",
+      "text": "Tellex et al. (2020) Stefanie Tellex, Nakul Gopalan, Hadas Kress-Gazit, and Cynthia Matuszek. 2020. Robots that use language. Annual Review of Control, Robotics, and Autonomous Systems , 3(1)."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib4",
+      "text": "Browne et al. (1986) Michael C. Browne, Edmund M. Clarke, David L. Dill, and Bud Mishra. 1986. Automatic verification of sequential circuits using temporal logic. IEEE Transactions on Computers , 35(12):1035–1044."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib22",
+      "text": "Maierhofer et al. (2020) Sebastian Maierhofer, Anna-Katharina Rettinger, Eva Charlotte Mayer, and Matthias Althoff. 2020. Formalization of interstate traffic rules in temporal logic . In 2020 IEEE Intelligent Vehicles Symposium (IV) , pages 752–759."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib16",
+      "text": "Gundana and Kress-Gazit (2022) David Gundana and Hadas Kress-Gazit. 2022. Event-based signal temporal logic tasks: Execution and feedback in complex environments. IEEE Robotics and Automation Letters , 7(4):10001–10008."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib27",
+      "text": "Raman et al. (2013) Vasumathi Raman, Constantine Lignos, Cameron Finucane, Kenton CT Lee, Mitchell P Marcus, and Hadas Kress-Gazit. 2013. Sorry dave, i’m afraid i can’t do that: Explaining unachievable robot tasks using natural language. In Robotics: science and systems , volume 2, pages 2–1. Citeseer."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib2",
+      "text": "Boteanu et al. (2016) Adrian Boteanu, Thomas Howard, Jacob Arkin, and Hadas Kress-Gazit. 2016. A model for verifiable grounding and execution of complex natural language instructions. In 2016 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS) , pages 2649–2654. IEEE."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib25",
+      "text": "Patel et al. (2020) Roma Patel, Ellie Pavlick, and Stefanie Tellex. 2020. Grounding language to non-markovian tasks with no supervision of task specifications. In Robotics: Science and Systems ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib15",
+      "text": "Gopalan et al. (2018) Nakul Gopalan, Dilip Arumugam, Lawson LS Wong, and Stefanie Tellex. 2018. Sequence-to-sequence language grounding of non-markovian task specifications. In Robotics: Science and Systems , volume 2018."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib1",
+      "text": "Ahn et al. (2022) Michael Ahn, Anthony Brohan, Noah Brown, Yevgen Chebotar, Omar Cortes, Byron David, Chelsea Finn, Chuyuan Fu, Keerthana Gopalakrishnan, Karol Hausman, Alex Herzog, Daniel Ho, Jasmine Hsu, Julian Ibarz, Brian Ichter, Alex Irpan, Eric Jang, Rosario Jauregui Ruano, Kyle Jeffrey, Sally Jesmonth, Nikhil Joshi, Ryan Julian, Dmitry Kalashnikov, Yuheng Kuang, Kuang-Huei Lee, Sergey Levine, Yao Lu, Linda Luu, Carolina Parada, Peter Pastor, Jornell Quiambao, Kanishka Rao, Jarek Rettinghouse, Diego Reyes, Pierre Sermanet, Nicolas Sievers, Clayton Tan, Alexander Toshev, Vincent Vanhoucke, Fei Xia, Ted Xiao, Peng Xu, Sichun Xu, Mengyuan Yan, and Andy Zeng. 2022. Do as i can and not as i say: Grounding language in robotic affordances. In arXiv preprint arXiv:2204.01691 ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib5",
+      "text": "Brunello et al. (2019) Andrea Brunello, Angelo Montanari, and Mark Reynolds. 2019. Synthesis of ltl formulas from natural language texts: State of the art and research directions. In 26th International Symposium on Temporal Representation and Reasoning (TIME 2019) . Schloss Dagstuhl-Leibniz-Zentrum fuer Informatik."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib7",
+      "text": "Buzhinsky (2019) Igor Buzhinsky. 2019. Formalization of natural language requirements into temporal logics: a survey ."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib24",
+      "text": "Patel et al. (2019) Roma Patel, Ellie Pavlick, and Stefanie Tellex. 2019. Learning to ground language to temporal logical form. In NAACL ."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib3",
+      "text": "Brown et al. (2020) Tom Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared D Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, et al. 2020. Language models are few-shot learners. Advances in neural information processing systems , 33:1877–1901."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib26",
+      "text": "Raffel et al. (2020) Colin Raffel, Noam Shazeer, Adam Roberts, Katherine Lee, Sharan Narang, Michael Matena, Yanqi Zhou, Wei Li, Peter J Liu, et al. 2020. Exploring the limits of transfer learning with a unified text-to-text transformer. J. Mach. Learn. Res. , 21(140):1–67."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib6",
+      "text": "Bubeck et al. (2023) Sébastien Bubeck, Varun Chandrasekaran, Ronen Eldan, Johannes Gehrke, Eric Horvitz, Ece Kamar, Peter Lee, Yin Tat Lee, Yuanzhi Li, Scott Lundberg, et al. 2023. Sparks of artificial general intelligence: Early experiments with gpt-4. arXiv preprint arXiv:2303.12712 ."
+    }
+  ]
+}

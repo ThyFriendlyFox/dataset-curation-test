@@ -1,0 +1,103 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.14497",
+  "title": "MULDE: Multiscale Log-Density Estimation via Denoising Score Matching for Video Anomaly Detection",
+  "authors": "Jakub Micorek, Horst Possegger, Dominik Narnhofer, Horst Bischof, Mateusz Kozinski",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2403.14497",
+  "html_url": "https://arxiv.org/html/2403.14497",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 750,
+  "text": "The goal of video anomaly detection (VAD) is to detect events that deviate from normal patterns in videos. VAD has numerous potential applications in healthcare, safety, and traffic monitoring. It can be used to detect events like human falling down, workplace, or traffic accidents, and holds the promise of dramatically reducing the time needed to respond to emergencies that can result from them. The main challenge of anomaly detection stems from the fact that, unlike classes of actions in video action recognition, anomalies do not form a coherent group of patterns and typically cannot be anticipated in advance. In consequence, in many applications anomalous training data is not available, necessitating the so-called one-class classification approach, in which the system is trained exclusively on normal data.\n\nTraditional approaches to one-class video anomaly detection rely on training a deep network in auxiliary self-supervised tasks, like auto-encoding the frame sequence [1,2,3,4,5,6], predicting future frames [7,8], inpainting spatio-temporal volumes [1], and solving jigsaw puzzles [9,10]. The underlying assumption is that given a video sufficiently different from those of the training set, i.e. one containing an anomaly, the network should fail to complete the self-supervised task. However, the connection between data normality or abnormality and the performance of the network remains unclear. Deep networks can generalize beyond their training set, and there is no guarantee that anomalies make them fail to complete their task.\n\nOur motivation is to lay more solid foundations for video anomaly detection. To that end, we treat feature vectors extracted from videos as realizations of a random variable with a fixed distribution, and seek to approximate its probability density function with a neural network. Such approximation would enable a principled and intuitive approach to detecting anomalies: since anomalous data is characterized by a low likelihood under the statistical model of normal data, it could be detected by thresholding the approximate density function.\n\nTraining a neural network to directly approximate p(\\mathbf{x}), the probability density function of the training data is very challenging. However, [11] showed that injecting the data with zero-centered, iid Gaussian noise makes it easier to model the distribution of the noisy data q(\\tilde{\\mathbf{x}}). For sufficiently low levels of noise, q preserves the shape of p, which makes it a suitable basis for our anomaly indicator. Vincent’s contribution consisted in proposing denoising score matching, a method to train a neural network to approximate -\\nabla_{\\tilde{\\mathbf{x}}}\\log q(\\tilde{\\mathbf{x}}), the negative log-gradient of the density function of noisy data, which became a core algorithm of a recent class of generative models [12]. We modify this method to train a neural anomaly indicator that approximates, up to a constant, the log-density, -\\log q(\\tilde{\\mathbf{x}}), well suited to indicating anomalies thanks to its one-to-one relation to q(\\tilde{\\mathbf{x}}). Our approach is illustrated in Figure 1.\n\nIn its basic form, introduced above, our method requires choosing the standard deviation \\sigma of the noise injected into the data, also called the noise scale. This choice represents a compromise between making q closer to p for small values of \\sigma and extending the support of q to cover more possible anomalies at larger noise levels. To avoid this unwelcome compromise, we do not settle on a single \\sigma, but approximate the log-density for a range of noise scales \\sigma\\in\\{\\sigma_{1},\\ldots\\sigma_{L}\\} with a neural network f(\\cdot,\\sigma), and introduce a regularization term that tends to align the approximations at different scales. At test time, we compute anomaly indicators for a range of noise scales and combine them into a single anomaly score with a Gaussian mixture model, fitted to normal data. Our experiments show that MULDE, the regularized MU ltiscale L og- DE nsity approximation, is a very effective video anomaly detector.\n\nTo summarize, the main contribution of this paper is a novel approach to detecting anomalies from video features with a neural approximation of their log-density function. In technical terms, we propose a modification of multiscale denoising score matching for training anomaly indicators and a new method to regularize this training. Our anomaly detector is simple, mathematically sound, and fast at test time, as inference requires merely extracting the features and forward-propagating them through a neural network and a Gaussian mixture model. Moreover, it is agnostic of the feature vector it consumes on input. Our experiments on the Ped2 [13], Avenue [14], ShanghaiTech [15], UCFCrime [16], and UBnormal [17] data sets demonstrate state-of-the-art performance in anomaly detection both in the object-centric setup, where features are extracted from bounding boxes of detected objects, and in the frame-centric setup, with features computed for entire frames.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib10",
+      "text": "Mariana-Iuliana Georgescu, Antonio Barbalau, Radu Tudor Ionescu, Fahad Shahbaz Khan, Marius Popescu, and Mubarak Shah. Anomaly detection in video via self-supervised and multi-task learning. In Proc. of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 2021a."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib11",
+      "text": "Mariana Iuliana Georgescu, Radu Tudor Ionescu, Fahad Shahbaz Khan, Marius Popescu, and Mubarak Shah. A background-agnostic framework with adversarial training for abnormal event detection in video. Transactions on Pattern Analysis and Machine Intelligence (PAMI) , 44(9), 2021b."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib13",
+      "text": "Mahmudul Hasan, Jonghyun Choi, Jan Neumann, Amit K Roy-Chowdhury, and Larry S Davis. Learning temporal regularity in video sequences. In Proc. of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 2016."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib16",
+      "text": "Radu Tudor Ionescu, Fahad Shahbaz Khan, Mariana-Iuliana Georgescu, and Ling Shao. Object-centric auto-encoders and dummy anomalies for abnormal event detection in video. In Proc. of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 2019."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib12",
+      "text": "Dong Gong, Lingqiao Liu, Vuong Le, Budhaditya Saha, Moussa Reda Mansour, Svetha Venkatesh, and Anton van den Hengel. Memorizing normality to detect anomaly: Memory-augmented deep autoencoder for unsupervised anomaly detection. In Proc. of the International Conference on Computer Vision (ICCV) , 2019."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib31",
+      "text": "Hyunjong Park, Jongyoun Noh, and Bumsub Ham. Learning memory-guided normality for anomaly detection. In Proc. of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 2020."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib23",
+      "text": "Wen Liu, Weixin Luo, Dongze Lian, and Shenghua Gao. Future frame prediction for anomaly detection–a new baseline. In Proc. of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 2018."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib30",
+      "text": "Trong-Nguyen Nguyen and Jean Meunier. Anomaly detection in video sequence with appearance-motion correspondence. In Proc. of the International Conference on Computer Vision (ICCV) , 2019."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib42",
+      "text": "Guodong Wang, Yunhong Wang, Jie Qin, Dongming Zhang, Xiuguo Bao, and Di Huang. Video anomaly detection by solving decoupled spatio-temporal jigsaw puzzles. In Proc. of the European Conference on Computer Vision (ECCV) , 2022."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib2",
+      "text": "Antonio Barbalau, Radu Tudor Ionescu, Mariana-Iuliana Georgescu, Jacob Dueholm, Bharathkumar Ramachandra, Kamal Nasrollahi, Fahad Shahbaz Khan, Thomas B. Moeslund, and Mubarak Shah. Ssmtl++: Revisiting self-supervised multi-task learning for video anomaly detection. Computer Vision and Image Understanding , 229, 2023."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib41",
+      "text": "Pascal Vincent. A connection between score matching and denoising autoencoders. Neural Computation , 23(7):1661–1674, 2011."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib38",
+      "text": "Yang Song and Stefano Ermon. Generative modeling by estimating gradients of the data distribution. In Proc. of the Conference on Neural Information Processing Systems (NeurIPS) , 2019."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib28",
+      "text": "Vijay Mahadevan, Weixin Li, Viral Bhalodia, and Nuno Vasconcelos. Anomaly detection in crowded scenes. In Proc. of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 2010."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib25",
+      "text": "Cewu Lu, Jianping Shi, and Jiaya Jia. Abnormal event detection at 150 fps in matlab. In Proc. of the International Conference on Computer Vision (ICCV) , 2013."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib26",
+      "text": "Weixin Luo, Wen Liu, and Shenghua Gao. A revisit of sparse coding based anomaly detection in stacked rnn framework. In Proc. of the International Conference on Computer Vision (ICCV) , 2017."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib39",
+      "text": "Waqas Sultani, Chen Chen, and Mubarak Shah. Real-world anomaly detection in surveillance videos. In Proc. of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 2018."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib1",
+      "text": "Andra Acsintoae, Andrei Florescu, Mariana-Iuliana Georgescu, Tudor Mare, Paul Sumedrea, Radu Tudor Ionescu, Fahad Shahbaz Khan, and Mubarak Shah. Ubnormal: New benchmark for supervised open-set video anomaly detection. In Proc. of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 2022."
+    }
+  ]
+}

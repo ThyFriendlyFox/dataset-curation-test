@@ -1,0 +1,78 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.15161",
+  "title": "FastCAD: Real-Time CAD Retrieval and Alignment from Scans and Videos",
+  "authors": "Florian Langer, Jihong Ju, Georgi Dikov, Gerhard Reitmayr, Mohsen Ghafoorian",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2403.15161",
+  "html_url": "https://arxiv.org/html/2403.15161",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 674,
+  "text": "Representing environments and rooms by aligned 3D CAD models is crucial for many downstream tasks in augmented reality or robotics. Compared to noisy 3D scene meshes or point clouds, a CAD-based representation has many advantages, such as the absence of holes in objects, clean surface geometry, object-level annotations, and potential part-level scene understanding. Additionally, the representation is more compact, with significantly fewer vertices and faces, which allows for faster rendering and collision simulations. In this work, we introduce FastCAD, which is carefully designed to perform real-time CAD retrieval and alignment (see Fig. 1). First, to achieve this goal, FastCAD simultaneously solves object alignment and retrieval thanks to the proposed embedding distillation technique. For this, we first learn an embedding space by training a separate encoder network in a contrastive learning setting. Noisy, partial scans and clean CAD models are embedded into a unified embedding space. By introducing two auxiliary tasks, performing foreground-background segmentation of the noisy object scan and predicting the similarity of the positive and negative CAD model used for the contrastive setup, we further improve the quality of the learned embeddings. Rather than using the encoder network to obtain embedding vectors at inference time, we distil the embeddings into FastCAD by supervising its shape embedding prediction per detection by the embedding of the ground-truth CAD model. Doing so greatly improves the speed as well as the quality of the retrieved shapes.\n\nSecond, FastCAD directly predicts alignment parameters. We parameterise the alignments with oriented 3D bounding boxes where we additionally predict the front-facing side of the CAD model within the bounding box. This is significantly faster than analysis-by-synthesis-based methods [1,2] where CAD alignments are obtained iteratively by minimising rendering-based alignment objectives. It is also more efficient than correspondence-based methods [3,4,5] where the network outputs object-to-CAD correspondences and object poses are extracted with an additional alignment optimisation [6]. At inference time, the shape embeddings predicted by FastCAD are used to retrieve the nearest neighbor CAD models from the embedding space. Those CAD models are aligned inside the predicted bounding boxes according to the predicted front-facing side to form the final output. In this way, we achieve a very efficient method running in just 50 ms per RGB-D scan (compared to [4,5], which takes 2.6 s) while achieving a similar accuracy on the Scan2CAD alignment benchmark compared to [5] (61.7% vs 61.2%, see Fig. 1).\n\nThird, we can use FastCAD in conjunction with reconstruction methods (e.g. [7,8,9]) to perform precise, real-time CAD alignments from videos. For this, we sample a point cloud from the output mesh generated with [8] and use it as the input to FastCAD to predict CAD alignments. Our results demonstrate that this way of first reconstructing an object-agnostic 3D scene representation and then performing object detection is more robust than frame-based methods [10,11]. Further, choosing an explicit 3D point cloud as an intermediate representation means that 3D reconstruction methods can be used out-of-the-box and can be applied in an online setting, unlike [12]. Applying FastCAD on the output of [8] our joint system can run online at 10 FPS (compared to less than 3 FPS [10]) while significantly improving the instance alignment accuracy on the Scan2CAD alignment benchmark from 43.0% [12] to 48.2%. Additionally, we introduce two metrics to assess the quality of retrieved shapes on the Scan2CAD [3] benchmark and show that FastCAD improves the introduced reconstruction accuracy from 22.9% [11] to 29.6%. In summary, our key contributions include:\n\n- • a novel and effective method for CAD model-based reconstruction where high-quality shape embeddings learned in a contrastive learning framework are distilled into an object detection network.\n\n- • an efficient system that predicts CAD retrievals and alignments for all objects in a scan in just 50 ms, allowing for online application to videos at 10 FPS.\n\n- • state-of-the-art alignment accuracy on the challenging and commonly used Scan2CAD benchmark for methods operating on scans (61.7% vs 61.2%) and on videos (48.2% vs. 43.0%).\n\n- • new evaluation metrics for the Scan2CAD benchmark assessing the quality of the retrieved shapes.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "Ainetter et al. [2023] Stefan Ainetter, Sinisa Stekovic, Friedrich Fraundorfer, and Vincent Lepetit. Automatically annotating indoor images with cad models via rgb-d scans. In IEEE/CVF Winter Conf. App. Comput. Vis. , 2023."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib16",
+      "text": "Hampali et al. [2021] Shreyas Hampali, Sinisa Stekovic, Sayan Deb Sarkar, Chetan Srinivasa Kumar, Friedrich Fraundorfer, and Vincent Lepetit. Monte carlo scene search for 3d scene understanding. In IEEE Conf. Comput. Vis. Pattern Recog. , 2021."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib2",
+      "text": "Avetisyan et al. [2019a] Armen Avetisyan, Manuel Dahnert, Angela Dai, Manolis Savva, Angel X. Chang, and Matthias Niessner. Scan2cad: Learning cad model alignment in rgb-d scans. In IEEE Conf. Comput. Vis. Pattern Recog. , 2019a."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib3",
+      "text": "Avetisyan et al. [2019b] Armen Avetisyan, Angela Dai, and Matthias Niessner. End-to-end cad model retrieval and 9dof alignment in 3d scans. In Int. Conf. Comput. Vis. , 2019b."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib4",
+      "text": "Avetisyan et al. [2020] Armen Avetisyan, Tatiana Khanova, Christopher Choy, Denver Dash, Angela Dai, and Matthias Nießner. Scenecad: Predicting object alignments and layouts in rgb-d scans. In Eur. Conf. Comput. Vis. , 2020."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib9",
+      "text": "Choy et al. [2020] Christopher Choy, Wei Dong, and Vladlen Koltun. Deep global registration. In IEEE Conf. Comput. Vis. Pattern Recog. , 2020."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib33",
+      "text": "Sayed et al. [2022] Mohamed Sayed, John Gibson, Jamie Watson, Victor Prisacariu, Michael Firman, and Clément Godard. Simplerecon: 3d reconstruction without 3d convolutions. In Eur. Conf. Comput. Vis. , 2022."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib18",
+      "text": "Ju et al. [2023] Jihong Ju, Ching Wei Tseng, Oleksandr Bailo, Georgi Dikov, and Mohsen Ghafoorian. Dg-recon: Depth-guided neural 3d scene reconstruction. In Int. Conf. Comput. Vis. , 2023."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib5",
+      "text": "Bozic et al. [2021] Aljaz Bozic, Pablo Palafox, Justus Thies, Angela Dai, and Matthias Nießner. Transformerfusion: Monocular rgb scene reconstruction using transformers. Adv. Neural Inform. Process. Syst. , 2021."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib22",
+      "text": "Li et al. [2021] Kejie Li, Daniel DeTone, Steven Chen, Minh Vo, Ian Reid, Hamid Rezatofighi, Chris Sweeney, Julian Straub, and Richard Newcombe. Odam: Object detection, association, and mapping using posed rgb video. In Int. Conf. Comput. Vis. , 2021."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib26",
+      "text": "Maninis et al. [2022] Kevis-Kokitsi Maninis, Stefan Popov, Matthias Nießner, and Vittorio Ferrari. Vid2cad: Cad model alignment using multi-view constraints from videos. IEEE Transactions on Pattern Analysis and Machine Inttelligence , 2022."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib35",
+      "text": "Tyszkiewicz et al. [2022] Michał J. Tyszkiewicz, Kevis-Kokitsi Maninis, Stefan Popov, and Vittorio Ferrari. Raytran: 3d pose estimation and shape reconstruction of multiple objects from videos with ray-traced transformers. In Eur. Conf. Comput. Vis. , 2022."
+    }
+  ]
+}

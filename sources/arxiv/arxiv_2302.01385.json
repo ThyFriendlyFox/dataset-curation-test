@@ -1,0 +1,124 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2302.01385",
+  "title": "Hyper-parameter Tuning for Fair Classification without Sensitive Attribute Access",
+  "authors": "Akshaj Kumar Veldanda, Ivan Brugere, Sanghamitra Dutta, Alan Mishler, Siddharth Garg",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.AI"
+  ],
+  "url": "https://arxiv.org/abs/2302.01385",
+  "html_url": "https://arxiv.org/html/2302.01385",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1177,
+  "text": "Despite their success on a range of real-world tasks, prior work [1,2,3] has found that state-of-the-art deep neural networks exhibit unintended biases towards specific subgroups, for instance towards disadvantaged subgroups or because of tendency to learn spurious correlations and simplicity bias, especially harming disadvantaged groups. Seminal work by [4] demonstrated, for instance, that commercial face recognition systems had lower accuracy on darker-skinned women than other groups. A body of work has sought to design fair machine learning algorithms that account for a model’s performance on a per-group basis [5,6,7].\n\nPrior work typically assumes that attributes, e.g. gender and race, on which we seek to train fair models are available on training and validation data [8,5]. We will refer to these as sensitive attributes (SA). However, recent work [9,10] has highlighted many real-world settings in which SA may not be available. For example, data subjects may abstain from providing sensitive information for privacy reasons or to evade future discrimination [11]. Attributes on which the model discriminates might not be known or available during training and only identified post-deployment [12,13,14]. For instance, recent work shows that fair NLP models trained on western datasets discriminate based on last names when re-contextualized to geo-cultural settings like India [15]. Similarly, reports suggest that Nikon’s face detection models repeatedly identify Asian faces as blinking, a bias that was only identified retrospectively [16]. Unfortunately, by this point, at least some harm is already incurred.\n\nRecent work has therefore sought to train fair classifiers without SA on the training set [6,17,18,3]. At their core, these methods first identify advantaged and disadvantaged groups within the training dataset; i.e., subgroups with high and low accuracy, respectively. Then, they deploy various training strategies to boost performance on disadvantaged groups. However, these methods are highly sensitive to the choice of hyperparameters, and can actually hurt fairness compared to baseline empirical risk minimization (ERM) without proper hyperparameter tuning [6]. Hence, with the exception of GEORGE [7] and ARL [19], prior work has assumed access to SA on the validation data. However, in practical settings, SA may not be available for the same reasons they are unavailable on training data.\n\nIn this paper, we propose Antigone, a principled approach that enables hyperparameter tuning for fairness without access to SA on training and validation data. Antigone enables effective hyperparameter tuning of methods like JTT [6], AFR [20] (that currently assume ground-truth SAs on validation data) and improves fairness when GEORGE’s and ARL’s own hyperparameter tuning methods are replaced with Antigone. Antigone works for fairness metrics including demographic parity, equal opportunity and worst sub-group accuracy.\n\nAntigone starts with a baseline ERM model trained to predict target labels (note these target labels are known and different from SAs). Subgroups advantaged by the baseline ERM model will be over-represented in the set of correctly classified inputs; similarly, disadvantaged subgroups are over-represented in the set of incorrectly classified inputs. Hence, Antigone uses the ERM model’s correctly and incorrectly classified validation data as proxies for advantaged and disadvantaged subgroups, respectively. We refer to these as pseudo-sensitive attributes (PSA). Note that PSA labels are noisy; some inputs from the advantaged subgroups will be incorrectly classified, and vice-versa. Can they still be used for hyperparameter tuning? Prior work shows that under certain theoretical assumptions on label noise, called the mutually corrupted (MC) noise model, fairness measured on PSA is proportional to ground-truth fairness [21]. Thus, PSA labels on validation data can still be used to compare different models for fairness, and consequently for hyperparameter tuning.\n\nHowever, this sets up a new problem: how do we tune the hyperparameters of the ERM model itself to maximize the accuracy (or minimize the noise) of our PSA? We cannot directly measure PSA accuracy or noise since we do not have any ground-truth SA labels. Here, we show formally that under the MC noise model, minimizing noise is equivalent to maximizing the Euclidean distance between the mean (EDM) images in the correct and incorrect classes. Since the EDM can be directly measured, we train a family of ERM models with different hyper-parameters and pick the model with the largest EDM on the validation dataset. The PSAs obtained are then used to tune hyperparameters for fairness schemes like JTT, AFR, GEORGE and ARL.\n\nFor more intuition, consider the example in Figure 1 on the CelebA dataset. The target label is hair color, and the (unknown) SA is gender. The baseline ERM model discriminates against blond men. The correct set for the ground-truth blond class has only 4\\% blond men while the incorrect set has 65\\% blond men. This is also reflected in the mean images for these two classes: the correct set for the ground-truth blond individuals has more female features while the incorrect set has more male features. As noted above, Antigone picks an ERM model with the largest distance between these mean images so as to maximize PSA label accuracy.\n\nWe evaluate Antigone in conjunction with three state-of-art methods, JTT [6], AFR [20], GEORGE [7] and ARL [19], on binary SA using demographic parity, equal opportunity, and worst subgroup accuracy as fairness metrics across the CelebA, Waterbirds and Adult datasets. Empirically, we find that: (1) Antigone produces more accurate PSA labels on validation data compared to GEORGE’s unsupervised clustering approach (Table 1); (2) used with JTT (AFR), Antigone comes close to matching the fairness of JTT (AFR) tuned with ground-truth SA as shown in Table 2 (Table 5); and (3) improves the fairness of both GEORGE and ARL when Antigone’s PSA labels are used instead of their own hyperparameter tuning methods (Table 3, Table 4). Specifically, the worst-group accuracy increases by 4.2% and 8.6% on the CelebA and Waterbirds datasets for GEORGE, respectively, and by up to 11.6% on the Adult dataset for ARL.\n\nAblation and sensitivity studies demonstrate the effectiveness of Antigone’s EDM metric versus alternatives (Table 1) and shed light on discrepancies between the ideal MC assumptions and its use in practice (Appendix Table 13). Overall, our key contributions are:\n\n- • We propose Antigone (subsection 2.2), a new method for the often overlooked problem of hyperparameter tuning for fair classification in setting where sensitive attributes are unavailable on both training and validation data. Antigone generates PSA labels on validation data using the correctly and incorrectly classified examples of an ERM model as proxies for advantaged and disadvantaged subgroups.\n\n- • We propose an unsupervised approach to tune Antigone’s own hyperparameters (specifically, those of its ERM model) by maximizing the Euclidean distance between the mean (EDM) images of the correctly and incorrectly classified sets. We theoretically justify this choice under the MC noise model, proving that maximizing EDM minimizes PSA label noise in an idealized setting (subsection 2.3). Empirically, we show that gap between our practical implementation and the idealized MC noise model is small.\n\n- • Experimentally, we find that Antigone based hyperparameter tuning boosts fairness for three state-of-art methods, JTT, AFR, GEORGE and ARL (section 3), even surpassing their own hyperparameter tuning techniques. Antigone also generates more accurate PSA labels compared to GEORGE’s unsupervised clustering approach (section 4).",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib16",
+      "text": "Hovy & Søgaard (2015) Dirk Hovy and Anders Søgaard. Tagging performance correlates with author age. In Proceedings of the 53rd Annual Meeting of the Association for Computational Linguistics and the 7th International Joint Conference on Natural Language Processing (Volume 2: Short Papers) , pp. 483–488, Beijing, China, July 2015. Association for Computational Linguistics. doi: 10.3115/v1/P15-2079 . URL https://aclanthology.org/P15-2079 ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib31",
+      "text": "Oren et al. (2019) Yonatan Oren, Shiori Sagawa, Tatsunori B. Hashimoto, and Percy Liang. Distributionally robust language modeling. In Proceedings of the 2019 Conference on Empirical Methods in Natural Language Processing and the 9th International Joint Conference on Natural Language Processing (EMNLP-IJCNLP) , pp. 4227–4237, Hong Kong, China, November 2019. Association for Computational Linguistics. doi: 10.18653/v1/D19-1432 . URL https://aclanthology.org/D19-1432 ."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib13",
+      "text": "Hashimoto et al. (2018a) Tatsunori Hashimoto, Megha Srivastava, Hongseok Namkoong, and Percy Liang. Fairness without demographics in repeated loss minimization. In International Conference on Machine Learning , pp. 1929–1938. PMLR, 2018a."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib5",
+      "text": "Buolamwini & Gebru (2018) Joy Buolamwini and Timnit Gebru. Gender shades: Intersectional accuracy disparities in commercial gender classification. In Sorelle A. Friedler and Christo Wilson (eds.), Proceedings of the 1st Conference on Fairness, Accountability and Transparency , volume 81 of Proceedings of Machine Learning Research , pp. 77–91. PMLR, 23–24 Feb 2018. URL https://proceedings.mlr.press/v81/buolamwini18a.html ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib33",
+      "text": "Prost et al. (2019) Flavien Prost, Hai Qian, Qiuwen Chen, Ed H. Chi, Jilin Chen, and Alex Beutel. Toward a better trade-off between performance and fairness with kernel-based distribution matching, 2019."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib25",
+      "text": "Liu et al. (2021) Evan Z Liu, Behzad Haghgoo, Annie S Chen, Aditi Raghunathan, Pang Wei Koh, Shiori Sagawa, Percy Liang, and Chelsea Finn. Just train twice: Improving group robustness without training group information. In Marina Meila and Tong Zhang (eds.), Proceedings of the 38th International Conference on Machine Learning , volume 139 of Proceedings of Machine Learning Research , pp. 6781–6792. PMLR, 18–24 Jul 2021. URL https://proceedings.mlr.press/v139/liu21f.html ."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib40",
+      "text": "Sohoni et al. (2020) Nimit Sohoni, Jared Dunnmon, Geoffrey Angus, Albert Gu, and Christopher Ré. No subclass left behind: Fine-grained robustness in coarse-grained classification problems. In H. Larochelle, M. Ranzato, R. Hadsell, M.F. Balcan, and H. Lin (eds.), Advances in Neural Information Processing Systems , volume 33, pp. 19339–19352. Curran Associates, Inc., 2020. URL https://proceedings.neurips.cc/paper/2020/file/e0688d13958a19e087e123148555e4b4-Paper.pdf ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib37",
+      "text": "Sagawa* et al. (2020) Shiori Sagawa*, Pang Wei Koh*, Tatsunori B. Hashimoto, and Percy Liang. Distributionally robust neural networks. In International Conference on Learning Representations , 2020. URL https://openreview.net/forum?id=ryxGuJrFvS ."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib41",
+      "text": "Veale & Binns (2017) Michael Veale and Reuben Binns. Fairer machine learning in the real world: Mitigating discrimination without collecting sensitive data. Big Data & Society , 4(2):2053951717743530, 2017. doi: 10.1177/2053951717743530 . URL https://doi.org/10.1177/2053951717743530 ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib15",
+      "text": "Holstein et al. (2019) Kenneth Holstein, Jennifer Wortman Vaughan, Hal Daumé, Miro Dudik, and Hanna Wallach. Improving fairness in machine learning systems: What do industry practitioners need? In Proceedings of the 2019 CHI Conference on Human Factors in Computing Systems , CHI ’19, pp. 1–16, New York, NY, USA, 2019. Association for Computing Machinery. ISBN 9781450359702. doi: 10.1145/3290605.3300830 . URL https://doi.org/10.1145/3290605.3300830 ."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib27",
+      "text": "Markos et al. (2017) Ereni Markos, George R. Milne, and James W. Peltier. Information sensitivity and willingness to provide continua: A comparative privacy study of the united states and brazil. Journal of Public Policy & Marketing , 36(1):79–96, 2017. doi: 10.1509/jppm.15.159 . URL https://doi.org/10.1509/jppm.15.159 ."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib7",
+      "text": "Citron & Pasquale (2014) Danielle Keats Citron and Frank Pasquale. The scored society: Due process for automated predictions. Wash. L. Rev. , 89:1, 2014."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib32",
+      "text": "Pasquale (2015) Frank Pasquale. The black box society: The secret algorithms that control money and information . Harvard University Press, 2015."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib43",
+      "text": "Veldanda et al. (2023b) Akshaj Kumar Veldanda, Fabian Grob, Shailja Thakur, Hammond Pearce, Benjamin Tan, Ramesh Karri, and Siddharth Garg. Are emily and greg still more employable than lakisha and jamal? investigating algorithmic hiring bias in the era of chatgpt. arXiv preprint arXiv:2310.05135 , 2023b."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib4",
+      "text": "Bhatt et al. (2022) Shaily Bhatt, Sunipa Dev, Partha Talukdar, Shachi Dave, and Vinodkumar Prabhakaran. Re-contextualizing fairness in nlp: The case of india, 2022. URL https://arxiv.org/abs/2209.12226 ."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib23",
+      "text": "Leslie (2020) David Leslie. Understanding bias in facial recognition technologies. Technical report, 2020. URL https://zenodo.org/record/4050457 ."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib8",
+      "text": "Creager et al. (2021) Elliot Creager, Jörn-Henrik Jacobsen, and Richard Zemel. Environment inference for invariant learning. In International Conference on Machine Learning , 2021."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib29",
+      "text": "Nam et al. (2020) Junhyun Nam, Hyuntak Cha, Sungsoo Ahn, Jaeho Lee, and Jinwoo Shin. Learning from failure: Training debiased classifier from biased classifier. In Advances in Neural Information Processing Systems , 2020."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib21",
+      "text": "Lahoti et al. (2020) Preethi Lahoti, Alex Beutel, Jilin Chen, Kang Lee, Flavien Prost, Nithum Thain, Xuezhi Wang, and Ed H. Chi. Fairness without demographics through adversarially reweighted learning, 2020."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib34",
+      "text": "Qiu et al. (2023) Shikai Qiu, Andres Potapczynski, Pavel Izmailov, and Andrew Gordon Wilson. Simple and fast group robustness by automatic feature reweighting. arXiv preprint arXiv:2306.11074 , 2023."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib22",
+      "text": "Lamy et al. (2019) Alexandre Lamy, Ziyuan Zhong, Aditya Krishna Menon, and Nakul Verma. Noise-Tolerant Fair Classification . Curran Associates Inc., Red Hook, NY, USA, 2019."
+    }
+  ]
+}

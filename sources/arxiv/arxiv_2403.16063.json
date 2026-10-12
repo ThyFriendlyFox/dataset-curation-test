@@ -1,0 +1,73 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.16063",
+  "title": "Explainable Port Mapping Inference with Sparse Performance Counters for AMD's Zen Architectures",
+  "authors": "Fabian Ritter, Sebastian Hack",
+  "year": "2024",
+  "categories": [
+    "cs.PF"
+  ],
+  "url": "https://arxiv.org/abs/2403.16063",
+  "html_url": "https://arxiv.org/html/2403.16063",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 483,
+  "text": "When optimizing code for peak performance on a processor microarchitecture, understanding the architecture’s performance characteristics is vital. Modern processor designs use many techniques to improve overall performance that cause complex, irregular performance characteristics. As manufacturers rarely provide performance models of their designs, we need to infer such models via microbenchmarks.\n\nIn this work, we consider models for an out-of-order processor’s ability to exploit instruction-level parallelism: the port mapping. The port mapping describes how instructions are decomposed into smaller operations, so-called “micro-ops” or µops, and how these µops are executed on the processor’s execution ports. Port mappings are important components in the cost models of compiler backends [1,2] and of instruction throughput predictors [3,4,5,6,7,8].\n\nInferring port mappings has been the subject of recent research: uops.info [9] provides accurate port mappings for Intel’s microarchitectures with microbenchmarks witnessing each instruction’s port usage. Their approach however does not cover other microarchitectures like AMD’s recent Zen architectures, since uops.info relies on Intel’s per-port hardware performance counters. Other recent port usage inference techniques have limitations that hinder their adoption in compilers and throughput predictors: PMEvo’s [10] port mappings rarely coincide with the actual microarchitecture. In contrast to the uops.info algorithm, PMEvo’s evolutionary algorithm cannot provide explanatory microbenchmarks to bolster confidence in the results. Palmed [11] infers conjunctive resource mappings with good performance prediction results, but they do not map directly to the microarchitecture and therefore do not fit into existing tools.\n\nIn this paper, we present a novel port-mapping inference algorithm that does not rely on per-port performance counters and therefore supports microarchitectures that uops.info cannot handle. Our algorithm instead uses throughput measurements and a single hardware performance counter to count the total number of executed µops for a given microbenchmark. Assuming that the processor behaves according to a formal port mapping model, these measurements are sufficient to infer port mappings with explanatory microbenchmarks similar to the uops.info algorithm. The core of our technique is a counter-example-guided algorithm powered by a satisfiability-modulo-theories (SMT) solver that directly leverages the formal model.\n\nWe evaluate our approach in a case study on AMD’s Zen+ architecture. We report cases where irregular performance characteristics and undocumented or wrongly documented cases hinder an accurate performance model of Zen+. Using our algorithm, we infer the most comprehensive explainable port mapping for Zen+ to date. Our port mapping outperforms the state of the art in terms of throughput prediction accuracy for the supported instructions.\n\nIn summary, we provide the following contributions:\n\n- • An explainable inference algorithm for port mappings that does not require Intel’s per-port performance counters and\n\n- • an implementation that we evaluate on AMD’s Zen+ architecture, which was previously out of scope for explainable port mapping inference algorithms.\n\n- • The result is, to the best of our knowledge, the most comprehensive and accurate port mapping available for Zen+.\n\n- • Our case study documents numerous previously undocumented or misdocumented aspects of Zen+.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib19",
+      "text": "GCC. GCC - scheduling model for AMD Zen microarchitectures. https://github.com/gcc-mirror/gcc/blob/15b83b69ca99d97643075776ba94f2dd1f05b46e/gcc/config/i386/znver.md , 2023. Accessed: 2023-08-22."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib26",
+      "text": "LLVM. LLVM - scheduling model for AMD Zen microarchitectures. https://github.com/llvm/llvm-project/blob/4eb1f1fab35d0f386b458bf1da4396bbeb00b04f/llvm/lib/Target/X86/X86ScheduleZnver1.td , 2023. Accessed: 2023-08-22."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib30",
+      "text": "Andres Charif Rubial, Emmanuel Oseret, Jose Noudohouenou, William Jalby, and Ghislain Lartigue. CQA: A code quality analyzer tool at binary level. In 21st International Conference on High Performance Computing, HiPC 2014, Goa, India, December 17-20, 2014 , pages 1–10. IEEE Computer Society, 2014."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib10",
+      "text": "Andrea Di Biagio. llvm-mca: A static performance analysis tool. https://lists.llvm.org/pipermail/llvm-dev/2018-March/121490.html , 2018. Accessed: 2023-08-22."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib27",
+      "text": "LLVM. llvm-mca - LLVM machine code analyzer (command guide). https://llvm.org/docs/CommandGuide/llvm-mca.html , 2023. Accessed: 2023-08-22."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib25",
+      "text": "Jan Laukemann, Julian Hammer, Johannes Hofmann, Georg Hager, and Gerhard Wellein. Automated instruction stream throughput prediction for Intel and AMD microarchitectures. In 2018 IEEE/ACM Performance Modeling, Benchmarking and Simulation of High Performance Computer Systems (PMBS) , pages 121–131. IEEE, 2018."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib3",
+      "text": "Andreas Abel and Jan Reineke. uiCA: Accurate throughput prediction of basic blocks on recent intel microarchitectures. In Lawrence Rauchwerger, Kirk W. Cameron, Dimitrios S. Nikolopoulos, and Dionisios N. Pnevmatikatos, editors, ICS ’22: 2022 International Conference on Supercomputing, Virtual Event, June 28 - 30, 2022 , pages 33:1–33:14. ACM, 2022."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib4",
+      "text": "Andreas Abel, Shrey Sharma, and Jan Reineke. Facile: Fast, accurate, and interpretable basic-block throughput prediction. In IEEE International Symposium on Workload Characterization, IISWC 2023, Ghent, Belgium, October 1-3, 2023 , pages 87–99. IEEE, 2023."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib1",
+      "text": "Andreas Abel and Jan Reineke. uops.info: Characterizing latency, throughput, and port usage of instructions on intel microarchitectures. In Iris Bahar, Maurice Herlihy, Emmett Witchel, and Alvin R. Lebeck, editors, Proceedings of the Twenty-Fourth International Conference on Architectural Support for Programming Languages and Operating Systems, ASPLOS 2019, Providence, RI, USA, April 13-17, 2019 , pages 673–686. ACM, 2019."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib29",
+      "text": "Fabian Ritter and Sebastian Hack. PMEvo: Portable inference of port mappings for out-of-order processors by evolutionary optimization. In Alastair F. Donaldson and Emina Torlak, editors, Proceedings of the 41st ACM SIGPLAN International Conference on Programming Language Design and Implementation, PLDI 2020, London, UK, June 15-20, 2020 , pages 608–622. ACM, 2020."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib14",
+      "text": "Nicolas Derumigny, Théophile Bastian, Fabian Gruber, Guillaume Iooss, Christophe Guillon, Louis-Noël Pouchet, and Fabrice Rastello. PALMED: throughput characterization for superscalar architectures. In Jae W. Lee, Sebastian Hack, and Tatiana Shpeisman, editors, IEEE/ACM International Symposium on Code Generation and Optimization, CGO 2022, Seoul, Korea, Republic of, April 2-6, 2022 , pages 106–117. IEEE, 2022."
+    }
+  ]
+}

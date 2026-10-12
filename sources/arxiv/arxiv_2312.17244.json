@@ -1,0 +1,64 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2312.17244",
+  "title": "The LLM Surgeon",
+  "authors": "Tycho F. A. van der Ouderaa, Markus Nagel, Mart van Baalen, Yuki M. Asano, Tijmen Blankevoort",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.CL"
+  ],
+  "url": "https://arxiv.org/abs/2312.17244",
+  "html_url": "https://arxiv.org/html/2312.17244",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 503,
+  "text": "Recent advancements in language modeling [1] allow fitting large language models (LLMs) with millions or even billions of parameters (such as OPT [2] and Llama 2 [3]) on big text corpora achieving high performance. Unfortunately, the size of these LLMs often makes it hard to deploy them within practical constraints. Cloud-based deployment can get very expensive for larger models, and efficient devices such as phones are frequently limited in the memory size to host a model.\n\nA body of literature extending back to the late 1980s, e.g., Optimal Brain Damage (OBD, [4]) and Optimal Brain Surgeon (OBS, [5]), phrases pruning as a constraint optimization problem to reduce a model’s footprint and runtime requirements. The Hessian required for this approach grows with the square of the number of parameters, and can only be computed in practice for unrealistically small networks. To overcome this issue, Eigendamage [6] introduces a Kronecker factorization of a blockwise-diagonal approximation of the Hessian. Recent works, like Optimal Brain Compression [7], SparseGPT [8], demonstrate practical post-training pruning of LLMs, but only consider a loss curvature of a pruned layer’s squared output reconstruction error, ignoring gradients that relate local removal costs to the target loss. As a result, their approximation to the target loss landscape is inaccurate, leading to a significant performance degradation for pruned LLMs. Further, these methods do not readily extend to structured pruning.\n\nThis work introduces LLM Surgeon, a general framework for unstructured, semi-structured and structured pruning of LLMs. At paper submission, we deemed this the first method to successfully perform structured pruning of LLMs. Concurrent work by [9] also considers structured pruning of LLMs but ignores gradient information, resulting in lower final performance. The superior performance of LLM Surgeon is achieved by scaling up the block-diagonal Kronecker-factorized approximations to the empirical Fisher from Eigendamage to LLMs. We further expand upon the work by deriving OBS-like weight pruning costs and updates for structured pruning of multiple rows and columns, and provide a general framework that also incorporates semi-structured and unstructured pruning. Instead of treating individual weight updates independently, we strive to consider as many correlations between weights as practically possible and derive joint weight updates for pruning multiple weights (or multiple sets of structured weights) at once. Unlike prior work in LLM pruning, LLM Surgeon prunes in multiple shots, updating weights and curvature estimates between shots. We use global thresholding for unstructured, semi-structured and structured, i.e., instead of pruning layers by a fixed amount, more sensitive layers are pruned less than those that are more robust. Lastly, we propose to mitigate possible first-order gradients not being zero by using optional low-rank first-order updates between shots. A key advantage of LLM Surgeon is that it allows trading off additional compute during compression for better accuracy by increasing the number of correlations and/or shots. Our method gives the first practically usable results for structured pruning of LLMs – they can be pruned by up to 30% with minor performance degradation. Furthermore, we achieve state-of-the-art results in unstructured and semi-structured LLM pruning.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib23",
+      "text": "Vaswani et al. (2017) Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N Gomez, Łukasz Kaiser, and Illia Polosukhin. Attention is all you need. Advances in neural information processing systems , 30, 2017."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib27",
+      "text": "Zhang et al. (2022) Susan Zhang, Stephen Roller, Naman Goyal, Mikel Artetxe, Moya Chen, Shuohui Chen, Christopher Dewan, Mona Diab, Xian Li, Xi Victoria Lin, et al. Opt: Open pre-trained transformer language models. arXiv preprint arXiv:2205.01068 , 2022."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib21",
+      "text": "Touvron et al. (2023) Hugo Touvron, Louis Martin, Kevin Stone, Peter Albert, Amjad Almahairi, Yasmine Babaei, Nikolay Bashlykov, Soumya Batra, Prajjwal Bhargava, Shruti Bhosale, et al. Llama 2: Open foundation and fine-tuned chat models. arXiv preprint arXiv:2307.09288 , 2023."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib15",
+      "text": "LeCun et al. (1989) Yann LeCun, John Denker, and Sara Solla. Optimal brain damage. Advances in neural information processing systems , 2, 1989."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib8",
+      "text": "Hassibi & Stork (1992) Babak Hassibi and David Stork. Second order derivatives for network pruning: Optimal brain surgeon. Advances in neural information processing systems , 5, 1992."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib24",
+      "text": "Wang et al. (2019) Chaoqi Wang, Roger Grosse, Sanja Fidler, and Guodong Zhang. Eigendamage: Structured pruning in the kronecker-factored eigenbasis. In International conference on machine learning , pp. 6566–6575. PMLR, 2019."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib5",
+      "text": "Frantar & Alistarh (2022) Elias Frantar and Dan Alistarh. Optimal brain compression: A framework for accurate post-training quantization and pruning. Advances in Neural Information Processing Systems , 35:4475–4488, 2022."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib6",
+      "text": "Frantar & Alistarh (2023) Elias Frantar and Dan Alistarh. Sparsegpt: Massive language models can be accurately pruned in one-shot. 2023."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib1",
+      "text": "Ashkboos et al. (2024) Saleh Ashkboos, Maximilian L Croci, Marcelo Gennari do Nascimento, Torsten Hoefler, and James Hensman. Slicegpt: Compress large language models by deleting rows and columns. arXiv preprint arXiv:2401.15024 , 2024."
+    }
+  ]
+}

@@ -1,0 +1,129 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2307.14316",
+  "title": "Reinforcement Learning by Guided Safe Exploration",
+  "authors": "Qisong Yang, Thiago D. SimÃ£o, Nils Jansen, Simon H. Tindemans, Matthijs T. J. Spaan",
+  "year": "2023",
+  "categories": [
+    "cs.LG",
+    "cs.AI"
+  ],
+  "url": "https://arxiv.org/abs/2307.14316",
+  "html_url": "https://arxiv.org/html/2307.14316",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 861,
+  "text": "Despite the numerous achievements of reinforcement learning (RL) [1,2], safety concerns still prevent the wide adoption of RL [3]. The lack of knowledge about the environment forces standard agents to rely on trial-and-error strategies. However, this approach is incompatible with safety-critical scenarios [4]. For instance, recommender systems should not suggest extremist content [5]. Constrained Markov decision processes (CMDP) [6] express such safety constraints with a cost signal indicating unsafe interactions. Such costs are decoupled from the rewards to facilitate the learning of safe behaviours.\n\nDevelopments in safe RL have allowed us to learn safe policies in CMDPs. For instance, SAC-Lagrangian [7] combines the Soft Actor-Critic (SAC) [8,9] algorithm with Lagrangian methods to learn a safe policy in an off-policy way. This algorithm solves high-dimensional problems with a sample complexity lower than on-policy algorithms. Unfortunately, it only finds a safe policy at the end of the training process and may be unsafe while learning. In terms of safety, we consider episode-wise constraints instead of step-wise constraints, so a few unsafe actions are allowed in an episode.\n\nSome knowledge about the safety dynamics can ensure safety during learning. One can pre-compute unsafe behaviour and mask unsafe actions using a so-called shield [10,11,12], or start from an initially safe baseline policy and gradually improve its performance while remaining safe [13,14,15]. However, these approaches may necessitate numerous interactions with the environment before they find an adequate policy [16]. Moreover, reusing a pre-trained policy can have a detrimental effect, since the agent encounters a new trajectory distribution as the policy changes [17]. Therefore, we investigate how to efficiently solve a task without violating the safety constraints.\n\nWe make two key observations. First, RL agents often learn in a controlled environment, such as a laboratory or a simulator, before being deployed in the real world [4]. Second, an agent can often benefit from expert guidance instead of solely relying on trial and error [18]. For instance, in autonomous driving, the driver agent can quickly learn by mimicking an expert’s behaviour to handle dangerous situations. Such a process is referred to as policy distillation. Furthermore, under expert guidance, the agent can safely explore before taking dangerous actions.\n\nTransfer learning [19] investigates how to improve the learning of a target task with some knowledge from a source task. In these settings, the source task may provide only partial knowledge of the target task. We adopt a transfer learning framework and refer to (i) the controlled environment as the source task ({\\diamond}) and (ii) the real world as the target task ({\\odot}). In our setting, the controlled environment provides only the cost signals related to safety but not the reward signals of the target task in the real world. The central problem is then to avoid safety violations after the target task has been revealed.\n\nOur approach. We show how to transfer knowledge encoded by a policy to enhance safety. Here, we refer to the policy that has been learned in the source task as the safe guide (SaGui, Figure 1). The intuition is that, in the real world, the agent is guided to accomplish the target task in a safe manner. We propose to transfer SaGui from the source task to the target task. Our approach has three central steps: 1. train the SaGui policy and transfer it to the target task; 2. distill the guide’s policy into a student policy which is dedicated to the target task, and 3. compose a behaviour policy that balances safe exploration (using the guide) and exploitation (using the student).\n\nAs we train the guide in a reward-free constrained RL setting [20], the agent only observes the costs related to safety, and it does not access reward signals. This task-agnostic approach allows us to train a guide independently of the reward of the target task, so this guide can be useful for different reward functions. Furthermore, we assume the source task preserves the dynamics related to safety, which allows us to train a guide that can act safely when transferred to the target task. Inspired by advances in robotics where an agent is trained under strict supervision, we assume the source task is a simulated/controlled environment [21,22]. Therefore, safety is not required while training the SaGui policy. Once the target task is revealed, SaGui safely collects the initial trajectories in the target environment and the student starts learning based on these trajectories. To ensure that the new policy quickly learns how to act safely, we also employ a policy distillation method, encouraging the student to imitate the guide.\n\nContributions. Our main contributions are: we 1. formalize transfer learning for RL from a safety perspective; 2. propose to guide learning using a task-agnostic agent with exploration benefits; 3. show how to adaptively regularize the student policy to the guide policy based on the student’s safety; 4. investigate when to sample from the student or from the guide to ensure safe behaviour in the target environment and fast convergence of the student policy; and 5. demonstrate empirically that, compared to learning from scratch and adapting a pre-trained policy, our method can solve the target task faster without violating the safety constraints in the target task.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib45",
+      "text": "Richard S. Sutton and Andrew G. Barto, Reinforcement Learning: An Introduction , volume 2, MIT press, 2018."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib35",
+      "text": "Volodymyr Mnih, Koray Kavukcuoglu, David Silver, Andrei A. Rusu, Joel Veness, Marc G. Bellemare, Alex Graves, Martin A. Riedmiller, Andreas Fidjeland, Georg Ostrovski, Stig Petersen, Charles Beattie, Amir Sadik, Ioannis Antonoglou, Helen King, Dharshan Kumaran, Daan Wierstra, Shane Legg, and Demis Hassabis, ‘Human-level control through deep reinforcement learning’, Nature , 518 (7540), 529–533, (2015)."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib11",
+      "text": "Gabriel Dulac-Arnold, Nir Levine, Daniel J. Mankowitz, Jerry Li, Cosmin Paduraru, Sven Gowal, and Todd Hester, ‘Challenges of real-world reinforcement learning: definitions, benchmarks and analysis’, Mach. Learn. , 110 (9), 2419–2468, (2021)."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib15",
+      "text": "Javier García and Fernando Fernández, ‘A Comprehensive Survey on Safe Reinforcement Learning’, JMLR , 16 (1), 1437–1480, (2015)."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib10",
+      "text": "Tommaso Di Noia, Nava Tintarev, Panagiota Fatourou, and Markus Schedl, ‘Recommender systems under european ai regulations’, Communications of the ACM , 65 (4), 69–73, (2022)."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib4",
+      "text": "Eitan Altman, Constrained Markov decision processes , volume 7, CRC Press, 1999."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib19",
+      "text": "Sehoon Ha, Peng Xu, Zhenyu Tan, Sergey Levine, and Jie Tan, ‘Learning to Walk in the Real World with Minimal Human Effort’, in CoRL , pp. 1110–1120, (2020)."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib21",
+      "text": "Tuomas Haarnoja, Aurick Zhou, Pieter Abbeel, and Sergey Levine, ‘Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor’, in ICML , pp. 1861–1870, (2018)."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib22",
+      "text": "Tuomas Haarnoja, Aurick Zhou, Kristian Hartikainen, George Tucker, Sehoon Ha, Jie Tan, Vikash Kumar, Henry Zhu, Abhishek Gupta, Pieter Abbeel, and Sergey Levine. Soft Actor-Critic Algorithms and Applications, 2018. arXiv:1812.05905 ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib3",
+      "text": "Mohammed Alshiekh, Roderick Bloem, Rüdiger Ehlers, Bettina Könighofer, Scott Niekum, and Ufuk Topcu, ‘Safe Reinforcement Learning via Shielding’, in AAAI , pp. 2669–2678, (2018)."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib26",
+      "text": "Nils Jansen, Bettina Könighofer, Sebastian Junges, Alex Serban, and Roderick Bloem, ‘Safe Reinforcement Learning Using Probabilistic Shields (Invited Paper)’, in CONCUR , pp. 1–16, (2020)."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib8",
+      "text": "Steven Carr, Nils Jansen, Sebastian Junges, and Ufuk Topcu, ‘Safe reinforcement learning via shielding under partial observability’, in AAAI , pp. 14748–14756, (2023)."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib2",
+      "text": "Joshua Achiam, David Held, Aviv Tamar, and Pieter Abbeel, ‘Constrained Policy Optimization’, in ICML , pp. 22–31, (2017)."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib49",
+      "text": "Chen Tessler, Daniel J. Mankowitz, and Shie Mannor, ‘Reward Constrained Policy Optimization’, in ICLR , (2019)."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib56",
+      "text": "Tsung-Yen Yang, Justinian Rosca, Karthik Narasimhan, and Peter J. Ramadge, ‘Projection-Based Constrained Policy Optimization’, in ICLR , (2020)."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib59",
+      "text": "Moritz A. Zanger, Karam Daaboul, and J. Marius Zöllner, ‘Safe Continuous Control with Constrained Model-Based Policy Optimization’, in IROS , pp. 3512–3519, (2021)."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib24",
+      "text": "Maximilian Igl, Gregory Farquhar, Jelena Luketina, Wendelin Boehmer, and Shimon Whiteson, ‘Transient Non-stationarity and Generalisation in Deep Reinforcement Learning’, in ICLR , (2021)."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib36",
+      "text": "Zhenghao Peng, Quanyi Li, Chunxiao Liu, and Bolei Zhou, ‘Safe driving via expert guided policy optimization’, in CoRL , pp. 1554–1563, (2022)."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib48",
+      "text": "Matthew E. Taylor and Peter Stone, ‘Transfer Learning for Reinforcement Learning Domains: A Survey’, JMLR , 10 (56), 1633–1685, (2009)."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib34",
+      "text": "Sobhan Miryoosefi and Chi Jin, ‘A simple reward-free approach to constrained reinforcement learning’, in ICML , pp. 15666–15698, (2022)."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib40",
+      "text": "Erik Schuitema, Martijn Wisse, Thijs Ramakers, and Pieter Jonker, ‘The design of LEO: A 2D bipedal walking robot for online autonomous Reinforcement Learning’, in IROS , pp. 3238–3243, (2010)."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib53",
+      "text": "Zhaoming Xie, Patrick Clary, Jeremy Dao, Pedro Morais, Jonathan W. Hurst, and Michiel van de Panne, ‘Learning Locomotion Skills for Cassie: Iterative Design and Sim-to-Real’, in CoRL , pp. 317–329, (2019)."
+    }
+  ]
+}

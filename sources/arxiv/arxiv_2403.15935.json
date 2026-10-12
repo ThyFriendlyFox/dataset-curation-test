@@ -1,0 +1,109 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.15935",
+  "title": "Sample and Communication Efficient Fully Decentralized MARL Policy Evaluation via a New Approach: Local TD update",
+  "authors": "Fnu Hairi, Zifan Zhang, Jia Liu",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.MA"
+  ],
+  "url": "https://arxiv.org/abs/2403.15935",
+  "html_url": "https://arxiv.org/html/2403.15935",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1247,
+  "text": "1) Background and Motivation: With the recent success of reinforcement learning (RL) techniques in the dynamic decision-making process [1], MARL, a natural extension of RL to multi-agent systems, has also received increasing attention. Compared to traditional RL, the richness of multi-agent systems has given rise to far more diverse problem settings in MARL, including cooperative, competitive, and mixed MARL (see [2] for an excellent survey). In this paper, we are interested in fully decentralized cooperative MARL, which has found a wide range of applications in the field of networked large-scale systems, such as power networks [3,4], autonomous driving [5,6], wireless network [7] and so on. A defining feature of fully decentralized cooperative MARL is that all agents in the system collaborate to learn a joint policy to maximize long-term system-wide total rewards through communicating with each other. However, due to the decentralized nature (i.e., lack of a centralized infrastructure) of fully decentralized cooperative MARL, the collaboration between the agents can only rely on some speical algorithmic designs to induce a “consensus” that can be reached by all agents.\n\nIn a consensus-based actor-critic framework, one of the key components is the MARL policy evaluation (PE) problem, where a set of N agents work cooperatively to evaluate the value function of the global states for a given joint policy. Just as the PE problem in single-agent RL, temporal difference (TD) learning [8] has been the prevailing method for MARL-PE thanks to its simplicity and effectiveness. Simply speaking, the key idea of TD learning is to learn the value function by using the Bellman equation to bootstrap from the current estimated value function.\n\nHowever, as mentioned earlier, the decentralized nature of the MARL-PE problem necessitates communication among agents for TD learning. Hence, a critical challenge in consensus-based MARL-PE is how to lower the sample and communication complexities, which are defined as the required number of training samples and rounds of communications between neighboring agents to converge to an \\epsilon -stationary point of the MARL-PE problem.\n\nTo lower communication complexity for solving MARL-PE problems, a “natural” idea is to use an “infrequent communication” approach where we perform multiple local TD-update steps between each consecutive rounds of communication to reduce the communication frequency. However, the validity of the “local TD-update” approach remains unclear due to the potential “agent-drift” phenomenon resulted from heterogeneous rewards across agents (more on this soon). This leads to two interesting open questions:\n\n- 1) Can the local TD-update approach achieve low sample and communication complexities for solving MARL-PE?\n\n- 2) If the answer to 1) is “yes,” how does the local TD-steps approach perform in comparison to other approaches?\n\nIn this paper, we make the first attempt to answer the above open questions. However, unlike conventional MARL research that adopts discounted reward, in this paper, we are particularly interested in the cooperative MARL setting with average reward [9,10,11,12,13]. The average reward setting of MARL-PE is motivated by and highly relevant for many multi-agent and network optimization problems that care about “average performances” (e.g., average throughput, average latency, and average energy consumption in multi-hop wireless networks).\n\n2) Technical Challenges: Answering Questions 1) and 2) above is highly non-trivial due to several technical challenges in the convergence analysis of the local TD-update approach. Notably, it is easy to see that the structure of TD learning in consensus-based cooperative MARL resembles that of decentralized stochastic gradient descent (DSGD) method in consensus-based decentralized optimization [14,15,16]. Thus, it is tempting to believe that one can borrow convergence analysis techniques of DSGD and apply them in TD learning. However, despite such similarities, there also exist significant differences between TD learning in MARL and DSGD.\n\n- • Structural Differences: First, we note that TD learning is not a true gradient-based method since TD error is not a gradient estimator of any static objective function which is well-defined in a consensus-based decentralized optimization problem. Also, in decentralized optimization, the gradient terms are often assumed to be bounded. However, when using approximation for value function in TD learning, TD-errors can not be assumed to be bounded without further assuming that the approximation parameters lie in some compact set.\n\n- • Markovian Noise in TD Learning: In RL/MARL problems, there exists an underlying Markovian dynamic process across time steps, where the state distribution may differ at different time steps. By contrast, in decentralized optimization, it is often safe to assume that the data at each agent are independently distributed. Thus, it is not possible to directly apply convergence analysis techniques of decentralized optimization in TD learning for MARL-PE. The coupling and dependence among samples renders the convergence analysis of TD learning in MARL far more challenging.\n\n- • “Agent-Drift” Phenomenon: Due to heterogeneity nature of the rewards across agents, executing multiple local TD-update steps would inevitably pull the value functions toward the direction of local value functions rather than the global value function, leading to the “agent-drift” phenomenon. Hence, it is unclear under such \"tug of war\" whether local TD-update steps help or hurt the convergence of TD learning in MARL-PE. Because of the agent-drift effect, the number of local TD update steps has to be chosen judiciously to mitigate the potentially large divergence of the value functions among agents between consecutive communication rounds.\n\n3) Main Results and Contribution: The main contribution of this paper is that we overcome the above challenges in analyzing the upper bounds of the sample and communication complexities for the local TD-update approach in cooperative fully decentralized MARL-PE. By doing so, we shed light on the effect of local TD-update steps in the consensus-based TD learning in MARL-PE with average reward. We summarize our main results in this paper as follows:\n\n- • Both theoretically and empirically, we show that allowing multiple local TD-update steps is indeed a valid approach that can significantly lower communication complexities of MARL-PE compared to vanilla consensus-based decentralized TD learning algorithms [17,18,11]. Specifically, we show that under the condition of achieving \\mathcal{O}(1/\\epsilon\\log^{2}(1/\\epsilon)) sample complexity (which differs from the state-of-the-art sample complexity only by a log factor), the local TD-update approach can allow up to \\mathcal{O}(1/\\epsilon^{1/2}\\log(1/\\epsilon)) local TD-update steps and the communication complexity upper bound is \\mathcal{O}(1/\\epsilon^{1/2}\\log(1/\\epsilon)). Compared to vanilla algorithms, this improves the communication complexity by a factor of \\mathcal{O}(1/\\epsilon^{1/2}).\n\n- • In comparison with another notable batching approach, we show that the local TD-update approach not only matches the communication complexity of the batching approach, but also achieves a better sample complexity than that of the batching approach [9] by a factor of \\mathcal{O}(1/\\epsilon^{1/2}) in average reward setting. Our extensive empirical results also verify the performance of the local TD-update approach and confirm our theoretical results compared to the vanilla TD learning and batching approaches with both synthetic and real-world datasets.\n\nThe rest of the paper is organized as follows. In Section 2, we review the literature to put our work in comparative perspectives. In Section 3, we present the system model and formulation of the MARL-PE problem in the average reward setting. In Section 4, we introduce the decentralized TD learning algorithm with multiple local TD-update steps for MARL-PE. In Section 5, we provide the theoretical convergence analysis for the decentralized TD learning algorithm with multiple local TD-update steps. In addition, we provide comparisons of both sample and communication complexities of the proposed local TD-update approach with other methods. Section 6 presents numerical results and Section 7 concludes this paper. Due to space limitation, some proof details and additional experiments are relegated to the supplementary material.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib27",
+      "text": "Sutton and Barto (2018) Richard S Sutton and Andrew G Barto. 2018. Reinforcement learning: An introduction . MIT press."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib35",
+      "text": "Zhang et al . (2021b) Kaiqing Zhang, Zhuoran Yang, and Tamer Başar. 2021b. Multi-agent reinforcement learning: A selective overview of theories and algorithms. Handbook of Reinforcement Learning and Control (2021), 321–384."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib4",
+      "text": "Chen et al . (2022) Xin Chen, Guannan Qu, Yujie Tang, Steven Low, and Na Li. 2022. Reinforcement learning for selective key applications in power systems: Recent advances and future challenges. IEEE Transactions on Smart Grid (2022)."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib23",
+      "text": "Riedmiller et al . (2000) Martin Riedmiller, Andrew Moore, and Jeff Schneider. 2000. Reinforcement learning for cooperating and communicating reactive agents in electrical power grids. In Workshop on Balancing Reactivity and Social Deliberation in Multi-Agent Systems . Springer, 137–149."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib34",
+      "text": "Yu et al . (2019) Chao Yu, Xin Wang, Xin Xu, Minjie Zhang, Hongwei Ge, Jiankang Ren, Liang Sun, Bingcai Chen, and Guozhen Tan. 2019. Distributed multiagent coordinated learning for autonomous driving in highways based on dynamic coordination graphs. IEEE Transactions on Intelligent Transportation Systems 21, 2 (2019), 735–748."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib24",
+      "text": "Shalev-Shwartz et al . (2016) Shai Shalev-Shwartz, Shaked Shammah, and Amnon Shashua. 2016. Safe, multi-agent, reinforcement learning for autonomous driving. arXiv preprint arXiv:1610.03295 (2016)."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib32",
+      "text": "Wei et al . (2022) Hanyu Wei, Chan Wang, Rongpeng Li, and Minjian Zhao. 2022. Mean-field MARL-based Priority-Aware CSMA/CA Strategy in Large-Scale MANETs. In GLOBECOM 2022-2022 IEEE Global Communications Conference . IEEE, 311–316."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib26",
+      "text": "Sutton (1988) Richard S Sutton. 1988. Learning to predict by the methods of temporal differences. Machine learning 3, 1 (1988), 9–44."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib8",
+      "text": "Hairi et al . (2022) FNU Hairi, Jia Liu, and Songtao Lu. 2022. Finite-Time Convergence and Sample Complexity of Multi-Agent Actor-Critic Reinforcement Learning with Average Reward. In International Conference on Learning Representations ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib21",
+      "text": "Qu et al . (2020) Guannan Qu, Yiheng Lin, Adam Wierman, and Na Li. 2020. Scalable multi-agent reinforcement learning for networked systems with average reward. Advances in Neural Information Processing Systems 33 (2020), 2074–2086."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib36",
+      "text": "Zhang et al . (2018) Kaiqing Zhang, Zhuoran Yang, Han Liu, Tong Zhang, and Tamer Basar. 2018. Fully decentralized multi-agent reinforcement learning with networked agents. In International Conference on Machine Learning . PMLR, 5872–5881."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib29",
+      "text": "Tsitsiklis and Van Roy (1999) John N Tsitsiklis and Benjamin Van Roy. 1999. Average cost temporal-difference learning. Automatica 35, 11 (1999), 1799–1808."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib30",
+      "text": "Tsitsiklis and Van Roy (2002) John N Tsitsiklis and Benjamin Van Roy. 2002. On average versus discounted reward temporal-difference learning. Machine Learning 49, 2 (2002), 179–191."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib18",
+      "text": "Nedic and Ozdaglar (2009) Angelia Nedic and Asuman Ozdaglar. 2009. Distributed subgradient methods for multi-agent optimization. IEEE Trans. Automat. Control 54, 1 (2009), 48–61."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib14",
+      "text": "Lian et al . (2017) Xiangru Lian, Ce Zhang, Huan Zhang, Cho-Jui Hsieh, Wei Zhang, and Ji Liu. 2017. Can decentralized algorithms outperform centralized algorithms? a case study for decentralized parallel stochastic gradient descent. Advances in Neural Information Processing Systems 30 (2017)."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib19",
+      "text": "Pu and Nedić (2021) Shi Pu and Angelia Nedić. 2021. Distributed stochastic gradient tracking methods. Mathematical Programming 187, 1 (2021), 409–457."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib7",
+      "text": "Doan et al . (2021) Thinh T Doan, Siva Theja Maguluri, and Justin Romberg. 2021. Finite-time performance of distributed temporal-difference learning with linear function approximation. SIAM Journal on Mathematics of Data Science 3, 1 (2021), 298–320."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib6",
+      "text": "Doan et al . (2019) Thinh Doan, Siva Maguluri, and Justin Romberg. 2019. Finite-time analysis of distributed TD (0) with linear function approximation on multi-agent reinforcement learning. In International Conference on Machine Learning . PMLR, 1626–1635."
+    }
+  ]
+}

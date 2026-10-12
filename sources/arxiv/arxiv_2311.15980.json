@@ -1,0 +1,88 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2311.15980",
+  "title": "Direct2.5: Diverse Text-to-3D Generation via Multi-view 2.5D Diffusion",
+  "authors": "Yuanxun Lu, Jingyang Zhang, Shiwei Li, Tian Fang, David McKinnon, Yanghai Tsin, Long Quan, Xun Cao, Yao Yao",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2311.15980",
+  "html_url": "https://arxiv.org/html/2311.15980",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 558,
+  "text": "Creating 3D content from generative models has become a heated research topic in the past year, which is key to a variety of downstream applications, including game and film industries, autonomous driving simulation, and virtual reality. Specifically, DreamFusion [1] was proposed to optimize a neural radiance field (NeRF) [2] using a pre-trained 2D text-to-image diffusion model and the score distillation sampling (SDS) technique, showing promising results for text-to-3D generation of arbitrary objects without any 3D data. However, the indirect 3D probability distribution modeling inevitably deteriorates the final generation quality. For example, it has been reported in DreamFusion and its follow-ups [3,4,5,6] that the overall generation success rate is low and the multi-face Janus problem exists.\n\nAnother line of work focuses on direct 3D generation by training on large-scale 3D data. For example, [7,8] apply the probabilistic diffusion model for point cloud generation and [9,10] model the denoise diffusion process on signed distance field (SDF). These methods usually apply a specific 3D representation and train the denoise diffusion on such representation using a specific 3D dataset, e.g., ShapeNet [11], and show high-quality generation results on objects similar to the training set. However, the scale of the current 3D dataset is still too small when compared with the text-image data [12]. Even with the largest 3D dataset [13] available, it is still challenging to train a 3D diffusion model for diverse text-to-3D generation.\n\nIn this work, we instead extend existing text-to-2D models to a denoising diffusion process on multi-view 2.5D depth/normal data. Compared with full 3D representations such as 3D point clouds or meshes, 1) 2.5D information such as depth or normal are much easier to capture or collect (e.g., depth provided by active sensors); 2) the depth and normal maps perfectly align with the image data, making it possible to adapt and fine-tune a 2.5D model from a pre-trained 2D RGB model. In order to construct full 3D models, 2.5D maps viewed from multiple perspectives are necessary. Therefore, the target diffusion model should be capable of generating multi-view images with content consistency. In practice, we fine-tune existing text-to-image diffusion models on multi-view 2.5D renderings from the Objaverse dataset [13]. On the one hand, the models are adapted to 2.5D information. On the other hand, joint multi-view distribution is captured with the help of structural modification of injecting multi-view information to the self-attention layers. During inference, multi-view images are generated synchronously by common schedulers like DDIM [14], which are then fused directly into a mesh by differentiable rasterization. The whole generation process completes in seconds, which is significantly faster than SDS-based methods that typically take 30 minutes. The system is extensively evaluated with complex text prompts and compared with both SDS-based and direct 3D generation methods, demonstrating the capability of generating 3D textured meshes with complex geometry, diversity, and high fidelity.\n\nTo summarize, major contributions of the paper include:\n\n- • We propose to approach the 3D generation task by training a multi-view 2.5D diffusion model, which explicitly models the 3D geometry distribution while inheriting a strong generalization ability of the large-scale pre-trained 2D image diffusion.\n\n- • We introduce an efficient differentiable rasterization scheme to optimize a textured mesh directly from the multi-view normal maps and RGB images.\n\n- • We carefully design a generation pipeline that achieves diverse, mode-seeking-free, and high-fidelity 3D content generation in only 10 seconds.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib28",
+      "text": "Ben Poole, Ajay Jain, Jonathan T Barron, and Ben Mildenhall. Dreamfusion: Text-to-3d using 2d diffusion. arXiv preprint arXiv:2209.14988 , 2022."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib24",
+      "text": "Ben Mildenhall, Pratul P Srinivasan, Matthew Tancik, Jonathan T Barron, Ravi Ramamoorthi, and Ren Ng. Nerf: Representing scenes as neural radiance fields for view synthesis. Communications of the ACM , 65(1):99–106, 2021."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib39",
+      "text": "Haochen Wang, Xiaodan Du, Jiahao Li, Raymond A Yeh, and Greg Shakhnarovich. Score jacobian chaining: Lifting pretrained 2d diffusion models for 3d generation. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 12619–12629, 2023a."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib15",
+      "text": "Chen-Hsuan Lin, Jun Gao, Luming Tang, Towaki Takikawa, Xiaohui Zeng, Xun Huang, Karsten Kreis, Sanja Fidler, Ming-Yu Liu, and Tsung-Yi Lin. Magic3d: High-resolution text-to-3d content creation. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 300–309, 2023."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib6",
+      "text": "Rui Chen, Yongwei Chen, Ningxin Jiao, and Kui Jia. Fantasia3d: Disentangling geometry and appearance for high-quality text-to-3d content creation. arXiv preprint arXiv:2303.13873 , 2023c."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib43",
+      "text": "Zhengyi Wang, Cheng Lu, Yikai Wang, Fan Bao, Chongxuan Li, Hang Su, and Jun Zhu. Prolificdreamer: High-fidelity and diverse text-to-3d generation with variational score distillation. arXiv preprint arXiv:2305.16213 , 2023b."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib22",
+      "text": "Shitong Luo and Wei Hu. Diffusion probabilistic models for 3d point cloud generation. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 2837–2845, 2021."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib26",
+      "text": "Alex Nichol, Heewoo Jun, Prafulla Dhariwal, Pamela Mishkin, and Mark Chen. Point-e: A system for generating 3d point clouds from complex prompts. arXiv preprint arXiv:2212.08751 , 2022."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib34",
+      "text": "Jaehyeok Shim, Changwoo Kang, and Kyungdon Joo. Diffusion-based signed distance fields for 3d shape generation. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 20887–20897, 2023."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib12",
+      "text": "Heewoo Jun and Alex Nichol. Shap-e: Generating conditional 3d implicit functions. arXiv preprint arXiv:2305.02463 , 2023."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib3",
+      "text": "Angel X Chang, Thomas Funkhouser, Leonidas Guibas, Pat Hanrahan, Qixing Huang, Zimo Li, Silvio Savarese, Manolis Savva, Shuran Song, Hao Su, et al. Shapenet: An information-rich 3d model repository. arXiv preprint arXiv:1512.03012 , 2015."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib32",
+      "text": "Christoph Schuhmann, Romain Beaumont, Richard Vencu, Cade Gordon, Ross Wightman, Mehdi Cherti, Theo Coombes, Aarush Katta, Clayton Mullis, Mitchell Wortsman, et al. Laion-5b: An open large-scale dataset for training next generation image-text models. Advances in Neural Information Processing Systems , 35:25278–25294, 2022."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib7",
+      "text": "Matt Deitke, Dustin Schwenk, Jordi Salvador, Luca Weihs, Oscar Michel, Eli VanderBilt, Ludwig Schmidt, Kiana Ehsani, Aniruddha Kembhavi, and Ali Farhadi. Objaverse: A universe of annotated 3d objects. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 13142–13153, 2023."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib35",
+      "text": "Jiaming Song, Chenlin Meng, and Stefano Ermon. Denoising diffusion implicit models. arXiv preprint arXiv:2010.02502 , 2020."
+    }
+  ]
+}

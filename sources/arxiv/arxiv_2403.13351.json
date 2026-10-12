@@ -1,0 +1,63 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.13351",
+  "title": "OrthCaps: An Orthogonal CapsNet with Sparse Attention Routing and Pruning",
+  "authors": "Xinyu Geng, Jiaming Wang, Jiawei Gong, Yuerong Xue, Jun Xu, Fanglin Chen, Xiaolin Huang",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2403.13351",
+  "html_url": "https://arxiv.org/html/2403.13351",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 695,
+  "text": "While convolutional Neural Networks (CNNs) excel in computer vision tasks, certain challenges remain, which include information loss in pooling layers, low robustness, and poor spatial feature correlation [1,2]. To address these limitations, Capsule Network (CapsNet) was proposed, using capsule vectors instead of traditional neurons. In CapsNet, each capsule vector’s length represents the presence probability of specific entities in the input image, and its direction encodes the captured features [1]. This setup allows the capsule vectors to capture features related to corresponding entities. CapsNet’s architecture includes a primary capsule extraction layer, a digit capsule layer, dynamic routing, and class-conditioned reconstruction. As a key component of CapsNet, dynamic routing aligns lower-level capsules with higher-level ones, which is described in Fig. 1. First, lower-level capsules U_{l} (in matrix form) predict poses \\hat{U}_{l} for higher-level capsules V_{l+1} via weight matrix W. Then, the routing process iteratively clusters to adjust the coupling coefficients c_{ij} of each lower-level capsule u_{l,i} to all higher-level capsules, with more crucial capsules receiving larger c_{ij}. The algorithm is in Sec. 9.\n\nRecent studies have mentioned that Capsnet contains redundant capsules [3,4,5]. As evidence, Fig. 2 shows 48.2% of primary capsule pairs exhibit cosine similarities above 0.65, indicating significant redundancy.\n\nAlthough certain studies have implemented pruning techniques at the primary capsule layer [6], deeper layers still show considerable over-similar issues, as demonstrated in Fig. 6. We attribute this persistent redundancy in deeper layers to dynamic routing. On the one hand, since v_{l+1,j}=g(\\sum_{i}c_{ij}\\hat{u}_{l,i}), each higher-level capsule is essentially a weighted sum of lower-level capsules, indicating a fully connected structure between lower and higher layers in CapsNet [7]. This full connection leads to a potential transmission of redundant information. On the other hand, considering \\hat{U}_{l}=WU_{l}, we can express higher-level capsules as V_{l+1}=g[(C*W)U_{l}]. Non-orthogonal matrices C*W in routing may increase the reduced capsule similarity after pruning, which not only impairs routing performance but also reintroduces redundancies in subsequent layers. Additionally, dynamic routing requires multiple iterations to repeatedly update c_{ij} until convergence, further straining computational resources.\n\nInspired by the successful use of orthogonality in CNNs [8] and Transformer [9] to reduce filter overlaps, we introduce the Orthogonal Capsule Network(OrthCaps). OrthCaps has two versions: the lightweight OrthCaps-Shallow (OrthCaps-S) and the OrthCaps-Deep (OrthCaps-D). OrthCaps addresses the above problems of the fully connected structure of dynamic routing, increasing similarity in deep layers, and the need for iteration, detailed as follows:\n\nFirstly, we introduce a pruned capsule layer after the primary capsule layer, which eliminates redundant capsules and retains only essential and representative ones. Here, capsules are firstly ordered by importance, then their cosine similarity is calculated to identify redundant capsules. Beginning with the least important, the process consistently prunes capsules that exceed the similarity threshold, proceeding through the entire set of capsules.\n\nSecondly, to solve the iteration issue, dynamic routing is replaced with attention routing, which is a straightforward routing mechanism. To solve the fully connected problem, we leverage sparsemax-based attention to produce an attention map, which selectively amplifies relevant feature groups corresponding to specific entities while downplaying irrelevant ones. For OrthCaps-S, a simplified attention-routing is adopted, optimizing parameter counts.\n\nThirdly, to address the issue of increased capsule similarity in deeper layers, we introduce orthogonality into capsule networks. By applying Householder orthogonal decomposition, we enforce orthogonality in the weight matrices during attention routing. Orthogonal weight matrices sustain low inter-capsule correlation, which encourages fewer capsules to represent more features during backpropagation, thereby enhancing accuracy while effectively reducing the number of parameters.\n\nContributions. To summarize our work, we make the following contributions:\n\n1) To our knowledge, this approach addresses the issue of deep redundancy in Capsule Networks for the first time. A novel pruned strategy is implemented to alleviate capsule redundancy and an orthogonal sparse attention routing mechanism is proposed to replace dynamic routing.\n\n2) It is the first time orthogonality has been introduced into Capsule Networks as far as we know. This simple, penalty-free orthogonalization method is also adaptable to other neural networks.\n\n3) Two OrthCaps versions are created: OrthCaps-S and OrthCaps-D. OrthCaps-S sets a new benchmark in accuracy with just 1.25% of CapsNet’s parameters on datasets of MNIST, SVHN, smallNORB, and CIFAR10. OrthCaps-D excels on CIFAR10, CIFAR100 and FashionMNIST while keeping parameters minimal.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib28",
+      "text": "Sara Sabour, Nicholas Frosst, and Geoffrey E Hinton. Dynamic routing between capsules. In Advances in Neural Information Processing Systems , page 3856–3866, 2017."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib7",
+      "text": "Geoffrey E Hinton, Sara Sabour, and Nicholas Frosst. Matrix capsules with EM routing. In International Conference on Learning Representations , 2018."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib1",
+      "text": "Hao Chen, Xian-bo Wang, and Zhi-Xin Yang. Fast robust capsule network with dynamic pruning and multiscale mutual information maximization for compound-fault diagnosis. IEEE/ASME Transactions on Mechatronics , 2022."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib29",
+      "text": "Ramin Sharifi, Pouya Shiri, and Amirali Baniasadi. Prunedcaps: A case for primary capsules discrimination. In 2021 20th IEEE International Conference on Machine Learning and Applications (ICMLA) , pages 1437–1442. IEEE, 2021."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib26",
+      "text": "Riccardo Renzulli and Marco Grangetto. Towards efficient capsule networks. In 2022 IEEE International Conference on Image Processing (ICIP) , pages 2801–2805. IEEE, 2022."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib27",
+      "text": "Riccardo Renzulli, Enzo Tartaglione, and Marco Grangetto. Rem: Routing entropy minimization for capsule networks. arXiv preprint arXiv:2204.01298 , 2022."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib13",
+      "text": "Taewon Jeong, Youngmin Lee, and Heeyoung Kim. Ladder capsule network. In Proceedings of the 36th International Conference on Machine Learning , pages 3071–3079. PMLR, 2019."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib36",
+      "text": "Jiayun Wang, Yubei Chen, Rudrasis Chakraborty, and Stella X. Yu. Orthogonal convolutional neural networks. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 11505–11515, 2020."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "Huaibo Huang, Xiaoqiang Zhou, and Ran He. Orthogonal transformer: An efficient vision transformer backbone with token orthogonalization. Advances in Neural Information Processing Systems , 35:14596–14607, 2022."
+    }
+  ]
+}

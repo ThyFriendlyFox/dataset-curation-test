@@ -1,0 +1,89 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.13644",
+  "title": "How to Relax Instantly: Elastic Relaxation of Concurrent Data Structures",
+  "authors": "KÃ¥re von Geijer, Philippas Tsigas",
+  "year": "2024",
+  "categories": [
+    "cs.DS",
+    "cs.DC"
+  ],
+  "url": "https://arxiv.org/abs/2403.13644",
+  "html_url": "https://arxiv.org/html/2403.13644",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 883,
+  "text": "As hardware parallelism advances with the development of multicore and multiprocessor systems, developers face the challenge of designing data structures that efficiently utilize these resources. Numerous concurrent data structures exist [1], but theoretical results such as [2] demonstrate that many common data structures, such as queues, have inherent scalability limitations as threads must contend for a few access points. One of the most promising solutions to tackle this scalability issue is to relax the sequential specification of data structures [3], which permits designs that increase the number of memory access points, at the expense of weakened sequential semantics.\n\nThe k out-of-order relaxation formalized in [4] is a popular model [5,6,7,8] that allows relaxed operations to deviate from the sequential order by up to k; for example, for the dequeue operation on a FIFO queue, any of the first k+1 items can be returned instead of just the head. This error, the distance from the head for a dequeue, is called the rank error. The advantage of relaxation is that multiple items can be inserted and removed at once, reducing contention at a few select access points. Furthermore, while other relaxations, such as quiescent consistency [9] are incompatible with linearizability [10], k-out-of-order relaxation can easily be combined with linearizability, as it modifies the semantics of the data structure instead of the consistency. Despite extensive work on out-of-order relaxation [6,4,5,11,12,13,8], almost all existing methods are static, requiring a fixed relaxation degree during the data structures’ lifetime.\n\nIn applications with dynamic workloads, such as bursts of activity with throughput constraints, it is essential to be able to temporarily sacrifice sequential semantics for improved performance in times of high contention. This is the problem tackled in this paper, to specify and design relaxed data structures where the relaxation is reconfigurable during run-time, which we term elastic relaxation. Elastically relaxed data structures enable the design of instance-optimizing systems, an area that is evolving extremely rapidly across various communities [14]. The trade-off between rank error and throughput is highlighted in [12] and [13], where their shortest-path benchmarks show that increased relaxation leads to higher throughput, but at the expense of additional required computation.\n\nSeveral relaxed data structures are implemented by splitting the original concurrent data structure into disjoint sub-structures, and then using load-balancing algorithms to direct different operations to different sub-structures. In this paper, we base our elastic designs on the relaxed 2D framework presented in [5], which has excellent scaling with both threads and relaxation, as well as provable rank error bounds. The key idea of the 2D framework is to superimpose a window (Win) over the sub-structures, as seen in green in Figure 2 for the 2D queue, where operations inside the window can linearize out of order. The Win {}^{\\textit{tail}} shifts upward by 0ptwhen it is full, and Win {}^{\\textit{head}} shifts upward when emptied, to allow further operations. The size of the window dictates the rank error, as a larger one allows for more reorderings.\n\nThe algorithmic design concept we propose in this paper is the Lateral structure that can extend the 2D structures to encompass elastic relaxation. The Lateral is added as a side structure next to the set of sub-structures in order to keep track of the elastic changes, as shown in Figure 2. We show how to incorporate the Lateral into the window mechanism that the 2D framework introduced while achieving a deterministic rank error bound. Although we chose to use the 2D framework as a base for our designs, the Lateral can also accommodate other designs, such as the distributed queues from [6], the k-queue from [7], and the k-stack from [4].\n\n## Contributions.\n\nThis work takes crucial steps toward designing reconfigurable relaxed concurrent data structures with deterministic error bounds, capable of adjusting relaxation levels during run-time.\n\n- • Firstly, we introduce the concept of elastic relaxation, where the rank error bound can change over time. In addition, we introduce a generic algorithmic extension, the Lateral, to efficiently extend many relaxed data structure designs to support elasticity.\n\n- • We design and implement two elastically relaxed queues and a stack based on the Lateral, as well as outline how to incorporate it into other data structures such as counters and deques.\n\n- • We establish rank error bounds for our elastic designs, as well as prove their correctness.\n\n- • We present an extensive evaluation of our proposed data structures, benchmarking against non-relaxed data structures and statically relaxed ones. These evaluations show that the elastic designs significantly outscale non-relaxed data structures and perform as well as the statically relaxed ones, while also supporting elastic relaxation.\n\n- • Finally, we showcase the elastic capabilities of our design by implementing a simple controller for a producer consumer application. By dynamically adjusting the relaxation, it is able to control the producer latency during bursts of activity with minimal overhead.\n\n## Structure.\n\nSection 2 introduces related work, as well as gives a short description of the structures on which we base our elastic designs. Section 3 introduces elastic relaxation and our novel data structures, which we then prove correct and provide worst-case bounds for in Section 4. Section 5 experimentally evaluates the new algorithms, both comparing them to earlier non-elastic data structures as well as testing their elastic capabilities. Section 6 contains a few closing remarks.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib12",
+      "text": "Herlihy, M., Shavit, N., Luchangco, V., Spear, M.: The Art of Multiprocessor Programming. Elsevier Science (2020)"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib6",
+      "text": "Ellen, F., Hendler, D., Shavit, N.: On the inherent sequentiality of concurrent objects. SIAM Journal on Computing 41 (3), 519–536 (2012). https://doi.org/10.1137/08072646X"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib26",
+      "text": "Shavit, N.: Data structures in the multicore age. Commun. ACM 54 (3), 76–84 (mar 2011). https://doi.org/10.1145/1897852.1897873"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib11",
+      "text": "Henzinger, T.A., Kirsch, C.M., Payer, H., Sezgin, A., Sokolova, A.: Quantitative relaxation of concurrent data structures. SIGPLAN Not. 48 (1), 317–328 (jan 2013). https://doi.org/10.1145/2480359.2429109"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib25",
+      "text": "Rukundo, A., Atalar, A., Tsigas, P.: Monotonically Relaxing Concurrent Data-Structure Semantics for Increasing Performance: An Efficient 2D Design Framework. In: 33rd International Symposium on Distributed Computing (DISC 2019). Leibniz International Proceedings in Informatics (LIPIcs), vol. 146, pp. 31:1–31:15. Schloss Dagstuhl–Leibniz-Zentrum fuer Informatik, Dagstuhl, Germany (2019). https://doi.org/10.4230/LIPIcs.DISC.2019.31"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib8",
+      "text": "Haas, A., Lippautz, M., Henzinger, T.A., Payer, H., Sokolova, A., Kirsch, C.M., Sezgin, A.: Distributed queues in shared memory: Multicore performance and scalability through quantitative relaxation. In: Proceedings of the ACM International Conference on Computing Frontiers. CF ’13, Association for Computing Machinery, New York, NY, USA (2013). https://doi.org/10.1145/2482767.2482789"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib16",
+      "text": "Kirsch, C.M., Payer, H., Röck, H., Sokolova, A.: Performance, Scalability, and Semantics of Concurrent FIFO Queues. In: Algorithms and Architectures for Parallel Processing, vol. 7439, pp. 273–287. Springer Berlin Heidelberg, Berlin, Heidelberg (2012). https://doi.org/10.1007/978-3-642-33078-0_20"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib29",
+      "text": "Wimmer, M., Gruber, J., Träff, J.L., Tsigas, P.: The lock-free k-lsm relaxed priority queue. In: Proceedings of the 20th ACM SIGPLAN Symposium on Principles and Practice of Parallel Programming. p. 277–278. PPoPP 2015, Association for Computing Machinery, New York, NY, USA (2015). https://doi.org/10.1145/2688500.2688547"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib5",
+      "text": "Derrick, J., Dongol, B., Schellhorn, G., Tofan, B., Travkin, O., Wehrheim, H.: Quiescent consistency: Defining and verifying relaxed linearizability. In: Jones, C., Pihlajasaari, P., Sun, J. (eds.) FM 2014: Formal Methods. pp. 200–214. Springer International Publishing, Cham (2014)"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib13",
+      "text": "Herlihy, M.P., Wing, J.M.: Linearizability: a correctness condition for concurrent objects. ACM Transactions on Programming Languages and Systems (TOPLAS) 12 (3), 463–492 (1990). https://doi.org/10.1145/78969.78972"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib14",
+      "text": "Kappes, G., Anastasiadis, S.V.: A family of relaxed concurrent queues for low-latency operations and item transfers. ACM Trans. Parallel Comput. 9 (4) (dec 2022). https://doi.org/10.1145/3565514"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib28",
+      "text": "Williams, M., Sanders, P., Dementiev, R.: Engineering MultiQueues: Fast Relaxed Concurrent Priority Queues. In: 29th Annual European Symposium on Algorithms (ESA 2021). Leibniz International Proceedings in Informatics (LIPIcs), vol. 204, pp. 81:1–81:17. Schloss Dagstuhl – Leibniz-Zentrum für Informatik, Dagstuhl, Germany (2021). https://doi.org/10.4230/LIPIcs.ESA.2021.81"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib23",
+      "text": "Postnikova, A., Koval, N., Nadiradze, G., Alistarh, D.: Multi-queues can be state-of-the-art priority schedulers. In: Proceedings of the 27th ACM SIGPLAN Symposium on Principles and Practice of Parallel Programming. p. 353–367. PPoPP ’22, Association for Computing Machinery, New York, NY, USA (2022). https://doi.org/10.1145/3503221.3508432"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib17",
+      "text": "Kraska, T.: Towards instance-optimized data systems, keynote. 2021 International Conference on Very Large Data Bases (2021)"
+    }
+  ]
+}

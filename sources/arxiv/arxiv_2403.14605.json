@@ -1,0 +1,85 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.14605",
+  "title": "SDP Synthesis of Maximum Coverage Trees for Probabilistic Planning under Control Constraints",
+  "authors": "Naman Aggarwal, Jonathan P. How",
+  "year": "2024",
+  "categories": [
+    "cs.RO",
+    "cs.SY",
+    "eess.SY"
+  ],
+  "url": "https://arxiv.org/abs/2403.14605",
+  "html_url": "https://arxiv.org/html/2403.14605",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 992,
+  "text": "Multi-query motion planning entails the design of plans that can be reused across different initial configurations of the system. This is typically done via the offline construction of a roadmap of feasible trajectories in the state space, such that in real-time, for a pair of initial and goal configurations of the system, planning proceeds by connecting the initial and goal configurations to the roadmap followed by graph search to find a path [1,2]. The pre-computation of a roadmap is beneficial since it avoids the computational burden of finding plans from scratch for new configurations, and reuses search effort across queries. Such an approach of constructing a roadmap of feasible trajectories facilitates robust planning since a plan to meet the mission requirements could be computed quickly if the system finds itself in unexpected configurations due to unmodeled dynamics or disturbances during online operation. An important design consideration for any roadmap based planning algorithm is the coverage of the roadmap – it is desirable to be able to re-use search effort across as many queries as possible, therefore, reasoning explicitly about the coverage of the roadmap becomes an important algorithmic design consideration.\n\nThere is extensive work on motion planning via the construction of reusable roadmaps for deterministic systems [3,4,5,6]. The work proposed in [3], for instance, builds a tree of funnels, which are regions of finite-time invariance around trajectories with associated feedback controllers, backwards from the goal in a space-filling manner. Paths to the goal could be found from different regions of the state space by traversing the branches of the constructed tree. Ref. [5] takes a different approach by populating a library with a finite set of feasible trajectories with associated funnels, such that the online planning proceeds through the sequential composition of the available funnels in the library.\n\nIn this paper, we are concerned with planning for systems with stochastic dynamics. A stochastic framework helps by making informed plans considering the probability of constraint violation and leads to a lesser conservative approach as compared to a deterministic framework considering worst-case uncertainty in the dynamics or enforcing hard constraints. CC-RRT [7] is a popular framework for single-query motion planning in stochastic systems. The algorithm proceeds by growing a forwards search tree of distributions over the state space, such that the obstacle avoidance constraints are satisfied probabilistically along each edge. The tree expansion phase involves randomly sampling open-loop control signals and simulating the system dynamics forward until the chance constraints on obstacle avoidance are satisfied, and adding the forward simulated state distribution to the tree as a node with the associated open-loop control sequence as the edge. A major limitation of constructing a search tree via sampling open-loop control signals is that the the second order moment of the state distributions (covariance) cannot be controlled via open-loop control even for the simplest case of linear-Gaussian systems. CC-RRT comes with a probabilistic completeness guarantee such that the algorithm finds paths to all goal distributions for which open-loop paths would exist [8]. However, the set of all possible distributions that could be reached with open-loop control is a subset of the set of all distributions that could be reached with a richer control scheme such as feedback control. Particularly, for a mission with tight goal reaching constraints (a specific size of the goal covariance as required by the mission), CC-RRT might fail to find a path even though a closed-loop path might exist.\n\nWhile CC-RRT is a single-query planner, there exist other roadmap based methods for planning in stochastic domains. FIRM [9] is a planning framework that builds a roadmap in the belief space by sampling stationary belief nodes and drawing belief stabilizing controllers as edges between the nodes. The closest in approach to our work, however, is the recently proposed CS-BRM [10] that provides a faster planning scheme as compared to FIRM by allowing sampling of non-stationary belief nodes and adding finite-time feedback controllers as edges. CS-BRM is built on top of a series of latest work on covariance steering that allows finite-time satisfaction of terminal covariance constraints [11,12,13]. CS-BRM, however, does not assume control input constraints, and adds edges between randomly sampled belief nodes. In the absence of control constraints, the distribution steering problem decouples into the mean steering and covariance steering problem: both of which are tractable to solve [13]. In the presence of control input constraints however, the reachability of belief nodes needs to be explicitly established. Even for the simplest case of a controllable linear-Gaussian system, it is no longer possible to drive arbitrary distributions to arbitrary distributions, and the existence of a steering maneuver for a pair of belief nodes must be determined by checking the feasibility of a nonconvex program. Therefore, CS-BRM is not efficient for settings with constraints on the control input due to unnecessary sampling of belief nodes that would not be added to the roadmap due to the non-existence of a steering control.\n\nMoreover, even for successful insertion of belief nodes, there is no explicit consideration of coverage while selecting nodes during the roadmap construction procedure, neither a post-analysis on the coverage characteristics of the roadmap generated by CS-BRM. We provide a systematic procedure that reasons about the coverage of the to-be-generated roadmap while adding nodes through a novel optimization formulation. The contributions of the paper are as follows:\n\n- • We characterize the notion of coverage of a roadmap in the stochastic domain formally via what we call h- \\operatorname{BRS} (Backward Reachable Set of Distributions) of the tree, which is the set of all distributions that can reach the goal in h-hops where 1 hop is a finite-time horizon of N-steps under control constraints.\n\n- • We propose a novel method of edge construction such that the BRT constructed following our method finds paths from provably the largest set of initial distributions for the overall planning problem, i.e. provides maximal coverage.\n\n- • We supplement our approach with extensive simulations on a 6 DoF model.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib2",
+      "text": "L. E. Kavraki, P. Svestka, J.-C. Latombe, and M. H. Overmars, “Probabilistic roadmaps for path planning in high-dimensional configuration spaces,” IEEE transactions on Robotics and Automation , vol. 12, no. 4, pp. 566–580, 1996."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib3",
+      "text": "V. N. Hartmann, M. P. Strub, M. Toussaint, and J. D. Gammell, “Effort informed roadmaps (eirm*): Efficient asymptotically optimal multiquery planning by actively reusing validation effort,” in The International Symposium of Robotics Research , pp. 555–571, Springer, 2022."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib4",
+      "text": "R. Tedrake, I. R. Manchester, M. Tobenkin, and J. W. Roberts, “Lqr-trees: Feedback motion planning via sums-of-squares verification,” The International Journal of Robotics Research , vol. 29, no. 8, pp. 1038–1052, 2010."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib5",
+      "text": "A. Majumdar, M. Tobenkin, and R. Tedrake, “Multi-query feedback motion planning with lqr-roadmaps,” 2011."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib6",
+      "text": "A. Majumdar and R. Tedrake, “Funnel libraries for real-time robust feedback motion planning,” The International Journal of Robotics Research , vol. 36, no. 8, pp. 947–982, 2017."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib7",
+      "text": "M. K. M Jaffar and M. Otte, “Pip-x: Online feedback motion planning/replanning in dynamic environments using invariant funnels,” The International Journal of Robotics Research , p. 02783649231209340, 2023."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib8",
+      "text": "B. Luders, M. Kothari, and J. How, “Chance constrained rrt for probabilistic robustness to environmental uncertainty,” in AIAA guidance, navigation, and control conference , p. 8160, 2010."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib9",
+      "text": "B. D. Luders, Robust sampling-based motion planning for autonomous vehicles in uncertain environments . PhD thesis, Massachusetts Institute of Technology, 2014."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib10",
+      "text": "A.-A. Agha-Mohammadi, S. Chakravorty, and N. M. Amato, “Firm: Sampling-based feedback motion-planning under motion uncertainty and imperfect measurements,” The International Journal of Robotics Research , vol. 33, no. 2, pp. 268–304, 2014."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib11",
+      "text": "D. Zheng, J. Ridderhof, Z. Zhang, P. Tsiotras, and A.-A. Agha-mohammadi, “Cs-brm: A probabilistic roadmap for consistent belief space planning with reachability guarantees,” IEEE Transactions on Robotics , 2024."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib12",
+      "text": "K. Okamoto, M. Goldshtein, and P. Tsiotras, “Optimal covariance control for stochastic systems under chance constraints,” IEEE Control Systems Letters , vol. 2, no. 2, pp. 266–271, 2018."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib13",
+      "text": "F. Liu, G. Rapakoulias, and P. Tsiotras, “Optimal covariance steering for discrete-time linear stochastic systems,” arXiv preprint arXiv:2211.00618 , 2022."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib14",
+      "text": "G. Rapakoulias and P. Tsiotras, “Discrete-time optimal covariance steering via semidefinite programming,” arXiv e-prints , pp. arXiv–2302, 2023."
+    }
+  ]
+}

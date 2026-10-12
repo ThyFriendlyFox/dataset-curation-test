@@ -1,0 +1,103 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.02041",
+  "title": "A Generative Approach for Wikipedia-Scale Visual Entity Recognition",
+  "authors": "Mathilde Caron, Ahmet Iscen, Alireza Fathi, Cordelia Schmid",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2403.02041",
+  "html_url": "https://arxiv.org/html/2403.02041",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 873,
+  "text": "Generative vision-language models such as GPT-4 [1], Flamingo [2] or PALI [3], are becoming increasingly popular for computer vision applications. They show an impressive ability to generate free-form text for describing the contents of an image (captioning), or answering questions based on an image (visual-question answering). Nevertheless, their potential for recognition tasks [4], which usually require a more concise, structured output, remains under-explored. The focus of this paper is to explore their application for the challenging task of web-scale entity recognition. A recent benchmark, Open-domain Visual Entity recognitioN (OVEN) [4], challenges models to associate an image with a Wikipedia entity from a pool of over six million entities. Models must establish a robust association between images across millions of coarse-grained and fine-grained entities, encompassing a wide spectrum of concepts such as animals, buildings, locations, and a multitude of others [4].\n\nTraditionally, the predominant methods employed to address the challenge of visual entity recognition have revolved around either classification or contrastive dual-encoder paradigm like CLIP [5]. While classification offers a straightforward approach, it grapples with limitations when confronted with extensive label spaces such as that of OVEN, resulting in substantial parameter counts and practical engineering complexities. The dual-encoder approach on the other hand, learns a unified image-text feature space, thereby facilitating efficient nearest neighbor searches for recognition. Nonetheless, this approach exhibits its own drawbacks: (a) it does not directly optimize for the final recognition task but instead relies on indirect optimization through contrastive loss where a set of negative data has to be subsampled at training time [6,7,5], (b) compressing either the image or text into an embedding vector results in loss of information, detrimentally affecting performance for fine-grained recognition [8] and (c) the memory requirements for storing dense representations scale proportionally with the size of the entity set.\n\nThese challenges of the dual-encoder paradigm have kindled interest in alternative strategies. Notably, in Natural Language Processing (NLP) domain, recent works challenge the dual-encoder approach and use generative models instead for information retrieval [9,10,11,12,13,14]. These works represent each element of the corpus by a compact code of integers, and learn an auto-regressive generative model to decode the target code for a given query. This paradigm promises to overcome some drawbacks of dual-encoders by simplifying the retrieval pipeline such that the training and inference objectives are the same, and directly encoding the corpus within the model’s parameters. Also as an alternative to dual encoders, OVEN paper [4] showcases the feasibility of extending a generative image captioning model [3] for visual entity recognition by matching the generated caption to one of the Wikipedia entity texts [15].\n\nInspired by these recent explorations, we propose a G enerative E ntity R ecognition (ger) framework (illustrated in Fig. 1) to facilitate end-to-end visual entity recognition by leveraging generative auto-regressive models. Specifically, we represent each Wikipedia entity with a code, i.e. a short sequence of integers. Then, we train models to predict an entity from an input image by auto-regressively generating the code corresponding to the target entity. We find that creating un A mbiguous, L anguage-based and D iscriminative (ald) entity codes results in the best variant of our ger framework, which we denote by ger-ald. In fact, while we observe that unstructured “atomic” codes work well in some scenarios, they fail when training data or model capacity are limited or more importantly, when the entity set reaches the million scale (see Sec. 4.4.1). Plus, they cannot generalize to new entities. In contrast, we find that semantically-structured codes based on language improve upon atomic codes by leveraging generic concepts shared across related entities (see example in Fig. 1 with “Black colobus” and “Black-and-white colobus” sharing common code tokens). A simple way of creating codes based on language is to directly tokenize [16] the entity name, which is akin to image captioning where the entity name is used as a caption [4,12]. However, we find that such tokenized entity names contain clutter and noisy information, all the more so when the entity name is long (see Sec. 4.4.2). Our ger-ald method improves over this simple captioning baseline by decoding only the most discriminative part of the tokenized entity name, i.e. the part which makes the considered entity name the most different compared to all other entities.\n\nFinally, we also propose an entity-based pre-training to condition the ger models to web-scale entity recognition. Inspired by recent advances in retrieval-based methods [8,17], we retrieve a subset of images from a large-scale image-text dataset typically used for captioning or contrastive pre-training [3] and re-purpose it by replacing the original text captions with related OVEN entity names. Overall, our experiments demonstrate the efficacy of the proposed ger paradigm: ger-ald outperforms previously published numbers on OVEN benchmark [4] by +6.7 top-1 accuracy, while using 42\\times less parameters. In summary, our contributions are as follows:\n\n- • a g enerative e ntity r ecognition framework (ger) to facilitate end-to-end visual entity recognition;\n\n- • an innovative strategy for encoding Wikipedia entities into un a mbiguous l anguage-based d iscriminative (ald) codes that are highly effective for ger;\n\n- • an entity-based pre-training process without requiring human intervention;\n\n- • state-of-the-art results in challenging web-scale OVEN entity recognition and on-par performance to traditional classifiers in smaller-scale label-space scenarios.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib30",
+      "text": "OpenAI. GPT-4 technical report. arXiv preprint arXiv:2303.08774 , 2023."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "Jean-Baptiste Alayrac, Jeff Donahue, Pauline Luc, Antoine Miech, Iain Barr, Yana Hasson, Karel Lenc, Arthur Mensch, Katherine Millican, Malcolm Reynolds, et al. Flamingo: a visual language model for few-shot learning. Advances in Neural Information Processing Systems , 35:23716–23736, 2022."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib5",
+      "text": "Xi Chen, Xiao Wang, Soravit Changpinyo, AJ Piergiovanni, Piotr Padlewski, Daniel Salz, Sebastian Goodman, Adam Grycner, Basil Mustafa, Lucas Beyer, et al. Pali: A jointly-scaled multilingual language-image model. ICLR , 2023."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib12",
+      "text": "Hexiang Hu, Yi Luan, Yang Chen, Urvashi Khandelwal, Mandar Joshi, Kenton Lee, Kristina Toutanova, and Ming-Wei Chang. Open-domain visual entity recognition: Towards recognizing millions of wikipedia entities. ICCV , 2023."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib32",
+      "text": "Alec Radford, Jong Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry, Amanda Askell, Pamela Mishkin, Jack Clark, et al. Learning transferable visual models from natural language supervision. In ICML , 2021."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib11",
+      "text": "Michael Gutmann and Aapo Hyvärinen. Noise-contrastive estimation: A new estimation principle for unnormalized statistical models. In Proceedings of the thirteenth international conference on artificial intelligence and statistics . JMLR Workshop and Conference Proceedings, 2010."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib29",
+      "text": "Aaron van den Oord, Yazhe Li, and Oriol Vinyals. Representation learning with contrastive predictive coding. arXiv preprint arXiv:1807.03748 , 2018."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib15",
+      "text": "Ahmet Iscen, Mathilde Caron, Alireza Fathi, and Cordelia Schmid. Retrieval-enhanced contrastive vision-text models. ICLR , 2024."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib42",
+      "text": "Yi Tay, Vinh Tran, Mostafa Dehghani, Jianmo Ni, Dara Bahri, Harsh Mehta, Zhen Qin, Kai Hui, Zhe Zhao, Jai Gupta, et al. Transformer memory as a differentiable search index. Advances in Neural Information Processing Systems , 2022."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib33",
+      "text": "Shashank Rajput, Nikhil Mehta, Anima Singh, Raghunandan H Keshavan, Trung Vu, Lukasz Heldt, Lichan Hong, Yi Tay, Vinh Q Tran, Jonah Samost, et al. Recommender systems with generative retrieval. arXiv preprint arXiv:2305.05065 , 2023."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib31",
+      "text": "Ronak Pradeep, Kai Hui, Jai Gupta, Adam D Lelkes, Honglei Zhuang, Jimmy Lin, Donald Metzler, and Vinh Q Tran. How does generative retrieval scale to millions of passages? arXiv preprint arXiv:2305.11841 , 2023."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib6",
+      "text": "Nicola De Cao, Gautier Izacard, Sebastian Riedel, and Fabio Petroni. Autoregressive entity retrieval. arXiv preprint arXiv:2010.00904 , 2020."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib25",
+      "text": "Sanket Vaibhav Mehta, Jai Gupta, Yi Tay, Mostafa Dehghani, Vinh Q Tran, Jinfeng Rao, Marc Najork, Emma Strubell, and Donald Metzler. Dsi++: Updating transformer memory with new documents. arXiv preprint arXiv:2212.09744 , 2022."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib41",
+      "text": "Weiwei Sun, Lingyong Yan, Zheng Chen, Shuaiqiang Wang, Haichao Zhu, Pengjie Ren, Zhumin Chen, Dawei Yin, Maarten Rijke, and Zhaochun Ren. Learning to tokenize for generative retrieval. NeurIPS , 2023."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib34",
+      "text": "Stephen Robertson, Hugo Zaragoza, et al. The probabilistic relevance framework: Bm25 and beyond. Foundations and Trends® in Information Retrieval , 2009."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib20",
+      "text": "Taku Kudo and John Richardson. Sentencepiece: A simple and language independent subword tokenizer and detokenizer for neural text processing. arXiv preprint arXiv:1808.06226 , 2018."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib23",
+      "text": "Haotian Liu, Kilho Son, Jianwei Yang, Ce Liu, Jianfeng Gao, Yong Jae Lee, and Chunyuan Li. Learning customized visual models with retrieval-augmented knowledge. In CVPR , 2023."
+    }
+  ]
+}

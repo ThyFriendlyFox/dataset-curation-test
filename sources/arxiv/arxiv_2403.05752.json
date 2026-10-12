@@ -1,0 +1,124 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.05752",
+  "title": "Task-Oriented GNNs Training on Large Knowledge Graphs for Accurate and Efficient Modeling",
+  "authors": "Hussein Abdallah, Waleed Afandi, Panos Kalnis, Essam Mansour",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.AI"
+  ],
+  "url": "https://arxiv.org/abs/2403.05752",
+  "html_url": "https://arxiv.org/html/2403.05752",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1296,
+  "text": "A knowledge graph (KG) is a heterogeneous graph that includes nodes representing different entities (\\mathcal{V}) of |\\mathcal{C}| classes, e.g., Paper and Author and edge types representing |\\mathcal{R}| relations, e.g., publishedIn and write, between these entities. \\mathcal{C} and \\mathcal{R} are the sets of node and edge types in the KG, respectively. Real-world KGs, such as Yago [1] and Wikidata [2], have hundreds to thousands of node/edge types. Heterogeneous graph neural networks (HGNNs) have emerged as a powerful tool for analyzing KGs by defining real-world problems as node classification, such as recommender systems [3], and entity alignment [4], or link prediction, such as drug discovery [5] and fraud detection [6] tasks.\n\nHGNN methods adopt mechanisms from GNNs designed for homogeneous graphs, such as multi-layer graph convolutional networks (GCNs) and sampling in mini-batch training [7,8,9,10,11,12]. Unlike GNNs on homogeneous graphs, the number of GCN layers in HGNNs is associated with the number of edge types or metapaths in the heterogeneous graph to model the distinct relationships effectively. A metapath captures distinct semantic relationships (edge types) between node types. For example, the metapath Author-(write)-Paper-(publishedIn)-Venue (APV) describes the semantic relationships of an author who published a paper in a particular venue. In mini-batch HGNN training, the incorporated sampling mechanisms aim to obtain a subgraph (a subset of nodes and edges) that captures the representative structure of the original KG in general. The sampling is performed without considering node and edge types, where some specific types may have negligible or no effect in training a particular task. For example, a DBPedia subgraph, including instances of APV does not contribute to training a model predicting a movie genre. Hence, HGNN methods are not optimized for identifying subgraphs of a smaller subset of types to reduce the number of GCN layers in training a specific task.\n\nThe space complexity of training HGNNs includes the memory required to store the graph structures, associated features, and multi-layer GCNs. Additionally, the time complexity includes the sampling process, in the case of mini-batch training, and the message-passing iterations needed to aggregate the embeddings of neighbouring nodes in each GCN. That leads to computationally expensive memory usage and training time with large KGs, where the complexity is influenced by the KG’s size, density, |\\mathcal{R}|, and |\\mathcal{C}| [13,7,8]. To alleviates the excessive computation on a large KG, AI practitioners manually handcraft a subgraph of a subset of \\mathcal{R} and \\mathcal{C} from a given KG for training HGNNs [14,15]. We refer to this subgraph as a task-oriented subgraph (TOSG). Training the task using TOSG instead of the original KG helps HGNN methods reduce training time and memory usage. For example, the open graph benchmark (OGB) [16,14] provided OGBN-MAG, a subgraph of 21M triples out of 8.4B triples \\approx 0.2\\% that is extracted from the Microsoft Academic Graph (MAG) [17] and is relevant to the node classification task for predicting a paper venue (PV). OGBN-MAG contains nodes and edges of only four types.\n\nTo demonstrate the effectiveness of this methodology, we trained the PV task on a super-set of OGBN-MAG that contains 166M triples \\approx 2\\% of MAG KG with 42M vertices, 58 node types and 62 edge types; we refer to it as (MAG-42M). The OGBN - MAG [14] is a subgraph of MAG - 42M relevant to PV, i.e., task-oriented subgraph for PV. We used the state-of-the-art GNN methods, namely ShaDowSAINT [8] and SeHGNN [13]. As shown in Figure 1, OGBN - MAG trades the accuracy to help both methods reduce time and memory usage in training the task. Furthermore, crafting the TOSG demands a deep understanding of the KG’s structure and the task’s objectives. Hence, the TOSG extraction is a challenging and time-consuming process and does not guarantee to improve the model performance.\n\nThis paper proposes KG-TOSA, an approach to automate the TOSG extraction for task-oriented HGNN training on a large KG. In KG-TOSA, we define a generic graph pattern that effectively captures both the local and global structure of a KG for a specific task. Our definition is grounded in the theoretical foundation of training HGNNs and considering crucial factors, such as data sufficiency and graph topology. The objective of our graph pattern is to maximize the diversity of neighbour node types while minimizing the average depth between non-target and target vertices. We preserve the local context by identifying an initial set of nodes targeted by the task. Then, we expand our selection to include neighbouring nodes within a specified distance of h hops. Our graph pattern interlinks the local context around each target node to generate a larger subgraph of node and edge types globally related to the task. This approach allows us to effectively capture the intricate relationships and dependencies between different entities in the KG to enhance the representation of the task-specific knowledge captured in the TOSG.\n\nWe explore different techniques to extract subgraphs matching our graph pattern. Two techniques sample around targeted nodes using biased random walk or influence scores. We also propose a SPARQL-based extraction method leveraging RDF engines’ built-in indices. Our biased random walk sampling performs random walks starting from nodes that match the target vertices in the task. In our influence-based sampling approach, we utilize a Personalized PageRank (PPR) score to measure the relevance or importance of nodes in the KG to the task. However, it is essential to note that these sampling methods can incur a significant extraction overhead, particularly with a large KG. This excessive overhead may overshadow the potential time savings in training using the TOSG generated by both sampling methods instead of the original KG. To mitigate this overhead, we propose a SPARQL-based method that leverages built-in indices in RDF engines. Hence, our SPARQL-based method automates the TOSG extraction with negligible preprocessing overhead. Figure 1 motivates the need for our KG-TOSA approach, which helps both ShaDowSAINT and SeHGNN (i) reduce the overall maintenance cost of the multi-layer GCNs, and (ii) improve the modelling performance, including accuracy and inference time.\n\nFor evaluating GNN methods on node classification and link prediction tasks, existing benchmarks, such as OGB [14], OGB-LSC [16], and Open-HGNN [18], include KGs of few node/edge types. Unlike these benchmarks, we develop a benchmark of real KGs of large sizes, up to hundred millions of triples and hundreds of node and edge types with various tasks for node classification and link prediction. Hence, our benchmark presents challenging settings for the state-of-the-art (SOTA) HGNN methods. Our benchmark encompasses KGs from the academic domain, such as MAG [17] and DBLP [19], as well as two versions of YAGO as a general-purpose KG of different sizes, namely YAGO-4 [1] and YAGO-3 [20]. We integrated KG-TOSA with SOTA GNN methods, namely SeHGNN [13], GraphSAINT [7], ShaDowSAINT [8], RGCN [21], MorsE [11], and LHGNN [12]. Our comprehensive evaluation using large real KGs and various ML tasks shows that KG-TOSA enables GNN methods to converge faster and use less memory for training. Moreover, KG-TOSA empowers GNN methods to enhance and attain comparable levels of accuracy.\n\nIn summary, our contributions are:\n\n- • the first approach (KG-TOSA) for task-oriented HGNN training based on our generic graph pattern identifying a KG’s local and global context related to a specific task, Section III.\n\n- • three mechanisms for automating the TOSG extraction using our generic graph pattern based on task-oriented sampling and SPARQL-based query extraction. Our SPARQL-based method outperforms the task-oriented sampling in time and memory usage, Section IV.\n\n- • a comprehensive evaluation using our KG benchmark and six SOTA GNN methods. Our KG benchmark includes four real KGs, six node classification tasks, and three link-prediction tasks. The KGs have up to 42 million nodes and 400 million edges. KG-TOSA achieves up to 70% memory and time reduction while improving the model performance for better accuracy, smaller model size, and less inference time, Section V,",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "T. P. Tanon, G. Weikum, and F. M. Suchanek, “YAGO 4: A reason-able knowledge base,” in The Semantic Web - 17th International Conference, ESWC , ser. Lecture Notes in Computer Science, vol. 12123. Springer, 2020, pp. 583–596. [Online]. Available: https://doi.org/10.1007/978-3-030-49461-2_34"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "D. Vrandecic and M. Krötzsch, “Wikidata: a free collaborative knowledge base,” Commun. ACM , vol. 57, no. 10, pp. 78–85, 2014. [Online]. Available: https://doi.org/10.1145/2629489"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "S. Wu, F. Sun, W. Zhang, X. Xie, and B. Cui, “Graph neural networks in recommender systems: A survey,” ACM Comput. Surv. , vol. 55, no. 5, pp. 97:1–97:37, 2023. [Online]. Available: https://doi.org/10.1145/3535101"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "Z. Wang, Q. Lv, X. Lan, and Y. Zhang, “Cross-lingual knowledge graph alignment via graph convolutional networks,” in Proceedings of the Conference on Empirical Methods in Natural Language Processing (EMNLP) , 2018, pp. 349–357. [Online]. Available: https://aclanthology.org/D18-1032"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "X. Lin, Z. Quan, Z. Wang, T. Ma, and X. Zeng, “Kgnn: Knowledge graph neural network for drug-drug interaction prediction,” in Proceedings of the International Joint Conference on Artificial Intelligence (IJCAI) , 2020, pp. 2739–2745. [Online]. Available: https://doi.org/10.24963/ijcai.2020/380"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "Y. Dou, Z. Liu, L. Sun, Y. Deng, H. Peng, and P. S. Yu, “Enhancing graph neural network-based fraud detectors against camouflaged fraudsters,” in The ACM International Conference on Information and Knowledge Management (CIKM) , 2020, pp. 315–324. [Online]. Available: https://doi.org/10.1145/3340531.3411903"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "H. Zeng, H. Zhou, A. Srivastava, R. Kannan, and V. K. Prasanna, “Graphsaint: Graph sampling based inductive learning method,” in 8th International Conference on Learning Representations, ICLR 2020, Addis Ababa, Ethiopia, April 26-30, 2020 , 2020, , GitHub Code: https://github.com/snap-stanford/ogb/blob/master/examples/nodeproppred/mag/graph_saint.py . [Online]. Available: https://openreview.net/forum?id=BJe8pkHFwS"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "H. Zeng, M. Zhang, Y. Xia, and et.al., “Decoupling the depth and scope of graph neural networks,” CoRR , vol. abs/2201.07858, 2022, , GitHub Code: https://github.com/facebookresearch/shaDow_GNN . [Online]. Available: https://arxiv.org/abs/2201.07858"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "J. Chen, T. Ma, and C. Xiao, “Fastgcn: Fast learning with graph convolutional networks via importance sampling,” in 6th International Conference on Learning Representations, ICLR . OpenReview.net, 2018. [Online]. Available: https://openreview.net/forum?id=rytstxWAW"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "P. Yu, C. Fu, Y. Yu, C. Huang, Z. Zhao, and J. Dong, “Multiplex heterogeneous graph convolutional network,” in KDD ’22: The 28th ACM SIGKDD Conference on Knowledge Discovery and Data Mining, Washington, DC, USA, August 14 - 18, 2022 . ACM, 2022, pp. 2377–2387. [Online]. Available: https://doi.org/10.1145/3534678.3539482"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "M. Chen, W. Zhang, Y. Zhu, H. Zhou, Z. Yuan, C. Xu, and H. Chen, “Meta-knowledge transfer for inductive knowledge graph embedding,” in Proceedings of the 45th International ACM SIGIR Conference , ser. SIGIR ’22. Association for Computing Machinery, 2022, p. 927–937, , GitHub Code: https://github.com/zjukg/MorsE . [Online]. Available: https://doi.org/10.1145/3477495.3531757"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "T. Nguyen, Z. Liu, and Y. Fang, “Link prediction on latent heterogeneous graphs,” in Proceedings of the ACM Web Conference 2023, WWW 2023, Austin, TX, USA, 30 April 2023 - 4 May 2023 . ACM, 2023, pp. 263–273. [Online]. Available: https://doi.org/10.1145/3543507.3583284"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "X. Yang, M. Yan, S. Pan, X. Ye, and D. Fan, “Simple and efficient heterogeneous graph neural network,” AAAI , vol. abs/2207.02547, 2023, gitHub Code: https://github.com/ICT-GIMLab/SeHGNN . [Online]. Available: https://doi.org/10.48550/arXiv.2207.02547"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "W. Hu, M. Fey, M. Zitnik, Y. Dong, H. Ren, B. Liu, M. Catasta, and J. Leskovec, “Open graph benchmark: Datasets for machine learning on graphs,” in Advances in Neural Information Processing Systems 33:NeurIPS , 2020. [Online]. Available: https://arxiv.org/abs/2005.00687"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "Q. Lv, M. Ding, and et. al., “Are we really making much progress?: Revisiting, benchmarking and refining heterogeneous graph neural networks,” in KDD 21 . ACM, 2021, pp. 1150–1160. [Online]. Available: https://doi.org/10.1145/3447548.3467350"
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "W. Hu, M. Fey, H. Ren, and et.al., “OGB-LSC: A large-scale challenge for machine learning on graphs,” in Proceedings of the Neural Information Processing Systems Track on Datasets and Benchmarks 1, NeurIPS , 2021. [Online]. Available: https://datasets-benchmarks-proceedings.neurips.cc/paper/2021/hash/db8e1af0cb3aca1ae2d0018624204529-Abstract-round2.html"
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "M. Färber, “The microsoft academic knowledge graph: A linked data source with 8 billion triples of scholarly data,” in The Semantic Web - ISWC, Proceedings, Part II , ser. Lecture Notes in Computer Science, vol. 11779, 2019, pp. 113–129. [Online]. Available: https://doi.org/10.1007/978-3-030-30796-7_8"
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "X. Wang, D. Bo, C. Shi, S. Fan, Y. Ye, and P. S. Yu, “A survey on heterogeneous graph embedding: Methods, techniques, applications and sources,” IEEE Trans. Big Data , vol. 9, no. 2, pp. 415–436, 2023. [Online]. Available: https://doi.org/10.1109/TBDATA.2022.3177455"
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "M. R. Ackermann. (2022) dblp in rdf. [Online]. Available: https://blog.dblp.org/2022/03/02/dblp-in-rdf/"
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "T. Dettmers, P. Minervini, P. Stenetorp, and S. Riedel, “Convolutional 2d knowledge graph embeddings,” in Proceedings of the Thirty-Second AAAI Conference on Artificial Intelligence,(AAAI-18) , 2018, pp. 1811–1818. [Online]. Available: https://www.aaai.org/ocs/index.php/AAAI/AAAI18/paper/view/17366"
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "M. S. Schlichtkrull, T. N. Kipf, and e. a. Peter Bloem, “Modeling relational data with graph convolutional networks,” in The Semantic Web - 15th International Conference, ESWC 2018, Heraklion, Crete, Greece, June 3-7, 2018, Proceedings , vol. 10843. Springer, 2018, pp. 593–607, , GitHub Code: https://github.com/thiviyanT/torch-rgcn . [Online]. Available: https://doi.org/10.1007/978-3-319-93417-4_38"
+    }
+  ]
+}

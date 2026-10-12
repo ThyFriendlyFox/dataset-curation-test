@@ -1,0 +1,100 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.15839",
+  "title": "TablePuppet: A Generic Framework for Relational Federated Learning",
+  "authors": "Lijie Xu, Chulin Xie, Yiran Guo, Gustavo Alonso, Bo Li, Guoliang Li, Wei Wang, Wentao Wu, Ce Zhang",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.DB",
+    "cs.DC"
+  ],
+  "url": "https://arxiv.org/abs/2403.15839",
+  "html_url": "https://arxiv.org/html/2403.15839",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 975,
+  "text": "Federated learning (FL) is commonly used to train machine learning (ML) models on decentralized data [1,2,3,4,5,6,7]. FL is particularly effective for scenarios where data sharing among participants is infeasible due to data privacy and security regulations like GDPR [8], or when data sharing is expensive, such as for geo-distributed or shared-nothing data systems [9,10].\n\nExisting FL approaches, such as horizontal FL (HFL) [11,12,13] and vertical FL (VFL) [6,7], view decentralized training data as a single, large table divided among participants, either by rows (HFL) or by columns (VFL). However, these approaches fall short in more common scenarios where training data is stored across relational tables in distributed databases, necessitating SQL operations like joins or unions to compose the training data. Take healthcare as an example, a patient’s information can span different organizations’ databases, such as hospitals, pharmacies, and insurance companies. Here, a patient can have multiple records in various hospital departments or pharmacy branches, considered as separate clients within these organizations. Data analysts need to aggregate the scattered tables using SQL operations (e.g., joins and unions) before model training. Given that VFL relies on one-to-one data alignment without joins and HFL is limited to tables with identical schemas, they are insufficient for this relational scenario. This leads us to ask: can we directly perform FL on these distributed relational tables without data sharing?\n\nIn this paper, we call this problem relational federated learning (RFL) and formalize it as FL atop union of conjunctive queries (UCQ), a well-known notion in the database literature [14]. Relational tables in different organizations are referred to as vertical tables, since they own different feature columns, albeit varying in size. Within the same organization, clients can have horizontal partitions of the vertical table, which we term as horizontal tables. To obtain the complete dataset for model training, one needs to union the horizontal tables and then join the vertical tables, which is conceptually equivalent to performing a UCQ over all the tables involved.\n\nRFL introduces several unique challenges. First, HFL/VFL approaches are inadequate for RFL, necessitating new learning methods. Research in both VFL and HFL [6,1] highlights integrating SQL queries with FL, such as supporting one-to-many data alignment and federated databases, as an important future direction. Second, given that RFL needs to be done conceptually on top of the UCQ result, which involves joining a large number of tables with duplicate tuples generated, the computation and communication overhead can be significant. Third, unlike in VFL where data labels are owned by a single client, in RFL labels are horizontally partitioned and distributed across multiple clients, which requires mechanisms to ensure the privacy of both features and labels.\n\nTo address these challenges, we propose TablePuppet, a generic framework for RFL that can be applied to two widely used ML training algorithms, stochastic gradient descent (SGD) and alternating direction method of multipliers (ADMM) [15]. TablePuppet decomposes the RFL problem over the joined table (UCQ result) into two sub-problems: (1) learning over join (LoJ) and (2) learning over union (LoU). Essentially, LoJ pushes learning on the joined table down to the vertical tables being joined, and LoU further pushes learning on each vertical table down to each horizontal table of the union. TablePuppet optimizes and reduces the computation and communication overhead of duplicate tuples introduced by joins. TablePuppet also extends previous work on differential privacy (DP) for VFL [16] to establish privacy guarantees not only for the (distributed) features, but also for the (distributed) data labels.\n\nThe implementation of TablePuppet adopts a server-client architecture, where the server can be one of the clients or an independent instance. The global ML model on the joined table is decoupled into local models held by clients. The server and clients collaboratively and iteratively train these local models. To unify the implementations of SGD/ADMM training processes, we design three physical operators in TablePuppet that abstract their computation and communication: (1) a LoJ operator, (2) a LoU operator, and (3) a client operator for the model updates inside clients. This abstraction facilitates the implementations of SGD/ADMM and the adjustment of computation/communication overheads in a flexible manner, leading to new SGD/ADMM algorithms that work not only for RFL (RFL-SGD and RFL-ADMM) but also for the vertical scenario of RFL without horizontal partitions (RFL-SGD-V, RFL-ADMM-V).\n\nWe study the effectiveness and efficiency of TablePuppet, by evaluating model accuracy and performance of SGD/ADMM atop our TablePuppet as well as counterparts in diverse scenarios. For model accuracy, we consider directly training centralized (i.e., non-federated) ML models on the joined table as the baseline approach. Our experiments show that TablePuppet can achieve model accuracy comparable to this (strongest) baseline. For performance, we focus on studying the communication overhead as it is the primary bottleneck in FL [11,13], especially for geo-distributed clients. Experimental results show that ADMM atop TablePuppet takes less communication time to converge (to similar accuracy) compared to SGD atop TablePuppet. In particular, SGD/ADMM algorithms atop TablePuppet outperform existing VFL methods that are forced to run directly on the vertical partitions of the joined table, in terms of communication time. The main contributions of this paper are as follows:\n\n- • We propose a new RFL problem as learning over the UCQ result of relational tables across distributed databases.\n\n- • We present TablePuppet, a generic RFL framework that pushes ML training down to individual tables, with both computation/communication optimization and privacy guarantees.\n\n- • We implement TablePuppet using a server-client architecture with an abstraction of three physical operators, which unifies the design and implementation of new SGD/ADMM algorithms for different scenarios of RFL.\n\n- • We provide a theoretical analysis of the computation and communication complexity of TablePuppet, as well as its data privacy guarantees based on differential privacy.\n\n- • We evaluate TablePuppet on real-world datasets with multiple ML models in diverse scenarios and our evaluation results demonstrate its effectiveness and efficiency.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib36",
+      "text": "Li et al . (2022) Qinbin Li, Yiqun Diao, Quan Chen, and Bingsheng He. 2022. Federated Learning on Non-IID Data Silos: An Experimental Study. In 38th IEEE International Conference on Data Engineering, ICDE 2022 . IEEE, 965–978."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib44",
+      "text": "R. et al . (2019) Santiago S. Silva R., Boris A. Gutman, Eduardo Romero, Paul M. Thompson, André Altmann, and Marco Lorenzi. 2019. Federated Learning in Distributed Medical Databases: Meta-Analysis of Large-Scale Subcortical Brain Data. In 16th IEEE International Symposium on Biomedical Imaging, ISBI 2019 . IEEE, 270–274."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib21",
+      "text": "Fu et al . (2023) Rui Fu, Yuncheng Wu, Quanqing Xu, and Meihui Zhang. 2023. FEAST: A Communication-efficient Federated Feature Selection Framework for Relational Data. Proc. ACM Manag. Data 1, 1 (2023), 107:1–107:28."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib51",
+      "text": "Shoham and Rappoport (2023) Ofir Ben Shoham and Nadav Rappoport. 2023. Federated Learning of Medical Concepts Embedding using BEHRT. CoRR abs/2305.13052 (2023). https://doi.org/10.48550/arXiv.2305.13052"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib57",
+      "text": "Yang et al . (2019a) Qiang Yang, Yang Liu, Tianjian Chen, and Yongxin Tong. 2019a. Federated Machine Learning: Concept and Applications. ACM Trans. Intell. Syst. Technol. 10, 2 (2019), 12:1–12:19. https://doi.org/10.1145/3298981"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib40",
+      "text": "Liu et al . (2023) Yang Liu, Yan Kang, Tianyuan Zou, Yanhong Pu, Yuanqin He, Xiaozhou Ye, Ye Ouyang, Ya-Qin Zhang, and Qiang Yang. 2023. Vertical Federated Learning: Concepts, Advances and Challenges. CoRR abs/2211.12814 (2023). https://doi.org/10.48550/arXiv.2211.12814 arXiv:2211.12814"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib32",
+      "text": "Khan et al . (2022) Afsana Khan, Marijn ten Thij, and Anna Wilbik. 2022. Vertical Federated Learning: A Structured Literature Review. CoRR abs/2212.00622 (2022). https://doi.org/10.48550/arXiv.2212.00622"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib3",
+      "text": "GDP (2016) 2016. General Data Protection Regulation (GDPR). https://gdpr-info.eu/ ."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib19",
+      "text": "Fu et al . (2022) Fangcheng Fu, Xupeng Miao, Jiawei Jiang, Huanran Xue, and Bin Cui. 2022. Towards Communication-efficient Vertical Federated Learning Training via Cache-enabled Local Update. Proc. VLDB Endow. 15, 10 (2022), 2111–2120."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib47",
+      "text": "Sandha et al . (2019) Sandeep Singh Sandha, Wellington Cabrera, Mohammed Al-Kateb, Sanjay Nair, and Mani B. Srivastava. 2019. In-database Distributed Machine Learning: Demonstration using Teradata SQL Engine. Proc. VLDB Endow. 12, 12 (2019), 1854–1857."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib42",
+      "text": "McMahan et al . (2017) Brendan McMahan, Eider Moore, Daniel Ramage, Seth Hampson, and Blaise Agüera y Arcas. 2017. Communication-Efficient Learning of Deep Networks from Decentralized Data. In Proceedings of the 20th International Conference on Artificial Intelligence and Statistics, AISTATS 2017 , Vol. 54. PMLR, 1273–1282."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib33",
+      "text": "Konečný et al . (2016a) Jakub Konečný, H. Brendan McMahan, Daniel Ramage, and Peter Richtárik. 2016a. Federated Optimization: Distributed Machine Learning for On-Device Intelligence. CoRR abs/1610.02527 (2016). arXiv:1610.02527 http://arxiv.org/abs/1610.02527"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib34",
+      "text": "Konečný et al . (2016b) Jakub Konečný, H. Brendan McMahan, Felix X. Yu, Peter Richtárik, Ananda Theertha Suresh, and Dave Bacon. 2016b. Federated Learning: Strategies for Improving Communication Efficiency. CoRR abs/1610.05492 (2016). arXiv:1610.05492 http://arxiv.org/abs/1610.05492"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib52",
+      "text": "Ullman (1988) Jeffrey D. Ullman. 1988. Principles of Database and Knowledge-Base Systems, Volume I . Computer Science Press."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib11",
+      "text": "Boyd et al . (2011) Stephen P. Boyd, Neal Parikh, Eric Chu, Borja Peleato, and Jonathan Eckstein. 2011. Distributed Optimization and Statistical Learning via the Alternating Direction Method of Multipliers. Found. Trends Mach. Learn. 3, 1 (2011), 1–122."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib55",
+      "text": "Xie et al . (2022) Chulin Xie, Pin-Yu Chen, Ce Zhang, and Bo Li. 2022. Improving Privacy-Preserving Vertical Federated Learning by Efficient Communication with ADMM. CoRR abs/2207.10226 (2022). https://doi.org/10.48550/arXiv.2207.10226"
+    }
+  ]
+}

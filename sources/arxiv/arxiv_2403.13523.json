@@ -1,0 +1,135 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.13523",
+  "title": "Have You Poisoned My Data? Defending Neural Networks against Data Poisoning",
+  "authors": "Fabio De Gaspari, Dorjan Hitaj, Luigi V. Mancini",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.AI",
+    "cs.CR"
+  ],
+  "url": "https://arxiv.org/abs/2403.13523",
+  "html_url": "https://arxiv.org/html/2403.13523",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1267,
+  "text": "The recent widespread success of machine learning rests in no small part on a large amount of public data available for training. Cutting-edge Deep Neural Networks (DNN), such as DALL-E, Imagen, LLaMA-2, and GPT4, have up to tens of billions of parameters trained by scraping as much data from the Internet as possible. The ever-growing amount of data required to train such large models makes it impractical to carefully filter and select what is included in the training set, especially in distributed learning settings [1], opening the doors to training-time adversarial attacks. One such family of attacks is data poisoning. Poisoning attacks manipulate the training dataset by injecting or maliciously altering datapoints, compromising the learned model to achieve a predefined adversarial goal. The goal of poisoning attacks can be typically divided into three categories [2]: (1) integrity violation, where the adversary aims to preserve the trained model’s performance, altering its output only under specific conditions; (2) availability violation, where the poisoning attack is crafted to decrease the performance of the trained model on its intended task; (3) privacy violation, where data poisoning is used to force the model to leak private information about the system, its users, or dataset.\n\nThis paper focuses on category (1) poisoning attacks, which involve compromising the integrity of the trained model to force misclassification for specific queries. In particular, we consider a particularly dangerous family of attacks documented in recent scientific literature: triggerless clean-label poisoning attacks. Triggerless clean-label attacks apply a constrained perturbation to a subset of the training set so that the perturbed samples reside closely to a target sample that the attacker wants to misclassify. The measure of closeness between the perturbed and target samples and the space in which their distance is measured can vary based on the specific poisoning attack. Some attacks force a collision between perturbed samples in the feature space of the model [3,4,5], while other proposals work in the gradient space [6]. Regardless of the specific process used to craft the perturbation, the goal is to force the model to misclassify a given target sample without injecting any obvious triggers or altering the labels of the training data [3]. We focus on triggerless clean-label poisoning attacks because their characteristics make them appealing to adversaries. Firstly, the adversarial perturbation applied to poisoned samples is heavily constrained, making it hard to detect with traditional approaches such as L2-norm [7]. Secondly, unlike backdoor attacks that rely on injecting a trigger in the query sample during inference [8,9], triggerless clean label attacks do not require modification of the target sample at inference time. Thirdly, the attack is stealthy as there is typically minimal performance impact on a poisoned model, making it hard to detect by model performance analysis. Finally, since the label of the poisoned training samples is unaltered and the perturbation is heavily constrained, poisons appear normal and are challenging to spot even with expert human inspection. Given the dangers of deploying a potentially poisoned model, especially in critical domains [10], several defense mechanisms have been proposed in recent years [11]. However, current defenses have significant shortcomings, mainly falling into four categories: failure to generalize, failure against strong poison generation algorithms, performance degradation, and failure against large adversarial budgets. Many defenses are designed against specific poison-crafting attacks and fail to generalize to different approaches [12,13,7,14]. Other techniques are effective against some poisoning attacks, but fail against stronger poison-generation algorithms [15,16]. Some proposed defenses effectively prevent the models’ poisoning but negatively impact testing and generalization performance [17,18]. Finally, as we show later in our evaluation, some defenses fail when the adversary is allowed a large poison budget (the portion of the training set that is poisoned) or perturbation budget (the constraint on the amount of allowed perturbation).\n\nWe address these shortcomings and propose a new defense method to sanitize the training set and filter poisoned datapoints in transfer learning settings. In transfer learning, a pre-trained network is used as a feature extractor to train another downstream network on a given task. Transfer learning allows repurposing the knowledge learned by the pre-trained network to provide more meaningful features to another network, without the need to train it from scratch. We focus on the transfer learning setting because it is quickly becoming the most common use case in deep learning. The large number of parameters of contemporary models and the immense dataset requirements make it impractical to train models from scratch [19]. On the other hand, the widespread availability of large, pre-trained models keeps increasing, with companies such as Meta releasing open-source, cutting-edge neural networks to the public [20,21]. Finally, poisoning attacks are considerably more effective in a transfer learning scenario. The pre-trained extractor allows crafting more effective adversarial perturbations, which make it easier to poison the downstream network during fine-tuning [22]. In light of these considerations, we propose a new poison sanitization approach based on the analysis of low- and high-level feature maps of the samples in the dataset. We hypothesize that the perturbation injected by poisoning algorithms is sufficient to meaningfully shift the distribution of poisons from clean images at different levels of representation within the network. We relate this hypothesis to a recent work on image synthesis [23], where Batch Normalization (BN) layers are used to effectively characterize the distributions of different classes in the dataset. We build on this insight and design a new characteristic vector representation to describe datapoints. We exploit this representation to detect poisons by measuring the distance between the datapoints in the dataset and a centroid pseudo-datapoint, which represents the general characteristics of each individual class. Effectively, we use BN layers as a proxy to describe the characteristics of low- and high-level feature maps of datapoints and distinguish samples drawn from clean and poisoned distributions in the characteristic vector space. We carry out a thorough experimental evaluation and demonstrate that, given a robustly trained feature extractor, characteristic vectors can be used to recognize poisons effectively. We show that our approach generalizes to multiple poison-generation techniques, is robust against strong poisons, does not affect the model’s performance, and is resilient against high poison perturbation budgets. We experimentally compare against recently proposed poisoning defenses and show that our approach outperforms the state-of-the-art in test accuracy and success rate. Moreover, we show that our approach can successfully separate real poisons from failed poisons: poisoned datapoints that do not affect the model’s learned decision boundary. Summarizing, this paper makes the following contributions:\n\n- • We propose a novel approach to effectively separate clean and poisoned samples in a training dataset. We rely on BN layers as a proxy to summarize the characteristics of low- and high-level feature maps of datapoints and build a characteristic vector representation to separate poisons from clean samples.\n\n- • We demonstrate that characteristic vectors are strong distinguishers for poisons. We show that our characterization allows the effective separation between real poisons and failed poisons (referring to poisoned datapoints that do not impact the model’s learned decision boundary). Furthermore, we illustrate that clean datapoints are distinctly separated from real poisons within the characteristic vector space.\n\n- • We show that while failed poisons overlap with clean points of the same class, real poisons fall in the class manifold of the target class in the characteristic vector space, i.e., the class the attacker wants to misclassify a sample as.\n\n- • We thoroughly evaluate our approach and show that it consistently outperforms current state-of-the-art defenses in test accuracy and success rate. Through extensive experimental evaluation, we demonstrate that our approach generalizes to several poison-generation algorithms and is resilient against high poison and perturbation budgets.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib14",
+      "text": "Hitaj, D., Pagnotta, G., Hitaj, B., Perez-Cruz, F., Mancini, L.V.: Fedcomm: Federated learning as a medium for covert communication. IEEE Transactions on Dependable and Secure Computing (2023)"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib4",
+      "text": "Cinà, A.E., Grosse, K., Demontis, A., Vascon, S., Zellinger, W., Moser, B.A., Oprea, A., Biggio, B., Pelillo, M., Roli, F.: Wild patterns reloaded: A survey of machine learning security against training data poisoning. ACM Computing Surveys 55 (13s), 1–39 (2023)"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib32",
+      "text": "Shafahi, A., Huang, W.R., Najibi, M., Suciu, O., Studer, C., Dumitras, T., Goldstein, T.: Poison frogs! targeted clean-label poisoning attacks on neural networks. In: Advances in neural information processing systems. NIPS (2018)"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib42",
+      "text": "Zhu, C., Huang, W.R., Li, H., Taylor, G., Studer, C., Goldstein, T.: Transferable clean-label poisoning attacks on deep neural nets. In: International Conference on Machine Learning. pp. 7614–7623. ICML (2019)"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib1",
+      "text": "Aghakhani, H., Meng, D., Wang, Y.X., Kruegel, C., Vigna, G.: Bullseye polytope: A scalable clean-label poisoning attack with improved transferability. In: IEEE European symposium on security and privacy. pp. 159–178. EuroS&P (2021)"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib11",
+      "text": "Geiping, J., Fowl, L.H., Huang, W.R., Czaja, W., Taylor, G., Moeller, M., Goldstein, T.: Witches’ brew: Industrial scale data poisoning via gradient matching. In: International Conference on Learning Representations. ICLR (2020)"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib29",
+      "text": "Peri, N., Gupta, N., Huang, W.R., Fowl, L., Zhu, C., Feizi, S., Goldstein, T., Dickerson, J.P.: Deep k-nn defense against clean-label data poisoning attacks. In: European Conference on Computer Vision Workshop. pp. 55–70 (2020)"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib20",
+      "text": "Liu, Y., Ma, S., Aafer, Y., Lee, W.C., Zhai, J., Wang, W., Zhang, X.: Trojaning attack on neural networks. In: 25th Annual Network And Distributed System Security Symposium. NDSS (2018)"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib25",
+      "text": "Nguyen, T.A., Tran, A.: Input-aware dynamic backdoor attack. Advances in Neural Information Processing Systems pp. 3454–3464 (2020)"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib26",
+      "text": "Pagnotta, G., De Gaspari, F., Hitaj, D., Andreolini, M., Colajanni, M., Mancini, L.V.: Dolos: A novel architecture for moving target defense. IEEE Transactions on Information Forensics and Security 18 , 5890–5905 (2023)"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib35",
+      "text": "Tian, Z., Cui, L., Liang, J., Yu, S.: A comprehensive survey on poisoning attacks and countermeasures in machine learning. ACM Computing Surveys 55 (8), 1–35 (2022)"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib28",
+      "text": "Paudice, A., Muñoz-González, L., Lupu, E.C.: Label sanitization against label flipping poisoning attacks. In: ECML PKDD 2018 Workshops. pp. 5–15. ECML PKDD (2019)"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib37",
+      "text": "Tran, B., Li, J., Madry, A.: Spectral signatures in backdoor attacks. In: Advances in neural information processing systems. NIPS (2018)"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib3",
+      "text": "Chen, B., Carvalho, W., Baracaldo, N., Ludwig, H., Edwards, B., Lee, T., Molloy, I., Srivastava, B.: Detecting backdoor attacks on deep neural networks by activation clustering. In: AAAI’s Workshop on Artificial Intelligence Safety. SafeAI (2018)"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib16",
+      "text": "Koh, P.W., Steinhardt, J., Liang, P.: Stronger data poisoning attacks break data sanitization defenses. Machine Learning pp. 1–47 (2022)"
+    },
+    {
+      "n": 16,
+      "id": "bib.bib33",
+      "text": "Shokri, R., et al.: Bypassing backdoor detection algorithms in deep learning. In: 2020 IEEE European Symposium on Security and Privacy. pp. 175–183. EuroS&P (2020)"
+    },
+    {
+      "n": 17,
+      "id": "bib.bib39",
+      "text": "Yang, Y., Liu, T.Y., Mirzasoleiman, B.: Not all poisons are created equal: Robust training against data poisoning. In: International Conference on Machine Learning. ICML (2022)"
+    },
+    {
+      "n": 18,
+      "id": "bib.bib10",
+      "text": "Geiping, J., Fowl, L., Somepalli, G., Goldblum, M., Moeller, M., Goldstein, T.: What doesn’t kill you makes you robust (er): How to adversarially train against data poisoning. In: ICLR Workshop on Security and Safety in Machine Learning Systems (2021)"
+    },
+    {
+      "n": 19,
+      "id": "bib.bib36",
+      "text": "Touvron, H., Lavril, T., Izacard, G., Martinet, X., Lachaux, M.A., Lacroix, T., Rozière, B., Goyal, N., Hambro, E., Azhar, F., et al.: Llama: Open and efficient foundation language models. arXiv preprint arXiv:2302.13971 (2023)"
+    },
+    {
+      "n": 20,
+      "id": "bib.bib23",
+      "text": "Meta: Llama 2. https://github.com/facebookresearch/llama (2023)"
+    },
+    {
+      "n": 21,
+      "id": "bib.bib22",
+      "text": "Meta: Code llama. https://github.com/facebookresearch/llama (2023)"
+    },
+    {
+      "n": 22,
+      "id": "bib.bib31",
+      "text": "Schwarzschild, A., Goldblum, M., Gupta, A., Dickerson, J.P., Goldstein, T.: Just how toxic is data poisoning? a unified benchmark for backdoor and data poisoning attacks. In: International Conference on Machine Learning. ICML (2021)"
+    },
+    {
+      "n": 23,
+      "id": "bib.bib40",
+      "text": "Yin, H., Molchanov, P., Alvarez, J.M., Li, Z., Mallya, A., Hoiem, D., Jha, N.K., Kautz, J.: Dreaming to distill: Data-free knowledge transfer via deepinversion. In: IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 8715–8724. CVPR (2020)"
+    }
+  ]
+}

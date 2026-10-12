@@ -1,0 +1,364 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2303.00652",
+  "title": "Finding the right XAI method -- A Guide for the Evaluation and Ranking of Explainable AI Methods in Climate Science",
+  "authors": "Philine Bommer, Marlene Kretschmer, Anna HedstrÃ¶m, Dilyara Bareeva, Marina M. -C. HÃ¶hne",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.AI"
+  ],
+  "url": "https://arxiv.org/abs/2303.00652",
+  "html_url": "https://arxiv.org/html/2303.00652",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1178,
+  "text": "Deep learning (DL) has become a widely used tool in climate science and assists various tasks, such as nowcasting [1,2,3], climate or weather monitoring [4,5] and forecasting [6,7,8], numerical model enhancement [9,10], and up-sampling of satellite data [11,12]. However, a deep neural network (DNN) is mostly considered a black box due to its inaccessible decision-making process. This lack of interpretability limits their trustworthiness and application in climate research, as DNNs should not only have high predictive performance but also provide accessible and consistent predictive reasoning aligned with existing theory [13,14,15,16,17,18]. Explainable artificial intelligence (XAI) aims to address the lack of interpretability by explaining potential reasons behind the predictions of a network. In the climate context, XAI can help to validate DNNs and on a well-performing model provide researchers with new insights into physical processes [19,20]. For example, [21] demonstrated using XAI that DNNs produce skillful seasonal precipitation forecasts based on known relevant physical processes. Moreover, XAI was used to improve the forecasting of droughts [22], teleconnections [23], and regional precipitation [24], to assess external drivers of global climate change [25] and to understand sub-seasonal drivers of high-temperature summers [26]. Additionally, [27] showed that XAI applications can aid in the comparative assessment of climate models.\n\nGenerally, explainability methods can be divided into ante-hoc and post-hoc approaches [28] (see Table 1). Ante-hoc approaches modify the DNN architecture to improve interpretability, like adding an interpretable prototype layer to learn humanly understandable representations for different classes (see e.g. [42] and [43,44]) or constructing mathematically similar but interpretable models [47]. Such approaches are also called self-explaining neural networks and link to the field of interpretability [18]. Post-hoc XAI methods, on the other hand, can be applied to any neural network architecture [28] and here we focus on three characterizing aspects [28,31,30], as shown in Table 1. The first considers the explanation target (i.e. what is explained) which can differ between local and global decision-making. While local explanations provide explanations of the network decision for a single data point [36,33,48,39], e.g., by assessing the contribution of each pixel in a given image based on the predicted class, global explanations reveal the overall decision strategy, e.g. by showing a map of important features or image patterns, learned by the model for the whole class [34,49,50,51,52,35]. The second aspect concerns the components used to calculate the explanation, differentiating between model-aware and model-agnostic methods. Model-aware methods use components of the trained model for the explanation calculation, such as network weights, while model-agnostic methods consider the model as a black box and only assess the change in the output caused by a perturbation in the input [53,39]. The third aspect considers the DNN explanation output. Here we can differentiate between methods where the assigned value of a pixel indicates the sensitivity of the network regarding that pixel also called sensitivity methods, such as absolute gradient, as well as methods, that display the positive or negative contribution of a pixel to predict the class, such as layer-wise Relevance Propagation (see Section 2.3) also called salience methods, and methods presenting input examples leading to the same prediction. Beyond these three characteristics, recent efforts [18] also differentiate between feature importance methods encompassing mostly global methods, which calculate feature contribution based on the network performance (e.g. accuracy), and feature relevance methods describing mostly local methods which calculate contributions to the model prediction. In climate research, the decision patterns learned by DNNs have been analyzed with local explanation methods such as LRP or Shapley values [21,22,23,25,54,55,27]. However, different local explanation methods can identify different input features as being important to the network decision, subsequently leading to different scientific conclusions [32,56,18]. Thus, with the increasing number of XAI methods available, selecting the most suitable method for a specific task poses a challenge and the practitioner’s choice of a method is often based upon popularity or upon easy-access [57]. To navigate the field of XAI, recent climate science publications have compared and assessed different explanation techniques using benchmark datasets, where the XAI method was assessed by comparing its predictions with a defined target, considered as ground truth [30,58]. While benchmark datasets [59,60,61] certainly contribute to the understanding of local XAI methods, the existence of a ground truth explanation is highly debated (e.g., [62,63]). In the case of DNNs, ground truth explanation labels can only be considered approximations and are not guaranteed to align precisely with the model’s decision process or the features it utilizes [29,64]. For exact ground truth, either perfect knowledge of how the model handles the available information or a carefully engineered model would be required, which is usually not the case. Additionally, post-hoc explanation methods are generally only approximations of a model’s behavior [32,56], and the distinct mathematical concepts of the different methods would consequently lead to distinct ground truth explanations.\n\nHere, we address these challenges, by introducing XAI evaluation in the context of climate science to compare different local explanation methods. The field of XAI evaluation has emerged recently and refers to the development of metrics to compare, benchmark, and rank explanation methods, in different explainability contexts (e.g. [65,66,64]). As discussed below in more detail, using evaluation metrics we are able to quantitatively assess the robustness, complexity, localization, randomization, and faithfulness of explanation methods, making them comparable regarding their suitability, their strengths, and weaknesses [67,68,69,66].\n\nIn this work, we discuss these properties in an exemplary manner and build upon work from [25]. In their work, an MLP was trained with global annual temperature anomaly maps and the network´s task was to assign the respective year or decade of occurrence. The MLP achieves the assignment, as global-mean warming progresses. Using layer-wise relevance propagation (LRP) they then identified the signals relevant to the network´s decision and found the North Atlantic, Southern Ocean, and Southeast Asia as key regions. Here, we use their work as a case study and train an MLP as well as a CNN for the same prediction tasks (see step 1 in Fig. 1). Then, we apply several explanation methods and show the variation in their explanation maps, potentially leading to different scientific insights (step 2 in Figure 1). We therefore introduce XAI evaluation metrics and quantify the skill of the different XAI methods against a random baseline in different properties to compare their performance with respect to the underlying task.\n\nThis paper is structured as follows. In Section 2 we discuss the used dataset and network types, and briefly describe the different analysed explanation methods. Section 3 introduces XAI evaluation and describe five evaluation properties. Then, in Section 4, we first discuss the performance of both network types and provide a motivational example highlighting the risks of an uninformed choice of an explanation method. Next, we evaluate different XAI methods applied to the MLP, using two different metrics for each evaluation property, and then compare the XAI evaluation results for the different networks (see Section 4.2 and 4.3). Finally, in Section 4.4, we present a guideline on using XAI evaluation to choose a suitable XAI method. The discussion of our results and our conclusion are presented in Section 5.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib88",
+      "text": "Shi et al. [2015] X. Shi, Z. Chen, H. Wang, D.-Y. Yeung, W.-K. Wong, and W.-c. Woo. Convolutional lstm network: A machine learning approach for precipitation nowcasting. Advances in neural information processing systems , 28, 2015."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib40",
+      "text": "Han et al. [2017] L. Han, J. Sun, W. Zhang, Y. Xiu, H. Feng, and Y. Lin. A machine learning nowcasting method based on real-time reanalysis data. Journal of Geophysical Research: Atmospheres , 122(7):4038–4051, 2017. doi: 10.1002/2016jd025783 ."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib19",
+      "text": "Bromberg et al. [2019] C. L. Bromberg, C. Gazen, J. J. Hickey, J. Burge, L. Barrington, and S. Agrawal. Machine learning for precipitation nowcasting from radar images. In Workshop at the 33rd Conference on Neural Information Processing Systems , page 4, 2019."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib47",
+      "text": "Hengl et al. [2017] T. Hengl, J. Mendes de Jesus, G. B. Heuvelink, M. Ruiperez Gonzalez, M. Kilibarda, A. Blagotić, W. Shangguan, M. N. Wright, X. Geng, B. Bauer-Marschallinger, et al. SoilGrids250m: Global gridded soil information based on machine learning. PLoS one , 12(2):e0169748, 2017. doi: 10.1371/journal.pone.0169748 ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib7",
+      "text": "Anantrasirichai et al. [2019] N. Anantrasirichai, J. Biggs, F. Albino, and D. Bull. A deep learning approach to detecting volcano deformation from satellite imagery using synthetic datasets. Remote Sensing of Environment , 230:111179, 2019. doi: 10.1016/j.rse.2019.04.032 ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib39",
+      "text": "Ham et al. [2019] Y.-G. Ham, J.-H. Kim, and J.-J. Luo. Deep learning for multi-year enso forecasts. Nature , 573(7775):568–572, 2019."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib26",
+      "text": "Chen et al. [2020] K. Chen, P. Wang, X. Yang, N. Zhang, and D. Wang. A model output deep learning method for grid temperature forecasts in tianjin area. Applied Sciences , 10(17):5808, 2020. doi: 10.3390/app10175808 ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib85",
+      "text": "Scher and Messori [2021] S. Scher and G. Messori. Ensemble methods for neural network-based weather forecasts. Journal of Advances in Modeling Earth Systems , 13(2), 2021. doi: 10.1029/2020ms002331 ."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib107",
+      "text": "Yuval and O’Gorman [2020] J. Yuval and P. A. O’Gorman. Stable machine-learning parameterization of subgrid processes for climate modeling at a range of resolutions. Nature communications , 11(1):3295, 2020. doi: 10.1038/s41467-020-17142-3 ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib42",
+      "text": "Harder et al. [2021] P. Harder, D. Watson-Parris, D. Strassel, N. Gauger, P. Stier, and J. Keuper. Emulating aerosol microphysics with machine learning. arXiv preprint arXiv:2109.10593 , 2021."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib104",
+      "text": "Wang et al. [2021] J. Wang, K. Gao, Z. Zhang, C. Ni, Z. Hu, D. Chen, and Q. Wu. Multisensor remote sensing imagery super-resolution with conditional gan. Journal of Remote Sensing , 2021, 2021. doi: 10.34133/2021/9829706 ."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib60",
+      "text": "Leinonen et al. [2021] J. Leinonen, D. Nerini, and A. Berne. Stochastic super-resolution for downscaling time-evolving atmospheric fields with a generative adversarial network. IEEE Transactions on Geoscience and Remote Sensing , 59(9):7211–7223, sep 2021. doi: 10.1109/tgrs.2020.3032790 ."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib67",
+      "text": "McGovern et al. [2019] A. McGovern, R. Lagerquist, D. John Gagne, G. E. Jergensen, K. L. Elmore, C. R. Homeyer, and T. Smith. Making the black box more transparent: Understanding the physical implications of machine learning. Bulletin of the American Meteorological Society , 100(11):2175–2199, nov 2019. doi: 10.1175/bams-d-18-0195.1 ."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib63",
+      "text": "Mamalakis et al. [2020] A. Mamalakis, I. Ebert-Uphoff, and E. A. Barnes. Explainable artificial intelligence in meteorology and climate science: Model fine-tuning, calibrating trust and learning new science. In International Workshop on Extending Explainable AI Beyond Deep Models and Classifiers , pages 315–339. Springer, 2020."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib23",
+      "text": "Camps-Valls et al. [2020] G. Camps-Valls, M. Reichstein, X. Zhu, and D. Tuia. Advancing Deep Learning for Earth Sciences From Hybrid Modeling To Interpretability. In IEEE International Geoscience and Remote Sensing Symposium, IGARSS 2020, Waikoloa, HI, USA, September 26 - October 2, 2020 , pages 3979–3982. IEEE, 2020. doi: 10.1109/IGARSS39084.2020.9323558 ."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib94",
+      "text": "Sonnewald and Lguensat [2021] M. Sonnewald and R. Lguensat. Revealing the impact of global heating on north atlantic circulation using transparent machine learning. Journal of Advances in Modeling Earth Systems , 13(8):e2021MS002496, 2021. doi: 10.1029/2021ms002496 ."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib27",
+      "text": "Clare et al. [2022] M. C. Clare, M. Sonnewald, R. Lguensat, J. Deshayes, and V. Balaji. Explainable artificial intelligence for bayesian neural networks: toward trustworthy predictions of ocean dynamics. Journal of Advances in Modeling Earth Systems , 14(11):e2022MS003162, 2022. doi: 10.1002/essoar.10511239.1 ."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib33",
+      "text": "Flora et al. [2024] M. L. Flora, C. K. Potvin, A. McGovern, and S. Handler. A machine learning explainability tutorial for atmospheric sciences. Artificial Intelligence for the Earth Systems , 3(1):e230018, 2024. doi: 10.1175/AIES-D-23-0018.1 . URL https://journals.ametsoc.org/view/journals/aies/3/1/AIES-D-23-0018.1.xml ."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib31",
+      "text": "Ebert-Uphoff and Hilburn [2020] I. Ebert-Uphoff and K. Hilburn. Evaluation, tuning and interpretation of neural networks for working with images in meteorological applications. Bulletin of the American Meteorological Society , pages 1–47, 2020. doi: 10.1175/bams-d-20-0097.1 ."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib49",
+      "text": "Hilburn et al. [2021] K. A. Hilburn, I. Ebert-Uphoff, and S. D. Miller. Development and interpretation of a neural-network-based synthetic radar reflectivity estimator using goes-r satellite observations. Journal of Applied Meteorology and Climatology , 60(1):3–21, 2021. doi: 10.1175/jamc-d-20-0084.1 ."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib37",
+      "text": "Gibson et al. [2021] P. B. Gibson, W. E. Chapman, A. Altinok, L. Delle Monache, M. J. DeFlorio, and D. E. Waliser. Training machine learning models on climate model output yields skillful interpretable seasonal precipitation forecasts. Communications Earth & Environment , 2(1):159, 2021. doi: 10.1038/s43247-021-00225-4 ."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib30",
+      "text": "Dikshit and Pradhan [2021] A. Dikshit and B. Pradhan. Interpretable and explainable ai (xai) model for spatial drought prediction. Science of the Total Environment , 801:149797, 2021. doi: 10.1016/j.scitotenv.2021.149797 ."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib66",
+      "text": "Mayer and Barnes [2021] K. J. Mayer and E. A. Barnes. Subseasonal forecasts of opportunity identified by an explainable neural network. Geophysical Research Letters , 48(10):e2020GL092092, 2021. doi: 10.1029/2020gl092092 ."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib76",
+      "text": "Pegion et al. [2022] K. Pegion, E. J. Becker, and B. P. Kirtman. Understanding predictability of daily southeast u.s. precipitation using explainable machine learning. Artificial Intelligence for the Earth Systems , 1(4), oct 2022. doi: 10.1175/aies-d-22-0011.1 ."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib57",
+      "text": "Labe and Barnes [2021] Z. M. Labe and E. A. Barnes. Detecting climate signals using explainable AI with single-forcing large ensembles. Journal of Advances in Modeling Earth Systems , 13(6), jun 2021. doi: 10.1029/2021ms002464 ."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib100",
+      "text": "Van Straaten et al. [2022] C. Van Straaten, K. Whan, D. Coumou, B. Van den Hurk, and M. Schmeits. Using explainable machine learning forecasts to discover subseasonal drivers of high summer temperatures in western and central europe. Monthly Weather Review , 150(5):1115–1134, 2022. doi: 10.1175/mwr-d-21-0201.1 ."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib58",
+      "text": "Labe and Barnes [2022] Z. M. Labe and E. A. Barnes. Comparison of climate model large ensembles with observations in the arctic using simple neural networks. Earth and Space Science , 9(7):e2022EA002348, 2022. doi: 10.1002/essoar.10510977.1 ."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib83",
+      "text": "Samek et al. [2019] W. Samek, G. Montavon, A. Vedaldi, L. K. Hansen, and K.-R. Müller. Explainable AI: interpreting, explaining and visualizing deep learning , volume 11700. Springer Nature, 2019."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib8",
+      "text": "Ancona et al. [2019] M. Ancona, E. Ceolini, C. Öztireli, and M. Gross. Gradient-based attribution methods. In Explainable AI: Interpreting, Explaining and Visualizing Deep Learning , pages 169–191. Springer International Publishing, 2019. doi: 10.1007/978-3-030-28954-6_9 ."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib65",
+      "text": "Mamalakis et al. [2022b] A. Mamalakis, I. Ebert-Uphoff, and E. A. Barnes. Neural network attribution methods for problems in geoscience: A novel synthetic benchmark dataset. Environmental Data Science , 1:e8, 2022b."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib61",
+      "text": "Letzgus et al. [2022] S. Letzgus, P. Wagner, J. Lederer, W. Samek, K.-R. Müller, and G. Montavon. Toward explainable artificial intelligence for regression models: A methodological perspective. IEEE Signal Processing Magazine , 39(4):40–58, 2022."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib62",
+      "text": "Lundberg and Lee [2017] S. M. Lundberg and S.-I. Lee. A Unified Approach to Interpreting Model Predictions. Advances in neural information processing systems , 30, 2017."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib12",
+      "text": "Bach et al. [2015] S. Bach, A. Binder, G. Montavon, F. Klauschen, K.-R. Müller, and W. Samek. On pixel-wise explanations for non-linear classifier decisions by layer-wise relevance propagation. PLOS ONE , 10(7):e0130140, jul 2015. doi: 10.1371/journal.pone.0130140 ."
+    },
+    {
+      "n": 34,
+      "id": "bib.bib90",
+      "text": "Simonyan et al. [2014] K. Simonyan, A. Vedaldi, and A. Zisserman. Deep inside convolutional networks: Visualising image classification models and saliency maps. In 2nd International Conference on Learning Representations, ICLR 2014, Workshop Track Proceedings , 2014. URL http://arxiv.org/abs/1312.6034 ."
+    },
+    {
+      "n": 35,
+      "id": "bib.bib21",
+      "text": "Bykov et al. [2022a] K. Bykov, M. Deb, D. Grinwald, K.-R. Müller, and M. M.-C. Höhne. Dora: Exploring outlier representations in deep neural networks. arXiv preprint arXiv:2206.04530 , 2022a."
+    },
+    {
+      "n": 36,
+      "id": "bib.bib13",
+      "text": "Baehrens et al. [2010] D. Baehrens, T. Schroeter, S. Harmeling, M. Kawanabe, K. Hansen, and K.-R. Müller. How to explain individual classification decisions. The Journal of Machine Learning Research , 11:1803–1831, 2010."
+    },
+    {
+      "n": 37,
+      "id": "bib.bib71",
+      "text": "Montavon et al. [2019] G. Montavon, A. Binder, S. Lapuschkin, W. Samek, and K.-R. Müller. Layer-wise relevance propagation: an overview. Explainable AI: interpreting, explaining and visualizing deep learning , pages 193–209, 2019."
+    },
+    {
+      "n": 38,
+      "id": "bib.bib86",
+      "text": "Selvaraju et al. [2017] R. R. Selvaraju, M. Cogswell, A. Das, R. Vedantam, D. Parikh, and D. Batra. Grad-cam: Visual explanations from deep networks via gradient-based localization. In Proceedings of the IEEE international conference on computer vision , pages 618–626, 2017."
+    },
+    {
+      "n": 39,
+      "id": "bib.bib78",
+      "text": "Ribeiro et al. [2016] M. T. Ribeiro, S. Singh, and C. Guestrin. ”why should i trust you?”: Explaining the predictions of any classifier. In Proceedings of the 22nd ACM SIGKDD international conference on knowledge discovery and data mining , pages 1135–1144, 2016."
+    },
+    {
+      "n": 40,
+      "id": "bib.bib97",
+      "text": "Sundararajan et al. [2017] M. Sundararajan, A. Taly, and Q. Yan. Axiomatic attribution for deep networks. In International conference on machine learning , pages 3319–3328. PMLR, 2017."
+    },
+    {
+      "n": 41,
+      "id": "bib.bib77",
+      "text": "Petsiuk et al. [2018] V. Petsiuk, A. Das, and K. Saenko. Rise: Randomized input sampling for explanation of black-box models. arXiv preprint arXiv:1806.07421 , 2018."
+    },
+    {
+      "n": 42,
+      "id": "bib.bib25",
+      "text": "Chen et al. [2019] C. Chen, O. Li, D. Tao, A. Barnett, C. Rudin, and J. K. Su. This looks like that: deep learning for interpretable image recognition. Advances in neural information processing systems , 32, 2019."
+    },
+    {
+      "n": 43,
+      "id": "bib.bib34",
+      "text": "Gautam et al. [2022] S. Gautam, A. Boubekki, S. Hansen, S. Salahuddin, R. Jenssen, M. Höhne, and M. Kampffmeyer. Protovae: A trustworthy self-explainable prototypical variational model. Advances in Neural Information Processing Systems , 35:17940–17952, 2022."
+    },
+    {
+      "n": 44,
+      "id": "bib.bib35",
+      "text": "Gautam et al. [2023] S. Gautam, M. M.-C. Höhne, S. Hansen, R. Jenssen, and M. Kampffmeyer. This looks more like that: Enhancing self-explaining models by prototypical relevance propagation. Pattern Recognition , 136:109172, 2023."
+    },
+    {
+      "n": 45,
+      "id": "bib.bib5",
+      "text": "Alvarez Melis and Jaakkola [2018] D. Alvarez Melis and T. Jaakkola. Towards robust interpretability with self-explaining neural networks. Advances in neural information processing systems , 31, 2018."
+    },
+    {
+      "n": 46,
+      "id": "bib.bib84",
+      "text": "Sawada and Nakamura [2022] Y. Sawada and K. Nakamura. C-senn: Contrastive self-explaining neural network. arXiv preprint arXiv:2206.09575 , 2022."
+    },
+    {
+      "n": 47,
+      "id": "bib.bib48",
+      "text": "Hilburn [2023] K. A. Hilburn. Understanding spatial context in convolutional neural networks using explainable methods: Application to interpretable GREMLIN. Artificial Intelligence for the Earth Systems , 2(3), jul 2023. doi: 10.1175/aies-d-22-0093.1 ."
+    },
+    {
+      "n": 48,
+      "id": "bib.bib102",
+      "text": "Vidovic et al. [2016] M. M.-C. Vidovic, N. Görnitz, K.-R. Müller, and M. Kloft. Feature importance measure for non-linear learning algorithms. arXiv preprint arXiv:1611.07567 , 2016."
+    },
+    {
+      "n": 49,
+      "id": "bib.bib101",
+      "text": "Vidovic et al. [2015] M. M.-C. Vidovic, N. Görnitz, K.-R. Müller, G. Rätsch, and M. Kloft. Opening the black box: Revealing interpretable sequence motifs in kernel-based learning algorithms. In Machine Learning and Knowledge Discovery in Databases: European Conference, ECML PKDD 2015, Porto, Portugal, September 7-11, 2015, Proceedings, Part II 15 , pages 137–153. Springer, 2015."
+    },
+    {
+      "n": 50,
+      "id": "bib.bib74",
+      "text": "Nguyen et al. [2016] A. Nguyen, A. Dosovitskiy, J. Yosinski, T. Brox, and J. Clune. Synthesizing the preferred inputs for neurons in neural networks via deep generator networks. In Advances in Neural Information Processing Systems 29: Annual Conference on Neural Information Processing Systems , pages 3387–3395, 2016. URL https://proceedings.neurips.cc/paper/2016/hash/5d79099fcdf499f12b79770834c0164a-Abstract.html ."
+    },
+    {
+      "n": 51,
+      "id": "bib.bib59",
+      "text": "Lapuschkin et al. [2019] S. Lapuschkin, S. Wäldchen, A. Binder, G. Montavon, W. Samek, and K.-R. Müller. Unmasking clever hans predictors and assessing what machines really learn. Nature communications , 10, 2019. ISSN 2041-1723. doi: 10.1038/s41467-019-08987-4 ."
+    },
+    {
+      "n": 52,
+      "id": "bib.bib38",
+      "text": "Grinwald et al. [2022] D. Grinwald, K. Bykov, S. Nakajima, and M. M.-C. Höhne. Visualizing the diversity of representations learned by bayesian neural networks. arXiv preprint arXiv:2201.10859 , 2022."
+    },
+    {
+      "n": 53,
+      "id": "bib.bib95",
+      "text": "Strumbelj and Kononenko [2010] E. Strumbelj and I. Kononenko. An efficient explanation of individual classifications using game theory. The Journal of Machine Learning Research , 11:1–18, 2010."
+    },
+    {
+      "n": 54,
+      "id": "bib.bib44",
+      "text": "He et al. [2021] S. He, X. Li, T. DelSole, P. Ravikumar, and A. Banerjee. Sub-seasonal climate forecasting via machine learning: Challenges, analysis, and advances. In Proceedings of the AAAI Conference on Artificial Intelligence , volume 35, pages 169–177, 2021."
+    },
+    {
+      "n": 55,
+      "id": "bib.bib32",
+      "text": "Felsche and Ludwig [2021] E. Felsche and R. Ludwig. Applying machine learning for drought prediction in a perfect model framework using data from a large ensemble of climate simulations. Natural Hazards and Earth System Sciences , 21(12):3679–3691, 2021."
+    },
+    {
+      "n": 56,
+      "id": "bib.bib41",
+      "text": "Han et al. [2022] T. Han, S. Srinivas, and H. Lakkaraju. Which explanation should i choose? a function approximation perspective to characterizing post hoc explanations. arXiv preprint arXiv:2206.01254 , 2022."
+    },
+    {
+      "n": 57,
+      "id": "bib.bib56",
+      "text": "Krishna et al. [2022] S. Krishna, T. Han, A. Gu, J. Pombra, S. Jabbari, S. Wu, and H. Lakkaraju. The disagreement problem in explainable machine learning: A practitioner’s perspective. arXiv preprint arXiv:2202.01602 , 2022."
+    },
+    {
+      "n": 58,
+      "id": "bib.bib64",
+      "text": "Mamalakis et al. [2022a] A. Mamalakis, E. A. Barnes, and I. Ebert-Uphoff. Investigating the fidelity of explainable artificial intelligence methods for applications of convolutional neural networks in geoscience. Artificial Intelligence for the Earth Systems , pages 1–42, aug 2022a. doi: 10.1175/aies-d-22-0012.1 ."
+    },
+    {
+      "n": 59,
+      "id": "bib.bib105",
+      "text": "Yang and Kim [2019] M. Yang and B. Kim. Benchmarking attribution methods with relative feature importance. arXiv e-prints , art. arXiv:1907.09701, July 2019. doi: 10.48550/arXiv.1907.09701 . URL https://ui.adsabs.harvard.edu/abs/2019arXiv190709701Y ."
+    },
+    {
+      "n": 60,
+      "id": "bib.bib10",
+      "text": "Arras et al. [2020] L. Arras, A. Osman, and W. Samek. Ground truth evaluation of neural network explanations with CLEVR-XAI. arXiv preprint arXiv:2003.07258 , 2020."
+    },
+    {
+      "n": 61,
+      "id": "bib.bib3",
+      "text": "Agarwal et al. [2022] C. Agarwal, S. Krishna, E. Saxena, M. Pawelczyk, N. Johnson, I. Puri, M. Zitnik, and H. Lakkaraju. OpenXAI: Towards a transparent evaluation of model explanations. In Thirty-sixth Conference on Neural Information Processing Systems Datasets and Benchmarks Track , 2022."
+    },
+    {
+      "n": 62,
+      "id": "bib.bib54",
+      "text": "Janzing et al. [2020] D. Janzing, L. Minorics, and P. Blöbaum. Feature relevance quantification in explainable ai: A causal problem. International Conference on artificial intelligence and statistics , pages 2907–2916, 2020."
+    },
+    {
+      "n": 63,
+      "id": "bib.bib96",
+      "text": "Sturmfels et al. [2020] P. Sturmfels, S. Lundberg, and S.-I. Lee. Visualizing the impact of feature attribution baselines. Distill , 5(1):e22, 2020. doi: 10.23915/distill.00022 ."
+    },
+    {
+      "n": 64,
+      "id": "bib.bib45",
+      "text": "Hedström et al. [2023a] A. Hedström, P. Bommer, K. K. Wickstrøm, W. Samek, S. Lapuschkin, and M. M.-C. Höhne. The meta-evaluation problem in explainable ai: Identifying reliable estimators with metaquantus. arXiv preprint arXiv:2302.07265 , 2023a."
+    },
+    {
+      "n": 65,
+      "id": "bib.bib2",
+      "text": "Adebayo et al. [2018] J. Adebayo, J. Gilmer, M. Muelly, I. Goodfellow, M. Hardt, and B. Kim. Sanity checks for saliency maps. Advances in neural information processing systems , 31, 2018."
+    },
+    {
+      "n": 66,
+      "id": "bib.bib46",
+      "text": "Hedström et al. [2023b] A. Hedström, L. Weber, D. Krakowczyk, D. Bareeva, F. Motzkus, W. Samek, S. Lapuschkin, and M. M.-C. Höhne. Quantus: An explainable ai toolkit for responsible evaluation of neural network explanations and beyond. Journal of Machine Learning Research , 24(34):1–11, 2023b."
+    },
+    {
+      "n": 67,
+      "id": "bib.bib50",
+      "text": "Hoffman et al. [2018] R. R. Hoffman, S. T. Mueller, G. Klein, and J. Litman. Metrics for explainable ai: Challenges and prospects. arXiv preprint arXiv:1812.04608 , 2018."
+    },
+    {
+      "n": 68,
+      "id": "bib.bib11",
+      "text": "Arrieta et al. [2020] A. B. Arrieta, N. Díaz-Rodríguez, J. Del Ser, A. Bennetot, S. Tabik, A. Barbado, S. García, S. Gil-López, D. Molina, R. Benjamins, et al. Explainable artificial intelligence (xai): Concepts, taxonomies, opportunities and challenges toward responsible ai. Information fusion , 58:82–115, 2020. doi: 10.1016/j.inffus.2019.12.012 ."
+    },
+    {
+      "n": 69,
+      "id": "bib.bib68",
+      "text": "Mohseni et al. [2021] S. Mohseni, N. Zarei, and E. D. Ragan. A multidisciplinary survey and framework for design and evaluation of explainable ai systems. ACM Transactions on Interactive Intelligent Systems (TiiS) , 11(3-4):1–45, 2021."
+    }
+  ]
+}

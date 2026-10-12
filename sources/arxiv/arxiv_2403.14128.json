@@ -1,0 +1,118 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.14128",
+  "title": "Gen-T: Table Reclamation in Data Lakes",
+  "authors": "Grace Fan, Roee Shraga, RenÃ©e J. Miller",
+  "year": "2024",
+  "categories": [
+    "cs.DB"
+  ],
+  "url": "https://arxiv.org/abs/2403.14128",
+  "html_url": "https://arxiv.org/html/2403.14128",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 947,
+  "text": "We introduce the problem of Table Reclamation where we are given a source table and seek to find a set of tables from a data lake (a large table repository) that, when integrated, reproduce the source table as closely as possible. We begin with an example showing how table reclamation can be used.\n\nSuppose a user is reading a news article that reports the demographics of employees in Top US tech companies in 2021 (top blue table in Figure 1). The user has access to 2021 Microsoft’s Diversity Report [1] which seems to contradict the numbers in the news article (bottom green table in Figure 1). Using table reclamation and her data lake (which may include wikitables, NYTimes Data and other public and private datasets), the user can ask if there is a set of tables that, when integrated, recreates the data in the news article (blue table). Table reclamation is able to reproduce this table using a number of tables including World_MS_Ethnicity and World_MS_Employees (which, after being joined and a selection on 2021 is applied, produce the first tuple). We call the tables used in reclamation, originating tables. Other tables can be unioned with the Microsoft tables to reclaim the other tuples. From this (the originating tables including their meta-data and data), a user can understand that while her table (green) is reporting US statistics numbers, the article is reporting international numbers.\n\nUnlike the well-known problem of Data Provenance [2,3], we do not have prior knowledge of the query or tables that were originally used to create a Source Table. Instead, we focus on recovering possible tables that, when integrated, confirm the data values and facts in a Source Table. Table reclamation is related to the common Query-By-Example (QBE) or Query-By-Target (QBT) that discover a query over input tables that produces an instance-equivalent table to the given example output table [4,5,6,7,8,9]. In order to generalize to a data lake setting, we do not assume we know a complete and correct set of input tables. Rather, we use an additional step of finding candidate tables within or across data lakes that may contribute to the Source Table (i.e., that may be originating tables). Also, existing QBE/QBT systems focus primarily on discovering (Select)-Project-Join queries over (largely complete) relational tables [10,11,12,13,14], with some using both the data values and the schema of the tables. Due to the noise and heterogeneity of data lake tables, these queries may not be sufficient to fully integrate data lake tables to produce a given Source table. So, we aim to recover Select-Project-Join-Union queries using only the data values, since the metadata of data lake tables may be missing or inconsistent [15,16,17,18]. We also consider operations that have proven to be important in data integration and data fusion of incomplete data, namely subsumption and complementation [19].\n\nOur goal is to reclaim the source table completely, but this may not always be possible.\n\nContinuing our example, it is possible that the best reclamation we can find has null values for the percentages of Hispanic employees for Google and a different number of Asian employees (20% instead of 24%). These differences indicate that the source data about Google was not completely found within the data lake. The user can analyze the originating tables returned by our approach to understand these differences. As an example, it may be that the originating tables for the Google data in the repository are European in origin and do not report values for all categories like Hispanic employees as this is a protected category under US, but not European law.\n\nIf certain tuples cannot be reclaimed, a data scientist would know these are not derivable from her data lake. If the reclaimed table contains different values from the source, a scientist can investigate whether the source values are wrong or if they are valid corrections to errors in the originating tables. Unlike traditional QBE and QBT approaches, our focus is on the data (rather than the query) and on understanding what data in a Source Table (and only data in a Source Table) can be reclaimed. We make the following contributions.\n\n\\bullet We define the novel problem of Table Reclamation – finding a set of originating tables that, when integrated, can reproduce a Source Table as closely as possible.\n\n\\bullet To evaluate how close a reclaimed table is to a Source Table, we define a new error-aware instance similarity (EIS) score that is a principled extension of instance similarity used in data exchange [20]), and show how it can be computed efficiently.\n\n\\bullet We present an approximate Table Reclamation solution named Gen-T that performs table discovery to retrieve a set of candidate tables, and filters out poor candidates using a novel table representation that simulates table integration without performing expensive integration operations. The remaining originating tables are integrated to produce a table whose values are as close as possible to the Source Table.\n\n\\bullet We conduct extensive experiments on real and synthetic data lakes, showing that Gen-T outperforms all baseline methods. Gen-T reclaims 5X more values from Source Tables than the best-performing baseline. We perform an ablation study on the sensitivity of Gen-T to erroneous data (data that cannot be reclaimed) and to incomplete data.\n\n\\bullet We show that our solution is efficient and scalable to the size of the data lake with experiments on real data lakes containing up to 15K tables, where the average table size (number of tuples) varies from small (web tables) to extremely large (open data tables) with on average over 1M tuples. In addition, our solution is scalable to large source tables, with experiments on source tables containing up to 22 columns and 1K rows.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "Microsoft, 2021, https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWNrak , last accessed on Nov 2, 2023."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "J. Cheney, L. Chiticariu, and W. C. Tan, “Provenance in databases: Why, how, and where,” Found. Trends Databases , vol. 1, no. 4, pp. 379–474, 2009."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "J. Cheney and W. Tan, “Provenance in databases,” in Encyclopedia of Database Systems, Second Edition . Springer, 2018."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "M. Koehler, E. Abel, A. Bogatu, C. Civili, L. Mazilu, N. Konstantinou, A. A. A. Fernandes, J. A. Keane, L. Libkin, and N. W. Paton, “Incorporating data context to cost-effectively automate end-to-end data wrangling,” IEEE Trans. Big Data , vol. 7, no. 1, pp. 169–186, 2021."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "C. Wang, A. Cheung, and R. Bodík, “Synthesizing highly expressive SQL queries from input-output examples,” in PLDI , 2017, pp. 452–466."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "Y. Shen, K. Chakrabarti, S. Chaudhuri, B. Ding, and L. Novik, “Discovering queries based on example tuples,” in SIGMOD , 2014, pp. 493–504."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "D. Deutch and A. Gilad, “QPlain: Query by explanation,” in ICDE , 2016, pp. 1358–1361."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "R. Bavishi, C. Lemieux, R. Fox, K. Sen, and I. Stoica, “AutoPandas: neural-backed generators for program synthesis,” Proc. ACM Program. Lang. , vol. 3, no. OOPSLA, pp. 168:1–168:27, 2019."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "J. Yang, Y. He, and S. Chaudhuri, “Auto-Pipeline: Synthesize data pipelines by-target using reinforcement learning and search,” Proc. VLDB Endow. , vol. 14, no. 11, pp. 2563–2575, 2021."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "M. Zhang, H. Elmeleegy, C. M. Procopiuc, and D. Srivastava, “Reverse engineering complex join queries,” in SIGMOD , 2013, pp. 809–820."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "D. V. Kalashnikov, L. V. S. Lakshmanan, and D. Srivastava, “FastQRE: Fast query reverse engineering,” in SIGMOD , 2018, pp. 337–350."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "P. Orvalho, M. Terra-Neves, M. Ventura, R. Martins, and V. M. Manquinho, “SQUARES: A SQL synthesizer using query reverse engineering,” Proc. VLDB Endow. , vol. 13, no. 12, pp. 2853–2856, 2020."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "Q. T. Tran, C. Chan, and S. Parthasarathy, “Query by output,” in SIGMOD , 2009, pp. 535–548."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "A. Bonifati, R. Ciucanu, A. Lemay, and S. Staworko, “A paradigm for learning queries on big data,” in Data4U@VLDB , 2014, p. 7."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "F. Nargesian, E. Zhu, K. Q. Pu, and R. J. Miller, “Table union search on open data,” Proc. VLDB Endow. , vol. 11, no. 7, pp. 813–825, 2018."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "M. D. Adelfio and H. Samet, “Schema extraction for tabular data on the web,” Proc. VLDB Endow. , vol. 6, no. 6, pp. 421–432, 2013."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "M. H. Farid, A. Roatis, I. F. Ilyas, H. Hoffmann, and X. Chu, “CLAMS: bringing quality to data lakes,” in SIGMOD , 2016, pp. 2089–2092."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "F. Nargesian, E. Zhu, R. J. Miller, K. Q. Pu, and P. C. Arocena, “Data lake management: Challenges and opportunities,” Proc. VLDB Endow. , vol. 12, no. 12, pp. 1986–1989, 2019."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "J. Bleiholder and F. Naumann, “Data fusion,” ACM Comput. Surv. , vol. 41, no. 1, pp. 1:1–1:41, 2008."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "B. Alexe, M. A. Hernández, L. Popa, and W. C. Tan, “MapMerge: Correlating independent schema mappings,” VLDB J. , vol. 21, no. 2, pp. 191–211, 2012."
+    }
+  ]
+}

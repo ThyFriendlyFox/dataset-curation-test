@@ -1,0 +1,80 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.14958",
+  "title": "Adapprox: Adaptive Approximation in Adam Optimization via Randomized Low-Rank Matrices",
+  "authors": "Pengxiang Zhao, Ping Li, Yingjie Gu, Yi Zheng, Stephan Ludger KÃ¶lker, Zhefeng Wang, Xiaoming Yuan",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.CL",
+    "math.OC"
+  ],
+  "url": "https://arxiv.org/abs/2403.14958",
+  "html_url": "https://arxiv.org/html/2403.14958",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 734,
+  "text": "In the field of deep learning, optimization algorithms play a pivotal role in training models both efficiently and effectively. Among the most popular optimization algorithms is the Adam [1], and its variant, AdamW [2], known for their robust performance across diverse applications. However, the shift from smaller architectures like AlexNet [3] with fewer than 100 million parameters, to colossal models such as GPT-3 [4], encompassing over 100 billion parameters, poses substantial memory consumption challenges. This issue becomes particularly acute in resource-constrained environments [5]. Despite its effectiveness, the Adam optimizer exacerbates this challenge by necessitating significant memory to store both first and second moments for each parameter to maintain adaptive learning rates.\n\nThere have been notable efforts in the development of memory-efficient optimizers [6,7,8,9]. Adafactor [6] offers the option to omit Adam’s first moment, while utilizing a factored representation for the second moment. However, Adafactor tends to show a decrease in training effectiveness, which is primarily linked to the unavoidable approximation errors that occur in its matrix factorization approach [7,9]. To mitigate this performance degradation and improve training stability, the CAME optimizer [9] extends Adafactor with a confidence-based scaling factor for the parameter updates. Nevertheless, CAME still relies on the same fundamental factorization technique to store the second moment and confidence statistics, thus inheriting the core challenges encountered by Adafactor.\n\nIn this study, we present Adapprox, a novel approach designed to overcome the limitations associated with memory-efficient optimizers that rely on matrix factorization. Our work is motivated by a crucial observation: in many large-scale model training scenarios, the second moment matrices often have a limited number of dominant singular values, with the rest exhibiting substantially lower magnitudes. This insight is corroborated by empirical evidence, illustrated in Figure 1. Consequently, Adapprox employs randomized low-rank matrix approximation [10,11,12] to effectively approximate the second moment in Adam. Our method primarily reduces memory usage by distilling key features from large matrices, while also ensuring a more precise representation.\n\nFigure 1 also elucidates the limitations of fixed 1-rank approximations used in Adafactor and CAME. This approach’s tendency to compromise accuracy due to multiple dominant singular values is evident in the top row of plots in Figure 1. However, in these instances, a modest increase in the target rank for approximation can substantially improve accuracy. Considering the singular value distribution patterns of the second moment, as illustrated in Figure 1, overestimating the target rank in low-rank approximations can lead to computationally intensive processes with minimal precision improvements. Conversely, underestimating the rank significantly compromises accuracy. In response to this, Adapprox introduces a dynamic rank-selection mechanism, designed to adaptively select an optimal rank for each target matrix within the low-rank approximation process.\n\nFurthermore, to mitigate systematic errors inherent in low-rank approximations, our approach optionally integrates a cosine similarity guidance mechanism. This method computes the cosine similarity between each update and the first moment, subsequently adjusting the learning rate for that step proportionally. A low cosine similarity results in a reduced update, while a high similarity prompts an increase in the update magnitude.\n\nWe evaluated our method through the pretraining of GPT-2 across various configurations and associated downstream tasks. The findings demonstrate that our approach achieves reduced memory usage compared to Adam, while maintaining only a marginally higher memory footprint than Adafactor and CAME. Crucially, our method not only maintains performance on par with Adam but also enables accelerated convergence and improved generalization performance.\n\nOur study’s key contributions are as follows:\n\n- • In light of the singular value distribution of the second moment in Adam, we present Adapprox, which utilizes randomized low-rank matrix approximation to effectively approximate the second moment in Adam.\n\n- • We develop an adaptive rank selection mechanism that balances precision and memory savings by choosing an appropriate rank for approximating the target matrix.\n\n- • We integrate an optional cosine similarity guidance strategy into Adapprox, which aims to expedite the convergence process and enhance the stability.\n\n- • We showcase Adapprox’s efficacy on the GPT-2 pretraining and several downstream tasks. Enabling the first moment, Adapprox achieves memory savings ranging from 34.5% to 49.9% for the GPT-2 117M model and 33.8% to 49.9% for the 345M model, compared to AdamW. Disabling the first moment elevates these savings to 84.5% to 99.9% for the 117M model, and to 83.8% to 99.9% for the 345M model. Furthermore, our experimental results suggest that Adapprox may offer faster convergence and potentially improved performance outcomes.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib12",
+      "text": "Kingma & Ba (2014) Kingma, D. P. and Ba, J. Adam: A method for stochastic optimization. arXiv preprint arXiv:1412.6980 , 2014."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib20",
+      "text": "Loshchilov & Hutter (2018) Loshchilov, I. and Hutter, F. Decoupled weight decay regularization. In International Conference on Learning Representations , 2018."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib13",
+      "text": "Krizhevsky et al. (2017) Krizhevsky, A., Sutskever, I., and Hinton, G. E. Imagenet classification with deep convolutional neural networks. Communications of the ACM , 60(6):84–90, 2017."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib3",
+      "text": "Brown et al. (2020) Brown, T., Mann, B., Ryder, N., Subbiah, M., Kaplan, J. D., Dhariwal, P., Neelakantan, A., Shyam, P., Sastry, G., Askell, A., et al. Language models are few-shot learners. Advances in neural information processing systems , 33:1877–1901, 2020."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib33",
+      "text": "Steiner et al. (2023) Steiner, B., Elhoushi, M., Kahn, J., and Hegarty, J. Model: memory optimizations for deep learning. In International Conference on Machine Learning , pp. 32618–32632. PMLR, 2023."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib29",
+      "text": "Shazeer & Stern (2018) Shazeer, N. and Stern, M. Adafactor: Adaptive learning rates with sublinear memory cost. In International Conference on Machine Learning , pp. 4596–4604. PMLR, 2018."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib1",
+      "text": "Anil et al. (2019) Anil, R., Gupta, V., Koren, T., and Singer, Y. Memory efficient adaptive optimization. Advances in Neural Information Processing Systems , 32, 2019."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib16",
+      "text": "Li et al. (2023) Li, B., Chen, J., and Zhu, J. Memory efficient optimizers with 4-bit states. arXiv preprint arXiv:2309.01507 , 2023."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib21",
+      "text": "Luo et al. (2023) Luo, Y., Ren, X., Zheng, Z., Jiang, Z., Jiang, X., and You, Y. Came: Confidence-guided adaptive memory efficient optimization. In Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) , pp. 4442–4453, 2023."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib19",
+      "text": "Liberty et al. (2007) Liberty, E., Woolfe, F., Martinsson, P.-G., Rokhlin, V., and Tygert, M. Randomized algorithms for the low-rank approximation of matrices. Proceedings of the National Academy of Sciences , 104(51):20167–20172, 2007."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib18",
+      "text": "Li et al. (2014) Li, M., Bi, W., Kwok, J. T., and Lu, B.-L. Large-scale nyström kernel matrix approximation using randomized svd. IEEE transactions on neural networks and learning systems , 26(1):152–164, 2014."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib2",
+      "text": "Batselier et al. (2018) Batselier, K., Yu, W., Daniel, L., and Wong, N. Computing low-rank approximations of large-scale matrices with the tensor network randomized svd. SIAM Journal on Matrix Analysis and Applications , 39(3):1221–1244, 2018."
+    }
+  ]
+}

@@ -1,0 +1,124 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.14714",
+  "title": "Compiler generated feedback for Large Language Models",
+  "authors": "Dejan Grubisic, Chris Cummins, Volker Seeker, Hugh Leather",
+  "year": "2024",
+  "categories": [
+    "cs.PL",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2403.14714",
+  "html_url": "https://arxiv.org/html/2403.14714",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 594,
+  "text": "Large Language Models (LLMs) have proven their ability in the software engineering domain to generate the code and documentation [1,2], translate code between programming languages [3,4], write unit-tests [5,6], as well as detect and fix bugs [7,8]. The availability of large open-source code datasets [9,10] and Github enabled models such as CodeLlama [11], ChatGPT [12], and Codex [13] to develop a statistical understanding of various languages improving significantly the coding experience. Some of the models such as AlphaCode [14] are pretrained on competitive programming tasks which enables the model to optimize code on the source level for several languages.\n\nMotivated by those successes we decided to embrace the use of LLMs further in compilers and optimize code on the level of LLVM IR. In contrast to optimizing source code, where LLM should provide suggestions and a programmer should accept it or not, in compilers, LLM is responsible for making the final decision. As a consequence, LLM is not allowed to change semantics in any case. To guarantee that syntax is not changed, we use LLM to suggest optimization strategies for the given code and direct the compiler to perform optimization passes. This way we can get the best of both worlds by navigating complex optimization space with LLM while keeping the code provably correct.\n\nPrevious research in machine learning-driven code optimization has adopted various techniques, ranging from manually crafted features [15,16,17] to sophisticated graph neural networks (GNNs) [18,19]. However, a common limitation across these approaches is that the representation of the input program provided to the machine learning model remains incomplete, resulting in some loss of critical information. For instance, in the case of MLGO [15], it leverages numerical features to offer insights into function inlining but falls short in faithfully reconstructing aspects such as the call graph and control flow. Similarly, PrograML [19] employs graph-based program representations for GNNs, yet it overlooks essential details like constant values and certain types of information, hindering the faithful reproduction of program instructions.\n\nTo overcome this problem Cummins et. all [20] proposed LLMs for tuning LLVM optimization passes to reduce code size. By using LLVM IR code directly as an input, this approach demonstrated remarkable code reasoning abilities, outperforming default LLVM -Oz optimization by 2.87% while long-run autotuner used to generate data for LLM achieved 5% improvement. Instead of generating just optimization passes the model also predicts the instruction count of source and target code and optimized IR which significantly increases the performance.\n\nWe extend [20] further by evaluating the consistency of model generation by the compiler and providing feedback to the model. For each generation of the original model, we evaluate if the generated pass list is valid and if predicted instruction counts are correct and calculate bleu score [21] between the generated code and code we get by compiling the generated pass list. Additionally, we provide generated and compiled code in the feedback.\n\nWe make the following contributions in this paper:\n\n- • We present 3 compiler-generated feedback models for LLMs (Section 2)\n\n- • We evaluate 3 sampling methods with feedback (Section 4.2)\n\n- • We evaluate iterative feedback generation (Section 5.1)\n\nWith the Feedback method, we were able to increase the performance from 2.87% to 3.4% over the -Oz with a single shot while failing to improve the performance of the original model when using sampling with more than 10 samples. Additionally, the Feedback method doesn’t improve the performance of the original model when it is allowed to iterate 5 steps, while the original model uses sampling with the same number of inferences.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib25",
+      "text": "Li et al. (2023) Li, R., Allal, L. B., Zi, Y., Muennighoff, N., Kocetkov, D., Mou, C., Marone, M., Akiki, C., Li, J., Chim, J., Liu, Q., Zheltonozhskii, E., Zhuo, T. Y., Wang, T., Dehaene, O., Davaadorj, M., Lamy-Poirier, J., Monteiro, J., Shliazhko, O., Gontier, N., Meade, N., Zebaze, A., Yee, M.-H., Umapathi, L. K., Zhu, J., Lipkin, B., Oblokulov, M., Wang, Z., Murthy, R., Stillerman, J., Patel, S. S., Abulkhanov, D., Zocca, M., Dey, M., Zhang, Z., Fahmy, N., Bhattacharyya, U., Yu, W., Singh, S., Luccioni, S., Villegas, P., Kunakov, M., Zhdanov, F., Romero, M., Lee, T., Timor, N., Ding, J., Schlesinger, C., Schoelkopf, H., Ebert, J., Dao, T., Mishra, M., Gu, A., Robinson, J., Anderson, C. J., Dolan-Gavitt, B., Contractor, D., Reddy, S., Fried, D., Bahdanau, D., Jernite, Y., Ferrandis, C. M., Hughes, S., Wolf, T., Guha, A., von Werra, L., and de Vries, H. StarCoder: may the source be with you! arXiv:2305.06161 , 2023."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib3",
+      "text": "Allal et al. (2023) Allal, L. B., Li, R., Kocetkov, D., Mou, C., Akiki, C., Ferrandis, C. M., Muennighoff, N., Mishra, M., Gu, A., Dey, M., Umapathi, L. K., Anderson, C. J., Zi, Y., Poirier, J. L., Schoelkopf, H., Troshin, S., Abulkhanov, D., Romero, M., Lappert, M., Toni, F. D., del Río, B. G., Liu, Q., Bose, S., Bhattacharyya, U., Zhuo, T. Y., Yu, I., Villegas, P., Zocca, M., Mangrulkar, S., Lansky, D., Nguyen, H., Contractor, D., Villa, L., Li, J., Bahdanau, D., Jernite, Y., Hughes, S., Fried, D., Guha, A., de Vries, H., and von Werra, L. SantaCoder: don’t reach for the stars! arXiv:2301.03988 , 2023."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib23",
+      "text": "Lachaux et al. (2020) Lachaux, M.-A., Roziere, B., Chanussot, L., and Lample, G. Unsupervised Translation of Programming Languages. arXiv:2006.03511 , 2020."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "Armengol-Estapé & O’Boyle (2021) Armengol-Estapé, J. and O’Boyle, M. F. Learning C to x86 Translation: An Experiment in Neural Compilation. arXiv:2108.07639 , 2021."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib15",
+      "text": "Deng et al. (2023) Deng, Y., Xia, C. S., Peng, H., Yang, C., and Zhang, L. Large language models are zero-shot fuzzers: Fuzzing deep-learning libraries via large language models. In ISSTA , 2023."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib35",
+      "text": "Schäfer et al. (2023) Schäfer, M., Nadi, S., Eghbali, A., and Tip, F. Adaptive Test Generation Using a Large Language Model. arXiv:2302.06527 , 2023."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib2",
+      "text": "Ahmad et al. (2023) Ahmad, B., Thakur, S., Tan, B., Karri, R., and Pearce, H. Fixing hardware security bugs with large language models. arXiv preprint arXiv:2302.01215 , 2023."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib42",
+      "text": "Xia et al. (2023) Xia, C. S., Wei, Y., and Zhang, L. Automated program repair in the era of large pre-trained language models. In Proceedings of the 45th International Conference on Software Engineering (ICSE 2023). Association for Computing Machinery , 2023."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib14",
+      "text": "Da Silva et al. (2021) Da Silva, A. F., Kind, B. C., de Souza Magalhães, J. W., Rocha, J. N., Guimaraes, B. C. F., and Pereira, F. M. Q. Anghabench: A suite with one million compilable c benchmarks for code-size reduction. In 2021 IEEE/ACM International Symposium on Code Generation and Optimization (CGO) , pp. 378–390. IEEE, 2021."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib5",
+      "text": "Armengol-Estapé et al. (2022) Armengol-Estapé, J., Woodruff, J., Brauckmann, A., Magalhães, J. W. d. S., and O’Boyle, M. F. Exebench: an ml-scale dataset of executable c functions. In Proceedings of the 6th ACM SIGPLAN International Symposium on Machine Programming , pp. 50–59, 2022."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib34",
+      "text": "Rozière et al. (2023) Rozière, B., Gehring, J., Gloeckle, F., Sootla, S., Gat, I., Tan, X. E., Adi, Y., Liu, J., Remez, T., Rapin, J., Kozhevnikov, A., Evtimov, I., Bitton, J., Bhatt, M., Ferrer, C. C., Grattafiori, A., Xiong, W., Défossez, A., Copet, J., Azhar, F., Touvron, H., Martin, L., Usunier, N., Scialom, T., and Synnaeve, G. Code Llama: Open Foundation Models for Code. arXiv:2308.12950 , 2023."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib31",
+      "text": "OpenAI (2023) OpenAI. GPT-4 Technical Report. arXiv:2303.08774 , 2023."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib9",
+      "text": "Chen et al. (2021) Chen, M., Tworek, J., Jun, H., Yuan, Q., Pinto, H. P. d. O., Kaplan, J., Edwards, H., Burda, Y., Joseph, N., Brockman, G., Ray, A., Puri, R., Krueger, G., Petrov, M., Khlaaf, H., Sastry, G., Mishkin, P., Chan, B., Gray, S., Ryder, N., Pavlov, M., Power, A., Kaiser, L., Bavarian, M., Winter, C., Tillet, P., Such, F. P., Cummings, D., Plappert, M., Chantzis, F., Barnes, E., Herbert-Voss, A., Guss, W. H., Nichol, A., Paino, A., Tezak, N., Tang, J., Babuschkin, I., Balaji, S., Jain, S., Saunders, W., Hesse, C., Carr, A. N., Leike, J., Achiam, J., Misra, V., Morikawa, E., Radford, A., Knight, M., Brundage, M., Murati, M., Mayer, K., Welinder, P., McGrew, B., Amodei, D., McCandlish, S., Sutskever, I., and Zaremba, W. Evaluating Large Language Models Trained on Code. arXiv:2107.03374 , 2021."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib26",
+      "text": "Li et al. (2022) Li, Y., Choi, D., Chung, J., Kushman, N., Schrittwieser, J., Leblond, R., Eccles, T., Keeling, J., Gimeno, F., Lago, A. D., Hubert, T., Choy, P., d’Autume, C. d. M., Babuschkin, I., Chen, X., Huang, P.-S., Welbl, J., Gowal, S., Cherepanov, A., Molloy, J., Mankowitz, D. J., Robson, E. S., Kohli, P., de Freitas, N., Kavukcuoglu, K., and Vinyals, O. Competition-level code generation with AlphaCode. Science , 378(6624), 2022."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib38",
+      "text": "Trofin et al. (2021) Trofin, M., Qian, Y., Brevdo, E., Lin, Z., Choromanski, K., and Li, D. MLGO: a Machine Learning Guided Compiler Optimizations Framework. arXiv:2101.04808 , 2021."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib39",
+      "text": "Wang & O’Boyle (2018) Wang, Z. and O’Boyle, M. Machine Learning in Compiler Optimisation. arXiv:1805.03441 , 2018."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib24",
+      "text": "Leather & Cummins (2020) Leather, H. and Cummins, C. Machine Learning in Compilers: Past, Present and Future. In FDL , 2020."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib27",
+      "text": "Liang et al. (2023) Liang, Y., Stone, K., Shameli, A., Cummins, C., Elhoushi, M., Guo, J., Steiner, B., Yang, X., Xie, P., Leather, H., and Tian, Y. Learning Compiler Pass Orders using Coreset and Normalized Value Prediction. In ICML , 2023."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib12",
+      "text": "Cummins et al. (2021) Cummins, C., Fisches, Z., Ben-Nun, T., Hoefler, T., O’Boyle, M., and Leather, H. ProGraML: A Graph-based Program Representation for Data Flow Analysis and Compiler Optimizations. In ICML , 2021."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib13",
+      "text": "Cummins et al. (2023) Cummins, C., Seeker, V., Grubisic, D., Elhoushi, M., Liang, Y., Roziere, B., Gehring, J., Gloeckle, F., Hazelwood, K., Synnaeve, G., et al. Large language models for compiler optimization. arXiv preprint arXiv:2309.07062 , 2023."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib32",
+      "text": "Papineni et al. (2002) Papineni, K., Roukos, S., Ward, T., and Zhu, W.-J. BLEU: A Method for Automatic Evaluation of Machine Translation. In ACL , 2002."
+    }
+  ]
+}

@@ -1,0 +1,123 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2310.07756",
+  "title": "Self-supervised Representation Learning From Random Data Projectors",
+  "authors": "Yi Sui, Tongzi Wu, Jesse C. Cresswell, Ga Wu, George Stein, Xiao Shi Huang, Xiaochen Zhang, Maksims Volkovs",
+  "year": "2024",
+  "categories": [
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2310.07756",
+  "html_url": "https://arxiv.org/html/2310.07756",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 772,
+  "text": "Learning data representations in a self-supervised manner is commonly associated with well-designed pretext tasks that can create heuristics for machine learning models to identify and encode useful information from unlabelled data. While pretext tasks are often highly customized to specific applications, they are typically based on a handful of underlying assumptions. Pretext tasks utilizing the transformation invariance assumption across data augmentation views show leading performance in multiple research domains. For computer vision, image representations are commonly guided to remain identical after cropping, rotating, flipping, or corrupting, among others [1,2]. Similarly, in natural language processing, sentences with similar words and semantic meaning are expected to have the same representation [3,4]. In these and other domains transformation invariance is encouraged explicitly through contrastive or momentum objectives that aim to bring together representations before and after transformation.\n\nDespite their strong performance in many domains, self-supervised representation learning (SSRL) algorithms that enforce transformation invariance are limited in that they do not support generic data types. Many well-known data augmentation methods are tailored to specific modalities, and are restricted in their generality across different domains. For instance, Gaussian noise corruption cannot be applied directly to textual data, while image rotation is not applicable in the tabular domain. Thus, augmentation based SSRL techniques are inherently constrained in their cross-domain applicability.\n\nWhile these examples show modality limitations, a more subtle problem is that even standard augmentations can conflict with application-specific constraints. For example, pathology images of stained tissue samples have low color variation [5,6], so naïve color-jittering produces unnatural augmentations (see Fig. 1). Such incorrect images may be inappropriate and unsafe for use in critical medical imaging applications [7]. For time series with high periodicity, such as online monitoring data, random shifting augmentations can create\n\nidentical augmented views that are not useful for pretext tasks [10,11]. In tabular settings where relatively few options for augmentations are available, random noise addition or random swapping of features between training examples can easily produce unrealistic examples. As a concrete example from particle physics, consider energies and momenta of interacting particles collected experimentally [12]. Since the incoming and outgoing energies are constrained by the laws of physics, only certain combinations are possible to observe. Tabular augmentations would produce unphysical combinations, harming the consistency of learned representations and leading to unpredictable failures on downstream tasks [13].\n\nInstead of relying on transformation invariance, many self-supervised learning techniques involve masking and reconstructing input data including masked image modelling [14,15] for computer vision and masked language modelling [16,17] for natural language processing. However, these methods often require specific backbone architectures like transformers [18] to achieve good performance [19].\n\nIn this paper, we introduce a SSRL training scheme that requires neither domain-specific data augmentations nor particular architectures as in masking approaches. Instead, the proposed learning method is based on a surprising hypothesis that good data representations can be obtained by learning to simultaneously reconstruct multiple randomly generated data projection functions. The hypothesis comes from the conventional motivation of representation learning – capturing and extracting abstract and valuable concepts that can support a range of downstream predictive tasks [20,21]. In particular, the downstream tasks could include arbitrary data projections. Formally, given random projection functions G=\\{\\cdots g^{(k)}(\\mathbf{x})\\cdots\\} whose input domains are raw data features \\mathbf{x}\\in\\mathcal{X}, the motivation above suggests that, for a good representation \\mathbf{z} of data \\mathbf{x}, there is another group of simple prediction functions H=\\{\\cdots h^{(k)}(\\mathbf{z})\\cdots\\} that can correctly predict the random functions’ outputs. With this insight, the representation learning task can be construed as a search for a combination of representation \\mathbf{z} and prediction functions H that can reproduce random data projections. In short, we conduct SSRL by learning from randomness (LFR).\n\nThe primary advantage of LFR is that random projection functions G can easily be created for any data modality. One straightforward instantiation is by taking a neural network with suitable architecture for consuming the data, and randomly initializing its parameters. Hence, LFR applies to all subfields of SSRL. Also, data augmentations are not used, so LFR avoids any concerns of unsafe, identical, or unrealistic augmentations as discussed above.\n\nWe empirically evaluate the effectiveness of LFR on a wide range of representation learning tasks that span diverse data types (including image, sequential, and tabular) and multiple real-world applications (banking, healthcare and natural sciences). The results show that LFR outperforms commonly used domain-agnostic SSRL algorithms. It is even competitive with many domain-specific approaches that rely heavily on expert knowledge for their data augmentation designs. The remarkable performance demonstrates that learning high-quality data representations from randomness is a feasible and plausible alternative when the transformation invariance assumption is hard to establish or enforce in a given application domain.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib12",
+      "text": "Chen et al. (2020) Ting Chen, Simon Kornblith, Mohammad Norouzi, and Geoffrey Hinton. A simple framework for contrastive learning of visual representations. In Proceedings of the 37th International Conference on Machine Learning , volume 119, pp. 1597–1607, 13–18 Jul 2020."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib23",
+      "text": "Grill et al. (2020) Jean-Bastien Grill, Florian Strub, Florent Altché, Corentin Tallec, Pierre Richemond, Elena Buchatskaya, Carl Doersch, Bernardo Avila Pires, Zhaohan Guo, Mohammad Gheshlaghi Azar, et al. Bootstrap your own latent-a new approach to self-supervised learning. In Advances in Neural Information Processing Systems , volume 33, 2020."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib59",
+      "text": "Wei & Zou (2019) Jason Wei and Kai Zou. EDA: Easy data augmentation techniques for boosting performance on text classification tasks. In Empirical Methods in Natural Language Processing and the 9th International Joint Conference on Natural Language Processing , 2019. doi: 10.18653/v1/D19-1670 ."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib60",
+      "text": "Wu et al. (2019) Xing Wu, Shangwen Lv, Liangjun Zang, Jizhong Han, and Songlin Hu. Conditional bert contextual augmentation. In International Conference onComputational Science , pp. 84–95, 2019."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib47",
+      "text": "Shen et al. (2022) Yiqing Shen, Yulin Luo, Dinggang Shen, and Jing Ke. RandStainNA: Learning Stain-Agnostic Features from Histology Slides by Bridging Stain Augmentation and Normalization. In Medical Image Computing and Computer Assisted Intervention , pp. 212–221. Springer, 2022."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib32",
+      "text": "Kang et al. (2023) Mingu Kang, Heon Song, Seonwook Park, Donggeun Yoo, and Sérgio Pereira. Benchmarking self-supervised learning on diverse pathology datasets. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pp. 3344–3354, June 2023."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib21",
+      "text": "Elgendi et al. (2021) Mohamed Elgendi, Muhammad Umer Nasir, Qunfeng Tang, David Smith, John-Paul Grenier, Catherine Batte, Bradley Spieler, William Donald Leslie, Carlo Menon, Richard Ribbon Fletcher, Newton Howard, Rabab Ward, William Parker, and Savvas Nicolaou. The Effectiveness of Image Augmentation in Deep Learning Networks for Detecting COVID-19: A Geometric Transformation Perspective. Frontiers in Medicine , 8:629134, 2021. doi: 10.3389/fmed.2021.629134 ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib10",
+      "text": "Chan (2014) John KC Chan. The wonderful colors of the hematoxylin–eosin stain in diagnostic surgical pathology. International Journal of Surgical Pathology , 22(1):12–32, 2014."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib13",
+      "text": "Chen & He (2021) Xinlei Chen and Kaiming He. Exploring simple siamese representation learning. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pp. 15750–15758, 2021."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib20",
+      "text": "Eldele et al. (2021) Emadeldeen Eldele, Mohamed Ragab, Zhenghua Chen, Min Wu, Chee Keong Kwoh, Xiaoli Li, and Cuntai Guan. Time-series representation learning via temporal and contextual contrasting. In Proceedings of the Thirtieth International Joint Conference on Artificial Intelligence , pp. 2352–2359, 2021."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib66",
+      "text": "Zhang & Ma (2022) Junbo Zhang and Kaisheng Ma. Rethinking the augmentation module in contrastive learning: Learning hierarchical augmentation invariance with expanded views. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pp. 16650–16659, 2022."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib8",
+      "text": "Brehmer & Cranmer (2020) Johann Brehmer and Kyle Cranmer. Flows for simultaneous manifold learning and density estimation. In Advances in Neural Information Processing Systems , volume 33, 2020."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib48",
+      "text": "Shorten & Khoshgoftaar (2019) Connor Shorten and Taghi M Khoshgoftaar. A survey on image data augmentation for deep learning. Journal of Big Data , 6(1):1–48, 2019."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib28",
+      "text": "He et al. (2022) Kaiming He, Xinlei Chen, Saining Xie, Yanghao Li, Piotr Dollár, and Ross Girshick. Masked autoencoders are scalable vision learners. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pp. 16000–16009, 2022."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib62",
+      "text": "Xie et al. (2022) Zhenda Xie, Zheng Zhang, Yue Cao, Yutong Lin, Jianmin Bao, Zhuliang Yao, Qi Dai, and Han Hu. SimMIM: A Simple Framework for Masked Image Modeling. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pp. 9653–9663, 2022."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib17",
+      "text": "Devlin et al. (2019) Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding. In Proceedings of NAACL-HLT , pp. 4171–4186, 2019."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib43",
+      "text": "Raffel et al. (2020) Colin Raffel, Noam Shazeer, Adam Roberts, Katherine Lee, Sharan Narang, Michael Matena, Yanqi Zhou, Wei Li, and Peter J. Liu. Exploring the limits of transfer learning with a unified text-to-text transformer. Journal of Machine Learning Research , 21(140):1–67, 2020."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib54",
+      "text": "Vaswani et al. (2017) Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N Gomez, Łukasz Kaiser, and Illia Polosukhin. Attention is all you need. In Advances in Neural Information Processing Systems , volume 30, 2017."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib6",
+      "text": "Balestriero et al. (2023) Randall Balestriero, Mark Ibrahim, Vlad Sobal, Ari Morcos, Shashank Shekhar, Tom Goldstein, Florian Bordes, Adrien Bardes, Gregoire Mialon, Yuandong Tian, et al. A Cookbook of Self-Supervised Learning. arXiv:2304.12210 , 2023."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib7",
+      "text": "Bengio et al. (2013) Yoshua Bengio, Aaron Courville, and Pascal Vincent. Representation learning: A review and new perspectives. IEEE Transactions on Pattern Analysis and Machine Intelligence , 35(8):1798–1828, 2013."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib35",
+      "text": "Le-Khac et al. (2020) Phuc H Le-Khac, Graham Healy, and Alan F Smeaton. Contrastive representation learning: A framework and review. IEEE Access , 8:193907–193934, 2020."
+    }
+  ]
+}

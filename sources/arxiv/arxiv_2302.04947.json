@@ -1,0 +1,159 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2302.04947",
+  "title": "Gaussian Process-Gated Hierarchical Mixtures of Experts",
+  "authors": "Yuhao Liu, Marzieh Ajirak, Petar Djuric",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "stat.ML"
+  ],
+  "url": "https://arxiv.org/abs/2302.04947",
+  "html_url": "https://arxiv.org/html/2302.04947",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1290,
+  "text": "In this paper, we present a novel approach to constructing a hierarchical mixture of experts (HMEs) using Gaussian processes (GPs). HMEs have proven instrumental in a wide array of applications, including regression, classification, and fusion tasks across diverse domains such as healthcare, finance, and pattern recognition [1]. These models can be conceptualized as conditional mixture models, where the distributions of target variables are expressed as combinations of expert distributions. The expert distributions, along with their corresponding mixing coefficients, are conditioned on the input variables. Traditionally, model parameters are estimated by maximizing the likelihood, a practice that often leads to severe overfitting. For addressing this challenge, a comprehensive Bayesian treatment of the model based on variational inference was proposed in [2].\n\nOur work in this paper aligns better with [3]. In that paper, the authors introduced an end-to-end differentiable amortized variational inference algorithm for HMEs. The algorithm incorporates a recurrent neural network to approximate the posterior distribution over tree node routing decisions. This not only enhances the flexibility and efficiency of the HME framework but also underscores the ongoing evolution of methodologies within this domain.\n\nThere is a structural similarity between hierarchical mixtures of experts and soft decision trees with fixed tree structures. We recall that a decision tree is a hierarchical structure composed of internal nodes and terminal leaves [4,5]. A canonical decision tree is composed of internal nodes that represent tests on attributes. Based on the results of the test, the tree assigns samples to one of the children. The leaves on the other hand hold the labels for the classification tasks or are constants for the regression tasks. As a result, a sample traverses a single path from the root to one of the leaves.\n\nDecision tree nodes exhibit characteristics based on feature comparisons. Univariate nodes use a single feature, comparing it against a threshold value [5]. In the case of multivariate nodes, they define a linear discriminant in the input space for comparisons [6,7], with the ability to generalize this discriminant to be nonlinear [8]. Decision trees can implement various statistical model selection procedures at their respective nodes [9].\n\nIn contrast to hard deterministic trees, where children are deterministically selected, soft probabilistic decision trees involve selecting children with specific probabilities [10]. This entails traversing all the possible paths to the leaves, and the final decision is collectively contributed by all the leaves with varying probabilities.\n\nThe interpretability of soft decision trees extends to Gaussian soft decision trees in the context of interpretable feature-based classification [11]. In [12], a deep neural network (DNN) was used to train a soft decision tree mimicking the input-output function discovered by a neural network (NN). Soft decision trees provide interpretability for DNNs and explainability for the representations of individual hidden layers. This approach is akin to a hierarchical mixture of experts with parametric probabilistic tree-based aggregation [1], where the experts correspond to the leaves, and the coefficients are derived from the gating nodes.\n\nGP extensions to HMEs have also been studied, [13,14], and in [15], hierarchical GP latent variable models have been investigated. We observe that the GP-based HME models rely mostly on function spaces rather than feature spaces.\n\nThe association between GPs and NNs has been addressed in several papers [16,17,18,19]. Given the relationship between GPs and single-layered NNs with an infinite number of hidden units [20], GPs alleviate the challenge of specifying the number of units in hidden layers by implicitly operating with infinite representations, This is particularly beneficial in the context of feature spaces, where GP models contribute to the formulation of Bayesian Neural Networks (BNNs) capable of quantifying uncertainties.\n\nSparse GPs stand out for their ability to reduce the computational complexity of standard GPs from cubic to quadratic. Three main approaches to complexity reduction of GPs include the (1) inducing point-based approach [21], (2) finite basis expansion using Random Fourier Features (RFFs) [22], and (3) Hilbert space approximations of the covariance operator (HGPs) [23]. Unlike inducing point-based methods, RFF-based GPs and HGPs do not require any matrix decomposition, and instead, they only need matrix products, which in turn boost their computational speed. These two approaches transform nonlinear input spaces into linear kernel feature spaces, hereinafter referred to as feature spaces to distinguish them from the original input spaces.\n\nIn this paper, we work with RFF-based GPs. The application of the RFF expansion to various kernels of GPs yields distinct activation functions in NN. For example, trigonometric functions are associated with the Radial Basis Function (RBF) kernel, while the ARC-COSINE kernel corresponds to Rectified Linear Unit (ReLU) functions [24]. Variational learning of the posterior over the random Fourier features when the squared exponential kernel is used was proposed in [25].\n\nSome recent contributions in the field and relevant to our work include Bayesian treed GP models [26], GP Bayesian Additive Regression Trees (GP-BART) [27], and GP-trees [28]. The Bayesian treed GP models allow for nonstationary modeling that couple stationary GPs with treed partitioning. The GP-BART approach from [27] introduces a Bayesian additive regression trees methodology based on GPs. This approach is distinguished by its use of GPs within the context of additive regression trees. Namely, in standard BART, there is no covariance structure over the observations which may lead to poor performance. The GP-BART model extends BART to address this weakness by assuming GP priors for the predictions of each terminal node. In [28], the authors present a GP-tree-type classifier specifically designed for few-shot incremental learning scenarios. The model addresses challenges in learning from limited labeled examples, and it works very well in scenarios where data is scarce. Other recent work in his space include [28].\n\nThe above models, partition the data only in the input space, either in the form of HMEs or soft decision trees. In other words, the gating models or the inner nodes are nonlinear functions of the inputs. In this paper, we propose GP-gated HMEs (GPHMEs) with structures of fixed complete binary trees where both, the gating and expert models, rely on RF expansions of GPs. This allows for making decisions by the GPs in linear feature spaces and for a considerable reduction of the complexity of the trees. We optimize the GPHMEs by using variational inference and by exploiting the reparameterization trick. In practice, the results show that the optimal height of a tree is no greater than four even for large-scale data sets with more than millions of samples. The smaller size of our tree structure is a result of the nonlinear transformation of the input space and the oblique decision mechanisms that are created. Further, the GPHME outperforms the tree-based benchmarks that partition the input data.\n\nOur model can also be used to provide interpretability of deep GPs (DGPs). DGPs are deep belief networks based on a stack of GP mappings, where each hidden layer is composed of a multivariate GP. In practice, DGPs require less depth and width compared to DNNs. However, the DGPs encounter the problem of interpreting the hidden layers. Similar to the interpretability of DNNs distilled by soft decision trees [12], this paper provides ways of getting insights into understanding how a DGP makes its decisions.\n\nIn summary, this paper introduces a GPHME model, a novel HME that uses RF-based GPs. We also demonstrate the superiority of the GPHME over existing state-of-the-art methods. Furthermore, the proposed method has reduced complexity and is readily applicable to large-scale problems. With our approach, we are able to quantify the uncertainty of GP probability distributions compared to trees, providing valuable insights for decision-makers. Additionally, we offer a method for interpreting DGP behaviors and offer explanations for the models located on the leaf nodes. Our contributions extend the current understanding of hierarchical models, offering a promising direction for future research and applications.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "M. I. Jordan and R. A. Jacobs, “Hierarchical mixtures of experts and the EM algorithm,” Neural Computation , vol. 6, no. 2, pp. 181–214, 1994."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "C. M. Bishop and M. Svensén, “Bayesian hierarchical mixtures of experts,” arXiv preprint arXiv:1212.2447 , 2012."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "A. Agrawal and J. Domke, “Amortized variational inference for simple hierarchical models,” in Advances in Neural Information Processing Systems , A. Beygelzimer, Y. Dauphin, P. Liang, and J. W. Vaughan, Eds., 2021."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "W.-Y. Loh, “Classification and regression trees,” Wiley Interdisciplinary Reviews: Data Mining and Knowledge Discovery , vol. 1, no. 1, pp. 14–23, 2011."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "J. R. Quinlan, C4. 5: Programs for Machine Learning . Elsevier, 2014."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "S. K. Murthy, S. Kasif, and S. Salzberg, “A system for induction of oblique decision trees,” Journal of Artificial Intelligence Research , vol. 2, pp. 1–32, 1994."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "O. T. Yildiz and E. Alpaydin, “Linear discriminant trees,” International Journal of Pattern Recognition and Artificial Intelligence , vol. 19, no. 03, pp. 323–353, 2005."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "H. Guo and S. B. Gelfand, “Classification trees with neural network feature extraction,” in Proceedings 1992 IEEE Computer Society Conference on Computer Vision and Pattern Recognition . IEEE Computer Society, 1992, pp. 183–184."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "C. Yildiz and E. Alpaydin, “Omnivariate decision trees,” IEEE Transactions on Neural Networks , vol. 12, no. 6, pp. 1539–1546, 2001."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "O. Irsoy, O. T. Yıldız, and E. Alpaydın, “Soft decision trees,” in Proceedings of the 21st International Conference on Pattern Recognition (ICPR2012) . IEEE, 2012, pp. 1819–1822."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "J. Yoo and L. Sael, “Gaussian soft decision trees for interpretable feature-based classification,” in Pacific-Asia Conference on Knowledge Discovery and Data Mining . Springer, 2021, pp. 143–155."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "N. Frosst and G. Hinton, “Distilling a neural network into a soft decision tree,” arXiv preprint arXiv:1711.09784 , 2017."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "J. Q. Shi, R. Murray-Smith, and D. M. Titterington, “Hierarchical Gaussian process mixtures for regression,” Statistics and Computing , vol. 15, no. 1, pp. 31–41, 2005."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "J. W. Ng and M. P. Deisenroth, “Hierarchical mixture-of-experts model for large-scale Gaussian process regression,” arXiv preprint arXiv:1412.3078 , 2014."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "N. D. Lawrence and A. J. Moore, “Hierarchical Gaussian process latent variable models,” in Proceedings of the 24th international Conference on Machine Learning , 2007, pp. 481–488."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "J. Lee, Y. Bahri, R. Novak, S. S. Schoenholz, J. Pennington, and J. Sohl-Dickstein, “Deep neural networks as Gaussian processes,” arXiv preprint arXiv:1711.00165 , 2017."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "A. G. Wilson and P. Izmailov, “Bayesian deep learning and a probabilistic perspective of generalization,” Advances in Neural Information Processing Systems , vol. 33, pp. 4697–4708, 2020."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "V. Dutordoir, J. Hensman, M. van der Wilk, C. H. Ek, Z. Ghahramani, and N. Durrande, “Deep neural networks as point estimates for deep Gaussian processes,” Advances in Neural Information Processing Systems , vol. 34, 2021."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "G. Pleiss and J. P. Cunningham, “The limitations of large width in neural networks: A deep Gaussian process perspective,” Advances in Neural Information Processing Systems , vol. 34, 2021."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "R. M. Neal, Bayesian Learning for Neural Networks . Springer Science & Business Media, 2012, vol. 118."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "J. Quinonero-Candela and C. E. Rasmussen, “A unifying view of sparse approximate Gaussian process regression,” The Journal of Machine Learning Research , vol. 6, pp. 1939–1959, 2005."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib22",
+      "text": "A. Rahimi and B. Recht, “Random features for large-scale kernel machines,” Advances in neural information processing systems , vol. 20, 2007."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib23",
+      "text": "A. Solin and S. Särkkä, “Hilbert space methods for reduced-rank Gaussian process regression,” Statistics and Computing , vol. 30, no. 2, pp. 419–446, 2020."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib24",
+      "text": "Y. Cho and L. Saul, “Kernel methods for deep learning,” Advances in Neural Information Processing Systems , vol. 22, 2009."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib25",
+      "text": "Y. Gal and R. Turner, “Improving the Gaussian process sparse spectrum approximation by representing uncertainty in frequency inputs,” in International Conference on Machine Learning . PMLR, 2015, pp. 655–664."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib26",
+      "text": "R. B. Gramacy and H. K. H. Lee, “Bayesian treed Gaussian process models with an application to computer modeling,” Journal of the American Statistical Association , vol. 103, no. 483, pp. 1119–1130, 2008."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib27",
+      "text": "M. Maia, K. Murphy, and A. C. Parnell, “GP-BART: a novel Bayesian additive regression trees approach using Gaussian processes,” Computational Statistics & Data Analysis , vol. 190, p. 107858, 2024."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib28",
+      "text": "I. Achituve, A. Navon, Y. Yemini, G. Chechik, and E. Fetaya, “GP-tree: A Gaussian process classifier for few-shot incremental learning,” in International Conference on Machine Learning . PMLR, 2021, pp. 54–65."
+    }
+  ]
+}

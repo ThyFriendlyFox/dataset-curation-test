@@ -1,0 +1,184 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2312.03347",
+  "title": "Identifying hubs in directed networks",
+  "authors": "Alec Kirkley",
+  "year": "2024",
+  "categories": [
+    "cs.SI",
+    "physics.soc-ph"
+  ],
+  "url": "https://arxiv.org/abs/2312.03347",
+  "html_url": "https://arxiv.org/html/2312.03347",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1160,
+  "text": "Highly connected “hub” nodes play an important role in the structure and function of networks across a wide range of applications [1]. Hub regions in brain networks are central for communication and information integration [2,3]. Hub stations in transportation networks are important for resilience to failures and efficient routing [4,5]. Hub proteins in protein interaction networks are often essential for the survival and reproduction of an organism [6]. And hub locations in human mobility networks can be hotspots for congestion, economic activity, and the spread of disease [7,8].\n\nThe natural way to define a hub node in a network is to use degree centrality as an indicator—the more connections a node has, the more critical it is for network connectivity, and above some degree threshold (typically at or above the average degree in the network) we consider a node to be a “hub” [9]. Often the label of “hub” is reserved for nodes with an “unusually high” degree [1], as these nodes have a disproportionate influence on many processes that take place on the network such as epidemics or information spreading [10,11]. The labelling of a node as a hub can be based on its in-degree and/or out-degree when the network is directed, depending on the application of interest. For example, in human mobility networks, one is often interested in targeting locations (nodes) with high population in-flows (weighted in-degree) for interventions to reduce congestion or the spread of disease, making the in-degree a relevant criterion for hub classification.\n\nThe concept of a hub node can also be extended to capture more global notions of centrality in a network. For example, the HITS algorithm [12] assigns a hub and authority score to each node in the network in a self-consistent manner: nodes are given a high authority score if they are pointed to by nodes with high hub scores, and nodes are given a high hub score if they point towards nodes with high authority scores. The stationary solution for the hub scores in the HITS algorithm are the entries in the leading eigenvector of the adjacency matrix of the network multiplied by its transpose, which indicates that these hub scores are capturing global information about the graph. Any number of other global centrality indices such as closeness, betweenness, eigenvector centrality, or Katz centrality can also in principle be used to define hub nodes at a global level, but ultimately many of these measures are highly correlated with degree in a large number of network models and real-world systems [13,14,15,16,17,18].\n\nIdentifying hub nodes as nodes with “unusually high” degrees can be thought of as performing outlier detection on the degree sequence listing the degree of each node in the network. But existing information theoretic outlier detection methods either require the number of outliers to be known ahead of time [19], are formulated for general graph databases [20], or have parametric forms for the model likelihood which must be inferred [21], making them poorly suited for direct application to network degree sequences for classifying hub nodes.\n\nThe identification of hubs in weighted, directed networks also directly relates to the idea of identifying “hotspots” with high flows in human mobility networks, for which the “Loubar” method of [22] is an elegant and widely used method. The Loubar method utilizes the Lorenz curve of the flows in and/or out of nodes in a human mobility network to identify nodes with high flows as hotspots of activity. The Loubar method has been used in range of applications to understand epidemic spreading [23,8], commuting structure [24], and economic growth [25] using human mobility data. This method has the desirable property of being completely nonparametric—it automatically selects the number of hotspot nodes from the data itself, without any user-controlled input parameters. However, it does not specifically look at the pairwise nature of network structure in its formulation, so cannot be compared with other network models using rigorous model selection criteria. The Loubar method also does not depend on the full distribution of flows, but only the mean and maximum of the flows, which we show in a range of experiments can lead to undesirable behavior where a large fraction of nodes in the network are classified as hubs.\n\nMethods directly aimed at network compression using Bayesian or information theoretic criteria—including blockmodeling [26], configuration models [27], core-periphery modeling [28], and other nonparametric information theoretic methods for summarizing network structure [29,30,31] —are well-suited for identifying hubs in network data, since these methods allow for the automatic selection of the number of hubs and comparison with other network models using the MDL principle. However, none of the aforementioned methods explicitly aim to identify hub nodes, and so may only identify hub nodes as a separate group by chance if grouping these nodes happens to provide compression with respect to the mixing structure assumed by the model. For example, high degree nodes are often grouped together in the (non-degree-corrected) stochastic blockmodel [32], and the core nodes in a core-periphery blockmodel are often of high degree [28]. To identify hub nodes one only needs to consider the number of edges incident on the hub nodes, and not the connectivity among the hub nodes nor among the non-hub nodes which are key factors in the description length of a network under a blockmodel.\n\nIn this paper we develop principled, efficient, nonparametric methods to classify hub nodes in directed networks based on the Minimum Description Length (MDL) principle, which states that the best model among a set of candidate models for a dataset is the one that results in the lowest description length for the data [33]. In our approach, the MDL principle allows us to select the optimal configuration of hub nodes in a network by minimizing the description length of data encodings that exploit degree discrepancies between hub nodes and non-hub nodes. We adapt our formulation to multiple encoding schemes applicable to unweighted and weighted networks, and describe a simple, fast algorithm to identify the hub nodes in these networks. We apply our method to a variety of synthetic network models, finding that the extent to which we can compress networks with hub nodes depends on the heterogeneity of the degree distribution and that our encodings can give more intuitive summaries of the hub structure than existing methods in these cases. We also apply our method to growing random graph models, finding that we can identify a hub transition at which it becomes most compressive to describe the network using hub nodes, and that this transition depends on the parameters of the growth model in a physically meaningful way. Finally, we apply our method to a corpus of directed network datasets from a wide range of disciplines, finding that many real networks do not have hub structure according to our more conservative encoding and that the information in many of the networks with discernible hub structure can be effectively compressed by focusing on the high degree hub nodes when transmitting the network.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "M. Newman, Networks . Oxford University Press, Oxford, 2nd edition (2018)."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "M. P. Van den Heuvel and O. Sporns, Network hubs in the human brain. Trends in Cognitive Sciences 17 (12), 683–696 (2013)."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "D. S. Bassett and O. Sporns, Network neuroscience. Nature Neuroscience 20 (3), 353–364 (2017)."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "T. Verma, N. A. Araújo, and H. J. Herrmann, Revealing the structure of the world airline network. Scientific Reports 4 (1), 5638 (2014)."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "C. Roucolle, T. Seregina, and M. Urdanoz, Measuring the development of airline networks: Comprehensive indicators. Transportation Research Part A: Policy and Practice 133 , 303–324 (2020)."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "X. He and J. Zhang, Why do hubs tend to be essential in protein networks? PLoS Genetics 2 (6), e88 (2006)."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "S. Mimar, D. Soriano-Paños, A. Kirkley, H. Barbosa, A. Sadilek, A. Arenas, J. Gómez-Gardeñes, and G. Ghoshal, Connecting intercity mobility with urban welfare. PNAS Nexus 1 (4), pgac178 (2022)."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "J. Aguilar, A. Bassolas, G. Ghoshal, S. Hazarie, A. Kirkley, M. Mazzoli, S. Meloni, S. Mimar, V. Nicosia, J. J. Ramasco, et al. , Impact of urban structure on infectious disease spreading. Scientific Reports 12 (1), 3816 (2022)."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "A.-L. Barabási, Network Science . Cambridge University Press, Cambridge (2016)."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "D. Chakrabarti, Y. Wang, C. Wang, J. Leskovec, and C. Faloutsos, Epidemic thresholds in real networks. ACM Transactions on Information and System Security (TISSEC) 10 (4), 1–26 (2008)."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "K. T. Gradoń, J. A. Hołyst, W. R. Moy, J. Sienkiewicz, and K. Suchecki, Countering misinformation: A multidisciplinary approach. Big Data & Society 8 (1), 20539517211013848 (2021)."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "J. M. Kleinberg, Authoritative sources in a hyperlinked environment. Journal of the ACM (JACM) 46 (5), 604–632 (1999)."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "S. Oldham, B. Fulcher, L. Parkes, A. Arnatkeviciūtė, C. Suo, and A. Fornito, Consistency and differences between centrality measures across distinct classes of networks. PloS One 14 (7), e0220061 (2019)."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "J. R. F. Ronqui and G. Travieso, Analyzing complex networks through correlations in centrality measurements. Journal of Statistical Mechanics: Theory and Experiment 2015 (5), P05030 (2015)."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "F. Grando, D. Noble, and L. C. Lamb, An analysis of centrality measures for complex and social networks. In 2016 IEEE Global Communications Conference (GLOBECOM) , pp. 1–6, IEEE (2016)."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "D. Schoch, T. W. Valente, and U. Brandes, Correlations among centrality indices and a class of uniquely ranked graphs. Social Networks 50 , 46–54 (2017)."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "F. Bloch, M. O. Jackson, and P. Tebaldi, Centrality measures in networks. Social Choice and Welfare pp. 1–41 (2023)."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "C. Shao, P. Cui, P. Xun, Y. Peng, and X. Jiang, Rank correlation between centrality metrics in complex networks: an empirical study. Open Physics 16 (1), 1009–1023 (2018)."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "S. Wu and S. Wang, Information-theoretic outlier detection for large-scale categorical data. IEEE Transactions on Knowledge and Data Engineering 25 (3), 589–602 (2011)."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "L. Akoglu, H. Tong, and D. Koutra, Graph based anomaly detection and description: a survey. Data Mining and Knowledge Discovery 29 , 626–688 (2015)."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "C. Böhm, K. Haegler, N. S. Müller, and C. Plant, Coco: coding cost for parameter-free outlier detection. In Proceedings of the 15th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining , pp. 149–158 (2009)."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib22",
+      "text": "T. Louail, M. Lenormand, O. G. Cantu Ros, M. Picornell, R. Herranz, E. Frias-Martinez, J. J. Ramasco, and M. Barthelemy, From mobile phone data to the spatial structure of cities. Scientific Reports 4 (1), 5276 (2014)."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib23",
+      "text": "S. Hazarie, D. Soriano-Paños, A. Arenas, J. Gómez-Gardeñes, and G. Ghoshal, Interplay between population density and mobility in determining the spread of epidemics in cities. Communications Physics 4 (1), 191 (2021)."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib24",
+      "text": "T. Louail, M. Lenormand, M. Picornell, O. Garcia Cantu, R. Herranz, E. Frias-Martinez, J. J. Ramasco, and M. Barthelemy, Uncovering the spatial structure of mobility networks. Nature Communications 6 (1), 6007 (2015)."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib25",
+      "text": "W. Xu, H. Chen, E. Frias-Martinez, M. Cebrian, and X. Li, The inverted u-shaped effect of urban hotspots spatial compactness on urban economic growth. Royal Society Open Science 6 (11), 181640 (2019)."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib27",
+      "text": "T. P. Peixoto, Bayesian stochastic blockmodeling. Advances in Network Clustering and Blockmodeling pp. 289–332 (2019)."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib28",
+      "text": "L. Hébert-Dufresne, J.-G. Young, A. Daniels, and A. Allard, Network onion divergence: Network representation and comparison using nested configuration models with fixed connectivity, correlation and centrality patterns. arXiv preprint arXiv:2204.08444 (2022)."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib29",
+      "text": "R. J. Gallagher, J.-G. Young, and B. F. Welles, A clarified typology of core-periphery structure in networks. Science Advances 7 (12), eabc9800 (2021)."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib30",
+      "text": "A. Kirkley, Spatial regionalization based on optimal information compression. Communications Physics 5 (1), 249 (2022)."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib31",
+      "text": "A. Kirkley, A. Rojas, M. Rosvall, and J.-G. Young, Compressing network populations with modal networks reveal structural diversity. Communications Physics 6 (1), 148 (2023)."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib32",
+      "text": "A. Kirkley, Constructing hypergraphs from temporal data. arXiv preprint arXiv:2308.16546 (2023)."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib33",
+      "text": "B. Karrer and M. E. Newman, Stochastic blockmodels and community structure in networks. Physical Review E 83 (1), 016107 (2011)."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib26",
+      "text": "J. Rissanen, Modeling by the shortest data description. Automatica 14 , 465–471 (1978)."
+    }
+  ]
+}

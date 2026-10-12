@@ -1,0 +1,118 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.14155",
+  "title": "Harmonizing Visual and Textual Embeddings for Zero-Shot Text-to-Image Customization",
+  "authors": "Yeji Song, Jimyeong Kim, Wonhark Park, Wonsik Shin, Wonjong Rhee, Nojun Kwak",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2403.14155",
+  "html_url": "https://arxiv.org/html/2403.14155",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 860,
+  "text": "Recent advancements in text-to-image (T2I) generation, especially diffusion models [1,2,3,4,5] have opened up a new era of image creation. Subject-driven generation [6,7,8,9,10] aims to generate novel images featuring a specific subject provided by the user. The common approach represents the subject as a new pseudo-word (\\text{S}^{*}) in the textual embedding space of the text encoder. They optimize a pseudo-word by updating the textual embedding of the pseudo-word [11] or the diffusion model’s parameters [6,12]. However, both approaches require per-subject optimization, posing challenges for real-time applications and multi-subject customization. In response to this challenge, zero-shot customization methods [13,14,15,16,17,18,19,20] have been proposed.\n\nThey adopt the mappers (e.g., MLP network [14,19,20], adapter [15,16,17] or multi-modal encoder [13]) to transform a subject’s image into the visual embedding, which is subsequently utilized along with the textual embedding. The visual embedding provides representative information about the subject’s identity from the input image, eliminating the need for additional training processes. To improve the user’s convenience, most zero-shot customization methods [13,14,15,17,18,19,20] encode a single image as the input. In line with this practice, we focus on single-image-based zero-shot customization in this paper.\n\nWhen dealing with a single image, the existing methods focus on separating the subject’s identity from other irrelevant details within an image, as the input image typically encompasses more than just the subject’s identity. To address this challenge, they employ the subject’s segmentation mask [13,14,17,18,20] or the visual embedding from the deepest layers of an encoder [14]. However, while those techniques effectively separate the subject from the background or other objects within the image, disentangling the subject’s pose from its identity is almost impossible as these aspects are tightly intertwined within the same pixels. We term this inevitable phenomenon as the pose-identity entanglement within visual embedding, which becomes apparent when attempting to change the pose of the subject while preserving the subject’s identity. Regarding this, we have identified two significant problems when modifying the subject’s pose with a text prompt, namely the (i) pose bias and (ii) identity loss:\n\n- (i) The generated images tend to either maintain the original pose of the subject or exhibit some unnaturalness that falls between the pose derived from the text prompt and the one presented in the input image.\n\n- (ii) The subject in the generated images partially loses its identity, appearing with a different color or body shape.\n\nIn this paper, we focus on resolving the pose bias and identity loss described above. They are imperative tasks for advancing towards a more diverse and desirable customization, while highly challenging due to the pose-identity entanglement. We start from unveiling the more direct and addressable cause of the two problems. We found that using only the textual embedding generates the subject in various poses faithfully complying with the text prompt (without pose bias) while using only the visual embedding results in the images where the subject retains its whole identity (without identity loss). This leads us to assume that a conflict exists between the visual and textual embeddings, from which the two problems mainly originate. We provide the result images in the supplementary materials. Regarding pose-identity entanglement, the input image carries the visual features of the subject in a specific pose. Therefore, when generating a novel image of the subject in a different pose, the input image and text prompt provide two concurrent but conflicting embeddings to the model with different pose information. As a result, the visual embedding readily interferes with the textual embedding, causing the pose bias. Conversely, textual embedding can also interfere with visual embedding, affecting the subject’s identity and resulting in identity loss.\n\nTo alleviate this conflict, we propose contextual embedding orchestration and self-attention swap that effectively resolve each problem. The former involves adjusting the visual embedding to align better with the textual embedding. This adjustment is achieved by orthogonalizing the visual embedding vector to the subspace of the textual embedding vectors, essentially reducing the interference of the visual embedding. The latter adopts another denoising process guided by the visual-only embedding that fundamentally evades the collision between the visual and textual embedding and aggregates clean information about the subject. By swapping the self-attention between the original and the visual-only-guided diffusion models, we could successfully maintain the subject’s identity in newly generated images. Our method is generic and easily applicable to any zero-shot customization method that utilizes visual and textual embeddings, as it does not require an additional tuning process. We demonstrate that our method significantly improves the pose variation of the baseline without compromising its performance in pose-irrelevant scenarios, e.g., placement of novel objects or changing the subject’s texture. Fig. 1 illustrates that our method effectively resolves the pose bias. We also provide the results regarding identity loss in Figs. 4 and 5, and supplementary materials.\n\nOur contributions are summarized as:\n\n- \\bullet We unveil the problem of pose bias and identity loss in zero-shot customization and shed light on the discord among the visual and textual embeddings.\n\n- \\bullet Our proposed method effectively resolves the pose bias and identity loss, offering highly diverse and pose-variant subject generation.\n\n- \\bullet Our method is readily applicable to any zero-shot customization methods that incorporate visual and textual embeddings.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib29",
+      "text": "Rombach, R., Blattmann, A., Lorenz, D., Esser, P., Ommer, B.: High-resolution image synthesis with latent diffusion models (2022)"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib4",
+      "text": "Balaji, Y., Nah, S., Huang, X., Vahdat, A., Song, J., Zhang, Q., Kreis, K., Aittala, M., Aila, T., Laine, S., Catanzaro, B., Karras, T., Liu, M.Y.: ediff-i: Text-to-image diffusion models with an ensemble of expert denoisers (2023)"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib31",
+      "text": "Saharia, C., Chan, W., Saxena, S., Li, L., Whang, J., Denton, E., Ghasemipour, S.K.S., Ayan, B.K., Mahdavi, S.S., Lopes, R.G., Salimans, T., Ho, J., Fleet, D.J., Norouzi, M.: Photorealistic text-to-image diffusion models with deep language understanding (2022)"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib28",
+      "text": "Ramesh, A., Dhariwal, P., Nichol, A., Chu, C., Chen, M.: Hierarchical text-conditional image generation with clip latents (2022)"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib24",
+      "text": "Nichol, A., Dhariwal, P., Ramesh, A., Shyam, P., Mishkin, P., McGrew, B., Sutskever, I., Chen, M.: Glide: Towards photorealistic image generation and editing with text-guided diffusion models (2022)"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib30",
+      "text": "Ruiz, N., Li, Y., Jampani, V., Pritch, Y., Rubinstein, M., Aberman, K.: Dreambooth: Fine tuning text-to-image diffusion models for subject-driven generation. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 22500–22510 (2023)"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib8",
+      "text": "Gal, R., Alaluf, Y., Atzmon, Y., Patashnik, O., Bermano, A.H., Chechik, G., Cohen-Or, D.: An image is worth one word: Personalizing text-to-image generation using textual inversion (2022)"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib35",
+      "text": "Tewel, Y., Gal, R., Chechik, G., Atzmon, Y.: Key-locked rank one editing for text-to-image personalization (2023)"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib26",
+      "text": "Qiu, Z., Liu, W., Feng, H., Xue, Y., Feng, Y., Liu, Z., Zhang, D., Weller, A., Schölkopf, B.: Controlling text-to-image diffusion by orthogonal finetuning (2023)"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib38",
+      "text": "Voynov, A., Chu, Q., Cohen-Or, D., Aberman, K.: P+: Extended textual conditioning in text-to-image generation (2023)"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib9",
+      "text": "Gal, R., Alaluf, Y., Atzmon, Y., Patashnik, O., Bermano, A.H., Chechik, G., Cohen-Or, D.: An image is worth one word: Personalizing text-to-image generation using textual inversion. arXiv preprint arXiv:2208.01618 (2022)"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib36",
+      "text": "Tewel, Y., Gal, R., Chechik, G., Atzmon, Y.: Key-locked rank one editing for text-to-image personalization. In: ACM SIGGRAPH 2023 Conference Proceedings. pp. 1–11 (2023)"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib17",
+      "text": "Li, D., Li, J., Hoi, S.: Blip-diffusion: Pre-trained subject representation for controllable text-to-image generation and editing. Advances in Neural Information Processing Systems 36 (2024)"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib39",
+      "text": "Wei, Y., Zhang, Y., Ji, Z., Bai, J., Zhang, L., Zuo, W.: Elite: Encoding visual concepts into textual embeddings for customized text-to-image generation. arXiv preprint arXiv:2302.13848 (2023)"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib6",
+      "text": "Chen, L., Zhao, M., Liu, Y., Ding, M., Song, Y., Wang, S., Wang, X., Yang, H., Liu, J., Du, K., Zheng, M.: Photoverse: Tuning-free image customization with text-to-image diffusion models (2023)"
+    },
+    {
+      "n": 16,
+      "id": "bib.bib32",
+      "text": "Shi, J., Xiong, W., Lin, Z., Jung, H.J.: Instantbooth: Personalized text-to-image generation without test-time finetuning (2023)"
+    },
+    {
+      "n": 17,
+      "id": "bib.bib21",
+      "text": "Ma, J., Liang, J., Chen, C., Lu, H.: Subject-diffusion:open domain personalized text-to-image generation without test-time fine-tuning (2023)"
+    },
+    {
+      "n": 18,
+      "id": "bib.bib12",
+      "text": "Jia, X., Zhao, Y., Chan, K.C.K., Li, Y., Zhang, H., Gong, B., Hou, T., Wang, H., Su, Y.C.: Taming encoder for zero fine-tuning image customization with text-to-image diffusion models (2023)"
+    },
+    {
+      "n": 19,
+      "id": "bib.bib42",
+      "text": "Yuan, Z., Cao, M., Wang, X., Qi, Z., Yuan, C., Shan, Y.: Customnet: Zero-shot object customization with variable-viewpoints in text-to-image diffusion models (2023)"
+    },
+    {
+      "n": 20,
+      "id": "bib.bib40",
+      "text": "Xiao, G., Yin, T., Freeman, W.T., Durand, F., Han, S.: Fastcomposer: Tuning-free multi-subject image generation with localized attention (2023)"
+    }
+  ]
+}

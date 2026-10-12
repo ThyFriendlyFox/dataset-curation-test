@@ -1,0 +1,128 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2309.06617",
+  "title": "Accelerating model evaluations in uncertainty propagation on tensor grids using computational graph transformations",
+  "authors": "Bingran Wang, Mark Sperry, Victor E. Gandarillas, John T. Hwang",
+  "year": "2024",
+  "categories": [
+    "cs.CE"
+  ],
+  "url": "https://arxiv.org/abs/2309.06617",
+  "html_url": "https://arxiv.org/html/2309.06617",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "1 Introduction",
+  "word_count": 1105,
+  "text": "In practical scenarios, the numerical models inherently fall short of achieving perfect fidelity with reality and consistently contend with inherent uncertainties. To address this challenge, uncertainty propagation, also known as forward uncertainty quantification (UQ), aims to undertake a rigorous examination and analysis of how a system’s output is influenced by the uncertainties inherent in its inputs. The resultant assessments of uncertainty serve as a valuable foundation for facilitating informed decision-making and thorough risk assessment. The applications of UQ can be found in many scientific and engineering domains such as weather forecast [1,2], structural analysis [3,4] and aircraft design [5,6,7].\n\nUncertainties within the inputs can stem from diverse origins and are typically classified into two categories: aleatoric and epistemic. Aleatoric uncertainties, recognized as irreducible uncertainties, are intrinsic to the system and encompass factors such as fluctuations in operational conditions, mission prerequisites, and model parameters. These uncertainties can often be described within a probabilistic framework. In contrast, epistemic uncertainties constitute reducible uncertainties arising from knowledge gaps. These uncertainties may be induced by approximations utilized in computational models or numerical solution methods, and are often difficult to be described within a probabilistic framework. This paper focuses on UQ problems within a probabilistic formalism where uncertain inputs are continuous random variables with known probability density distributions. The goal is to estimate statistical moments such as the mean and variance of the Quantity of Interest (QoI), or more complex risk measures such as the probability of failure or the conditional value at risk.\n\nFor this type of UQ problem, the most common non-intrusive methods include the method of moments, polynomial chaos, kriging, and Monte Carlo. The method of moments analytically computes the statistical moments of the QoI, using the Taylor series approximation. It often only uses function evaluations and derivative information at one or a small number of input points [8]. The most commonly employed variants of this method utilize derivatives up to either first [9] or second order [10,11] to ensure cost-effectiveness. While adept at efficiently estimating statistical moments, this approach grapples with challenges in estimating other kinds of risk measures. Moreover, it may lack accuracy when input variance is significant. In contrast, the Monte Carlo approach employs random sampling of uncertain inputs to compute the risk measures. Based on the law of large numbers, Monte Carlo’s convergence rate is independent of the number of uncertain inputs, making it particularly attractive for solving high-dimensional problems. Recent strides in enhancing its efficiency encompass multi-fidelity [12,13] and importance sampling [14] techniques. However, in the context of low-dimensional problems, the Monte Carlo method might demand substantially more model evaluations to achieve the same level of accuracy as the alternative UQ methodologies. Kriging, also known as Gaussian process regression, is a common statistical technique employed in various fields. In UQ, kriging constructs a surrogate response surface by leveraging input-output data pairs. The surrogate model replaces the original expensive function to allow a large number of model evaluations in order to perform reliability analysis [15,16] or optimization under uncertainty [17]. For low-dimensional UQ problems, if the objective function is assumed to be smooth, the polynomial chaos-based techniques often stand out as the most efficacious option. The generalized polynomial chaos theory represents the QoI as orthogonal polynomials that are derived from the distributions of the uncertain inputs. Benefiting from the inherent smoothness of the random space, polynomial chaos-based methods exhibit rapid convergence rates facilitated by sampling or integration techniques. Common polynomial chaos-based methods include non-intrusive polynomial chaos (NIPC) [18,19,20] and stochastic collocation (SC) [21,22].\n\nFor both NIPC and SC methods, we can use a tensor-product grid to sample the input space, but this approach is often not preferred and is only used for very low-dimensional UQ problems, as the number of input points increases exponentially with the number of uncertain inputs. The commonly used methods choose to use a sparse grid to sample the input space or have the sample points randomly generated, in order to reduce the input points with a minimum loss of accuracy. However, our recent findings show that maintaining a tensor structure for the input points offers some unique advantages and for certain problems, the total model evaluation cost can be reduced in a different approach without changing the tensor structure of the input points.\n\nWhen we evaluate a computational model on full-grid input points, if we view the computational model as a computational graph with only elementary operations, the current framework evaluates each operation the same number of times at the tensor-product input points of all the uncertain inputs. However, for each operation, the output data only has distinct values at the distinct input points in their dependent input space, and a large portion of the operations may not be dependent on all of the uncertain inputs. This means the current framework of NIPC and SC could create many wasteful evaluations on a large portion of the operations.\n\nIn this paper, we propose a computational graph transformation method called Accelerated Model evaluations on Tensor grids using Computational graph transformations (AMTC) that algorithmically modifies the computational graph to eliminate the unnecessary evaluations incurred by the current framework of integration-based NIPC and SC. AMTC reduces the model evaluation cost on full-grid quadrature points by partitioning the computational graph into sub-graphs using the operations’ dependency information and evaluating each sub-graph on the distinct quadrature points. The proposed method is implemented in conjunction with a new algebraic modeling language, the Computational System Design Language (CSDL). We achieve cost reductions on UQ problems in a general and automatic way by analyzing and manipulating the computational graph that CSDL makes available.\n\nThis method has been applied to four different UQ problems with different computational graph structures. For three of the problems, we observed a significant acceleration in model evaluation time when solving the UQ problems using the full-grid NIPC method, which makes this UQ method the most efficient method among the implemented UQ methods for these problems. Generally, for a wide range of UQ problems that involve multi-point, multi-disciplinary, or other models that possess a sparse graph structure, we expect our method to significantly reduce the model evaluation time on tensor-grid input points, which can improve the time scaling for, but not limited to NIPC and SC methods.\n\nThis paper is organized as follows. Section 2 gives some background on PCE-related UQ methods, the current model evaluation framework, and how to view tensor-grid evaluations through computational graphs. Section 3 presents the details of the new computational graph transformation algorithm, AMTC, and how it is implemented in CSDL. Section 4 shows the numerical results of three UQ problems. Section 5 summarizes the work and offers concluding thoughts.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bibx1",
+      "text": "Susan Joslyn and Sonia Savelli “Communicating forecast uncertainty: Public perception of weather forecast uncertainty” In Meteorological Applications 17.2 Wiley Online Library, 2010, pp. 180–195 DOI: 10.1002/met.190"
+    },
+    {
+      "n": 2,
+      "id": "bib.bibx2",
+      "text": "F. Pappenberger et al. “Cascading model uncertainty from medium range weather forecasts (10 days) through a rainfall-runoff model to flood inundation predictions within the European Flood Forecasting System (EFFS)” In Hydrology and Earth System Sciences 9.4 , 2005, pp. 381–393 DOI: 10.5194/hess-9-381-2005"
+    },
+    {
+      "n": 3,
+      "id": "bib.bibx3",
+      "text": "Hua-Ping Wan, Zhu Mao, Michael Todd and Wei-Xin Ren “Analytical uncertainty quantification for modal frequencies with structural parameter uncertainty using a Gaussian process metamodel” In Engineering Structures 75 Elsevier, 2014, pp. 577–589 DOI: 10.1016/j.engstruct.2014.06.028"
+    },
+    {
+      "n": 4,
+      "id": "bib.bibx4",
+      "text": "Zhen Hu, Sankaran Mahadevan and Dan Ao “Uncertainty aggregation and reduction in structure–material performance prediction” In Computational Mechanics 61.1 Springer, 2018, pp. 237–257 DOI: 10.1007/s00466-017-1448-6"
+    },
+    {
+      "n": 5,
+      "id": "bib.bibx5",
+      "text": "Leo Ng and Karen Willcox “Monte Carlo information-reuse approach to aircraft conceptual design optimization under uncertainty” In Journal of Aircraft 53.2 American Institute of AeronauticsAstronautics, 2016, pp. 427–438 DOI: 10.2514/1.C033352"
+    },
+    {
+      "n": 6,
+      "id": "bib.bibx6",
+      "text": "Bingran Wang, Nicholas Orndorff, Mark Sperry and John Hwang “High-dimensional uncertainty quantification using graph-accelerated non-intrusive polynomial chaos and active subspace methods” In AIAA AVIATION 2023 Forum , 2023, pp. 4264 DOI: 10.2514/6.2023-4264"
+    },
+    {
+      "n": 7,
+      "id": "bib.bibx7",
+      "text": "Daejin Lim, Hyeongseok Kim and Kwanjung Yee “Uncertainty propagation in flight performance of multirotor with parametric and model uncertainties” In Aerospace Science and Technology 122 Elsevier, 2022, pp. 107398 DOI: 10.1016/j.ast.2022.107398"
+    },
+    {
+      "n": 8,
+      "id": "bib.bibx8",
+      "text": "Jeffrey Wooldridge “Applications of generalized method of moments estimation” In Journal of Economic perspectives 15.4 American Economic Association, 2001, pp. 87–100 DOI: 10.1257/jep.15.4.87"
+    },
+    {
+      "n": 9,
+      "id": "bib.bibx9",
+      "text": "KB Fragkos, EM Papoutsis-Kiachagias and KC Giannakoglou “pFOSM: An efficient algorithm for aerodynamic robust design based on continuous adjoint and matrix-vector products” In Computers & Fluids 181 Elsevier, 2019, pp. 57–66 DOI: 10.1016/j.compfluid.2019.01.016"
+    },
+    {
+      "n": 10,
+      "id": "bib.bibx10",
+      "text": "Jiaqi Luo and Feng Liu “Statistical evaluation of performance impact of manufacturing variability by an adjoint method” In Aerospace Science and Technology 77 Elsevier, 2018, pp. 471–484 DOI: 10.1016/j.ast.2018.03.030"
+    },
+    {
+      "n": 11,
+      "id": "bib.bibx11",
+      "text": "Jiaqi Luo, Yao Zheng and Feng Liu “Optimal tolerance allocation in blade manufacturing by sensitivity-based performance impact evaluation” In Journal of Propulsion and Power 36.4 American Institute of AeronauticsAstronautics, 2020, pp. 632–638 DOI: 10.2514/1.B37718"
+    },
+    {
+      "n": 12,
+      "id": "bib.bibx12",
+      "text": "Benjamin Peherstorfer, Karen Willcox and Max Gunzburger “Optimal model management for multifidelity Monte Carlo estimation” In SIAM Journal on Scientific Computing 38.5 SIAM, 2016, pp. A3163–A3194 DOI: 10.1137/15M1046472"
+    },
+    {
+      "n": 13,
+      "id": "bib.bibx13",
+      "text": "Benjamin Peherstorfer, Karen Willcox and Max Gunzburger “Survey of multifidelity methods in uncertainty propagation, inference, and optimization” In Siam Review 60.3 SIAM, 2018, pp. 550–591 DOI: 10.1137/16M1082469"
+    },
+    {
+      "n": 14,
+      "id": "bib.bibx14",
+      "text": "Armin Tabandeh, Gaofeng Jia and Paolo Gardoni “A review and assessment of importance sampling methods for reliability analysis” In Structural Safety 97 Elsevier, 2022, pp. 102216 DOI: 10.1016/j.strusafe.2022.102216"
+    },
+    {
+      "n": 15,
+      "id": "bib.bibx15",
+      "text": "Irfan Kaymaz “Application of kriging method to structural reliability problems” In Structural safety 27.2 Elsevier, 2005, pp. 133–151 DOI: 10.1016/j.strusafe.2004.09.001"
+    },
+    {
+      "n": 16,
+      "id": "bib.bibx16",
+      "text": "Zhen Hu and Sankaran Mahadevan “A single-loop kriging surrogate modeling for time-dependent reliability analysis” In Journal of Mechanical Design 138.6 American Society of Mechanical Engineers, 2016, pp. 061406 DOI: 10.1115/1.4033428"
+    },
+    {
+      "n": 17,
+      "id": "bib.bibx17",
+      "text": "Markus Rumpfkeil “Optimizations under uncertainty using gradients, Hessians, and surrogate models” In AIAA journal 51.2 American Institute of AeronauticsAstronautics, 2013, pp. 444–451 DOI: 10.2514/1.J051847"
+    },
+    {
+      "n": 18,
+      "id": "bib.bibx18",
+      "text": "Serhat Hosder, Robert Walters and Rafael Perez “A non-intrusive polynomial chaos method for uncertainty propagation in CFD simulations” In 44th AIAA aerospace sciences meeting and exhibit , 2006, pp. 891 DOI: 10.2514/6.2006-891"
+    },
+    {
+      "n": 19,
+      "id": "bib.bibx19",
+      "text": "Brandon Jones, Alireza Doostan and George Born “Nonlinear propagation of orbit uncertainty using non-intrusive polynomial chaos” In Journal of Guidance, Control, and Dynamics 36.2 American Institute of AeronauticsAstronautics, 2013, pp. 430–444 DOI: 10.2514/1.57599"
+    },
+    {
+      "n": 20,
+      "id": "bib.bibx20",
+      "text": "Vahid Keshavarzzadeh, Felipe Fernandez and Daniel Tortorelli “Topology optimization under uncertainty via non-intrusive polynomial chaos expansion” In Computer Methods in Applied Mechanics and Engineering 318 Elsevier, 2017, pp. 120–147 DOI: 10.1016/j.cma.2017.01.019"
+    },
+    {
+      "n": 21,
+      "id": "bib.bibx21",
+      "text": "Dongbin Xiu and Jan Hesthaven “High-order collocation methods for differential equations with random inputs” In SIAM Journal on Scientific Computing 27.3 SIAM, 2005, pp. 1118–1139 DOI: 10.1137/040615201"
+    },
+    {
+      "n": 22,
+      "id": "bib.bibx22",
+      "text": "Ivo Babuška, Fabio Nobile and Raúl Tempone “A stochastic collocation method for elliptic partial differential equations with random input data” In SIAM Journal on Numerical Analysis 45.3 SIAM, 2007, pp. 1005–1034 DOI: 10.1137/050645142"
+    }
+  ]
+}

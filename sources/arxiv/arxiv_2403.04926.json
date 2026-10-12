@@ -1,0 +1,103 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.04926",
+  "title": "BAGS: Blur Agnostic Gaussian Splatting through Multi-Scale Kernel Modeling",
+  "authors": "Cheng Peng, Yutao Tang, Yifan Zhou, Nengyu Wang, Xijun Liu, Deming Li, Rama Chellappa",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2403.04926",
+  "html_url": "https://arxiv.org/html/2403.04926",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 987,
+  "text": "High quality scene reconstruction and novel view synthesis from 2D images is a long-standing research problem with extensive applications in robotics, virtual reality, e-commerce, cinematography, etc. Significant advancements in this field have been made in recent years with the introduction of Neural Radiance Field (NeRF) [1]. NeRF can achieve photorealistic view synthesis by implicitly representing the scene with a Multi-Layer Perceptron (MLP) and optimizing the MLP with differentiable ray-tracing. Many subsequent works have since been proposed to improve various aspects of NeRF, including optimization acceleration [2,3,4,5], anti-aliasing [6,7], dynamic and generative modeling [8,9,10,11], etc. Recently, 3D Gaussian Splatting (3DGS) [12] has been introduced as an alternative to NeRF-based approaches. 3DGS uses Gaussians as explicit 3D representations and a differentiable rasterization technique, which enables high quality scene reconstruction in a short time.\n\nPractical applications of 3DGS, however, can be challenging. Despite its impressive performance on curated datasets, 3DGS requires high quality images and a good point cloud initialization to work well. Without these conditions, 3DGS often generates undesired Gaussians to overfit observation noise, leading to worse renderings, e.g., compared to NeRF. For instance, images acquired in real life or from the internet are often in non-ideal conditions. The camera may be unstable or out of focus, leading to motion or defocus blur. Images may also have different resolutions depending on the sensor types or post processes.\n\nThere often exists sufficient information within a multi-view image set to generate a high quality reconstruction, even if the individual images are degraded. This is because the same region is often observed repeatedly from different views; such redundancy can then be explored to better recover the underlying scene. Works like Deblur-NeRF [13] and its variants [14,15,16,17] are designed based on this insight. Formally, a simple yet powerful forward model can be used to describe the potentially blurry pixel value \\tilde{C}(x) at coordinate x:\n\nwhere C(x_{k}) is the clear pixel value at pixel coordinates x_{k} around the neighborhood of x, and h(x_{k}) is the blur kernel weights. In this formulation, C(x_{k}) is multi-view consistent, and \\tilde{C}(x) is multi-view inconsistent due to the blur from h. Previous methods [13,14,15,17,16] aim to simultaneously optimize a multi-view consistent C(x_{k}) through NeRF and the multi-view inconsistent \\tilde{C}(x) through a view-specific network that predicts h(x_{k}). As such, we render only the clear C(x_{k}) after training. In comparison, vanilla NeRF [1] treats C(x_{k}) and \\tilde{C}(x) as one variable, forcing multi-view inconsistencies to be baked into the scene.\n\nIn this work, we build upon the blur formulation in Eq. (1), and explore two key differences between NeRF and 3DGS in robust reconstruction. NeRF-based approaches suffer from slow training speed, i.e. only limited number of rays can be rendered at once. This is exacerbated by kernel modeling, which requires the rendering of a patch to model a single pixel. To mitigate this issue, current approaches model the kernel h sparsely [13,14,15] or only for specific types of blur [17,16]. Since 3DGS can rasterize entire images efficiently, it potentially has great synergy with Eq. (1). On the flip side, NeRF requires only calibrated camera poses for reconstruction, whereas 3DGS also requires a good point cloud initialization. For noisy images, camera poses can often be estimated based on just a few correct matches, but a dense point cloud is challenging to obtain.\n\nAs shown in Fig 1, we introduce Blur Agnostic Gaussian Splatting, or BAGS, which is a Splatting-based method that is robust against various types of blur. At the core of BAGS is a Blur Proposal Network (BPN). Contrary to previous methods [13,14,15] that sparsely estimate h, BPN directly estimates dense kernels on full images during training. We find that estimating a dense h is more effective and no less efficient than estimating a sparse one, which also has to predict kernel positions x_{k}. BPN considers the position and view embedding of pixel x, accounting for the spatial variance in image blur. Furthermore, a three-layer Convolution Neural Network (CNN) is used to compute the RGBD features of the rendered image. These extracted features allow BPN to consider the color and depth variation of the scene, e.g. around edges and corners, more effectively. Finally, BPN also computes a per-pixel mask, which blends the estimated clear and blurry pixels together. We make the observation that not necessarily all pixels are blurry; therefore, by constraining on its sparsity, such a mask can visualize regions where blur occurs. This is particularly useful as a way to evaluate image quality.\n\nIn addition to BPN, BAGS proposes a coarse-to-fine kernel optimization scheme. In some cases, BAGS cannot perform reconstruction well if it jointly optimizes BPN with a very sparse point cloud, due to the inherent ambiguity of separating blur from the observation. Furthermore, optimizing a dense kernel on full resolution directly is computationally expensive and time-consuming. To solve these conundrums, we first optimize the scene and BPN at lower scales with a smaller kernel dimension. This allows the optimization process to address a less challenging and ambiguous problem initially. We then gradually increase the resolution of the training images and the estimated kernels; since the blur problem has been partially addressed at a small scale, optimization at larger scales is more stable and effective. Under this scheme, we not only observe improved performance but also faster optimization process.\n\nIn summary, our contributions can be summarized in three parts:\n\n- 1. We introduce a Blur Proposal Network, which considers spatial, depth, and color variations of the scene to model image blur; BPN can also produce a mask that indicates blurry regions in an input image.\n\n- 2. We introduce a coarse-to-fine optimization scheme, which gradually increases the training image resolution and the estimated kernel size with additional neural network layers; this improves the stability of the joint optimization process given a sparse point cloud.\n\n- 3. We evaluate the overall method, BAGS, on three image blur scenarios and find significant quantitative and visual improvements compared to current SoTA methods.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib24",
+      "text": "Mildenhall, B., Srinivasan, P.P., Tancik, M., Barron, J.T., Ramamoorthi, R., Ng, R.: Nerf: Representing scenes as neural radiance fields for view synthesis. In: Vedaldi, A., Bischof, H., Brox, T., Frahm, J. (eds.) Computer Vision - ECCV 2020 - 16th European Conference, Glasgow, UK, August 23-28, 2020, Proceedings, Part I. Lecture Notes in Computer Science, vol. 12346, pp. 405–421. Springer (2020)"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib37",
+      "text": "Sun, C., et al.: Direct voxel grid optimization: Super-fast convergence for radiance fields reconstruction. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (2022)"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib9",
+      "text": "Fridovich-Keil, S., Yu, A., Tancik, M., Chen, Q., Recht, B., Kanazawa, A.: Plenoxels: Radiance fields without neural networks. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 5501–5510 (2022)"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib25",
+      "text": "Müller, T., Evans, A., Schied, C., Keller, A.: Instant neural graphics primitives with a multiresolution hash encoding. ACM Trans. Graph. 41 (4), 102:1–102:15 (Jul 2022)"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib6",
+      "text": "Chen, A., Xu, Z., Geiger, A., Yu, J., Su, H.: Tensorf: Tensorial radiance fields. In: ECCV (2022)"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib2",
+      "text": "Barron, J.T., Mildenhall, B., Verbin, D., Srinivasan, P.P., Hedman, P.: Mip-nerf 360: Unbounded anti-aliased neural radiance fields. CVPR (2022)"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib3",
+      "text": "Barron, J.T., Mildenhall, B., Verbin, D., Srinivasan, P.P., Hedman, P.: Zip-nerf: Anti-aliased grid-based neural radiance fields. arXiv preprint arXiv:2304.06706 (2023)"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib32",
+      "text": "Pumarola, A., Corona, E., Pons-Moll, G., Moreno-Noguer, F.: D-nerf: Neural radiance fields for dynamic scenes (2020)"
+    },
+    {
+      "n": 9,
+      "id": "bib.bib40",
+      "text": "Tretschk, E., Tewari, A., Golyanik, V., Zollhöfer, M., Lassner, C., Theobalt, C.: Non-rigid neural radiance fields: Reconstruction and novel view synthesis of a dynamic scene from monocular video. In: IEEE International Conference on Computer Vision (ICCV). IEEE (2021)"
+    },
+    {
+      "n": 10,
+      "id": "bib.bib19",
+      "text": "Liu, Y.L., Gao, C., Meuleman, A., Tseng, H.Y., Saraf, A., Kim, C., Chuang, Y.Y., Kopf, J., Huang, J.B.: Robust dynamic radiance fields. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (2023)"
+    },
+    {
+      "n": 11,
+      "id": "bib.bib31",
+      "text": "Poole, B., Jain, A., Barron, J.T., Mildenhall, B.: Dreamfusion: Text-to-3d using 2d diffusion. arXiv preprint arXiv:2209.14988 (2022)"
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "Kerbl, B., Kopanas, G., Leimkühler, T., Drettakis, G.: 3d gaussian splatting for real-time radiance field rendering. ACM Transactions on Graphics 42 (4) (2023)"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib21",
+      "text": "Ma, L., Li, X., Liao, J., Zhang, Q., Wang, X., Wang, J., Sander, P.V.: Deblur-nerf: Neural radiance fields from blurry images. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 12861–12870 (2022)"
+    },
+    {
+      "n": 14,
+      "id": "bib.bib30",
+      "text": "Peng, C., Chellappa, R.: Pdrf: progressively deblurring radiance field for fast scene reconstruction from blurry images. In: Proceedings of the AAAI Conference on Artificial Intelligence. vol. 37, pp. 2029–2037 (2023)"
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "Lee, D., Lee, M., Shin, C., Lee, S.: Dp-nerf: Deblurred neural radiance field with physical scene priors. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 12386–12396 (2023)"
+    },
+    {
+      "n": 16,
+      "id": "bib.bib41",
+      "text": "Wang, P., Zhao, L., Ma, R., Liu, P.: Bad-nerf: Bundle adjusted deblur neural radiance fields. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 4170–4179 (2023)"
+    },
+    {
+      "n": 17,
+      "id": "bib.bib16",
+      "text": "Lee, D., Oh, J., Rim, J., Cho, S., Lee, K.M.: Exblurf: Efficient radiance fields for extreme motion blurred images. In: Proceedings of the IEEE/CVF International Conference on Computer Vision. pp. 17639–17648 (2023)"
+    }
+  ]
+}

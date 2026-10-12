@@ -1,0 +1,154 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2403.14737",
+  "title": "FedMef: Towards Memory-efficient Federated Dynamic Pruning",
+  "authors": "Hong Huang, Weiming Zhuang, Chen Chen, Lingjuan Lyu",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.DC"
+  ],
+  "url": "https://arxiv.org/abs/2403.14737",
+  "html_url": "https://arxiv.org/html/2403.14737",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 641,
+  "text": "Federated learning (FL) has emerged as an important paradigm for the training of machine learning models across decentralized clients while preserving the confidentiality of local data [1,2,3]. In particular, cross-device FL, as described in [4], places emphasis on scenarios where FL clients predominantly consist of edge devices with resource constraints. Cross-device FL has gained significant attention in academic research and industry applications, fueling a wide range of applications, including Google Keyboard [5,6], Apple Speech Recognition [7], etc. Despite its success, the resource-intensive nature of training models, which includes high computational and memory costs, poses challenges for the deployment of cross-device FL on resource-constrained devices.\n\nNeural network pruning [8,9,10,11] is a potential solution to improve the efficiency of the model and reduce the high demand for resources. However, a closer inspection of some previous work on the application of neural network pruning to FL [12,13,14,15] reveals a potential pitfall: They often rely on initial training of dense models, similar to centralized pruning methodologies [9,10,11]. These federated pruning methods are not suitable for cross-device FL because the training of dense models still requires high computation and memory costs on resource-constrained devices.\n\nTo address these challenges, recent research has shifted to federated dynamic pruning [16,17,18,19]. These frameworks derive specialized pruned models by iterative adjustment of sparse on-device models. Devices start with a randomly pruned model, followed by traditional FL training, and periodically adjust the sparse model structure through pruning and growing operations [20]. Through iterative training and adjustments, devices can develop specialized pruned models bypassing the need to train dense models, which reduces both computational and memory demands.\n\nHowever, existing federated dynamic pruning frameworks [16,17,18,19] face two issues: significant post-pruning accuracy degradation and substantial activation memory usage. First, these frameworks cause a significant decline in accuracy after magnitude pruning because they hastily eliminate low-magnitude parameters, regardless of the substantial information they may contain. Such incautious parameter pruning often results in the model’s inability to regain its previous accuracy before the subsequent pruning iteration, ultimately leading to suboptimal end-of-training performance. Second, these frameworks fail to reduce the memory footprint of activation. For certain widely adopted models for edge deployment, like MobileNet [21], a significant portion of the total memory footprints is allocated to activation. However, current federated dynamic pruning methods focus primarily on reducing the model size, overlooking optimization for activation memory.\n\nIn this work, we introduce FedMef, an Fed erated M emory- ef fcient dynamic pruning framework that adeptly addresses all the aforementioned challenges. Figure 1 illustrates the workflow of FedMef and highlights our two new proposed components. First, FedMef presents budget-aware extrusion (BaE) to address the challenge of post-pruning accuracy degradation. Rather than simply discarding low-magnitude parameters, our method salvages essential information from these potential pruning candidates by transferring it to other parameters through a surrogate loss function within a preset budget. Second, FedMef proposes scaled activation pruning (SAP) to address the problem of high activation memory. This method performs activation pruning during the training process to dramatically reduce the memory footprints of the activation caches, as illustrated in Figure 2. To enhance the efficacy of SAP, especially for devices with severe memory constraints, we are inspired by recent methods that remove batch normalization (BN) layers [22,23] and replace convolution layers with Normalized Sparse Convolution (NSConv). NSConv can normalize most of the activation elements to be or close to zero. This reduces the disparity between original and pruned activation, mitigating the degradation of accuracy in SAP.\n\nWe conducted extensive experiments on three datasets: CIFAR-10 [24], CINIC-10 [25], and TinyImageNet [26], using ResNet18 [27] and MobileNetV2 [21] models. Extensive experimental results suggest that FedMef outperforms the state-of-the-art (SOTA) methods on all datasets and models. In addition, FedMef requires fewer memory footprints than SOTA methods. For example, FedMef significantly reduces the memory footprint of MobileNetV2 by 28.5% while improving the accuracy by more than 2%.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib31",
+      "text": "Brendan McMahan, Eider Moore, Daniel Ramage, Seth Hampson, and Blaise Aguera y Arcas. Communication-efficient learning of deep networks from decentralized data. In Artificial intelligence and statistics , pages 1273–1282. PMLR, 2017."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib27",
+      "text": "Xiang Li, Kaixuan Huang, Wenhao Yang, Shusen Wang, and Zhihua Zhang. On the convergence of fedavg on non-iid data. arXiv preprint arXiv:1907.02189 , 2019."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib50",
+      "text": "Weiming Zhuang, Yonggang Wen, Lingjuan Lyu, and Shuai Zhang. Mas: Towards resource-efficient federated multiple-task learning. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 23414–23424, 2023."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib21",
+      "text": "Peter Kairouz, H Brendan McMahan, Brendan Avent, Aurélien Bellet, Mehdi Bennis, Arjun Nitin Bhagoji, Kallista Bonawitz, Zachary Charles, Graham Cormode, Rachel Cummings, et al. Advances and open problems in federated learning. Foundations and Trends® in Machine Learning , 14(1–2):1–210, 2021."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib15",
+      "text": "Andrew Hard, Kanishka Rao, Rajiv Mathews, Swaroop Ramaswamy, Françoise Beaufays, Sean Augenstein, Hubert Eichner, Chloé Kiddon, and Daniel Ramage. Federated learning for mobile keyboard prediction. arXiv preprint arXiv:1811.03604 , 2018."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib25",
+      "text": "David Leroy, Alice Coucke, Thibaut Lavril, Thibault Gisselbrecht, and Joseph Dureau. Federated learning for keyword spotting. In ICASSP 2019-2019 IEEE international conference on acoustics, speech and signal processing (ICASSP) , pages 6341–6345. IEEE, 2019."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib37",
+      "text": "Matthias Paulik, Matt Seigel, Henry Mason, Dominic Telaar, Joris Kluivers, Rogier van Dalen, Chi Wai Lau, Luke Carlson, Filip Granqvist, Chris Vandevelde, et al. Federated evaluation and tuning for on-device personalization: System design & applications. arXiv preprint arXiv:2102.08503 , 2021."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib19",
+      "text": "Steven A Janowsky. Pruning versus clipping in neural networks. Physical Review A , 39(12):6600, 1989."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib14",
+      "text": "Song Han, Huizi Mao, and William J Dally. Deep compression: Compressing deep neural networks with pruning, trained quantization and huffman coding. arXiv preprint arXiv:1510.00149 , 2015."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib33",
+      "text": "Pavlo Molchanov, Arun Mallya, Stephen Tyree, Iuri Frosio, and Jan Kautz. Importance estimation for neural network pruning. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 11264–11272, 2019a."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib42",
+      "text": "Sidak Pal Singh and Dan Alistarh. Woodfisher: Efficient second-order approximation for neural network compression. Advances in Neural Information Processing Systems , 33:18098–18109, 2020."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib40",
+      "text": "Rulin Shao, Hui Liu, and Dianbo Liu. Privacy preserving stochastic channel-based federated learning with neural network pruning. arXiv preprint arXiv:1910.02115 , 2019."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib26",
+      "text": "Ang Li, Jingwei Sun, Binghui Wang, Lin Duan, Sicheng Li, Yiran Chen, and Hai Li. Lotteryfl: Empower edge intelligence with personalized and communication-efficient federated learning. In 2021 IEEE/ACM Symposium on Edge Computing (SEC) , pages 68–79. IEEE, 2021a."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib29",
+      "text": "Shengli Liu, Guanding Yu, Rui Yin, and Jiantao Yuan. Adaptive network pruning for wireless federated learning. IEEE Wireless Communications Letters , 10(7):1572–1576, 2021."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib36",
+      "text": "Muhammad Tahir Munir, Muhammad Mustansar Saeed, Mahad Ali, Zafar Ayyub Qazi, and Ihsan Ayyub Qazi. Fedprune: Towards inclusive federated learning. arXiv preprint arXiv:2110.14205 , 2021."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib20",
+      "text": "Yuang Jiang, Shiqiang Wang, Victor Valls, Bong Jun Ko, Wei-Han Lee, Kin K Leung, and Leandros Tassiulas. Model pruning enables efficient federated learning on edge devices. IEEE Transactions on Neural Networks and Learning Systems , 2022."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib38",
+      "text": "Xinchi Qiu, Javier Fernandez-Marques, Pedro PB Gusmao, Yan Gao, Titouan Parcollet, and Nicholas Donald Lane. Zerofl: Efficient on-device training for federated learning with local sparsity. arXiv preprint arXiv:2208.02507 , 2022."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib3",
+      "text": "Sameer Bibikar, Haris Vikalo, Zhangyang Wang, and Xiaohan Chen. Federated dynamic sparse training: Computing less, communicating less, yet learning better. In Proceedings of the AAAI Conference on Artificial Intelligence , pages 6080–6088, 2022."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib17",
+      "text": "Hong Huang, Lan Zhang, Chaoyue Sun, Ruogu Fang, Xiaoyong Yuan, and Dapeng Wu. Fedtiny: Pruned federated learning towards specialized tiny models. arXiv preprint arXiv:2212.01977 , 2022."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib11",
+      "text": "Utku Evci, Trevor Gale, Jacob Menick, Pablo Samuel Castro, and Erich Elsen. Rigging the lottery: Making all tickets winners. In International Conference on Machine Learning , pages 2943–2952. PMLR, 2020."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib39",
+      "text": "Mark Sandler, Andrew Howard, Menglong Zhu, Andrey Zhmoginov, and Liang-Chieh Chen. Mobilenetv2: Inverted residuals and linear bottlenecks. In Proceedings of the IEEE conference on computer vision and pattern recognition , pages 4510–4520, 2018."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib4",
+      "text": "Andrew Brock, Soham De, and Samuel L Smith. Characterizing signal propagation to close the performance gap in unnormalized resnets. arXiv preprint arXiv:2101.08692 , 2021."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib45",
+      "text": "Weiming Zhuang and Lingjuan Lyu. Is normalization indispensable for multi-domain federated learning? arXiv preprint arXiv:2306.05879 , 2023."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib22",
+      "text": "A Krizhevsky. Learning multiple layers of features from tiny images. Master’s thesis, University of Tront , 2009."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib9",
+      "text": "Luke N Darlow, Elliot J Crowley, Antreas Antoniou, and Amos J Storkey. Cinic-10 is not imagenet or cifar-10. arXiv preprint arXiv:1810.03505 , 2018."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib23",
+      "text": "Ya Le and Xuan Yang. Tiny imagenet visual recognition challenge. CS 231N , 7(7):3, 2015."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib16",
+      "text": "Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. Deep residual learning for image recognition. In Proceedings of the IEEE conference on computer vision and pattern recognition , pages 770–778, 2016."
+    }
+  ]
+}
