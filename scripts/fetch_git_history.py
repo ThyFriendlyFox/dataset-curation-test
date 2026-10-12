@@ -17,7 +17,7 @@ META_KEYS = (r"Feature Name|Start Date|RFC PR|Rust Issue|Proposals?|Authors?|Aut
              r"Implementation|Upcoming Feature Flag|Decision Notes|Bugs?|Previous Revisions?|Previous Proposal|Reviews?|"
              r"Type|Issues?|Prototype|Discussion(?: at)?|Last [Uu]pdated|Created|Requires|Category|Version|Target|"
              r"Contributors?|Champions?|YouTrack issue|Design|Pitch|Vision|Roadmap|Review thread|Shepherd")
-META_LINE = re.compile(rf"^\s*(?:[-*]\s+)?\**\s*(?:{META_KEYS})\s*\**\s*(?:\(s\))?\s*\**\s*:")
+META_LINE = re.compile(rf"^\s*(?:[-*]\s+)?\**\s*(?:(?:{META_KEYS})\s*\**\s*(?:\(s\))?\s*\**\s*:|Discussion at\s)", re.I)
 
 
 # Go design docs open with "Name\" byline lines and a date line
@@ -25,11 +25,12 @@ DATE_OR_BYLINE = re.compile(r"^\s*(?:[A-Z][\w.'-]+(?: [A-Z][\w.'-]+){0,3}\s*\\|(
 
 
 def git(repo, *args):
-    return subprocess.run(["git", "-C", repo, *args], capture_output=True, text=True, check=True).stdout
+    return subprocess.run(["git", "-C", repo, *args], capture_output=True, text=True, errors="replace", check=True).stdout
 
 
 def strip_header(text):
     """Remove the document's metadata header, keeping a leading '# Title' line."""
+    text = re.sub(r"<!--.*?-->", "", text, flags=re.S)  # invisible template guidance (EIPs and others)
     if text.startswith("---\n") and "\n---" in text[4:]:  # YAML front matter (EIPs, Scala SIPs)
         text = text[4:].split("\n---", 1)[1].lstrip("-\n")
     lines = text.split("\n")

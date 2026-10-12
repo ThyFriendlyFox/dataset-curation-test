@@ -11,7 +11,7 @@ for B/C both variants are sampled from the same pool of real versions.
 
 Usage: python3 scripts/build_dataset.py   (writes data/*.parquet, data/*.jsonl, review/*.md)
 """
-import difflib, glob, json, os, re
+import difflib, functools, glob, gzip, json, os, re
 import pyarrow as pa
 import pyarrow.parquet as pq
 from wikitext import convert
@@ -38,8 +38,14 @@ CITE = re.compile(r"\[(\d+(?:[,–-]\d+)*)\]")
 
 
 def load(path):
-    with open(path, encoding="utf-8") as f:
+    opener = gzip.open if path.endswith(".gz") else open
+    with opener(path, "rt", encoding="utf-8") as f:
         return json.load(f)
+
+
+def resolve(path):
+    """Source paths in reconstruction files may be absolute or relative to the repo root."""
+    return path if os.path.isabs(path) else os.path.join(ROOT, path)
 
 
 def with_refs(text, refs):
@@ -48,6 +54,7 @@ def with_refs(text, refs):
     return text + "\n\nReferences:\n" + "\n".join(f"[{r['n']}] {r['text']}" for r in refs)
 
 
+@functools.lru_cache(maxsize=8192)  # both variants of a row score the same snapshots
 def similarity(a, b):
     """Word-level similarity in [0,1] (difflib ratio); used to place snapshots along the path to final."""
     return round(difflib.SequenceMatcher(None, a.split(), b.split(), autojunk=False).ratio(), 4)
@@ -92,8 +99,8 @@ def pick(pool, k, final_text):
 
 # ---------- A: reconstructed ----------
 def a_row(name, variant):
-    src = load(S("final_text", f"{name}.json"))
     rec = load(S("reconstructed", f"{name}.json"))
+    src = load(resolve(rec["source_file"]) if rec.get("source_file") else S("final_text", f"{name}.json"))
     final = with_refs(src["text"], src["references"])
     texts = [s["text"] for s in sorted(rec["steps"], key=lambda s: s["step"])] + [final]
     assert len(texts) == 9, name
@@ -118,8 +125,8 @@ def snapshot_names(k):
 
 
 # ---------- B: Wikipedia revision history ----------
-def b_row(name, variant):
-    src = load(S("wiki_history", f"{name}.json"))
+def b_row(name, variant, path=None):
+    src = load(path or S("wiki_history", f"{name}.json"))
     pool = []
     for s in src["snapshots"]:
         if "wikitext" in s:  # re-convert with the current converter
@@ -145,8 +152,12 @@ def b_row(name, variant):
 
 
 # ---------- C: git history ----------
-def c_row(name, variant):
-    src = load(S("github_history", f"{name}.json"))
+C_KINDS = {"rfc": "Rust RFC", "pep": "Python PEP", "se": "Swift Evolution", "go": "Go proposal",
+           "keep": "Kotlin KEEP", "sip": "Scala SIP", "eip": "Ethereum EIP"}
+
+
+def c_row(name, variant, path=None):
+    src = load(path or S("github_history", f"{name}.json"))
     pool = [{**v, "full_text": v["text"]} for v in src["versions"]]
     final = pool[-1]["full_text"]
     k = 8 if variant == "9step" else 4
@@ -155,7 +166,7 @@ def c_row(name, variant):
     steps = [step(0, "title", src["title"], final, "source_title")]
     for j, v in enumerate(snaps, start=1):
         steps.append(step(j, names[j], v["full_text"], final, f"commit {v['commit'][:10]} ({v['date'][:10]})"))
-    kind = "Rust RFC" if name.startswith("rfc") else "Python PEP"
+    kind = C_KINDS[name.split("_", 1)[0]]
     return {
         "id": f"C-{name}", "approach": "github_commits", "doc_type": "design_document",
         "title": f"{kind}: {src['title']}",
