@@ -1,0 +1,103 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2309.08315",
+  "title": "i-Octree: A Fast, Lightweight, and Dynamic Octree for Proximity Search",
+  "authors": "Jun Zhu, Hongyi Li, Zhepeng Wang, Shengjie Wang, Tao Zhang",
+  "year": "2024",
+  "categories": [
+    "cs.RO"
+  ],
+  "url": "https://arxiv.org/abs/2309.08315",
+  "html_url": "https://arxiv.org/html/2309.08315",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 588,
+  "text": "Nearest neighbors search (NNS) is necessary in many robotic applications, such as real-time LiDAR-based simultaneous localization and mapping (SLAM) and motion planning, where the data is sampled sequentially and real-time mapping is essential. For example, in LiDAR-based SLAM, NNS is crucial to compute feature [1,2], estimate normal [3,4], and match new points to the map [5,6,7,8]. Recent advances in LiDAR technology have not only significantly reduced the cost, size, weight, and power of LiDAR but also enabled high performance of LiDAR, making it an essential sensor for robots [9]. However, this also poses challenges to NNS. The current LiDAR sensor can produce a large amount of 3D points with centimeter accuracy at hundreds of meters measuring range per second. The large amount of sequential data requires being processed in real-time, which is a quite challenging task on robots with limited onboard computing resources. To guarantee the efficiency of NNS, maintaining a large map supporting high efficient inquiry and dynamic updates with newly arriving points in real-time comes to vital importance.\n\nAlthough various static tree data structures have been proposed, they struggle to meet the demands. R-tree [10] and R \\ast -tree [11] partition the data by grouping nearby points into their minimum bounding rectangle in the next higher level of the tree. k-d tree [12] is a well-known instance to split the space. The octree recursively splits the space equally into eight axis-aligned cubes, which form the volumes represented by eight child nodes. Although k-d tree is a favored data structure in general k-nearest neighbors (KNN) search libraries, it is hard to draw any final conclusions as to whether the k-d tree is better suited for NNS compared to other data structures. Comparative studies [13,14] show that the performance of different implementations of k-d trees can be diverse, and the octree is amongst the best performing algorithms especially for radius search due to its regular partitioning of the search space. Despite its performance, octree has not been fully exploited. Elseberg et al. [15] proposed an efficient octree to store and compress 3D data without loss of precision. Behley et al. [16] proposed an index-based octree that significantly improves the radius neighbor search in three-dimensional data, while the KNN search and dynamic updates are not enabled. When incorporating these static trees in real robotic applications, re-building the entire tree from scratch [17] repeatedly is inevitable, which is so time-consuming that the robots may fail to run.\n\nIn this paper, we propose a dynamic octree structure called i-Octree, which incrementally updates the octree with new points and enables fast NNS. In addition, our i-Octree boasts impressive efficiency in both time and memory, adaptable to various types of points, and allows for on-tree down-sampling and box-wise delete. We conduct validation experiments on both randomized data and real-world open datasets to assess the effectiveness of i-Octree. In the randomized data experiments, our i-Octree demonstrates significant improvements in runtime compared to the state-of-the-art incremental k-d tree (i.e., ikd-Tree [9] proposed recently). Specifically, it reduces run-time by 64% for building the tree, 66% for point insertion, 30% for KNN search, and 56% for radius neighbors search. Moreover, when applied to real-world data in LiDAR-based SLAM, i-Octree showcases remarkable time performance enhancements. It achieves over twice the speed of the original method while often maintaining higher accuracy levels. Furthermore, Our implementation of i-Octree is open-sourced on Github.\n\nThe remaining paper is organized as follows: the design of i-Octree is described in Section II. Experiments are shown in Section III, followed by conclusions in Section IV.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "X. Xiong, D. Munoz, J. A. Bagnell, and M. Hebert, “3-d scene analysis via sequenced predictions over points and regions,” in 2011 IEEE International Conference on Robotics and Automation , 2011, pp. 2609–2616."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "J. Behley, V. Steinhage, and A. B. Cremers, “Performance of histogram descriptors for the classification of 3d laser range data in urban environments,” in 2012 IEEE International Conference on Robotics and Automation , 2012, pp. 4391–4398."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "N. J. Mitra and A. Nguyen, “Estimating surface normals in noisy point cloud data,” in Proceedings of the Nineteenth Annual Symposium on Computational Geometry , ser. SCG ’03. New York, NY, USA: Association for Computing Machinery, 2003, p. 322–328. [Online]. Available: https://doi.org/10.1145/777792.777840"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "K. Klasing, D. Wollherr, and M. Buss, “A clustering method for efficient segmentation of 3d laser data,” in 2008 IEEE International Conference on Robotics and Automation , 2008, pp. 4043–4048."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "J. Zhang and S. Singh, “Loam: Lidar odometry and mapping in real-time.” in Robotics: Science and Systems , vol. 2, no. 9, 2014."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "T. Shan and B. Englot, “Lego-loam: Lightweight and ground-optimized lidar odometry and mapping on variable terrain,” in 2018 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS) . IEEE, 2018, pp. 4758–4765."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "J. Lin and F. Zhang, “Loam livox: A fast, robust, high-precision lidar odometry and mapping package for lidars of small fov,” in 2020 IEEE International Conference on Robotics and Automation (ICRA) . IEEE, 2020, pp. 3126–3131."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "W. Xu and F. Zhang, “Fast-lio: A fast, robust lidar-inertial odometry package by tightly-coupled iterated kalman filter,” arXiv preprint arXiv:2010.08196 , 2020."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "W. Xu, Y. Cai, D. He, J. Lin, and F. Zhang, “Fast-lio2: Fast direct lidar-inertial odometry,” IEEE Transactions on Robotics , vol. 38, no. 4, pp. 2053–2073, 2022."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "A. Guttman, “R-trees: A dynamic index structure for spatial searching,” in Proceedings of the 1984 ACM SIGMOD international conference on Management of data , 1984, pp. 47–57."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "N. Beckmann, H.-P. Kriegel, R. Schneider, and B. Seeger, “The r*-tree: An efficient and robust access method for points and rectangles,” in Proceedings of the 1990 ACM SIGMOD international conference on Management of data , 1990, pp. 322–331."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "J. L. Bentley, “Multidimensional binary search trees used for associative searching,” Communications of the ACM , vol. 18, no. 9, pp. 509–517, 1975."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "J. L. Vermeulen, A. Hillebrand, and R. Geraerts, “A comparative study of k-nearest neighbour techniques in crowd simulation,” Computer Animation and Virtual Worlds , vol. 28, no. 3-4, p. e1775, 2017."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "J. Elseberg, S. Magnenat, R. Siegwart, and A. Nüchter, “Comparison of nearest-neighbor-search strategies and implementations for efficient shape registration,” Journal of Software Engineering for Robotics , vol. 3, no. 1, pp. 2–12, 2012."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "J. Elseberg, D. Borrmann, and A. Nüchter, “One billion points in the cloud–an octree for efficient processing of 3d laser scans,” ISPRS Journal of Photogrammetry and Remote Sensing , vol. 76, pp. 76–88, 2013."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "J. Behley, V. Steinhage, and A. B. Cremers, “Efficient radius neighbor search in three-dimensional point clouds,” in 2015 IEEE International Conference on Robotics and Automation (ICRA) , 2015, pp. 3625–3630."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "R. B. Rusu and S. Cousins, “3d is here: Point cloud library (pcl),” in 2011 IEEE international conference on robotics and automation . IEEE, 2011, pp. 1–4."
+    }
+  ]
+}

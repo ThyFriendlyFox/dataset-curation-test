@@ -1,0 +1,99 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2112.01799",
+  "title": "Global Context with Discrete Diffusion in Vector Quantised Modelling for Image Generation",
+  "authors": "Minghui Hu, Yujie Wang, Tat-Jen Cham, Jianfei Yang, P. N. Suganthan",
+  "year": "2021",
+  "categories": [
+    "cs.CV",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2112.01799",
+  "html_url": "https://arxiv.org/html/2112.01799",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 673,
+  "text": "Vector Quantised Variational AutoEncoder (VQ-VAE) [1] is a popular method developed to compress images into discrete representations for the generation. Typically, after the compression and discretization representation by the convolutional network, an autoregressive model is used to model and sample in the discrete latent space, including PixelCNN family [2,3,4], transformers family [5,6], etc. However, in addition to the disadvantage of the huge number of model parameters, these autoregressive models can only make predictions based on the observed pixels (left upper part of the target pixel) due to the inductive bias caused by the strict adherence to the progressive scan order [7,8]. If the conditional information is located at the end of the autoregressive sequence, it is difficult for the model to obtain relevant information.\n\nA recent alternative generative model is the Denoising Diffusion Model, which can effectively mitigate the lack of global information [9,10], also achieving comparable or state-of-the-art performance in text [11,12], image [13] and speech generation [14] tasks. Diffusion models are parameterized Markov chains trained to translate simple distributions to more sophisticated target data distributions in a finite set of steps. Typically the Markov chain begins with an isotropic Gaussian distribution in continuous state space, with the transitions of the chain for reversing a diffusion process that gradually adds Gaussian noise to source images. In the inverse process, as the current step is based on the global information of the previous step in the chain, this endows the diffusion model with the ability to capture the global information.\n\nHowever, the diffusion model has a non-negligible disadvantage in that the time and computational effort involved in generating the images are enormous. The main reason is that the reverse process typically contains thousands of steps. Although we do not need to iterate through all the steps when training, all these steps are still required when generating a sample, which is much slower compared to GANs and even autoregressive models.\n\nSome recent works [15,16] have attempted addressing these issues by decreasing the sampling steps, but the computation cost is still high as each step of the reverse process generates a full-resolution image.\n\nIn this work, we propose the V ector Q uantized D iscrete D iffusion M odel (VQ-DDM), a versatile framework for image generation consisting of a discrete variational autoencoder and a discrete diffusion model. VQ-DDM consists of two stages: (1) learning an abundant and efficient discrete representation of images, (2) fitting the prior distribution of such latent visual codes via discrete diffusion model.\n\nVQ-DDM substantially reduces the computational resources and required time to generate high-resolution images by using a discrete scheme. Then the common problem of the lack of global content and overly large number of parameters of the autoregressive model is solved by fitting a latent variable prior using the discrete diffusion model. Finally, since a bias of codebook will limit generation quality, while model size is also dependent on the number of categories, we propose a re-build and fine-tune(ReFiT) strategy to construct a codebook with higher utilization, which will also reduce the number of parameters in our model.\n\nIn summary, our key contributions include the following:\n\n- • VQ-DDM fits the prior over discrete latent codes with a discrete diffusion model. The use of diffusion model allows the generative models consider the global information instead of only focusing on partially seen context to avoid sequential bias.\n\n- • We propose a ReFiT approach to improve the utilisation of latent representations in the visual codebook, which can increase the code usage of VQ-GAN from 31.85\\% to 97.07\\%, while the FID between reconstruction image and original training image is reduced from 10.18 to 5.64 on CelebA-HQ 256\\times 256.\n\n- • VQ-DDM is highly efficient for the both number of parameters and generation speed. As shown in Figure 1, using only 120M parameters, it outperforms VQ-VAE-2 with around 10B parameters and is comparable with VQ-GAN with 1B parameters in image generation tasks in terms of image quality. It is also 10 \\sim 100 times faster than other diffusion models for image generation [15,10].",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib34",
+      "text": "Aaron van den Oord, Oriol Vinyals, and Koray Kavukcuoglu. Neural discrete representation learning. In Proceedings of the 31st International Conference on Neural Information Processing Systems , pages 6309–6318, 2017."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib23",
+      "text": "Aaron van den Oord, Nal Kalchbrenner, Oriol Vinyals, Lasse Espeholt, Alex Graves, and Koray Kavukcuoglu. Conditional image generation with pixelcnn decoders. arXiv preprint arXiv:1606.05328 , 2016."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib35",
+      "text": "Aaron Van Oord, Nal Kalchbrenner, and Koray Kavukcuoglu. Pixel recurrent neural networks. In International Conference on Machine Learning , pages 1747–1756. PMLR, 2016."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib5",
+      "text": "Xi Chen, Nikhil Mishra, Mostafa Rohaninejad, and Pieter Abbeel. Pixelsnail: An improved autoregressive generative model. In International Conference on Machine Learning , pages 864–872. PMLR, 2018."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib25",
+      "text": "Aditya Ramesh, Mikhail Pavlov, Gabriel Goh, Scott Gray, Chelsea Voss, Alec Radford, Mark Chen, and Ilya Sutskever. Zero-shot text-to-image generation. arXiv preprint arXiv:2102.12092 , 2021."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib4",
+      "text": "Mark Chen, Alec Radford, Rewon Child, Jeffrey Wu, Heewoo Jun, David Luan, and Ilya Sutskever. Generative pretraining from pixels. In International Conference on Machine Learning , pages 1691–1703. PMLR, 2020."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib16",
+      "text": "Salman Khan, Muzammal Naseer, Munawar Hayat, Syed Waqas Zamir, Fahad Shahbaz Khan, and Mubarak Shah. Transformers in vision: A survey. arXiv preprint arXiv:2101.01169 , 2021."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib3",
+      "text": "Samy Bengio, Oriol Vinyals, Navdeep Jaitly, and Noam Shazeer. Scheduled sampling for sequence prediction with recurrent neural networks. arXiv preprint arXiv:1506.03099 , 2015."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib30",
+      "text": "Jascha Sohl-Dickstein, Eric Weiss, Niru Maheswaranathan, and Surya Ganguli. Deep unsupervised learning using nonequilibrium thermodynamics. In International Conference on Machine Learning , pages 2256–2265. PMLR, 2015."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "Jonathan Ho, Ajay Jain, and Pieter Abbeel. Denoising diffusion probabilistic models. arXiv preprint arxiv:2006.11239 , 2020."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib12",
+      "text": "Emiel Hoogeboom, Didrik Nielsen, Priyank Jaini, Patrick Forré, and Max Welling. Argmax flows and multinomial diffusion: Towards non-autoregressive language models. arXiv preprint arXiv:2102.05379 , 2021."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib1",
+      "text": "Jacob Austin, Daniel Johnson, Jonathan Ho, Danny Tarlow, and Rianne van den Berg. Structured denoising diffusion models in discrete state-spaces. arXiv preprint arXiv:2107.03006 , 2021."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib6",
+      "text": "Prafulla Dhariwal and Alex Nichol. Diffusion models beat gans on image synthesis. arXiv e-prints , pages arXiv–2105, 2021."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib20",
+      "text": "Zhifeng Kong, Wei Ping, Jiaji Huang, Kexin Zhao, and Bryan Catanzaro. Diffwave: A versatile diffusion model for audio synthesis. In International Conference on Learning Representations , 2020."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib31",
+      "text": "Jiaming Song, Chenlin Meng, and Stefano Ermon. Denoising diffusion implicit models. In International Conference on Learning Representations , 2020."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib22",
+      "text": "Alex Nichol and Prafulla Dhariwal. Improved denoising diffusion probabilistic models. arXiv preprint arXiv:2102.09672 , 2021."
+    }
+  ]
+}

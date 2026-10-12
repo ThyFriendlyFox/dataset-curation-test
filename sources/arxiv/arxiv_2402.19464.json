@@ -1,0 +1,110 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2402.19464",
+  "title": "Curiosity-driven Red-teaming for Large Language Models",
+  "authors": "Zhang-Wei Hong, Idan Shenfeld, Tsun-Hsuan Wang, Yung-Sung Chuang, Aldo Pareja, James Glass, Akash Srivastava, Pulkit Agrawal",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.AI",
+    "cs.CL"
+  ],
+  "url": "https://arxiv.org/abs/2402.19464",
+  "html_url": "https://arxiv.org/html/2402.19464",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 750,
+  "text": "Large language models (LLMs) have achieved unprecedented success in question-answering, virtual assistance, summarization, and other applications of natural language processing (NLP). A big issue in deploying LLMs is the potential generation of misinformation and harmful content [1]. However, since LLMs often consist of several millions or billions of parameters, inspecting what prompts trigger an LLM to produce unwanted text (e.g., toxic, hateful, or untruthful) is challenging.\n\nOne possibility is to use a classifier to filter the LLM’s output to avoid presenting a user with unwanted responses. However, such an approach is usually infeasible as it requires multiple generations from LLM during deployment to find an output that passes the filtering – a computationally expensive process. Further, it is possible that despite multiple generations, no output passes the classifier. Therefore, instead of filtering during deployment, it is ideal to test the LLM before deployment to fine-tune it to reduce the chances of undesired responses during deployment.\n\nCurrently, models are tested by human testers who design test cases (i.e., prompts) that elicit unwanted responses from the target LLM [2]. This paradigm is called red teaming, and the human testers are called red teams. As human red teaming is costly and time-consuming, a promising alternative is to automate test case generation using a red-team LLM [3] (which is a different model than the target LLM) using reinforcement learning (RL) [4]. Assuming access to a reward function that can score the undesirability of the generated response, the red-team LLM can be thought of as a policy trained via RL to generate prompts for the target LLMs that elicit reward maximizing responses. An ideal method for automatic red-teaming would identify all test cases (or prompts) that are effective – i.e., elicit an unwanted response from the target LLM.\n\nExisting RL-based methods for automatic red teaming identify effective test cases, but generated test cases lack diversity, resulting in low coverage of the span of prompts that elicit undesirable responses. Insufficient coverage implies that the target LLM is not thoroughly evaluated, as many prompts that can trigger unwanted responses are missed. The primary reason behind the low coverage is that current RL methods are only trained to maximize rewards (i.e., generate effective test cases) without any incentive to span all possible test cases. Once a few effective test cases are found, RL training reinforces these few test cases to obtain high rewards and quickly converges to a deterministic policy [5,6]. Thus, RL approaches overlook alternative but equally effective test cases, resulting in low coverage of effective test cases.\n\nOne way to increase the coverage is to increase the diversity of the policy’s output. It is common to increase diversity of LLM outputs by increasing the sampling temperature [7] of the policy [8] and adding entropy bonus [9] to the training RL’s training objective. However, we found that diversity only minimally increases coverage – a small set of dissimilar test cases are diverse (i.e., maximize entropy), but may not cover the span of all possible effective test cases (see discussion in Section 4.5).\n\nA more direct way to increase coverage is to directly optimize for the novelty of the generated test cases. In this form, the problem of finding effective test cases that increase coverage can be cast into the curiosity-driven exploration framework [14,15,16] of jointly maximizing the novelty and the task reward. We measure the novelty of test cases based on text similarity metrics [17,18]. Lower similarity to previously generated test cases indicates higher novelty.\n\nWe evaluate our curiosity-driven red teaming (CRT) method on text continuation and instruction following scenarios. The evaluation reveals that the proposed method (CRT) increases the coverage of the generated test compared to current RL-based red-teaming methods. The effectiveness of test cases is measured as the toxicity of the responses elicited from the target LLM. We use toxicity as a metric due to its prevalence in red teaming [3], but our method can be applied to any other metric. Intriguingly, curiosity-driven exploration also improves red-teaming’s effectiveness, implying that improved exploration enables a red-team model to discover more effective test cases. We show that CRT can successfully find prompts that elicit toxic responses even from LLMs that have been fine-tuned with a few rounds of reinforcement learning from human feedback (RLHF) [13]. These results highlight both the usefulness of our method and the fact that the current RLHF methods are insufficient to make LLMs safe. Our results also indicate that curiosity-driven exploration is likely to be a vital component for effective automated red teaming.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib25",
+      "text": "Lee (2016) Peter Lee. Learning from tay’s introduction. https://blogs.microsoft.com/blog/2016/03/25/learning-tays-introduction/ , 2016."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib18",
+      "text": "Ganguli et al. (2022) Deep Ganguli, Liane Lovitt, Jackson Kernion, Amanda Askell, Yuntao Bai, Saurav Kadavath, Ben Mann, Ethan Perez, Nicholas Schiefer, Kamal Ndousse, et al. Red teaming language models to reduce harms: Methods, scaling behaviors, and lessons learned. arXiv preprint arXiv:2209.07858 , 2022."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib34",
+      "text": "Perez et al. (2022) Ethan Perez, Saffron Huang, Francis Song, Trevor Cai, Roman Ring, John Aslanides, Amelia Glaese, Nat McAleese, and Geoffrey Irving. Red teaming language models with language models. arXiv preprint arXiv:2202.03286 , 2022."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib42",
+      "text": "Sutton & Barto (2018) Richard S Sutton and Andrew G Barto. Reinforcement learning: An introduction . 2018."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib35",
+      "text": "Puterman (2014) Martin L Puterman. Markov decision processes: discrete stochastic dynamic programming . John Wiley & Sons, 2014."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib4",
+      "text": "Bengio et al. (2021) Emmanuel Bengio, Moksh Jain, Maksym Korablyov, Doina Precup, and Yoshua Bengio. Flow network based generative models for non-iterative diverse candidate generation. Advances in Neural Information Processing Systems , 34:27381–27394, 2021."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib40",
+      "text": "Softmax function (2023) Softmax function. Softmax function — Wikipedia, the free encyclopedia, 2023. URL https://en.wikipedia.org/wiki/Softmax_function ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib13",
+      "text": "Chung et al. (2023) John Joon Young Chung, Ece Kamar, and Saleema Amershi. Increasing diversity while maintaining accuracy: Text data generation with large language models and human interventions. arXiv preprint arXiv:2306.04140 , 2023."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib38",
+      "text": "Schulman et al. (2017a) John Schulman, Xi Chen, and Pieter Abbeel. Equivalence between policy gradients and soft q-learning. arXiv preprint arXiv:1704.06440 , 2017a."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib39",
+      "text": "Schulman et al. (2017b) John Schulman, Filip Wolski, Prafulla Dhariwal, Alec Radford, and Oleg Klimov. Proximal policy optimization algorithms. arXiv preprint arXiv:1707.06347 , 2017b."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib28",
+      "text": "Mnih et al. (2016) Volodymyr Mnih, Adria Puigdomenech Badia, Mehdi Mirza, Alex Graves, Timothy P Lillicrap, Tim Harley, David Silver, and Koray Kavukcuoglu. Asynchronous methods for deep reinforcement learning. In ICML , 2016."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib31",
+      "text": "Ouyang et al. (2022) Long Ouyang, Jeffrey Wu, Xu Jiang, Diogo Almeida, Carroll Wainwright, Pamela Mishkin, Chong Zhang, Sandhini Agarwal, Katarina Slama, Alex Ray, et al. Training language models to follow instructions with human feedback. Advances in Neural Information Processing Systems , 35:27730–27744, 2022."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib2",
+      "text": "Bai et al. (2022) Yuntao Bai, Andy Jones, Kamal Ndousse, Amanda Askell, Anna Chen, Nova DasSarma, Dawn Drain, Stanislav Fort, Deep Ganguli, Tom Henighan, et al. Training a helpful and harmless assistant with reinforcement learning from human feedback. arXiv preprint arXiv:2204.05862 , 2022."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib7",
+      "text": "Burda et al. (2019) Yuri Burda, Harrison Edwards, Amos Storkey, and Oleg Klimov. Exploration by random network distillation. In International Conference on Learning Representations , 2019. URL https://openreview.net/forum?id=H1lJJnR5Ym ."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib33",
+      "text": "Pathak et al. (2017) Deepak Pathak, Pulkit Agrawal, Alexei A Efros, and Trevor Darrell. Curiosity-driven exploration by self-supervised prediction. In Proceedings of the 34th International Conference on Machine Learning , pp. 2778–2787, 2017."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib11",
+      "text": "Chen* et al. (2022) Eric Chen*, Zhang-Wei Hong*, Joni Pajarinen, and Pulkit (* equal contribution) Agrawal. Redeeming intrinsic rewards via constrained optimization. Advances in Neural Information Processing Systems , 35:4996–5008, 2022."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib44",
+      "text": "Tevet & Berant (2020) Guy Tevet and Jonathan Berant. Evaluating the evaluation of diversity in natural language generation. arXiv preprint arXiv:2004.02990 , 2020."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib32",
+      "text": "Papineni et al. (2002) Kishore Papineni, Salim Roukos, Todd Ward, and Wei-Jing Zhu. Bleu: a method for automatic evaluation of machine translation. In Proceedings of the 40th annual meeting of the Association for Computational Linguistics , pp. 311–318, 2002."
+    }
+  ]
+}

@@ -1,0 +1,103 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2402.18824",
+  "title": "Batch size invariant Adam",
+  "authors": "Xi Wang, Laurence Aitchison",
+  "year": "2024",
+  "categories": [
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2402.18824",
+  "html_url": "https://arxiv.org/html/2402.18824",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 522,
+  "text": "Adam [1] and Adam [2] are state-of-art optimizerss, commonly used for LLM pretraining runs [3,4]. Given the huge investments in these pretraining runs, it is critical to understand how to tune the hyperparameters of Adam. However, as with most optimization algorithms, setting the Adam hyperparameters is difficult. As an example of this, we might want to tune the hyperparameters in smaller-scale settings and transfer those hyperparameters to a single, very large-scale training run. However, to do that effectively, we need our optimization to behave in the same way for any mini- batch size. This property, which we call batch size invariance, can be achieved straightforwardly in SGD, by scaling the learning rate linearly with the batch size (i.e. \\eta\\propto B) [5,6,7,8,9,10,11,12,13,14]. However, for modern adaptive optimizers such as Adam [1,2], it is more difficult to achieve batch size invariance.\n\nTo understand the key barrier to obtaining truly batch size invariant Adam, we need to look at the Adam update rule,\n\nThe key term here is \\hat{v}_{t}, which is a debiased, exponential moving average estimate of the raw second moment of the gradient, \\operatorname{E}\\left[(g^{\\prime})^{2}\\right] (here, the expectation is over randomness in the choice of datapoints incorporated in the mini- batch, and we use g^{\\prime} for the mini- batch gradient as we will use g for the micro- batch gradient later in the manuscript). Of course, the raw second moment is the sum of the mean-squared gradient, \\operatorname{E}\\left[g^{\\prime}\\right]^{2}, and the variance of the gradient, \\operatorname{Var}\\left[g^{\\prime}\\right]. The key issue is that the variance of the mini- batch gradient depends on the mini- batch size, \\operatorname{Var}\\left[g^{\\prime}\\right]\\propto 1/B [15,16,17]. There is therefore an inevitable mini- batch size dependence in \\hat{v}_{t}, which appears as a change in the effective learning rate, \\eta/(\\sqrt{\\hat{v}_{t}}+\\epsilon).\n\nRecent work suggested correcting for these effects by tweaking the learning rate, \\eta [15,16,17]. In particular, they proposed a square-root scaling (i.e. \\eta\\propto\\sqrt{B}). However, for this square-root scaling to be valid, strong assumptions need to hold, namely that \\operatorname{Var}\\left[g^{\\prime}\\right] “dominates” (i.e. is much bigger than) \\operatorname{E}\\left[g^{\\prime}\\right]^{2}. Of course, this can hardly be guaranteed to hold. In fact, there are two settings where this assumption might break down. First, close to initialization, where \\operatorname{E}\\left[g^{\\prime}\\right] will be large. Second, as the batch size gets very large (e.g. in large LLM pretraining runs), we would expect \\operatorname{Var}\\left[g^{\\prime}\\right]\\propto 1/B to become small.\n\nWe take a different approach to batch size invariance in Adam, by modifying the Adam updates themselves to eliminate the batch size dependence at source. In particular, we consider a large-scale setting in which a mini- batch is split into a number of micro- batches, which may be distributed among worker nodes. Standard Adam computes the average gradient (across micro- batches), then squares. In contrast, we consider an alternative scheme, which first squares the micro- batch gradients, then averages across micro- batches. We prove that this alternative scheme is batch size invariant under much weaker assumptions. In particular, we do not need the gradient variance to dominate the expectation. We just need sufficiently small updates (e.g. learning rates), which is required by [16] anyway, and is just the Adam analogue of the critical batch size in SGD [10,11,12,13,14].",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib11",
+      "text": "Kingma & Ba (2014) Kingma, D. P. and Ba, J. Adam: A method for stochastic optimization. arXiv preprint arXiv:1412.6980 , 2014."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib14",
+      "text": "Loshchilov & Hutter (2017) Loshchilov, I. and Hutter, F. Decoupled weight decay regularization. arXiv preprint arXiv:1711.05101 , 2017."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib26",
+      "text": "Zhang et al. (2022) Zhang, S., Roller, S., Goyal, N., Artetxe, M., Chen, M., Chen, S., Dewan, C., Diab, M., Li, X., Lin, X. V., et al. Opt: Open pre-trained transformer language models. arXiv preprint arXiv:2205.01068 , 2022."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib23",
+      "text": "Touvron et al. (2023) Touvron, H., Martin, L., Stone, K., Albert, P., Almahairi, A., Babaei, Y., Bashlykov, N., Batra, S., Bhargava, P., Bhosale, S., et al. Llama 2: Open foundation and fine-tuned chat models. arXiv preprint arXiv:2307.09288 , 2023."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib12",
+      "text": "Krizhevsky (2014) Krizhevsky, A. One weird trick for parallelizing convolutional neural networks. arXiv preprint arXiv:1404.5997 , 2014."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib22",
+      "text": "Stephan et al. (2017) Stephan, M., Hoffman, M. D., Blei, D. M., et al. Stochastic gradient descent as approximate bayesian inference. Journal of Machine Learning Research , 18(134):1–35, 2017."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib6",
+      "text": "Goyal et al. (2017) Goyal, P., Dollár, P., Girshick, R., Noordhuis, P., Wesolowski, L., Kyrola, A., Tulloch, A., Jia, Y., and He, K. Accurate, large minibatch sgd: Training imagenet in 1 hour. arXiv preprint arXiv:1706.02677 , 2017."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib20",
+      "text": "Smith & Le (2017) Smith, S. L. and Le, Q. V. A bayesian perspective on generalization and stochastic gradient descent. arXiv preprint arXiv:1710.06451 , 2017."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib21",
+      "text": "Smith et al. (2017) Smith, S. L., Kindermans, P.-J., Ying, C., and Le, Q. V. Don’t decay the learning rate, increase the batch size. arXiv preprint arXiv:1711.00489 , 2017."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib15",
+      "text": "Ma et al. (2018) Ma, S., Bassily, R., and Belkin, M. The power of interpolation: Understanding the effectiveness of sgd in modern over-parametrized learning. In International Conference on Machine Learning , pp. 3325–3334. PMLR, 2018."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib5",
+      "text": "Golmant et al. (2018) Golmant, N., Vemuri, N., Yao, Z., Feinberg, V., Gholami, A., Rothauge, K., Mahoney, M. W., and Gonzalez, J. On the computational inefficiency of large batch sizes for stochastic gradient descent. arXiv preprint arXiv:1811.12941 , 2018."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib17",
+      "text": "McCandlish et al. (2018) McCandlish, S., Kaplan, J., Amodei, D., and Team, O. D. An empirical model of large-batch training. arXiv preprint arXiv:1812.06162 , 2018."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib25",
+      "text": "Zhang et al. (2019) Zhang, G., Li, L., Nado, Z., Martens, J., Sachdeva, S., Dahl, G., Shallue, C., and Grosse, R. B. Which algorithmic choices matter at which batch sizes? insights from a noisy quadratic model. Advances in neural information processing systems , 32, 2019."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib19",
+      "text": "Shallue et al. (2019) Shallue, C. J., Lee, J., Antognini, J., Sohl-Dickstein, J., Frostig, R., and Dahl, G. E. Measuring the effects of data parallelism on neural network training. Journal of Machine Learning Research , 20(112):1–49, 2019."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib7",
+      "text": "Granziol et al. (2022) Granziol, D., Zohren, S., and Roberts, S. Learning rates as a function of batch size: A random matrix theory approach to neural network training. The Journal of Machine Learning Research , 23(1):7795–7859, 2022."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "Malladi et al. (2022) Malladi, S., Lyu, K., Panigrahi, A., and Arora, S. On the sdes and scaling rules for adaptive gradient algorithms. Advances in Neural Information Processing Systems , 35:7697–7711, 2022."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib9",
+      "text": "Hilton et al. (2022) Hilton, J., Cobbe, K., and Schulman, J. Batch size-invariance for policy optimization. Advances in Neural Information Processing Systems , 35:17086–17098, 2022."
+    }
+  ]
+}

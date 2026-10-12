@@ -1,0 +1,100 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2303.05707",
+  "title": "MuLTI: Efficient Video-and-Language Understanding with Text-Guided MultiWay-Sampler and Multiple Choice Modeling",
+  "authors": "Jiaqi Xu, Bo Liu, Yunkuo Chen, Mengli Cheng, Xing Shi",
+  "year": "2024",
+  "categories": [
+    "cs.CV",
+    "cs.CL",
+    "cs.MM"
+  ],
+  "url": "https://arxiv.org/abs/2303.05707",
+  "html_url": "https://arxiv.org/html/2303.05707",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 738,
+  "text": "Video-and-language understanding has a wide range of applications such as video question answering (videoQA), text-video retrieval and multi-label classification [1]. Existing methods have made significant progress in video-and-language understanding. However, they still suffer from two challenges: Balancing computational efficiency and performance when dealing with long sequences and the domain gap between pretraining and downstream tasks.\n\nThe video-text model generally consists of three modules: text encoder, video encoder, and feature fusion module. The latter two usually cause high computational costs.\n\nFeature fusion modules face efficiency and effectiveness challenges. Previous studies [2,3] concatenate video-text encoder outputs for transformer encoders processing, with complexity growing with sequence length squared. Other studies [4,5,6,7] reduce computation by condensing video features via mean pooling or class tokens before feature fusion, risking loss of critical details. Flamingo [8] employs samplers and random queries for efficient video feature condensation, though this approach is suboptimal and may compromise feature integrity. In summary, balancing computational costs and the model’s accuracy in the feature fusion module is still challenging. Following [9,10,11,12,13], we explore strategies for selectively freezing encoder components to lower visual encoder training costs.\n\nAligning pretraining with downstream tasks is challenging. Previous pretraining frameworks generally apply four typical pretraining tasks: Masked Frame Modeling (MVM) tasks [7,14,2,3] for video encoder optimization, Masked Language Modeling (MLM) tasks [15,10,12,16,11,4] for text encoder optimization, Video Text Matching (VTM) and Video Text Comparison (VTC) tasks [11,16,2,5] for joint optimization of video and text encoders. Although the above methods have proven effective in learning video and text representations, there are still significant domain gaps between pretraining and downstream tasks, especially in videoQA. Only the VTC task is consistent with text-video retrieval among the above pretraining tasks. In summary, narrowing the domain gap between the pretraining and downstream tasks is still challenging.\n\nAddressing these challenges, we introduce MuLTI, featuring a Text-Guided MultiWay-Sampler for sequence condensation and multi-modal fusion. Existing methods typically use a learnable query vector to sample the video feature through self-attention modules [8]. A randomly initialized query vector can discard vital original feature information, causing performance drops. We design an lightweight Adapt-Pooling method in Text-Guided MultiWay-Sampler to obtain the condensed features by calculating the importance of each sequence block. Then, we add the condensed features to the sampled features and use short text features to sample and fuse long video features. We share the self-attention and reserve different feed forward networks for different modalities in the sampler.\n\nFigure 1 shows that previous models (a) [2,3] and (b) [5] consume substantial video memory with their lengthy concatenated feature fusion. Both (b) and (c) [8] compress video features, a common choice due to their greater length compared to text. However, excessive compression can impair performance because of the rich information in video features. In contrast, we design MuLTI like (d) and introduces the Text-Guided MultiWay-Sampler to efficiently condense text features for fusion. Since text is more concise, we use the streamlined text to direct video feature sampling, resulting in enhanced performance.\n\nPretraining on large-scale video-text datasets could improve the performance of video-text models significantly. However, there are still domain gaps between the existing pretraining tasks and downstream tasks, specifically in videoQA. The difficulty of introducing videoQA to pretraining tasks is constructing suitable question-answer pairs. To reduce the domain gap between the pretraining task and the downstream task in videoQA, we introduce a new pretraining task named Multiple Choice Modeling (MCM). The MCM can bridge the task gap between pretraining and downstream tasks by constructing multiple-choice question answering tasks on large-scale video-text datasets. It asks the model to find text descriptions that match the video most from a randomly constructed collection, which enhances the representation ability of the video and text encoders and the alignment between video and text features.\n\nThe contributions can be summarized as follows:\n\n(1) We propose MuLTI, a highly accurate and memory-efficient video-and-language framework, which achieves efficient and effective feature fusion through the feature sampling and attention modules.\n\n(2) We propose a Text-Guided MultiWay-Sampler to sample long sequence features and facilitate the interactions between video and text features, reducing memory cost and improving performance.\n\n(3) We design a new pretraining task called Multiple Choice Modeling (MCM) to bridge the task gap between pretraining and downstream tasks. Experimental results on seven English tasks and one Chinese multi-label classification task demonstrate the effectiveness of MuLTI.\n\nAlthough we designed MuLTI for industrial scenarios with long sequences, MuLTI still handles short sequences well and achieves state-of-the-art performance.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib7",
+      "text": "Diba et al. (2019) Diba, A.; Fayyaz, M.; Sharma, V.; Paluri, M.; Gall, J.; Stiefelhagen, R.; and Gool, L. V. 2019. Large Scale Holistic Video Understanding. In European Conference on Computer Vision ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib8",
+      "text": "Fu et al. (2021) Fu, T.-J.; Li, L.; Gan, Z.; Lin, K.; Wang, W. Y.; Wang, L.; and Liu, Z. 2021. VIOLET : End-to-End Video-Language Transformers with Masked Visual-token Modeling. ArXiv , abs/2111.12681."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib12",
+      "text": "Huang et al. (2022) Huang, J.; Li, Y.; Feng, J.; Sun, X.; and Ji, R. 2022. Clover: Towards A Unified Video-Language Alignment and Fusion Model. ArXiv , abs/2207.07885."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib15",
+      "text": "Lei et al. (2021b) Lei, J.; Li, L.; Zhou, L.; Gan, Z.; Berg, T. L.; Bansal, M.; and Liu, J. 2021b. Less is more: Clipbert for video-and-language learning via sparse sampling. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 7331–7341."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib16",
+      "text": "Li et al. (2021) Li, D.; Li, J.; Li, H.; Niebles, J. C.; and Hoi, S. C. H. 2021. Align and Prompt: Video-and-Language Pre-training with Entity Prompts. ArXiv , abs/2112.09583."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib33",
+      "text": "Yang et al. (2022) Yang, A.; Miech, A.; Sivic, J.; Laptev, I.; and Schmid, C. 2022. Zero-Shot Video Question Answering via Frozen Bidirectional Language Models. ArXiv , abs/2206.08155."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib14",
+      "text": "Lei et al. (2021a) Lei, C.; Luo, S.; Liu, Y.; He, W.; Wang, J.; Wang, G.; Tang, H.; Miao, C.; and Li, H. 2021a. Understanding Chinese Video and Language via Contrastive Multimodal Pre-Training. Proceedings of the 29th ACM International Conference on Multimedia ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib1",
+      "text": "Alayrac et al. (2022) Alayrac, J.-B.; Donahue, J.; Luc, P.; Miech, A.; Barr, I.; Hasson, Y.; Lenc, K.; Mensch, A.; Millican, K.; Reynolds, M.; Ring, R.; Rutherford, E.; Cabi, S.; Han, T.; Gong, Z.; Samangooei, S.; Monteiro, M.; Menick, J.; Borgeaud, S.; Brock, A.; Nematzadeh, A.; Sharifzadeh, S.; Binkowski, M.; Barreira, R.; Vinyals, O.; Zisserman, A.; and Simonyan, K. 2022. Flamingo: a Visual Language Model for Few-Shot Learning. ArXiv , abs/2204.14198."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib23",
+      "text": "Miech et al. (2019) Miech, A.; Zhukov, D.; Alayrac, J.-B.; Tapaswi, M.; Laptev, I.; and Sivic, J. 2019. HowTo100M: Learning a Text-Video Embedding by Watching Hundred Million Narrated Video Clips. 2019 IEEE/CVF International Conference on Computer Vision (ICCV) , 2630–2640."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib28",
+      "text": "Sun et al. (2019) Sun, C.; Myers, A.; Vondrick, C.; Murphy, K. P.; and Schmid, C. 2019. VideoBERT: A Joint Model for Video and Language Representation Learning. 2019 IEEE/CVF International Conference on Computer Vision (ICCV) , 7463–7472."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib17",
+      "text": "Li et al. (2020) Li, L.; Chen, Y.-C.; Cheng, Y.; Gan, Z.; Yu, L.; and Liu, J. 2020. Hero: Hierarchical Encoder for Video+Language Omni-representation Pre-training. ArXiv , abs/2005.00200."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib35",
+      "text": "Zhu and Yang (2020) Zhu, L.; and Yang, Y. 2020. ActBERT: Learning Global-Local Video-Text Representations. 2020 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 8743–8752."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib22",
+      "text": "Miech et al. (2020) Miech, A.; Alayrac, J.-B.; Smaira, L.; Laptev, I.; Sivic, J.; and Zisserman, A. 2020. End-to-End Learning of Visual Representations From Uncurated Instructional Videos. 2020 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 9876–9886."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib21",
+      "text": "Ma, Lou, and Ouyang (2021) Ma, Z.; Lou, M.; and Ouyang, X. 2021. Top1 Solution of QQ Browser 2021 Ai Algorithm Competition Track 1 : Multimodal Video Similarity. ArXiv , abs/2111.01677."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib6",
+      "text": "Devlin et al. (2018) Devlin, J.; Chang, M.; Lee, K.; and Toutanova, K. 2018. BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding. CoRR , abs/1810.04805."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib19",
+      "text": "Luo et al. (2020) Luo, H.; Ji, L.; Shi, B.; Huang, H.; Duan, N.; Li, T.; Li, J.; Bharti, T.; and Zhou, M. 2020. Univl: A unified video and language pre-training model for multimodal understanding and generation. arXiv preprint arXiv:2002.06353 ."
+    }
+  ]
+}

@@ -1,0 +1,128 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2307.09950",
+  "title": "Prompting for Automatic Log Template Extraction",
+  "authors": "Junjielong Xu, Ruichun Yang, Yintong Huo, Chengyu Zhang, Pinjia He",
+  "year": "2024",
+  "categories": [
+    "cs.SE"
+  ],
+  "url": "https://arxiv.org/abs/2307.09950",
+  "html_url": "https://arxiv.org/html/2307.09950",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 921,
+  "text": "Modern software systems, including online services such as Google Search and Bing Search, and system software such as Android and Windows, have become an essential part of our lives, serving millions of users globally. These systems produce valuable software logs continuously, providing a rich resource for maintainers to perform downstream tasks, such as anomaly detection [1,2,3,4], root cause analysis [5,6,7], and program verification [8,9]. The first step of log analysis is log parsing, i.e., converting semi-structured log messages into structured log messages. Manual log parsing is impractical due to the enormous volume of logs generated [10]. Therefore, numerous data-driven automatic log parsers have been proposed, including traditional unsupervised parsers [11,12,13,14] and deep learning (DL) based supervised parsers [15,16,17]. Existing log parsers primarily distinguish between constants and variables in a log message without the guide of logging statements. As shown in Fig. 1, constants are the tokens written by developers in the logging statements (e.g., a description of a software operation), while variables are tokens that record run-time environments (e.g., a directory path). These constants make up a log template, while variables are treated as parameters.\n\nHowever, existing log parsers still face limited robustness [18,17], leading to unsatisfactory accuracy in diverse logs for two reasons:\n\nFirst, unsupervised log parsers utilize specially designed features or heuristics (e.g., n-gram [13], prefix tree [12,14]) based on domain knowledge to extract common patterns for log parsing. As a result, they often fall short in log sources whose template design does not match well with the handcrafted features. For example, the most widely-used parser, Drain, [14] assumes that leading tokens are constants, and logs from the same template share the same length. However, they are inadequate for logs from E8 event in Proxifier [19], e.g., \"ss.bdimg.com:80 close, 89652 bytes (87.5 KB) sent, 599249 bytes (585 KB) received, lifetime 37:51\", where the prefix is a variable (i.e., URL) and log length is flexible due to the optional tokens in brackets (i.e., no bracket tokens when the transferred bytes less than 1KB). Moreover, unsupervised parsers usually need preprocessing [10], wherein regex replace common variable tokens with the wildcard \"<*>\". Developers typically invest extra effort in designing distinct regex for different datasets with their domain knowledge due to the significant impact of regex quality on parsing performance [20], which further limits their usability.\n\nSecond, existing supervised log parsers typically need to train models to mine the data characteristics in target log samples [16,17]. This training process may restrict the models to the specific training data, leading to sub-optimal generalization performance across the overall dataset, especially when the dataset exhibits significant sample diversity. For instance, the state-of-the-art parser, LogPPT [17], extracts a few of the most frequent variable tokens from the adaptively selected logs to generate virtual labels for model training. However, for diverse and complex datasets such as Mac [19], there might be no representative logs or variables for overall dataset, as the dataset contains large variance of logs and variables (e.g., E253 event only contains one token without variable, while E277 event contains 78 tokens with 36 variables) and imbalanced template distribution (e.g., the number of logs in each template ranging from 1 to 166, with over 50% of templates containing only one log). Overall, there is a pressing need for a more effective log parsing technique that matches the following requirements: (1) Sufficiently automated to reduce the human effort and domain knowledge involved. (2) Demonstrates decent results on complex data and ensures stability across various log datasets.\n\nTo this end, this paper proposes DivLog, an effective and training-free log parsing framework without requiring human effort in feature design or hyperparameter tuning. DivLog adopts in-context learning (ICL) ability of large language models (LLMs) [21] to generate log templates via mining the common features of related log examples in the prompt. Specifically, DivLog employs GPT-3 [22] as the backbone, the first LLM that exhibits the ability to learn semantics in prompt contexts. Before log parsing, DivLog selects a fixed amount of logs by explicitly maximizing their diversity to build a candidate set for subsequent prompting. During the parsing process, it retrieves the top five most relative log examples and their labels from candidate set for each target log based on their similarity. Then, DivLog organizes them in a special prompt format, which is designed to enhance ICL performance for log parsing. With the guidance of examples and their labels in the prompt, DivLog generates log templates without necessitating model tuning. DivLog has been evaluated on 16 public datasets from LogPAI. [18] The results show that DivLog achieves (1) 98.1% Parsing Accuracy, (2) 92.1% Precision Template Accuracy, and (3) 92.9% Recall Template Accuracy when using the prompt examples from the same log source of the target log message, outperforms the current best method by 6.5%, 24.7%, 18.8%, respectively. Furthermore, DivLog exhibits stable parsing quality across 16 different datasets, with standard deviations of only 3.58%, 7.66%, and 7.65% for the three accuracy metrics.\n\nThis paper makes the following main contributions:\n\n- • It proposes DivLog, the first general log parsing framework that exploits the in-context learning ability for log parsing by mining common patterns in prompt examples.\n\n- • It designs a general prompt format to explicitly control the output structure and ensure the quality of the generated log template from LLMs, which can be generalized to enhance other prompting methods.\n\n- • It presents the evaluation of DivLog on 16 public datasets using three different metrics. The results show that DivLog achieves the SOTA performance, outperforming all existing log parsing tools.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib12",
+      "text": "Du et al . (2017) Min Du, Feifei Li, Guineng Zheng, and Vivek Srikumar. 2017. Deeplog: Anomaly detection and diagnosis from system logs through deep learning. In Proceedings of the 2017 ACM SIGSAC conference on computer and communications security . 1285–1298."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib22",
+      "text": "He et al . (2016a) Shilin He, Jieming Zhu, Pinjia He, and Michael R Lyu. 2016a. Experience report: System log analysis for anomaly detection. In 2016 IEEE 27th international symposium on software reliability engineering (ISSRE) . IEEE, 207–218."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib35",
+      "text": "Lou et al . (2010) Jian-Guang Lou, Qiang Fu, Shenqi Yang, Ye Xu, and Jiang Li. 2010. Mining invariants from console logs for system problem detection. In 2010 USENIX Annual Technical Conference (USENIX ATC 10) ."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib54",
+      "text": "Zhang et al . (2019) Xu Zhang, Yong Xu, Qingwei Lin, Bo Qiao, Hongyu Zhang, Yingnong Dang, Chunyu Xie, Xinsheng Yang, Qian Cheng, Ze Li, et al . 2019. Robust log-based anomaly detection on unstable log data. In Proceedings of the 2019 27th ACM Joint Meeting on European Software Engineering Conference and Symposium on the Foundations of Software Engineering . 807–817."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib3",
+      "text": "Amar and Rigby (2019) Anunay Amar and Peter C Rigby. 2019. Mining historical test logs to predict bugs and localize faults in the test logs. In 2019 IEEE/ACM 41st International Conference on Software Engineering (ICSE) . IEEE, 140–151."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib21",
+      "text": "He et al . (2018) Shilin He, Qingwei Lin, Jian-Guang Lou, Hongyu Zhang, Michael R Lyu, and Dongmei Zhang. 2018. Identifying impactful service system problems via log analysis. In Proceedings of the 2018 26th ACM Joint Meeting on European Software Engineering Conference and Symposium on the Foundations of Software Engineering . 60–70."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib30",
+      "text": "Lin et al . (2016) Qingwei Lin, Hongyu Zhang, Jian-Guang Lou, Yu Zhang, and Xuewei Chen. 2016. Log clustering based problem identification for online service systems. In 2016 IEEE/ACM 38th International Conference on Software Engineering Companion (ICSE-C) . IEEE, 102–111."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib9",
+      "text": "Ding et al . (2015) Rui Ding, Hucheng Zhou, Jian-Guang Lou, Hongyu Zhang, Qingwei Lin, Qiang Fu, Dongmei Zhang, and Tao Xie. 2015. Log2: A cost-aware logging mechanism for performance diagnosis. In 2015 { \\{ USENIX } \\} Annual Technical Conference ( { \\{ USENIX } \\} { \\{ ATC } \\} 15) . 139–150."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib44",
+      "text": "Shang et al . (2013) Weiyi Shang, Zhen Ming Jiang, Hadi Hemmati, Brain Adams, Ahmed E Hassan, and Patrick Martin. 2013. Assisting developers of big data analytics applications when deploying on hadoop clouds. In 2013 35th International Conference on Software Engineering (ICSE) . IEEE, 402–411."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib20",
+      "text": "He et al . (2021) Shilin He, Pinjia He, Zhuangbin Chen, Tianyi Yang, Yuxin Su, and Michael R Lyu. 2021. A survey on automated log analysis for reliability engineering. ACM computing surveys (CSUR) 54, 6 (2021), 1–37."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib13",
+      "text": "Fu et al . (2009a) Qiang Fu, Jian-Guang Lou, Yi Wang, and Jiang Li. 2009a. Execution anomaly detection in distributed systems through unstructured log analysis. In 2009 ninth IEEE international conference on data mining . IEEE, 149–158."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib11",
+      "text": "Du and Li (2016) Min Du and Feifei Li. 2016. Spell: Streaming parsing of system event logs. In 2016 IEEE 16th International Conference on Data Mining (ICDM) . IEEE, 859–864."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib6",
+      "text": "Dai et al . (2020) Hetong Dai, Heng Li, Che Shao Chen, Weiyi Shang, and Tse-Hsun Chen. 2020. Logram: Efficient log parsing using n-gram dictionaries. IEEE Transactions on Software Engineering (2020)."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib19",
+      "text": "He et al . (2017b) Pinjia He, Jieming Zhu, Zibin Zheng, and Michael R Lyu. 2017b. Drain: An online log parsing approach with fixed depth tree. In 2017 IEEE international conference on web services (ICWS) . IEEE, 33–40."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib34",
+      "text": "Liu et al . (2022) Yudong Liu, Xu Zhang, Shilin He, Hongyu Zhang, Liqun Li, Yu Kang, Yong Xu, Minghua Ma, Qingwei Lin, Yingnong Dang, et al . 2022. UniParser: A Unified Log Parser for Heterogeneous Log Data. In Proceedings of the ACM Web Conference 2022 . 1893–1901."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib23",
+      "text": "Huo et al . (2021) Yintong Huo, Yuxin Su, Baitong Li, and Michael R Lyu. 2021. SemParser: A Semantic Parser for Log Analysis. arXiv preprint arXiv:2112.12636 (2021)."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib26",
+      "text": "Le and Zhang (2023a) Van-Hoang Le and Hongyu Zhang. 2023a. Log Parsing with Prompt-based Few-shot Learning. arXiv preprint arXiv:2302.07435 (2023)."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib57",
+      "text": "Zhu et al . (2019) Jieming Zhu, Shilin He, Jinyang Liu, Pinjia He, Qi Xie, Zibin Zheng, and Michael R Lyu. 2019. Tools and benchmarks for automated log parsing. In 2019 IEEE/ACM 41st International Conference on Software Engineering: Software Engineering in Practice (ICSE-SEIP) . IEEE, 121–130."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib56",
+      "text": "Zhu et al . ([n. d.]) Jieming Zhu, Shilin He, Jinyang Liu, Pinjia He, Qi Xie, Zibin Zheng, and Michael R Lyu. [n. d.]. Repository of LogPAI. https://github.com/logpai/loghub ."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib17",
+      "text": "He et al . (2016b) Pinjia He, Jieming Zhu, Shilin He, Jian Li, and Michael R Lyu. 2016b. An evaluation study on log parsing and its use in log mining. In 2016 46th annual IEEE/IFIP international conference on dependable systems and networks (DSN) . IEEE, 654–661."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib32",
+      "text": "Liu et al . (2023) Pengfei Liu, Weizhe Yuan, Jinlan Fu, Zhengbao Jiang, Hiroaki Hayashi, and Graham Neubig. 2023. Pre-train, prompt, and predict: A systematic survey of prompting methods in natural language processing. Comput. Surveys 55, 9 (2023), 1–35."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib4",
+      "text": "Brown et al . (2020) Tom Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared D Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, et al . 2020. Language models are few-shot learners. Advances in neural information processing systems 33 (2020), 1877–1901."
+    }
+  ]
+}

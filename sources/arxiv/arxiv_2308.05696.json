@@ -1,0 +1,143 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2308.05696",
+  "title": "A Preliminary Study of the Intrinsic Relationship between Complexity and Alignment",
+  "authors": "Yingxiu Zhao, Bowen Yu, Binyuan Hui, Haiyang Yu, Fei Huang, Yongbin Li, Nevin L. Zhang",
+  "year": "2024",
+  "categories": [
+    "cs.CL"
+  ],
+  "url": "https://arxiv.org/abs/2308.05696",
+  "html_url": "https://arxiv.org/html/2308.05696",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "1. Introduction",
+  "word_count": 1099,
+  "text": "The latest generation of large language models (LLMs) has attracted significant attention due to their immense potential in language technologies [1,2,3,4]. To enhance interactive user requests and chat interfaces, these models undergo instruction-tuning using supervised input-output pairs [5,6,7]. This process enables the model to comprehend the required style and format for effective user interaction, showcasing the knowledge and capabilities gained during pre-training [8].\n\nConsequently, the efficacy of instruction data significantly influences LLMs’ abilities, shaping users’ perceptions of their capabilities [9,10,11]. Recently, LIMA has demonstrated that with just 1000 carefully curated prompts and responses, an LLM can achieve remarkably strong performance [12]. This suggests that the scaling laws of instruction tuning are not solely dependent on data quantity but rather influenced by prompt diversity and quality. However, one critical and less-explored aspect of evaluating instruction data is complexity. There are at least three unanswered questions related to complexity: (1) The scaling law of instruction complexity: Intuitively, more complex instruction data might elicit more potential capabilities in LLMs to address intricate problems [13,14]. WizardLM [15] introduce in-depth and in-breadth evolving methods to rewrite prompts into more complex and diverse versions, resulting in a 12.4% increase in LLMs’ win rate with the same amount of data. Yet, whether WizardLM’s performance improvement is due to complexity or merely derived from diversity remains uncertain. Moreover, the ongoing enhancements in complexity are yet to be explored. (2) The relationship between complexity-induced performance improvement and token quantity: Enhancing instance complexity inevitably increases the number of tokens per instance [16]. While WizardLM exhibits performance improvements with the same instance quantity, it increases the number of tokens per instance. This raises the question of whether complexity-induced improvement in LLMs results from increased training tokens. As known, enlarging LLMs’ pretraining token counts can lead to better performance [17,18]. (3) The effectiveness of complexity-based curriculum instruction learning: Curriculum learning is a strategy in machine learning that starts with easy instances and gradually introduces harder ones [19]. Its effectiveness has been demonstrated in various NLP tasks like machine translation [20], dialogue systems [21], and question answering [22]. However, its potential efficacy in instruction tuning is still under-explored.\n\nHowever, to answer the aforementioned questions, the key hurdle lies in finding a controlled way to increase the complexity of instruction data without introducing unwanted factors such as diversity. WizardLM [15] employs an in-depth evolving prompt like “ Your objective is to rewrite a given prompt into a more complex version to make ChatGPT and GPT4 a bit harder to handle. ” to complicate the existing instructions. Unfortunately, although intended to enhance complexity, this approach might inadvertently introduce diversity by diverting from the initial instruction objectives. This issue becomes particularly severe when repeatedly employing in-depth evolving to achieve varying levels of complexity. We study and analyze the instructions before and after in-depth evolving in Sec. 4.1. As illustrated in Fig. 2, the iteratively evolved instructions append additional objectives that deviate from the original instructions, showcasing a greater diversity.\n\nTo address this concern, we propose Tree-Instruct, which involves prompting LLMs to add a specific number of new nodes to the semantic tree of an existing instruction, as opposed to manipulating the text sequence directly, as done in Self-Instruct [23] or WizardLM [15]. We use the number of added nodes to represent the introduced level of complexity. The advantage of this approach lies in the fact that semantic tree nodes lack any sequential order [24]. By enforcing LLMs to operate on the semantic tree, this process becomes analogous to inserting new words into the middle of the original instructions. This compels the models to complicate while adhering to the structural constraints of the initial instruction rather than merely appending new instructions. It can significantly mitigate the issue of straying from the primary theme of the initial instruction. We leverage GPT-4 to assess the consistency of evolved instructions with original ones, and the results verify that Tree-Instruct improves WizardLM’s consistency score from 0.56 to 0.69. Fig. 1 highlights how the number of added nodes raises the complexity level of the samples.\n\nWith the help of Tree-Instruct, we have obtained the following preliminary experimental conclusions:\n\n(1) As the complexity of the instruction data increases, the benefits of instruction tuning continue to grow: Following LIMA [12], we attempt instruction tuning using 1,000 samples from Alpaca-GPT-4 as a base. We add 3, 6, and 10 nodes to the semantic tree of each sample, resulting in performance gains of 13%, 20%, and 26%, respectively, across eight sub-skills such as commonsense, writing, and coding, showing consistent improvements. Furthermore, this scaling law can be extended to more complex instruction data. For instance, when fine-tuning around 6,000 conversations filtered from ShareGPT via OpenChat [25] (showing excellent performance in the open-source LLMs), we observe that by increasing the complexity through Tree-Instruct to around 1,100 users’ instructions, the winning rate increases from 84.56% to 86.19% for AlpacaEval benchmark.\n\n(2) The increase in complexity partly comes from additional tokens, but a few complex instructions outperform diverse yet simple instructions, under the same token budget.: We find that as the complexity increases, the number of tokens also increases. Adding ten nodes in the semantic tree increases the average token length of instructions from 186 to 607. Hence, to make a fair comparison, we increase the number of original instructions from 1,000 to 4,000 to match the total token quantity of our tree-instructed samples. Under this setting, the performance gain from adding ten nodes still achieves more than 15%. This indicates that the improvement due to complexity is partly attributed to the increased tokens, but increasing the complexity of samples is equivalent to the diversity achieved by four times the token count of simple samples. Moreover, with an equal number of instruction tokens, the evolution of Tree-Instruct yields a 2% higher win rate than those from three iterations of in-depth evolution of WizardLM, demonstrating the superior efficacy of Tree-Instruct in enhancing complexity.\n\n(3) Curriculum instruction tuning may not be effective; increasing complexity is all you need: We implement curriculum learning by progressively training the LLM on increasing levels of difficulty. Initially, we train it on easy-level data with an addition of three nodes, followed by medium-level data with six nodes, and ultimately on hard data with ten nodes added. We observe that, when given the same number of training steps, curriculum learning does outperform training with a mixed difficulty of samples but still falls short compared to training solely on the added ten-node instruction data. This indicates that, as sample complexity increases, the significance of simpler samples diminishes significantly, suggesting that repeating training with complex samples may be sufficient.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib58",
+      "text": "OpenAI (2022) OpenAI. 2022. Introducing chatgpt."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib81",
+      "text": "Touvron et al. (2023) Hugo Touvron, Thibaut Lavril, Gautier Izacard, Xavier Martinet, Marie-Anne Lachaux, Timothée Lacroix, Baptiste Rozière, Naman Goyal, Eric Hambro, Faisal Azhar, Aurelien Rodriguez, Armand Joulin, Edouard Grave, and Guillaume Lample. 2023. Llama: Open and efficient foundation language models ."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib92",
+      "text": "Wei et al. (2023) Xiangpeng Wei, Haoran Wei, Huan Lin, Tianhao Li, Pei Zhang, Xingzhang Ren, Mei Li, Yu Wan, Zhiwei Cao, Binbin Xie, et al. 2023. Polylm: An open source polyglot large language model. arXiv preprint arXiv:2307.06018 ."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib47",
+      "text": "Li et al. (2023) Minghao Li, Feifan Song, Bowen Yu, Haiyang Yu, Zhoujun Li, Fei Huang, and Yongbin Li. 2023. Api-bank: A benchmark for tool-augmented llms. arXiv preprint arXiv:2304.08244 ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib36",
+      "text": "Iyer et al. (2022) Srinivasan Iyer, Xi Victoria Lin, Ramakanth Pasunuru, Todor Mihaylov, Daniel Simig, Ping Yu, Kurt Shuster, Tianlu Wang, Qing Liu, Punit Singh Koura, et al. 2022. Opt-iml: Scaling language model instruction meta learning through the lens of generalization. arXiv preprint arXiv:2212.12017 ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib38",
+      "text": "Jang et al. (2023) Joel Jang, Seungone Kim, Seonghyeon Ye, Doyoung Kim, Lajanugen Logeswaran, Moontae Lee, Kyungjae Lee, and Minjoon Seo. 2023. Exploring the benefits of training expert language models over instruction tuning. arXiv preprint arXiv:2302.03202 ."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib21",
+      "text": "Chung et al. (2022) Hyung Won Chung, Le Hou, Shayne Longpre, Barret Zoph, Yi Tay, William Fedus, Eric Li, Xuezhi Wang, Mostafa Dehghani, Siddhartha Brahma, et al. 2022. Scaling instruction-finetuned language models. arXiv preprint arXiv:2210.11416 ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib60",
+      "text": "Ouyang et al. (2022) Long Ouyang, Jeffrey Wu, Xu Jiang, Diogo Almeida, Carroll Wainwright, Pamela Mishkin, Chong Zhang, Sandhini Agarwal, Katarina Slama, Alex Ray, et al. 2022. Training language models to follow instructions with human feedback. Advances in Neural Information Processing Systems , 35:27730–27744."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib91",
+      "text": "Wang et al. (2023g) Yufei Wang, Wanjun Zhong, Liangyou Li, Fei Mi, Xingshan Zeng, Wenyong Huang, Lifeng Shang, Xin Jiang, and Qun Liu. 2023g. Aligning large language models with human: A survey. arXiv preprint arXiv:2307.12966 ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib44",
+      "text": "Köpf et al. (2023) Andreas Köpf, Yannic Kilcher, Dimitri von Rütte, Sotiris Anagnostidis, Zhi-Rui Tam, Keith Stevens, Abdullah Barhoum, Nguyen Minh Duc, Oliver Stanley, Richárd Nagyfi, et al. 2023. Openassistant conversations–democratizing large language model alignment. arXiv preprint arXiv:2304.07327 ."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib19",
+      "text": "Chiang et al. (2023) Wei-Lin Chiang, Zhuohan Li, Zi Lin, Ying Sheng, Zhanghao Wu, Hao Zhang, Lianmin Zheng, Siyuan Zhuang, Yonghao Zhuang, Joseph E Gonzalez, et al. 2023. Vicuna: An open-source chatbot impressing gpt-4 with 90%* chatgpt quality. See https://vicuna. lmsys. org (accessed 14 April 2023) ."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib105",
+      "text": "Zhou et al. (2023) Chunting Zhou, Pengfei Liu, Puxin Xu, Srini Iyer, Jiao Sun, Yuning Mao, Xuezhe Ma, Avia Efrat, Ping Yu, Lili Yu, et al. 2023. Lima: Less is more for alignment. arXiv preprint arXiv:2305.11206 ."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib54",
+      "text": "Luo et al. (2023) Ziyang Luo, Can Xu, Pu Zhao, Qingfeng Sun, Xiubo Geng, Wenxiang Hu, Chongyang Tao, Jing Ma, Qingwei Lin, and Daxin Jiang. 2023. Wizardcoder: Empowering code large language models with evol-instruct. arXiv preprint arXiv:2306.08568 ."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib57",
+      "text": "Mukherjee et al. (2023) Subhabrata Mukherjee, Arindam Mitra, Ganesh Jawahar, Sahaj Agarwal, Hamid Palangi, and Ahmed Awadallah. 2023. Orca: Progressive learning from complex explanation traces of gpt-4. arXiv preprint arXiv:2306.02707 ."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib94",
+      "text": "Xu et al. (2023) Can Xu, Qingfeng Sun, Kai Zheng, Xiubo Geng, Pu Zhao, Jiazhan Feng, Chongyang Tao, and Daxin Jiang. 2023. Wizardlm: Empowering large language models to follow complex instructions. arXiv preprint arXiv:2304.12244 ."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib22",
+      "text": "Dai et al. (2021) Yinpei Dai, Hangyu Li, Yongbin Li, Jian Sun, Fei Huang, Luo Si, and Xiaodan Zhu. 2021. Preview, attend and review: Schema-aware curriculum learning for multi-domain dialog state tracking. arXiv preprint arXiv:2106.00291 ."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib56",
+      "text": "Muennighoff et al. (2023) Niklas Muennighoff, Alexander M Rush, Boaz Barak, Teven Le Scao, Aleksandra Piktus, Nouamane Tazi, Sampo Pyysalo, Thomas Wolf, and Colin Raffel. 2023. Scaling data-constrained language models. arXiv preprint arXiv:2305.16264 ."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib80",
+      "text": "Tay et al. (2022) Yi Tay, Jason Wei, Hyung Won Chung, Vinh Q Tran, David R So, Siamak Shakeri, Xavier Garcia, Huaixiu Steven Zheng, Jinfeng Rao, Aakanksha Chowdhery, et al. 2022. Transcending scaling laws with 0.1% extra compute. arXiv preprint arXiv:2210.11399 ."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib7",
+      "text": "Bengio et al. (2009) Yoshua Bengio, Jérôme Louradour, Ronan Collobert, and Jason Weston. 2009. Curriculum learning. In Proceedings of the 26th annual international conference on machine learning , pages 41–48."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib106",
+      "text": "Zhou et al. (2020) Yikai Zhou, Baosong Yang, Derek F Wong, Yu Wan, and Lidia S Chao. 2020. Uncertainty-aware curriculum learning for neural machine translation. In Proceedings of the 58th Annual Meeting of the association for computational linguistics , pages 6934–6944."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib107",
+      "text": "Zhu et al. (2021) Qingqing Zhu, Xiuying Chen, Pengfei Wu, JunFei Liu, and Dongyan Zhao. 2021. Combining curriculum learning and knowledge distillation for dialogue generation. In Findings of the Association for Computational Linguistics: EMNLP 2021 , pages 1284–1295."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib69",
+      "text": "Sachan and Xing (2016) Mrinmaya Sachan and Eric Xing. 2016. Easy questions first? a case study on curriculum learning for question answering. In Proceedings of the 54th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) , pages 453–463."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib88",
+      "text": "Wang et al. (2022a) Yizhong Wang, Yeganeh Kordi, Swaroop Mishra, Alisa Liu, Noah A Smith, Daniel Khashabi, and Hannaneh Hajishirzi. 2022a. Self-instruct: Aligning language model with self generated instructions. arXiv preprint arXiv:2212.10560 ."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib71",
+      "text": "Shiv and Quirk (2019) Vighnesh Shiv and Chris Quirk. 2019. Novel positional encodings to enable tree-based transformers. Advances in neural information processing systems , 32."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib82",
+      "text": "Wang et al. (2023a) Guan Wang, Sijie Cheng, Qiying Yu, and Changling Liu. 2023a. OpenChat: Advancing Open-source Language Models with Imperfect Data ."
+    }
+  ]
+}

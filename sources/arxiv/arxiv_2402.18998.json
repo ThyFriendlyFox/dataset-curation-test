@@ -1,0 +1,93 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2402.18998",
+  "title": "COFT-AD: COntrastive Fine-Tuning for Few-Shot Anomaly Detection",
+  "authors": "Jingyi Liao, Xun Xu, Manh Cuong Nguyen, Adam Goodge, Chuan Sheng Foo",
+  "year": "2024",
+  "categories": [
+    "cs.CV"
+  ],
+  "url": "https://arxiv.org/abs/2402.18998",
+  "html_url": "https://arxiv.org/html/2402.18998",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1068,
+  "text": "Identifying anomalous data, a.k.a. anomaly detection (AD), is a fundamental problem in machine learning research with significant potential in various applications, such as defect identification [1], surveillance [2], and autonomous driving [3]. It is typically assumed that normal images are abundant, whereas labeled anomaly examples are non-exhaustive. Hence, anomaly detection models are trained only with normal images, a.k.a. one-class classification. However, this is not always the case. For example, some practical applications require an AD system to function instantly upon deployment on a new task with limited existing data or when acquiring normal samples is expensive or time-consuming. As a result, large numbers of normal images may not be available for building a good anomaly detection model, especially at the initial stages of bootstrapping an AD system.\n\nIn response to the demand for building an anomaly detection system under the deficiency of normal training examples, few-shot anomaly detection (FSAD), where only a few normal and no abnormal images are available, emerged as a solution [4,5,6], and there is growing interest from the community on this topic. Among the limited pioneering works, Sheynin et al. [4] developed a generative adversarial model to distinguish transformed image patches from generated ones. However, such adversarial models may be tricky to tune [7] and require multiple transformations on test samples at inference time, resulting in additional computation overhead. The more recent work of RegAD [5] learns a common model over multiple classes of normal images using a feature registration proxy task, but their method requires a training set with normal images from multiple known classes, which is a more restrictive setting. GraphCore [6], stemming from PatchCore [8], approached FSAD by comparing testing patches to few-shot training ones. However, both RegAD and GraphCore are built upon the assumption that anomalies are caused by variations in local appearance and their success is only demonstrated on highly constrained industrial anomaly detection tasks. In summary, existing methods in FSAD either complicate the training procedure with tricky hyper-parameter tuning [4] or have overly restrictive assumptions on the presentations of anomalies [8,6], which limit their applicability to wider range of tasks.\n\nIn this work, we aim to develop a few-shot anomaly detection framework applicable to a wide variety of data domains, without complicated hyper-parameter tuning. We achieve this by synergistically combining transfer learning from a pre-trained model with representation learning on the available few-shot normal data. Re-using weights from a backbone network pre-trained on a large source domain dataset, e.g. ImageNet [9], enables exploitation of powerful, low-level feature extractors and better initialization of network parameters [10] for downstream tasks. We believe that re-using pre-trained weights could particularly benefit few-shot anomaly detection, as training data is insufficient to achieve learning good representations from scratch. However, as highlighted in existing works [11,12], directly reusing the pre-trained weights may not fully utilize the limited supervision in the downstream task because of two factors. First, the anomaly detection task requires feature representation that separates normal samples from abnormal ones. The representations learned during pre-training are optimized for a different task, such as semantic image classification of ImageNet, and are therefore not necessarily optimal for the downstream anomaly detection task. Second, performance can be hindered by covariate shift [13], which is a result of the difference in distribution between the source domain data (used for pre-training the model), and the target domain data (anomalies are to be detected).\n\nTo tackle these challenges, we propose an unsupervised fine-tuning approach, named “COntrastive Fine-Tuning for few-shot Anomaly Detection” (COFT-AD), to adapt pre-trained weights to downstream few-shot anomaly detection task. To ameliorate the covariate shift between source and target domain data, we first design customized loss functions with three components, each of which encourages a desirable property in the learnt representation space when adapted towards the anomaly detection task in the target domain. The first component is a contrastive loss [14], defined on all available few-shot normal examples. Optimizing a contrastive loss helps adapt pre-trained model weights to downstream anomaly detection dataset distribution. Specifically, this is achieved by encouraging closeness between one sample and its augmented versions in the feature space. This helps improve model’s robustness to natural variations within the normal data. The second component further optimizes representations for the downstream anomaly detection task by encouraging normal samples to form a tight cluster in the feature space such that a density based anomaly inference is facilitated. We achieve this with a cross-instance positive pair loss that encourages closeness between the feature embeddings of two randomly sampled normal images. Note that this differs from standard contrastive training as closeness is encouraged between two different normal samples instead of a sample and its augmented version. Finally, when prior knowledge on the anomalies is available, we are able to synthesize negative examples [15] to simulate anomalies in an additional negative pair loss, which encourages better separation between the normal samples and their negative pairs. In our analysis, we empirically reveal that the method, by which negative samples are synthesised, has high impact on FSAD performance and should be used carefully with prior knowledge on the nature of anomalies. An overall illustration of the proposed framework is presented in Fig. 1.\n\nWe extensively evaluate COFT-AD on a diverse range of anomaly detection tasks, covering controlled setups, in which normal and anomalous data are deliberately designed in order to exhibit certain properties, as well as on real-world data FSAD, where the nature of anomalies is out of our control. The extensive evaluations demonstrate the ability of our method to handle greater diversity in data domains while maintaining its strong performance. We summarize the contribution of our work as follows:\n\n- • We approach hyper-parameter friendly and data domain versatile few-shot anomaly detection from a transfer learning perspective. We adopt contrastive fine-tuning on few-shot normal samples in the target domain to adapt pre-trained model weights to target domain distribution.\n\n- • We further introduce a cross-instance positive pair loss to encourage normal samples to form a tight cluster in the embedding space for better density-based anomaly detection.\n\n- • In scenarios where prior knowledge on anomaly presentations is available, a negative pair loss is further incorporated with synthesized negative samples to encourage better separation between normal and abnormal samples.\n\n- • We demonstrate the effectiveness of the proposed method, COntrastive Fine-Tuning for few-shot Anomaly Detection (COFT-AD), on 3 controlled anomaly detection datasets and 4 real-world industrial defect identification datasets, achieving very competitive performance.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "P. Bergmann, M. Fauser, D. Sattlegger, and C. Steger, “Mvtec ad–a comprehensive real-world dataset for unsupervised anomaly detection,” in IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2019."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "T. Xiang and S. Gong, “Video behavior profiling for anomaly detection,” IEEE transactions on pattern analysis and machine intelligence , 2008."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "K. Lis, K. Nakka, P. Fua, and M. Salzmann, “Detecting the unexpected via image resynthesis,” in IEEE/CVF International Conference on Computer Vision , 2019."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "S. Sheynin, S. Benaim, and L. Wolf, “A hierarchical transformation-discriminating generative model for few shot anomaly detection,” in IEEE/CVF International Conference on Computer Vision , 2021."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "C. Huang, H. Guan, A. Jiang, Y. Zhang, M. Spratling, and Y.-F. Wang, “Registration based few-shot anomaly detection,” in European Conference on Computer Vision , 2022."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "G. Xie, J. Wang, J. Liu, Y. Jin, and F. Zheng, “Pushing the limits of fewshot anomaly detection in industry vision: Graphcore,” in International Conference on Learning Representations , 2023."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "N. Kodali, J. Abernethy, J. Hays, and Z. Kira, “On convergence and stability of gans,” arXiv preprint arXiv:1705.07215 , 2017."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "K. Roth, L. Pemula, J. Zepeda, B. Schölkopf, T. Brox, and P. Gehler, “Towards total recall in industrial anomaly detection,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2022."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "O. Russakovsky, J. Deng, H. Su, J. Krause, S. Satheesh, S. Ma, Z. Huang, A. Karpathy, A. Khosla, M. Bernstein et al. , “Imagenet large scale visual recognition challenge,” International Journal of Computer Vision , 2015."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "S. Kornblith, J. Shlens, and Q. V. Le, “Do better imagenet models transfer better?” in IEEE/CVF conference on computer vision and pattern recognition , 2019."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "X. Xu, J. Liao, L. Cai, M. C. Nguyen, K. Lu, W. Zhang, Y. Yazici, and C. S. Foo, “Revisiting pretraining for semi-supervised learning in the low-label regime,” arXiv preprint arXiv:2205.03001 , 2022."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "S. Li, D. Chen, Y. Chen, L. Yuan, L. Zhang, Q. Chu, B. Liu, and N. Yu, “Unsupervised finetuning,” arXiv preprint arXiv:2110.09510 , 2021."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "M. Wang and W. Deng, “Deep visual domain adaptation: A survey,” Neurocomputing , 2018."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "J.-B. Grill, F. Strub, F. Altché, C. Tallec, P. H. Richemond, E. Buchatskaya, C. Doersch, B. A. Pires, Z. D. Guo, M. G. Azar et al. , “Bootstrap your own latent: A new approach to self-supervised learning,” in Advances in neural information processing systems , 2020."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "C.-L. Li, K. Sohn, J. Yoon, and T. Pfister, “Cutpaste: Self-supervised learning for anomaly detection and localization,” in IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2021."
+    }
+  ]
+}

@@ -1,0 +1,133 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2302.14334",
+  "title": "Design of an Adaptive Lightweight LiDAR to Decouple Robot-Camera Geometry",
+  "authors": "Yuyang Chen, Dingkang Wang, Lenworth Thomas, Karthik Dantu, Sanjeev J. Koppal",
+  "year": "2024",
+  "categories": [
+    "cs.RO"
+  ],
+  "url": "https://arxiv.org/abs/2302.14334",
+  "html_url": "https://arxiv.org/html/2302.14334",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1134,
+  "text": "Modern autonomy is largely driven by vision and depth sensors for perception. Most such techniques make an implicit assumption that the relative pose of the sensor w.r.t. the robot is fixed and changes in sensor viewpoint require a change in the robot pose. This implies that fast-moving robots must deal with motion compensation (i.e. camera-robot stabilization) and that robots need to reorient themselves to observe the relevant parts of the scene. Correspondingly, stabilization [1,2,3,4] and active vision [5,6,7,8] are well-studied problems.\n\nLet us consider the specific example of image stabilization. While successful, most such methods compensate through post-capture processing of sensor data. We contend that this is simply not feasible for the next generation of fast miniature robots such as robotic bees [9], crawling and walking robots [10], and other micro-air vehicles [11]. For example, flapping-wing robots such as the RoboBee exhibit a high frequency rocking motion (at about 120 Hz in one design) due to the piezo-electric actuation [12]. Environmental factors such as wind affects micro-robots to a greater extent than a larger robot. There might be aerodynamic instability due to ornithopter-based shock absorption [13]. The egomotion of small robots (and onboard sensors) is quite extreme making any sensing challenging. While there have been software methods to correct for such effects for cameras [14] and LiDARs [15], this is often difficult to perform in real-time onboard due to the computational, energy and latency constraints on the robot mentioned above. Without proper motion compensation for miniature devices, we will not be able to unlock the full potential of what is one of the ten grand challenges in robotics [16].\n\n## I-A Key Idea: Compensation during Imaging\n\nOur idea is for motion correction to happen in sensor hardware during imaging such that measurements are already compensated without requiring onboard computing. This paper shows the motion compensation advantage of decoupling robot-camera geometry, and providing the ability to control the camera properties independent of the robot pose could bring about a new perspective to robot perception and simplify the autonomy pipeline. We demonstrate this through the design of a MEMS-driven LiDAR and perform compensation in two ways - (i) onboard IMU, and (ii) external feedback of robot pose at a high rate.\n\nWe are inspired by animal eyes that have fast mechanical movements that compensate for motion, in real-time and at high accuracy [17]. In Fig. 2, we show frames V(t) from a video of a hawk (Buteo jamaicensis) being moved by a human trainer [18]. We also show the average of the video \\sum_{t}\\frac{V(t)}{T} over a time interval T. Note that the averaged image shows motion blurring, except where the eagle mechanically compensates for the shifts. We envision biologically-inspired motion compensation that happens during sensing. These sensors need to adaptively change their orientation, in real-time, and in concert with robot goals such as mapping or navigation. Effectively, the rotation matrix R must cancel out robot motion to provide a ”stable” view of a scene.\n\n## I-B MEMS Mirror-enabled Adaptive LIDAR\n\nThe ability to reorient sensor pose could have many uses in robotics, particularly in image alignment during motion such as in SLAM. If the camera and robot are rigidly attached, then the camera experiences all the motion the robot experiences, including jitter and other potential disturbances that are detrimental to the Visual SLAM task. This could result in spurious features, errors in localization, and incorrect feature association leading to an inaccurate map. In this paper, we describe a sensor design that can perform image reorientation of a LiDAR in hardware without the need for any software processing for such compensation. Previously, pan-tilt-zoom (PTZ) cameras have attempted to address this problem. However, they use mechanical actuation which can react in ones of Hz making it not suitable for tasks such as egomotion compensation in real-time. This is evidenced by the limited use of PTZ cameras on robots - most robots just have sensors rigidly attached.\n\nOur designs break through these past difficulties by exploiting recently available microelectromechanical (MEMS) and opto-mechanical components for changing camera parameters. Opto-MEMS components are famously fast (many kHz), and they allow the changing of the LiDAR projection offset orientation during robot motion, such that the view of LiDAR is effectively static. By changing LiDAR views two orders of magnitude (or more) faster than robot motion, we can effectively allow for camera views to be independent of the robot view. In this work, we can compensate the LiDAR point cloud using an onboard IMU or external feedback such as motion tracking setup. More generally, such compensation allows the robot to focus on the control task while the camera can perform perception (which is required for the control task) independently, and greatly simplifies robot planning as the planner does not need to account for perception and just needs to reason about the control task at hand.\n\nMEMS LiDAR optics have the advantages of small size and low power consumption [19,20,21]. Our algorithmic and system design contributions beyond this are:\n\n- • We present the design of a novel LiDAR sensor adopting a MEMS mirror similar to this LiDAR MEMS scanner [22]. This design enables wide non-resonant scanning angles for arbitrary orientations. We integrate this with two types of feedback (IMU and external sensors) to demonstrate quick and high-rate motion compensation. Fig. 1 shows the design of our sensor.\n\n- • We describe and geometrically characterize our sensor, showing that compensation in hardware can reduce the number of unknowns for proprioceptive and exteroceptive tasks. In a simulation, we characterize the effect of compensation delay and compensation rate to identify benefits for robot perception. The quantitative and qualitative results of these simulations are shown in Sec. III.\n\n- • We present the compensation control algorithms for our LiDAR. We further characterize the performance of compensation control through experiments and simulations in Sec. IV.\n\n- • We show UAV flight with a proof-of-concept hardware prototype combining external feedback with the MEMS mirror for egomotion compensation. We enable UAV flight by tethering the MEMS modulator to the other heavy necessary components, like the laser, photodetector, optics, the driver circuit, and the signal processing circuitry. The frequencies of the mirror modulation and IMU measurement are much higher than typical robot egomotion. Our prototype MEMS compensated scan system can perform such compensation in under 10 ms. Please see the accompanying video for proper visualization, and see Fig. 12.\n\n- • We provide an implementation of the sensor in the Gazebo simulator. Using this simulated sensor, we propose a framework to adapt modern LiDAR SLAM pipeline to incorporate motion compensation. We adapt a modern LiDAR SLAM pipeline LIO-SAM [23] to incorporate motion compensation to use such a sensor and demonstrate the utility of such motion compensation. We have open-sourced the sensor implementation, the UAV simulation environment, as well as our LIO-SAM adaptations.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bibx34",
+      "text": "Frank Neuhaus, Tilman Koß, Robert Kohnen and Dietrich Paulus “Mc2slam: Real-time inertial lidar odometry using two-scan motion compensation” In German Conference on Pattern Recognition , 2018, pp. 60–72 Springer"
+    },
+    {
+      "n": 2,
+      "id": "bib.bibx13",
+      "text": "Zan Gojcic, Caifa Zhou, Jan Wegner and Andreas Wieser “The perfect match: 3d point cloud matching with smoothed densities” In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2019, pp. 5545–5554"
+    },
+    {
+      "n": 3,
+      "id": "bib.bibx44",
+      "text": "Takafumi Taketomi, Hideaki Uchiyama and Sei Ikeda “Visual SLAM algorithms: a survey from 2010 to 2016” In IPSJ Transactions on Computer Vision and Applications 9.1 Springer, 2017, pp. 16"
+    },
+    {
+      "n": 4,
+      "id": "bib.bibx36",
+      "text": "Ethan Phelps and Charles Primmerman “Blind Compensation of Angle Jitter for Satellite-Based Ground-Imaging Lidar” In IEEE Transactions on Geoscience and Remote Sensing 58.2 IEEE, 2019, pp. 1436–1449"
+    },
+    {
+      "n": 5,
+      "id": "bib.bibx6",
+      "text": "Gabriele Costante et al. “Perception-aware Path Planning” In IEEE Transactions on Robotics Institute of ElectricalElectronics Engineers, 2016, pp. Epub–ahead"
+    },
+    {
+      "n": 6,
+      "id": "bib.bibx4",
+      "text": "Andreas Bircher et al. “Receding horizon” next-best-view” planner for 3d exploration” In 2016 IEEE international conference on robotics and automation (ICRA) , 2016, pp. 1462–1468 IEEE"
+    },
+    {
+      "n": 7,
+      "id": "bib.bibx61",
+      "text": "Zichao Zhang and Davide Scaramuzza “Perception-aware receding horizon navigation for MAVs” In 2018 IEEE International Conference on Robotics and Automation (ICRA) , 2018, pp. 2534–2541 IEEE"
+    },
+    {
+      "n": 8,
+      "id": "bib.bibx37",
+      "text": "Seyed Sadat et al. “Feature-rich path planning for robust navigation of MAVs with mono-SLAM” In 2014 IEEE International Conference on Robotics and Automation (ICRA) , 2014, pp. 3870–3875 IEEE"
+    },
+    {
+      "n": 9,
+      "id": "bib.bibx53",
+      "text": "Robert Wood, Radhika Nagpal and Gu-Yeon Wei “flight of the robobees” In Scientific American 308.3 Scientific American, a division of Nature America, Inc., 2013, pp. 60–65 URL: http://www.jstor.org/stable/26018027"
+    },
+    {
+      "n": 10,
+      "id": "bib.bibx19",
+      "text": "Katie Hoffman “Design and locomotion studies of a miniature centipede-inspired robot”, 2013"
+    },
+    {
+      "n": 11,
+      "id": "bib.bibx33",
+      "text": "Yash Mulgaonkar, Gareth Cross and Vijay Kumar “Design of small, safe and robust quadrotor swarms” In 2015 IEEE international conference on robotics and automation (ICRA) , 2015, pp. 2208–2215 IEEE"
+    },
+    {
+      "n": 12,
+      "id": "bib.bibx18",
+      "text": "E Helbling, Sawyer Fuller and Robert Wood “Pitch and yaw control of a robotic insect using an onboard magnetometer” In 2014 IEEE international conference on robotics and automation (ICRA) , 2014, pp. 5516–5522 IEEE"
+    },
+    {
+      "n": 13,
+      "id": "bib.bibx55",
+      "text": "Dong Xue et al. “Computational simulation and free flight validation of body vibration of flapping-wing MAV in forward flight” In Aerospace Science and Technology 95 Elsevier, 2019, pp. 105491"
+    },
+    {
+      "n": 14,
+      "id": "bib.bibx5",
+      "text": "Chao-Ho Chen, Yi-Li Kuo, Tsong-Yi Chen and Jie-Ru Chen “Real-time video stabilization based on motion compensation” In 2009 Fourth International Conference on Innovative Computing, Information and Control (ICICIC) , 2009, pp. 1495–1498 IEEE"
+    },
+    {
+      "n": 15,
+      "id": "bib.bibx35",
+      "text": "Tao Peng and Satyandra Gupta “Model and algorithms for point cloud construction using digital projection patterns”, 2007"
+    },
+    {
+      "n": 16,
+      "id": "bib.bibx56",
+      "text": "Guang-Zhong Yang et al. “The grand challenges of Science Robotics” In Science robotics 3.14 AAAS, 2018, pp. eaar7650"
+    },
+    {
+      "n": 17,
+      "id": "bib.bibx1",
+      "text": "Thiemo Alldieck et al. “Optical flow-based 3d human motion estimation from monocular video” In German Conference on Pattern Recognition , 2017, pp. 347–360 Springer"
+    },
+    {
+      "n": 18,
+      "id": "bib.bibx16",
+      "text": "“Hawk Head Stabilization” In YouTube YouTube, 2020 URL: https://www.youtube.com/watch?v=aqgewVCC0k0"
+    },
+    {
+      "n": 19,
+      "id": "bib.bibx45",
+      "text": "Zaid Tasneem et al. “Adaptive fovea for scanning depth sensors” In The International Journal of Robotics Research 39.7 SAGE Publications Sage UK: London, England, 2020, pp. 837–855"
+    },
+    {
+      "n": 20,
+      "id": "bib.bibx24",
+      "text": "Abhishek Kasturi, Veljko Milanovic, Bryan Atwood and James Yang “UAV-borne lidar with MEMS mirror-based scanning capability” In Laser Radar Technology and Applications XXI 9832 , 2016, pp. 98320M International Society for OpticsPhotonics"
+    },
+    {
+      "n": 21,
+      "id": "bib.bibx25",
+      "text": "Katsumi Kimoto et al. “Development of small size 3D LIDAR” In 2014 IEEE International Conference on Robotics and Automation (ICRA) , 2014, pp. 4620–4626 IEEE"
+    },
+    {
+      "n": 22,
+      "id": "bib.bibx51",
+      "text": "Dingkang Wang et al. “A low-voltage, low-current, digital-driven MEMS mirror for low-power LiDAR” In IEEE Sensors Letters 4.8 IEEE, 2020, pp. 1–4"
+    },
+    {
+      "n": 23,
+      "id": "bib.bibx40",
+      "text": "Tixiao Shan et al. “Lio-sam: Tightly-coupled lidar inertial odometry via smoothing and mapping” In 2020 IEEE/RSJ international conference on intelligent robots and systems (IROS) , 2020, pp. 5135–5142 IEEE"
+    }
+  ]
+}

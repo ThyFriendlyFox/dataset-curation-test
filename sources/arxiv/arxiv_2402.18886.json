@@ -1,0 +1,124 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2402.18886",
+  "title": "BP-DeepONet: A new method for cuffless blood pressure estimation using the physcis-informed DeepONet",
+  "authors": "Lingfeng Li, Xue-Cheng Tai, Raymond Chan",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "physics.med-ph"
+  ],
+  "url": "https://arxiv.org/abs/2402.18886",
+  "html_url": "https://arxiv.org/html/2402.18886",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 960,
+  "text": "According to the World Health Organization (WHO), cardiovascular diseases (CVDs) are the leading cause of death globally [1]. In 2019, there were about 32% of all global deaths caused by CVDs. The majority of these deaths were due to heart attack and stroke. There is sufficient evidence to support that high blood pressure (or hypertension) is the predominant cause of CVDs [2]. In practice, the morphology of the arterial blood pressure (ABP) waveforms can reflect the cardiovascular status of humans [3,4,5,6]. Therefore, it is of great importance to monitor ABP waveforms continuously to detect and prevent diseases.\n\nIn the clinical setting, the gold standard for ABP waveform monitoring is the invasive method, which involves implanting an invasive pressure sensor into the artery. The invasive method is very risky, and the used devices are expensive. It is commonly used in intensive care units (ICUs). On the other hand, the non-invasive method is a more desirable choice for the daily monitoring of ABP waveforms.\n\nThe deep learning-based method for non-invasive ABP waveform estimation has attracted huge research interest in recent years. These methods usually estimate the ABP from other physiological signals that are much easier to measure. Electrocardiogram (ECG) and photoplethysmogram (PPG) are the most commonly used signals. The ECG signal records the heart’s electrical activity through cardiac cycles. It is measured by some electrodes, which can detect the small electrical changes resulting from the cardiac activity. The patterns of ECG signals can indicate many cardiac abnormalities. The PPG signal is an optical signal that can detect blood volume changes in the microvascular bed of tissue. It is often obtained by illuminating the skin with a pulse oximeter and measuring changes in light absorption. Examples of filtered ECG and PPG signals are shown in Figure 1.\n\nDeep learning models were introduced to estimate systolic and diastolic blood pressure in [7]. Then, more complicated neural networks are used to estimate the entire ABP waveform [8,9,10]. In [8], the authors proposed a neural network consisting of a convolutional neural network (CNN), a bi-directional gated recurrent unit (Bi-GRU), and attention layers to estimate ABP from ECG and PPG. In [9], a network that predicts ABP only using PPG signals was proposed. In [10], the authors introduced a modified transformer-based model to predict the ABP waveform from ECG, PPG, and some morphological extracted features.\n\nThe models above are all trained in a data-driven way, i.e., trained by minimizing the difference between the ground truth label and the network prediction. Since the labeled data is usually measured by invasive methods in the radial artery [11], the trained neural network will only predict the radial ABP waveform. However, ABP waveforms differ at different locations in the arterial systems [12,13] (See Figure 2), and radial waveforms may not be sufficient to diagnose CVD and reflect the status of the cardiovascular system. For example, some studies have shown that the brachial waveform is more valuable than the radial waveform when assessing cardiac contractility [14,15]. Another important observation is the pulse pressure amplification effect. Pulse pressure is defined as the difference between the maximum and minimum of the pressure waveforms, and this difference will increase through the propagation of the pulse wave in the arterial system. All current deep learning-based algorithms can only predict radial ABP waveforms since they are trained with labeled data measured at the radial artery.\n\nIn this work, we aim to develop new methods to predict ABP waveforms at different locations and at all times in the artery conditioned to the physical law that governs the blood flow, i.e. the Navier-Stokes equation. We use the physics-informed DeepONet (PI-DeepONet) [16]. DeepONet was initially proposed to learn the solution operator that maps variable inputs to the corresponding latent solutions of certain partial differential equation (PDE) systems [17], and its training process is entirely data-driven. If the underlying PDE system is explicitly given, then the PDE can be incorporated into the training loss like the physics-informed neural networks (PINN) [18]. The DeepONet trained in this way is called the physics-informed DeepONet. In the arterial system, the hemodynamics, i.e., blood flow dynamics, can be modeled and simulated by the Navier-Stokes equation [19,20,21]. Therefore, we can incorporate the Navier-Stokes equation into the training loss and learn the solution operator that maps physiological signals to solutions of the corresponding PDEs. In our setting, the spatial domain of the Navier-Stokes equation is a segment of the artery, and the labeled data can serve as a Dirichlet boundary condition. After providing other necessary initial/boundary conditions, we can identify the PDE solution in the whole domain. Consequently, we can obtain the ABP waveforms at different locations and at all times.\n\nWe summarize our main contributions as follows:\n\n- 1. This work is the first attempt to apply physics-informed operator learning to ABP waveform estimation. The proposed methods are the first ones to predict ABP waveforms at different locations in the artery conditioned by the physical law that governs the blood flow, i.e., the Navier-Stokes equation. The proposed methods enforce neural network solutions to satisfy a 1-D Navier-Stokes equation with a Windkessel boundary condition and a time-periodic condition. The Windkessel boundary condition can simulate physical reflection waves.\n\n- 2. The proposed methods can predict the blood pressure waveforms with reasonably good accuracy and preserve some physical properties like pulse pressure amplification.\n\n- 3. To the best of our knowledge, the proposed methods are the first ones that incorporate variable time-periodic conditions to DeepONet. We also propose an effective implementation method for the network training.\n\n- 4. We also incorporate meta-learning into the training to estimate model hyper-parameters automatically from the input physiological signals.\n\n- 5. During training, we only require the blood pressure measurement at the outlet side of the domain, and no extra measurement is needed.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "World Health Organization, Cardiovascular diseases (cvds), https://www.who.int/news-room/fact-sheets/detail/cardiovascular-diseases-(cvds) ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "F. D. Fuchs, P. K. Whelton, High blood pressure and cardiovascular disease, Hypertension 75 (2) (2020) 285–292."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "B. Matthieu, N.-G. Karine, C. Vincent, V. Alain, C. J. François, R. Philippe, S. François, Cardiac output measurement in patients undergoing liver transplantation: pulmonary artery catheter versus uncalibrated arterial pressure waveform analysis, Anesthesia & Analgesia 106 (5) (2008) 1480–1486."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "R. H. Thiele, M. E. Durieux, Arterial waveform analysis for the anesthesiologist: past, present, and future concepts, Anesthesia & Analgesia 113 (4) (2011) 766–776."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "Y. Li, H. Gu, H. Fok, J. Alastruey, P. Chowienczyk, Forward and backward pressure waveform morphology in hypertension, Hypertension 69 (2) (2017) 375–381."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "D. A. Hullender, O. R. Brown, Simulations of blood pressure and identification of atrial fibrillation and arterial stiffness using an extended kalman filter with oscillometric pulsation measurements, Computer Methods and Programs in Biomedicine 198 (2021) 105768."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "P. Su, X.-R. Ding, Y.-T. Zhang, J. Liu, F. Miao, N. Zhao, Long-term blood pressure prediction with deep recurrent neural networks, in: 2018 IEEE EMBS International Conference on Biomedical & Health Informatics (BHI), IEEE, 2018, pp. 323–328."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "H. Eom, D. Lee, S. Han, Y. S. Hariyani, Y. Lim, I. Sohn, K. Park, C. Park, End-to-end deep learning architecture for continuous blood pressure estimation using attention mechanism, Sensors 20 (8) (2020) 2338."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "N. Ibtehaz, S. Mahmud, M. E. Chowdhury, A. Khandakar, M. Salman Khan, M. A. Ayari, A. M. Tahir, M. S. Rahman, Ppg2abp: Translating photoplethysmogram (ppg) signals to arterial blood pressure (abp) waveforms, Bioengineering 9 (11) (2022) 692."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "C. Ma, P. Zhang, F. Song, Y. Sun, G. Fan, T. Zhang, Y. Feng, G. Zhang, Kd-informer: Cuff-less continuous blood pressure waveform estimation approach based on single photoplethysmography, IEEE Journal of Biomedical and Health Informatics (2022)."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "K. Lakhal, V. Robert-Edan, Invasive monitoring of blood pressure: a radiant future for brachial artery as an alternative to radial artery catheterisation?, Journal of Thoracic Disease 9 (12) (2017) 4812."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "S.-P. E, Continuous non-invasive arterial pressure shows high accuracy in comparison to invasive intra-arterial blood pressure measurement , 2008. URL https://api.semanticscholar.org/CorpusID:30046018"
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "M. K. Armstrong, M. G. Schultz, D. S. Picone, J. A. Black, N. Dwyer, P. Roberts-Thomson, J. E. Sharman, Brachial and radial systolic blood pressure are not the same: evidence to support the popeye phenomenon, Hypertension 73 (5) (2019) 1036–1041."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "J. Kyriazis, J. Glotsos, L. Bilirakis, N. Smirnioudis, The (dp/dt) max derived from arterial pulse waveforms: prospective applications in the haemodialysis setting, Nephrology Dialysis Transplantation 16 (5) (2001) 1087–1088."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "J. Sharman, A. Qasem, L. Hanekom, D. Gill, R. Lim, T. Marwick, Radial pressure waveform dp/dt max is a poor indicator of left ventricular systolic function, European Journal of Clinical Investigation 37 (4) (2007) 276–281."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "S. Wang, H. Wang, P. Perdikaris, Learning the solution operator of parametric partial differential equations with physics-informed deeponets, Science Advances 7 (40) (2021) eabi8605."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "L. Lu, P. Jin, G. Pang, Z. Zhang, G. E. Karniadakis, Learning nonlinear operators via deeponet based on the universal approximation theorem of operators, Nature Machine Intelligence 3 (3) (2021) 218–229."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "M. Raissi, P. Perdikaris, G. E. Karniadakis, Physics-informed neural networks: A deep learning framework for solving forward and inverse problems involving nonlinear partial differential equations, Journal of Computational physics 378 (2019) 686–707."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "L. Formaggia, D. Lamponi, A. Quarteroni, One-dimensional models for blood flow in arteries, Journal of Engineering Mathematics 47 (2003) 251–276."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "A. Quarteroni, L. Formaggia, Mathematical modelling and numerical simulation of the cardiovascular system, Handbook of Numerical Analysis 12 (2004) 3–127."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "N. Xiao, J. Alastruey, C. Alberto Figueroa, A systematic comparison between 1-d and 3-d hemodynamics in compliant arterial models, International Journal for Numerical Methods in Biomedical Engineering 30 (2) (2014) 204–231."
+    }
+  ]
+}

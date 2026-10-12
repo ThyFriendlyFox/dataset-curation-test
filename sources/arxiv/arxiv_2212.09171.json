@@ -1,0 +1,138 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2212.09171",
+  "title": "Rainproof: An Umbrella To Shield Text Generators From Out-Of-Distribution Data",
+  "authors": "Maxime Darrin, Pablo Piantanida, Pierre Colombo",
+  "year": "2023",
+  "categories": [
+    "cs.CL"
+  ],
+  "url": "https://arxiv.org/abs/2212.09171",
+  "html_url": "https://arxiv.org/html/2212.09171",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 806,
+  "text": "Significant progress has been made in Natural Language Generation (NLG) in recent years with the development of powerful generic (e.g., GPT [1,2,3], LLAMA [4] and its variants) and task-specific (e.g., Grover [5], Pegasus [6] and DialogGPT [7]) text generators. They power machine translation (MT) systems or chatbots that are exposed to the public, and their reliability is a prerequisite for adoption. Text generators are trained in the context of a so-called closed world [8], where training and test data are assumed to be drawn i.i.d. from a single distribution, known as the in-distribution. However, when deployed, these models operate in an open world [9,10] where the i.i.d. assumption is often violated. Changes in data distribution are detrimental and induce a drop in performance. It is necessary to develop tools to protect models from harmful distribution shifts as it is a clearly unresolved practical problem [11]. For example, a trained translation model is not expected to be reliable when presented with another language (e.g. a Spanish model exposed to Catalan, or a Dutch model exposed to Afrikaans) or unexpected technical language (e.g., a colloquial translation model exposed to rare technical terms from the medical field). They also tend to be released behind API [12] ruling out many usual features-based OOD detection methods.\n\nMost work on Out-Of-Distribution (OOD) detection focus on classification, leaving OOD detection in (conditional) text generation settings mainly unexplored, even though it is among the most exposed applications. Existing solutions fall into two categories. The first one called training-aware methods [13,14,15], modifies the classifier training by exposing the neural network to OOD samples during training. The second one, called plug-in methods aims to distinguish regular samples in the in-distribution (IN) from OOD samples based on the model’s behaviour on a new input. Plug-in methods include Maximum Softmax Probabilities (MSP) [16] or Energy [17] or feature-based anomaly detectors that compute a per-class anomaly score [18,19,20,21]. Although plug-in methods from classification settings seem attractive, their adaptation to text generation tasks is more involved. While text generation can be seen as a sequence of classification problems, i.e., chosing the next token at each step, the number of possible tokens is two orders of magnitude higher than usual classification setups.\n\nIn this work, we aim to develop new tools to build more reliable text generators which can be used in practical systems. To do so, we work under 4 constraints: (i) We do not assume we can access OOD samples; (ii) We suppose we are in a black-box scenario: we do not assume we have access to the internal states of the model but only to the soft probability distributions it outputs; (iii) The detectors should be easy enough to use on top of any existing model to ensure adaptability; (iv) Not only should OOD detectors be able to filter OOD samples, but they also are expected to improve the average performance on the end-task the model has to perform.\n\nOur contributions. Our main contributions can be summarized as follows:\n\n- 1. A more operational benchmark for text generation OOD detection. We present LOFTER the L anguage O ut o F dis T ribution p E rformance benchma R k. Existing works on OOD detection for language modelling [11] focus on (i) the English language only, (ii) the GLUE benchmark, and (iii) measure performance solely in terms of OOD detection. LOFTER introduces more realistic data shifts in the generative setting that goes beyond English: language shifts induced by closely related language pairs (e.g., Spanish and Catalan or Dutch and Afrikaans [22]) and domain change (e.g., medical vs news data or vs dialogs). In addition, LOFTER comes with an updated evaluation setting: detectors’ performance is jointly evaluated w.r.t the overall system’s performance on the end task.\n\n- 2. A novel detector inspired by information projection. We present RAINPROOF: a R elative inform A I tio N P rojection O ut O F distribution detector. RAINPROOF is fully unsupervised. It is flexible and can be applied both when no reference samples (IN) are available (corresponding to scenario \\mathbb{s}_{0}) and when they are (corresponding to scenario \\mathbb{s}_{1}). RAINPROOF tackles \\mathbb{s}_{0} by computing the models’ predictions negentropy [23] and uses it as a measure of normality. For \\mathbb{s}_{1}, it relies upon its natural extension: the Information Projection [24], which relies on a reference set to get a data-driven notion of normality.\n\n- 3. New insights on the operational value of OOD detectors. Our experiments on LOFTER show that OOD detectors may filter out samples that are well processed (i.e. well translated) by the model and keep samples that are not, leading to weaker performance. Our results show that RAINPROOF improves performance on the end task while removing most of the OOD samples.\n\n- 4. Code and reproductibility. We release a plug-and-play library built upon the Transformers library that implements our detectors and baselines.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib41",
+      "text": "Radford et al. (2018) Alec Radford, Karthik Narasimhan, Tim Salimans, Ilya Sutskever, et al. 2018. Improving language understanding by generative pre-training."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib4",
+      "text": "Brown et al. (2020) Tom Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared D Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, et al. 2020. Language models are few-shot learners. Advances in neural information processing systems , 33:1877–1901."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib2",
+      "text": "Bahrini et al. (2023) Aram Bahrini, Mohammadsadra Khamoshifar, Hossein Abbasimehr, Robert J. Riggs, Maryam Esmaeili, Rastin Mastali Majdabadkohne, and Morteza Pasehvar. 2023. Chatgpt: Applications, opportunities, and threats ."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib55",
+      "text": "Touvron et al. (2023) Hugo Touvron, Thibaut Lavril, Gautier Izacard, Xavier Martinet, Marie-Anne Lachaux, Timothée Lacroix, Baptiste Rozière, Naman Goyal, Eric Hambro, Faisal Azhar, Aurelien Rodriguez, Armand Joulin, Edouard Grave, and Guillaume Lample. 2023. Llama: Open and efficient foundation language models ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib61",
+      "text": "Zellers et al. (2019) Rowan Zellers, Ari Holtzman, Hannah Rashkin, Yonatan Bisk, Ali Farhadi, Franziska Roesner, and Yejin Choi. 2019. Defending against neural fake news. Advances in neural information processing systems , 32."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib62",
+      "text": "Zhang et al. (2020) Jingqing Zhang, Yao Zhao, Mohammad Saleh, and Peter Liu. 2020. Pegasus: Pre-training with extracted gap-sentences for abstractive summarization. In International Conference on Machine Learning , pages 11328–11339. PMLR."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib64",
+      "text": "Zhang et al. (2019b) Yizhe Zhang, Siqi Sun, Michel Galley, Yen-Chun Chen, Chris Brockett, Xiang Gao, Jianfeng Gao, Jingjing Liu, and Bill Dolan. 2019b. Dialogpt: Large-scale generative pre-training for conversational response generation. arXiv preprint arXiv:1911.00536 ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib13",
+      "text": "Fei and Liu (2016) Geli Fei and Bing Liu. 2016. Breaking the closed world assumption in text classification. In Proceedings of the 2016 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies , pages 506–514."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib37",
+      "text": "Parmar et al. (2021) Jitendra Parmar, Satyendra Singh Chouhan, Vaskar Raychoudhury, and Santosh Singh Rathore. 2021. Open-world machine learning: Applications, challenges, and opportunities ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib66",
+      "text": "Zhou (2022) Zhi-Hua Zhou. 2022. Open-environment machine learning. National Science Review , 9(8):nwac123."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib1",
+      "text": "Arora et al. (2021) Udit Arora, William Huang, and He He. 2021. Types of out-of-distribution texts and how to detect them. arXiv preprint arXiv:2109.06827 ."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib35",
+      "text": "OpenAI (2023) OpenAI. 2023. Gpt-4 technical report ."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib67",
+      "text": "Zhu et al. (2022) Qiuyu Zhu, Guohui Zheng, and Yingying Yan. 2022. Effective out-of-distribution detection in classifier based on pedcc-loss ."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib57",
+      "text": "Vernekar et al. (2019a) Sachin Vernekar, Ashish Gaurav, Vahdat Abdelzad, Taylor Denouden, Rick Salay, and Krzysztof Czarnecki. 2019a. Out-of-distribution detection in classifiers via generation ."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib58",
+      "text": "Vernekar et al. (2019b) Sachin Vernekar, Ashish Gaurav, Taylor Denouden, Buu Phan, Vahdat Abdelzad, Rick Salay, and Krzysztof Czarnecki. 2019b. Analysis of confident-classifiers for out-of-distribution detection. arXiv preprint arXiv:1904.12220 ."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib18",
+      "text": "Hendrycks and Gimpel (2016) Dan Hendrycks and Kevin Gimpel. 2016. A baseline for detecting misclassified and out-of-distribution examples in neural networks. arXiv preprint arXiv:1610.02136 ."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib30",
+      "text": "Liu et al. (2020) Weitang Liu, Xiaoyun Wang, John Owens, and Yixuan Li. 2020. Energy-based out-of-distribution detection. Advances in Neural Information Processing Systems ."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib32",
+      "text": "Ming et al. (2022) Yifei Ming, Yiyou Sun, Ousmane Dia, and Yixuan Li. 2022. Cider: Exploiting hyperspherical embeddings for out-of-distribution detection. arXiv preprint arXiv:2203.04450 ."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib45",
+      "text": "Ryu et al. (2017) Seonghan Ryu, Seokhwan Kim, Junhwi Choi, Hwanjo Yu, and Gary Geunbae Lee. 2017. Neural sentence embedding using only in-domain sentences for out-of-domain sentence detection in dialog systems. Pattern Recognition Letters , 88:26–32."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib21",
+      "text": "Huang et al. (2020) Haiwen Huang, Zhihan Li, Lulu Wang, Sishuo Chen, Bin Dong, and Xinyu Zhou. 2020. Feature space singularity for out-of-distribution detection. arXiv preprint arXiv:2011.14654 ."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib43",
+      "text": "Ren et al. (2021a) Jie Ren, Stanislav Fort, Jeremiah Liu, Abhijit Guha Roy, Shreyas Padhy, and Balaji Lakshminarayanan. 2021a. A simple fix to mahalanobis distance for improving near-ood detection. arXiv preprint arXiv:2106.09022 ."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib59",
+      "text": "Xiao et al. (2020) Tim Z. Xiao, Aidan N. Gomez, and Yarin Gal. 2020. Wat zei je? detecting out-of-distribution translations with variational transformers ."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib3",
+      "text": "Brillouin (1953) Leon Brillouin. 1953. The negentropy principle of information. Journal of Applied Physics , 24(9):1152–1163."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib9",
+      "text": "Csiszar and Matus (2003) I. Csiszar and F. Matus. 2003. Information projections revisited . IEEE Transactions on Information Theory , 49(6):1474–1490."
+    }
+  ]
+}

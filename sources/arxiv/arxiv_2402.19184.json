@@ -1,0 +1,58 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2402.19184",
+  "title": "Data Transfer Optimizations for Host-CPU and Accelerators in AXI4MLIR",
+  "authors": "Jude Haris, Nicolas Bohm Agostini, Antonino Tumeo, David Kaeli, JosÃ© Cano",
+  "year": "2024",
+  "categories": [
+    "cs.PL"
+  ],
+  "url": "https://arxiv.org/abs/2402.19184",
+  "html_url": "https://arxiv.org/html/2402.19184",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 396,
+  "text": "Renewed interest in heterogeneous computing with custom hardware accelerators can be attributed to the diminishing performance improvements of traditional architectures, especially as the core count grows. Custom hardware accelerators provide increased performance through architectural-level support that is tailored to the specific requirements of the given problem or application [1,2,3,4]. Tensor algebra processing, pervasive in machine learning [5] applications, is computationally demanding and requires high memory bandwidth. Specialized accelerators are ideal for providing the computational power necessary to meet the needs of these applications. Leveraging custom accelerators poses a new challenge - how do we realize their full potential, since it requires efficient communication between the accelerator, off-chip memory, and host CPU, demanding effective hardware-software co-design of the accelerator and host driver code. An efficient accelerator driver is necessary to handle data transfers, synchronize operations, and control the accelerator with instructions or control signals. However, manually developing host driver code for a particular accelerator and different applications is a very time-consuming and error-prone process.\n\nTo solve this problem, we can utilize automated CPU-accelerator driver code generation, which considers the host-CPU, the accelerator, the associated communication protocol, and the available accelerator instructions. AXI4MLIR [6] is an extension of the MLIR compiler framework [7] that generates host-driver code which offloads linear algebra operations to custom AXI-Stream based accelerators. AXI4MLIR takes a high-level application description in the MLIR’s linear algebra (linalg) abstraction [8] as input and introduces custom MLIR attributes to describe the target accelerator capabilities, which eventually gets transformed into low-level DMA library calls to send or receive data and instructions to the accelerator.\n\nWhile AXI4MLIR can provide considerable speedup over a manual implementation of the host-driver code, we observe potential areas for further optimizations, which can improve the utilization of the accelerator and reduce overall latency. Figure 1 shows a breakdown of the cycles spent inside the accelerator while executing MatMul problems for a range of dimensions and tile sizes. Ideally, the accelerator’s compute cores should be fully utilized, but our experiments show that we are achieving on average less than 10% utilization. Additionally, profiling the execution of this MatMul problem from the CPU’s perspective, we observed that the CPU-side bottleneck is caused by copying data allocated within the memory heap to the DMA buffers. To tackle this accelerator under-utilization and host-side bottlenecks, we propose extending AXI4MLIR with three key optimizations, discussed in detail in the following section.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib3",
+      "text": "H. Shabani, A. Singh, B. Youhana, and X. Guo, “Hirac: A hierarchical accelerator with sorting-based packing for spgemms in dnn applications,” in IEEE International Symposium on High-Performance Computer Architecture , ser. HPCA’23. Montreal, QC, Canada: IEEE, 2023, pp. 247–258. [Online]. Available: https://doi.org/10.1109/HPCA56546.2023.10070977"
+    },
+    {
+      "n": 2,
+      "id": "bib.bib4",
+      "text": "B. Kim, S. Li, and H. Li, “Inca: Input-stationary dataflow at outside-the-box thinking about deep learning accelerators,” in IEEE International Symposium on High-Performance Computer Architecture , ser. HPCA’23. Montreal, QC, Canada: IEEE, 2023, pp. 29–41. [Online]. Available: https://doi.org/10.1109/HPCA56546.2023.10070992"
+    },
+    {
+      "n": 3,
+      "id": "bib.bib5",
+      "text": "S. Hsia, U. Gupta, B. Acun, N. Ardalani, P. Zhong, G.-Y. Wei, D. Brooks, and C.-J. Wu, “Mp-rec: Hardware-software co-design to enable multi-path recommendation,” in Proceedings of the 28th ACM International Conference on Architectural Support for Programming Languages and Operating Systems, Volume 3 , ser. ASPLOS 2023. New York, NY, USA: Association for Computing Machinery, 2023, p. 449–465. [Online]. Available: https://doi.org/10.1145/3582016.3582068"
+    },
+    {
+      "n": 4,
+      "id": "bib.bib6",
+      "text": "F. Muñoz Martínez, R. Garg, M. Pellauer, J. L. Abellán, M. E. Acacio, and T. Krishna, “Flexagon: A multi-dataflow sparse-sparse matrix multiplication accelerator for efficient dnn processing,” in Proceedings of the 28th ACM International Conference on Architectural Support for Programming Languages and Operating Systems , ser. ASPLOS’23. New York, NY, USA: Association for Computing Machinery, 2023, p. 252–265. [Online]. Available: https://doi.org/10.1145/3582016.3582069"
+    },
+    {
+      "n": 5,
+      "id": "bib.bib7",
+      "text": "Q. Rao and J. Frtunikj, “Deep learning for self-driving cars: Chances and challenges,” in IEEE/ACM 1st International Workshop on Software Engineering for AI in Autonomous Systems , ser. SEFAIS’18. New York, NY, USA: Association for Computing Machinery, 2018, p. 35–38. [Online]. Available: https://doi.org/10.1145/3194085.3194087"
+    },
+    {
+      "n": 6,
+      "id": "bib.bib1",
+      "text": "N. B. Agostini, J. Haris, P. Gibson, M. Jayaweera, N. Rubin, A. Tumeo, J. L. Abellán, J. Cano, and D. Kaeli, “AXI4MLIR: User-Driven Automatic Host Code Generation for Custom AXI-Based Accelerators,” 2023. [Online]. Available: https://doi.org/10.48550/arXiv.2312.14821"
+    },
+    {
+      "n": 7,
+      "id": "bib.bib2",
+      "text": "C. Lattner, M. Amini, U. Bondhugula, A. Cohen, A. Davis, J. Pienaar, R. Riddle, T. Shpeisman, N. Vasilache, and O. Zinenko, “MLIR: Scaling Compiler Infrastructure for Domain Specific Computation,” in IEEE/ACM International Symposium on Code Generation and Optimization , ser. CGO’21. Seoul, Korea (South): IEEE, 2021, pp. 2–14. [Online]. Available: https://doi.org/10.1109/CGO51591.2021.9370308"
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "M. Developers, “’linalg’ Dialect,” 2020, online accessed on 11-04-2023. [Online]. Available: https://mlir.llvm.org/docs/Dialects/Linalg/"
+    }
+  ]
+}

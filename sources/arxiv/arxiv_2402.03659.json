@@ -1,0 +1,170 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2402.03659",
+  "title": "Learning to Generate Explainable Stock Predictions using Self-Reflective Large Language Models",
+  "authors": "Kelvin J. L. Koa, Yunshan Ma, Ritchie Ng, Tat-Seng Chua",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.CL",
+    "q-fin.ST"
+  ],
+  "url": "https://arxiv.org/abs/2402.03659",
+  "html_url": "https://arxiv.org/html/2402.03659",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 971,
+  "text": "The Efficient Market Hypothesis (EMH) states that in financial markets, stock prices reflect all available information [1], and should only react to new information. Through mining and analysing external data sources, the goal of investors is to quickly understand the impact of new information on the market, in order to anticipate future stock price movements [2]. However, analyzing the impact of these data on the stock market is a huge undertaking and imposes a heavy workload on financial experts, due to the large volume of information available [3]. Because of this, many have explored the use of deep-learning techniques [4,5,6] for stock prediction.\n\nHowever, due to their complex and quantitative nature, traditional deep-learning methods in stock prediction are black box models and do not address the explainability of their predictions [7]. This reduces their usability in practical applications, as users might not be able to trust [8] the results to invest their capital. Even among works that deal with explainable stock predictions [9,7], the \"explanations\" are often simply defined as the specific texts that caused the price movement, which are usually obtained by analyzing learnt attention weights [10,11]. For example, these models could analyze a series of texts regarding Apple stock and determine that its Positive prediction is attributed to the text \" Apple reported revenue of $90.1 billion, beating expectations \". However, these models do not go beyond that to explain why these texts caused the stock movement, and require the user to make their own inference.\n\nToday, the emergence of Large Language Models (LLMs) has presented a solution to this problem. Recent surveys [12,13] have shown that LLMs possess both strong Natural-Language Understanding capabilities, which allow them to perform tasks like text summarization [14] and text classification [15] in a few-shot manner; and strong Natural-Language Generation capabilities, which let them generate human-readable explanations for their own decision-making process [16,17]. Currently, works that utilize LLMs for stock prediction [18,19] are few, and use limited techniques such as pre-trained LLMs or instruction tuning. Our work seeks to fill this gap by designing a reinforcement learning (RL) framework which can fine-tune a LLM to generate explanations for stock prediction.\n\nTo tackle the explainable stock prediction task using LLMs, we can identify two main challenges. Firstly, it is well-established in past stock prediction literature that social texts are chaotic, where the influence of different texts on stock prices can be highly diverse [20,21]. For example, breaking news such as surprise earnings announcements or crisis events often have a visible impact on the stock price, while unsubstantiated opinions or vague remarks usually cause little to no change [22]. This requires a prediction model to have the ability to weigh the varying impacts of new information [23], and arrive at a maximum-likelihood prediction [24]. Typically, this involves training a regression-based neural network, and is not a known capability of LLMs (see Figure 1). Secondly, the problem becomes progressively harder with the introduction of the explanation component, as it requires the LLM to explain verbally why certain information are more important than others. However, to train a LLM for this task using RL [25,26], one would need good and bad samples [27,16] of explanations for each price movement in the training set. This requires substantial amount of labour by financial experts, which is expensive and impractical to scale.\n\nTo deal with the above-mentioned problems, we propose our Summarize-Explain-Predict (SEP) framework, which utilizes a self-reflective agent [28] and Proximal Policy Optimization (PPO) [29] to let a LLM teach itself how to make explainable stock predictions in a fully autonomous manner (see Figure 2). Firstly, the Summarize module utilizes the strong summarization capabilities of LLMs [14] to convert large volumes of text input data into point-form summaries of factual information. Secondly, in the Explain module, a reflective agent teaches itself to generate correct stock predictions and explain their reasoning [17] given a sequence of summarized facts, via an iterative, verbal self-reflective process [30,28]. The iterative process additionally allows us to obtain a series of correct and incorrect predictions with annotated explanations through its past mistakes, which can be used as fine-tuning samples without human-in-the-loop. Lastly, in the Predict module, a specialized LLM is fine-tuned [25,26] via PPO training [29] using its own self-taught responses, in order to generate the most likely stock predictions and explanations, given the input texts from an unseen test set.\n\nTo demonstrate the effectiveness of the SEP framework, we validate through experimental results that our model is able to outperform both traditional deep-learning and LLM methods in terms of its prediction accuracy and Matthews correlation coefficient (MCC) for the binary stock classification task. We also analyze some responses from the fine-tuned LLM qualitatively, to show how it is better able to understand and weigh the impacts of different information within the input texts. Additionally, to justify the generalization capability of the framework, we test it on the portfolio construction task, by generating explainable weights for a stock portfolio. We also demonstrate the effectiveness of this method through portfolio metrics, such as its profitability and Sharpe Ratio.\n\nThe main contributions of this paper are summarized as:\n\n- • We investigate the limitations of teaching LLMs to weigh information in multiple texts for stock prediction in an explainable manner, without expert-annotated explanation samples.\n\n- • We propose a solution that utilizes a self-reflective agent and PPO techniques, that can allow a LLM to teach itself how to make explainable stock predictions in a fully autonomous manner.\n\n- • We validate the effectiveness of SEP through experimental results on tweet data, and show that the fine-tuned LLM is able to provide improvements in both the prediction performance and the quality of its explanations. We further demonstrate the generalizability of the framework by fine-tuning a LLM to generate quantitative weights for multiple stocks, to tackle the portfolio task.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib21",
+      "text": "Fama (1970) Eugene F Fama. 1970. Efficient capital markets: A review of theory and empirical work. The journal of Finance 25, 2 (1970), 383–417."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib28",
+      "text": "Gidofalvi and Elkan (2001) Gyozo Gidofalvi and Charles Elkan. 2001. Using news articles to predict stock price movements. Department of computer science and engineering, university of california, san diego 17 (2001)."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib25",
+      "text": "Feng et al . (2021) Fuli Feng, Moxin Li, Cheng Luo, Ritchie Ng, and Tat-Seng Chua. 2021. Hybrid learning to rank for financial event ranking. In Proceedings of the 44th International ACM SIGIR Conference on Research and Development in Information Retrieval . 233–243."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib24",
+      "text": "Feng et al . (2019) Fuli Feng, Xiangnan He, Xiang Wang, Cheng Luo, Yiqun Liu, and Tat-Seng Chua. 2019. Temporal relational ranking for stock prediction. ACM Transactions on Information Systems (TOIS) 37, 2 (2019), 1–30."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib42",
+      "text": "Li et al . (2021) Wei Li, Ruihan Bao, Keiko Harimoto, Deli Chen, Jingjing Xu, and Qi Su. 2021. Modeling the stock relation with graph network for overnight stock movement prediction. In Proceedings of the twenty-ninth international conference on international joint conferences on artificial intelligence . 4541–4547."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib38",
+      "text": "Koa et al . (2023) Kelvin J.L. Koa, Yunshan Ma, Ritchie Ng, and Tat-Seng Chua. 2023. Diffusion Variational Autoencoder for Tackling Stochasticity in Multi-Step Regression Stock Price Prediction. In Proceedings of the 32nd ACM International Conference on Information & Knowledge Management ."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib41",
+      "text": "Li et al . (2023a) Shuqi Li, Weiheng Liao, Yuhan Chen, and Rui Yan. 2023a. PEN: prediction-explanation network to forecast stock price movement with better explainability. In Proceedings of the AAAI Conference on Artificial Intelligence , Vol. 37. 5187–5194."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib5",
+      "text": "Biran and McKeown (2017) Or Biran and Kathleen R McKeown. 2017. Human-Centric Justification of Machine Learning Predictions.. In IJCAI , Vol. 2017. 1461–1467."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib7",
+      "text": "Carta et al . (2021) Salvatore M Carta, Sergio Consoli, Luca Piras, Alessandro Sebastian Podda, and Diego Reforgiato Recupero. 2021. Explainable machine learning exploiting news and domain-specific lexicon for stock market forecasting. IEEE Access 9 (2021), 30193–30205."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib16",
+      "text": "Deng et al . (2019) Shumin Deng, Ningyu Zhang, Wen Zhang, Jiaoyan Chen, Jeff Z Pan, and Huajun Chen. 2019. Knowledge-driven stock trend prediction and explanation via temporal convolutional network. In Companion Proceedings of The 2019 World Wide Web Conference . 678–685."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib57",
+      "text": "Sawhney et al . (2020) Ramit Sawhney, Shivam Agarwal, Arnav Wadhwa, and Rajiv Shah. 2020. Deep attentive learning for stock movement prediction from social media text and company correlations. In Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing (EMNLP) . 8415–8426."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib70",
+      "text": "Yang et al . (2023a) Jingfeng Yang, Hongye Jin, Ruixiang Tang, Xiaotian Han, Qizhang Feng, Haoming Jiang, Bing Yin, and Xia Hu. 2023a. Harnessing the power of llms in practice: A survey on chatgpt and beyond. arXiv preprint arXiv:2304.13712 (2023)."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib80",
+      "text": "Zhao et al . (2023) Wayne Xin Zhao, Kun Zhou, Junyi Li, Tianyi Tang, Xiaolei Wang, Yupeng Hou, Yingqian Min, Beichen Zhang, Junjie Zhang, Zican Dong, et al . 2023. A survey of large language models. arXiv preprint arXiv:2303.18223 (2023)."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib54",
+      "text": "Pu et al . (2023) Xiao Pu, Mingqi Gao, and Xiaojun Wan. 2023. Summarization is (Almost) Dead. arXiv preprint arXiv:2309.09558 (2023)."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib43",
+      "text": "Liang et al . (2022) Percy Liang, Rishi Bommasani, Tony Lee, Dimitris Tsipras, Dilara Soylu, Michihiro Yasunaga, Yian Zhang, Deepak Narayanan, Yuhuai Wu, Ananya Kumar, et al . 2022. Holistic evaluation of language models. arXiv preprint arXiv:2211.09110 (2022)."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib44",
+      "text": "Liu et al . (2023) Hao Liu, Carmelo Sferrazza, and Pieter Abbeel. 2023. Chain of hindsight aligns language models with feedback. arXiv preprint arXiv:2302.02676 3 (2023)."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib64",
+      "text": "Wei et al . (2022) Jason Wei, Xuezhi Wang, Dale Schuurmans, Maarten Bosma, Fei Xia, Ed Chi, Quoc V Le, Denny Zhou, et al . 2022. Chain-of-thought prompting elicits reasoning in large language models. Advances in Neural Information Processing Systems 35 (2022), 24824–24837."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib77",
+      "text": "Yu et al . (2023) Xinli Yu, Zheng Chen, Yuan Ling, Shujing Dong, Zongyi Liu, and Yanbin Lu. 2023. Temporal Data Meets LLM–Explainable Financial Time Series Forecasting. arXiv preprint arXiv:2306.11025 (2023)."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib11",
+      "text": "Chen et al . (2023) Zihan Chen, Lei Nico Zheng, Cheng Lu, Jialu Yuan, and Di Zhu. 2023. ChatGPT Informed Graph Neural Network for Stock Movement Prediction. arXiv preprint arXiv:2306.03763 (2023)."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib34",
+      "text": "Hu et al . (2018) Ziniu Hu, Weiqing Liu, Jiang Bian, Xuanzhe Liu, and Tie-Yan Liu. 2018. Listening to chaotic whispers: A deep learning framework for news-oriented stock trend prediction. In Proceedings of the eleventh ACM international conference on web search and data mining . 261–269."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib68",
+      "text": "Xu and Cohen (2018) Yumo Xu and Shay B Cohen. 2018. Stock movement prediction from tweets and historical prices. In Proceedings of the 56th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) . 1970–1979."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib61",
+      "text": "Sprenger and Welpe (2011) Timm O Sprenger and Isabell M Welpe. 2011. News or noise? The stock market reaction to different types of company-specific news events. The Stock Market Reaction to Different Types of Company-Specific News Events (2011)."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib22",
+      "text": "Fama and French (2015) Eugene F Fama and Kenneth R French. 2015. A five-factor asset pricing model. Journal of financial economics 116, 1 (2015), 1–22."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib29",
+      "text": "Giglio et al . (2022) Stefano Giglio, Bryan Kelly, and Dacheng Xiu. 2022. Factor models, machine learning, and asset pricing. Annual Review of Financial Economics 14 (2022), 337–368."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib52",
+      "text": "Ouyang et al . (2022) Long Ouyang, Jeffrey Wu, Xu Jiang, Diogo Almeida, Carroll Wainwright, Pamela Mishkin, Chong Zhang, Sandhini Agarwal, Katarina Slama, Alex Ray, et al . 2022. Training language models to follow instructions with human feedback. Advances in Neural Information Processing Systems 35 (2022), 27730–27744."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib33",
+      "text": "Hu et al . (2021) Edward J Hu, Yelong Shen, Phillip Wallis, Zeyuan Allen-Zhu, Yuanzhi Li, Shean Wang, Lu Wang, and Weizhu Chen. 2021. Lora: Low-rank adaptation of large language models. arXiv preprint arXiv:2106.09685 (2021)."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib39",
+      "text": "Lee et al . (2023) Harrison Lee, Samrat Phatale, Hassan Mansoor, Kellie Lu, Thomas Mesnard, Colton Bishop, Victor Carbune, and Abhinav Rastogi. 2023. RLAIF: Scaling Reinforcement Learning from Human Feedback with AI Feedback. arXiv preprint arXiv:2309.00267 (2023)."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib60",
+      "text": "Shinn et al . (2023) Noah Shinn, Federico Cassano, Beck Labash, Ashwin Gopinath, Karthik Narasimhan, and Shunyu Yao. 2023. Reflexion: Language Agents with Verbal Reinforcement Learning. arXiv:2303.11366 [cs.AI]"
+    },
+    {
+      "n": 29,
+      "id": "bib.bib58",
+      "text": "Schulman et al . (2017) John Schulman, Filip Wolski, Prafulla Dhariwal, Alec Radford, and Oleg Klimov. 2017. Proximal policy optimization algorithms. arXiv preprint arXiv:1707.06347 (2017)."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib49",
+      "text": "Madaan et al . (2023) Aman Madaan, Niket Tandon, Prakhar Gupta, Skyler Hallinan, Luyu Gao, Sarah Wiegreffe, Uri Alon, Nouha Dziri, Shrimai Prabhumoye, Yiming Yang, et al . 2023. Self-refine: Iterative refinement with self-feedback. arXiv preprint arXiv:2303.17651 (2023)."
+    }
+  ]
+}

@@ -1,0 +1,155 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2402.14096",
+  "title": "EyeTrans: Merging Human and Machine Attention for Neural Code Summarization",
+  "authors": "Yifan Zhang, Jiliang Li, Zachary Karas, Aakash Bansal, Toby Jia-Jun Li, Collin McMillan, Kevin Leach, Yu Huang",
+  "year": "2024",
+  "categories": [
+    "cs.SE",
+    "cs.AI",
+    "cs.HC"
+  ],
+  "url": "https://arxiv.org/abs/2402.14096",
+  "html_url": "https://arxiv.org/html/2402.14096",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 966,
+  "text": "A code summary is a brief description representing the purpose and function of code that can aid developer comprehension [1]. Code summaries are a common part of documenting source code — while typically provided by the developer, machine learning models have increasingly been used to automatically generate summaries to augment documentation and improve comprehension. When documenting or summarizing source code, programmers’ attention will focus on different parts of the code to formulate a general idea about it, eventually establishing a comprehensive understanding [2].\n\nSeveral studies have developed an initial understanding of how human developers comprehend code. To capture the nuanced attention shifts of programmers reading code, a popular approach is to conduct eye-tracking studies [3,4] to empirically analyze common eye gaze patterns during the process. Intuitively, certain patterns of eye gaze when examining source code correspond to a change in attention within the code [5,6], which is usually highly correlated with changes in human concentration and is potentially valuable for gaining a better understanding of the cognitive processes in programming [7,8,9,10]. Researchers have conducted several eye-tracking studies to explore human attention during code summarization. These usually involve university students or professional developers drafting or evaluating summaries for code snippets and recording their eye gaze patterns to understand human attention in such activities [11,12]. Though the focus has been primarily on understanding the eye-tracking patterns, these studies have unveiled certain correlations between human visual attention and code summarization [4,3], paving the way for future work to improve relevant tool design leveraging human attention.\n\nIn recent years, in tandem with the traditional definition of “attention” in human activities, attention can also refer to a concept in machine learning that describes the importance of weights in the layers of neural networks [13,14]. Within this area, the Transformer [15] architecture is one of the most influential baseline structures that incorporate neural attention into a machine learning model. With advancements in machine attention mechanisms for system applications [16,17,18], an increasing number of Transformer-based models have been developed to address a variety of neural code summarization tasks [19,20,21,22]. These methods leverage specific domain knowledge to modify their model structures accordingly, incorporating elements such as the Abstract Syntax Tree (AST) [19], dataflow graph [21], and function call graph [23]. To generate code summaries, these Transformer models essentially aim to “comprehend” the code, which is a task that human programmers already accomplish. It is therefore possible that human attention can be leveraged to improve these models’ performance [24], which, to the best of our knowledge, has not yet been attempted. This process can be framed into the following questions: can human attention be integrated into complex machine attention mechanisms to enhance overall performance? If so, how can we pragmatically incorporate human attention into attention-based machine learning models? These questions are particularly relevant for Software Engineering (SE) and AI communities considering the Transformer architecture, which underlies the most recent advanced AI applications in SE, and large language models (LLMs) in natural language processing (NLP) [25,26,27].\n\nIn this paper, we hypothesize that human attention can enhance Transformer models, and with the understanding that a formalized methodology for this integration has yet to be explored, we introduce EyeTrans. EyeTrans leverages human eye-tracking data during training to effectively integrate human attention with machine attention, as illustrated in Figure 1. To this end, we first conduct a human study to collect eye-tracking data from 27 programmers, which we then preprocess and incorporate into the Transformer. We describe our methodology, then present evaluation metrics that assess EyeTrans ’s performance. Specifically, we employ two code summarization-based evaluation methods to illustrate the effectiveness of human attention in augmenting neural code summarization: (1) classification-based code summarization, referred to as Functional Summarization, in which a model predicts the name of function (e.g., “open” or “sort”) given its source code. This serves as a foundational step, enabling programmers to consolidate a preliminary understanding of the inherent functionality and semantics of the code. (2) Sequence-to-sequence (seq2seq) based code summarization, referred to as General Code Summarization, in which a model generates a sequence of natural language tokens succinctly describing what a given function does (e.g., documentation for the function). We find that integrating human attention results in a performance improvement of up to 29.91% in functional summarization, and up to 6.39% in general code summarization, thereby demonstrating the effectiveness of EyeTrans. We view our work as a proof-of-concept and hope our work can inspire more future work to leverage human factor research in AI for software engineering. We included the eye-tracking data collected in the study (de-identified) and the experimental code in the supplementary package and plan to release them to the public.\n\nThe contributions of this paper are as follows:\n\n- \\bullet We propose EyeTrans, the first approach to demonstrate that integrating human attention with the Transformer architecture can substantially enhance the performance of neural code summarization.\n\n- \\bullet We conduct exploratory examinations of eye-tracking data and rationalize the integration of human attention through preliminary analysis.\n\n- \\bullet We design a data-centric method to incorporate human attention into Transformers without altering its structure, and present comprehensive quantitative analyses to validate the performance of our approach.\n\n- \\bullet We illustrate alterations in the Transformer’s attention maps to qualitatively demonstrate the changes brought by combining human attention and attention layer in Transformer.\n\n- \\bullet We review existing attention synthesis methods in relation to our work and outline prospective avenues for future research.\n\nPaper Organization: Section 2 presents the design for the eye-tracking human study in this paper, and provides background knowledge on EyeTrans and the Transformer architecture. Section 3 elaborates on the details of EyeTrans. Section 4 details the experimental setup. Section 5 analyzes the results. Section 6 discusses threats to validity. Section 7 surveys related work. Finally, Section 9 concludes the paper and outlines future research directions.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib62",
+      "text": "Stapleton et al . (2020) Sean Stapleton, Yashmeet Gambhir, Alexander LeClair, Zachary Eberhart, Westley Weimer, Kevin Leach, and Yu Huang. 2020. A human study of comprehension and code summarization. In Proceedings of the 28th International Conference on Program Comprehension . 2–13."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib25",
+      "text": "Haiduc et al . (2010) Sonia Haiduc, Jairo Aponte, and Andrian Marcus. 2010. Supporting program comprehension with source code summarization. In Proceedings of the 32nd ACM/IEEE International Conference on Software Engineering-Volume 2 . 223–226."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "Abid et al . (2019a) Nahla J Abid, Jonathan I Maletic, and Bonita Sharif. 2019a. Using developer eye movements to externalize the mental model used in code summarization tasks. In Proceedings of the 11th ACM Symposium on Eye Tracking Research & Applications . 1–9."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib51",
+      "text": "Rodeghero and McMillan (2015) Paige Rodeghero and Collin McMillan. 2015. An empirical study on the patterns of eye movement during summarization tasks. In 2015 ACM/IEEE International Symposium on Empirical Software Engineering and Measurement (ESEM) . IEEE, 1–10."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib64",
+      "text": "Sun and Hsu (2019) Jerry Chih-Yuan Sun and Kelly Yi-Chuan Hsu. 2019. A smart eye-tracking feedback scaffolding approach to improving students’ learning self-efficacy and performance in a C programming course. Computers in Human Behavior 95 (2019), 66–72."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib46",
+      "text": "Peitek et al . (2020) Norman Peitek, Janet Siegmund, and Sven Apel. 2020. What drives the reading order of programmers? an eye tracking study. In Proceedings of the 28th International Conference on Program Comprehension . 342–353."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib11",
+      "text": "Bansal et al . (2023b) Aakash Bansal, Chia-Yi Su, Zachary Karas, Yifan Zhang, Yu Huang, Toby Jia-Jun Li, and Collin McMillan. 2023b. Modeling Programmer Attention as Scanpath Prediction. In 2023 38th IEEE/ACM International Conference on Automated Software Engineering (ASE) . IEEE, 1732–1736."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib56",
+      "text": "Sharafi et al . (2021) Zohreh Sharafi, Yu Huang, Kevin Leach, and Westley Weimer. 2021. Toward an Objective Measure of Developers’ Cognitive Activities. ACM Transactions on Software Engineering and Methodology (TOSEM) 30, 3 (2021), 1–40."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib28",
+      "text": "Huang et al . (2020) Yu Huang, Kevin Leach, Zohreh Sharafi, Nicholas McKay, Tyler Santander, and Westley Weimer. 2020. Biases and differences in code review using medical imaging and eye-tracking: genders, humans, and machines. In Proceedings of the 28th ACM Joint Meeting on European Software Engineering Conference and Symposium on the Foundations of Software Engineering . 456–468."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib5",
+      "text": "Ahmad et al . (2023) Hammad Ahmad, Zachary Karas, Kimberly Diaz, Amir Kamil, Jean-Baptiste Jeannin, and Westley Weimer. 2023. How Do We Read Formal Claims? Eye-Tracking and the Cognition of Proofs about Algorithms. In 2023 IEEE/ACM 45th International Conference on Software Engineering (ICSE) . IEEE, 208–220."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib52",
+      "text": "Rodeghero et al . (2014) Paige Rodeghero, Collin McMillan, Paul W McBurney, Nigel Bosch, and Sidney D’Mello. 2014. Improving automated source code summarization via an eye-tracking study of programmers. In Proceedings of the 36th international conference on Software engineering . 390–401."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib50",
+      "text": "Rodeghero et al . (2015) Paige Rodeghero, Cheng Liu, Paul W McBurney, and Collin McMillan. 2015. An eye-tracking study of java programmers and application to source code summarization. IEEE Transactions on Software Engineering 41, 11 (2015), 1038–1054."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib43",
+      "text": "Niu et al . (2021) Zhaoyang Niu, Guoqiang Zhong, and Hui Yu. 2021. A review on the attention mechanism of deep learning. Neurocomputing 452 (2021), 48–62."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib24",
+      "text": "Guo et al . (2022) Meng-Hao Guo, Tian-Xing Xu, Jiang-Jiang Liu, Zheng-Ning Liu, Peng-Tao Jiang, Tai-Jiang Mu, Song-Hai Zhang, Ralph R Martin, Ming-Ming Cheng, and Shi-Min Hu. 2022. Attention mechanisms in computer vision: A survey. Computational visual media 8, 3 (2022), 331–368."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib68",
+      "text": "Vaswani et al . (2017) Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N Gomez, Łukasz Kaiser, and Illia Polosukhin. 2017. Attention is all you need. Advances in neural information processing systems 30 (2017)."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib77",
+      "text": "Zhao et al . (2022) Yue Zhao, Gao Cong, Jiachen Shi, and Chunyan Miao. 2022. QueryFormer: a tree transformer model for query plan representation. Proceedings of the VLDB Endowment 15, 8 (2022), 1658–1670."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib69",
+      "text": "Wang et al . (2022) Hao Wang, Wenjie Qu, Gilad Katz, Wenyu Zhu, Zeyu Gao, Han Qiu, Jianwei Zhuge, and Chao Zhang. 2022. Jtrans: Jump-aware transformer for binary code similarity detection. In Proceedings of the 31st ACM SIGSOFT International Symposium on Software Testing and Analysis . 1–13."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib78",
+      "text": "Zhu et al . (2023) Wenyu Zhu, Hao Wang, Yuchen Zhou, Jiaming Wang, Zihan Sha, Zeyu Gao, and Chao Zhang. 2023. kTrans: Knowledge-Aware Transformer for Binary Code Embedding. arXiv preprint arXiv:2308.12659 (2023)."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib66",
+      "text": "Tang et al . (2022) Ze Tang, Xiaoyu Shen, Chuanyi Li, Jidong Ge, Liguo Huang, Zhelin Zhu, and Bin Luo. 2022. AST-trans: Code summarization with efficient tree-structured attention. In Proceedings of the 44th International Conference on Software Engineering . 150–162."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib6",
+      "text": "Ahmad et al . (2020) Wasi Uddin Ahmad, Saikat Chakraborty, Baishakhi Ray, and Kai-Wei Chang. 2020. A transformer-based approach for source code summarization. arXiv preprint arXiv:2005.00653 (2020)."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib22",
+      "text": "Gong et al . (2022) Zi Gong, Cuiyun Gao, Yasheng Wang, Wenchao Gu, Yun Peng, and Zenglin Xu. 2022. Source code summarization with structural relative position guided transformer. In 2022 IEEE International Conference on Software Analysis, Evolution and Reengineering (SANER) . IEEE, 13–24."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib65",
+      "text": "Tang et al . (2021) Ze Tang, Chuanyi Li, Jidong Ge, Xiaoyu Shen, Zheling Zhu, and Bin Luo. 2021. AST-transformer: Encoding abstract syntax trees efficiently for code summarization. In 2021 36th IEEE/ACM International Conference on Automated Software Engineering (ASE) . IEEE, 1193–1195."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib36",
+      "text": "Le-Cong et al . (2022) Thanh Le-Cong, Hong Jin Kang, Truong Giang Nguyen, Stefanus Agus Haryono, David Lo, Xuan-Bach D Le, and Quyet Thang Huynh. 2022. Autopruner: transformer-based call graph pruning. In Proceedings of the 30th ACM Joint European Software Engineering Conference and Symposium on the Foundations of Software Engineering . 520–532."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib53",
+      "text": "Rohanian et al . (2017) Omid Rohanian, Shiva Taslimipoor, Victoria Yaneva, and Le An Ha. 2017. Using gaze data to predict multiword expressions. (2017)."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib41",
+      "text": "Liu et al . (2019) Yinhan Liu, Myle Ott, Naman Goyal, Jingfei Du, Mandar Joshi, Danqi Chen, Omer Levy, Mike Lewis, Luke Zettlemoyer, and Veselin Stoyanov. 2019. Roberta: A robustly optimized bert pretraining approach. arXiv preprint arXiv:1907.11692 (2019)."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib23",
+      "text": "Guo et al . (2020) Daya Guo, Shuo Ren, Shuai Lu, Zhangyin Feng, Duyu Tang, Shujie Liu, Long Zhou, Nan Duan, Alexey Svyatkovskiy, Shengyu Fu, et al . 2020. Graphcodebert: Pre-training code representations with data flow. arXiv preprint arXiv:2009.08366 (2020)."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib67",
+      "text": "Touvron et al . (2023) Hugo Touvron, Thibaut Lavril, Gautier Izacard, Xavier Martinet, Marie-Anne Lachaux, Timothée Lacroix, Baptiste Rozière, Naman Goyal, Eric Hambro, Faisal Azhar, et al . 2023. Llama: Open and efficient foundation language models. arXiv preprint arXiv:2302.13971 (2023)."
+    }
+  ]
+}

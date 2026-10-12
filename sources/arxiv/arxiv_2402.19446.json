@@ -1,0 +1,105 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2402.19446",
+  "title": "ArCHer: Training Language Model Agents via Hierarchical Multi-Turn RL",
+  "authors": "Yifei Zhou, Andrea Zanette, Jiayi Pan, Sergey Levine, Aviral Kumar",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.AI",
+    "cs.CL"
+  ],
+  "url": "https://arxiv.org/abs/2402.19446",
+  "html_url": "https://arxiv.org/html/2402.19446",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 766,
+  "text": "## Introduction\n\nOwing to their generalist knowledge, large language models (LLMs) have a tremendous potential to address a wide variety of decision-making or “agent” problems that can be expressed in text or natural language, from writing code [1,2,3], navigating the web [4,5], and using tools [6], all the way to interacting with humans [7,8,9]. In order to succeed in these domains, an LLM needs to make a sequence of intelligent decisions over multiple turns of interaction instead of generating the most probable text completion at each step.\n\nDespite these multi-turn agent problems, most methods for eliciting goal-directed behavior from LLMs often rely on myopic objectives that either attempt to mimic successful demonstrations at each step [10,11], or otherwise optimize for single-turn preferences [12,13,14]. Policies trained via single-turn approaches often fail to perform effective credit assignment (e.g., they fail to identify good actions that may lead to long-term future performance despite appearing suboptimal at a given step) and do not endow policies with information-seeking behavior, which is important in agent problems (e.g., when dealing with a new tool). Therefore, in this paper, we consider the problem of building multi-turn RL approaches that are able to directly maximize long-term objective of interest (e.g., customer satisfaction at the end of a multi-turn conversation with an LLM assistant), formulated via a scalar reward function.\n\nUnlike single-step RL [12,13,14], training LLMs via multi-turn RL presents a number of unique challenges. First of all, multi-turn RL would require online interaction with external sources such as humans or web servers, which can be slow and expensive. Due to this, on-policy methods such as PPO [15] quickly become impractical owing to their inability to reuse data from past interaction. While off-policy fully offline methods circumvent this problem, these methods present other challenges: since the number of tokens increase with multiple turns (often substantially so, due to the bias of LLMs towards producing long responses), token-level methods [16,9] that consider individual tokens as actions need to now propagate reward signal over extremely long horizons. This results in extremely slow learning speeds over long horizons for token-level algorithms. For example, token-level ILQL [16] takes more than 10 days to converge on a task in our experiments, while filtered behavior cloning takes less than a day. In principle, to address long horizon issues, one can treat the entire utterance for each turn as an action [8,17], but this comes at the cost of introducing an enormous, variable-size action space, presenting a challenge for off-policy methods based on temporal-difference (TD) learning that require maximization over the action at each time step. This necessitates a multi-turn RL framework that can attain a sweet spot in terms of the aforementioned challenges.\n\nIn this paper, we devise a framework for building multi-turn RL algorithms that attains this kind of a sweet spot. Our key insight is that a hierarchical approach for RL with language models that addresses the challenges with both on-policy and off-policy RL approaches as outlined above. Specifically, our framework prescribes an off-policy temporal difference learning method for training an utterance-level value function at the high level, and any on-policy policy gradient algorithm for optimizing the token generation at each turn of the interaction at the low level, treating the high-level value function as the terminal reward for that turn. Unlike on-policy methods, this allows for sample reuse and faster convergence, while avoiding Bellman backups over individual tokens or maximization over enormous action spaces, as the high-level critic is trained at a coarser time-scale, on tokens produced by the actor. In addition, it also directly inherits implementation details from existing token-level RL algorithms developed for single-turn RL with preferences, for training the policy. This way we are able to obtain the best of both utterance-based and token-based, and off-policy and on-policy approaches for training LLMs.\n\nOur main contribution is a framework for developing hierarchical RL approaches for LLMs, that we call: A cto r - C ritic framework with a H i e rarchical Structu r e (or ArCHer in short). We study several concrete algorithmic instantations derived from the ArCHer framework by conducting experiments on a range of language “agent” tasks with active data collection (i.e., the “online” setting). We find that algorithms derived from ArCHer are 100x more sample efficient than on-policy methods such as PPO, and converge to a better performance than off-policy methods. Moreover, our methods are easy to build on existing single-turn RL methods and scale to different transformer architectures and more parameters (we show effectiveness of our approach up to the 7 billion scale), directly enabling plug-and-play choices of RL algorithms and models.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib55",
+      "text": "Yang et al. (2023a) John Yang, Akshara Prabhakar, Karthik Narasimhan, and Shunyu Yao. Intercode: Standardizing and benchmarking interactive coding with execution feedback, 2023a."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib25",
+      "text": "Li et al. (2022) Yujia Li, David H. Choi, Junyoung Chung, Nate Kushman, Julian Schrittwieser, Rémi Leblond, Tom, Eccles, James Keeling, Felix Gimeno, Agustin Dal Lago, Thomas Hubert, Peter Choy, Cyprien de, Masson d’Autume, Igor Babuschkin, Xinyun Chen, Po-Sen Huang, Johannes Welbl, Sven Gowal, Alexey, Cherepanov, James Molloy, Daniel Jaymin Mankowitz, Esme Sutherland Robson, Pushmeet Kohli, Nando de, Freitas, Koray Kavukcuoglu, and Oriol Vinyals. Competition-level code generation with alphacode. Science , 378:1092 – 1097, 2022. URL https://api.semanticscholar.org/CorpusID:246527904 ."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib26",
+      "text": "Lin et al. (2018) Xi Victoria Lin, Chenglong Wang, Luke Zettlemoyer, and Michael D. Ernst. Nl2bash: A corpus and semantic parser for natural language interface to the linux operating system. CoRR , abs/1802.08979, 2018. URL http://arxiv.org/abs/1802.08979 ."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib63",
+      "text": "Zhou et al. (2023a) Shuyan Zhou, Frank F. Xu, Hao Zhu, Xuhui Zhou, Robert Lo, Abishek Sridhar, Xianyi Cheng, Yonatan Bisk, Daniel Fried, Uri Alon, and Graham Neubig. Webarena: A realistic web environment for building autonomous agents. ArXiv , abs/2307.13854, 2023a. URL https://api.semanticscholar.org/CorpusID:260164780 ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib57",
+      "text": "Yao et al. (2023a) Shunyu Yao, Howard Chen, John Yang, and Karthik Narasimhan. Webshop: Towards scalable real-world web interaction with grounded language agents, 2023a."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib40",
+      "text": "Schick et al. (2023) Timo Schick, Jane Dwivedi-Yu, Roberto Dessì, Roberta Raileanu, Maria Lomeli, Luke Zettlemoyer, Nicola Cancedda, and Thomas Scialom. Toolformer: Language models can teach themselves to use tools, 2023."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib11",
+      "text": "Ghosal et al. (2022) Deepanway Ghosal, Siqi Shen, Navonil Majumder, Rada Mihalcea, and Soujanya Poria. Cicero: A dataset for contextualized commonsense inference in dialogues. In Annual Meeting of the Association for Computational Linguistics , 2022. URL https://api.semanticscholar.org/CorpusID:247762111 ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib50",
+      "text": "Verma et al. (2022) Siddharth Verma, Justin Fu, Mengjiao Yang, and Sergey Levine. Chai: A chatbot ai for task-oriented dialogue with offline reinforcement learning, 2022."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib18",
+      "text": "Jaques et al. (2020) Natasha Jaques, Judy Hanwen Shen, Asma Ghandeharioun, Craig Ferguson, Àgata Lapedriza, Noah Jones, Shixiang Shane Gu, and Rosalind W. Picard. Human-centric dialog training via offline reinforcement learning. CoRR , abs/2010.05848, 2020. URL https://arxiv.org/abs/2010.05848 ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib61",
+      "text": "Zeng et al. (2023) Aohan Zeng, Mingdao Liu, Rui Lu, Bowen Wang, Xiao Liu, Yuxiao Dong, and Jie Tang. Agenttuning: Enabling generalized agent abilities for llms, 2023."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib5",
+      "text": "Chen et al. (2023) Baian Chen, Chang Shu, Ehsan Shareghi, Nigel Collier, Karthik Narasimhan, and Shunyu Yao. Fireact: Toward language agent fine-tuning. ArXiv , abs/2310.05915, 2023. URL https://api.semanticscholar.org/CorpusID:263829338 ."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib48",
+      "text": "Touvron et al. (2023) Hugo Touvron, Louis Martin, Kevin Stone, Peter Albert, Amjad Almahairi, Yasmine Babaei, Nikolay Bashlykov, Soumya Batra, Prajjwal Bhargava, Shruti Bhosale, Dan Bikel, Lukas Blecher, Cristian Canton Ferrer, Moya Chen, Guillem Cucurull, David Esiobu, Jude Fernandes, Jeremy Fu, Wenyin Fu, Brian Fuller, Cynthia Gao, Vedanuj Goswami, Naman Goyal, Anthony Hartshorn, Saghar Hosseini, Rui Hou, Hakan Inan, Marcin Kardas, Viktor Kerkez, Madian Khabsa, Isabel Kloumann, Artem Korenev, Punit Singh Koura, Marie-Anne Lachaux, Thibaut Lavril, Jenya Lee, Diana Liskovich, Yinghai Lu, Yuning Mao, Xavier Martinet, Todor Mihaylov, Pushkar Mishra, Igor Molybog, Yixin Nie, Andrew Poulton, Jeremy Reizenstein, Rashi Rungta, Kalyan Saladi, Alan Schelten, Ruan Silva, Eric Michael Smith, Ranjan Subramanian, Xiaoqing Ellen Tan, Binh Tang, Ross Taylor, Adina Williams, Jian Xiang Kuan, Puxin Xu, Zheng Yan, Iliyan Zarov, Yuchen Zhang, Angela Fan, Melanie Kambadur, Sharan Narang, Aurelien Rodriguez, Robert Stojnic, Sergey Edunov, and Thomas Scialom. Llama 2: Open foundation and fine-tuned chat models, 2023."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib32",
+      "text": "Ouyang et al. (2022) Long Ouyang, Jeff Wu, Xu Jiang, Diogo Almeida, Carroll L. Wainwright, Pamela Mishkin, Chong Zhang, Sandhini Agarwal, Katarina Slama, Alex Ray, John Schulman, Jacob Hilton, Fraser Kelton, Luke E. Miller, Maddie Simens, Amanda Askell, Peter Welinder, Paul Francis Christiano, Jan Leike, and Ryan J. Lowe. Training language models to follow instructions with human feedback. ArXiv , abs/2203.02155, 2022. URL https://api.semanticscholar.org/CorpusID:246426909 ."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib2",
+      "text": "Bai et al. (2022) Yuntao Bai, Andy Jones, Kamal Ndousse, Amanda Askell, Anna Chen, Nova DasSarma, Dawn Drain, Stanislav Fort, Deep Ganguli, Tom Henighan, Nicholas Joseph, Saurav Kadavath, Jackson Kernion, Tom Conerly, Sheer El-Showk, Nelson Elhage, Zac Hatfield-Dodds, Danny Hernandez, Tristan Hume, Scott Johnston, Shauna Kravec, Liane Lovitt, Neel Nanda, Catherine Olsson, Dario Amodei, Tom Brown, Jack Clark, Sam McCandlish, Chris Olah, Ben Mann, and Jared Kaplan. Training a helpful and harmless assistant with reinforcement learning from human feedback, 2022."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib42",
+      "text": "Schulman et al. (2017) John Schulman, Filip Wolski, Prafulla Dhariwal, Alec Radford, and Oleg Klimov. Proximal policy optimization algorithms. CoRR , abs/1707.06347, 2017. URL http://arxiv.org/abs/1707.06347 ."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib44",
+      "text": "Snell et al. (2023) Charlie Snell, Ilya Kostrikov, Yi Su, Mengjiao Yang, and Sergey Levine. Offline rl for natural language generation with implicit language q learning, 2023."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "Jang et al. (2022) Youngsoo Jang, Jongmin Lee, and Kee-Eung Kim. GPT-critic: Offline reinforcement learning for end-to-end task-oriented dialogue systems. In International Conference on Learning Representations , 2022. URL https://openreview.net/forum?id=qaxhBG1UUaS ."
+    }
+  ]
+}

@@ -1,0 +1,216 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2401.11627",
+  "title": "Tight Verification of Probabilistic Robustness in Bayesian Neural Networks",
+  "authors": "Ben Batten, Mehran Hosseini, Alessio Lomuscio",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.AI",
+    "cs.FL",
+    "cs.LO"
+  ],
+  "url": "https://arxiv.org/abs/2401.11627",
+  "html_url": "https://arxiv.org/html/2401.11627",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1081,
+  "text": "In recent years Neural Networks (NNs) have been proposed to perform safety-critical functions in applications such as automated driving, medical image processing and beyond [1,2,3,4]. For machine learning methods to be adopted in these areas, assurance and certification are paramount.\n\nFollowing the known vulnerabilities of NNs to adversarial attacks [5,6,7,8,9], a rapidly growing body of research has focused on methods to verify the safety of NNs [10,11,12,13,14,15] to identify fragilities before deployment.\n\nTo mitigate NN vulnerabilities to adversarial attacks, several methods have been proposed, including adversarial training [13,16,17,18], and verification-based augmentation [19]. While considerable progress has been made in these areas, present models remain fragile to various input perturbations, thereby limiting their potential applicability in key areas.\n\nIn an attempt to overcome this problem, architectures that are inherently more robust have been proposed. Bayesian Neural Networks (BNNs) have arguably emerged as a key class of models intrinsically more resilient to adversarial attacks [20,21]. This is because BNNs naturally incorporate the randomness present in the posterior distribution [22].\n\nAlthough BNNs have been shown to provide a degree of natural robustness, it is crucial to verify their safety and correctness with respect to specifications of interest, including robustness, before deployment. Note that while safety is formulated as a standard decision problem in deterministic NNs, for BNNs, safety is a probabilistic concept. Specifically, given a BNN, an input region and a safe set, the probabilistic robustness problem concerns determining the probability that the input neighbourhood is mapped to a safe set by the BNN [23,24,25].\n\nThe probabilistic robustness problem for BNNs is also sometimes referred to as the probabilistic safety problem [24]. Since the exact computation of probabilistic robustness for BNNs is computationally intractable, several approaches for approximating it have been proposed [25,26,27].\n\nA key challenge in this area is to approximate the probabilistic robustness of BNNs tightly and efficiently. As we demonstrate in Sections 3 and 4, existing methods are either loose or computationally expensive. It therefore remains of great interest to explore new approaches that can derive tighter approximations to probabilistic robustness while remaining computationally effective. To this end, our contributions in this paper can be summarised as follows.\n\n- • We introduce two new algorithms, Pure Iterative Expansion (PIE) and Gradient-guided Iterative Expansion (GIE). We show that they produce sound lower bounds on the probabilistic robustness of BNNs, which are provably tighter than SoA sampling-based approaches.\n\n- • We empirically evaluate our algorithms on MNIST and CIFAR10 benchmarks against the SoA and show that our approach produces tighter approximations of the probabilistic robustness.\n\n- • For reproducibility, we provide our code in the supplementary material.\n\nThe rest of the paper is organised as follows. In Subsection 1, we review the related literature on NN and BNN verification. In Section 2, we formally define BNNs, the probabilistic robustness problem for BNNs, and other related terminology that we use throughout the paper. We discuss the details of our approach in Section 3 by introducing the PIE and GIE algorithms for exploring the set of safe weights and computing lower bounds for the probabilistic robustness of BNNs in Subsection 3.2. We also formally show that our approach outperforms the SoA sampling-based method in Subsection 3.3 by producing provably tighter bounds. We evaluate the performance of our approach against SoA on the MNIST and CIFAR10 datasets in Section 4.\n\n## Related Work\n\nMixed-Integer Linear Programming (MILP) and Bound Propagation (BP) are two common techniques used for the verification of standard NNs. In MILP-based approaches, the verification problem for NNs is encoded as an MILP problem [11,28,29], which can be solved using MILP solvers. A common assumption in MILP-based approaches is that activations are piecewise-linear.\n\nPropagation-based approaches differ from MILP-based approaches in that they consider a relaxed network and propagate bounds on each node’s output through the network’s layers to solve the verification problem [30,31,32,33].\n\nSoA approaches for the verification of NNs combine MILP and BP to achieve complete and scalable verification for NNs. For instance, [34] uses bound propagation alongside adaptive splitting [35,36] to reduce the number of binary variables in the resulting MILP problem and thus further speed up the verification process. An important and well-studied safety specification in NN verification is robustness, i.e., a model’s resilience in returning the same output for all values in a small neighbourhood of a given input. An example approach devoted only to checking robustness is [24], where they compute upper bounds on the robustness of BNNs. Closely related to this, [23] considers the problem of computing the probability of whether, for a given input to a BNN, there exists another input within a bounded set around the input such that the network’s prediction differs for the two points and provides an approach to approximate this probability and compute statistical guarantees for it.\n\nIn the same line of research [21] shows that the vulnerability of BNNs to gradient-based attacks arises as a result of the data lying on a lower-dimensional submanifold of the ambient space.\n\n[25] considers a set-up similar to this paper, using a sampling-based approach to bound the probabilistic robustness of BNNs. In this approach, they sample orthotopes from the posterior distribution and use Interval Bound Propagation (IBP) and Linear Bound Propagation (LBP) to determine whether a given orthotope is safe. By repeating this process, they obtain a robustness certificate and a lower bound for the probabilistic robustness of the BNN.\n\n[26] consider the adversarial robustness of BNNs. They use the notion of Lagrangian duality, which replaces standard Lagrangian multipliers with functional multipliers. For an optimal choice of functional multipliers, this approach leads to exact verification, i.e., the exact computation of probabilistic robustness. Nevertheless, this may not be practical. The authors show that for specific classes of multipliers, however, one can obtain lower bounds for the probabilistic robustness.\n\n[37] introduced an algorithm to verify the adversarial robustness of BNNs. They use Dynamic Programming alongside bound propagation and convex relaxations to compute lower and upper bounds on BNN predictions for a given input set. [38] build on the algorithm first presented in [25] to provide upper bounds on the probabilistic robustness of BNNs in addition to lower bounds. Moreover, they extend the algorithmic formulation in [25] to handle the specification proposed in [26] on posterior distributions with unbounded support.\n\n[27] uses MILP to obtain robustness guarantees for infinite time-horizon safety and robustness of BNNs. However, this approach can only be used for small networks. [39] obtains robustness guarantees for credal BNNs via constraint relaxation over probabilistic circuits.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "Abiodun et al., (2018) Abiodun, O. I., Jantan, A., Omolara, A. E., Dada, K. V., Mohamed, N. A., and Arshad, H. (2018). State-of-the-art in artificial neural network applications: A survey. Heliyon , 4(11):e00938."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib3",
+      "text": "Anwar et al., (2018) Anwar, S. M., Majid, M., Qayyum, A., Awais, M., Alnowami, M., and Khan, M. K. (2018). Medical image analysis using convolutional neural networks: a review. Journal of medical systems , 42(11):1–13."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib6",
+      "text": "Bojarski et al., (2016) Bojarski, M., Del Testa, D., Dworakowski, D., Firner, B., Flepp, B., Goyal, P., Jackel, L. D., Monfort, M., Muller, U., Zhang, J., et al. (2016). End to end learning for self-driving cars."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib29",
+      "text": "(29) Liu, Z., Cai, Y., Wang, H., Chen, L., Gao, H., Jia, Y., and Li, Y. (2021b). Robust target recognition and tracking of self-driving cars with radar and camera information fusion under severe weather conditions. IEEE Transactions on Intelligent Transportation Systems ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib12",
+      "text": "Dalvi et al., (2004) Dalvi, N. N., Domingos, P. M., Mausam, Sanghai, S. K., and Verma, D. (2004). Adversarial classification. In Proceedings of the Tenth ACM SIGKDD International Conference on Knowledge Discovery and Data Mining KDD , pages 99–108. ACM."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib41",
+      "text": "Szegedy et al., (2014) Szegedy, C., Zaremba, W., Sutskever, I., Bruna, J., Erhan, D., Goodfellow, I. J., and Fergus, R. (2014). Intriguing properties of neural networks. In 2nd International Conference on Learning Representations, ICLR ."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib20",
+      "text": "Ilyas et al., (2019) Ilyas, A., Santurkar, S., Tsipras, D., logan Engstrom, Tran, B., and Madry, A. (2019). Adversarial examples are not bugs, they are features. In Advances in Neural Information Processing Systems, NeurIPS ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib37",
+      "text": "Sharif et al., (2016) Sharif, M., Bhagavatula, S., Bauer, L., and Reiter, M. K. (2016). Accessorize to a crime: Real and stealthy attacks on state-of-the-art face recognition. In Proceedings of the 2016 ACM SIGSAC Conference on Computer and Communications Security , pages 1528–1540. ACM."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib15",
+      "text": "Goodfellow et al., (2015) Goodfellow, I. J., Shlens, J., and Szegedy, C. (2015). Explaining and harnessing adversarial examples. In International Conference on Learning Representations, ICLR . OpenReview.net."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib34",
+      "text": "Pulina and Tacchella, (2010) Pulina, L. and Tacchella, A. (2010). An abstraction-refinement approach to verification of artificial neural networks. In Computer Aided Verification, 22nd International Conference, CAV , volume 6174 of Lecture Notes in Computer Science , pages 243–257. Springer."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib30",
+      "text": "Lomuscio and Maganti, (2017) Lomuscio, A. and Maganti, L. (2017). An approach to reachability analysis for feed-forward relu neural networks."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib22",
+      "text": "Katz et al., (2017) Katz, G., Barrett, C. W., Dill, D. L., Julian, K., and Kochenderfer, M. J. (2017). Reluplex: An efficient SMT solver for verifying deep neural networks. In Computer Aided Verification - 29th International Conference, CAV , volume 10426 of Lecture Notes in Computer Science , pages 97–117. Springer."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib32",
+      "text": "Madry et al., (2018) Madry, A., Makelov, A., Schmidt, L., Tsipras, D., and Vladu, A. (2018). Towards deep learning models resistant to adversarial attacks. In International Conference on Learning Representations, ICLR . OpenReview.net."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib28",
+      "text": "(28) Liu, C., Arnon, T., Lazarus, C., Strong, C., Barrett, C., Kochenderfer, M. J., et al. (2021a). Algorithms for verifying deep neural networks. Foundations and Trends® in Optimization , 4(3-4):244–404."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib49",
+      "text": "Zhang et al., (2023) Zhang, Y., Wei, Z., Zhang, X., and Sun, M. (2023). Using Z3 for formal modeling and verification of FNN global robustness. In The 35th International Conference on Software Engineering and Knowledge Engineering, SEKE , pages 110–113. KSI Research Inc."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib43",
+      "text": "Tramèr et al., (2018) Tramèr, F., Kurakin, A., Papernot, N., Goodfellow, I. J., Boneh, D., and McDaniel, P. D. (2018). Ensemble adversarial training: Attacks and defenses. In 6th International Conference on Learning Representations, ICLR . OpenReview.net."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib14",
+      "text": "Ganin et al., (2017) Ganin, Y., Ustinova, E., Ajakan, H., Germain, P., Larochelle, H., Laviolette, F., Marchand, M., and Lempitsky, V. S. (2017). Domain-adversarial training of neural networks. In Domain Adaptation in Computer Vision Applications , Advances in Computer Vision and Pattern Recognition. JMLR. org."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib36",
+      "text": "Shafahi et al., (2019) Shafahi, A., Najibi, M., Ghiasi, A., Xu, Z., Dickerson, J. P., Studer, C., Davis, L. S., Taylor, G., and Goldstein, T. (2019). Adversarial training for free! In Advances in Neural Information Processing Systems, NeurIPS ."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib13",
+      "text": "Dreossi et al., (2019) Dreossi, T., Fremont, D. J., Ghosh, S., Kim, E., Ravanbakhsh, H., Vazquez-Chanlatte, M., and Seshia, S. A. (2019). VerifAI: A Toolkit for the Formal Design and Analysis of Artificial Intelligence-Based Systems. In Computer Aided Verification CAV , volume 11561 of Lecture Notes in Computer Science , pages 432–442. Springer."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib33",
+      "text": "Pang et al., (2021) Pang, Y., Cheng, S., Hu, J., and Liu, Y. (2021). Evaluating the robustness of bayesian neural networks against different types of attacks."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib9",
+      "text": "Carbone et al., (2020) Carbone, G., Wicker, M., Laurenti, L., Patané, A., Bortolussi, L., and Sanguinetti, G. (2020). Robustness of bayesian neural networks to gradient-based attacks. In Advances in Neural Information Processing Systems, NeurIPS ."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib44",
+      "text": "Uchendu et al., (2021) Uchendu, A., Campoy, D., Menart, C., and Hildenbrandt, A. (2021). Robustness of bayesian neural networks to white-box adversarial attacks. In Fourth IEEE International Conference on Artificial Intelligence and Knowledge Engineering, AIKE ."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib10",
+      "text": "(10) Cardelli, L., Kwiatkowska, M., Laurenti, L., Paoletti, N., Patane, A., and Wicker, M. (2019a). Statistical guarantees for the robustness of bayesian neural networks. In Proceedings of the Twenty-Eighth International Joint Conference on Artificial Intelligence, IJCAI ."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib11",
+      "text": "(11) Cardelli, L., Kwiatkowska, M., Laurenti, L., and Patane, A. (2019b). Robustness guarantees for bayesian inference with gaussian processes. In The Thirty-Third Conference on Artificial Intelligence, AAAI ."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib46",
+      "text": "Wicker et al., (2020) Wicker, M., Laurenti, L., Patane, A., and Kwiatkowska, M. (2020). Probabilistic safety for bayesian neural networks. In Proceedings of the Thirty-Sixth Conference on Uncertainty in Artificial Intelligence, UAI ."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib4",
+      "text": "Berrada et al., (2021) Berrada, L., Dathathri, S., Dvijotham, K., Stanforth, R., Bunel, R., Uesato, J., Gowal, S., and Kumar, M. P. (2021). Make sure you’re unsure: A framework for verifying probabilistic specifications. In Advances in Neural Information Processing Systems, NeurIPS , pages 11136–11147."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib26",
+      "text": "Lechner et al., (2021) Lechner, M., Žikelić, D. o. e., Chatterjee, K., and Henzinger, T. (2021). Infinite time horizon safety of bayesian neural networks. In Advances in Neural Information Processing Systems , volume 34, pages 10171–10185. Curran Associates, Inc."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib19",
+      "text": "Hosseini and Lomuscio, (2023) Hosseini, M. and Lomuscio, A. (2023). Bounded and unbounded verification of rnn-based agents in non-deterministic environments. In Proceedings of the 22nd International Conference on Autonomous Agents and Multiagent Systems, AAMAS , pages 2382–2384. IFAAMAS."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib42",
+      "text": "Tjeng et al., (2019) Tjeng, V., Xiao, K. Y., and Tedrake, R. (2019). Evaluating robustness of neural networks with mixed integer programming. In International Conference on Learning Representations, ICLR . OpenReview.net."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib16",
+      "text": "Gowal et al., (2018) Gowal, S., Dvijotham, K., Stanforth, R., Bunel, R., Qin, C., Uesato, J., Arandjelovic, R., Mann, T. A., and Kohli, P. (2018). On the effectiveness of interval bound propagation for training verifiably robust models."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib39",
+      "text": "Singh et al., (2019) Singh, G., Gehr, T., Püschel, M., and Vechev, M. T. (2019). An abstract domain for certifying neural networks. Proc. ACM Program. Lang. , 3(POPL):41:1–41:30."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib38",
+      "text": "Singh et al., (2018) Singh, G., Gehr, T., Mirman, M., Püschel, M., and Vechev, M. T. (2018). Fast and effective robustness certification. In Advances in Neural Information Processing Systems, NeurIPS ."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib45",
+      "text": "Wang et al., (2018) Wang, S., Pei, K., Whitehouse, J., Yang, J., and Jana, S. (2018). Formal security analysis of neural networks using symbolic intervals. In 27th USENIX Security Symposium, USENIX ."
+    },
+    {
+      "n": 34,
+      "id": "bib.bib24",
+      "text": "Kouvaros and Lomuscio, (2021) Kouvaros, P. and Lomuscio, A. (2021). Towards scalable complete verification of relu neural networks via dependency-based branching. In Proceedings of the Thirtieth International Joint Conference on Artificial Intelligence, IJCAI ."
+    },
+    {
+      "n": 35,
+      "id": "bib.bib18",
+      "text": "Henriksen and Lomuscio, (2020) Henriksen, P. and Lomuscio, A. R. (2020). Efficient neural network verification via adaptive refinement and adversarial search. In 24th European Conference on Artificial Intelligence, ECAI ."
+    },
+    {
+      "n": 36,
+      "id": "bib.bib8",
+      "text": "Botoeva et al., (2020) Botoeva, E., Kouvaros, P., Kronqvist, J., Lomuscio, A., and Misener, R. (2020). Efficient verification of relu-based neural networks via dependency analysis. In The Thirty-Fourth AAAI Conference on Artificial Intelligence, AAAI ."
+    },
+    {
+      "n": 37,
+      "id": "bib.bib2",
+      "text": "Adams et al., (2023) Adams, S., Patane, A., Lahijanian, M., and Laurenti, L. (2023). BNN-DP: robustness certification of bayesian neural networks via dynamic programming. In International conference on machine learning, ICML , pages 1613–1622. PMLR."
+    },
+    {
+      "n": 38,
+      "id": "bib.bib47",
+      "text": "Wicker et al., (2023) Wicker, M., Patane, A., Laurenti, L., and Kwiatkowska, M. (2023). Adversarial robustness certification for bayesian neural networks."
+    },
+    {
+      "n": 39,
+      "id": "bib.bib48",
+      "text": "Wijk et al., (2022) Wijk, H., Wang, B., and Kwiatkowska, M. (2022). Robustness guarantees for credal bayesian networks via constraint relaxation over probabilistic circuits. In International Joint Conference on Artificial Intelligence, IJCAI , pages 4885–4892."
+    }
+  ]
+}

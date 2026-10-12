@@ -1,0 +1,134 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2402.17110",
+  "title": "Sinkhorn Distance Minimization for Knowledge Distillation",
+  "authors": "Xiao Cui, Yulei Qin, Yuting Gao, Enwei Zhang, Zihan Xu, Tong Wu, Ke Li, Xing Sun, Wengang Zhou, Houqiang Li",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.CL"
+  ],
+  "url": "https://arxiv.org/abs/2402.17110",
+  "html_url": "https://arxiv.org/html/2402.17110",
+  "license": "http://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "1. Introduction",
+  "word_count": 860,
+  "text": "Large language models (LLMs) such as BERT [1], RoBERTa [2], T0 [3], and GPT [4,5] have set state-of-the-art (SOTA) records on various tasks in the field of natural language processing (NLP). On one hand, the scaling laws of LLMs undoubtedly stimulate the development of models with billions of parameters. On the other hand, the surge of model size makes it unaffordable for LLMs to be deployed under resource-constrained environments. Consequently, knowledge distillation (KD), emerging as a cost-efficient approach, has attracted attention from researchers to distill smaller models which maintain highly competitive performance.\n\nOne kind of the most representative KD methods is logits-based KD, where the divergence between the distributions of the predicted logits from teacher and student models is measured and minimized for knowledge transfer. The key to effective logits-based KD is exactly the proper measurement of such divergence. Existing studies have experimented with Kullback-Leibler (KL) divergence [6], reverse Kullback-Leibler (RKL) divergence [7,8], and Jensen-Shannon (JS) divergence [9,10,11]. All these measures can be viewed as variants of the f -divergence measures, which are notoriously limited in quantification of distributions that lack substantial intersections [12]. Moreover, as illustrated in Fig. 1, each measure has its own drawbacks. KL distillation results in a mode-averaging issue [13,14], causing the student to learn an excessively smooth distribution that encompasses the entire support of the teacher distribution. RKL distillation leads to mode-collapsing [15,9], where the student overly focuses on one of the highly probable regions of the teacher distribution and ignores the remaining one. JS distillation gives rise to mode-underestimation [16,17] where the student underestimates the probability of rare events due to insufficient penalty.\n\nAnother challenge of performing sample-wise KD on LLMs is that for discriminative tasks, the low-dimensional categorical outputs from the teacher provide limited insights into their underlying distributions in the high-dimensional hidden space. One intuitive solution is to bring in a batch of samples to collectively grasp the distribution differences. Nevertheless, existing divergence measures can only independently deal with each sample for logit-by-logit matching because they are not distance metrics and cannot locate the paired teacher and student logits of the same sample from the batch for overall distance minimization.\n\nTo address these challenges, we propose Sin khorn K nowledge D istillation, termed as SinKD, for distillation of LLMs. In consideration of generalizability, we tackle logits-based KD in the present study, which would benefit a broad range of applications. Our SinKD employs the Sinkhorn distance [18], a variant of the Wasserstein distance [19,20], as divergence measure. The Wasserstein distance quantifies the dissimilarity between two distributions by calculating the minimum cost required to transform one distribution into the other. Compared with traditional divergence measures, it is more sensible as a cost function for distillation. Furthermore, it is differentiable almost everywhere, enabling easy optimization. Despite these advantages, the Wasserstein distance itself is difficult to be computed analytically. Its associated computational cost is prohibitively high for distilling LLMs. Under such circumstance, we propose to use Sinkhorn distance as an efficient approximation, which not only retains all the benefits of Wasserstein distance but also greatly mitigates its cost issue.\n\nA straightforward application of Sinkhorn distance on sample-wise logits matching, though feasible, cannot take full advantage of its perception of structural differences in distributions. Fortunately, Sinkhorn distance is a symmetric metric and its derivation from the optimal transport (OT) imposes explicit constraints on matching correctness. It means that given a batch of logits outputs from the teacher and the student respectively as sets A and B, the minimization of the overall Sinkhorn distance between A and B enforces a precise element-wise matching between the two outputs coming from the same sample in a batch. Such properties allow it to work beyond sample-wise distillation. As a result, we propose the batch-wise reformulation. In this way, we can capture geometric structures of the intricate and implicit distributions even through low-dimensional observations. We do not introduce additional network layer or modify output formats specific to NLP tasks.\n\nExtensive experiments are conducted in view of 1) comparability, 2) validity, and 3) generalizability. For comparability, we test SinKD with BERT on the GLUE benchmark [21] and it consistently outperforms the SOTA KD methods. For validity, we provide a comprehensive analysis on ablation studies and hyper-parameters, Our findings advise practitioners on how to adopt SinKD in their own work. For generalizability, we test SinKD on the SuperGLUE benchmark [22] with LLMs of various architectures, ranging from the encoder-decoder T0 [3] to the decoder-only GPT-Neo [23] transformers. Our SinKD showcases robustness across model choices while previous studies merely investigate KD techniques on the encoder-only BERT.\n\nIn summary, our contributions are:\n\n- • We propose SinKD, a knowledge distillation approach that employs the Sinkhorn distance for divergence measurement. It not only addresses limitations of KL, RKL, and JS divergences under extreme distribution scenarios, but also circumvents the computation burden of Wasserstein distance for distillation.\n\n- • We unearth the properties of Sinkhorn distance and reformulate SinKD into batch-wise OT, extending its applicability in NLP tasks.\n\n- • Extensive experiments in terms of comparability, validity, and generalizability demonstrate the superiority of SinKD over SOTA methods. We offer practical guidelines of distilling various LLMs for real-world applications.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib13",
+      "text": "Devlin et al. (2018) Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. 2018. Bert: Pre-training of deep bidirectional transformers for language understanding. arXiv preprint arXiv:1810.04805 ."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib32",
+      "text": "Liu et al. (2019) Yinhan Liu, Myle Ott, Naman Goyal, Jingfei Du, Mandar Joshi, Danqi Chen, Omer Levy, Mike Lewis, Luke Zettlemoyer, and Veselin Stoyanov. 2019. Roberta: A robustly optimized bert pretraining approach. arXiv preprint arXiv:1907.11692 ."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib44",
+      "text": "Sanh et al. (2021) Victor Sanh, Albert Webson, Colin Raffel, Stephen H Bach, Lintang Sutawika, Zaid Alyafeai, Antoine Chaffin, Arnaud Stiegler, Teven Le Scao, Arun Raja, et al. 2021. Multitask prompted training enables zero-shot task generalization. arXiv preprint arXiv:2110.08207 ."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib40",
+      "text": "Radford et al. (2019) Alec Radford, Jeffrey Wu, Rewon Child, David Luan, Dario Amodei, Ilya Sutskever, et al. 2019. Language models are unsupervised multitask learners. OpenAI blog ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "Brown et al. (2020) Tom Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared D Kaplan, Prafulla Dhariwal, Arvind Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, et al. 2020. Language models are few-shot learners. In Advances in neural information processing systems , pages 1877–1901."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib23",
+      "text": "Hinton et al. (2015) Geoffrey Hinton, Oriol Vinyals, and Jeff Dean. 2015. Distilling the knowledge in a neural network. arXiv preprint arXiv:1503.02531 ."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib49",
+      "text": "Tu et al. (2020) Lifu Tu, Richard Yuanzhe Pang, Sam Wiseman, and Kevin Gimpel. 2020. Engine: Energy-based inference networks for non-autoregressive machine translation. arXiv preprint arXiv:2005.00850 ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib20",
+      "text": "Gu et al. (2023b) Yuxian Gu, Li Dong, Furu Wei, and Minlie Huang. 2023b. Knowledge distillation of large language models. arXiv preprint arXiv:2306.08543 ."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib58",
+      "text": "Wen et al. (2023) Yuqiao Wen, Zichao Li, Wenyu Du, and Lili Mou. 2023. f-divergence minimization for sequence-level knowledge distillation. In Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) , pages 10817–10834."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib62",
+      "text": "Yin et al. (2020) Hongxu Yin, Pavlo Molchanov, Jose M Alvarez, Zhizhong Li, Arun Mallya, Derek Hoiem, Niraj K Jha, and Jan Kautz. 2020. Dreaming to distill: Data-free knowledge transfer via deepinversion. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 8715–8724."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib15",
+      "text": "Fang et al. (2021) Gongfan Fang, Yifan Bao, Jie Song, Xinchao Wang, Donglin Xie, Chengchao Shen, and Mingli Song. 2021. Mosaicking to distill: Knowledge distillation from out-of-domain data. Advances in Neural Information Processing Systems , 34:11920–11932."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib2",
+      "text": "Arjovsky et al. (2017) Martin Arjovsky, Soumith Chintala, and Léon Bottou. 2017. Wasserstein generative adversarial networks. In International conference on machine learning , pages 214–223. PMLR."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib28",
+      "text": "Kim and Rush (2016) Yoon Kim and Alexander M Rush. 2016. Sequence-level knowledge distillation. arXiv preprint arXiv:1606.07947 ."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib27",
+      "text": "Kim et al. (2021) Taehyeon Kim, Jaehoon Oh, Nak Yil Kim, Sangwook Cho, and Se-Young Yun. 2021. Comparing kullback-leibler divergence and mean squared error loss in knowledge distillation . In Proceedings of the Thirtieth International Joint Conference on Artificial Intelligence , pages 2628–2635."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib1",
+      "text": "Arjovsky and Bottou (2017) Martin Arjovsky and Leon Bottou. 2017. Towards principled methods for training generative adversarial networks. In International Conference on Learning Representations ."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib35",
+      "text": "Nowozin et al. (2016) Sebastian Nowozin, Botond Cseke, and Ryota Tomioka. 2016. f-gan: Training generative neural samplers using variational divergence minimization. Advances in neural information processing systems , 29."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib63",
+      "text": "Yu et al. (2020) Lantao Yu, Yang Song, Jiaming Song, and Stefano Ermon. 2020. Training deep energy-based models with f-divergence minimization. In International Conference on Machine Learning , pages 10957–10967. PMLR."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib11",
+      "text": "Cuturi (2013) Marco Cuturi. 2013. Sinkhorn distances: Lightspeed computation of optimal transport. Advances in neural information processing systems , 26."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib51",
+      "text": "Vallender (1974a) SS Vallender. 1974a. Calculation of the wasserstein distance between probability distributions on the line. Theory of Probability & Its Applications , 18(4):784–786."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib16",
+      "text": "Frogner et al. (2015a) Charlie Frogner, Chiyuan Zhang, Hossein Mobahi, Mauricio Araya, and Tomaso A Poggio. 2015a. Learning with a wasserstein loss. Advances in neural information processing systems , 28."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib55",
+      "text": "Wang et al. (2018) Alex Wang, Amanpreet Singh, Julian Michael, Felix Hill, Omer Levy, and Samuel Bowman. 2018. Glue: A multi-task benchmark and analysis platform for natural language understanding. In Proceedings of the 2018 EMNLP Workshop BlackboxNLP: Analyzing and Interpreting Neural Networks for NLP , pages 353–355."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib54",
+      "text": "Wang et al. (2019) Alex Wang, Yada Pruksachatkun, Nikita Nangia, Amanpreet Singh, Julian Michael, Felix Hill, Omer Levy, and Samuel Bowman. 2019. Superglue: A stickier benchmark for general-purpose language understanding systems. Advances in neural information processing systems , 32."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib4",
+      "text": "Black et al. (2021) Sid Black, Leo Gao, Phil Wang, Connor Leahy, and Stella Biderman. 2021. GPT-Neo: Large Scale Autoregressive Language Modeling with Mesh-Tensorflow . If you use this software, please cite it using these metadata."
+    }
+  ]
+}

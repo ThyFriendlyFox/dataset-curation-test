@@ -1,0 +1,163 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2402.16192",
+  "title": "Defending Large Language Models against Jailbreak Attacks via Semantic Smoothing",
+  "authors": "Jiabao Ji, Bairu Hou, Alexander Robey, George J. Pappas, Hamed Hassani, Yang Zhang, Eric Wong, Shiyu Chang",
+  "year": "2024",
+  "categories": [
+    "cs.CL"
+  ],
+  "url": "https://arxiv.org/abs/2402.16192",
+  "html_url": "https://arxiv.org/html/2402.16192",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 694,
+  "text": "Large language models (LLMs) are a transformative technology that are now ubiquitous in fields spanning business analytics [1], code generation [2], and law [3]. The widespread use of these models is due in large part to their propensity to generate realistic, factual text corresponding to a vast array of subjects. Despite the impressive performance, however, it has recently become clear that LLMs have a tendency to generate objectionable content, including misinformation, malware, and hate speech [4,5,6]. Consequently, several related areas of research have sought to devise ways to align LLMs with human intentions via principled training algorithms [7,8,9,10] and various forms of safety scaffolding wrapped around these models [11,12,13].\n\nBy and large, efforts to align LLMs have resulted in an ecosystem wherein popular models such as ChatGPT and Gemini refuse to generate objectionable content when directly prompted. Yet despite this promising progress, a growing literature has identified schemes that allow malicious actors to adversarially attack LLMs [14,15]. Such attacks—which are commonly referred to as jailbreaks —are designed to bypass the safeguards imparted by alignment techniques and fool LLMs into generating objectionable content [16,17,18]. Indeed, the tendency of such jailbreaks, which are often difficult to detect [19] and require only black-box access to the targeted LLM [20], to elicit unaligned behavior presents a significant barrier to the widespread deployment of this technology.\n\nToward resolving the pernicious threat posed by jailbreaking techniques, recent research has sought to design defenses tailored to specific threat models. Broadly speaking, jailbreaking algorithms can be divided into two sub-categories: token-level jailbreaks [16] and prompt-level jailbreaks [20]. Token-level attacks, which generally require white-box access to a targeted LLM, use optimization-based search to design a sequence of tokens that tend to fool LLM into generating the requested content when appended to a harmful input prompt requesting objectionable content [21,22,23,24,16]. And although defenses against token-level jailbreaks are empirically successful, existing algorithms tend to rely on uninterpretable heuristics [12,25] and suffer from non-negligible trade-offs with respect to nominal performance [11]. On the other hand, prompt-level jailbreaks generally use fixed templates or other LLMs to generate human-interpretable prompts that persuade a targeted LLM into generating objectionable content [20,26]. Research surrounding defenses against prompt-based jailbreaks is still at its infancy, and existing defenses, which tend to use LLM-based classifiers to detect potential jailbreaks [13,27,28], offer limited levels of robustness and tend to be susceptible to adaptive attacks [11].\n\nThe drawbacks of existing jailbreaking defenses motivate the need for new defense algorithms that are broadly applicable to both token- and prompt-level attacks. These algorithms should avoid uninterpretable heuristics, nominal performance trade-offs, and susceptibility to adaptive attacks. To this end, we introduce SemanticSmooth, a defense framework that significantly improves robustness against an array of state-of-the-art jailbreaking attacks. The design of SemanticSmooth is based on a general smoothing framework [29,11] involving prompt perturbation and prediction aggregation, wherein multiple copies of an input prompt are perturbed by semantic transformations (e.g., paraphrasing, summarization, and translation) and then the predictions corresponding to the transformed inputs are aggregated. Furthermore, SemanticSmooth uses an input-dependent policy network that adaptively selects the transformations applied to each input. Our experimental results in § 4 indicate that SemanticSmooth is robust to transfer and adaptive attacks while maintaining a favorable trade-off on benign inputs. Finally, in § 5, we use our framework to provide the first quantitative analysis examining why the well-known GCG attack proposed in [16] successfully jailbreaks state-of-the-art LLMs with nonsensical adversarial suffixes.\n\nContributions. Our contributions are as follows:\n\n- • Broadly-applicable jailbreaking defense. We introduce SemanticSmooth, a randomized smoothing-based defense framework against jailbreak attacks. SemanticSmooth is a general framework that is compatible with different semantic transformations and can defend various types of jailbreak attacks.\n\n- • Favorable trade-off between robustness and nominal performance of LLMs. We equip the smoothing framework with semantics-preserving transformations and a learnable policy network. The experiment results on 3 different LLMs, 3 jailbreak attacks, and 2 instruction-following datasets demonstrate that our method achieves the best trade-off between robustness and nominal performance compared to other state-of-the-art baselines.\n\n- • Interpretability of GCG. We additionally highlight that semantic transformations provide a reasonable explanation of the working mechanism of the nonsensical strings generated by GCG [16].",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib40",
+      "text": "Wu et al. (2023) Wu, S., Irsoy, O., Lu, S., Dabravolski, V., Dredze, M., Gehrmann, S., Kambadur, P., Rosenberg, D., and Mann, G. Bloomberggpt: A large language model for finance. arXiv preprint arXiv:2303.17564 , 2023."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib31",
+      "text": "Roziere et al. (2023) Roziere, B., Gehring, J., Gloeckle, F., Sootla, S., Gat, I., Tan, X. E., Adi, Y., Liu, J., Remez, T., Rapin, J., et al. Code llama: Open foundation models for code. arXiv preprint arXiv:2308.12950 , 2023."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib11",
+      "text": "Cyphert (2021) Cyphert, A. B. A human being wrote this law review article: Gpt-3 and the practice of law. UC Davis L. Rev. , 55:401, 2021."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib26",
+      "text": "Newman (2023) Newman, J. A taxonomy of trustworthiness for artificial intelligence. CLTC: North Charleston, SC, USA , 2023."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib8",
+      "text": "Chen & Shu (2023) Chen, C. and Shu, K. Combating misinformation in the age of llms: Opportunities and challenges. arXiv preprint arXiv:2311.05656 , 2023."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib42",
+      "text": "Yao et al. (2023) Yao, Y., Duan, J., Xu, K., Cai, Y., Sun, E., and Zhang, Y. A survey on large language model (llm) security and privacy: The good, the bad, and the ugly. arXiv preprint arXiv:2312.02003 , 2023."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib17",
+      "text": "Ji et al. (2023) Ji, J., Qiu, T., Chen, B., Zhang, B., Lou, H., Wang, K., Duan, Y., He, Z., Zhou, J., Zhang, Z., et al. Ai alignment: A comprehensive survey. arXiv preprint arXiv:2310.19852 , 2023."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib29",
+      "text": "Rafailov et al. (2023) Rafailov, R., Sharma, A., Mitchell, E., Ermon, S., Manning, C. D., and Finn, C. Direct preference optimization: Your language model is secretly a reward model. arXiv preprint arXiv:2305.18290 , 2023."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib13",
+      "text": "Glaese et al. (2022) Glaese, A., McAleese, N., Trębacz, M., Aslanides, J., Firoiu, V., Ewalds, T., Rauh, M., Weidinger, L., Chadwick, M., Thacker, P., et al. Improving alignment of dialogue agents via targeted human judgements. arXiv preprint arXiv:2209.14375 , 2022."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib28",
+      "text": "Ouyang et al. (2022) Ouyang, L., Wu, J., Jiang, X., Almeida, D., Wainwright, C., Mishkin, P., Zhang, C., Agarwal, S., Slama, K., Ray, A., et al. Training language models to follow instructions with human feedback. Advances in Neural Information Processing Systems , 35:27730–27744, 2022."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib30",
+      "text": "Robey et al. (2023) Robey, A., Wong, E., Hassani, H., and Pappas, G. J. Smoothllm: Defending large language models against jailbreaking attacks. arXiv preprint arXiv:2310.03684 , 2023."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib16",
+      "text": "Jain et al. (2023) Jain, N., Schwarzschild, A., Wen, Y., Somepalli, G., Kirchenbauer, J., Chiang, P.-y., Goldblum, M., Saha, A., Geiping, J., and Goldstein, T. Baseline defenses for adversarial attacks against aligned language models. arXiv preprint arXiv:2309.00614 , 2023."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib14",
+      "text": "Helbling et al. (2023) Helbling, A., Phute, M., Hull, M., and Chau, D. H. Llm self defense: By self examination, llms know they are being tricked. arXiv preprint arXiv:2308.07308 , 2023."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib38",
+      "text": "Wei et al. (2023) Wei, Z., Wang, Y., and Wang, Y. Jailbreak and guard aligned language models with only few in-context demonstrations. arXiv preprint arXiv:2310.06387 , 2023."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib6",
+      "text": "Carlini et al. (2023) Carlini, N., Nasr, M., Choquette-Choo, C. A., Jagielski, M., Gao, I., Awadalla, A., Koh, P. W., Ippolito, D., Lee, K., Tramer, F., et al. Are aligned neural networks adversarially aligned? arXiv preprint arXiv:2306.15447 , 2023."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib52",
+      "text": "Zou et al. (2023) Zou, A., Wang, Z., Kolter, J. Z., and Fredrikson, M. Universal and transferable adversarial attacks on aligned language models. arXiv preprint arXiv:2307.15043 , 2023."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib22",
+      "text": "Liu et al. (2023) Liu, X., Xu, N., Chen, M., and Xiao, C. Autodan: Generating stealthy jailbreak prompts on aligned large language models. arXiv preprint arXiv:2310.04451 , 2023."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib34",
+      "text": "Shen et al. (2023) Shen, X., Chen, Z., Backes, M., Shen, Y., and Zhang, Y. \" do anything now\": Characterizing and evaluating in-the-wild jailbreak prompts on large language models. arXiv preprint arXiv:2308.03825 , 2023."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "Kumar et al. (2023) Kumar, A., Agarwal, C., Srinivas, S., Feizi, S., and Lakkaraju, H. Certifying llm safety against adversarial prompting. arXiv preprint arXiv:2309.02705 , 2023."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib7",
+      "text": "Chao et al. (2023) Chao, P., Robey, A., Dobriban, E., Hassani, H., Pappas, G. J., and Wong, E. Jailbreaking black box large language models in twenty queries. arXiv preprint arXiv:2310.08419 , 2023."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib35",
+      "text": "Shin et al. (2020) Shin, T., Razeghi, Y., Logan IV, R. L., Wallace, E., and Singh, S. Autoprompt: Eliciting knowledge from language models with automatically generated prompts. arXiv preprint arXiv:2010.15980 , 2020."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib24",
+      "text": "Maus et al. (2023) Maus, N., Chao, P., Wong, E., and Gardner, J. Adversarial prompting for black box foundation models. arXiv preprint arXiv:2302.04237 , 2023."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib39",
+      "text": "Wen et al. (2023) Wen, Y., Jain, N., Kirchenbauer, J., Goldblum, M., Geiping, J., and Goldstein, T. Hard prompts made easy: Gradient-based discrete optimization for prompt tuning and discovery. arXiv preprint arXiv:2302.03668 , 2023."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib18",
+      "text": "Jones et al. (2023) Jones, E., Dragan, A., Raghunathan, A., and Steinhardt, J. Automatically auditing large language models via discrete optimization. arXiv preprint arXiv:2303.04381 , 2023."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib1",
+      "text": "Alon & Kamfonas (2023) Alon, G. and Kamfonas, M. Detecting language model attacks with perplexity. arXiv preprint arXiv:2308.14132 , 2023."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib48",
+      "text": "Zeng et al. (2024) Zeng, Y., Lin, H., Zhang, J., Yang, D., Jia, R., and Shi, W. How johnny can persuade llms to jailbreak them: Rethinking persuasion to challenge ai safety by humanizing llms. arXiv preprint arXiv: 2401.06373 , 2024."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib4",
+      "text": "Cao et al. (2023) Cao, B., Cao, Y., Lin, L., and Chen, J. Defending against alignment-breaking attacks via robustly aligned llm. arXiv preprint arXiv:2309.14348 , 2023."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib15",
+      "text": "Inan et al. (2023) Inan, H., Upasani, K., Chi, J., Rungta, R., Iyer, K., Mao, Y., Tontchev, M., Hu, Q., Fuller, B., Testuggine, D., et al. Llama guard: Llm-based input-output safeguard for human-ai conversations. arXiv preprint arXiv:2312.06674 , 2023."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib10",
+      "text": "Cohen et al. (2019) Cohen, J. M., Rosenfeld, E., and Kolter, J. Z. Certified adversarial robustness via randomized smoothing. International Conference on Machine Learning , 2019."
+    }
+  ]
+}

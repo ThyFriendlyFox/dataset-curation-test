@@ -1,0 +1,88 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2402.18873",
+  "title": "Reducing Hallucinations in Entity Abstract Summarization with Facts-Template Decomposition",
+  "authors": "Fangwei Zhu, Peiyi Wang, Zhifang Sui",
+  "year": "2024",
+  "categories": [
+    "cs.CL"
+  ],
+  "url": "https://arxiv.org/abs/2402.18873",
+  "html_url": "https://arxiv.org/html/2402.18873",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 775,
+  "text": "Entity abstract summarization aims to generate a correct and fluent summary of an entity based on a collection of relevant documents gathered from the Internet. The task is typically viewed as a variant of the multi-document summarization task, as illustrated in Figure 1. Entity abstract summarization could provide users with condensed information about a given entity in search engines, and assists the writing process of new Wikipedia entries [1].\n\nEarly pieces of work [1,2] on entity abstract summarization generally adopt extractive methods that select valuable sentences from the input documents, which face the problem of poor fluency in the generated summary. Inspired by the large-scale WikiSum [3] dataset, recent work tends to directly generate abstractive summaries from the given input documents. Various approaches have been explored to identify necessary information from the vast input documents: [4] classifies documents into different topics to filter out noisy data, HierSumm [5] ranks the input documents with a learning-based ranker, and models the dependency across different paragraphs, and NoisySumm [6] distills the knowledge in a noisy teacher model into a student model.\n\nHowever, these models suffer from hallucinations as they are not able to ensure the factual correctness of generated summaries. Hallucinations refer to the nonsensical or unfaithful contents in the generated texts [7]. They could hinder performance and introduce false information for real-world applications [8]. Take Figure 1 as an example, the summarization model correctly identifies the band name and band genre of the given entity Peter Wichers, but incorrectly assumes the nationality to be American rather than Sweden. Hallucinated by the text snippet “from Atlanta and Baltimore” in the source, the summarization model mistakenly relates the text snippet to the nationality of America, ignoring the fact that Peter Wichers comes from Sweden. These factual errors are difficult to detect with automatic metrics and could degrade the system performance, leading to the failure in meeting user expectations in real-world scenarios [8].\n\nHallucination is an intrinsic drawback of language models and is challenging even for large language models [9]. Hallucinations are difficult to eliminate under the traditional sequence-to-sequence paradigm, and various attempts have been taken to introduce external knowledge like dense retrieval [10] or API calling [11]. Templates are naturally suitable for utilising external knowledge, as the slots in templates could provide guidance for retrieving knowledge. While template-based methods are widely adopted in various text generation problems like data-to-text [12] and dialogue system [13], there has not yet been template-based solutions for entity abstract summarization. To face the difficulty of locating hallucinations in plain text, we augment the language model to generate semi-structured templates before outputting the final summary. We view the entity abstract as a combination of Facts and Template, where Facts represents the factual information about the given entity, and Template represents the remaining generic components. In this way, we can easily locate the facts in generated summaries, and correct erroneous predictions with external knowledge like knowledge base or human assistance.\n\nBased on the facts-template decomposition, in this paper, we propose SlotSum, an explainable entity abstract summarization framework that disentangles facts from generated entity abstracts to reduce hallucination. SlotSum first generates a template according to the input documents, where the facts in the template are replaced by slots marked with special tokens. Afterwards, SlotSum predicts the facts for each slot, and attempts to rectify the predictions with credible external knowledge. The final summary is constructed by filling facts into slots. SlotSum could ensure factual correctness by introducing external knowledge sources, while retaining the ability to generate summaries solely from the input documents. Moreover, the framework is highly controllable and explainable, as the facts are explicitly stated and can be easily edited.\n\nBy supplementing the WikiSum [3] dataset with related facts, we construct WikiFactSum to observe the effectiveness of disentangling facts. SlotSum, with BART-large [14] as the backbone model, clearly outperforms other baseline models on ROUGE score when credible external knowledge is provided. We also evaluate the factual correctness with both automatic metrics and human evaluation, where SlotSum significantly provides more correct facts.\n\nIn conclusion, the main contributions of our work are as follows:\n\n- • We disentangle fact from the generated text in the entity abstract summarization task, which helps to reduce hallucinations produced by pretrained language models.\n\n- • We propose SlotSum, an entity abstract summarization framework that first generates templates with slots, then predicts facts and further correct them with external knowledge to fill in the slots.\n\n- • We construct a new dataset WikiFactSum, and conduct a series of experiments on it. SlotSum demonstrates a clear advantage over other baseline models, indicating disentangling facts from the text would lead to more factually correct summaries.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib20",
+      "text": "Sauper and Barzilay (2009) Christina Sauper and Regina Barzilay. 2009. Automatically generating wikipedia articles: a structure-aware approach. In Proceedings of the Joint Conference of the 47th Annual Meeting of the ACL and the 4th International Joint Conference on Natural Language Processing of the AFNLP , pages 208–216."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib1",
+      "text": "Banerjee and Mitra (2016) Siddhartha Banerjee and Prasenjit Mitra. 2016. Wikiwrite: generating wikipedia articles automatically. In Proceedings of the 25th International Joint Conference on Artificial Intelligence , pages 2740–2746."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib13",
+      "text": "Liu et al. (2018) Peter J Liu, Mohammad Saleh, Etienne Pot, Ben Goodrich, Ryan Sepassi, Lukasz Kaiser, and Noam Shazeer. 2018. Generating wikipedia by summarizing long sequences. In International Conference on Learning Representations ."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib18",
+      "text": "Perez-Beltrachini et al. (2019) Laura Perez-Beltrachini, Yang Liu, and Mirella Lapata. 2019. Generating summaries with topic templates and structured convolutional decoders. In Proceedings of the 57th Annual Meeting of the Association for Computational Linguistics , pages 5107–5116."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib14",
+      "text": "Liu and Lapata (2019) Yang Liu and Mirella Lapata. 2019. Hierarchical transformers for multi-document summarization. In Proceedings of the 57th Annual Meeting of the Association for Computational Linguistics , pages 5070–5081."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib15",
+      "text": "Liu et al. (2021) Yang Liu, Sheng Shen, and Mirella Lapata. 2021. Noisy self-knowledge distillation for text summarization. In Proceedings of the 2021 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies , pages 692–703."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib17",
+      "text": "Maynez et al. (2020) Joshua Maynez, Shashi Narayan, Bernd Bohnet, and Ryan McDonald. 2020. On faithfulness and factuality in abstractive summarization. In Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics , pages 1906–1919."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib6",
+      "text": "Ji et al. (2023) Ziwei Ji, Nayeon Lee, Rita Frieske, Tiezheng Yu, Dan Su, Yan Xu, Etsuko Ishii, Ye Jin Bang, Andrea Madotto, and Pascale Fung. 2023. Survey of hallucination in natural language generation. ACM Computing Surveys , 55(12):1–38."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib2",
+      "text": "Bubeck et al. (2023) Sébastien Bubeck, Varun Chandrasekaran, Ronen Eldan, Johannes Gehrke, Eric Horvitz, Ece Kamar, Peter Lee, Yin Tat Lee, Yuanzhi Li, Scott Lundberg, et al. 2023. Sparks of artificial general intelligence: Early experiments with gpt-4. arXiv preprint arXiv:2303.12712 ."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "Lewis et al. (2020b) Patrick Lewis, Ethan Perez, Aleksandra Piktus, Fabio Petroni, Vladimir Karpukhin, Naman Goyal, Heinrich Küttler, Mike Lewis, Wen-tau Yih, Tim Rocktäschel, et al. 2020b. Retrieval-augmented generation for knowledge-intensive nlp tasks. Advances in Neural Information Processing Systems , 33:9459–9474."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib21",
+      "text": "Schick et al. (2023) Timo Schick, Jane Dwivedi-Yu, Roberto Dessì, Roberta Raileanu, Maria Lomeli, Luke Zettlemoyer, Nicola Cancedda, and Thomas Scialom. 2023. Toolformer: Language models can teach themselves to use tools. arXiv preprint arXiv:2302.04761 ."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib16",
+      "text": "Luo et al. (2020) Bingfeng Luo, Zuo Bai, Kunfeng Lai, and Jianping Shen. 2020. Make templates smarter: A template based data2text system powered by text stitch model. In Findings of the Association for Computational Linguistics: EMNLP 2020 , pages 1057–1062."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib11",
+      "text": "Liang et al. (2021) Zujie Liang, Huang Hu, Can Xu, Jian Miao, Yingying He, Yining Chen, Xiubo Geng, Fan Liang, and Daxin Jiang. 2021. Learning neural templates for recommender dialogue system. arXiv preprint arXiv:2109.12302 ."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib9",
+      "text": "Lewis et al. (2020a) Mike Lewis, Yinhan Liu, Naman Goyal, Marjan Ghazvininejad, Abdelrahman Mohamed, Omer Levy, Veselin Stoyanov, and Luke Zettlemoyer. 2020a. Bart: Denoising sequence-to-sequence pre-training for natural language generation, translation, and comprehension. In Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics , pages 7871–7880."
+    }
+  ]
+}

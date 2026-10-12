@@ -1,0 +1,174 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2402.18913",
+  "title": "AdaMergeX: Cross-Lingual Transfer with Large Language Models via Adaptive Adapter Merging",
+  "authors": "Yiran Zhao, Wenxuan Zhang, Huiming Wang, Kenji Kawaguchi, Lidong Bing",
+  "year": "2024",
+  "categories": [
+    "cs.CL",
+    "cs.AI"
+  ],
+  "url": "https://arxiv.org/abs/2402.18913",
+  "html_url": "https://arxiv.org/html/2402.18913",
+  "license": "http://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Introduction",
+  "word_count": 674,
+  "text": "Multilingual NLP models, including conventional models such as mBERT [1], XLM [2], XLM-R [3], as well as recent multilingual large language models (LLMs) like ChatGPT [4], PaLM2 [5], Llama2 [6], have gained significant attention given the growing need for multilingual requirements. To further enhance the model’s multilingual capability, particularly in cases where training data of certain tasks for low-resource languages is scarce and fine-tuning becomes impractical [7], cross-lingual transfer is introduced to extend the task-solving ability in a source language to a wide range of target languages [8,9,10].\n\nEssentially, cross-lingual transfer aims to transfer the ability to solve a certain task (“task-ability”) from a source language to a particular target language (“language ability”). Some cross-lingual transfer techniques do not directly improve the language ability in specific languages. Instead, they utilize the language ability in English for multilingual tasks by employing methods such as translation [11,12], representation alignment [13,14,15], or prompting method specifically developed for LLMs [16,17,18]. Some works intertwine these two abilities and utilize translated parallel corpora for fine-tuning [19,20,21].\n\nOn the contrary, some studies directly focus on enhancing the language abilities in target languages, so they endeavor to decouple task ability and language ability, enhance them separately, and subsequently merge them [22,23,24]. However, such an approach overlooks the intrinsic interdependence between task ability and language ability. Given that any specific task would be expressed in a particular language, these two abilities cannot be distinctly isolated from one another.\n\nIn this work, we argue that language ability and task ability are inherently interconnected. Instead of separating one from another, they should follow that task ability is affiliated with the source language while language ability refers to the capacity gap between the target language and the source language. In line with the famous equation “ king-queen=man-woman ” in the word embedding space [25], we assume that the divergences between LLMs fine-tuned in different languages on a particular task follow the same distribution across diverse tasks. In the case of parameter-efficient fine-tuning, the equation becomes {read}^{\\,fr}-{read}^{\\,en}={math}^{\\,fr}-{math}^{\\,en} in the adapter space, where read and math refers to two tasks, and fr and en indicates two languages of the corresponding tasks. As shown in the left side of Figure 2, in the adapter space, the divergence between the target language and source language on the target task follows the same distribution as the divergence on the reference task.\n\nTherefore, we propose to accomplish the cross-lingual transfer through Adaptive Adapter Merging (AdaMergeX) with such a relation as shown in the right side of Figure 2. Specifically, we introduce a reference task from which we obtain the divergence between the target language and source language. Such a reference task can be an easily accessible task for both high-resource and low-resource languages, such as causal language modeling. In addition, we fine-tune LLMs on the target task in the source language. Finally, by merging the language ability and task ability, we can obtain the adapters of the target task in the target language.\n\nFurthermore, in contrast to previous studies that combine models or adapters through a linear combination [26,27,24], we argue that the model merging method should align with the manner in which adapters are integrated with language models. Therefore, we design a structure-adaptive adapter merging method, which can adaptively select merging methods for LoRA [28], (IA) 3 [29], Adapter [30], Prefix-Tuning [31] etc.\n\nWe evaluate the proposed AdaMergeX method on a wide range of multilingual tasks spanning 12 languages, covering a broad resource spectrum from high-resource to low-resource languages. Our evaluation demonstrates that AdaMergeX consistently outperforms other state-of-the-art methods including model merging, prompting, and general adapter merging methods. Notably, compared to MAD-X [22] which separates the task and language ability with two adapters, AdaMergeX achieves 8.0\\% and 15.9\\% absolute improvement on XCOPA and XQuAD respectively with XLM-R. In the case of state-of-the-art adapter merging method Arimerge [27], AdaMergeX achieves 31.1\\% relative improvement on average in all languages and all tasks with Llama2. Moreover, the ablation analysis shows that AdaMergeX performs consistently well with different backbone models, source languages, and reference tasks.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib22",
+      "text": "Kenton and Toutanova (2019) Jacob Devlin Ming-Wei Chang Kenton and Lee Kristina Toutanova. 2019. Bert: Pre-training of deep bidirectional transformers for language understanding. In Proceedings of naacL-HLT , volume 1, page 2."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib9",
+      "text": "Conneau and Lample (2019) Alexis Conneau and Guillaume Lample. 2019. Cross-lingual language model pretraining. Advances in neural information processing systems , 32."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib8",
+      "text": "Conneau et al. (2020) Alexis Conneau, Kartikay Khandelwal, Naman Goyal, Vishrav Chaudhary, Guillaume Wenzek, Francisco Guzmán, Édouard Grave, Myle Ott, Luke Zettlemoyer, and Veselin Stoyanov. 2020. Unsupervised cross-lingual representation learning at scale. In Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics , pages 8440–8451."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib36",
+      "text": "OpenAI (2022) OpenAI. 2022. Chatgpt: Optimizing language models for dialogue . OpenAI Blog ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib1",
+      "text": "Anil et al. (2023) Rohan Anil, Andrew M Dai, Orhan Firat, Melvin Johnson, Dmitry Lepikhin, Alexandre Passos, Siamak Shakeri, Emanuel Taropa, Paige Bailey, Zhifeng Chen, et al. 2023. Palm 2 technical report. arXiv preprint arXiv:2305.10403 ."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib47",
+      "text": "Touvron et al. (2023) Hugo Touvron, Louis Martin, Kevin Stone, Peter Albert, Amjad Almahairi, Yasmine Babaei, Nikolay Bashlykov, Soumya Batra, Prajjwal Bhargava, Shruti Bhosale, et al. 2023. Llama 2: Open foundation and fine-tuned chat models. arXiv preprint arXiv:2307.09288 ."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib30",
+      "text": "Ma et al. (2023) Bolei Ma, Ercong Nie, Helmut Schmid, and Hinrich Schütze. 2023. Is prompt-based finetuning always better than vanilla finetuning? insights from cross-lingual language understanding. arXiv preprint arXiv:2307.07880 ."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib28",
+      "text": "Lin et al. (2019) Yu-Hsiang Lin, Chian-Yu Chen, Jean Lee, Zirui Li, Yuyan Zhang, Mengzhou Xia, Shruti Rijhwani, Junxian He, Zhisong Zhang, Xuezhe Ma, et al. 2019. Choosing transfer languages for cross-lingual learning. In Proceedings of the 57th Annual Meeting of the Association for Computational Linguistics , volume 57."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib5",
+      "text": "Chen et al. (2022) Guanhua Chen, Shuming Ma, Yun Chen, Dongdong Zhang, Jia Pan, Wenping Wang, and Furu Wei. 2022. Towards making the most of cross-lingual transfer for zero-shot neural machine translation. In Proceedings of the 60th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) , pages 142–157."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib11",
+      "text": "Deb et al. (2023) Ujan Deb, Ridayesh Parab, and Preethi Jyothi. 2023. Zero-shot cross-lingual transfer with learned projections using unlabeled target-language data. In Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (Volume 2: Short Papers) , pages 449–457."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib26",
+      "text": "Liang et al. (2023) Yaobo Liang, Quanzhi Zhu, Junhe Zhao, and Nan Duan. 2023. Machine-created universal language for cross-lingual transfer. arXiv preprint arXiv:2305.13071 ."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib20",
+      "text": "Huang et al. (2023b) Haoyang Huang, Tianyi Tang, Dongdong Zhang, Wayne Xin Zhao, Ting Song, Yan Xia, and Furu Wei. 2023b. Not all languages are created equal in llms: Improving multilingual capability by cross-lingual-thought prompting. arXiv preprint arXiv:2305.07004 ."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib35",
+      "text": "Nguyen et al. (2023) Hoang H Nguyen, Chenwei Zhang, Tao Zhang, Eugene Rohrbaugh, and Philip S Yu. 2023. Enhancing cross-lingual transfer via phonemic transcription integration. arXiv preprint arXiv:2307.04361 ."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib43",
+      "text": "Salesky et al. (2023) Elizabeth Salesky, Neha Verma, Philipp Koehn, and Matt Post. 2023. Pixel representations for multilingual translation and data-efficient cross-lingual transfer. arXiv preprint arXiv:2305.14280 ."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib12",
+      "text": "Gao et al. (2023) Pengzhi Gao, Liwen Zhang, Zhongjun He, Hua Wu, and Haifeng Wang. 2023. Improving zero-shot multilingual neural machine translation by leveraging cross-lingual consistency regularization. arXiv preprint arXiv:2305.07310 ."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib24",
+      "text": "Li et al. (2023) Shuang Li, Xuming Hu, Aiwei Liu, Yawen Yang, Fukun Ma, Philip S Yu, and Lijie Wen. 2023. Enhancing cross-lingual natural language inference by soft prompting with multilingual verbalizer. arXiv preprint arXiv:2305.12761 ."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib46",
+      "text": "Tanwar et al. (2023) Eshaan Tanwar, Manish Borthakur, Subhabrata Dutta, and Tanmoy Chakraborty. 2023. Multilingual llms are better cross-lingual in-context learners with alignment. arXiv preprint arXiv:2305.05940 ."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib54",
+      "text": "Zhang et al. (2023b) Wenxuan Zhang, Sharifah Mahani Aljunied, Chang Gao, Yew Ken Chia, and Lidong Bing. 2023b. M3Exam: A multilingual, multimodal, multilevel benchmark for examining large language models. arXiv preprint arXiv:2306.05179 ."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib38",
+      "text": "Pan et al. (2021) Xiao Pan, Mingxuan Wang, Liwei Wu, and Lei Li. 2021. Contrastive learning for many-to-many multilingual neural machine translation. In Proceedings of the 59th Annual Meeting of the Association for Computational Linguistics and the 11th International Joint Conference on Natural Language Processing (Volume 1: Long Papers) , pages 244–258."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib53",
+      "text": "Zhang et al. (2022) Rui Zhang, Yangfeng Ji, Yue Zhang, and Rebecca J Passonneau. 2022. Contrastive data and learning for natural language processing. In Proceedings of the 2022 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies: Tutorial Abstracts , pages 39–47."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib55",
+      "text": "Zhu et al. (2023) Wenhao Zhu, Yunzhe Lv, Qingxiu Dong, Fei Yuan, Jingjing Xu, Shujian Huang, Lingpeng Kong, Jiajun Chen, and Lei Li. 2023. Extrapolating large language models to non-english by aligning languages. arXiv preprint arXiv:2308.04948 ."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib39",
+      "text": "Pfeiffer et al. (2020) Jonas Pfeiffer, Ivan Vulić, Iryna Gurevych, and Sebastian Ruder. 2020. Mad-x: An adapter-based framework for multi-task cross-lingual transfer. In Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing (EMNLP) , pages 7654–7673."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib2",
+      "text": "Ansell et al. (2022) Alan Ansell, Edoardo Ponti, Anna Korhonen, and Ivan Vulić. 2022. Composable sparse fine-tuning for cross-lingual transfer. In Proceedings of the 60th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) , pages 1778–1796."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib41",
+      "text": "Ponti et al. (2023) Edoardo Maria Ponti, Alessandro Sordoni, Yoshua Bengio, and Siva Reddy. 2023. Combining parameter-efficient modules for task-level generalisation. In Proceedings of the 17th Conference of the European Chapter of the Association for Computational Linguistics , pages 687–702."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib33",
+      "text": "Mikolov et al. (2013) Tomas Mikolov, Kai Chen, Greg Corrado, and Jeffrey Dean. 2013. Efficient estimation of word representations in vector space. arXiv preprint arXiv:1301.3781 ."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib21",
+      "text": "Ilharco et al. (2022) Gabriel Ilharco, Marco Tulio Ribeiro, Mitchell Wortsman, Ludwig Schmidt, Hannaneh Hajishirzi, and Ali Farhadi. 2022. Editing models with task arithmetic. In The Eleventh International Conference on Learning Representations ."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib52",
+      "text": "Zhang et al. (2023a) Jinghan Zhang, Shiqi Chen, Junteng Liu, and Junxian He. 2023a. Composing parameter-efficient modules with arithmetic operations. arXiv preprint arXiv:2306.14870 ."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib18",
+      "text": "Hu et al. (2021) Edward J Hu, Phillip Wallis, Zeyuan Allen-Zhu, Yuanzhi Li, Shean Wang, Lu Wang, Weizhu Chen, et al. 2021. Lora: Low-rank adaptation of large language models. In International Conference on Learning Representations ."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib29",
+      "text": "Liu et al. (2022) Haokun Liu, Derek Tam, Mohammed Muqeeth, Jay Mohta, Tenghao Huang, Mohit Bansal, and Colin A Raffel. 2022. Few-shot parameter-efficient fine-tuning is better and cheaper than in-context learning. Advances in Neural Information Processing Systems , 35:1950–1965."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib17",
+      "text": "Houlsby et al. (2019) Neil Houlsby, Andrei Giurgiu, Stanislaw Jastrzebski, Bruna Morrone, Quentin De Laroussilhe, Andrea Gesmundo, Mona Attariyan, and Sylvain Gelly. 2019. Parameter-efficient transfer learning for nlp. In International Conference on Machine Learning , pages 2790–2799. PMLR."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib25",
+      "text": "Li and Liang (2021) Xiang Lisa Li and Percy Liang. 2021. Prefix-tuning: Optimizing continuous prompts for generation . In Proceedings of the 59th Annual Meeting of the Association for Computational Linguistics and the 11th International Joint Conference on Natural Language Processing (Volume 1: Long Papers) , pages 4582–4597, Online. Association for Computational Linguistics."
+    }
+  ]
+}

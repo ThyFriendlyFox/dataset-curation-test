@@ -1,0 +1,123 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2112.04539",
+  "title": "Prompt-based Zero-shot Relation Extraction with Semantic Knowledge Augmentation",
+  "authors": "Jiaying Gong, Hoda Eldardiry",
+  "year": "2024",
+  "categories": [
+    "cs.CL"
+  ],
+  "url": "https://arxiv.org/abs/2112.04539",
+  "html_url": "https://arxiv.org/html/2112.04539",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "1. Introduction",
+  "word_count": 812,
+  "text": "Relation triplet extraction (RTE) aims to extract both the pairs of entities and relations from unstructured text. However, existing approaches based on supervised learning [1,2,3,4,5,6] or few-shot learning [7,8,9,10,11,12] still require labeled data. They can not catch up with a dynamic and open environment where new classes emerge. In the real-world setting, the classes of instances are sometimes rare or never seen in the training data. Thus, we tend to learn a model similar to the way humans learn and recognize new concepts. Such a task is referred to as zero-shot learning (ZSL). We follow the same definition of ZSL in [13,14] to conduct experiments.\n\nZero-shot RTE aims to extract relation triplets in a sentence that is absent from the learning stage. Figure 1 shows an example of zero-shot RTE. The relation sets at the training and testing stages are disjoint. The model for zero-shot RTE is only trained on the seen relations in the training stage and extracts triplets with unseen relations in the testing stage. Existing approaches to zero-shot relation extraction still have limitations. First, some models perform zero-shot relation extraction by question answering [15] or by using GPT-2 to help generate synthetic data [13]. These models have a strong assumption that an excellent additional deep learning model is learned, and that all values extracted from this model are correct. Second, some existing studies formulate relation extraction as a text entailment task [16]. They only predict a binary label indicating whether the name entities in the given sentence can be described by a given description. Third, some SOTA models leverage auxiliary information to tackle zero-shot tasks. They focus on class names/descriptions, losing the connection or relationships between seen relations and unseen relations [17,14,18]. Besides, these works mainly focus on zero-shot relation classification (ZSRC), which only predicts unseen relations instead of triplets in the format of <head entity, relation, tail entity>. ZSRC has a strong assumption that two name entities are available for training. However, it is not realistic that name entities are already provided.\n\nTo address the above challenges, we propose a prompt-based model with semantic knowledge augmentation (ZS-SKA) to perform zero-shot RTE. We first implement data augmentation by a word-level sentence translation to generate augmented instances with unseen relations from training instances with seen relations. We follow a new generation rule introduced in Sec. 3.2.1 to generate high-quality augmented instances for training in zero-shot settings. Note that ZS-SKA is trained only on labeled data from seen classes and augmented data generated from seen classes.\n\nSecondly, inspired by prompt-tuning on pre-trained language models [19,20], we design the prompts based on the knowledge graph to integrate semantic knowledge to generally infer the features of unseen relations using patterns learned from seen relations. For the prompt design, we consider semantic knowledge information, including relation descriptions, super-class of relations and name entities, and a general knowledge graph to effectively learn the unseen relations. Instead of using the real label word directly in the prompt template, we automatically search a set of appropriate label words based on the knowledge graph for each label. The weight of each appropriate label word is calculated based on its semantic knowledge information in Sec. 3.2.2. We calculate the distance between each appropriate label with the true label itself to help denoise the set of appropriate label words. Then, we construct virtual label words in the prompt by weighted averaging all appropriate label word candidates.\n\nFinally, we apply prototypical networks [21] to compute a prototype representing each relation. Each prototype is the mean vector of embedded and augmented sentences with prompts belonging to one relation. Euclidean distance is calculated between query sentence embeddings with prototypes to predict relations. A distance threshold explored in the validation set is applied to determine the number of relation triplets. For name entity predictions, we use a name entity extractor to recognize different types of entities. Then, sorted entity types are compared with the super-class of name entities in the prompt to determine the final relation triplets. The contributions:\n\n- • We propose a prompt-based model with semantic knowledge augmentation (ZS-SKA) to extract triplets with unseen relations under the zero-shot setting. Unlike some previous works, ZS-SKA considers semantic information from different granularities and does not rely on other large models with additional training.\n\n- • We present a new word-level sentence translation rule to generate augmented instances with unseen relations from instances with seen relations. The augmented sentences are then used as the training sets for unseen relations.\n\n- • We propose prompts for training based on an external knowledge graph to integrate semantic knowledge information learned from seen relations. We construct weighted virtual label words for the mask in the prompt template instead of using the actual label sets.\n\n- • We demonstrate that ZS-SKA significantly outperforms state-of-the-art methods for relation extraction with unseen relations under the ZSL setting on three public datasets.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib35",
+      "text": "Ma et al. (2022) Youmi Ma, Tatsuya Hiraoka, and Naoaki Okazaki. 2022. Joint entity and relation extraction based on table labeling using convolutional neural networks . In Proceedings of the Sixth Workshop on Structured Prediction for NLP , pages 11–21, Dublin, Ireland. Association for Computational Linguistics."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib59",
+      "text": "Zhong and Chen (2021) Zexuan Zhong and Danqi Chen. 2021. A frustratingly easy approach for entity and relation extraction . In Proceedings of the 2021 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies , pages 50–61, Online. Association for Computational Linguistics."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib39",
+      "text": "Ren et al. (2021) Feiliang Ren, Longhui Zhang, Shujuan Yin, Xiaofeng Zhao, Shilei Liu, Bochao Li, and Yaduo Liu. 2021. A novel global feature-oriented relational triple extraction model based on table filling . In Proceedings of the 2021 Conference on Empirical Methods in Natural Language Processing , pages 2646–2656, Online and Punta Cana, Dominican Republic. Association for Computational Linguistics."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib22",
+      "text": "Huguet Cabot and Navigli (2021) Pere-Lluís Huguet Cabot and Roberto Navigli. 2021. REBEL: Relation extraction by end-to-end language generation . In Findings of the Association for Computational Linguistics: EMNLP 2021 , pages 2370–2381, Punta Cana, Dominican Republic. Association for Computational Linguistics."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib61",
+      "text": "Zhu et al. (2019) Hao Zhu, Yankai Lin, Zhiyuan Liu, Jie Fu, Tat-Seng Chua, and Maosong Sun. 2019. Graph neural networks with generated parameters for relation extraction . In Proceedings of the 57th Annual Meeting of the Association for Computational Linguistics , pages 1331–1339, Florence, Italy. Association for Computational Linguistics."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib28",
+      "text": "Li and Tian (2020) Cheng Li and Ye Tian. 2020. Downstream model design of pre-trained language model for relation extraction task . CoRR , abs/2004.03786."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib33",
+      "text": "Liu et al. (2022b) Yang Liu, Jinpeng Hu, Xiang Wan, and Tsung-Hui Chang. 2022b. A simple yet effective relation information guided approach for few-shot relation extraction . In Findings of the Association for Computational Linguistics: ACL 2022 , pages 757–763, Dublin, Ireland. Association for Computational Linguistics."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib11",
+      "text": "Dou et al. (2022) Chunliu Dou, Shaojuan Wu, Xiaowang Zhang, Zhiyong Feng, and Kewen Wang. 2022. Function-words adaptively enhanced attention networks for few-shot inverse relation classification . In Proceedings of the Thirty-First International Joint Conference on Artificial Intelligence, IJCAI-22 , pages 2937–2943. International Joint Conferences on Artificial Intelligence Organization. Main Track."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib17",
+      "text": "Han et al. (2021a) Jiale Han, Bo Cheng, and Wei Lu. 2021a. Exploring task difficulty for few-shot relation extraction . In Proceedings of the 2021 Conference on Empirical Methods in Natural Language Processing , pages 2605–2616, Online and Punta Cana, Dominican Republic. Association for Computational Linguistics."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib14",
+      "text": "Gao et al. (2019) Tianyu Gao, Xu Han, Zhiyuan Liu, and Maosong Sun. 2019. Hybrid attention-based prototypical networks for noisy few-shot relation classification . Proceedings of the AAAI Conference on Artificial Intelligence , 33(01):6407–6414."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib40",
+      "text": "Ren et al. (2020) Haopeng Ren, Yi Cai, Xiaofeng Chen, Guohua Wang, and Qing Li. 2020. A two-phase prototypical network model for incremental few-shot relation classification . In Proceedings of the 28th International Conference on Computational Linguistics , pages 1618–1629, Barcelona, Spain (Online). International Committee on Computational Linguistics."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib10",
+      "text": "Dong et al. (2020) Bowen Dong, Yuan Yao, Ruobing Xie, Tianyu Gao, Xu Han, Zhiyuan Liu, Fen Lin, Leyu Lin, and Maosong Sun. 2020. Meta-information guided meta-learning for few-shot relation classification . In Proceedings of the 28th International Conference on Computational Linguistics , pages 1594–1605, Barcelona, Spain (Online). International Committee on Computational Linguistics."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib7",
+      "text": "Chia et al. (2022) Yew Ken Chia, Lidong Bing, Soujanya Poria, and Luo Si. 2022. RelationPrompt: Leveraging prompts to generate synthetic data for zero-shot relation triplet extraction . In Findings of the Association for Computational Linguistics: ACL 2022 , pages 45–57, Dublin, Ireland. Association for Computational Linguistics."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib3",
+      "text": "Chen and Li (2021) Chih-Yao Chen and Cheng-Te Li. 2021. Zs-bert: Towards zero-shot relation extraction with attribute representation learning. In Proceedings of 2021 Annual Conference of the North American Chapter of the Association for Computational Linguistics (NAACL-2021) ."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib27",
+      "text": "Levy et al. (2017) Omer Levy, Minjoon Seo, Eunsol Choi, and Luke Zettlemoyer. 2017. Zero-shot relation extraction via reading comprehension . In Proceedings of the 21st Conference on Computational Natural Language Learning (CoNLL 2017) , pages 333–342, Vancouver, Canada. Association for Computational Linguistics."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib36",
+      "text": "Obamuyide and Vlachos (2018) Abiola Obamuyide and Andreas Vlachos. 2018. Zero-shot relation classification as textual entailment . In Proceedings of the First Workshop on Fact Extraction and VERification (FEVER) , pages 72–78, Brussels, Belgium. Association for Computational Linguistics."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib15",
+      "text": "Gong and Eldardiry (2021) Jiaying Gong and Hoda Eldardiry. 2021. Zero-Shot Relation Classification from Side Information , page 576–585. Association for Computing Machinery, New York, NY, USA."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib52",
+      "text": "Wang et al. (2022) Shusen Wang, Bosen Zhang, Yajing Xu, Yanan Wu, and Bo Xiao. 2022. RCL: Relation contrastive learning for zero-shot relation extraction . In Findings of the Association for Computational Linguistics: NAACL 2022 , pages 2456–2468, Seattle, United States. Association for Computational Linguistics."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib44",
+      "text": "Schick and Schütze (2021a) Timo Schick and Hinrich Schütze. 2021a. Exploiting cloze-questions for few-shot text classification and natural language inference . In Proceedings of the 16th Conference of the European Chapter of the Association for Computational Linguistics: Main Volume, EACL 2021, Online, April 19 - 23, 2021 , pages 255–269. Association for Computational Linguistics."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib45",
+      "text": "Schick and Schütze (2021b) Timo Schick and Hinrich Schütze. 2021b. It’s not just size that matters: Small language models are also few-shot learners . In Proceedings of the 2021 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, NAACL-HLT 2021, Online, June 6-11, 2021 , pages 2339–2352. Association for Computational Linguistics."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib47",
+      "text": "Snell et al. (2017) Jake Snell, Kevin Swersky, and Richard Zemel. 2017. Prototypical networks for few-shot learning . In Advances in Neural Information Processing Systems , volume 30. Curran Associates, Inc."
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2207.00288",
+  "title": "Distributed Influence-Augmented Local Simulators for Parallel MARL in Large Networked Systems",
+  "authors": "Miguel Suau, Jinke He, Mustafa Mert Ãelikok, Matthijs T. J. Spaan, Frans A. Oliehoek",
+  "year": "2024",
+  "categories": [
+    "cs.LG",
+    "cs.MA"
+  ],
+  "url": "https://arxiv.org/abs/2207.00288",
+  "html_url": "https://arxiv.org/html/2207.00288",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 708,
+  "text": "Imagine we have to train a team of agents to control the traffic lights of a very large city, so large that we simply cannot control all traffic lights using a single policy. The first step would be to split the problem into multiple sub-regions. A natural division would be to assign one traffic light to each agent. Then, since the agents act locally, we would limit their observations to contain only local information. This partial observability could affect their optimal policies but would also make each individual decision-making problem more manageable [1,2]. Moreover, we may also want to reward agents only for what occurs in their local neighborhood such that we reduce the variance of the returns [3] and facilitate credit assignment [4]. Finally, we could train all agents together on a big traffic simulator that reproduces the global dynamics. However, if the city is truly large, it could take weeks or even months to optimize their policies. That is assuming training actually converges.\n\nOne may argue that, since the agents’ observations and rewards are local, we could as well train them on separate simulators that model only the local transition dynamics (i.e. cars moving within each of the sub-regions; [5]). This approach might work if the agents’ local transitions are isolated from the rest of the system [6], but would probably break when the local regions are coupled. This is because the local simulators would fail to account for the fact that the agents’ local regions belong to a larger system and depend on one another. A solution is to model the influence the global system exerts on each local region. Fortunately, this does not necessarily imply modelling the entire system, or else we would just use the global simulator. In many scenarios, such as in the traffic problem, even though the local regions may be affected by many external variables (e.g.traffic densities in other parts of the city), they are only directly influenced by a small subset of them (e.g., road segments that connect the intersections with the rest of the city). This subset of variables is known as the influence sources. The theoretical framework of Influence-Based Abstraction [7] shows that by monitoring the posterior distribution of the influence sources given the action local state history (ALSH), one can simulate realistic trajectories that match those produced by the global simulator. The resulting simulator, known as the influence-augmented local simulator (IALS), has been proven effective in single agent scenarios when combined with planning [8] and reinforcement learning (RL) algorithms [9].\n\nIn this paper, we extend the IBA framework to multi-agent domains. We show how to factorize large networked systems, such as the previous traffic example, into multiple sub-regions so that we can replace the GS by a distributed network of IALSs that can run independently and in parallel. There is one important caveat to this. The IBA framework assumes only a single agent is learning at a time. This assumption is needed to make the influence distributions stationary. This implies that in our case since we want the agents to learn simultaneously, previously computed influence distributions would no longer be valid after the agents update their policies. The naive solution would be to recompute new influence distributions every time any agent updates its policy. However, we argue that this is not only impractical, since recomputing the distributions is not without costs, but also undesirable. The theoretical results in Section 4.1 demonstrate that multiple (similar) joint policies may induce the same influence distributions and that even when they vary a little, they can still elicit the same optimal policies. Further, our insights in Section 4.3 hint that what seems to be a problem at first, may in fact be an advantage since in many situations, maintaining the previous influence distributions implies that the local transitions, although biased, remain stationary.\n\nThe main contributions of this paper are: (1) adapting IBA to multi-agent reinforcement learning (MARL), and demonstrating that simultaneous learning is possible without incurring major computational costs, (2) showing that by distributing the simulation among different processes, we can parallelize training and scale up to systems with many agents, (3) revealing that the non-stationarity issues inherent to MARL are partly mitigated as a result of this training scheme.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib30",
+      "text": "McCallum, (1995) McCallum, A. K. (1995). Reinforcement Learning with Selective Perception and Hidden State . PhD thesis, University of Rochester."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib10",
+      "text": "Dearden and Boutilier, (1997) Dearden, R. and Boutilier, C. (1997). Abstraction and approximate decision-theoretic planning. Artificial Intelligence , 89(1-2):219–283."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib41",
+      "text": "Spooner et al., (2021) Spooner, T., Vadori, N., and Ganesh, S. (2021). Factored policy gradients: Leveraging structure for efficient learning in MOMDPs. Advances in Neural Information Processing Systems , 34."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib5",
+      "text": "Castellini et al., (2020) Castellini, J., Devlin, S., Oliehoek, F. A., and Savani, R. (2020). Difference rewards policy gradients. arXiv preprint arXiv:2012.11258 ."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib33",
+      "text": "van der Pol and Oliehoek, (2016) van der Pol, E. and Oliehoek, F. A. (2016). Coordinated deep reinforcement learners for traffic light control. NIPS’16 Workshop on Learning, Inference and Control of Multi-Agent Systems."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib1",
+      "text": "Becker et al., (2003) Becker, R., Zilberstein, S., Lesser, V., and Goldman, C. V. (2003). Transition-independent decentralized Markov decision processes. In Proc. of the International Conference on Autonomous Agents and Multiagent Systems , pages 41–48."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib34",
+      "text": "Oliehoek et al., (2021) Oliehoek, F., Witwicki, S., and Kaelbling, L. (2021). A sufficient statistic for influence in structured multiagent environments. Journal of Artificial Intelligence Research , 70:789–870."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib17",
+      "text": "He et al., (2020) He, J., Suau, M., and Oliehoek, F. (2020). Influence-augmented online planning for complex environments. In Larochelle, H., Ranzato, M., Hadsell, R., Balcan, M. F., and Lin, H., editors, Advances in Neural Information Processing Systems , volume 33, pages 4392–4402. Curran Associates, Inc."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib43",
+      "text": "(43) Suau, M., He, J., Spaan, M. T., and Oliehoek, F. (2022b). Influence-augmented local simulators: A scalable solution for fast deep rl in large networked systems. In International Conference on Machine Learning , pages 20604–20624. PMLR."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib36",
+      "text": "Oliehoek et al., (2012) Oliehoek, F. A., Witwicki, S. J., and Kaelbling, L. P. (2012). Influence-based abstraction for multiagent systems. In AAAI12 ."
+    }
+  ]
+}

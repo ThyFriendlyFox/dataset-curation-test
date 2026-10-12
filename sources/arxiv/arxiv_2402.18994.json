@@ -1,0 +1,139 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2402.18994",
+  "title": "Spyx: A Library for Just-In-Time Compiled Optimization of Spiking Neural Networks",
+  "authors": "Kade M. Heckel, Thomas Nowotny",
+  "year": "2024",
+  "categories": [
+    "cs.NE",
+    "cs.LG"
+  ],
+  "url": "https://arxiv.org/abs/2402.18994",
+  "html_url": "https://arxiv.org/html/2402.18994",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 805,
+  "text": "Since the avalanche of research into transformer neural network architectures resulting from the publication of \"Attention is All You Need\" [1], the capacity and capability of modern AI accelerators has exploded. A direct result of this is a self-reinforcing cycle deemed the \"Hardware Lottery\" [2], where the demand to train increasingly massive deep neural networks drives tremendous investment in AI hardware which prioritizes parallel and dense matrix computations which then facilitate even greater performance of DNN models. A significant area of concern with the current trajectory of deep learning research and industrial adoption lies in its equally dramatic energy and environmental cost for training and deploying such models [3]. Taking inspiration from biology, the field of neuromorphic computing and the investigation of Spiking Neural Network architectures aim to drastically reduce the computational resources required of ML tools by leveraging sparsity and event-based computation executed on low-power custom hardware.\n\nThe highly heterogeneous architectures and experimental nature of the neuromorphic hardware ecosystem poses unique challenges to developing SNN models, since on-chip learning for one platform may be difficult or impossible to transfer to other systems. Consequently, a number of neuromorphic frameworks developed in the last five years have instead opted to leverage the immense support for GPU-based development to enable the training and simulation of platform-agnostic SNNs on high-performance hardware before conversion and transfer to a specific target device.\n\nWhile the motivation of high-power training for low-power underpins almost all SNN training frameworks, each library pursues this objective in a different fashion with associated advantages and drawbacks. In the following we will focus on libraries for direct training of SNNs; the other popular approach of converting a trained artificial neural network to an SNN also adheres to the high-to-low power paradigm but is not a focus of this paper. Some libraries use custom low-level code; for example, mlGeNN [4] is built upon custom low-level CUDA kernels to implement their neuron dynamics and SpikingJelly [5] builds on PyTorch but augments it with custom CUDA, improving their computational speed with some tradeoffs in flexibility and interoperability. In contrast, higher-level frameworks such as snnTorch [6] and Norse [7] promote flexibility by extending the PyTorch deep learning framework without adding low-level code, enabling a simpler programming experience at the cost of hardware optimization due to dynamic computation graphs though this is a less significant drawback when dealing with multi-node training or if the dataset in question is extremely large. Finally, some libraries such as Lava-dl [8] and Rockpool [9] offer tooling, features, and abstraction models targeted for their specific neuromorphic computing platforms which are Intel’s Loihi [10] and SynSense’s Xylo [9] hardware families respectively.\n\nThe year 2023 has seen the emergence of SNN research powered by the new and growing JAX [11] high-performance array computing framework developed by Google DeepMind. JAX features Just-In-Time (JIT) compilation for execution on AI accelerators, composable function transformations like vectorization, and automatic differentiation capabilities. Because of its Numpy-like interface and adherence to functional programming paradigms, JAX is host to a growing community of easily connectable libraries such as a differentiable physics simulator [12], reinforcement learning environments [13,14,15], or evolutionary optimization tools [16].\n\nContinuing with the trend each approach again tackles slightly different issues in training SNNs, this time capitalizing on the unique features of JAX. The work of Finkbeiner et. al. [17] compared the performance of sparse vector computation on NVIDIA GPUs against Graphcore Intelligence Processing Units (IPUs) using a JAX-based implementation, finding significant acceleration for sparse SNN simulation when using the IPU’s Multiple-Instruction, Multiple-Data (MIMD) architecture instead of the GPU’s Single-Instruction, Multiple-Data (SIMD) construction. Jaxsnn [18], a continuous-time library for SNN simulation also debuted, drawing parallels to ml-GeN [4] and Norse [7] by avoiding the discretization of spiking data into a fixed time grid as is common in other SNN libraries. Instead, Jaxsnn is tailored for event-based training and facilitates data-sparse training approaches including time-to-first-spike [19] and EventProp [20] and includes support for hardware integration with the BrainScaleS-2 platform [21].\n\nConcurrent with other JAX-based SNN work and inspired by the approach of snnTorch [6], the Spyx [22] library was developed to facilitate the efficient investigation of modern evolutionary strategies for optimizing SNNs [23]. Spyx combines the flexibility advantages of PyTorch-based frameworks with the performance and efficiency of libraries backed by low-level kernel implementations. Specifically, Spyx allows the user to specify their own surrogate gradient functions or neuron models in only a few lines of code, while the entire training and evaluation loop can be reliably traced and executed on either a GPU or TPU with maximum utilization.\n\nThis paper presents a comparison of simulation performance between Spyx and other notable SNN libraries which sit at the intersection of deep learning and neuromorphic computing. The source code is located on GitHub and the package is regularly released and updated on the Python Package Index (PyPI) [24].",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N Gomez, Ł ukasz Kaiser, and Illia Polosukhin. Attention is all you need. In I. Guyon, U. Von Luxburg, S. Bengio, H. Wallach, R. Fergus, S. Vishwanathan, and R. Garnett, editors, Advances in Neural Information Processing Systems , volume 30. Curran Associates, Inc., 2017."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "Sara Hooker. The hardware lottery. CoRR , abs/2009.06489, 2020."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "Emma Strubell, Ananya Ganesh, and Andrew McCallum. Energy and policy considerations for deep learning in nlp, 2019."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "James Paul Turner, James C Knight, Ajay Subramanian, and Thomas Nowotny. mlgenn: accelerating snn inference using gpu-enabled neural networks. Neuromorphic Computing and Engineering , 2(2):024002, mar 2022."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "Wei Fang, Yanqi Chen, Jianhao Ding, Zhaofei Yu, Timothée Masquelier, Ding Chen, Liwei Huang, Huihui Zhou, Guoqi Li, and Yonghong Tian. Spikingjelly: An open-source machine learning infrastructure platform for spike-based intelligence. Science Advances , 9(40):eadi1480, 2023."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "Jason K Eshraghian, Max Ward, Emre Neftci, Xinxin Wang, Gregor Lenz, Girish Dwivedi, Mohammed Bennamoun, Doo Seok Jeong, and Wei D Lu. Training spiking neural networks using lessons from deep learning. Proceedings of the IEEE , 111(9):1016–1054, 2023."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "Christian Pehle and Jens Egholm Pedersen. Norse - A deep learning library for spiking neural networks, January 2021. Documentation: https://norse.ai/docs/."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "Lava: A software framework for neuromorphic computing, 2021."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "Dylan R. Muir, Felix Bauer, and Philipp Weidel. Rockpool documentaton, September 2019."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "Garrick Orchard, E. Paxon Frady, Daniel Ben Dayan Rubin, Sophia Sanborn, Sumit Bam Shrestha, Friedrich T. Sommer, and Mike Davies. Efficient neuromorphic signal processing with loihi 2, 2021."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "James Bradbury, Roy Frostig, Peter Hawkins, Matthew James Johnson, Chris Leary, Dougal Maclaurin, George Necula, Adam Paszke, Jake VanderPlas, Skye Wanderman-Milne, and Qiao Zhang. JAX: composable transformations of Python+NumPy programs, 2018."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "C. Daniel Freeman, Erik Frey, Anton Raichuk, Sertan Girgin, Igor Mordatch, and Olivier Bachem. Brax - a differentiable physics engine for large scale rigid body simulation, 2021."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "Robert Tjarko Lange. gymnax: A JAX-based reinforcement learning environment library, 2022."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "Clément Bonnet, Daniel Luo, Donal Byrne, Shikha Surana, Vincent Coyette, Paul Duckworth, Laurence I. Midgley, Tristan Kalloniatis, Sasha Abramowitz, Cemlyn N. Waters, Andries P. Smit, Nathan Grinsztajn, Ulrich A. Mbou Sob, Omayma Mahjoub, Elshadai Tegegn, Mohamed A. Mimouni, Raphael Boige, Ruan de Kock, Daniel Furelos-Blanco, Victor Le, Arnu Pretorius, and Alexandre Laterre. Jumanji: a diverse suite of scalable reinforcement learning environments in jax, 2023."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "Sotetsu Koyamada, Shinri Okano, Soichiro Nishimori, Yu Murata, Keigo Habara, Haruka Kita, and Shin Ishii. Pgx: Hardware-accelerated parallel game simulators for reinforcement learning. In Advances in Neural Information Processing Systems , 2023."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "Robert Tjarko Lange. evosax: Jax-based evolution strategies. arXiv preprint arXiv:2212.04180 , 2022."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "Jan Finkbeiner, Thomas Gmeinder, Mark Pupilli, Alexander Titterton, and Emre Neftci. Harnessing manycore processors with distributed memory for accelerated training of sparse and recurrent models, 2023."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "Eric Müller, Moritz Althaus, Elias Arnold, Philipp Spilger, Christian Pehle, and Johannes Schemmel. jaxsnn: Event-driven gradient estimation for analog neuromorphic hardware. arXiv preprint arXiv:2401.16841 , 2024."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "J. Göltz, L. Kriener, A. Baumbach, S. Billaudelle, O. Breitwieser, B. Cramer, D. Dold, A. F. Kungl, W. Senn, J. Schemmel, K. Meier, and M. A. Petrovici. Fast and energy-efficient neuromorphic deep learning with first-spike times. Nature Machine Intelligence , 3(9):823–835, September 2021."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "Timo C. Wunderlich and Christian Pehle. Event-based backpropagation can compute exact gradients for spiking neural networks. Scientific Reports , 11(1), June 2021."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "Christian Pehle, Sebastian Billaudelle, Benjamin Cramer, Jakob Kaiser, Korbinian Schreiber, Yannik Stradmann, Johannes Weis, Aron Leibfried, Eric Müller, and Johannes Schemmel. The brainscales-2 accelerated neuromorphic system with hybrid plasticity. Frontiers in Neuroscience , 16, 2022."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib22",
+      "text": "Kade Heckel, Steven Abreu, Gregor Lenz, and Thomas Nowotny. kmheckel/spyx: v0.1.17, February 2024."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib23",
+      "text": "Kade Heckel. Neuroevolution of spiking neural networks, February 2024."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib24",
+      "text": "Kade Heckel, Steven Abreu, Gregor Lenz, and Thomas Nowotny. kmheckel/spyx: Paper edition, February 2024."
+    }
+  ]
+}

@@ -1,0 +1,539 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2402.18652",
+  "title": "Spatial Variation-Aware Read Disturbance Defenses: Experimental Analysis of Real DRAM Chips and Implications on Future Solutions",
+  "authors": "Abdullah Giray YaÄlÄ±kÃ§Ä±, Yahya Can TuÄrul, Geraldo F. Oliveira, Ä°smail Emir YÃ¼ksel, Ataberk Olgun, Haocong Luo, Onur Mutlu",
+  "year": "2024",
+  "categories": [
+    "cs.CR",
+    "cs.AR"
+  ],
+  "url": "https://arxiv.org/abs/2402.18652",
+  "html_url": "https://arxiv.org/html/2402.18652",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 921,
+  "text": "To ensure system robustness (including reliability, security, and safety), it is critical to maintain memory isolation: accessing a memory address should not cause unintended side-effects on data stored on other addresses [1]. Unfortunately, with aggressive technology scaling, DRAM [2], the prevalent main memory technology, suffers from increased read disturbance: accessing (reading) a row of DRAM cells (i.e., a DRAM row) degrades the data integrity of other physically close but unaccessed DRAM rows. RowHammer and RowPress are two prime examples of the DRAM read disturbance phenomenon where a DRAM row (i.e., victim row) can experience bitflips when a nearby DRAM row (i.e., aggressor row) is 1) repeatedly opened (i.e., hammered) [3,4,5,6,7,8,9,10,1,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69] or 2) kept open for a long period (i.e., pressed) [70], respectively.\n\nMany prior works demonstrate attacks on a wide range of systems that exploit read disturbance to escalate privilege, leak private data, and manipulate critical application outputs [3,4,5,6,7,8,9,10,1,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,71,72,73,74,75,76,77,78,79,80,81,82,83,84]. To make matters worse, various experimental studies [1,25,33,36,37,61,70] find that newer DRAM chip generations are more susceptible to read disturbance. For example, chips manufactured in 2018-2020 can experience RowHammer bitflips at an order of magnitude fewer row activations compared to the chips manufactured in 2012-2013 [61]. As read disturbance in DRAM chips worsens, ensuring robust (i.e., reliable, secure, and safe) operation becomes more expensive in terms of performance overhead, energy consumption, and hardware complexity [61,85,86]. Therefore, it is critical to understand the read disturbance vulnerabilities of DRAM chips in greater detail with in-depth insights in order to develop more effective and efficient solutions for current and future DRAM-based memory systems. To this end, prior works study various characteristics of DRAM read disturbance [87,1,88,54,89,55,56,57,90,91,58,59,92,60,61,62,93,46,49,63,64,65,66,67,68,69,94,95,36,25,96,33,97,98,99,70]. Unfortunately, no prior work rigorously studies the spatial variation of DRAM read disturbance and its implications on future solutions.\n\nOur goal in this paper is to build a detailed understanding of the spatial variation in read disturbance across DRAM rows and leverage this understanding to improve the existing solutions. To this end, in this paper, we 1) present the first rigorous experimental characterization of the spatial variation in read disturbance vulnerabilities of real DRAM chips, and 2) propose Svärd, a new mechanism that dynamically adapts the aggressiveness of existing solutions based on the observed variation.\n\nCharacterization. We test 144 modern real DDR4 DRAM chips representing 10 different chip designs from three major manufacturers. Our experimental results show that the read disturbance vulnerabilities of DRAM chips vary significantly and irregularly across 1) DRAM rows within a DRAM subarray, i.e., a two-dimensional DRAM array that consists of hundreds of DRAM rows (§ 2) and 2) subarrays within a DRAM bank, i.e., a group of many subarrays that share an I/O circuitry (§ 2). We make two key observations from our characterization: 1) the fraction of erroneous DRAM cells, i.e., bit error rate (BER), varies by a factor of 2\\times and 2) the minimum hammer count required to induce the first bitflip (HC_{first}) varies by an order of magnitude across DRAM rows in a subarray.\n\nWe investigate the correlations between a victim DRAM row’s spatial features (i.e., physical location within the corresponding subarray and bank) and read disturbance vulnerability in two steps. First, we reverse engineer the organization of a DRAM bank. Second, we perform extensive statistical analyses based on 1) reverse-engineered spatial features and 2) observed HC_{first} values. We make the key observation that the variation in read disturbance vulnerability across DRAM rows correlates well with the spatial features of DRAM rows only in four out of 15 tested DRAM modules. Therefore, we conclude that read disturbance vulnerability irregularly varies across DRAM rows, and thus, row-level spatial features we evaluate are insufficient to predict read disturbance vulnerability.\n\nImproving existing solutions. Based on the understanding we develop via our rigorous experimental characterization, we propose Svärd, a new mechanism that dynamically adapts the aggressiveness of existing solutions to the read disturbance vulnerability level of each potential victim row. Svärd forces an existing solution to react more aggressively to an aggressor row activation (e.g., preventively refresh the potential victim row) if a potential victim row is more vulnerable to read disturbance. Svärd is implemented together with existing solutions, which can be either 1) in the memory controller within the processor chip (i.e., without modifications to the DRAM chip or DRAM interface) or 2) within the DRAM chip (i.e., transparent to the rest of the system). We evaluate the performance benefits of Svärd on five state-of-the-art solutions, AQUA [102], BlockHammer [85], Hydra [103], PARA [1], and RRS [104] using three representative spatial distribution profiles of read disturbance that we generate based on our experimental characterization of real DRAM chips (i.e., one for each manufacturer). Our performance evaluation results show that Svärd significantly reduces the performance overheads of AQUA, BlockHammer, Hydra, PARA, and RRS, leading to system performance improvements of 1.23\\times, 2.65\\times, 1.03\\times, 1.57\\times, and 2.76\\times, respectively, on average across 120 multiprogrammed memory-intensive workloads.\n\nWe make the following contributions:\n\n- • We present the first rigorous characterization of the spatial variation of read disturbance in modern DRAM chips. Our experimental results on 144 real DDR4 DRAM chips spanning 10 different chip designs show a significant and irregular variation in read disturbance vulnerability across DRAM rows.\n\n- • We propose Svärd, a new mechanism that dynamically adapts the aggressiveness of an existing read disturbance solution to the vulnerability level of the potential victim row.\n\n- • We showcase Svärd’s integration with five different state-of-the-art read disturbance solutions. Our results show that Svärd reduces the performance overhead of these four state-of-the-art solutions, leading to large system performance benefits.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib1",
+      "text": "Y. Kim, R. Daly, J. Kim, C. Fallin, J. H. Lee, D. Lee, C. Wilkerson, K. Lai, and O. Mutlu, “Flipping Bits in Memory Without Accessing Them: An Experimental Study of DRAM Disturbance Errors,” in ISCA , 2014."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib2",
+      "text": "R. H. Dennard, “Field-Effect Transistor Memory,” 1968, U.S. Patent 3,387,286."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib3",
+      "text": "A. P. Fournaris, L. Pocero Fraile, and O. Koufopavlou, “Exploiting Hardware Vulnerabilities to Attack Embedded System Devices: A Survey of Potent Microarchitectural Attacks,” Electronics , 2017."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib4",
+      "text": "D. Poddebniak, J. Somorovsky, S. Schinzel, M. Lochter, and P. Rösler, “Attacking Deterministic Signature Schemes using Fault Attacks,” in EuroS&P , 2018."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib5",
+      "text": "A. Tatar, R. K. Konoth, E. Athanasopoulos, C. Giuffrida, H. Bos, and K. Razavi, “Throwhammer: Rowhammer Attacks Over the Network and Defenses,” in USENIX ATC , 2018."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib6",
+      "text": "S. Carre, M. Desjardins, A. Facon, and S. Guilley, “OpenSSL Bellcore’s Protection Helps Fault Attack,” in DSD , 2018."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib7",
+      "text": "A. Barenghi, L. Breveglieri, N. Izzo, and G. Pelosi, “Software-only Reverse Engineering of Physical DRAM Mappings for Rowhammer Attacks,” in IVSW , 2018."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib8",
+      "text": "Z. Zhang, Z. Zhan, D. Balasubramanian, X. Koutsoukos, and G. Karsai, “Triggering Rowhammer Hardware Faults on ARM: A Revisit,” in ASHES , 2018."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib9",
+      "text": "S. Bhattacharya and D. Mukhopadhyay, “Advanced Fault Attacks in Software: Exploiting the Rowhammer Bug,” in Fault Tolerant Architectures for Cryptography and Hardware Security , 2018."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib10",
+      "text": "M. Seaborn and T. Dullien, “Exploiting the DRAM Rowhammer Bug to Gain Kernel Privileges,” http://googleprojectzero.blogspot.com.tr/2015/03/exploiting-dram-rowhammer-bug-to-gain.html , 2015."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib11",
+      "text": "SAFARI Research Group, “RowHammer — GitHub Repository,” https://github.com/CMU-SAFARI/rowhammer , 2014."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib12",
+      "text": "M. Seaborn and T. Dullien, “Exploiting the DRAM Rowhammer Bug to Gain Kernel Privileges,” Black Hat , 2015."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib13",
+      "text": "V. van der Veen, Y. Fratantonio, M. Lindorfer, D. Gruss, C. Maurice, G. Vigna, H. Bos, K. Razavi, and C. Giuffrida, “Drammer: Deterministic Rowhammer Attacks on Mobile Platforms,” in CCS , 2016."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib14",
+      "text": "D. Gruss, C. Maurice, and S. Mangard, “Rowhammer.js: A Remote Software-Induced Fault Attack in Javascript,” in DIMVA , 2016."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib15",
+      "text": "K. Razavi, B. Gras, E. Bosman, B. Preneel, C. Giuffrida, and H. Bos, “Flip Feng Shui: Hammering a Needle in the Software Stack,” in USENIX Security , 2016."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "P. Pessl, D. Gruss, C. Maurice, M. Schwarz, and S. Mangard, “DRAMA: Exploiting DRAM Addressing for Cross-CPU Attacks,” in USENIX Security , 2016."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib17",
+      "text": "Y. Xiao, X. Zhang, Y. Zhang, and R. Teodorescu, “One Bit Flips, One Cloud Flops: Cross-VM Row Hammer Attacks and Privilege Escalation,” in USENIX Security , 2016."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib18",
+      "text": "E. Bosman, K. Razavi, H. Bos, and C. Giuffrida, “Dedup Est Machina: Memory Deduplication as An Advanced Exploitation Vector,” in S&P , 2016."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib19",
+      "text": "S. Bhattacharya and D. Mukhopadhyay, “Curious Case of RowHammer: Flipping Secret Exponent Bits using Timing Analysis,” in CHES , 2016."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib20",
+      "text": "W. Burleson, O. Mutlu, and M. Tiwari, “Invited: Who is the Major Threat to Tomorrow’s Security? You, the Hardware Designer,” in DAC , 2016."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib21",
+      "text": "R. Qiao et al. , “A New Approach for RowHammer Attacks,” in HOST , 2016."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib22",
+      "text": "F. Brasser, L. Davi, D. Gens, C. Liebchen, and A.-R. Sadeghi, “Can’t Touch This: Software-Only Mitigation Against Rowhammer Attacks Targeting Kernel Memory,” in USENIX Security , 2017."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib23",
+      "text": "Y. Jang, J. Lee, S. Lee, and T. Kim, “SGX-Bomb: Locking Down the Processor via Rowhammer Attack,” in SysTEX , 2017."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib24",
+      "text": "M. T. Aga, Z. B. Aweke, and T. Austin, “When Good Protections Go Bad: Exploiting Anti-DoS Measures to Accelerate Rowhammer Attacks,” in HOST , 2017."
+    },
+    {
+      "n": 25,
+      "id": "bib.bib25",
+      "text": "O. Mutlu, “The RowHammer Problem and Other Issues We May Face as Memory Becomes Denser,” in DATE , 2017."
+    },
+    {
+      "n": 26,
+      "id": "bib.bib26",
+      "text": "A. Tatar, C. Giuffrida, H. Bos, and K. Razavi, “Defeating Software Mitigations Against Rowhammer: A Surgical Precision Hammer,” in RAID , 2018."
+    },
+    {
+      "n": 27,
+      "id": "bib.bib27",
+      "text": "D. Gruss, M. Lipp, M. Schwarz, D. Genkin, J. Juffinger, S. O’Connell, W. Schoechl, and Y. Yarom, “Another Flip in the Wall of Rowhammer Defenses,” in S&P , 2018."
+    },
+    {
+      "n": 28,
+      "id": "bib.bib28",
+      "text": "M. Lipp, M. T. Aga, M. Schwarz, D. Gruss, C. Maurice, L. Raab, and L. Lamster, “Nethammer: Inducing Rowhammer Faults Through Network Requests,” arXiv:1805.04956, 2018."
+    },
+    {
+      "n": 29,
+      "id": "bib.bib29",
+      "text": "V. van der Veen, M. Lindorfer, Y. Fratantonio, H. P. Pillai, G. Vigna, C. Kruegel, H. Bos, and K. Razavi, “GuardION: Practical Mitigation of DMA-Based Rowhammer Attacks on ARM,” in DIMVA , 2018."
+    },
+    {
+      "n": 30,
+      "id": "bib.bib30",
+      "text": "P. Frigo, C. Giuffrida, H. Bos, and K. Razavi, “Grand Pwning Unit: Accelerating Microarchitectural Attacks with the GPU,” in S&P , 2018."
+    },
+    {
+      "n": 31,
+      "id": "bib.bib31",
+      "text": "L. Cojocar, K. Razavi, C. Giuffrida, and H. Bos, “Exploiting Correcting Codes: On the Effectiveness of ECC Memory Against Rowhammer Attacks,” in S&P , 2019."
+    },
+    {
+      "n": 32,
+      "id": "bib.bib32",
+      "text": "S. Ji, Y. Ko, S. Oh, and J. Kim, “Pinpoint Rowhammer: Suppressing Unwanted Bit Flips on Rowhammer Attacks,” in ASIACCS , 2019."
+    },
+    {
+      "n": 33,
+      "id": "bib.bib33",
+      "text": "O. Mutlu, “RowHammer and Beyond,” in COSADE , 2019."
+    },
+    {
+      "n": 34,
+      "id": "bib.bib34",
+      "text": "S. Hong, P. Frigo, Y. Kaya, C. Giuffrida, and T. Dumitras, “Terminal Brain Damage: Exposing the Graceless Degradation in Deep Neural Networks Under Hardware Fault Attacks,” in USENIX Security , 2019."
+    },
+    {
+      "n": 35,
+      "id": "bib.bib35",
+      "text": "A. Kwong, D. Genkin, D. Gruss, and Y. Yarom, “RAMBleed: Reading Bits in Memory Without Accessing Them,” in S&P , 2020."
+    },
+    {
+      "n": 36,
+      "id": "bib.bib36",
+      "text": "P. Frigo, E. Vannacci, H. Hassan, V. van der Veen, O. Mutlu, C. Giuffrida, H. Bos, and K. Razavi, “TRRespass: Exploiting the Many Sides of Target Row Refresh,” in S&P , 2020."
+    },
+    {
+      "n": 37,
+      "id": "bib.bib37",
+      "text": "L. Cojocar, J. Kim, M. Patel, L. Tsai, S. Saroiu, A. Wolman, and O. Mutlu, “Are We Susceptible to Rowhammer? An End-to-End Methodology for Cloud Providers,” in S&P , 2020."
+    },
+    {
+      "n": 38,
+      "id": "bib.bib38",
+      "text": "Z. Weissman, T. Tiemann, D. Moghimi, E. Custodio, T. Eisenbarth, and B. Sunar, “JackHammer: Efficient Rowhammer on Heterogeneous FPGA–CPU Platforms,” arXiv:1912.11523, 2020."
+    },
+    {
+      "n": 39,
+      "id": "bib.bib39",
+      "text": "Z. Zhang, Y. Cheng, D. Liu, S. Nepal, Z. Wang, and Y. Yarom, “PTHammer: Cross-User-Kernel-Boundary Rowhammer Through Implicit Accesses,” in MICRO , 2020."
+    },
+    {
+      "n": 40,
+      "id": "bib.bib40",
+      "text": "F. Yao, A. S. Rakin, and D. Fan, “Deephammer: Depleting the Intelligence of Deep Neural Networks Through Targeted Chain of Bit Flips,” in USENIX Security , 2020."
+    },
+    {
+      "n": 41,
+      "id": "bib.bib41",
+      "text": "F. de Ridder, P. Frigo, E. Vannacci, H. Bos, C. Giuffrida, and K. Razavi, “SMASH: Synchronized Many-Sided Rowhammer Attacks from JavaScript,” in USENIX Security , 2021."
+    },
+    {
+      "n": 42,
+      "id": "bib.bib42",
+      "text": "H. Hassan, Y. C. Tugrul, J. S. Kim, V. van der Veen, K. Razavi, and O. Mutlu, “Uncovering In-DRAM RowHammer Protection Mechanisms: A New Methodology, Custom RowHammer Patterns, and Implications,” in MICRO , 2021."
+    },
+    {
+      "n": 43,
+      "id": "bib.bib43",
+      "text": "P. Jattke, V. van der Veen, P. Frigo, S. Gunter, and K. Razavi, “Blacksmith: Scalable Rowhammering in the Frequency Domain,” in S&P , 2022."
+    },
+    {
+      "n": 44,
+      "id": "bib.bib44",
+      "text": "M. C. Tol, S. Islam, B. Sunar, and Z. Zhang, “Toward Realistic Backdoor Injection Attacks on DNNs using RowHammer,” arXiv:2110.07683, 2022."
+    },
+    {
+      "n": 45,
+      "id": "bib.bib45",
+      "text": "A. Kogler, J. Juffinger, S. Qazi, Y. Kim, M. Lipp, N. Boichat, E. Shiu, M. Nissler, and D. Gruss, “Half-Double: Hammering From the Next Row Over,” in USENIX Security , 2022."
+    },
+    {
+      "n": 46,
+      "id": "bib.bib46",
+      "text": "L. Orosa, U. Rührmair, A. G. Yaglikci, H. Luo, A. Olgun, P. Jattke, M. Patel, J. Kim, K. Razavi, and O. Mutlu, “SpyHammer: Using RowHammer to Remotely Spy on Temperature,” arXiv:2210.04084, 2022."
+    },
+    {
+      "n": 47,
+      "id": "bib.bib47",
+      "text": "Z. Zhang, W. He, Y. Cheng, W. Wang, Y. Gao, D. Liu, K. Li, S. Nepal, A. Fu, and Y. Zou, “Implicit Hammer: Cross-Privilege-Boundary Rowhammer through Implicit Accesses,” IEEE TDSC , 2022."
+    },
+    {
+      "n": 48,
+      "id": "bib.bib48",
+      "text": "L. Liu, Y. Guo, Y. Cheng, Y. Zhang, and J. Yang, “Generating Robust DNN with Resistance to Bit-Flip based Adversarial Weight Attack,” IEEE TC , 2022."
+    },
+    {
+      "n": 49,
+      "id": "bib.bib49",
+      "text": "Y. Cohen, K. S. Tharayil, A. Haenel, D. Genkin, A. D. Keromytis, Y. Oren, and Y. Yarom, “HammerScope: Observing DRAM Power Consumption Using Rowhammer,” in CCS , 2022."
+    },
+    {
+      "n": 50,
+      "id": "bib.bib50",
+      "text": "M. Zheng, Q. Lou, and L. Jiang, “TrojViT: Trojan Insertion in Vision Transformers,” arXiv:2208.13049, 2022."
+    },
+    {
+      "n": 51,
+      "id": "bib.bib51",
+      "text": "M. Fahr Jr, H. Kippen, A. Kwong, T. Dang, J. Lichtinger, D. Dachman-Soled, D. Genkin, A. Nelson, R. Perlner, A. Yerukhimovich et al. , “When Frodo Flips: End-to-End Key Recovery on FrodoKEM via Rowhammer,” CCS , 2022."
+    },
+    {
+      "n": 52,
+      "id": "bib.bib52",
+      "text": "Y. Tobah, A. Kwong, I. Kang, D. Genkin, and K. G. Shin, “SpecHammer: Combining Spectre and Rowhammer for New Speculative Attacks,” in S&P , 2022."
+    },
+    {
+      "n": 53,
+      "id": "bib.bib53",
+      "text": "A. S. Rakin, M. H. I. Chowdhuryy, F. Yao, and D. Fan, “DeepSteal: Advanced Model Extractions Leveraging Efficient Weight Stealing in Memories,” in S&P , 2022."
+    },
+    {
+      "n": 54,
+      "id": "bib.bib54",
+      "text": "K. Park, D. Yun, and S. Baeg, “Statistical Distributions of Row-hammering Induced Failures in DDR3 Components,” Microelectronics Reliability , 2016."
+    },
+    {
+      "n": 55,
+      "id": "bib.bib55",
+      "text": "K. Park, C. Lim, D. Yun, and S. Baeg, “Experiments and Root Cause Analysis for Active-precharge Hammering Fault in DDR3 SDRAM under 3 × \\times nm Technology,” Microelectronics Reliability , 2016."
+    },
+    {
+      "n": 56,
+      "id": "bib.bib56",
+      "text": "C. Lim, K. Park, and S. Baeg, “Active Precharge Hammering to Monitor Displacement Damage Using High-Energy Protons in 3x-nm SDRAM,” TNS , 2017."
+    },
+    {
+      "n": 57,
+      "id": "bib.bib57",
+      "text": "S.-W. Ryu, K. Min, J. Shin, H. Kwon, D. Nam, T. Oh, T.-S. Jang, M. Yoo, Y. Kim, and S. Hong, “Overcoming the Reliability Limitation in the Ultimately Scaled DRAM using Silicon Migration Technique by Hydrogen Annealing,” in IEDM , 2017."
+    },
+    {
+      "n": 58,
+      "id": "bib.bib58",
+      "text": "D. Yun, M. Park, C. Lim, and S. Baeg, “Study of TID Effects on One Row Hammering using Gamma in DDR4 SDRAMs,” in IRPS , 2018."
+    },
+    {
+      "n": 59,
+      "id": "bib.bib59",
+      "text": "T. Yang and X.-W. Lin, “Trap-Assisted DRAM Row Hammer Effect,” EDL , 2019."
+    },
+    {
+      "n": 60,
+      "id": "bib.bib60",
+      "text": "A. J. Walker, S. Lee, and D. Beery, “On DRAM RowHammer and the Physics on Insecurity,” IEEE TED , 2021."
+    },
+    {
+      "n": 61,
+      "id": "bib.bib61",
+      "text": "J. S. Kim, M. Patel, A. G. Yağlıkcı, H. Hassan, R. Azizi, L. Orosa, and O. Mutlu, “Revisiting RowHammer: An Experimental Analysis of Modern Devices and Mitigation Techniques,” in ISCA , 2020."
+    },
+    {
+      "n": 62,
+      "id": "bib.bib62",
+      "text": "L. Orosa, A. G. Yağlıkcı, H. Luo, A. Olgun, J. Park, H. Hassan, M. Patel, J. S. Kim, and O. Mutlu, “A Deeper Look into RowHammer’s Sensitivities: Experimental Analysis of Real DRAM Chips and Implications on Future Attacks and Defenses,” in MICRO , 2021."
+    },
+    {
+      "n": 63,
+      "id": "bib.bib63",
+      "text": "A. G. Yağlıkcı, H. Luo, G. F. De Oliviera, A. Olgun, M. Patel, J. Park, H. Hassan, J. S. Kim, L. Orosa, and O. Mutlu, “Understanding RowHammer Under Reduced Wordline Voltage: An Experimental Study Using Real DRAM Devices,” in DSN , 2022."
+    },
+    {
+      "n": 64,
+      "id": "bib.bib64",
+      "text": "M. N. I. Khan and S. Ghosh, “Analysis of Row Hammer Attack on STTRAM,” in ICCD , 2018."
+    },
+    {
+      "n": 65,
+      "id": "bib.bib65",
+      "text": "S. Agarwal, H. Dixit, D. Datta, M. Tran, D. Houssameddine, D. Shum, and F. Benistant, “Rowhammer for Spin Torque based Memory: Problem or Not?” in INTERMAG , 2018."
+    },
+    {
+      "n": 66,
+      "id": "bib.bib66",
+      "text": "H. Li, H.-Y. Chen, Z. Chen, B. Chen, R. Liu, G. Qiu, P. Huang, F. Zhang, Z. Jiang, B. Gao, L. Liu, X. Liu, S. Yu, H.-S. P. Wong, and J. Kang, “Write Disturb Analyses on Half-Selected Cells of Cross-Point RRAM Arrays,” in IRPS , 2014."
+    },
+    {
+      "n": 67,
+      "id": "bib.bib67",
+      "text": "K. Ni, X. Li, J. A. Smith, M. Jerry, and S. Datta, “Write Disturb in Ferroelectric FETs and Its Implication for 1T-FeFET AND Memory Arrays,” IEEE EDL , 2018."
+    },
+    {
+      "n": 68,
+      "id": "bib.bib68",
+      "text": "P. R. Genssler, V. M. van Santen, J. Henkel, and H. Amrouch, “On the Reliability of FeFET On-Chip Memory,” TC , 2022."
+    },
+    {
+      "n": 69,
+      "id": "bib.bib69",
+      "text": "O. Mutlu, A. Olgun, and A. G. Yaglikci, “Fundamentally Understanding and Solving RowHammer,” in ASP-DAC , 2023."
+    },
+    {
+      "n": 70,
+      "id": "bib.bib70",
+      "text": "H. Luo, A. Olgun, A. G. Yağlıkcı, Y. C. Tuğrul, S. Rhyner, M. B. Cavlak, J. Lindegger, M. Sadrosadati, and O. Mutlu, “RowPress: Amplifying Read Disturbance in Modern DRAM Chips,” in ISCA , 2023."
+    },
+    {
+      "n": 71,
+      "id": "bib.bib71",
+      "text": "H. Aydin and A. Sertbaş, “Cyber Security in Industrial Control Systems (ICS): A Survey of RowHammer Vulnerability,” Applied Computer Science , 2022."
+    },
+    {
+      "n": 72,
+      "id": "bib.bib72",
+      "text": "K. Mus, Y. Doröz, M. C. Tol, K. Rahman, and B. Sunar, “Jolt: Recovering TLS Signing Keys via Rowhammer Faults,” Cryptology ePrint Archive , 2022."
+    },
+    {
+      "n": 73,
+      "id": "bib.bib73",
+      "text": "J. Wang, H. Xu, C. Xiao, L. Zhang, and Y. Zheng, “Research and Implementation of Rowhammer Attack Method based on Domestic NeoKylin Operating System,” in ICFTIC , 2022."
+    },
+    {
+      "n": 74,
+      "id": "bib.bib74",
+      "text": "S. Lefforge, “Reverse Engineering Post-Quantum Cryptography Schemes to Find Rowhammer Exploits,” Bachelor’s Thesis, University of Arkansas, 2023."
+    },
+    {
+      "n": 75,
+      "id": "bib.bib75",
+      "text": "M. J. Fahr, “The Effects of Side-Channel Attacks on Post-Quantum Cryptography: Influencing FrodoKEM Key Generation Using the Rowhammer Exploit,” Master’s thesis, University of Arkansas, 2022."
+    },
+    {
+      "n": 76,
+      "id": "bib.bib76",
+      "text": "A. Kaur, P. Srivastav, and B. Ghoshal, “Work-in-Progress: DRAM-MaUT: DRAM Address Mapping Unveiling Tool for ARM Devices,” in CASES , 2022."
+    },
+    {
+      "n": 77,
+      "id": "bib.bib77",
+      "text": "K. Cai, Z. Zhang, and F. Yao, “On the Feasibility of Training-time Trojan Attacks through Hardware-based Faults in Memory,” in HOST , 2022."
+    },
+    {
+      "n": 78,
+      "id": "bib.bib78",
+      "text": "D. Li, D. Liu, Y. Ren, Z. Wang, Y. Sun, Z. Guan, Q. Wu, and J. Liu, “CyberRadar: A PUF-based Detecting and Mapping Framework for Physical Devices,” arXiv:2201.07597, 2022."
+    },
+    {
+      "n": 79,
+      "id": "bib.bib79",
+      "text": "A. Roohi and S. Angizi, “Efficient Targeted Bit-Flip Attack Against the Local Binary Pattern Network,” in HOST , 2022."
+    },
+    {
+      "n": 80,
+      "id": "bib.bib80",
+      "text": "F. Staudigl, H. Al Indari, D. Schön, D. Sisejkovic, F. Merchant, J. M. Joseph, V. Rana, S. Menzel, and R. Leupers, “NeuroHammer: Inducing Bit-Flips in Memristive Crossbar Memories,” in DATE , 2022."
+    },
+    {
+      "n": 81,
+      "id": "bib.bib81",
+      "text": "L.-H. Yang, S.-S. Huang, T.-L. Cheng, Y.-C. Kuo, and J.-J. Kuo, “Socially-Aware Collaborative Defense System against Bit-Flip Attack in Social Internet of Things and Its Online Assignment Optimization,” in ICCCN , 2022."
+    },
+    {
+      "n": 82,
+      "id": "bib.bib82",
+      "text": "S. Islam, K. Mus, R. Singh, P. Schaumont, and B. Sunar, “Signature Correction Attack on Dilithium Signature Scheme,” in Euro S&P , 2022."
+    },
+    {
+      "n": 83,
+      "id": "bib.bib83",
+      "text": "C. Tomita, M. Takita, K. Fukushima, Y. Nakano, Y. Shiraishi, and M. Morii, “Extracting the secrets of openssl with rambleed,” Sensors , 2022."
+    },
+    {
+      "n": 84,
+      "id": "bib.bib84",
+      "text": "L. France, F. Bruguier, M. Mushtaq, D. Novo, and P. Benoit, “Modeling Rowhammer in the gem5 Simulator,” in CHES 2022-Conference on Cryptographic Hardware and Embedded Systems , 2022."
+    },
+    {
+      "n": 85,
+      "id": "bib.bib85",
+      "text": "A. G. Yağlıkcı, M. Patel, J. S. Kim, R. Azizibarzoki, A. Olgun, L. Orosa, H. Hassan, J. Park, K. Kanellopoullos, T. Shahroodi, S. Ghose, and O. Mutlu, “BlockHammer: Preventing RowHammer at Low Cost by Blacklisting Rapidly-Accessed DRAM Rows,” in HPCA , 2021."
+    },
+    {
+      "n": 86,
+      "id": "bib.bib86",
+      "text": "Y. Park, W. Kwon, E. Lee, T. J. Ham, J. H. Ahn, and J. W. Lee, “Graphene: Strong yet Lightweight Row Hammer Protection,” in MICRO , 2020."
+    },
+    {
+      "n": 87,
+      "id": "bib.bib87",
+      "text": "M. Redeker, B. F. Cockburn, and D. G. Elliott, “An Investigation into Crosstalk Noise in DRAM Structures,” in MTDT , 2002."
+    },
+    {
+      "n": 88,
+      "id": "bib.bib88",
+      "text": "K. Park, S. Baeg, S. Wen, and R. Wong, “Active-Precharge Hammering on a Row-Induced Failure in DDR3 SDRAMs Under 3x nm Technology,” in IIRW , 2014."
+    },
+    {
+      "n": 89,
+      "id": "bib.bib89",
+      "text": "C. Yang, C. K. Wei, Y. J. Chang, T. C. Wu, H. P. Chen, and C. S. Lai, “Suppression of RowHammer Effect by Doping Profile Modification in Saddle-Fin Array Devices for Sub-30-nm DRAM Technology,” TDMR , 2016."
+    },
+    {
+      "n": 90,
+      "id": "bib.bib90",
+      "text": "C.-M. Yang, C.-K. Wei, H.-P. Chen, J.-S. Luo, Y. J. Chang, T.-C. Wu, and C.-S. Lai, “Scanning Spreading Resistance Microscopy for Doping Profile in Saddle-Fin Devices,” IEEE Transactions on Nanotechnology , 2017."
+    },
+    {
+      "n": 91,
+      "id": "bib.bib91",
+      "text": "C. Lim, K. Park, G. Bak, D. Yun, M. Park, S. Baeg, S.-J. Wen, and R. Wong, “Study of Proton Radiation Effect to Row Hammer Fault in DDR4 SDRAMs,” Microelectronics Reliability , 2018."
+    },
+    {
+      "n": 92,
+      "id": "bib.bib92",
+      "text": "S. Gautam, S. Manhas, A. Kumar, M. Pakala, and E. Yieh, “Row Hammering Mitigation Using Metal Nanowire in Saddle Fin DRAM,” IEEE TED , 2019."
+    },
+    {
+      "n": 93,
+      "id": "bib.bib93",
+      "text": "Y. Jiang, H. Zhu, D. Sullivan, X. Guo, X. Zhang, and Y. Jin, “Quantifying RowHammer Vulnerability for DRAM Security,” in DAC , 2021."
+    },
+    {
+      "n": 94,
+      "id": "bib.bib94",
+      "text": "W. He, Z. Zhang, Y. Cheng, W. Wang, W. Song, Y. Gao, Q. Zhang, K. Li, D. Liu, and S. Nepal, “WhistleBlower: A System-level Empirical Study on RowHammer,” IEEE Transactions on Computers , 2023."
+    },
+    {
+      "n": 95,
+      "id": "bib.bib95",
+      "text": "S. Baeg, D. Yun, M. Chun, and S.-J. Wen, “Estimation of the Trap Energy Characteristics of Row Hammer-Affected Cells in Gamma-Irradiated DDR4 DRAM,” IEEE Transactions on Nuclear Science , 2022."
+    },
+    {
+      "n": 96,
+      "id": "bib.bib96",
+      "text": "O. Mutlu, “RowHammer,” https://people.inf.ethz.ch/omutlu/pub/onur-Rowhammer-TopPicksinHardwareEmbeddedSecurity-November-8-2018.pdf , 2018, Top Picks in Hardware and Embedded Security."
+    },
+    {
+      "n": 97,
+      "id": "bib.bib97",
+      "text": "A. Olgun, M. Osseiran, A. G. Yaglikci, Y. C. Tugrul, H. Luo, S. Rhyner, B. Salami, J. Gomez Luna, and O. Mutlu, “An Experimental Analysis of RowHammer in HBM2 DRAM Chips,” in DSN Disrupt , 2023."
+    },
+    {
+      "n": 98,
+      "id": "bib.bib98",
+      "text": "A. Olgun, H. Hassan, A. G. Yağlıkcı, Y. C. Tuğrul, L. Orosa, H. Luo, M. Patel, E. Oğuz, and O. Mutlu, “DRAM Bender: An Extensible and Versatile FPGA-based Infrastructure to Easily Test State-of-the-art DRAM Chips,” TCAD , 2023."
+    },
+    {
+      "n": 99,
+      "id": "bib.bib99",
+      "text": "L. Zhou, J. Li, Z. Qiao, P. Ren, Z. Sun, J. Wang, B. Wu, Z. Ji, R. Wang, K. Cao, and R. Huang, “Double-sided Row Hammer Effect in Sub-20 nm DRAM: Physical Mechanism, Key Features and Mitigation,” in IRPS , 2023."
+    },
+    {
+      "n": 100,
+      "id": "bib.bib100",
+      "text": "T. Alsop, “DRAM Manufacturers Revenue Share Worldwide from 2011 to 2022, by Quarter,” https://www.statista.com/statistics/271726/global-market-share-held-by-dram-chip-vendors-since-2010 , 2023."
+    },
+    {
+      "n": 101,
+      "id": "bib.bib101",
+      "text": "E. Wang, “Due to Falling Shipments and Prices, Global DRAM Revenue for 3Q22 Showed QoQ Drop of Almost 30%—Unprecedented Since 2008 Financial Crisis,” https://www.trendforce.com/presscenter/news/20221116-11459.html , 2022."
+    },
+    {
+      "n": 102,
+      "id": "bib.bib102",
+      "text": "A. Saxena, G. Saileshwar, P. J. Nair, and M. Qureshi, “AQUA: Scalable Rowhammer Mitigation by Quarantining Aggressor Rows at Runtime,” in MICRO , 2022."
+    },
+    {
+      "n": 103,
+      "id": "bib.bib103",
+      "text": "M. Qureshi, A. Rohan, G. Saileshwar, and P. J. Nair, “Hydra: Enabling Low-Overhead Mitigation of Row-Hammer at Ultra-Low Thresholds via Hybrid Tracking,” in ISCA , 2022."
+    },
+    {
+      "n": 104,
+      "id": "bib.bib104",
+      "text": "G. Saileshwar, B. Wang, M. Qureshi, and P. J. Nair, “Randomized Row-Swap: Mitigating Row Hammer by Breaking Spatial Correlation Between Aggressor and Victim Rows,” in ASPLOS , 2022."
+    }
+  ]
+}

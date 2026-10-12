@@ -1,0 +1,139 @@
+{
+  "source_type": "research_paper",
+  "source_id": "arXiv:2402.19450",
+  "title": "Functional Benchmarks for Robust Evaluation of Reasoning Performance, and the Reasoning Gap",
+  "authors": "Saurabh Srivastava, Annarose M B, Anto P, Shashank Menon, Ajay Sukumar, Adwaith Samod T, Alan Philipose, Stevin Prince, Sooraj Thomas",
+  "year": "2024",
+  "categories": [
+    "cs.AI",
+    "cs.CL"
+  ],
+  "url": "https://arxiv.org/abs/2402.19450",
+  "html_url": "https://arxiv.org/html/2402.19450",
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "section": "Introduction",
+  "word_count": 1296,
+  "text": "Accurately evaluating reasoning performance is critical to improving large language models (LLMs) beyond their current capabilities. The current standard for benchmarking fails to accurately measure reasoning of LLMs. An accurate test should consist of posing a question whose answer can be derived under the assumption of axioms for that domain. Reasoning systems (or humans) should be able to conclude the answer despite not having seen the question before. An ideal system would provide not only the answer but also each step of the derivation. Explicit elucidation of steps is ideal, but not critical. State-of-the-art language models exhibit some reasoning capabilities, but accurate evaluation is lagging. In particular, the capabilities of LLMs may be overestimated because they are tested using benchmarks that are sufficient for language understanding (textual question, answer) but may not accurately measure reasoning.\n\nWhen testing generalized problem-solving, the aim is to assess whether the tested system can effectively answer questions it has not encountered before. This is the opposite objective when compared to knowledge retrieval. Finding novel questions is challenging when the model has been trained on a snapshot of the internet. Even if datasets exist that are not currently on the internet, it is unreasonable to expect them to remain so, or that we will continue to develop novel datasets. Contamination-testing by checking for k -contiguous token sequences fails to account for various other forms in which leakage might occur, especially when the benchmark is a set of static text question-answers (“static QAs”). These may include i) accidental leakage occurring from paraphrasing or compressed representations in the training data or fragments of semantically similar statements; ii) not accounting for the provenance of data used in every stage of training or fine-tuning, which becomes increasingly difficult as more models are trained from existing high-quality starting weights; iii) sourcing synthetic training data from an existing model which could be contaminated, especially if it is closed-source and closed-data, iv) overfitting through preference tuning, which may in the extreme case cause reinforcement feedback allowing the model to evolve to discover correct static answers.\n\nChecking against a static QA is only an indirect test of reasoning. Text questions and answers work well for humans as producing correct answers implies likely correct stepwise reasoning. The same does not apply to model outputs.\n\nWe propose an alternative approach that alleviates concerns with static QA testing, but also works seamlessly with existing evaluation harnesses. We propose rewriting each static QA’s reasoning into code, whose inputs can be varied to create infinite versions that follow the same reasoning pattern, but the steps needed in each would be different. We call this the functional variant of the benchmark, and running each of those code fragments will create a snapshot that is a drop-in replacement into the existing static evaluation harness. The accuracy on these replacements, with the static variant included, might be lower than that on the static variant alone, which we quantify as the reasoning gap.\n\nFor domains where this can be done, employing functional variants would improve on static QA evaluation. We would convert a static benchmark Bench (e.g., MATH or GSM8K or HumanEval) into their functional variant Bench(rngs). The functional variants (denoted here as QA(rngs)) take as inputs a set of deterministic typed random generators rngs which output a pseudorandom typed value, e.g., natural int, positive or negative float, fractions, string, positive evens or odds, primes. The rngs when seeded make the instantiation deterministic, generating a snapshot of each test (denoted here as QA*) and of the entire benchmark.\n\nEach QA* text pair in this snapshot is different from the original static QA. However, answering QA* requires the same reasoning used in the static QA. To have an unbiased accurate baseline, we created the functionalization manually by rewriting the reasoning of each test into code. Functionalization—a one-time time-consuming task—results in infinite snapshot instantiations to test against.\n\nOf the popular benchmarks, functionalization is easy for the subcategories of math (MATH [1] and GSM8K [2]), and code (HumanEval [3], MBPP [4], and Natural2Code [5]). The categories of commonsense reasoning (HellaSwag [6], Winogrande [7], PIQA [8], SIQA [9], OpenbookQA [10], ARC-Easy/Challenge [11], CommonsenseQA [12]), world knowledge (NaturalQuestions [13], TriviaQA [14]), and reading comprehension (BoolQ [15], QuAC [16], DROP [17]) test English understanding and thus are not good candidates for functionalization. Subparts of the aggregated benchmarks (MMLU [18], HELM [19], BBH [20], and AGI Eval [21]) could be functionalized.\n\nAs of this work, we have functionalized 41.2% of the MATH benchmark, with the subset chosen so as to fully cover the static QA tests solved by 4 closed-weight and 9 open-weight state-of-the-art (SOTA) models. This allows us to provide complete metrics over all of MATH for these models, assuming a simple few-shot prompting strategy. We find a reasoning gap of 58.35% to 80.31% across these models. The value of the gap when using optimized prompting such as chain-of-thought (CoT [22]), tree-of-thought (ToT [23]), chain-of-code (CoC [24]), amongst others, could be lower and we will resolve that open question when we have built the100% functionalized MATH().\n\nIn future work, we will present functionalized variants of GSM8K, HumanEval, and MBPP.\n\n## 2.1 Contributions\n\nThis work presents the first steps towards reasoning evaluation with functional benchmarks:\n\n- • Framework for evaluation for models that have seen the text of the entire internet: We present a proposal for a long-term solution to the problem of evaluating models that are increasingly trained on all written knowledge. The proposed framework allows a benchmark to be instantiated to infinite snapshots, with a probabilistic guarantee that a new snapshot will not have existed before. For a static QA in the benchmark whose individual test captures a specific reasoning process, each snapshot QA* will follow the same process, but the test will be new. For a model to perform well on a set of snapshots, it will need to be able to perform step-by-step derivations to reach an answer, rather than simply recalling a static final answer.\n\n- • Functional version of MATH, an important benchmark for reasoning evaluation, and its publicly available snapshots: Our framework is designed to allow the reworking of existing benchmarks on which models are already being tested without modification. We are in the process of functionalizing the entire MATH benchmark. The specific functionalization code will never be publicly accessible. Instead three snapshots will be released every quarter. The {Oct, Nov, Dec}-2023 snapshots are available at https://github.com/consequentai/fneval/ along with the evaluation code. The repository will be kept up to date with the last quarter’s snapshots.\n\n- • Robust evaluations that are resistant to contamination: There are infinite snapshots of a functional benchmark, with the reasoning involved in each remaining identical. If a model consistently solves a problem across multiple snapshots (e.g., three snapshots) then there is a high likelihood it does so with proper reasoning, because it should be fairly difficult to get the answer right across many snapshots by chance.\n\n- • Reasoning gap: We define the reasoning gap as the quantitative measure of the difference in accuracy when testing against static vs functional variants. The gap is a measure of reasoning vs memorization, with gap-0 being true reasoning and gap-100 being full memorization. The community should aim to build models that have the highest accuracy while maintaining a gap close to 0. Minimizing the gap may serve as a training optimization objective that could lead to models that perform better at generalized reasoning.\n\n- • Open problem of training gap-0 models: Here we show that even the current best models have large reasoning gaps, with the caveat that the reasoning gap is likely to be smaller with more sophisticated prompting strategies. Our current datasets, training, fine-tuning, and inference strategies might be non-optimal for training gap-0 models. We leave it as an open problem to train gap-0 models.",
+  "references": [
+    {
+      "n": 1,
+      "id": "bib.bib29",
+      "text": "Dan Hendrycks, Collin Burns, Saurav Kadavath, Akul Arora, Steven Basart, Eric Tang, Dawn Song, and Jacob Steinhardt. Measuring mathematical problem solving with the MATH dataset. CoRR , abs/2103.03874, 2021."
+    },
+    {
+      "n": 2,
+      "id": "bib.bib20",
+      "text": "Karl Cobbe, Vineet Kosaraju, Mohammad Bavarian, Mark Chen, Heewoo Jun, Lukasz Kaiser, Matthias Plappert, Jerry Tworek, Jacob Hilton, Reiichiro Nakano, Christopher Hesse, and John Schulman. Training verifiers to solve math word problems. CoRR , abs/2110.14168, 2021."
+    },
+    {
+      "n": 3,
+      "id": "bib.bib12",
+      "text": "Mark Chen, Jerry Tworek, Heewoo Jun, Qiming Yuan, Henrique Pondé de Oliveira Pinto, Jared Kaplan, Harrison Edwards, Yuri Burda, Nicholas Joseph, Greg Brockman, Alex Ray, Raul Puri, Gretchen Krueger, Michael Petrov, Heidy Khlaaf, Girish Sastry, Pamela Mishkin, Brooke Chan, Scott Gray, Nick Ryder, Mikhail Pavlov, Alethea Power, Lukasz Kaiser, Mohammad Bavarian, Clemens Winter, Philippe Tillet, Felipe Petroski Such, Dave Cummings, Matthias Plappert, Fotios Chantzis, Elizabeth Barnes, Ariel Herbert-Voss, William Hebgen Guss, Alex Nichol, Alex Paino, Nikolas Tezak, Jie Tang, Igor Babuschkin, Suchir Balaji, Shantanu Jain, William Saunders, Christopher Hesse, Andrew N. Carr, Jan Leike, Joshua Achiam, Vedant Misra, Evan Morikawa, Alec Radford, Matthew Knight, Miles Brundage, Mira Murati, Katie Mayer, Peter Welinder, Bob McGrew, Dario Amodei, Sam McCandlish, Ilya Sutskever, and Wojciech Zaremba. Evaluating large language models trained on code. CoRR , abs/2107.03374, 2021."
+    },
+    {
+      "n": 4,
+      "id": "bib.bib7",
+      "text": "Jacob Austin, Augustus Odena, Maxwell I. Nye, Maarten Bosma, Henryk Michalewski, David Dohan, Ellen Jiang, Carrie J. Cai, Michael Terry, Quoc V. Le, and Charles Sutton. Program synthesis with large language models. CoRR , abs/2108.07732, 2021."
+    },
+    {
+      "n": 5,
+      "id": "bib.bib71",
+      "text": "Gemini Team. Gemini: A family of highly capable multimodal models, 2023."
+    },
+    {
+      "n": 6,
+      "id": "bib.bib89",
+      "text": "Rowan Zellers, Ari Holtzman, Yonatan Bisk, Ali Farhadi, and Yejin Choi. Hellaswag: Can a machine really finish your sentence? CoRR , abs/1905.07830, 2019."
+    },
+    {
+      "n": 7,
+      "id": "bib.bib59",
+      "text": "Keisuke Sakaguchi, Ronan Le Bras, Chandra Bhagavatula, and Yejin Choi. WINOGRANDE: an adversarial winograd schema challenge at scale. CoRR , abs/1907.10641, 2019."
+    },
+    {
+      "n": 8,
+      "id": "bib.bib11",
+      "text": "Yonatan Bisk, Rowan Zellers, Ronan Le Bras, Jianfeng Gao, and Yejin Choi. PIQA: reasoning about physical commonsense in natural language. CoRR , abs/1911.11641, 2019."
+    },
+    {
+      "n": 9,
+      "id": "bib.bib60",
+      "text": "Maarten Sap, Hannah Rashkin, Derek Chen, Ronan Le Bras, and Yejin Choi. Socialiqa: Commonsense reasoning about social interactions. CoRR , abs/1904.09728, 2019."
+    },
+    {
+      "n": 10,
+      "id": "bib.bib50",
+      "text": "Todor Mihaylov, Peter Clark, Tushar Khot, and Ashish Sabharwal. Can a suit of armor conduct electricity? A new dataset for open book question answering. CoRR , abs/1809.02789, 2018."
+    },
+    {
+      "n": 11,
+      "id": "bib.bib19",
+      "text": "Peter Clark, Isaac Cowhey, Oren Etzioni, Tushar Khot, Ashish Sabharwal, Carissa Schoenick, and Oyvind Tafjord. Think you have solved question answering? try arc, the AI2 reasoning challenge. CoRR , abs/1803.05457, 2018."
+    },
+    {
+      "n": 12,
+      "id": "bib.bib70",
+      "text": "Alon Talmor, Jonathan Herzig, Nicholas Lourie, and Jonathan Berant. Commonsenseqa: A question answering challenge targeting commonsense knowledge. CoRR , abs/1811.00937, 2018."
+    },
+    {
+      "n": 13,
+      "id": "bib.bib38",
+      "text": "Tom Kwiatkowski, Jennimaria Palomaki, Olivia Redfield, Michael Collins, Ankur Parikh, Chris Alberti, Danielle Epstein, Illia Polosukhin, Jacob Devlin, Kenton Lee, Kristina Toutanova, Llion Jones, Matthew Kelcey, Ming-Wei Chang, Andrew M. Dai, Jakob Uszkoreit, Quoc Le, and Slav Petrov. Natural questions: A benchmark for question answering research. Transactions of the Association for Computational Linguistics , 7:452–466, 2019."
+    },
+    {
+      "n": 14,
+      "id": "bib.bib36",
+      "text": "Mandar Joshi, Eunsol Choi, Daniel Weld, and Luke Zettlemoyer. TriviaQA: A large scale distantly supervised challenge dataset for reading comprehension. In Regina Barzilay and Min-Yen Kan, editors, Proceedings of the 55th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) , pages 1601–1611, Vancouver, Canada, July 2017. Association for Computational Linguistics."
+    },
+    {
+      "n": 15,
+      "id": "bib.bib18",
+      "text": "Christopher Clark, Kenton Lee, Ming-Wei Chang, Tom Kwiatkowski, Michael Collins, and Kristina Toutanova. BoolQ: Exploring the surprising difficulty of natural yes/no questions. In Jill Burstein, Christy Doran, and Thamar Solorio, editors, Proceedings of the 2019 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long and Short Papers) , pages 2924–2936, Minneapolis, Minnesota, June 2019. Association for Computational Linguistics."
+    },
+    {
+      "n": 16,
+      "id": "bib.bib16",
+      "text": "Eunsol Choi, He He, Mohit Iyyer, Mark Yatskar, Wen-tau Yih, Yejin Choi, Percy Liang, and Luke Zettlemoyer. Quac : Question answering in context. CoRR , abs/1808.07036, 2018."
+    },
+    {
+      "n": 17,
+      "id": "bib.bib22",
+      "text": "Dheeru Dua, Yizhong Wang, Pradeep Dasigi, Gabriel Stanovsky, Sameer Singh, and Matt Gardner. DROP: A reading comprehension benchmark requiring discrete reasoning over paragraphs. CoRR , abs/1903.00161, 2019."
+    },
+    {
+      "n": 18,
+      "id": "bib.bib28",
+      "text": "Dan Hendrycks, Collin Burns, Steven Basart, Andy Zou, Mantas Mazeika, Dawn Song, and Jacob Steinhardt. Measuring massive multitask language understanding. CoRR , abs/2009.03300, 2020."
+    },
+    {
+      "n": 19,
+      "id": "bib.bib43",
+      "text": "Percy Liang, Rishi Bommasani, Tony Lee, Dimitris Tsipras, Dilara Soylu, Michihiro Yasunaga, Yian Zhang, Deepak Narayanan, Yuhuai Wu, Ananya Kumar, Benjamin Newman, Binhang Yuan, Bobby Yan, Ce Zhang, Christian Cosgrove, Christopher D. Manning, Christopher Ré, Diana Acosta-Navas, Drew A. Hudson, Eric Zelikman, Esin Durmus, Faisal Ladhak, Frieda Rong, Hongyu Ren, Huaxiu Yao, Jue Wang, Keshav Santhanam, Laurel Orr, Lucia Zheng, Mert Yuksekgonul, Mirac Suzgun, Nathan Kim, Neel Guha, Niladri Chatterji, Omar Khattab, Peter Henderson, Qian Huang, Ryan Chi, Sang Michael Xie, Shibani Santurkar, Surya Ganguli, Tatsunori Hashimoto, Thomas Icard, Tianyi Zhang, Vishrav Chaudhary, William Wang, Xuechen Li, Yifan Mai, Yuhui Zhang, and Yuta Koreeda. Holistic evaluation of language models, 2023."
+    },
+    {
+      "n": 20,
+      "id": "bib.bib69",
+      "text": "Mirac Suzgun, Nathan Scales, Nathanael Schärli, Sebastian Gehrmann, Yi Tay, Hyung Won Chung, Aakanksha Chowdhery, Quoc V. Le, Ed H. Chi, Denny Zhou, and Jason Wei. Challenging big-bench tasks and whether chain-of-thought can solve them, 2022."
+    },
+    {
+      "n": 21,
+      "id": "bib.bib94",
+      "text": "Wanjun Zhong, Ruixiang Cui, Yiduo Guo, Yaobo Liang, Shuai Lu, Yanlin Wang, Amin Saied, Weizhu Chen, and Nan Duan. Agieval: A human-centric benchmark for evaluating foundation models, 2023."
+    },
+    {
+      "n": 22,
+      "id": "bib.bib80",
+      "text": "Jason Wei, Xuezhi Wang, Dale Schuurmans, Maarten Bosma, Ed H. Chi, Quoc Le, and Denny Zhou. Chain of thought prompting elicits reasoning in large language models. CoRR , abs/2201.11903, 2022."
+    },
+    {
+      "n": 23,
+      "id": "bib.bib85",
+      "text": "Shunyu Yao, Dian Yu, Jeffrey Zhao, Izhak Shafran, Thomas L. Griffiths, Yuan Cao, and Karthik Narasimhan. Tree of thoughts: Deliberate problem solving with large language models, 2023."
+    },
+    {
+      "n": 24,
+      "id": "bib.bib41",
+      "text": "Chengshu Li, Jacky Liang, Andy Zeng, Xinyun Chen, Karol Hausman, Dorsa Sadigh, Sergey Levine, Li Fei-Fei, Fei Xia, and Brian Ichter. Chain of code: Reasoning with a language model-augmented code emulator, 2023."
+    }
+  ]
+}
