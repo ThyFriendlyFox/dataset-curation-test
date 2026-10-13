@@ -111,8 +111,8 @@ Four approaches, each at two granularities, each with train / validation / test 
 |---|---|---|---|
 | `A_reconstructed_5stage` | 720 | 645 / 37 / 38 | 1,213 |
 | `A_reconstructed_9step` | 720 | 645 / 37 / 38 | 1,213 |
-| `B_wiki_history_5stage` | 17 | 15 / 0 / 2 | 2,127 |
-| `B_wiki_history_9step` | 17 | 15 / 0 / 2 | 2,127 |
+| `B_wiki_history_5stage` | 18 | 16 / 0 / 2 | 2,037 |
+| `B_wiki_history_9step` | 18 | 16 / 0 / 2 | 2,037 |
 | `C_github_commits_5stage` | 1,249 | 1,125 / 64 / 60 | 2,292 |
 | `C_github_commits_9step` | 807 | 734 / 39 / 34 | 2,558 |
 | `D_mix_5stage` | 346 | 321 / 13 / 12 | 1,657 |
