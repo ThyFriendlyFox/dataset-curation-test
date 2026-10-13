@@ -109,14 +109,14 @@ Four approaches, each at two granularities, each with train / validation / test 
 
 | config | rows | train / validation / test | mean final length (words) |
 |---|---|---|---|
-| `A_reconstructed_5stage` | 559 | 500 / 29 / 30 | 1,199 |
-| `A_reconstructed_9step` | 559 | 500 / 29 / 30 | 1,199 |
+| `A_reconstructed_5stage` | 720 | 645 / 37 / 38 | 1,213 |
+| `A_reconstructed_9step` | 720 | 645 / 37 / 38 | 1,213 |
 | `B_wiki_history_5stage` | 17 | 15 / 0 / 2 | 2,127 |
 | `B_wiki_history_9step` | 17 | 15 / 0 / 2 | 2,127 |
-| `C_github_commits_5stage` | 1,273 | 1,148 / 65 / 60 | 2,285 |
-| `C_github_commits_9step` | 827 | 753 / 40 / 34 | 2,547 |
-| `D_mix_5stage` | 268 | 250 / 9 / 9 | 1,710 |
-| `D_mix_9step` | 245 | 231 / 6 / 8 | 1,644 |
+| `C_github_commits_5stage` | 1,249 | 1,125 / 64 / 60 | 2,292 |
+| `C_github_commits_9step` | 807 | 734 / 39 / 34 | 2,558 |
+| `D_mix_5stage` | 346 | 321 / 13 / 12 | 1,657 |
+| `D_mix_9step` | 319 | 298 / 10 / 11 | 1,607 |
 
 The 80 rows of the first trial (10 per config) are kept as `trial_*` configs and are also included in the
 full configs.
