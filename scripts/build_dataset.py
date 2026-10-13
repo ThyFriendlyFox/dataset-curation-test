@@ -9,7 +9,7 @@ Every row has the same schema; step 0 is always the "idea" (prompt for A, title 
 step is always the finished document. The 5-stage variant of A is steps 0,2,4,6,8 of the 9-step one;
 for B/C both variants are sampled from the same pool of real versions.
 
-Usage: python3 scripts/build_dataset.py   (writes data/*.parquet, data/*.jsonl, review/*.md)
+Usage: python3 scripts/build_dataset.py   (writes data/trial/*.parquet, data/trial/*.jsonl, review/trial/)
 """
 import difflib, functools, glob, gzip, json, os, re
 import pyarrow as pa
@@ -178,15 +178,15 @@ def c_row(name, variant, path=None):
 
 
 def write(fname, rows):
-    os.makedirs(os.path.join(ROOT, "data"), exist_ok=True)
+    os.makedirs(os.path.join(ROOT, "data", "trial"), exist_ok=True)
     for r in rows:
         r["domain"] = "computer_science"
         r["num_steps"] = len(r["steps"])
-    with open(os.path.join(ROOT, "data", f"{fname}.jsonl"), "w", encoding="utf-8") as f:
+    with open(os.path.join(ROOT, "data", "trial", f"{fname}.jsonl"), "w", encoding="utf-8") as f:
         for r in rows:
             f.write(json.dumps(r, ensure_ascii=False) + "\n")
-    pq.write_table(pa.Table.from_pylist(rows), os.path.join(ROOT, "data", f"{fname}.parquet"), compression="zstd")
-    review(fname, rows)
+    pq.write_table(pa.Table.from_pylist(rows), os.path.join(ROOT, "data", "trial", f"{fname}.parquet"), compression="zstd")
+    review(f"trial/{fname}", rows)
 
 
 def review(fname, rows):
