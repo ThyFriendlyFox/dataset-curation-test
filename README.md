@@ -2,7 +2,7 @@
 license: cc-by-sa-4.0
 language:
   - en
-pretty_name: Draft-to-Polish Trajectories (CS) — trial
+pretty_name: Draft-to-Polish Trajectories (Computer Science)
 tags:
   - text-diffusion
   - iterative-refinement
@@ -12,57 +12,143 @@ tags:
 task_categories:
   - text-generation
 size_categories:
-  - n<1K
+  - 1K<n<10K
 configs:
   - config_name: A_reconstructed_5stage
-    data_files: data/A_reconstructed_5stage.parquet
+    data_files:
+      - split: train
+        path: data/full/A_reconstructed_5stage/train.parquet
+      - split: validation
+        path: data/full/A_reconstructed_5stage/validation.parquet
+      - split: test
+        path: data/full/A_reconstructed_5stage/test.parquet
   - config_name: A_reconstructed_9step
-    data_files: data/A_reconstructed_9step.parquet
+    default: true
+    data_files:
+      - split: train
+        path: data/full/A_reconstructed_9step/train.parquet
+      - split: validation
+        path: data/full/A_reconstructed_9step/validation.parquet
+      - split: test
+        path: data/full/A_reconstructed_9step/test.parquet
   - config_name: B_wiki_history_5stage
-    data_files: data/B_wiki_history_5stage.parquet
+    data_files:
+      - split: train
+        path: data/full/B_wiki_history_5stage/train.parquet
+      - split: test
+        path: data/full/B_wiki_history_5stage/test.parquet
   - config_name: B_wiki_history_9step
-    data_files: data/B_wiki_history_9step.parquet
+    data_files:
+      - split: train
+        path: data/full/B_wiki_history_9step/train.parquet
+      - split: test
+        path: data/full/B_wiki_history_9step/test.parquet
   - config_name: C_github_commits_5stage
-    data_files: data/C_github_commits_5stage.parquet
+    data_files:
+      - split: train
+        path: data/full/C_github_commits_5stage/train.parquet
+      - split: validation
+        path: data/full/C_github_commits_5stage/validation.parquet
+      - split: test
+        path: data/full/C_github_commits_5stage/test.parquet
   - config_name: C_github_commits_9step
-    data_files: data/C_github_commits_9step.parquet
+    data_files:
+      - split: train
+        path: data/full/C_github_commits_9step/train.parquet
+      - split: validation
+        path: data/full/C_github_commits_9step/validation.parquet
+      - split: test
+        path: data/full/C_github_commits_9step/test.parquet
   - config_name: D_mix_5stage
-    data_files: data/D_mix_5stage.parquet
+    data_files:
+      - split: train
+        path: data/full/D_mix_5stage/train.parquet
+      - split: validation
+        path: data/full/D_mix_5stage/validation.parquet
+      - split: test
+        path: data/full/D_mix_5stage/test.parquet
   - config_name: D_mix_9step
-    data_files: data/D_mix_9step.parquet
+    data_files:
+      - split: train
+        path: data/full/D_mix_9step/train.parquet
+      - split: validation
+        path: data/full/D_mix_9step/validation.parquet
+      - split: test
+        path: data/full/D_mix_9step/test.parquet
+  - config_name: trial_A_reconstructed_5stage
+    data_files: data/trial/A_reconstructed_5stage.parquet
+  - config_name: trial_A_reconstructed_9step
+    data_files: data/trial/A_reconstructed_9step.parquet
+  - config_name: trial_B_wiki_history_5stage
+    data_files: data/trial/B_wiki_history_5stage.parquet
+  - config_name: trial_B_wiki_history_9step
+    data_files: data/trial/B_wiki_history_9step.parquet
+  - config_name: trial_C_github_commits_5stage
+    data_files: data/trial/C_github_commits_5stage.parquet
+  - config_name: trial_C_github_commits_9step
+    data_files: data/trial/C_github_commits_9step.parquet
+  - config_name: trial_D_mix_5stage
+    data_files: data/trial/D_mix_5stage.parquet
+  - config_name: trial_D_mix_9step
+    data_files: data/trial/D_mix_9step.parquet
 ---
 
-# Draft-to-Polish Trajectories (Computer Science) — 10-row trial
+# Draft-to-Polish Trajectories (Computer Science)
 
-Training data for a **text-diffusion prototype in which denoising is drafting**: instead of going from
-noise to text, each timestep moves a document from *idea → outline → rough draft → cited draft → polished
-final*, the way people actually write.
+Training data for a **text-diffusion model in which denoising is drafting**. Instead of going from noise
+to text, each timestep moves a document from *idea → outline → rough draft → cited draft → polished final*,
+the way people actually write.
 
 Every row is **one document** shown as an ordered list of complete snapshots (`steps`). Step 0 is the
-idea (a prompt or a title); the last step is the finished, cited text. All rows are computer science.
+idea (a prompt or a title); the last step is the finished text. Every row is computer science or closely
+related (algorithms, theory, systems, programming languages, ML, security, networking).
 
-This is a **trial**: 4 approaches × 2 granularities = 8 files of 10 rows each, built to be compared and
-graded before scaling up.
+## Configs
+
+Four approaches, each at two granularities, each with train / validation / test splits.
+
+| config | rows | train / validation / test | mean final length (words) |
+|---|---|---|---|
+| `A_reconstructed_5stage` | 559 | 500 / 29 / 30 | 1,199 |
+| `A_reconstructed_9step` | 559 | 500 / 29 / 30 | 1,199 |
+| `B_wiki_history_5stage` | 17 | 15 / 0 / 2 | 2,127 |
+| `B_wiki_history_9step` | 17 | 15 / 0 / 2 | 2,127 |
+| `C_github_commits_5stage` | 1,273 | 1,148 / 65 / 60 | 2,285 |
+| `C_github_commits_9step` | 827 | 753 / 40 / 34 | 2,547 |
+| `D_mix_5stage` | 268 | 250 / 9 / 9 | 1,710 |
+| `D_mix_9step` | 245 | 231 / 6 / 8 | 1,644 |
+
+The 80 rows of the first trial (10 per config) are kept as `trial_*` configs and are also included in the
+full configs.
+
+```python
+from datasets import load_dataset
+ds = load_dataset("<this repo>", "A_reconstructed_9step")   # or any config above
+row = ds["train"][0]
+for s in row["steps"]:
+    print(s["step"], s["name"], s["word_count"])
+```
 
 ## The four approaches
 
-| file prefix | approach | where the steps come from | strength | weakness |
-|---|---|---|---|---|
-| `A_reconstructed` | Backward reconstruction | Final = a real, cited arXiv CS paper introduction or Wikipedia CS section. Earlier steps written *backwards* from it under strict rules ([spec](docs/reconstruction_spec.md)): no new facts, only the source's real citations. | Clean, aligned stages exactly matching outline → fill → cite → polish | Intermediate drafts are model-written (distilled), not real human drafts |
-| `B_wiki_history` | Real revision history | Snapshots of a Wikipedia CS article's actual edit history, from first version to today (reverted edits skipped). | Real human process; citations accrue naturally | Stages are not labeled; growth is uneven; whole articles are long |
-| `C_github_commits` | Real git history | Successive commits of a real design document (Rust RFCs, Python PEPs) from first draft to accepted text. | Real drafting by the authors; several start from an outline template | Design docs, not essays; citations are mostly links, not references |
-| `D_mix` | Mix | 7 A-type rows (5 arXiv intros + ENIAC, Dijkstra's algorithm) + 3 B-type rows (Huffman coding, Levenshtein distance, Rabin–Karp). No document appears in A or B. | Tests whether the two kinds combine | — |
+| prefix | where the steps come from | strength | weakness |
+|---|---|---|---|
+| `A_reconstructed` | The final is a real, cited text: an openly licensed arXiv CS paper introduction or a Wikipedia CS article section. Earlier steps are written *backwards* from it under strict rules ([spec](docs/reconstruction_spec.md)): no new facts, only the source's real citations, every row machine-validated. | Clean, aligned stages exactly matching outline → fill → cite → polish | Intermediate drafts are model-written (distilled), not real human drafts |
+| `B_wiki_history` | Real snapshots of a Wikipedia CS article's edit history, from its first version to today (reverted edits skipped). | Real human process; citations accrue naturally | Stages are not labeled; growth is uneven; articles are long. Small, because Wikipedia rate-limits history downloads |
+| `C_github_commits` | Real successive commits of a design document, from first draft to accepted text: Rust RFCs, Python PEPs, Swift Evolution, Go, Kotlin KEEP and Scala SIP proposals, Ethereum EIPs. | Real drafting by the authors; many start from an outline template | Design documents, not essays; citations are mostly links |
+| `D_mix` | ~70% A-type rows + ~30% real-history rows (B-type first, topped up with C-type). No document appears in two configs. | Tests whether reconstructed and real trajectories combine | — |
 
 ## The two granularities
 
-* `*_5stage` — 5 steps. For A: `prompt, outline, rough_draft, cited_draft, final`. For B/C: `title` + 4 real
-  versions (`earliest_version, early_revision, late_revision, final`).
-* `*_9step` — 9 steps. For A: `prompt, skeleton_outline, detailed_outline, partial_draft, rough_draft,
-  draft_citation_needed, cited_draft, revised_draft, final`. For B/C: `title` + 8 real versions.
+* `*_5stage`: 5 steps. A: `prompt, outline, rough_draft, cited_draft, final`. B/C: `title` + 4 real versions
+  (`earliest_version, early_revision, late_revision, final`).
+* `*_9step`: 9 steps. A: `prompt, skeleton_outline, detailed_outline, partial_draft, rough_draft,
+  draft_citation_needed, cited_draft, revised_draft, final`. B/C: `title` + 8 real versions.
 
-The A 5-stage steps are exactly steps 0/2/4/6/8 of the 9-step rows. For B/C, real versions are picked
-from the history so that consecutive steps are roughly equal amounts of progress toward the final text
-(measured by word-level similarity), always including the first version and the final one.
+A's 5-stage steps are exactly steps 0/2/4/6/8 of its 9-step rows. For B/C, versions are picked from the
+real history so consecutive steps are roughly equal amounts of progress toward the final (word-level
+similarity), always including the first version and the final one. Histories with fewer than 8 distinct
+versions appear only in the 5-stage configs (never padded), which is why the 9-step B/C/D configs are smaller.
 
 ## Schema
 
@@ -74,60 +160,69 @@ from the history so that consecutive steps are roughly equal amounts of progress
 | `domain` | string | always `computer_science` |
 | `title` | string | document title |
 | `num_steps` | int | 5 or 9 |
-| `steps` | list | ordered snapshots, each `{step, name, text, word_count, citation_count, similarity_to_final, provenance}` |
+| `split` | string | `train` / `validation` / `test` (stable hash of `id`) |
+| `steps` | list | ordered snapshots: `{step, name, text, word_count, citation_count, similarity_to_final, provenance}` |
 | `source` | struct | `{url, license, authors, section, source_id, notes}` |
 
 `provenance` says where each step's text came from: `reconstructed`, `source`, `source_title`,
 `enwiki rev <id> (<date>)`, or `commit <sha> (<date>)`.
 
-## What's in the trial
+## How it was built
 
-| file | rows | steps | mean final length (words) | documents |
-|---|---|---|---|---|
-| A_reconstructed | 10 | 5 / 9 | 1,169 | arXiv: Gated SAEs, Vigenère key length, palindrome/square streaming, residential-proxy traffic, Z3alpha SMT strategies · Wikipedia: Turing machine, Halting problem, Quicksort (History); Hash table (Hash function); Lambda calculus (History) |
-| B_wiki_history | 10 | 5 / 9 | 2,371 | Bloom filter, Skip list, Merkle tree, Trie, Rope, Fenwick tree, Bogosort, Byzantine fault, Two Generals' Problem, Dining philosophers |
-| C_github_commits | 10 | 5 / 9 | 2,610 | Rust RFCs: or-patterns, trait alias, feature unification, destructuring assignment, `black_box` · PEPs 318, 308, 479, 526, 378 |
-| D_mix | 10 | 5 / 9 | 1,590 | arXiv: Tao, query expansion for cross-encoders, upsampling fairness, OOD via normalizing flows, attention bridges · Wikipedia: ENIAC, Dijkstra's algorithm · histories: Huffman coding, Levenshtein distance, Rabin–Karp |
+* **A sources.** arXiv OAI-PMH harvest of CS papers (primary category `cs.*`) licensed CC BY / CC BY-SA /
+  CC0; the Introduction is extracted from arXiv's HTML with citations as `[n]` and the cited bibliography
+  entries; kept if 250–1,300 words with ≥3 resolved citations. Wikipedia: CS articles from 41 CS categories
+  (via PetScan), one cited section per article (250–1,300 words, ≥3 citations).
+* **Topic filter.** Wikipedia articles whose Wikidata item is a person, organization, company, product,
+  software product, website, dataset or event are excluded (programming languages, algorithms, data
+  structures, protocols and file formats are kept).
+* **A drafts.** Written by parallel model writers following [the spec](docs/reconstruction_spec.md), then
+  checked by [`validate_reconstruction.py`](scripts/validate_reconstruction.py): no citation markers before
+  the cited draft, `[citation needed]` exactly where the final cites, cited-draft markers identical to the
+  final's, references verbatim, and no numbers absent from the final. Writers skipped sources with garbled
+  extraction (missing equations, stripped code) rather than invent content.
+* **B/C histories.** Wikipedia revisions via the MediaWiki API (wikitext converted to text with numbered
+  citations); git histories from full clones, following renames and stripping metadata headers.
 
-## Reviewing
+## Review
 
-Start at [`review/`](review/README.md): one folder per file, each with an index table and one page per
-row showing every step (collapsible) plus per-step word count, citation count, similarity to final and
-provenance.
+Sample pages for every config are in [`review/full/`](review/full/) (10 test-split rows each, every step
+viewable), and the graded trial is in [`review/trial/`](review/trial/README.md).
 
-## Known issues (trial)
+## Known issues
 
-* **A, arXiv rows**: papers that cite by author name read like "[9] and [10] recently used…" because
-  names are replaced by numbered markers in extraction. Uncited drafts say "prior work…" instead of
-  inventing names.
-* **A/D, Wikipedia rows**: Wikipedia `{{rp}}` page locators survive as ": 2" after some markers; they
-  appear only in the final and revised steps.
-* **B**: real histories are uneven. Levenshtein distance (D) jumps from 0.17 to 1.0 similarity in its
-  last step because the article was substantially rewritten in September 2026. Rope has a single
-  reference; Rabin–Karp has none inline (its sources are a general bibliography), so neither shows a
-  citation stage. Whole articles are long (Bloom filter's final is ~7,500 words).
-* **C**: some documents arrive nearly complete in one commit (e.g. the or-patterns RFC goes from a
-  269-word stub to 2,893 words in one commit). Citations in RFCs/PEPs are mostly links, so
-  `citation_count` (bracketed numeric markers) is approximate there.
-* `similarity_to_final` is word-level `difflib` ratio; it is a progress signal, not a quality score.
+* **A, arXiv rows**: papers that cite by author name read like "[9] and [10] recently used…", because
+  names become numbered markers in extraction. Uncited drafts say "prior work…" rather than invent names.
+* **A, Wikipedia rows**: some page locators survive as ": 2" after markers (final and revised steps only).
+* **B** is small: Wikipedia rate-limits this environment's shared IP, so only a few dozen full histories
+  could be downloaded. Real histories are uneven (an article may be rewritten in one edit), and some
+  articles have no inline citations, so they show no citation stage.
+* **C**: some documents arrive nearly complete in one commit. Citations are mostly links, so
+  `citation_count` (bracketed numeric markers) is approximate.
+* The topic filter is not perfect; a small share of rows are adjacent fields (applied math, signal
+  processing) or general computing history.
+* `similarity_to_final` is word-level `difflib` ratio, a progress signal, not a quality score.
 
 ## Sources and licenses
 
-* arXiv papers: only papers whose arXiv license is CC BY 4.0 or CC BY-SA 4.0 (checked against arXiv
-  OAI-PMH metadata). Attribution is in each row's `source`.
+* arXiv papers: only papers whose arXiv license is CC BY 4.0, CC BY-SA 4.0 or CC0 (checked in OAI-PMH
+  metadata); attribution in each row's `source`.
 * Wikipedia: CC BY-SA 4.0; attribution to Wikipedia contributors with revision links.
-* Rust RFCs: MIT OR Apache-2.0. Python PEPs: placed in the public domain (or CC0) by their authors.
+* Rust RFCs: MIT OR Apache-2.0 · Python PEPs: public domain / CC0 · Swift Evolution, Kotlin KEEP, Scala SIPs:
+  Apache-2.0 · Go proposals: BSD-3-Clause · Ethereum EIPs: CC0.
 
-Because the Wikipedia and CC BY-SA material is share-alike, the dataset as a whole is released under
-**CC BY-SA 4.0**.
+Because Wikipedia and CC BY-SA material is share-alike, the dataset as a whole is released under
+**CC BY-SA 4.0**; each row's own license is in `source.license`.
 
 ## Reproducing
 
 ```bash
 pip install requests beautifulsoup4 lxml mwparserfromhell pyarrow
-python3 scripts/fetch_arxiv.py 2404.16014 > sources/final_text/arxiv_2404.16014.json
-python3 scripts/fetch_wikipedia.py "Quicksort" "history" > sources/final_text/wiki_Quicksort.json
-(cd scripts && python3 fetch_wiki_history.py "Bloom filter") > sources/wiki_history/Bloom_filter.json
-python3 scripts/fetch_git_history.py <clone of rust-lang/rfcs> text/2535-or-patterns.md https://github.com/rust-lang/rfcs "MIT OR Apache-2.0" > sources/github_history/rfc_2535-or-patterns.json
-python3 scripts/build_dataset.py
+(cd scripts && python3 harvest_arxiv.py ../sources/arxiv 2024-03-01 2024-08-31 3000)
+(cd scripts && python3 list_wiki_cs.py) > sources/wiki_cs_articles.json
+(cd scripts && python3 topic_filter.py ../sources/wiki_cs_articles.json)
+(cd scripts && python3 wiki_sections.py ../sources/wiki_cs_articles.json ../sources/wiki_sections)
+python3 scripts/fetch_git_history.py --batch <clone> 'text/*.md' https://github.com/rust-lang/rfcs "MIT OR Apache-2.0" rfc sources/github_history_full
+# A drafts: see docs/reconstruction_spec.md; validate with scripts/validate_reconstruction.py
+python3 scripts/build_full.py && python3 scripts/write_card.py
 ```

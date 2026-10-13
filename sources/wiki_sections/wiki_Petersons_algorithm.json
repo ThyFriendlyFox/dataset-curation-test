@@ -1,0 +1,34 @@
+{
+  "source_type": "encyclopedia_article",
+  "source_id": "enwiki:Peterson's algorithm#rev1376352871",
+  "title": "Peterson's algorithm",
+  "authors": "Wikipedia contributors",
+  "year": "2026",
+  "url": "https://en.wikipedia.org/w/index.php?title=Peterson%27s_algorithm&oldid=1376352871",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "The algorithm",
+  "word_count": 744,
+  "text": "The algorithm uses two variables: flag and turn. A flag[n] value of true indicates that the process n wants to enter the critical section. Entrance to the critical section is granted for process P0 if P1 does not want to enter its critical section or if P1 has given priority to P0 by setting turn to 0.\n\nThe algorithm satisfies the three essential criteria to solve the critical-section problem. The while condition works even with preemption.[1]\n\nThe three criteria are mutual exclusion, progress, and bounded waiting.[2]\n\nSince turn can take on one of two values, it can be replaced by a single bit, meaning that the algorithm requires only three bits of memory.[3]\n\n### Mutual exclusion\n\nP0 and P1 can never be in the critical section at the same time. If P0 is in its critical section, then flag[4] is true. In addition, either flag[1] is false (meaning that P1 has left its critical section), or turn is 0 (meaning that P1 is just now trying to enter the critical section, but graciously waiting), or P1 is at label P1_gate (trying to enter its critical section, after setting flag[1] to true but before setting turn to 0 and busy waiting). So if both processes are in their critical sections, then we conclude that the state must satisfy flag[4] and flag[1] and turn = 0 and turn = 1. No state can satisfy both turn = 0 and turn = 1, so there can be no state where both processes are in their critical sections.\n\n(This recounts an argument that is made rigorous in Schneider 1997.[5])\n\n### Progress\n\nProgress is defined as the following: if no process is executing in its critical section and some processes wish to enter their critical sections, then only those processes that are not executing in their remainder sections can participate in making the decision as to which process will enter its critical section next. Note that for a process or thread, the remainder sections are parts of the code that are not related to the critical section. This selection cannot be postponed indefinitely.[2] A process cannot immediately re-enter the critical section if the other process has set its flag to say that it would like to enter its critical section.\n\n### Bounded waiting\n\nBounded waiting, or bounded bypass, means that the number of times a process is bypassed by another process after it has indicated its desire to enter the critical section is bounded by a function of the number of processes in the system. In Peterson's algorithm, a process will never wait longer than one turn for entrance to the critical section.\n\n### Filter algorithm: Peterson's algorithm for more than two processes\n\nThe filter algorithm generalizes Peterson's algorithm to N > 2 processes.[6] Instead of a boolean flag, it requires an integer variable per process, stored in a single-writer/multiple-reader (SWMR) atomic register, and N − 1 additional variables in similar registers. The registers can be represented in pseudocode as arrays:\n\nlevel : array of N integers\n\nlast_to_enter : array of N − 1 integers\n\nThe level variables take on values up to N − 1, each representing a distinct \"waiting room\" before the critical section. Processes advance from one room to the next, finishing in room N − 1, which is the critical section. Specifically, to acquire a lock, process i executes\n\ni ← ProcessNo\n\nfor ℓ from 0 to N − 1 exclusive\n\nlevel[i] ← ℓ\n\nlast_to_enter[ℓ] ← i\n\nwhile last_to_enter[ℓ] = i and there exists k ≠ i, such that level[k] ≥ ℓ\n\nwait\n\nTo release the lock upon exiting the critical section, process i sets level[i] to −1.\n\nThat this algorithm achieves mutual exclusion can be proven as follows. Process i exits the inner loop when there is either no process with a higher level than level[i], so the next waiting room is free; or, when i ≠ last_to_enter[ℓ], so another process joined its waiting room. At level zero, then, even if all N processes were to enter waiting room zero at the same time, no more than N − 1 will proceed to the next room, the final one finding itself the last to enter the room. Similarly, at the next level, N − 2 will proceed, etc., until at the final level, only one process is allowed to leave the waiting room and enter the critical section, giving mutual exclusion.\n\nUnlike the two-process Peterson algorithm, the filter algorithm does not guarantee bounded waiting.",
+  "references": [
+    {
+      "n": 1,
+      "text": "G. L. Peterson: \"Myths About the Mutual Exclusion Problem\", Information Processing Letters 12(3) 1981, 115–116"
+    },
+    {
+      "n": 2,
+      "text": "Silberschatz. Operating Systems Concepts: Seventh Edition. John Wiley and Sons, 2005, Page 194."
+    },
+    {
+      "n": 3,
+      "text": "Raynal, Michel. (2012). Concurrent Programming: Algorithms, Principles, and Foundations. Springer Science & Business Media."
+    },
+    {
+      "n": 5,
+      "text": "F. B. Schneider, On Concurrent Programming, Springer Verlag, 1997, pages 185–196."
+    },
+    {
+      "n": 6,
+      "text": "Herlihy, Maurice. (2012). The Art of Multiprocessor Programming. Elsevier."
+    }
+  ]
+}

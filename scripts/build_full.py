@@ -9,8 +9,8 @@ Pools (no document is used by two approaches):
   B-type  sources/wiki_history/*.json (trial) + sources/wiki_history_full/*.json.gz
   C       sources/github_history/*.json (trial) + sources/github_history_full/*.json.gz
 Wikipedia articles marked off-topic (topic_filter.py) are excluded from every pool.
-D takes a disjoint share: ~25% of the B-type pool and 7 A-type rows for every 3 B-type rows, so D is
-~70/30 like the trial. Trial rows keep their trial assignment. Assignment and splits are stable hashes.
+D takes a disjoint share: 25% of the A-type pool plus 3 real-history rows for every 7 (B-type first,
+topped up from C), so D is ~70/30 reconstructed/real like the trial. Trial rows keep their trial assignment. Assignment and splits are stable hashes.
 B/C histories with too few distinct versions for a variant are left out of that variant, never padded.
 """
 import glob, hashlib, json, os, sys
@@ -70,16 +70,24 @@ def pools():
     return a, b, c
 
 
-def allocate(a, b):
+def allocate(a, b, c):
+    """Split pools so no document is in two files. D is ~70% reconstructed / 30% real history:
+    25% of the new A-type rows, plus 3 real-history rows per 7 — taken from B first (25% of the new
+    B pool at most) and topped up from C when Wikipedia's rate limit keeps B small."""
     trial_a, trial_da = set(bd.A_ROWS), set(bd.D_A_ROWS)
     trial_b, trial_db = set(bd.B_ALL[:10]), set(bd.B_ALL[10:13])
-    new_b = sorted((n for n in b if n not in trial_b | trial_db), key=lambda n: h("alloc:" + n))
-    new_a = sorted((n for n in a if n not in trial_a | trial_da), key=lambda n: h("alloc:" + n))
-    n_db = round(0.25 * len(new_b))
-    n_da = min(round(n_db * 7 / 3), round(0.3 * len(new_a)))
-    d_b = trial_db | set(new_b[:n_db])
-    d_a = trial_da | set(new_a[:n_da])
-    return ({n for n in a if n not in d_a}, {n for n in b if n not in d_b}, d_a, d_b)
+    trial_c = set(bd.C_ROWS)
+    order = lambda names: sorted(names, key=lambda n: h("alloc:" + n))
+    new_a = order(n for n in a if n not in trial_a | trial_da)
+    new_b = order(n for n in b if n not in trial_b | trial_db)
+    new_c = order(n for n in c if n not in trial_c)
+    n_da = round(0.25 * len(new_a))
+    n_real = round(n_da * 3 / 7)
+    n_db = min(round(0.25 * len(new_b)), n_real)
+    n_dc = max(0, n_real - n_db - len(trial_db))
+    d_a, d_b, d_c = trial_da | set(new_a[:n_da]), trial_db | set(new_b[:n_db]), set(new_c[:n_dc])
+    return ({n for n in a if n not in d_a}, {n for n in b if n not in d_b}, {n for n in c if n not in d_c},
+            d_a, d_b, d_c)
 
 
 def build_one(job):
@@ -122,9 +130,10 @@ def write_config(config, rows):
 
 def main():
     a, b, c = pools()
-    a_main, b_main, d_a, d_b = allocate(a, b)
+    a_main, b_main, c_main, d_a, d_b, d_c = allocate(a, b, c)
     jobs = [("A", n, a[n]) for n in sorted(a)] + [("B", n, b[n]) for n in sorted(b)] + [("C", n, c[n]) for n in sorted(c)]
-    print(f"pools: A-type {len(a)} (A {len(a_main)}, D {len(d_a)}), B-type {len(b)} (B {len(b_main)}, D {len(d_b)}), C {len(c)}", flush=True)
+    print(f"pools: A-type {len(a)} (A {len(a_main)}, D {len(d_a)}), B-type {len(b)} (B {len(b_main)}, D {len(d_b)}), "
+          f"C {len(c)} (C {len(c_main)}, D {len(d_c)})", flush=True)
     built, errors, dropped = {}, [], {v: 0 for v in VARIANTS}
     with Pool(os.cpu_count()) as pool:
         for i, (kind, name, out) in enumerate(pool.imap_unordered(build_one, jobs, chunksize=4), 1):
@@ -139,8 +148,8 @@ def main():
                 print(f"  built {i}/{len(jobs)}", flush=True)
     groups = {"A_reconstructed": [("A", n) for n in sorted(a_main)],
               "B_wiki_history": [("B", n) for n in sorted(b_main)],
-              "C_github_commits": [("C", n) for n in sorted(c)],
-              "D_mix": [("A", n) for n in sorted(d_a)] + [("B", n) for n in sorted(d_b)]}
+              "C_github_commits": [("C", n) for n in sorted(c_main)],
+              "D_mix": [("A", n) for n in sorted(d_a)] + [("B", n) for n in sorted(d_b)] + [("C", n) for n in sorted(d_c)]}
     stats = {}
     for g, members in groups.items():
         for v in VARIANTS:

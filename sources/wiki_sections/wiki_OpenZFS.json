@@ -1,0 +1,74 @@
+{
+  "source_type": "encyclopedia_article",
+  "source_id": "enwiki:OpenZFS#rev1378505727",
+  "title": "OpenZFS",
+  "authors": "Wikipedia contributors",
+  "year": "2026",
+  "url": "https://en.wikipedia.org/w/index.php?title=OpenZFS&oldid=1378505727",
+  "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "section": "Version history",
+  "word_count": 1094,
+  "text": "### Pool versions and feature flags\n\nOriginally, version numbers of the pool and file system were incremented as new features were introduced, in order to designate the on-disk file system format and available features. This worked well when a single entity controlled the development of ZFS, and this versioning scheme is still in use with the ZFS in Oracle Solaris.[1,2]\n\nIn a more distributed development model, having a single version number is far from ideal as all implementations of OpenZFS would need to agree on all changes to the on-disk file system format. The solution selected by OpenZFS was to introduce feature flags as a new versioning system that tags on-disk format changes with unique names, and supports both completely independent format changes and format changes that depend on each other. A pool can be moved and used between OpenZFS implementations as long as all feature flags in use by the pool are supported by both implementations.[3,4,5]\n\nIn OpenZFS, the pool version is permanently set to 5000, signifying that the pool indicates new features by setting or unsetting ZFS feature flags rather than by incrementing the pool version.[6] The number 5000 was chosen because it is expected to never conflict with version numbers given by Oracle. Legacy version numbers still exist for pool versions 1–28.[7,8,9] Future on-disk format changes are enabled / disabled independently via these feature flags.\n\nLegacy version numbers still exist for pool versions 1–28, and are implied by the pool version 5000;[10] the initial proposal was to use 1000 as the pool version.[4] Future on-disk format changes are enabled and disabled independently via feature flags.\n\nFeature flags are exposed as pool properties, following these naming scheme rules:[4]\n\nFormat of the property name is feature@<org-name>:<feature-name>\n\n<org-name> is the reverse DNS name of the organization that developed the feature, ensuring unique property names.\n\nProperty names can be shortened to feature@<feature-name> when they remain unambiguous.\n\nFor example, feature@com.foocompany:async_destroy is a valid property name, and it could be shortened to feature@async_destroy.[4]\n\nEach pool feature can be in either disabled, enabled, or active state. Disabled features are those that will not be used, and no on-disk format changes will be made; as a result, such features are backward-compatible. Enabled features are those that will be used, no on-disk format changes have been made yet, but the software may make the changes at any time; such features are still backward-compatible. Active features are those that have made backward-incompatible on-disk format changes to the pool.[4]\n\nWhen any pool feature is enabled, legacy version of the pool is automatically upgraded to 5000 and any other prerequisite features are also enabled. By default, new pools are created with all supported features enabled. In general, state of a feature can be changed from active back to enabled, undoing that way performed on-disk format changes and making the pool compatible again with an older OpenZFS implementation; however, for some features that might not be possible.[4,10]\n\nOn-disk format changes can be associated with either features for write or features for read. The former are the features that an OpenZFS implementation must support to be capable of writing to the pool, while supporting such features is not mandatory for opening the pool in read-only mode. The latter are the features that an OpenZFS implementation must support to be able to read from the pool or to just open it, because opening a pool is not possible without actually reading from it.[4]\n\nFor example, async_destroy feature adds a new on-disk data structure to keep track of freed datasets, but an OpenZFS implementation does not need to know about this data structure to access the pool in read-only mode. Additionally, writing to a pool that has some features in active state is not possible by an OpenZFS implementation that does not support the same features.[4]\n\nA list of feature flags and which operating systems support them is available from the OpenZFS documentation Web site[11] (here the old Open-ZFS.org Web site[12])\n\n### OpenZFS 2.0\n\nHistorically, OpenZFS has been implemented as a core ZFS code, with each operating system's team adapting it to fit into their projects. This led in some cases to feature stagnation and divergence of features and command lines, as different operating systems developed divergent features and bug fixes, often for a single platform rather than across all platforms. Over time, new feature development shifted from Illumos to Linux.[13] These new features and fixes then had to be backported to Illumos before they could be re-ported for FreeBSD.[13] But this was difficult because the Linux version also included many smaller changes, which were hard to disentangle.[13]\n\nIn 2018, it was agreed that OpenZFS development would be overhauled to remedy these issues.[13] Rather than try to import all the Linux changes to other platforms piecemeal, the entire Linux ZFS code would be 'pivoted' as a whole, with other platforms being based on the more actively developed Linux version.[13] A wide range of ported and new features, including many long-desired enhancements, would also be rolled out or ported across platforms, and future changes would be discussed across platforms before being implemented.[13] The plans included appropriate porting layers to prevent Linux, GPL or Linux-KPI shim code from being introduced to other platform kernels.[13]\n\nThe features in progress or ported for OpenZFS 2.0 is lengthy, and includes:\n\nFaster rollout of enhancements and new features across platforms[13]\n\nCommand line standardisation[13]\n\nImproved pool portability (ZFS pools created on one system can be equally used by another)[14]\n\nWider cross-platform feature parity and platform independence[14]\n\nOverlay (union) mounts accepted by default[14]\n\nBug fixes and enhancements[14]\n\nZTS and various other features working on FreeBSD[14]\n\nTRIM and ACLMODE enhancements[14,13]\n\nZFS holds (from FreeBSD)[14]\n\nEnhanced native NFSv4 ACLs (FreeBSD)[14]\n\nEnhanced AES-GCM performance for encrypted pools[14]\n\nRedacted send/receive[14]\n\nLog spacemap and other metaslab management enhancements - a project to re-implement ZFS' management of free space and \"metaslabs\" for much greater efficiency[14]\n\nFast clone deletion[14]\n\nZstd data compression as a new option[14]\n\nChannel program property inheritance[14]\n\nAltiVec RAID-Z[14]\n\nBookmark support and copying[14]\n\nDirect IO support[14]\n\nPersistent L2ARC (L2ARC retained across reboots)[14]\n\nSequential (high speed) scrub and resilver[13]\n\nScrub pause/resume[13]\n\nResilver restart[13]\n\nDevice (VDEV) removal[13]\n\nZpool initialize and checkpoint[13]\n\nChannel programs[13]\n\nLarge Dnode[13]\n\nAllocation classes (allowing specific high speed storage to be designated for metadata and deduplication tables)[13]\n\nParallel pool mounting[13]\n\nPer-vdev properties[13]\n\nDeduplication enhancements – dedup-log (high speed deduplication), dedup table size limits, and deduplication table preloading (loaded fully at one time rather than piecemeal as needed), listed as \"nice to have\" in 2018, were all stated in April 2020 to be \"coming along nicely\" or largely complete[15]",
+  "references": [
+    {
+      "n": 1,
+      "text": "(2010). Solaris ZFS Administration Guide, Appendix A ZFS Version Descriptions. Oracle Corporation. http://download.oracle.com/docs/cd/E19253-01/819-5461/appendixa-1/index.html"
+    },
+    {
+      "n": 2,
+      "text": "Oracle Solaris ZFS Version Descriptions. Oracle Corporation. http://docs.oracle.com/cd/E26502_01/html/E29007/appendixa-1.html#scrolltoc"
+    },
+    {
+      "n": 3,
+      "text": "Ahrens, Matt. (September 17, 2013). LinuxCon 2013: OpenZFS. Linux Foundation. https://events.linuxfoundation.org/sites/events/files/slides/OpenZFS%20-%20LinuxCon_0.pdf"
+    },
+    {
+      "n": 4,
+      "text": "Siden, Christopher. (January 11, 2012). ZFS Feature Flags (Illumos Meetup). delphix.com. http://blog.delphix.com/csiden/files/2012/01/ZFS_Feature_Flags.pdf"
+    },
+    {
+      "n": 5,
+      "text": "OpenZFS Features – Feature flags. open-zfs.org. http://open-zfs.org/wiki/Features#Feature_Flags"
+    },
+    {
+      "n": 6,
+      "text": "Features – OpenZFS – Feature flags. OpenZFS. http://open-zfs.org/wiki/Features#Feature_Flags"
+    },
+    {
+      "n": 7,
+      "text": "Siden, Christopher. (January 2012). ZFS Feature Flags. Delphix. http://blog.delphix.com/csiden/files/2012/01/ZFS_Feature_Flags.pdf"
+    },
+    {
+      "n": 8,
+      "text": "/usr/src/uts/common/sys/fs/zfs.h (line 338). illumos (GitHub). https://github.com/illumos/illumos-gate/blob/master/usr/src/uts/common/sys/fs/zfs.h#L338"
+    },
+    {
+      "n": 9,
+      "text": "/usr/src/uts/common/fs/zfs/zfeature.c (line 89). illumos (GitHub). https://github.com/illumos/illumos-gate/blob/master/usr/src/uts/common/fs/zfs/zfeature.c#L89"
+    },
+    {
+      "n": 10,
+      "text": "(September 26, 2013). OpenZFS FAQ: Are storage pools created by OpenZFS portable between operating systems?. open-zfs.org. http://open-zfs.org/wiki/FAQ#Are_storage_pools_created_by_OpenZFS_portable_between_operating_systems.3F"
+    },
+    {
+      "n": 11,
+      "text": "Feature Flags — OpenZFS documentation. openzfs.github.io. https://openzfs.github.io/openzfs-docs/Basic%20Concepts/Feature%20Flags.html"
+    },
+    {
+      "n": 12,
+      "text": "Feature Flags – OpenZFS. open-zfs.org. http://open-zfs.org/wiki/Feature_Flags#Feature_flags_implementation"
+    },
+    {
+      "n": 13,
+      "text": "Archived copy. https://papers.freebsd.org/2019/BSDCan/jude-The_Future_of_OpenZFS_and_FreeBSD.files/jude-The_Future_of_OpenZFS_and_FreeBSD.pdf"
+    },
+    {
+      "n": 14,
+      "text": "OpenZFS 2.0 · openzfs/ZFS. GitHub. https://github.com/openzfs/zfs/projects/25"
+    },
+    {
+      "n": 15,
+      "text": "OpenZFS Leadership Team - Meeting Agenda and Notes. https://docs.google.com/document/d/1w2jv2XVYFmBVvG1EGf-9A5HBVsjAYoLIFZAnWHhV-BM/edit"
+    }
+  ]
+}

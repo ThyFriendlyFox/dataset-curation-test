@@ -1,0 +1,5436 @@
+# 8. Python PEP: Literal String Interpolation
+
+`C-pep_pep-0498` · [full/C_github_commits_9step](README.md)
+
+Source: <https://github.com/python/peps/blob/545c670f1e986162eb7161d63c944108e504bd09/peps/pep-0498.rst> · License: Public domain / CC0-1.0 (PEP text) · 89 commits touching the file; 79 distinct versions
+
+| step | name | words | citations | similarity to final | provenance |
+|---|---|---|---|---|---|
+| 0 | title | 3 | 0 | 0.00 | source_title |
+| 1 | revision_1 | 2016 | 0 | 0.59 | commit 0405ad7da6 (2015-08-07) |
+| 2 | revision_2 | 2673 | 0 | 0.65 | commit 7261e0d009 (2015-08-21) |
+| 3 | revision_3 | 3308 | 0 | 0.74 | commit 29a1f236da (2015-08-21) |
+| 4 | revision_4 | 3354 | 10 | 0.80 | commit 617e3748a8 (2015-08-28) |
+| 5 | revision_5 | 3378 | 10 | 0.83 | commit 2025cc03c5 (2015-09-04) |
+| 6 | revision_6 | 3253 | 6 | 0.89 | commit b9502b9255 (2015-09-04) |
+| 7 | revision_7 | 3477 | 6 | 0.94 | commit 2245b0b334 (2016-08-18) |
+| 8 | final | 3495 | 6 | 1.00 | commit 6aa0b6619c (2025-02-01) |
+
+<details><summary><b>Step 0 — title</b> (3 words)</summary>
+
+````text
+Literal String Interpolation
+````
+
+</details>
+
+<details><summary><b>Step 1 — revision_1</b> (2016 words)</summary>
+
+````text
+PEP: XXX
+Title: Literal String Formatting
+Last-Modified: $Date$
+Content-Type: text/x-rst
+Python-Version: 3.6
+Post-History: 07-Aug-2015
+
+Abstract
+========
+
+Python supports multiple ways to format text strings. These include
+%-formatting [#]_, str.format [#]_, and string.Template [#]_. Each of
+these methods have their advantages, but in addition have
+disadvantages that make them cumbersome to use in practice. This PEP
+proposed to add a new string formatting mechanism: Literal String
+Formatting. In this PEP, such strings will be refered to as
+"f-strings", taken from the leading character used to denote such
+strings.
+
+f-strings provide a way to combine string literals with Python
+expressions, using a minimal syntax. It should be noted that an
+f-string is really an expression evaluated at run time, not a constant
+value. An f-string is a string, prefixed with 'f', that contains
+expressions inside braces. The expressions are replaced with their
+values. Some examples are::
+
+  >>> import datetime
+  >>> name = 'Fred'
+  >>> age = 50
+  >>> anniversary = datetime.date(1991, 10, 12)
+  >>> f'My name is {name}, my age next year is {age+1}, my anniversary is {anniversary:%A, %B %d, %Y}.'
+  'My name is Fred, my age next year is 51, my anniversary is Saturday, October 12, 1991.'
+  >>> f'He said his name is {name!r}.'
+  "He said his name is 'Fred'."
+
+This PEP does not propose to remove or deprecate any of the existing
+string formatting mechanisms.
+
+A similar feature was proposed in PEP 215 [#]_. PEP 215 proposed to
+support a subset of Python expressions, and did not support the
+type-specific string formatting (the __format__ method) which was
+introduced with PEP 3101 [#]_.
+
+Rationale
+=========
+
+This PEP is driven by the desire to have a simpler way to format
+strings in Python. The existing ways of formatting are either error
+prone, inflexible, or cumbersome.
+
+%-formatting is limited as to the types it supports. Only ints, strs,
+and doubles can be formatted. All other types are either not
+supported, or converted to one of these types before formatting. In
+addition, there's a well-known trap where a single value is passed::
+
+  >>> msg = 'disk failure'
+  >>> 'error: %s' % msg
+  'error: disk failure'
+
+But if msg were ever to be a tuple, the same code would fail::
+
+  >>> msg = ('disk failure', 32)
+  >>> 'error: %s' % msg
+  Traceback (most recent call last):
+    File "<stdin>", line 1, in <module>
+  TypeError: not all arguments converted during string formatting
+
+To be defensive, the following code should be used::
+
+  >>> 'error: %s' % (msg,)
+  "error: ('disk failure', 32)"
+
+str.format() was added to address some of these problems with
+%-formatting. In particular, it uses normal function call syntax (and
+therefor supports mutliple parameters) and it is extensible through
+the __format__() method on the object being converted to a string. See
+PEP-3101 for a detailed rationale.
+
+However, str.format() is not without its issues. Chief among them are
+its verbosity. For example, the text 'value' is repeated here::
+
+  >>> value = 4 * 20
+  >>> 'The value is {value}.'.format(value=value)
+  'The value is 80.'
+
+Even in its simplest form, there is a bit of boilerplate, and the
+value that's inserted into the placeholder is sometimes far removed
+from where the placeholder is situated::
+
+  >>> 'The value is {}.'.format(value)
+  'The value is 80.'
+
+With an f-string, this becomes::
+
+  >>> f'The value is {value}.'
+  'The value is 80.'
+
+f-strings provide a concise, readable way to include expressions
+inside strings.
+
+string.Template has similar shortcomings to str.format(), but also
+supports fewer formatting options. In particular, it does not support
+__format__.
+
+No use of globals() or locals()
+-------------------------------
+
+In the discussions on python-dev [#]_, a number of solutions where
+presented that used locals() and globals() or their equivalents. All
+of these have various problems. Among these are referencing variables
+that are not otherwise used in a closure. Consider::
+
+  >>> def outer(x):
+  ...     def inner():
+  ...         return 'x={x}'.format_map(locals())
+  ...     return inner
+  ...
+  >>> outer(42)()
+  Traceback (most recent call last):
+    File "<stdin>", line 1, in <module>
+    File "<stdin>", line 3, in inner
+  KeyError: 'x'
+
+This returns an error because the compiler has not added a reference
+to x inside the closure. You need to manually add a reference to x in
+order for this to work::
+
+  >>> def outer(x):
+  ...     def inner():
+  ...         x
+  ...         return 'x={x}'.format_map(locals())
+  ...     return inner
+  ...
+  >>> outer(42)()
+  'x=42'
+
+Guido stated [#]_ that any solution to better string interpolation
+would not use locals() or globals().
+
+Specification
+=============
+
+In source code, f-strings are string literals that are prefixed by the
+letter 'f'. 'f' may be combined with 'r', in either order, to produce
+raw f-string literals. 'f' may not be combined with 'b': there are no
+binary f-strings. 'f' may also be combined with 'u', in either order,
+although adding 'u' has no effect.
+
+f-strings are parsed in to literals and expressions. Expressions
+appear within curly braces '{' and '}. The parts of the string outside
+of braces are literals.  The expressions are evaluated, formatted with
+the existing __format__ protocol, then the results are concatenated
+together with the string literals. While scanning the string for
+expressions, any doubled braces '{{' or '}}' are replaced by the
+corresponding single brace. Doubled opening braces do not signify the
+start of an expression.
+
+Following the expression, an optionally the type conversion may be
+specified.  The allowed conversions are '!s' or '!r'. These are
+treated the same as in str.format: '!s' calls str() on the expression,
+and '!r' calls repr() on the expression. These conversions are applied
+before the call to __format__. The only reason to use '!s' is if you
+want to specify a format specifier that applies to str, not to the
+type of the expression.
+
+Similar to str.format, optional format specifiers maybe be included
+inside the f-string, separated from the expression (or the type
+conversion, if specified) by a colon. If a format specifier is not
+provied, an empty string is used.
+
+So, an f-string looks like::
+
+  f ' <text> { <expression> <optional !s or !r> <optional : format specifier> } text ... '
+
+The resulting expression's __format__ method is called with the format
+specifier. The resulting value is used when building the value of the
+f-string.
+
+Expressions cannot contain ':' or '!' outside of strings or parens,
+brackets, or braces. The exception is that the '!=' operator is
+special cased.
+
+Code equivalence
+----------------
+
+The exact code that is executed when converting expressions to strings
+is unspecified by this PEP. However, it is specified that once the
+expression is evaluated, the results __format__() method will be
+called with the given format specifier.
+
+For example, this code::
+
+  f'abc{expr1:spec1}{expr2!r:spec2}def{expr3:!s}ghi'
+
+May be evaluated as::
+
+  ''.join(['abc', expr1.__format__('spec1'), repr(expr2).__format__('spec2'), 'def', str(expr3).__format__(''), 'ghi'])
+
+Expression evaluation
+---------------------
+
+The expressions that are extracted from the string are evaluated in
+the context where the f-string appeared. This means the expression has
+full access to local and global variables. Any valid Python expression
+can be used, including function and method calls.
+
+Because the f-strings are evaluated where the string appears in the
+source code, there is no additional expressiveness available with
+f-strings. There are also no additional security concerns: you could
+have also just written the same expression, not inside of an
+f-string::
+
+  >>> def foo():
+  ...   return 20
+  ...
+  >>> f'result={foo()}'
+  'result=20'
+
+Is equivalent to::
+
+  >>> 'result=' + str(foo())
+  'result=20'
+
+Format specifiers
+-----------------
+
+Format specifiers are not interpreted by the f-string parser. Just as
+in str.format(), they are merely passed in to the __format__() method
+of the object being formatted.
+
+Concatenating strings
+---------------------
+
+Adjacent f-strings and regular strings are concatenated. Regular
+strings are concatenated at compile time, and f-strings are
+concatenated at run time. For example, the expression::
+
+  >>> x = 10
+  >>> y = 'hi'
+  >>> 'a' 'b' f'{x}' 'c' f'str<{y:^4}>' 'd' 'e'
+
+yields the value::
+
+  'ab10cstr< hi >de'
+
+While the exact code that is executed when evaluating this f-string is
+not specified, one possible strategy is to evaluate::
+
+  ''.join(['ab', x.__format__(''), 'c', 'str<', y.__format__('^4'), '>', 'de'])
+
+Error handling
+--------------
+
+Either compile time or run time errors can occur when processing
+f-strings. Compile time errors are limited to those errors that can be
+detected when scanning an f-string. These errors all raise
+SyntaxError.
+
+Unmatched braces::
+
+  >>> f'x={x'
+    File "<stdin>", line 1
+  SyntaxError: missing '}' in format string expression
+
+Invalid expressions::
+
+  >>> f'x={!x}'
+    File "<fstring>", line 1
+      !x
+      ^
+  SyntaxError: invalid syntax
+
+Run time errors occur when evaluating the expressions inside an
+f-string. Note that an f-string can be executed multiple times, and
+work sometimes and raise an error other times::
+
+  >>> d = {0:10, 1:20}
+  >>> for i in range(3):
+  ...     print(f'{i}:{d[i]}')
+  ...
+  0:10
+  1:20
+  Traceback (most recent call last):
+    File "<stdin>", line 2, in <module>
+  KeyError: 2
+
+Leading whitespace in expressions is skipped
+--------------------------------------------
+
+Because expressions may begin with a left brace ('{'), there is a
+problem when parsing such expressions. For example::
+
+  >>> f'{{k:v for k, v in [(1, 2), (3, 4)}}'
+  '{k:v for k, v in [(1, 2), (3, 4)}'
+
+In this case, the doubled left braces and doubled right braces are
+interpreted as single braces, and the string becomes just a normal
+string literal. There is no expression evaluation being performed.
+
+To account for this, whitespace characters at the beginning of an
+expression are skipped::
+
+  >>> f'{ {k:v for k, v in [(1, 2), (3, 4)}}'
+  '{k:v for k, v in [(1, 2), (3, 4)}'
+
+Discussion
+==========
+
+Most of the discussions on python-ideas [#]_ focused on a few issues:
+
+ - Whether to allow full Python expressions.
+ - How to designate f-strings, and how specify the locaton of
+   expressions in them.
+ - How to concatenate adjacent strings and f-strings.
+
+XXX: more on the above issues.
+
+Differences between f-string and str.format expressions
+-------------------------------------------------------
+
+There is one small difference between the limited expressions allowed
+in str.format() and the full expressions allowed inside f-strings. The
+difference is in how index lookups are performed. In str.format(),
+index values that do not look like numbers are converted to strings::
+
+  >>> d = {'a': 10, 'b': 20}
+  >>> 'a={d[a]}'.format(d=d)
+  'a=10'
+
+Notice that the index value is converted to the string "a" when it is
+looked up in the dict.
+
+However, in f-strings, you would need to use a literal for the value
+of 'a'::
+
+  >>> f'a={d["a"]}'
+  'a=10'
+
+This difference is required because otherwise you would not be able to
+use variables as index values::
+
+  >>> a = 'b'
+  >>> f'a={d[a]}'
+  'a=20'
+
+See [#]_ for a further discussion. It was this observation that led to
+full Python expressions being supported in f-strings.
+
+No binary f-strings
+-------------------
+
+For the same reason that we don't support bytes.format(), you may not
+combine 'f' with 'b' string literals. The primary problem is that an
+object's __format__() method may return Unicode data that is not
+compatible with a bytes string.
+
+!s and !r are redundant
+-----------------------
+
+The !s and !r are not strictly required. Because arbitrary expressions
+are allowed inside the f-strings, this code::
+
+  >>> a = 'some string'
+  >>> f'{a!r}'
+  "'some string'"
+
+Is identical to::
+
+  >>> f'{repr(a)}'
+  "'some string'"
+
+Similarly, !s can be replaced by calls to str().
+
+However, !s and !r are supported by this PEP in order to minimize the
+differences with str.format(). !s and !r are required in str.format()
+because it does not allow the execution of arbitrary expressions.
+
+Lambdas inside expressions
+--------------------------
+
+Because lambdas use the ':' character, they cannot appear outside of
+parenthesis in an expression. The colon is interpreted as the start of
+the format specifier, which means the start of the lambda expression
+is seen and is syntactically invalid. As there's no practical use for
+a plain lambda in an f-string expression, this is not seen as much of
+a limitation.
+
+Lambdas may be used inside of parens::
+
+  >>> f'{(lambda x: x*2)(3)}'
+  '6'
+
+References
+==========
+
+.. [#] %-formatting
+       (https://docs.python.org/3/library/stdtypes.html#printf-style-string-formatting)
+
+.. [#] str.format
+       (https://docs.python.org/3/library/string.html#formatstrings)
+
+.. [#] string.Template documentation
+       (https://docs.python.org/3/library/string.html#template-strings)
+
+.. [#] PEP 215: String Interpolation
+       (https://www.python.org/dev/peps/pep-0215/)
+
+.. [#] PEP 3101: Advanced String Formatting
+       (https://www.python.org/dev/peps/pep-3101/)
+
+.. [#] Formatting using locals() and globals()
+       (https://mail.python.org/pipermail/python-ideas/2015-July/034671.html)
+
+.. [#] Avoid locals() and globals()
+       (https://mail.python.org/pipermail/python-ideas/2015-July/034701.html)
+
+.. [#] Start of python-ideas discussion
+       (https://mail.python.org/pipermail/python-ideas/2015-July/034657.html)
+
+.. [#] Differences in str.format() and f-string expressions
+       (https://mail.python.org/pipermail/python-ideas/2015-July/034726.html)
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
+````
+
+</details>
+
+<details><summary><b>Step 2 — revision_2</b> (2673 words)</summary>
+
+````text
+Abstract
+========
+
+Python supports multiple ways to format text strings. These include
+%-formatting [#]_, str.format [#]_, and string.Template [#]_. Each of
+these methods have their advantages, but in addition have
+disadvantages that make them cumbersome to use in practice. This PEP
+proposed to add a new string formatting mechanism: Literal String
+Formatting. In this PEP, such strings will be refered to as
+"f-strings", taken from the leading character used to denote such
+strings.
+
+This PEP does not propose to remove or deprecate any of the existing
+string formatting mechanisms.
+
+f-strings provide a way to combine string literals with Python
+expressions, using a minimal syntax. It should be noted that an
+f-string is really an expression evaluated at run time, not a constant
+value. An f-string is a string, prefixed with 'f', that contains
+expressions inside braces. The expressions are replaced with their
+values. Some examples are::
+
+  >>> import datetime
+  >>> name = 'Fred'
+  >>> age = 50
+  >>> anniversary = datetime.date(1991, 10, 12)
+  >>> f'My name is {name}, my age next year is {age+1}, my anniversary is {anniversary:%A, %B %d, %Y}.'
+  'My name is Fred, my age next year is 51, my anniversary is Saturday, October 12, 1991.'
+  >>> f'He said his name is {name!r}.'
+  "He said his name is 'Fred'."
+
+This PEP proposes a new method on the str type:
+str.interpolate(). This method will be used to implement f-strings.
+
+A similar feature was proposed in PEP 215 [#]_. PEP 215 proposed to
+support a subset of Python expressions, and did not support the
+type-specific string formatting (the __format__ method) which was
+introduced with PEP 3101 [#]_.
+
+Rationale
+=========
+
+This PEP is driven by the desire to have a simpler way to format
+strings in Python. The existing ways of formatting are either error
+prone, inflexible, or cumbersome.
+
+%-formatting is limited as to the types it supports. Only ints, strs,
+and doubles can be formatted. All other types are either not
+supported, or converted to one of these types before formatting. In
+addition, there's a well-known trap where a single value is passed::
+
+  >>> msg = 'disk failure'
+  >>> 'error: %s' % msg
+  'error: disk failure'
+
+But if msg were ever to be a tuple, the same code would fail::
+
+  >>> msg = ('disk failure', 32)
+  >>> 'error: %s' % msg
+  Traceback (most recent call last):
+    File "<stdin>", line 1, in <module>
+  TypeError: not all arguments converted during string formatting
+
+To be defensive, the following code should be used::
+
+  >>> 'error: %s' % (msg,)
+  "error: ('disk failure', 32)"
+
+str.format() was added to address some of these problems with
+%-formatting. In particular, it uses normal function call syntax (and
+therefor supports mutliple parameters) and it is extensible through
+the __format__() method on the object being converted to a string. See
+PEP-3101 for a detailed rationale. This PEP reuses much of the
+str.format() syntax and machinery, in order to provide continuity with
+an existing Python string formatting mechanism.
+
+However, str.format() is not without its issues. Chief among them are
+its verbosity. For example, the text 'value' is repeated here::
+
+  >>> value = 4 * 20
+  >>> 'The value is {value}.'.format(value=value)
+  'The value is 80.'
+
+Even in its simplest form, there is a bit of boilerplate, and the
+value that's inserted into the placeholder is sometimes far removed
+from where the placeholder is situated::
+
+  >>> 'The value is {}.'.format(value)
+  'The value is 80.'
+
+With an f-string, this becomes::
+
+  >>> f'The value is {value}.'
+  'The value is 80.'
+
+f-strings provide a concise, readable way to include expressions
+inside strings.
+
+string.Template has similar shortcomings to str.format(), but also
+supports fewer formatting options. In particular, it does not support
+__format__.
+
+No use of globals() or locals()
+-------------------------------
+
+In the discussions on python-dev [#]_, a number of solutions where
+presented that used locals() and globals() or their equivalents. All
+of these have various problems. Among these are referencing variables
+that are not otherwise used in a closure. Consider::
+
+  >>> def outer(x):
+  ...     def inner():
+  ...         return 'x={x}'.format_map(locals())
+  ...     return inner
+  ...
+  >>> outer(42)()
+  Traceback (most recent call last):
+    File "<stdin>", line 1, in <module>
+    File "<stdin>", line 3, in inner
+  KeyError: 'x'
+
+This returns an error because the compiler has not added a reference
+to x inside the closure. You need to manually add a reference to x in
+order for this to work::
+
+  >>> def outer(x):
+  ...     def inner():
+  ...         x
+  ...         return 'x={x}'.format_map(locals())
+  ...     return inner
+  ...
+  >>> outer(42)()
+  'x=42'
+
+In addition, using locals() or globals() introduces an information
+leak. A called routine that has access to the callers locals() or
+globals() has access to far more information than needed to do the
+string interpolation.
+
+Guido stated [#]_ that any solution to better string interpolation
+would not use locals() or globals().
+
+Specification
+=============
+
+In source code, f-strings are string literals that are prefixed by the
+letter 'f'. 'f' may be combined with 'r', in either order, to produce
+raw f-string literals. 'f' may not be combined with 'b': there are no
+binary f-strings. 'f' may also be combined with 'u', in either order,
+although adding 'u' has no effect.
+
+f-strings are parsed in to literals and expressions. Expressions
+appear within curly braces '{' and '}. The parts of the string outside
+of braces are literals.  The expressions are evaluated, formatted with
+the existing __format__ protocol, then the results are concatenated
+together with the string literals. While scanning the string for
+expressions, any doubled braces '{{' or '}}' are replaced by the
+corresponding single brace. Doubled opening braces do not signify the
+start of an expression.
+
+Following the expression, an optional type conversion may be
+specified.  The allowed conversions are '!s', '!r', or '!a'. These are
+treated the same as in str.format: '!s' calls str() on the expression,
+'!r' calls repr() on the expression, and '!a' calls ascii() on the
+expression. These conversions are applied before the call to
+__format__. The only reason to use '!s' is if you want to specify a
+format specifier that applies to str, not to the type of the
+expression.
+
+Similar to str.format, optional format specifiers maybe be included
+inside the f-string, separated from the expression (or the type
+conversion, if specified) by a colon. If a format specifier is not
+provied, an empty string is used.
+
+So, an f-string looks like::
+
+  f ' <text> { <expression> <optional !s, !r, or !a> <optional : format specifier> } text ... '
+
+The resulting expression's __format__ method is called with the format
+specifier. The resulting value is used when building the value of the
+f-string.
+
+Expressions cannot contain ':' or '!' outside of strings or parens,
+brackets, or braces. The exception is that the '!=' operator is
+special cased.
+
+str.interpolate()
+-----------------
+
+str.interpolate(mapping) will be a new method. It takes one argument:
+a mapping of field names to values. This method is the same as
+str.format_map() [#]_, with one difference: it does not interpret the
+field_name [#]_ in any way. The field_name is only used to look up the
+replacement value in the supplied mapping object. Like str.format()
+and str.format_map(), str.interpolate() does interpret and apply the
+optional conversion and format_spec. Thus, a field_name may not
+contain the characters ':' or '}', nor the strings '!s', '!r', or
+'!a'.
+
+Code equivalence
+----------------
+
+An f-string is evaluated at run time as a call to str.interpolate().
+
+For example, this code::
+
+  f'abc{expr1:spec1}{expr2!r:spec2}def{expr3:!s}ghi'
+
+Will be be evaluated as::
+
+  'abc{expr1:spec1}{expr2!r:spec2}def{expr3:!s}ghi'.interpolate({'expr1': expr1, 'expr2': expr2, 'expr3': expr3})
+
+Note that the string on which interpolate() is being called is
+identical to the value of the f-string.
+
+
+Expression evaluation
+---------------------
+
+The expressions that are extracted from the string are evaluated in
+the context where the f-string appeared. This means the expression has
+full access to local and global variables. Any valid Python expression
+can be used, including function and method calls.
+
+Because the f-strings are evaluated where the string appears in the
+source code, there is no additional expressiveness available with
+f-strings. There are also no additional security concerns: you could
+have also just written the same expression, not inside of an
+f-string::
+
+  >>> def foo():
+  ...   return 20
+  ...
+  >>> f'result={foo()}'
+  'result=20'
+
+Is equivalent to::
+
+  >>> 'result=' + str(foo())
+  'result=20'
+
+After stripping leading and trailing whitespace (see below), the
+expression is parsed with the equivalent of ast.parse(expression,
+'<fstring>', 'eval') [#]_. Note that this restricts the expression: it
+cannot contain any newlines, for example::
+
+  >>> x = 0
+  >>> f'''{x
+  ... +1}'''
+    File "<fstring>", line 2
+      +1
+      ^
+  SyntaxError: invalid syntax
+
+But note that this works, since the newline is removed from the
+string, and the spaces in from of the '1' are allowed in an
+expression::
+
+  >>> f'{x+\
+  ...    1}'
+  '2'
+
+Format specifiers
+-----------------
+
+Format specifiers may also contain evaluated expressions. This allows
+code such as::
+
+  >>> width = 10
+  >>> precision = 4
+  >>> value = decimal.Decimal('12.34567')
+  >>> f'result: {value:{width}.{prevision}}'
+  'result:      12.35'
+
+Once expressions in a format specifier are evaluated (if necessary),
+format specifiers are not interpreted by the f-string evaluator. Just as
+in str.format(), they are merely passed in to the __format__() method
+of the object being formatted.
+
+Concatenating strings
+---------------------
+
+Adjacent f-strings and regular strings are concatenated. Regular
+strings are concatenated at compile time, and f-strings are
+concatenated at run time. For example, the expression::
+
+  >>> x = 10
+  >>> y = 'hi'
+  >>> 'a' 'b' f'{x}' '{c}' f'str<{y:^4}>' 'd' 'e'
+
+yields the value::
+
+  'ab10{c}str< hi >de'
+
+While the exact method of this run time concatenation is unspecified,
+the above code might evaluate to::
+
+  ''.join(['ab', '{x}'.interpolate({'x': x}), '{c}', 'str<', 'str<{y:^4}>'.interpolate({'y': y}), 'de'])
+
+You are guaranteed, however, that there will be no compile time
+combination of f-strings::
+
+  >>> x = 0
+  >>> y = 1
+  >>> f'{x}' f'{y}'
+  '01'
+
+Will result in 2 calls to str.interpolate(): once on the string '{x}',
+and again on the string '{y}'. This guarantee is needed to facilitate
+proposed future internationalization.
+
+Error handling
+--------------
+
+Either compile time or run time errors can occur when processing
+f-strings. Compile time errors are limited to those errors that can be
+detected when scanning an f-string. These errors all raise
+SyntaxError.
+
+Unmatched braces::
+
+  >>> f'x={x'
+    File "<stdin>", line 1
+  SyntaxError: missing '}' in format string expression
+
+Invalid expressions::
+
+  >>> f'x={!x}'
+    File "<fstring>", line 1
+      !x
+      ^
+  SyntaxError: invalid syntax
+
+Run time errors occur when evaluating the expressions inside an
+f-string. Note that an f-string can be evaluated multiple times, and
+work sometimes and raise an error at other times::
+
+  >>> d = {0:10, 1:20}
+  >>> for i in range(3):
+  ...     print(f'{i}:{d[i]}')
+  ...
+  0:10
+  1:20
+  Traceback (most recent call last):
+    File "<stdin>", line 2, in <module>
+  KeyError: 2
+
+or::
+
+  >>> for x in (32, 100, 'fifty'):
+  ...   print(f'x = {x:+3}')
+  ...
+  'x = +32'
+  'x = +100'
+  Traceback (most recent call last):
+    File "<stdin>", line 2, in <module>
+  ValueError: Sign not allowed in string format specifier
+
+Leading and trailing whitespace in expressions is skipped
+---------------------------------------------------------
+
+For ease of readability, leading and trailing whitespace in
+expressions is ignored. However, this does not affect the string or
+keys passed to str.interpolate()::
+
+  >>> x = 100
+  >>> f'x = { x }'
+  'x = 100'
+
+This would be evaluated as::
+
+  'x = { x }'.interpolate({' x ': 100})
+
+Discussion
+==========
+
+Most of the discussions on python-ideas [#]_ focused on a few issues.
+
+ - Whether to allow full Python expressions.
+ - How to designate f-strings, and how to specify the location of
+   expressions in them.
+
+XXX: more on the above issues.
+
+Similar support in other languages
+----------------------------------
+
+Wikipedia has a good discussion of string interpolation in other
+programming languages [#]_. This feature is implemented in many
+languages, with a variety of syntaxes and restrictions.
+
+Differences between f-string and str.format expressions
+-------------------------------------------------------
+
+There is one small difference between the limited expressions allowed
+in str.format() and the full expressions allowed inside f-strings. The
+difference is in how index lookups are performed. In str.format(),
+index values that do not look like numbers are converted to strings::
+
+  >>> d = {'a': 10, 'b': 20}
+  >>> 'a={d[a]}'.format(d=d)
+  'a=10'
+
+Notice that the index value is converted to the string "a" when it is
+looked up in the dict.
+
+However, in f-strings, you would need to use a literal for the value
+of 'a'::
+
+  >>> f'a={d["a"]}'
+  'a=10'
+
+This difference is required because otherwise you would not be able to
+use variables as index values::
+
+  >>> a = 'b'
+  >>> f'a={d[a]}'
+  'a=20'
+
+See [#]_ for a further discussion. It was this observation that led to
+full Python expressions being supported in f-strings.
+
+Triple-quoted f-strings
+-----------------------
+
+Triple quoted f-strings are allowed. These strings are parsed just as
+normal triple-quoted strings are. After parsing, the normal f-string
+logic is applied, and str.interpolate() is called.
+
+Raw f-strings
+-------------
+
+Raw and f-strings may be combined. For example they could be used to
+build up regular expressions::
+
+  >>> header = 'Subject'
+  >>> fr'{header}:\s+'
+  'Subject:\\s+'
+
+In addition, raw f-strings may be combined with triple-quoted strings.
+
+No binary f-strings
+-------------------
+
+For the same reason that we don't support bytes.format(), you may not
+combine 'f' with 'b' string literals. The primary problem is that an
+object's __format__() method may return Unicode data that is not
+compatible with a bytes string.
+
+Binary f-strings would first require a solution for
+bytes.format(). This idea has been proposed in the past, most recently
+in PEP 461 [#]_. The discussions of such a feature usually suggest either
+
+  - adding a method such as __bformat__() so an object can control how
+    it is converted to bytes, or
+
+  - having bytes.format() not be as general purpose or extensible as
+    str.format().
+
+Both of these remain as options in the future, if such functionality
+is desired.
+
+!s, !r, and !s are redundant
+----------------------------
+
+The !s, !r, and !a are not strictly required. Because arbitrary
+expressions are allowed inside the f-strings, this code::
+
+  >>> a = 'some string'
+  >>> f'{a!r}'
+  "'some string'"
+
+Is identical to::
+
+  >>> f'{repr(a)}'
+  "'some string'"
+
+Similarly, !s can be replaced by calls to str() and !a by calls to
+ascii().
+
+However, !s, !r, and !a are supported by this PEP in order to minimize
+the differences with str.format(). !s, !r, and !a are required in
+str.format() because it does not allow the execution of arbitrary
+expressions.
+
+Lambdas inside expressions
+--------------------------
+
+Because lambdas use the ':' character, they cannot appear outside of
+parenthesis in an expression. The colon is interpreted as the start of
+the format specifier, which means the start of the lambda expression
+is seen and is syntactically invalid. As there's no practical use for
+a plain lambda in an f-string expression, this is not seen as much of
+a limitation.
+
+Lambdas may be used inside of parens::
+
+  >>> f'{(lambda x: x*2)(3)}'
+  '6'
+
+Future extensions:
+==================
+
+XXX: By using another leading character (say, 'i'), we could extend
+this proposal to cover internationalization and localization. The idea
+is that the string would be passed to some lookup function before
+.interpolate() is called on it::
+
+   >>> name = 'Eric'
+   >>> fi'Name: {name}'
+
+Could be translated as::
+
+   gettext.gettext('Name: {name}').interpolate({'name': name})
+
+If gettext.gettext() returned '{name} es mi nombre', then the
+resulting string would be 'Eric es mi nombre'.
+
+Any such internationalization work will be specified in an additional
+PEP. In all likelyhood, such a PEP will need to propose one or more
+additional optional parameters to str.interpolate() in order to handle
+the string.Template case of "safe substitution", where the substituted
+field_names are not found in the mapping argument. The choices might
+be: use the field_name, use a default (possibly empty) string, or
+raise an exception.
+
+References
+==========
+
+.. [#] %-formatting
+       (https://docs.python.org/3/library/stdtypes.html#printf-style-string-formatting)
+
+.. [#] str.format
+       (https://docs.python.org/3/library/string.html#formatstrings)
+
+.. [#] string.Template documentation
+       (https://docs.python.org/3/library/string.html#template-strings)
+
+.. [#] PEP 215: String Interpolation
+       (https://www.python.org/dev/peps/pep-0215/)
+
+.. [#] PEP 3101: Advanced String Formatting
+       (https://www.python.org/dev/peps/pep-3101/)
+
+.. [#] Formatting using locals() and globals()
+       (https://mail.python.org/pipermail/python-ideas/2015-July/034671.html)
+
+.. [#] Avoid locals() and globals()
+       (https://mail.python.org/pipermail/python-ideas/2015-July/034701.html)
+
+.. [#] str.format_map() documentation
+       (https://docs.python.org/3/library/stdtypes.html#str.format_map)
+
+.. [#] Format string syntax
+       (https://docs.python.org/3/library/string.html#format-string-syntax)
+
+.. [#] ast.parse() documentation
+       (https://docs.python.org/3/library/ast.html#ast.parse)
+
+.. [#] Start of python-ideas discussion
+       (https://mail.python.org/pipermail/python-ideas/2015-July/034657.html)
+
+.. [#] Wikipedia article on string interpolation
+       (https://en.wikipedia.org/wiki/String_interpolation)
+
+.. [#] Differences in str.format() and f-string expressions
+       (https://mail.python.org/pipermail/python-ideas/2015-July/034726.html)
+
+.. [#] PEP 461 rejects bytes.format()
+       (https://www.python.org/dev/peps/pep-0461/#proposed-variations)
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
+````
+
+</details>
+
+<details><summary><b>Step 3 — revision_3</b> (3308 words)</summary>
+
+````text
+Abstract
+========
+
+Python supports multiple ways to format text strings. These include
+%-formatting [#]_, str.format [#]_, and string.Template [#]_. Each of
+these methods have their advantages, but in addition have
+disadvantages that make them cumbersome to use in practice. This PEP
+proposed to add a new string formatting mechanism: Literal String
+Formatting. In this PEP, such strings will be refered to as
+"f-strings", taken from the leading character used to denote such
+strings.
+
+This PEP does not propose to remove or deprecate any of the existing
+string formatting mechanisms.
+
+f-strings provide a way to embed expressions inside string literals,
+using a minimal syntax. It should be noted that an f-string is really
+an expression evaluated at run time, not a constant value. In Python
+source code, an f-string is a literal string, prefixed with 'f', that
+contains expressions inside braces. The expressions are replaced with
+their values. Some examples are::
+
+  >>> import datetime
+  >>> name = 'Fred'
+  >>> age = 50
+  >>> anniversary = datetime.date(1991, 10, 12)
+  >>> f'My name is {name}, my age next year is {age+1}, my anniversary is {anniversary:%A, %B %d, %Y}.'
+  'My name is Fred, my age next year is 51, my anniversary is Saturday, October 12, 1991.'
+  >>> f'He said his name is {name!r}.'
+  "He said his name is 'Fred'."
+
+This PEP proposes a new method on the str type:
+str.interpolate(). This method will be used to implement f-strings.
+
+A similar feature was proposed in PEP 215 [#]_. PEP 215 proposed to
+support a subset of Python expressions, and did not support the
+type-specific string formatting (the __format__ method) which was
+introduced with PEP 3101 [#]_.
+
+Rationale
+=========
+
+This PEP is driven by the desire to have a simpler way to format
+strings in Python. The existing ways of formatting are either error
+prone, inflexible, or cumbersome.
+
+%-formatting is limited as to the types it supports. Only ints, strs,
+and doubles can be formatted. All other types are either not
+supported, or converted to one of these types before formatting. In
+addition, there's a well-known trap where a single value is passed::
+
+  >>> msg = 'disk failure'
+  >>> 'error: %s' % msg
+  'error: disk failure'
+
+But if msg were ever to be a tuple, the same code would fail::
+
+  >>> msg = ('disk failure', 32)
+  >>> 'error: %s' % msg
+  Traceback (most recent call last):
+    File "<stdin>", line 1, in <module>
+  TypeError: not all arguments converted during string formatting
+
+To be defensive, the following code should be used::
+
+  >>> 'error: %s' % (msg,)
+  "error: ('disk failure', 32)"
+
+str.format() was added to address some of these problems with
+%-formatting. In particular, it uses normal function call syntax (and
+therefor supports mutliple parameters) and it is extensible through
+the __format__() method on the object being converted to a string. See
+PEP-3101 for a detailed rationale. This PEP reuses much of the
+str.format() syntax and machinery, in order to provide continuity with
+an existing Python string formatting mechanism.
+
+However, str.format() is not without its issues. Chief among them is
+its verbosity. For example, the text 'value' is repeated here::
+
+  >>> value = 4 * 20
+  >>> 'The value is {value}.'.format(value=value)
+  'The value is 80.'
+
+Even in its simplest form, there is a bit of boilerplate, and the
+value that's inserted into the placeholder is sometimes far removed
+from where the placeholder is situated::
+
+  >>> 'The value is {}.'.format(value)
+  'The value is 80.'
+
+With an f-string, this becomes::
+
+  >>> f'The value is {value}.'
+  'The value is 80.'
+
+f-strings provide a concise, readable way to include expressions
+inside strings.
+
+In this sense, string.Template and %-formatting have similar
+shortcomings to str.format(), but also support fewer formatting
+options. In particular, they do not support the __format__ protocol,
+so that there is no way to control how a specific object is converted
+to a string, nor can it be extended to additional types that want to
+control how they are converted to strings (such as Decimal and
+datetime). This example is not possible with string.Template::
+
+  >>> value = 1234
+  >>> f'input={value:#0.6x}'
+  'input=0x04d2'
+
+And neither %-formatting nor string.Template can control formatting
+such as::
+
+  >>> date = datetime.date(1991, 10, 12)
+  >>> f'{date} was on a {date:%A}'
+  '1991-10-12 was on a Saturday'
+
+No use of globals() or locals()
+-------------------------------
+
+In the discussions on python-dev [#]_, a number of solutions where
+presented that used locals() and globals() or their equivalents. All
+of these have various problems. Among these are referencing variables
+that are not otherwise used in a closure. Consider::
+
+  >>> def outer(x):
+  ...     def inner():
+  ...         return 'x={x}'.format_map(locals())
+  ...     return inner
+  ...
+  >>> outer(42)()
+  Traceback (most recent call last):
+    File "<stdin>", line 1, in <module>
+    File "<stdin>", line 3, in inner
+  KeyError: 'x'
+
+This returns an error because the compiler has not added a reference
+to x inside the closure. You need to manually add a reference to x in
+order for this to work::
+
+  >>> def outer(x):
+  ...     def inner():
+  ...         x
+  ...         return 'x={x}'.format_map(locals())
+  ...     return inner
+  ...
+  >>> outer(42)()
+  'x=42'
+
+In addition, using locals() or globals() introduces an information
+leak. A called routine that has access to the callers locals() or
+globals() has access to far more information than needed to do the
+string interpolation.
+
+If locals() and globals() were used, and if a future extension to this
+PEP would add an internationalization layer before str.interpolate()
+is called, a malicious translator could get access to additional
+variables in the callers context.
+
+Guido stated [#]_ that any solution to better string interpolation
+would not use locals() or globals().
+
+Specification
+=============
+
+In source code, f-strings are string literals that are prefixed by the
+letter 'f'. 'f' may be combined with 'r', in either order, to produce
+raw f-string literals. 'f' may not be combined with 'b': there are no
+binary f-strings. 'f' may also be combined with 'u', in either order,
+although adding 'u' has no effect.
+
+f-strings are parsed in to literals and expressions. Expressions
+appear within curly braces '{' and '}. The parts of the string outside
+of braces are literals.  The expressions are evaluated, formatted with
+the existing __format__ protocol, then the results are concatenated
+together with the string literals. While scanning the string for
+expressions, any doubled braces '{{' or '}}' are replaced by the
+corresponding single brace. Doubled opening braces do not signify the
+start of an expression.
+
+Following the expression, an optional type conversion may be
+specified.  The allowed conversions are '!s', '!r', or '!a'. These are
+treated the same as in str.format: '!s' calls str() on the expression,
+'!r' calls repr() on the expression, and '!a' calls ascii() on the
+expression. These conversions are applied before the call to
+__format__. The only reason to use '!s' is if you want to specify a
+format specifier that applies to str, not to the type of the
+expression.
+
+Similar to str.format, optional format specifiers maybe be included
+inside the f-string, separated from the expression (or the type
+conversion, if specified) by a colon. If a format specifier is not
+provied, an empty string is used.
+
+So, an f-string looks like::
+
+  f ' <text> { <expression> <optional !s, !r, or !a> <optional : format specifier> } text ... '
+
+The resulting expression's __format__ method is called with the format
+specifier. The resulting value is used when building the value of the
+f-string.
+
+Expressions cannot contain ':' or '!' outside of strings or parens,
+brackets, or braces. The exception is that the '!=' operator is
+special cased.
+
+str.interpolate()
+-----------------
+
+str.interpolate(mapping) will be a new method on the str type. It
+takes one argument: a mapping of field names to values. This method is
+the same as str.format_map() [#]_, with one difference: it does not
+interpret the field_name [#]_ in any way. The field_name is only used
+to look up the replacement value in the supplied mapping object. Like
+str.format() and str.format_map(), str.interpolate() does interpret
+and apply the optional conversion and format_spec. Thus, a field_name
+may not contain the characters ':' or '}', nor the strings '!s', '!r',
+or '!a'.
+
+Examples::
+
+  >>> name = 'Guido'
+  >>> 'name={name}'.interpolate({'name': name})
+  'name=Guido'
+
+  >>> '{date} was on a {date:%A}. It was {weather}.'.interpolate({'weather': 'sunny', 'date': datetime.date(1991, 10, 12)})
+  '1991-10-12 was on a Saturday. It was sunny.'
+
+Like str.format_map(), only the field_name portion inside braces is
+used to look up values in the mapping. The format_spec is not used as
+part of this lookup. Thus::
+
+  >>> 'name={name:10}'.interpolate({'name': name})
+  'name=Guido     '
+
+But::
+
+  >>> 'name={name:10}'.interpolate({'name:10': name})
+  'name=Guido     '
+  Traceback (most recent call last):
+    File "<stdin>", line 1, in <module>
+  KeyError: 'name'
+
+Code equivalence
+----------------
+
+An f-string is evaluated at run time using a call to str.interpolate().
+
+For example, this code::
+
+  f'abc{expr1:spec1}{expr2!r:spec2}def{expr3:!s}ghi'
+
+Will be be evaluated as::
+
+  'abc{expr1:spec1}{expr2!r:spec2}def{expr3:!s}ghi'.interpolate({'expr1': expr1, 'expr2': expr2, 'expr3': expr3})
+
+Note that the string on which interpolate() is being called is
+identical to the value of the f-string.
+
+
+Expression evaluation
+---------------------
+
+The expressions that are extracted from the string are evaluated in
+the context where the f-string appeared. This means the expression has
+full access to local and global variables. Any valid Python expression
+can be used, including function and method calls.
+
+Because the f-strings are evaluated where the string appears in the
+source code, there is no additional expressiveness available with
+f-strings. There are also no additional security concerns: you could
+have also just written the same expression, not inside of an
+f-string::
+
+  >>> def foo():
+  ...   return 20
+  ...
+  >>> f'result={foo()}'
+  'result=20'
+
+Is equivalent to::
+
+  >>> 'result=' + str(foo())
+  'result=20'
+
+After stripping leading and trailing whitespace (see below), the
+expression is parsed with the equivalent of ast.parse(expression,
+'<fstring>', 'eval') [#]_. Note that this restricts the expression: it
+cannot contain any newlines, for example::
+
+  >>> x = 0
+  >>> f'''{x
+  ... +1}'''
+    File "<fstring>", line 2
+      +1
+      ^
+  SyntaxError: invalid syntax
+
+But note that this works, since the newline is removed from the
+string, and the spaces in from of the '1' are allowed in an
+expression::
+
+  >>> f'{x+\
+  ...    1}'
+  '2'
+
+Format specifiers
+-----------------
+
+Format specifiers may also contain evaluated expressions. This allows
+code such as::
+
+  >>> width = 10
+  >>> precision = 4
+  >>> value = decimal.Decimal('12.34567')
+  >>> f'result: {value:{width}.{prevision}}'
+  'result:      12.35'
+
+Once expressions in a format specifier are evaluated (if necessary),
+format specifiers are not interpreted by the f-string evaluator. Just as
+in str.format(), they are merely passed in to the __format__() method
+of the object being formatted.
+
+Concatenating strings
+---------------------
+
+Adjacent f-strings and regular strings are concatenated. Regular
+strings are concatenated at compile time, and f-strings are
+concatenated at run time. For example, the expression::
+
+  >>> x = 10
+  >>> y = 'hi'
+  >>> 'a' 'b' f'{x}' '{c}' f'str<{y:^4}>' 'd' 'e'
+
+yields the value::
+
+  'ab10{c}str< hi >de'
+
+While the exact method of this run time concatenation is unspecified,
+the above code might evaluate to::
+
+  ''.join(['ab', '{x}'.interpolate({'x': x}), '{c}', 'str<', 'str<{y:^4}>'.interpolate({'y': y}), 'de'])
+
+You are guaranteed, however, that there will be no compile time
+combination of f-strings::
+
+  >>> x = 0
+  >>> y = 1
+  >>> f'{x}' f'{y}'
+  '01'
+
+Will result in 2 calls to str.interpolate(): once on the string '{x}',
+and again on the string '{y}'. This guarantee is needed to facilitate
+proposed future internationalization.
+
+Error handling
+--------------
+
+Either compile time or run time errors can occur when processing
+f-strings. Compile time errors are limited to those errors that can be
+detected when scanning an f-string. These errors all raise
+SyntaxError.
+
+Unmatched braces::
+
+  >>> f'x={x'
+    File "<stdin>", line 1
+  SyntaxError: missing '}' in format string expression
+
+Invalid expressions::
+
+  >>> f'x={!x}'
+    File "<fstring>", line 1
+      !x
+      ^
+  SyntaxError: invalid syntax
+
+Run time errors occur when evaluating the expressions inside an
+f-string. Note that an f-string can be evaluated multiple times, and
+work sometimes and raise an error at other times::
+
+  >>> d = {0:10, 1:20}
+  >>> for i in range(3):
+  ...     print(f'{i}:{d[i]}')
+  ...
+  0:10
+  1:20
+  Traceback (most recent call last):
+    File "<stdin>", line 2, in <module>
+  KeyError: 2
+
+or::
+
+  >>> for x in (32, 100, 'fifty'):
+  ...   print(f'x = {x:+3}')
+  ...
+  'x = +32'
+  'x = +100'
+  Traceback (most recent call last):
+    File "<stdin>", line 2, in <module>
+  ValueError: Sign not allowed in string format specifier
+
+Leading and trailing whitespace in expressions is skipped
+---------------------------------------------------------
+
+For ease of readability, leading and trailing whitespace in
+expressions is ignored. However, this does not affect the string or
+keys passed to str.interpolate()::
+
+  >>> x = 100
+  >>> f'x = { x }'
+  'x = 100'
+
+This would be evaluated as::
+
+  'x = { x }'.interpolate({' x ': 100})
+
+Discussion
+==========
+
+python-ideas discussion
+-----------------------
+
+Most of the discussions on python-ideas [#]_ focused on three issues:
+
+ - How to denote f-strings,
+ - How to specify the location of expressions in f-strings, and
+ - Whether to allow full Python expressions.
+
+How to denote f-strings
+***********************
+
+Because the compiler must be involved in evaluating the expressions
+contained in the interpolated strings, there must be some way to
+denote to the compiler which strings should be evaluated. This PEP
+chose a leading 'f' character preceeding the string literal. This is
+similar to how 'b' and 'r' prefixes change the meaning of the string
+itself, at compile time. Other prefixes were suggested, such as 'i'. No
+option seemed better than the other, so 'f' was chosen.
+
+Another option was to support special functions, known to the
+compiler, such as Format(). This seems like too much magic for Python:
+not only is there a chance for collision with existing identifiers,
+the PEP author feels that it's better to signify the magic with a
+string prefix character.
+
+How to specify the location of expressions in f-strings
+*******************************************************
+
+This PEP supports the same syntax as str.format() for distinguishing
+replacement text inside strings: expressions are contained inside
+braces. There were other options suggested, such as string.Template's
+$identifier or ${expression}.
+
+While $identifier is no doubt more familiar to shell scripters and
+users of some other languages, in Python str.format() is heavily
+used. A quick search of Python's standard library shows only a handful
+of uses of string.Template, but over 1000 uses of str.format().
+
+Another proposed alternative was to have the substituted text between
+\{ and } or between \{ and \}. While this syntax would probably be
+desirable if all string literals were to support interpolation, this
+PEP only supports strings that are already marked with the leading
+'f'. As such, the PEP is using unadorned braces to denoted substituted
+text, in order to leverage end user familiarity with str.format().
+
+Supporting full Python expressions
+**********************************
+
+Many people on the python-ideas discussion wanted support for either
+only single identifiers, or a limited subset of Python expressions
+(such as the subset supported by str.format()). This PEP supports full
+Python expressions inside the braces. Without full expressions, some
+desirable usage would be forbidden::
+
+  >>> f'Column={col_idx+1}'
+  >>> f'number of items: {len(items)}'
+
+would become::
+
+  >>> col_number = col_idx+1
+  >>> f'Column={col_number}'
+  >>> n_items = len(items)
+  >>> f'number of items: {n_items}'
+
+While it's true that very ugly expressions could be included in the
+f-strings, this PEP takes the position that such uses should be
+addressed in a linter or code review::
+
+  >>> f'mapping is { {a:b for (a, b) in ((1, 2), (3, 4))}}'
+  'mapping is {1: 2, 3: 4}'
+
+Similar support in other languages
+----------------------------------
+
+Wikipedia has a good discussion of string interpolation in other
+programming languages [#]_. This feature is implemented in many
+languages, with a variety of syntaxes and restrictions.
+
+Differences between f-string and str.format expressions
+-------------------------------------------------------
+
+There is one small difference between the limited expressions allowed
+in str.format() and the full expressions allowed inside f-strings. The
+difference is in how index lookups are performed. In str.format(),
+index values that do not look like numbers are converted to strings::
+
+  >>> d = {'a': 10, 'b': 20}
+  >>> 'a={d[a]}'.format(d=d)
+  'a=10'
+
+Notice that the index value is converted to the string "a" when it is
+looked up in the dict.
+
+However, in f-strings, you would need to use a literal for the value
+of 'a'::
+
+  >>> f'a={d["a"]}'
+  'a=10'
+
+This difference is required because otherwise you would not be able to
+use variables as index values::
+
+  >>> a = 'b'
+  >>> f'a={d[a]}'
+  'a=20'
+
+See [#]_ for a further discussion. It was this observation that led to
+full Python expressions being supported in f-strings.
+
+Triple-quoted f-strings
+-----------------------
+
+Triple quoted f-strings are allowed. These strings are parsed just as
+normal triple-quoted strings are. After parsing, the normal f-string
+logic is applied, and str.interpolate() is called.
+
+Raw f-strings
+-------------
+
+Raw and f-strings may be combined. For example they could be used to
+build up regular expressions::
+
+  >>> header = 'Subject'
+  >>> fr'{header}:\s+'
+  'Subject:\\s+'
+
+In addition, raw f-strings may be combined with triple-quoted strings.
+
+No binary f-strings
+-------------------
+
+For the same reason that we don't support bytes.format(), you may not
+combine 'f' with 'b' string literals. The primary problem is that an
+object's __format__() method may return Unicode data that is not
+compatible with a bytes string.
+
+Binary f-strings would first require a solution for
+bytes.format(). This idea has been proposed in the past, most recently
+in PEP 461 [#]_. The discussions of such a feature usually suggest either
+
+  - adding a method such as __bformat__() so an object can control how
+    it is converted to bytes, or
+
+  - having bytes.format() not be as general purpose or extensible as
+    str.format().
+
+Both of these remain as options in the future, if such functionality
+is desired.
+
+!s, !r, and !s are redundant
+----------------------------
+
+The !s, !r, and !a are not strictly required. Because arbitrary
+expressions are allowed inside the f-strings, this code::
+
+  >>> a = 'some string'
+  >>> f'{a!r}'
+  "'some string'"
+
+Is identical to::
+
+  >>> f'{repr(a)}'
+  "'some string'"
+
+Similarly, !s can be replaced by calls to str() and !a by calls to
+ascii().
+
+However, !s, !r, and !a are supported by this PEP in order to minimize
+the differences with str.format(). !s, !r, and !a are required in
+str.format() because it does not allow the execution of arbitrary
+expressions.
+
+Lambdas inside expressions
+--------------------------
+
+Because lambdas use the ':' character, they cannot appear outside of
+parenthesis in an expression. The colon is interpreted as the start of
+the format specifier, which means the start of the lambda expression
+is seen and is syntactically invalid. As there's no practical use for
+a plain lambda in an f-string expression, this is not seen as much of
+a limitation.
+
+Lambdas may be used inside of parens::
+
+  >>> f'{(lambda x: x*2)(3)}'
+  '6'
+
+Future extensions:
+==================
+
+By using another leading character (say, 'i'), we could extend this
+proposal to cover internationalization and localization. The idea is
+that the string would be passed to some lookup function before
+.interpolate() is called on it::
+
+   >>> name = 'Eric'
+   >>> i'Name: {name}'
+
+Could be translated as::
+
+   gettext.gettext('Name: {name}').interpolate({'name': name})
+
+If gettext.gettext() returned '{name} es mi nombre', then the
+resulting string would be 'Eric es mi nombre'.
+
+Any such internationalization work will be specified in an additional
+PEP. In all likelyhood, such a PEP will need to propose one or more
+additional optional parameters to str.interpolate() in order to handle
+the string.Template case of "safe substitution", where the substituted
+field_names are not found in the mapping argument. The choices might
+be: use the field_name, use a default (possibly empty) string, or
+raise an exception.
+
+There would obviously need to be some way to specify to the compiler
+what lookup function would be called.
+
+References ==========
+
+.. [#] %-formatting
+       (https://docs.python.org/3/library/stdtypes.html#printf-style-string-formatting)
+
+.. [#] str.format
+       (https://docs.python.org/3/library/string.html#formatstrings)
+
+.. [#] string.Template documentation
+       (https://docs.python.org/3/library/string.html#template-strings)
+
+.. [#] PEP 215: String Interpolation
+       (https://www.python.org/dev/peps/pep-0215/)
+
+.. [#] PEP 3101: Advanced String Formatting
+       (https://www.python.org/dev/peps/pep-3101/)
+
+.. [#] Formatting using locals() and globals()
+       (https://mail.python.org/pipermail/python-ideas/2015-July/034671.html)
+
+.. [#] Avoid locals() and globals()
+       (https://mail.python.org/pipermail/python-ideas/2015-July/034701.html)
+
+.. [#] str.format_map() documentation
+       (https://docs.python.org/3/library/stdtypes.html#str.format_map)
+
+.. [#] Format string syntax
+       (https://docs.python.org/3/library/string.html#format-string-syntax)
+
+.. [#] ast.parse() documentation
+       (https://docs.python.org/3/library/ast.html#ast.parse)
+
+.. [#] Start of python-ideas discussion
+       (https://mail.python.org/pipermail/python-ideas/2015-July/034657.html)
+
+.. [#] Wikipedia article on string interpolation
+       (https://en.wikipedia.org/wiki/String_interpolation)
+
+.. [#] Differences in str.format() and f-string expressions
+       (https://mail.python.org/pipermail/python-ideas/2015-July/034726.html)
+
+.. [#] PEP 461 rejects bytes.format()
+       (https://www.python.org/dev/peps/pep-0461/#proposed-variations)
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
+````
+
+</details>
+
+<details><summary><b>Step 4 — revision_4</b> (3354 words)</summary>
+
+````text
+Abstract
+========
+
+Python supports multiple ways to format text strings. These include
+%-formatting [#]_, str.format [#]_, and string.Template [#]_. Each of
+these methods have their advantages, but in addition have
+disadvantages that make them cumbersome to use in practice. This PEP
+proposed to add a new string formatting mechanism: Literal String
+Formatting. In this PEP, such strings will be refered to as
+"f-strings", taken from the leading character used to denote such
+strings.
+
+This PEP does not propose to remove or deprecate any of the existing
+string formatting mechanisms.
+
+f-strings provide a way to embed expressions inside string literals,
+using a minimal syntax. It should be noted that an f-string is really
+an expression evaluated at run time, not a constant value. In Python
+source code, an f-string is a literal string, prefixed with 'f', that
+contains expressions inside braces. The expressions are replaced with
+their values. Some examples are::
+
+  >>> import datetime
+  >>> name = 'Fred'
+  >>> age = 50
+  >>> anniversary = datetime.date(1991, 10, 12)
+  >>> f'My name is {name}, my age next year is {age+1}, my anniversary is {anniversary:%A, %B %d, %Y}.'
+  'My name is Fred, my age next year is 51, my anniversary is Saturday, October 12, 1991.'
+  >>> f'He said his name is {name!r}.'
+  "He said his name is 'Fred'."
+
+A similar feature was proposed in PEP 215 [#]_. PEP 215 proposed to
+support a subset of Python expressions, and did not support the
+type-specific string formatting (the __format__ method) which was
+introduced with PEP 3101 [#]_.
+
+Rationale
+=========
+
+This PEP is driven by the desire to have a simpler way to format
+strings in Python. The existing ways of formatting are either error
+prone, inflexible, or cumbersome.
+
+%-formatting is limited as to the types it supports. Only ints, strs,
+and doubles can be formatted. All other types are either not
+supported, or converted to one of these types before formatting. In
+addition, there's a well-known trap where a single value is passed::
+
+  >>> msg = 'disk failure'
+  >>> 'error: %s' % msg
+  'error: disk failure'
+
+But if msg were ever to be a tuple, the same code would fail::
+
+  >>> msg = ('disk failure', 32)
+  >>> 'error: %s' % msg
+  Traceback (most recent call last):
+    File "<stdin>", line 1, in <module>
+  TypeError: not all arguments converted during string formatting
+
+To be defensive, the following code should be used::
+
+  >>> 'error: %s' % (msg,)
+  "error: ('disk failure', 32)"
+
+str.format() was added to address some of these problems with
+%-formatting. In particular, it uses normal function call syntax (and
+therefor supports multiple parameters) and it is extensible through
+the __format__() method on the object being converted to a string. See
+PEP-3101 for a detailed rationale. This PEP reuses much of the
+str.format() syntax and machinery, in order to provide continuity with
+an existing Python string formatting mechanism.
+
+However, str.format() is not without its issues. Chief among them is
+its verbosity. For example, the text 'value' is repeated here::
+
+  >>> value = 4 * 20
+  >>> 'The value is {value}.'.format(value=value)
+  'The value is 80.'
+
+Even in its simplest form, there is a bit of boilerplate, and the
+value that's inserted into the placeholder is sometimes far removed
+from where the placeholder is situated::
+
+  >>> 'The value is {}.'.format(value)
+  'The value is 80.'
+
+With an f-string, this becomes::
+
+  >>> f'The value is {value}.'
+  'The value is 80.'
+
+f-strings provide a concise, readable way to include expressions
+inside strings.
+
+In this sense, string.Template and %-formatting have similar
+shortcomings to str.format(), but also support fewer formatting
+options. In particular, they do not support the __format__ protocol,
+so that there is no way to control how a specific object is converted
+to a string, nor can it be extended to additional types that want to
+control how they are converted to strings (such as Decimal and
+datetime). This example is not possible with string.Template::
+
+  >>> value = 1234
+  >>> f'input={value:#0.6x}'
+  'input=0x04d2'
+
+And neither %-formatting nor string.Template can control formatting
+such as::
+
+  >>> date = datetime.date(1991, 10, 12)
+  >>> f'{date} was on a {date:%A}'
+  '1991-10-12 was on a Saturday'
+
+No use of globals() or locals()
+-------------------------------
+
+In the discussions on python-dev [#]_, a number of solutions where
+presented that used locals() and globals() or their equivalents. All
+of these have various problems. Among these are referencing variables
+that are not otherwise used in a closure. Consider::
+
+  >>> def outer(x):
+  ...     def inner():
+  ...         return 'x={x}'.format_map(locals())
+  ...     return inner
+  ...
+  >>> outer(42)()
+  Traceback (most recent call last):
+    File "<stdin>", line 1, in <module>
+    File "<stdin>", line 3, in inner
+  KeyError: 'x'
+
+This returns an error because the compiler has not added a reference
+to x inside the closure. You need to manually add a reference to x in
+order for this to work::
+
+  >>> def outer(x):
+  ...     def inner():
+  ...         x
+  ...         return 'x={x}'.format_map(locals())
+  ...     return inner
+  ...
+  >>> outer(42)()
+  'x=42'
+
+In addition, using locals() or globals() introduces an information
+leak. A called routine that has access to the callers locals() or
+globals() has access to far more information than needed to do the
+string interpolation.
+
+Guido stated [#]_ that any solution to better string interpolation
+would not use locals() or globals().
+
+Specification
+=============
+
+In source code, f-strings are string literals that are prefixed by the
+letter 'f'. 'f' may be combined with 'r', in either order, to produce
+raw f-string literals. 'f' may not be combined with 'b': there are no
+binary f-strings. 'f' may also be combined with 'u', in either order,
+although adding 'u' has no effect.
+
+f-strings are parsed in to literals and expressions. Expressions
+appear within curly braces '{' and '}. The parts of the string outside
+of braces are literals.  The expressions are evaluated, formatted with
+the existing __format__ protocol, then the results are concatenated
+together with the string literals. While scanning the string for
+expressions, any doubled braces '{{' or '}}' are replaced by the
+corresponding single brace. Doubled opening braces do not signify the
+start of an expression.
+
+Following the expression, an optional type conversion may be
+specified.  The allowed conversions are '!s', '!r', or '!a'. These are
+treated the same as in str.format: '!s' calls str() on the expression,
+'!r' calls repr() on the expression, and '!a' calls ascii() on the
+expression. These conversions are applied before the call to
+__format__. The only reason to use '!s' is if you want to specify a
+format specifier that applies to str, not to the type of the
+expression.
+
+Similar to str.format, optional format specifiers maybe be included
+inside the f-string, separated from the expression (or the type
+conversion, if specified) by a colon. If a format specifier is not
+provied, an empty string is used.
+
+So, an f-string looks like::
+
+  f ' <text> { <expression> <optional !s, !r, or !a> <optional : format specifier> } text ... '
+
+The resulting expression's __format__ method is called with the format
+specifier. The resulting value is used when building the value of the
+f-string.
+
+Expressions cannot contain ':' or '!' outside of strings or parens,
+brackets, or braces. The exception is that the '!=' operator is
+special cased.
+
+Escape sequences
+----------------
+
+Scanning an f-string for expressions happens after escape sequences
+are decoded. Because hex(ord('{')) == 0x7b, the f-string
+f'\\u007b4*10}' is decoded to f'{4*10}', which evaluates as the integer
+40::
+
+  >>> f'\u007b4*10}'
+  '40'
+  >>> f'\x7b4*10}'
+  '40'
+  >>> f'\x7b4*10\N{RIGHT CURLY BRACKET}'
+  '40'
+
+These examples aren't generally useful, they're just to show that
+escape sequences are processed before f-strings are parsed for
+expressions.
+
+Code equivalence
+----------------
+
+The exact code used to implement f-strings is not specified. However,
+it is guaranteed that any embedded value that is converted to a string
+will use that value's __format__ method. This is the same mechanism
+that str.format() uses to convert values to strings.
+
+For example, this code::
+
+  f'abc{expr1:spec1}{expr2!r:spec2}def{expr3:!s}ghi'
+
+Might be be evaluated as::
+
+  ''.join(['abc', expr1.__format__(spec1), repr(expr2).__format__(spec2), 'def', str(spec3).__format__(''), 'ghi'])
+
+Expression evaluation
+---------------------
+
+The expressions that are extracted from the string are evaluated in
+the context where the f-string appeared. This means the expression has
+full access to local and global variables. Any valid Python expression
+can be used, including function and method calls.
+
+Because the f-strings are evaluated where the string appears in the
+source code, there is no additional expressiveness available with
+f-strings. There are also no additional security concerns: you could
+have also just written the same expression, not inside of an
+f-string::
+
+  >>> def foo():
+  ...   return 20
+  ...
+  >>> f'result={foo()}'
+  'result=20'
+
+Is equivalent to::
+
+  >>> 'result=' + str(foo())
+  'result=20'
+
+After stripping leading and trailing whitespace (see below), the
+expression is parsed with the equivalent of ast.parse(expression,
+'<fstring>', 'eval') [#]_. Note that this restricts the expression: it
+cannot contain any newlines, for example::
+
+  >>> x = 0
+  >>> f'''{x
+  ... +1}'''
+    File "<fstring>", line 2
+      +1
+      ^
+  SyntaxError: invalid syntax
+
+But note that this works, since the newline is removed from the
+string, and the spaces in front of the '1' are allowed in an
+expression::
+
+  >>> f'{x+\
+  ...    1}'
+  '2'
+
+Format specifiers
+-----------------
+
+Format specifiers may also contain evaluated expressions. This allows
+code such as::
+
+  >>> width = 10
+  >>> precision = 4
+  >>> value = decimal.Decimal('12.34567')
+  >>> f'result: {value:{width}.{precision}}'
+  'result:      12.35'
+
+Once expressions in a format specifier are evaluated (if necessary),
+format specifiers are not interpreted by the f-string evaluator. Just as
+in str.format(), they are merely passed in to the __format__() method
+of the object being formatted.
+
+Concatenating strings
+---------------------
+
+Adjacent f-strings and regular strings are concatenated. Regular
+strings are concatenated at compile time, and f-strings are
+concatenated at run time. For example, the expression::
+
+  >>> x = 10
+  >>> y = 'hi'
+  >>> 'a' 'b' f'{x}' '{c}' f'str<{y:^4}>' 'd' 'e'
+
+yields the value::
+
+  'ab10{c}str< hi >de'
+
+While the exact method of this run time concatenation is unspecified,
+the above code might evaluate to::
+
+  ''.join(['ab', x.__format__(''), '{c}', 'str<', y.__format__('^4'), 'de'])
+
+Error handling
+--------------
+
+Either compile time or run time errors can occur when processing
+f-strings. Compile time errors are limited to those errors that can be
+detected when scanning an f-string. These errors all raise
+SyntaxError.
+
+Unmatched braces::
+
+  >>> f'x={x'
+    File "<stdin>", line 1
+  SyntaxError: missing '}' in format string expression
+
+Invalid expressions::
+
+  >>> f'x={!x}'
+    File "<fstring>", line 1
+      !x
+      ^
+  SyntaxError: invalid syntax
+
+Run time errors occur when evaluating the expressions inside an
+f-string. Note that an f-string can be evaluated multiple times, and
+work sometimes and raise an error at other times::
+
+  >>> d = {0:10, 1:20}
+  >>> for i in range(3):
+  ...     print(f'{i}:{d[i]}')
+  ...
+  0:10
+  1:20
+  Traceback (most recent call last):
+    File "<stdin>", line 2, in <module>
+  KeyError: 2
+
+or::
+
+  >>> for x in (32, 100, 'fifty'):
+  ...   print(f'x = {x:+3}')
+  ...
+  'x = +32'
+  'x = +100'
+  Traceback (most recent call last):
+    File "<stdin>", line 2, in <module>
+  ValueError: Sign not allowed in string format specifier
+
+Leading and trailing whitespace in expressions is skipped
+---------------------------------------------------------
+
+For ease of readability, leading and trailing whitespace in
+expressions is ignored.
+
+Evaluation order of expressions
+-------------------------------
+
+The expressions in an f-string are evaluated in left-to-right
+order. This is detectable only if the expressions have side effects::
+
+  >>> def fn(l, incr):
+  ...    result = l[0]
+  ...    l[0] += incr
+  ...    return result
+  ...
+  >>> lst = [0]
+  >>> f'{fn(lst,2)} {fn(lst,3)}'
+  '0 2'
+  >>> f'{fn(lst,2)} {fn(lst,3)}'
+  '5 7'
+  >>> lst
+  [10]
+
+Discussion
+==========
+
+python-ideas discussion
+-----------------------
+
+Most of the discussions on python-ideas [#]_ focused on three issues:
+
+ - How to denote f-strings,
+ - How to specify the location of expressions in f-strings, and
+ - Whether to allow full Python expressions.
+
+How to denote f-strings
+***********************
+
+Because the compiler must be involved in evaluating the expressions
+contained in the interpolated strings, there must be some way to
+denote to the compiler which strings should be evaluated. This PEP
+chose a leading 'f' character preceeding the string literal. This is
+similar to how 'b' and 'r' prefixes change the meaning of the string
+itself, at compile time. Other prefixes were suggested, such as 'i'. No
+option seemed better than the other, so 'f' was chosen.
+
+Another option was to support special functions, known to the
+compiler, such as Format(). This seems like too much magic for Python:
+not only is there a chance for collision with existing identifiers,
+the PEP author feels that it's better to signify the magic with a
+string prefix character.
+
+How to specify the location of expressions in f-strings
+*******************************************************
+
+This PEP supports the same syntax as str.format() for distinguishing
+replacement text inside strings: expressions are contained inside
+braces. There were other options suggested, such as string.Template's
+$identifier or ${expression}.
+
+While $identifier is no doubt more familiar to shell scripters and
+users of some other languages, in Python str.format() is heavily
+used. A quick search of Python's standard library shows only a handful
+of uses of string.Template, but hundreds of uses of str.format().
+
+Another proposed alternative was to have the substituted text between
+\\{ and } or between \\{ and \\}. While this syntax would probably be
+desirable if all string literals were to support interpolation, this
+PEP only supports strings that are already marked with the leading
+'f'. As such, the PEP is using unadorned braces to denoted substituted
+text, in order to leverage end user familiarity with str.format().
+
+Supporting full Python expressions
+**********************************
+
+Many people on the python-ideas discussion wanted support for either
+only single identifiers, or a limited subset of Python expressions
+(such as the subset supported by str.format()). This PEP supports full
+Python expressions inside the braces. Without full expressions, some
+desirable usage would be cumbersome. For example::
+
+  >>> f'Column={col_idx+1}'
+  >>> f'number of items: {len(items)}'
+
+would become::
+
+  >>> col_number = col_idx+1
+  >>> f'Column={col_number}'
+  >>> n_items = len(items)
+  >>> f'number of items: {n_items}'
+
+While it's true that very ugly expressions could be included in the
+f-strings, this PEP takes the position that such uses should be
+addressed in a linter or code review::
+
+  >>> f'mapping is { {a:b for (a, b) in ((1, 2), (3, 4))}}'
+  'mapping is {1: 2, 3: 4}'
+
+Similar support in other languages
+----------------------------------
+
+Wikipedia has a good discussion of string interpolation in other
+programming languages [#]_. This feature is implemented in many
+languages, with a variety of syntaxes and restrictions.
+
+Differences between f-string and str.format expressions
+-------------------------------------------------------
+
+There is one small difference between the limited expressions allowed
+in str.format() and the full expressions allowed inside f-strings. The
+difference is in how index lookups are performed. In str.format(),
+index values that do not look like numbers are converted to strings::
+
+  >>> d = {'a': 10, 'b': 20}
+  >>> 'a={d[a]}'.format(d=d)
+  'a=10'
+
+Notice that the index value is converted to the string "a" when it is
+looked up in the dict.
+
+However, in f-strings, you would need to use a literal for the value
+of 'a'::
+
+  >>> f'a={d["a"]}'
+  'a=10'
+
+This difference is required because otherwise you would not be able to
+use variables as index values::
+
+  >>> a = 'b'
+  >>> f'a={d[a]}'
+  'a=20'
+
+See [#]_ for a further discussion. It was this observation that led to
+full Python expressions being supported in f-strings.
+
+Furthermore, the limited expressions that str.format() understands
+need not be valid Python expressions. For example::
+
+  >>> '{i[";]}'.format(i={'";':4})
+  '4'
+
+For this reason, the str.format() "expression parser" is not suitable
+for use when implementing f-strings.
+
+Triple-quoted f-strings
+-----------------------
+
+Triple quoted f-strings are allowed. These strings are parsed just as
+normal triple-quoted strings are. After parsing, the normal f-string
+logic is applied, and __format__() on each value is called.
+
+Raw f-strings
+-------------
+
+Raw and f-strings may be combined. For example they could be used to
+build up regular expressions::
+
+  >>> header = 'Subject'
+  >>> fr'{header}:\s+'
+  'Subject:\\s+'
+
+In addition, raw f-strings may be combined with triple-quoted strings.
+
+No binary f-strings
+-------------------
+
+For the same reason that we don't support bytes.format(), you may not
+combine 'f' with 'b' string literals. The primary problem is that an
+object's __format__() method may return Unicode data that is not
+compatible with a bytes string.
+
+Binary f-strings would first require a solution for
+bytes.format(). This idea has been proposed in the past, most recently
+in PEP 461 [#]_. The discussions of such a feature usually suggest either
+
+  - adding a method such as __bformat__() so an object can control how
+    it is converted to bytes, or
+
+  - having bytes.format() not be as general purpose or extensible as
+    str.format().
+
+Both of these remain as options in the future, if such functionality
+is desired.
+
+!s, !r, and !a are redundant
+----------------------------
+
+The !s, !r, and !a are not strictly required. Because arbitrary
+expressions are allowed inside the f-strings, this code::
+
+  >>> a = 'some string'
+  >>> f'{a!r}'
+  "'some string'"
+
+Is identical to::
+
+  >>> f'{repr(a)}'
+  "'some string'"
+
+Similarly, !s can be replaced by calls to str() and !a by calls to
+ascii().
+
+However, !s, !r, and !a are supported by this PEP in order to minimize
+the differences with str.format(). !s, !r, and !a are required in
+str.format() because it does not allow the execution of arbitrary
+expressions.
+
+Lambdas inside expressions
+--------------------------
+
+Because lambdas use the ':' character, they cannot appear outside of
+parenthesis in an expression. The colon is interpreted as the start of
+the format specifier, which means the start of the lambda expression
+is seen and is syntactically invalid. As there's no practical use for
+a plain lambda in an f-string expression, this is not seen as much of
+a limitation.
+
+If you feel you must use lambdas, they may be used inside of parens::
+
+  >>> f'{(lambda x: x*2)(3)}'
+  '6'
+
+Examples from Python's source code
+==================================
+
+Here are some examples from Python source code that currently use
+str.format(), and how they would look with f-strings. This PEP does
+not recommend wholesale converting to f-strings, these are just
+examples of real-world usages of str.format() and how they'd look if
+written from scratch using f-strings.
+
+Lib/asyncio/locks.py::
+
+  extra = '{},waiters:{}'.format(extra, len(self._waiters))
+  extra = f'{extra},waiters:{len(self._waiters)}'
+
+Lib/configparser.py::
+
+  message.append(" [line {0:2d}]".format(lineno))
+  message.append(f" [line {lineno:2d}]")
+
+Tools/clinic/clinic.py::
+
+  methoddef_name = "{}_METHODDEF".format(c_basename.upper())
+  methoddef_name = f"{c_basename.upper()}_METHODDEF"
+
+python-config.py::
+
+  print("Usage: {0} [{1}]".format(sys.argv[0], '|'.join('--'+opt for opt in valid_opts)), file=sys.stderr)
+  print(f"Usage: {sys.argv[0]} [{'|'.join('--'+opt for opt in valid_opts)}]", file=sys.stderr)
+
+Implementation limitations
+==========================
+
+Maximum of 255 expressions
+--------------------------
+
+Due to a CPython limit with the number of parameters to a function, an
+f-string may not contain more that 255 expressions. This includes
+expressions inside format specifiers. So this code would count as
+having 2 expressions::
+
+  f'{x:.{width}}'
+
+The same expression used multiple times
+---------------------------------------
+
+Every expression in braces in an f-string is evaluated exactly
+once. If the same expression is used more than once in the same
+f-string, it will be evaluated multiple times. However, it's undefined
+which result will show up in the resulting string value. For purposes
+of this section, two expressions are the same if they have the exact
+same literal text defining them. For example, '{i}' and '{i}' are the
+same expression, but '{i}' and '{ i}' are not, due to the extra space
+in the second expression.
+
+For example, given::
+
+  >>> def fn(lst):
+  ...    lst[0] += 1
+  ...    return lst[0]
+  ...
+  >>> lst=[0]
+  >>> f'{fn(lst)} {fn(lst)}'
+  '1 2'
+
+The resulting f-string might have the value '1 2', '2 2', '1 1', or
+even '2 1'.
+
+However::
+
+  >>> lst=[0]
+  >>> f'{fn(lst)} { fn(lst)}'
+  '1 2'
+
+This f-string will always have the value '1 2'. This is due to the two
+expressions not being the same: the space in the second example makes
+the two expressions distinct.
+
+This restriction is in place in order to allow for a possible future
+extension allowing translated strings, wherein the expression
+substitutions would be identified by their text values as they show up
+between the braces.
+
+References
+==========
+
+.. [#] %-formatting
+       (https://docs.python.org/3/library/stdtypes.html#printf-style-string-formatting)
+
+.. [#] str.format
+       (https://docs.python.org/3/library/string.html#formatstrings)
+
+.. [#] string.Template documentation
+       (https://docs.python.org/3/library/string.html#template-strings)
+
+.. [#] PEP 215: String Interpolation
+       (https://www.python.org/dev/peps/pep-0215/)
+
+.. [#] PEP 3101: Advanced String Formatting
+       (https://www.python.org/dev/peps/pep-3101/)
+
+.. [#] Formatting using locals() and globals()
+       (https://mail.python.org/pipermail/python-ideas/2015-July/034671.html)
+
+.. [#] Avoid locals() and globals()
+       (https://mail.python.org/pipermail/python-ideas/2015-July/034701.html)
+
+.. [#] str.format_map() documentation
+       (https://docs.python.org/3/library/stdtypes.html#str.format_map)
+
+.. [#] Format string syntax
+       (https://docs.python.org/3/library/string.html#format-string-syntax)
+
+.. [#] ast.parse() documentation
+       (https://docs.python.org/3/library/ast.html#ast.parse)
+
+.. [#] Start of python-ideas discussion
+       (https://mail.python.org/pipermail/python-ideas/2015-July/034657.html)
+
+.. [#] Wikipedia article on string interpolation
+       (https://en.wikipedia.org/wiki/String_interpolation)
+
+.. [#] Differences in str.format() and f-string expressions
+       (https://mail.python.org/pipermail/python-ideas/2015-July/034726.html)
+
+.. [#] PEP 461 rejects bytes.format()
+       (https://www.python.org/dev/peps/pep-0461/#proposed-variations)
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
+````
+
+</details>
+
+<details><summary><b>Step 5 — revision_5</b> (3378 words)</summary>
+
+````text
+Abstract
+========
+
+Python supports multiple ways to format text strings. These include
+%-formatting [#]_, ``str.format()`` [#]_, and ``string.Template``
+[#]_. Each of these methods have their advantages, but in addition
+have disadvantages that make them cumbersome to use in practice. This
+PEP proposed to add a new string formatting mechanism: Literal String
+Interpolation. In this PEP, such strings will be refered to as
+"f-strings", taken from the leading character used to denote such
+strings, and standing for "formatted strings".
+
+This PEP does not propose to remove or deprecate any of the existing
+string formatting mechanisms.
+
+f-strings provide a way to embed expressions inside string literals,
+using a minimal syntax. It should be noted that an f-string is really
+an expression evaluated at run time, not a constant value. In Python
+source code, an f-string is a literal string, prefixed with 'f', that
+contains expressions inside braces. The expressions are replaced with
+their values. Some examples are::
+
+  >>> import datetime
+  >>> name = 'Fred'
+  >>> age = 50
+  >>> anniversary = datetime.date(1991, 10, 12)
+  >>> f'My name is {name}, my age next year is {age+1}, my anniversary is {anniversary:%A, %B %d, %Y}.'
+  'My name is Fred, my age next year is 51, my anniversary is Saturday, October 12, 1991.'
+  >>> f'He said his name is {name!r}.'
+  "He said his name is 'Fred'."
+
+A similar feature was proposed in PEP 215 [#]_. PEP 215 proposed to
+support a subset of Python expressions, and did not support the
+type-specific string formatting (the ``__format__()`` method) which
+was introduced with PEP 3101 [#]_.
+
+Rationale
+=========
+
+This PEP is driven by the desire to have a simpler way to format
+strings in Python. The existing ways of formatting are either error
+prone, inflexible, or cumbersome.
+
+%-formatting is limited as to the types it supports. Only ints, strs,
+and doubles can be formatted. All other types are either not
+supported, or converted to one of these types before formatting. In
+addition, there's a well-known trap where a single value is passed::
+
+  >>> msg = 'disk failure'
+  >>> 'error: %s' % msg
+  'error: disk failure'
+
+But if msg were ever to be a tuple, the same code would fail::
+
+  >>> msg = ('disk failure', 32)
+  >>> 'error: %s' % msg
+  Traceback (most recent call last):
+    File "<stdin>", line 1, in <module>
+  TypeError: not all arguments converted during string formatting
+
+To be defensive, the following code should be used::
+
+  >>> 'error: %s' % (msg,)
+  "error: ('disk failure', 32)"
+
+``str.format()`` was added to address some of these problems with
+%-formatting. In particular, it uses normal function call syntax (and
+therefor supports multiple parameters) and it is extensible through
+the ``__format__()`` method on the object being converted to a
+string. See PEP-3101 for a detailed rationale. This PEP reuses much of
+the ``str.format()`` syntax and machinery, in order to provide
+continuity with an existing Python string formatting mechanism.
+
+However, ``str.format()`` is not without its issues. Chief among them
+is its verbosity. For example, the text ``value`` is repeated here::
+
+  >>> value = 4 * 20
+  >>> 'The value is {value}.'.format(value=value)
+  'The value is 80.'
+
+Even in its simplest form, there is a bit of boilerplate, and the
+value that's inserted into the placeholder is sometimes far removed
+from where the placeholder is situated::
+
+  >>> 'The value is {}.'.format(value)
+  'The value is 80.'
+
+With an f-string, this becomes::
+
+  >>> f'The value is {value}.'
+  'The value is 80.'
+
+f-strings provide a concise, readable way to include the value of
+Python expressions inside strings.
+
+In this sense, ``string.Template`` and %-formatting have similar
+shortcomings to ``str.format()``, but also support fewer formatting
+options. In particular, they do not support the ``__format__``
+protocol, so that there is no way to control how a specific object is
+converted to a string, nor can it be extended to additional types that
+want to control how they are converted to strings (such as ``Decimal``
+and ``datetime``). This example is not possible with
+``string.Template``::
+
+  >>> value = 1234
+  >>> f'input={value:#0.6x}'
+  'input=0x04d2'
+
+And neither %-formatting nor ``string.Template`` can control
+formatting such as::
+
+  >>> date = datetime.date(1991, 10, 12)
+  >>> f'{date} was on a {date:%A}'
+  '1991-10-12 was on a Saturday'
+
+No use of globals() or locals()
+-------------------------------
+
+In the discussions on python-dev [#]_, a number of solutions where
+presented that used locals() and globals() or their equivalents. All
+of these have various problems. Among these are referencing variables
+that are not otherwise used in a closure. Consider::
+
+  >>> def outer(x):
+  ...     def inner():
+  ...         return 'x={x}'.format_map(locals())
+  ...     return inner
+  ...
+  >>> outer(42)()
+  Traceback (most recent call last):
+    File "<stdin>", line 1, in <module>
+    File "<stdin>", line 3, in inner
+  KeyError: 'x'
+
+This returns an error because the compiler has not added a reference
+to x inside the closure. You need to manually add a reference to x in
+order for this to work::
+
+  >>> def outer(x):
+  ...     def inner():
+  ...         x
+  ...         return 'x={x}'.format_map(locals())
+  ...     return inner
+  ...
+  >>> outer(42)()
+  'x=42'
+
+In addition, using locals() or globals() introduces an information
+leak. A called routine that has access to the callers locals() or
+globals() has access to far more information than needed to do the
+string interpolation.
+
+Guido stated [#]_ that any solution to better string interpolation
+would not use locals() or globals().
+
+Specification
+=============
+
+In source code, f-strings are string literals that are prefixed by the
+letter 'f'. 'f' may be combined with 'r', in either order, to produce
+raw f-string literals. 'f' may not be combined with 'b': there are no
+binary f-strings. 'f' may also be combined with 'u', in either order,
+although adding 'u' has no effect.
+
+f-strings are parsed in to literals and expressions. Expressions
+appear within curly braces '{' and '}. The parts of the string outside
+of braces are literals.  The expressions are evaluated, formatted with
+the existing __format__ protocol, then the results are concatenated
+together with the string literals. While scanning the string for
+expressions, any doubled braces '{{' or '}}' are replaced by the
+corresponding single brace. Doubled opening braces do not signify the
+start of an expression.
+
+Following the expression, an optional type conversion may be
+specified.  The allowed conversions are ``'!s'``, ``'!r'``, or
+``'!a'``. These are treated the same as in ``str.format()``: ``'!s'``
+calls ``str()`` on the expression, ``'!r'`` calls ``repr()`` on the
+expression, and ``'!a'`` calls ``ascii()`` on the expression. These
+conversions are applied before the call to ``__format__``. The only
+reason to use ``'!s'`` is if you want to specify a format specifier
+that applies to ``str``, not to the type of the expression.
+
+Similar to ``str.format()``, optional format specifiers maybe be
+included inside the f-string, separated from the expression (or the
+type conversion, if specified) by a colon. If a format specifier is
+not provied, an empty string is used.
+
+So, an f-string looks like::
+
+  f ' <text> { <expression> <optional !s, !r, or !a> <optional : format specifier> } text ... '
+
+The resulting expression's ``__format__`` method is called with the
+format specifier. The resulting value is used when building the value
+of the f-string.
+
+Expressions cannot contain ``':'`` or ``'!'`` outside of strings or
+parens, brackets, or braces. The exception is that the ``'!='``
+operator is allowed as a special case.
+
+Escape sequences
+----------------
+
+Scanning an f-string for expressions happens after escape sequences
+are decoded. Because ``hex(ord('{')) == 0x7b``, the f-string
+``f'\u007b4*10}'`` is decoded to ``f'{4*10}'``, which evaluates as
+the integer 40::
+
+  >>> f'\u007b4*10}'
+  '40'
+  >>> f'\x7b4*10}'
+  '40'
+  >>> f'\x7b4*10\N{RIGHT CURLY BRACKET}'
+  '40'
+
+These examples aren't generally useful, they're just to show that
+escape sequences are processed before f-strings are parsed for
+expressions.
+
+Code equivalence
+----------------
+
+The exact code used to implement f-strings is not specified. However,
+it is guaranteed that any embedded value that is converted to a string
+will use that value's ``__format__`` method. This is the same
+mechanism that ``str.format()`` uses to convert values to strings.
+
+For example, this code::
+
+  f'abc{expr1:spec1}{expr2!r:spec2}def{expr3:!s}ghi'
+
+Might be be evaluated as::
+
+  'abc' + expr1.__format__(spec1) + repr(expr2).__format__(spec2) + 'def' + str(spec3).__format__('') + 'ghi'
+
+Expression evaluation
+---------------------
+
+The expressions that are extracted from the string are evaluated in
+the context where the f-string appeared. This means the expression has
+full access to local and global variables. Any valid Python expression
+can be used, including function and method calls.
+
+Because the f-strings are evaluated where the string appears in the
+source code, there is no additional expressiveness available with
+f-strings. There are also no additional security concerns: you could
+have also just written the same expression, not inside of an
+f-string::
+
+  >>> def foo():
+  ...   return 20
+  ...
+  >>> f'result={foo()}'
+  'result=20'
+
+Is equivalent to::
+
+  >>> 'result=' + str(foo())
+  'result=20'
+
+After stripping leading and trailing whitespace (see below), the
+expression is parsed with the equivalent of ``ast.parse(expression,
+'<fstring>', 'eval')`` [#]_. Note that this restricts the expression:
+it cannot contain any newlines, for example::
+
+  >>> x = 0
+  >>> f'''{x
+  ... +1}'''
+    File "<fstring>", line 2
+      +1
+      ^
+  SyntaxError: invalid syntax
+
+But note that this works, since the newline is removed from the
+string, and the spaces in front of the ``'1'`` are allowed in an
+expression::
+
+  >>> f'{x+\
+  ...    1}'
+  '2'
+
+Format specifiers
+-----------------
+
+Format specifiers may also contain evaluated expressions. This allows
+code such as::
+
+  >>> width = 10
+  >>> precision = 4
+  >>> value = decimal.Decimal('12.34567')
+  >>> f'result: {value:{width}.{precision}}'
+  'result:      12.35'
+
+Once expressions in a format specifier are evaluated (if necessary),
+format specifiers are not interpreted by the f-string evaluator. Just
+as in ``str.format()``, they are merely passed in to the
+``__format__()`` method of the object being formatted.
+
+Concatenating strings
+---------------------
+
+Adjacent f-strings and regular strings are concatenated. Regular
+strings are concatenated at compile time, and f-strings are
+concatenated at run time. For example, the expression::
+
+  >>> x = 10
+  >>> y = 'hi'
+  >>> 'a' 'b' f'{x}' '{c}' f'str<{y:^4}>' 'd' 'e'
+
+yields the value::
+
+  'ab10{c}str< hi >de'
+
+While the exact method of this run time concatenation is unspecified,
+the above code might evaluate to::
+
+  'ab' + x.__format__('') + '{c}' + 'str<', y.__format__('^4') + 'de'
+
+Error handling
+--------------
+
+Either compile time or run time errors can occur when processing
+f-strings. Compile time errors are limited to those errors that can be
+detected when scanning an f-string. These errors all raise
+``SyntaxError``.
+
+Unmatched braces::
+
+  >>> f'x={x'
+    File "<stdin>", line 1
+  SyntaxError: missing '}' in format string expression
+
+Invalid expressions::
+
+  >>> f'x={!x}'
+    File "<fstring>", line 1
+      !x
+      ^
+  SyntaxError: invalid syntax
+
+Run time errors occur when evaluating the expressions inside an
+f-string. Note that an f-string can be evaluated multiple times, and
+work sometimes and raise an error at other times::
+
+  >>> d = {0:10, 1:20}
+  >>> for i in range(3):
+  ...     print(f'{i}:{d[i]}')
+  ...
+  0:10
+  1:20
+  Traceback (most recent call last):
+    File "<stdin>", line 2, in <module>
+  KeyError: 2
+
+or::
+
+  >>> for x in (32, 100, 'fifty'):
+  ...   print(f'x = {x:+3}')
+  ...
+  'x = +32'
+  'x = +100'
+  Traceback (most recent call last):
+    File "<stdin>", line 2, in <module>
+  ValueError: Sign not allowed in string format specifier
+
+Leading and trailing whitespace in expressions is skipped
+---------------------------------------------------------
+
+For ease of readability, leading and trailing whitespace in
+expressions is ignored.
+
+Evaluation order of expressions
+-------------------------------
+
+The expressions in an f-string are evaluated in left-to-right
+order. This is detectable only if the expressions have side effects::
+
+  >>> def fn(l, incr):
+  ...    result = l[0]
+  ...    l[0] += incr
+  ...    return result
+  ...
+  >>> lst = [0]
+  >>> f'{fn(lst,2)} {fn(lst,3)}'
+  '0 2'
+  >>> f'{fn(lst,2)} {fn(lst,3)}'
+  '5 7'
+  >>> lst
+  [10]
+
+Discussion
+==========
+
+python-ideas discussion
+-----------------------
+
+Most of the discussions on python-ideas [#]_ focused on three issues:
+
+ - How to denote f-strings,
+ - How to specify the location of expressions in f-strings, and
+ - Whether to allow full Python expressions.
+
+How to denote f-strings
+***********************
+
+Because the compiler must be involved in evaluating the expressions
+contained in the interpolated strings, there must be some way to
+denote to the compiler which strings should be evaluated. This PEP
+chose a leading ``'f'`` character preceeding the string literal. This
+is similar to how ``'b'`` and ``'r'`` prefixes change the meaning of
+the string itself, at compile time. Other prefixes were suggested,
+such as ``'i'``. No option seemed better than the other, so ``'f'``
+was chosen.
+
+Another option was to support special functions, known to the
+compiler, such as ``Format()``. This seems like too much magic for
+Python: not only is there a chance for collision with existing
+identifiers, the PEP author feels that it's better to signify the
+magic with a string prefix character.
+
+How to specify the location of expressions in f-strings
+*******************************************************
+
+This PEP supports the same syntax as ``str.format()`` for
+distinguishing replacement text inside strings: expressions are
+contained inside braces. There were other options suggested, such as
+``string.Template``'s ``$identifier`` or ``${expression}``.
+
+While ``$identifier`` is no doubt more familiar to shell scripters and
+users of some other languages, in Python ``str.format()`` is heavily
+used. A quick search of Python's standard library shows only a handful
+of uses of ``string.Template``, but hundreds of uses of
+``str.format()``.
+
+Another proposed alternative was to have the substituted text between
+``\\{`` and ``}`` or between ``\\{`` and ``\\}``. While this syntax
+would probably be desirable if all string literals were to support
+interpolation, this PEP only supports strings that are already marked
+with the leading ``'f'``. As such, the PEP is using unadorned braces
+to denoted substituted text, in order to leverage end user familiarity
+with ``str.format()``.
+
+Supporting full Python expressions
+**********************************
+
+Many people on the python-ideas discussion wanted support for either
+only single identifiers, or a limited subset of Python expressions
+(such as the subset supported by ``str.format()``). This PEP supports
+full Python expressions inside the braces. Without full expressions,
+some desirable usage would be cumbersome. For example::
+
+  >>> f'Column={col_idx+1}'
+  >>> f'number of items: {len(items)}'
+
+would become::
+
+  >>> col_number = col_idx+1
+  >>> f'Column={col_number}'
+  >>> n_items = len(items)
+  >>> f'number of items: {n_items}'
+
+While it's true that very ugly expressions could be included in the
+f-strings, this PEP takes the position that such uses should be
+addressed in a linter or code review::
+
+  >>> f'mapping is { {a:b for (a, b) in ((1, 2), (3, 4))}}'
+  'mapping is {1: 2, 3: 4}'
+
+Similar support in other languages
+----------------------------------
+
+Wikipedia has a good discussion of string interpolation in other
+programming languages [#]_. This feature is implemented in many
+languages, with a variety of syntaxes and restrictions.
+
+Differences between f-string and str.format expressions
+-------------------------------------------------------
+
+There is one small difference between the limited expressions allowed
+in ``str.format()`` and the full expressions allowed inside
+f-strings. The difference is in how index lookups are performed. In
+``str.format()``, index values that do not look like numbers are
+converted to strings::
+
+  >>> d = {'a': 10, 'b': 20}
+  >>> 'a={d[a]}'.format(d=d)
+  'a=10'
+
+Notice that the index value is converted to the string ``'a'`` when it
+is looked up in the dict.
+
+However, in f-strings, you would need to use a literal for the value
+of ``'a'``::
+
+  >>> f'a={d["a"]}'
+  'a=10'
+
+This difference is required because otherwise you would not be able to
+use variables as index values::
+
+  >>> a = 'b'
+  >>> f'a={d[a]}'
+  'a=20'
+
+See [#]_ for a further discussion. It was this observation that led to
+full Python expressions being supported in f-strings.
+
+Furthermore, the limited expressions that ``str.format()`` understands
+need not be valid Python expressions. For example::
+
+  >>> '{i[";]}'.format(i={'";':4})
+  '4'
+
+For this reason, the str.format() "expression parser" is not suitable
+for use when implementing f-strings.
+
+Triple-quoted f-strings
+-----------------------
+
+Triple quoted f-strings are allowed. These strings are parsed just as
+normal triple-quoted strings are. After parsing, the normal f-string
+logic is applied, and ``__format__()`` on each value is called.
+
+Raw f-strings
+-------------
+
+Raw and f-strings may be combined. For example they could be used to
+build up regular expressions::
+
+  >>> header = 'Subject'
+  >>> fr'{header}:\s+'
+  'Subject:\\s+'
+
+In addition, raw f-strings may be combined with triple-quoted strings.
+
+No binary f-strings
+-------------------
+
+For the same reason that we don't support ``bytes.format()``, you may
+not combine ``'f'`` with ``'b'`` string literals. The primary problem
+is that an object's ``__format__()`` method may return Unicode data that
+is not compatible with a bytes string.
+
+Binary f-strings would first require a solution for
+``bytes.format()``. This idea has been proposed in the past, most
+recently in PEP 461 [#]_. The discussions of such a feature usually
+suggest either
+
+  - adding a method such as ``__bformat__()`` so an object can control
+    how it is converted to bytes, or
+
+  - having ``bytes.format()`` not be as general purpose or extensible
+    as ``str.format()``.
+
+Both of these remain as options in the future, if such functionality
+is desired.
+
+``!s``, ``!r``, and ``!a`` are redundant
+----------------------------------------
+
+The ``!s``, ``!r``, and ``!a`` conversions are not strictly
+required. Because arbitrary expressions are allowed inside the
+f-strings, this code::
+
+  >>> a = 'some string'
+  >>> f'{a!r}'
+  "'some string'"
+
+Is identical to::
+
+  >>> f'{repr(a)}'
+  "'some string'"
+
+Similarly, ``!s`` can be replaced by calls to ``str()`` and ``!a`` by
+calls to ``ascii()``.
+
+However, ``!s``, ``!r``, and ``!a`` are supported by this PEP in order
+to minimize the differences with ``str.format()``. ``!s``, ``!r``, and
+``!a`` are required in ``str.format()`` because it does not allow the
+execution of arbitrary expressions.
+
+Lambdas inside expressions
+--------------------------
+
+Because lambdas use the ``':'`` character, they cannot appear outside
+of parenthesis in an expression. The colon is interpreted as the start
+of the format specifier, which means the start of the lambda
+expression is seen and is syntactically invalid. As there's no
+practical use for a plain lambda in an f-string expression, this is
+not seen as much of a limitation.
+
+If you feel you must use lambdas, they may be used inside of parens::
+
+  >>> f'{(lambda x: x*2)(3)}'
+  '6'
+
+Examples from Python's source code
+==================================
+
+Here are some examples from Python source code that currently use
+``str.format()``, and how they would look with f-strings. This PEP
+does not recommend wholesale converting to f-strings, these are just
+examples of real-world usages of ``str.format()`` and how they'd look
+if written from scratch using f-strings.
+
+``Lib/asyncio/locks.py``::
+
+  extra = '{},waiters:{}'.format(extra, len(self._waiters))
+  extra = f'{extra},waiters:{len(self._waiters)}'
+
+``Lib/configparser.py``::
+
+  message.append(" [line {0:2d}]".format(lineno))
+  message.append(f" [line {lineno:2d}]")
+
+``Tools/clinic/clinic.py``::
+
+  methoddef_name = "{}_METHODDEF".format(c_basename.upper())
+  methoddef_name = f"{c_basename.upper()}_METHODDEF"
+
+``python-config.py``::
+
+  print("Usage: {0} [{1}]".format(sys.argv[0], '|'.join('--'+opt for opt in valid_opts)), file=sys.stderr)
+  print(f"Usage: {sys.argv[0]} [{'|'.join('--'+opt for opt in valid_opts)}]", file=sys.stderr)
+
+Implementation limitations
+==========================
+
+Maximum of 255 expressions
+--------------------------
+
+Due to a CPython limit with the number of parameters to a function, an
+f-string may not contain more that 255 expressions. This includes
+expressions inside format specifiers. So this code would count as
+having 2 expressions::
+
+  f'{x:.{width}}'
+
+The same expression used multiple times
+---------------------------------------
+
+Every expression in an f-string is evaluated exactly once for each
+time it appears in the f-string. However, when the same expression
+appears more than once in an f-string, it's undefined which result
+will be used in the resulting string value. This only matters for
+expressions with side effects.
+
+For purposes of this section, two expressions are the same if they
+have the exact same literal text defining them. For example, ``'{i}'``
+and ``'{i}'`` are the same expression, but ``'{i}'`` and ``'{i }'``
+are not, due to the extra space in the second expression.
+
+For example, given::
+
+  >>> def fn(lst):
+  ...    lst[0] += 1
+  ...    return lst[0]
+  ...
+  >>> lst=[0]
+  >>> f'{fn(lst)} {fn(lst)}'
+  '1 2'
+
+The resulting f-string might have the value ``'1 2'``, ``'2 2'``,
+``'1 1'``, or even ``'2 1'``.
+
+However::
+
+  >>> lst=[0]
+  >>> f'{fn(lst)} { fn(lst)}'
+  '1 2'
+
+This f-string will always have the value ``'1 2'``. This is due to the
+two expressions not being the same: the space in the second example
+makes the two expressions distinct.
+
+This restriction is in place in order to allow for a possible future
+extension allowing translated strings, wherein the expression
+substitutions would be identified by their text representations in the
+f-strings.
+
+References
+==========
+
+.. [#] %-formatting
+       (https://docs.python.org/3/library/stdtypes.html#printf-style-string-formatting)
+
+.. [#] str.format
+       (https://docs.python.org/3/library/string.html#formatstrings)
+
+.. [#] string.Template documentation
+       (https://docs.python.org/3/library/string.html#template-strings)
+
+.. [#] PEP 215: String Interpolation
+       (https://www.python.org/dev/peps/pep-0215/)
+
+.. [#] PEP 3101: Advanced String Formatting
+       (https://www.python.org/dev/peps/pep-3101/)
+
+.. [#] Formatting using locals() and globals()
+       (https://mail.python.org/pipermail/python-ideas/2015-July/034671.html)
+
+.. [#] Avoid locals() and globals()
+       (https://mail.python.org/pipermail/python-ideas/2015-July/034701.html)
+
+.. [#] str.format_map() documentation
+       (https://docs.python.org/3/library/stdtypes.html#str.format_map)
+
+.. [#] Format string syntax
+       (https://docs.python.org/3/library/string.html#format-string-syntax)
+
+.. [#] ast.parse() documentation
+       (https://docs.python.org/3/library/ast.html#ast.parse)
+
+.. [#] Start of python-ideas discussion
+       (https://mail.python.org/pipermail/python-ideas/2015-July/034657.html)
+
+.. [#] Wikipedia article on string interpolation
+       (https://en.wikipedia.org/wiki/String_interpolation)
+
+.. [#] Differences in str.format() and f-string expressions
+       (https://mail.python.org/pipermail/python-ideas/2015-July/034726.html)
+
+.. [#] PEP 461 rejects bytes.format()
+       (https://www.python.org/dev/peps/pep-0461/#proposed-variations)
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
+````
+
+</details>
+
+<details><summary><b>Step 6 — revision_6</b> (3253 words)</summary>
+
+````text
+Abstract
+========
+
+Python supports multiple ways to format text strings. These include
+%-formatting [#]_, ``str.format()`` [#]_, and ``string.Template``
+[#]_. Each of these methods have their advantages, but in addition
+have disadvantages that make them cumbersome to use in practice. This
+PEP proposed to add a new string formatting mechanism: Literal String
+Interpolation. In this PEP, such strings will be refered to as
+"f-strings", taken from the leading character used to denote such
+strings, and standing for "formatted strings".
+
+This PEP does not propose to remove or deprecate any of the existing
+string formatting mechanisms.
+
+f-strings provide a way to embed expressions inside string literals,
+using a minimal syntax. It should be noted that an f-string is really
+an expression evaluated at run time, not a constant value. In Python
+source code, an f-string is a literal string, prefixed with 'f', that
+contains expressions inside braces. The expressions are replaced with
+their values. Some examples are::
+
+  >>> import datetime
+  >>> name = 'Fred'
+  >>> age = 50
+  >>> anniversary = datetime.date(1991, 10, 12)
+  >>> f'My name is {name}, my age next year is {age+1}, my anniversary is {anniversary:%A, %B %d, %Y}.'
+  'My name is Fred, my age next year is 51, my anniversary is Saturday, October 12, 1991.'
+  >>> f'He said his name is {name!r}.'
+  "He said his name is 'Fred'."
+
+A similar feature was proposed in PEP 215 [#]_. PEP 215 proposed to
+support a subset of Python expressions, and did not support the
+type-specific string formatting (the ``__format__()`` method) which
+was introduced with PEP 3101 [#]_.
+
+Rationale
+=========
+
+This PEP is driven by the desire to have a simpler way to format
+strings in Python. The existing ways of formatting are either error
+prone, inflexible, or cumbersome.
+
+%-formatting is limited as to the types it supports. Only ints, strs,
+and doubles can be formatted. All other types are either not
+supported, or converted to one of these types before formatting. In
+addition, there's a well-known trap where a single value is passed::
+
+  >>> msg = 'disk failure'
+  >>> 'error: %s' % msg
+  'error: disk failure'
+
+But if msg were ever to be a tuple, the same code would fail::
+
+  >>> msg = ('disk failure', 32)
+  >>> 'error: %s' % msg
+  Traceback (most recent call last):
+    File "<stdin>", line 1, in <module>
+  TypeError: not all arguments converted during string formatting
+
+To be defensive, the following code should be used::
+
+  >>> 'error: %s' % (msg,)
+  "error: ('disk failure', 32)"
+
+``str.format()`` was added to address some of these problems with
+%-formatting. In particular, it uses normal function call syntax (and
+therefor supports multiple parameters) and it is extensible through
+the ``__format__()`` method on the object being converted to a
+string. See PEP-3101 for a detailed rationale. This PEP reuses much of
+the ``str.format()`` syntax and machinery, in order to provide
+continuity with an existing Python string formatting mechanism.
+
+However, ``str.format()`` is not without its issues. Chief among them
+is its verbosity. For example, the text ``value`` is repeated here::
+
+  >>> value = 4 * 20
+  >>> 'The value is {value}.'.format(value=value)
+  'The value is 80.'
+
+Even in its simplest form, there is a bit of boilerplate, and the
+value that's inserted into the placeholder is sometimes far removed
+from where the placeholder is situated::
+
+  >>> 'The value is {}.'.format(value)
+  'The value is 80.'
+
+With an f-string, this becomes::
+
+  >>> f'The value is {value}.'
+  'The value is 80.'
+
+f-strings provide a concise, readable way to include the value of
+Python expressions inside strings.
+
+In this sense, ``string.Template`` and %-formatting have similar
+shortcomings to ``str.format()``, but also support fewer formatting
+options. In particular, they do not support the ``__format__``
+protocol, so that there is no way to control how a specific object is
+converted to a string, nor can it be extended to additional types that
+want to control how they are converted to strings (such as ``Decimal``
+and ``datetime``). This example is not possible with
+``string.Template``::
+
+  >>> value = 1234
+  >>> f'input={value:#0.6x}'
+  'input=0x04d2'
+
+And neither %-formatting nor ``string.Template`` can control
+formatting such as::
+
+  >>> date = datetime.date(1991, 10, 12)
+  >>> f'{date} was on a {date:%A}'
+  '1991-10-12 was on a Saturday'
+
+No use of globals() or locals()
+-------------------------------
+
+In the discussions on python-dev [#]_, a number of solutions where
+presented that used locals() and globals() or their equivalents. All
+of these have various problems. Among these are referencing variables
+that are not otherwise used in a closure. Consider::
+
+  >>> def outer(x):
+  ...     def inner():
+  ...         return 'x={x}'.format_map(locals())
+  ...     return inner
+  ...
+  >>> outer(42)()
+  Traceback (most recent call last):
+    File "<stdin>", line 1, in <module>
+    File "<stdin>", line 3, in inner
+  KeyError: 'x'
+
+This returns an error because the compiler has not added a reference
+to x inside the closure. You need to manually add a reference to x in
+order for this to work::
+
+  >>> def outer(x):
+  ...     def inner():
+  ...         x
+  ...         return 'x={x}'.format_map(locals())
+  ...     return inner
+  ...
+  >>> outer(42)()
+  'x=42'
+
+In addition, using locals() or globals() introduces an information
+leak. A called routine that has access to the callers locals() or
+globals() has access to far more information than needed to do the
+string interpolation.
+
+Guido stated [#]_ that any solution to better string interpolation
+would not use locals() or globals().
+
+Specification
+=============
+
+In source code, f-strings are string literals that are prefixed by the
+letter 'f'. 'f' may be combined with 'r', in either order, to produce
+raw f-string literals. 'f' may not be combined with 'b': there are no
+binary f-strings. 'f' may also be combined with 'u', in either order,
+although adding 'u' has no effect.
+
+f-strings are tokenized using the same rules as normal strings, raw
+strings, binary strings, and triple quoted strings. That is, the
+string must end with the same character that it started with: if it
+starts with a single quote it must end with a single quote, etc.  This
+implies that any code that currently scans Python code looking for
+strings should be trivially modifiable to recognize f-strings (parsing
+within an f-string is another matter, of course).
+
+Once tokenized, f-strings are decoded. This will convert backslash
+escapes such as ``\n``, ``\xhh``, ``\uxxxx``, ``\Uxxxxxxxx``, and
+named unicode characters ``\N{name}`` into their associated Unicode
+characters [#]_.
+
+Up to this point, the processing of f-strings and normal strings is
+exactly the same.
+
+The difference is that f-strings are then parsed in to literals and
+expressions. Expressions appear within curly braces '{' and '}. The
+parts of the string outside of braces are literals.  The expressions
+are evaluated, formatted with the existing __format__ protocol, then
+the results are concatenated together with the string literals. While
+scanning the string for expressions, any doubled braces '{{' or '}}'
+are replaced by the corresponding single brace. Doubled opening braces
+do not signify the start of an expression.
+
+Following the expression, an optional type conversion may be
+specified.  The allowed conversions are ``'!s'``, ``'!r'``, or
+``'!a'``. These are treated the same as in ``str.format()``: ``'!s'``
+calls ``str()`` on the expression, ``'!r'`` calls ``repr()`` on the
+expression, and ``'!a'`` calls ``ascii()`` on the expression. These
+conversions are applied before the call to ``__format__``. The only
+reason to use ``'!s'`` is if you want to specify a format specifier
+that applies to ``str``, not to the type of the expression.
+
+Similar to ``str.format()``, optional format specifiers maybe be
+included inside the f-string, separated from the expression (or the
+type conversion, if specified) by a colon. If a format specifier is
+not provied, an empty string is used.
+
+So, an f-string looks like::
+
+  f ' <text> { <expression> <optional !s, !r, or !a> <optional : format specifier> } text ... '
+
+The resulting expression's ``__format__`` method is called with the
+format specifier. The resulting value is used when building the value
+of the f-string.
+
+Expressions cannot contain ``':'`` or ``'!'`` outside of strings or
+parens, brackets, or braces. The exception is that the ``'!='``
+operator is allowed as a special case.
+
+Escape sequences
+----------------
+
+Scanning an f-string for expressions happens after escape sequences
+are decoded. Because ``hex(ord('{')) == 0x7b``, the f-string
+``f'\u007b4*10}'`` is decoded to ``f'{4*10}'``, which evaluates as
+the integer 40::
+
+  >>> f'\u007b4*10}'
+  '40'
+  >>> f'\x7b4*10}'
+  '40'
+  >>> f'\x7b4*10\N{RIGHT CURLY BRACKET}'
+  '40'
+
+These examples aren't generally useful, they're just to show that
+escape sequences are processed before f-strings are parsed for
+expressions.
+
+Note that the correct way to have a literal brace appear in the
+resulting string value is to double the brace::
+
+  >>> f'{{ {4*10} }}'
+  '{ 40 }'
+  >>> f'{{{4*10}}}'
+  '{40}'
+
+Code equivalence
+----------------
+
+The exact code used to implement f-strings is not specified. However,
+it is guaranteed that any embedded value that is converted to a string
+will use that value's ``__format__`` method. This is the same
+mechanism that ``str.format()`` uses to convert values to strings.
+
+For example, this code::
+
+  f'abc{expr1:spec1}{expr2!r:spec2}def{expr3:!s}ghi'
+
+Might be be evaluated as::
+
+  'abc' + expr1.__format__(spec1) + repr(expr2).__format__(spec2) + 'def' + str(spec3).__format__('') + 'ghi'
+
+Expression evaluation
+---------------------
+
+The expressions that are extracted from the string are evaluated in
+the context where the f-string appeared. This means the expression has
+full access to local and global variables. Any valid Python expression
+can be used, including function and method calls.
+
+Because the f-strings are evaluated where the string appears in the
+source code, there is no additional expressiveness available with
+f-strings. There are also no additional security concerns: you could
+have also just written the same expression, not inside of an
+f-string::
+
+  >>> def foo():
+  ...   return 20
+  ...
+  >>> f'result={foo()}'
+  'result=20'
+
+Is equivalent to::
+
+  >>> 'result=' + str(foo())
+  'result=20'
+
+Expressions are parsed with the equivalent of ``ast.parse('(' +
+expression + ')', '<fstring>', 'eval')`` [#]_.
+
+Note that since the expression is enclosed by implicit parentheses
+before evaluation, expressions can contain newlines. For example::
+
+  >>> x = 0
+  >>> f'''{x
+  ... +1}'''
+  '1'
+
+  >>> d = {0: 'zero'}
+  >>> f'''{d[0
+  ... ]}'''
+  'zero'
+
+Format specifiers
+-----------------
+
+Format specifiers may also contain evaluated expressions. This allows
+code such as::
+
+  >>> width = 10
+  >>> precision = 4
+  >>> value = decimal.Decimal('12.34567')
+  >>> f'result: {value:{width}.{precision}}'
+  'result:      12.35'
+
+Once expressions in a format specifier are evaluated (if necessary),
+format specifiers are not interpreted by the f-string evaluator. Just
+as in ``str.format()``, they are merely passed in to the
+``__format__()`` method of the object being formatted.
+
+Concatenating strings
+---------------------
+
+Adjacent f-strings and regular strings are concatenated. Regular
+strings are concatenated at compile time, and f-strings are
+concatenated at run time. For example, the expression::
+
+  >>> x = 10
+  >>> y = 'hi'
+  >>> 'a' 'b' f'{x}' '{c}' f'str<{y:^4}>' 'd' 'e'
+
+yields the value::
+
+  'ab10{c}str< hi >de'
+
+While the exact method of this run time concatenation is unspecified,
+the above code might evaluate to::
+
+  'ab' + x.__format__('') + '{c}' + 'str<', y.__format__('^4') + 'de'
+
+Error handling
+--------------
+
+Either compile time or run time errors can occur when processing
+f-strings. Compile time errors are limited to those errors that can be
+detected when scanning an f-string. These errors all raise
+``SyntaxError``.
+
+Unmatched braces::
+
+  >>> f'x={x'
+    File "<stdin>", line 1
+  SyntaxError: missing '}' in format string expression
+
+Invalid expressions::
+
+  >>> f'x={!x}'
+    File "<fstring>", line 1
+      !x
+      ^
+  SyntaxError: invalid syntax
+
+Run time errors occur when evaluating the expressions inside an
+f-string. Note that an f-string can be evaluated multiple times, and
+work sometimes and raise an error at other times::
+
+  >>> d = {0:10, 1:20}
+  >>> for i in range(3):
+  ...     print(f'{i}:{d[i]}')
+  ...
+  0:10
+  1:20
+  Traceback (most recent call last):
+    File "<stdin>", line 2, in <module>
+  KeyError: 2
+
+or::
+
+  >>> for x in (32, 100, 'fifty'):
+  ...   print(f'x = {x:+3}')
+  ...
+  'x = +32'
+  'x = +100'
+  Traceback (most recent call last):
+    File "<stdin>", line 2, in <module>
+  ValueError: Sign not allowed in string format specifier
+
+Leading and trailing whitespace in expressions is ignored
+---------------------------------------------------------
+
+For ease of readability, leading and trailing whitespace in
+expressions is ignored.
+
+Evaluation order of expressions
+-------------------------------
+
+The expressions in an f-string are evaluated in left-to-right
+order. This is detectable only if the expressions have side effects::
+
+  >>> def fn(l, incr):
+  ...    result = l[0]
+  ...    l[0] += incr
+  ...    return result
+  ...
+  >>> lst = [0]
+  >>> f'{fn(lst,2)} {fn(lst,3)}'
+  '0 2'
+  >>> f'{fn(lst,2)} {fn(lst,3)}'
+  '5 7'
+  >>> lst
+  [10]
+
+Discussion
+==========
+
+python-ideas discussion
+-----------------------
+
+Most of the discussions on python-ideas [#]_ focused on three issues:
+
+ - How to denote f-strings,
+ - How to specify the location of expressions in f-strings, and
+ - Whether to allow full Python expressions.
+
+How to denote f-strings
+***********************
+
+Because the compiler must be involved in evaluating the expressions
+contained in the interpolated strings, there must be some way to
+denote to the compiler which strings should be evaluated. This PEP
+chose a leading ``'f'`` character preceeding the string literal. This
+is similar to how ``'b'`` and ``'r'`` prefixes change the meaning of
+the string itself, at compile time. Other prefixes were suggested,
+such as ``'i'``. No option seemed better than the other, so ``'f'``
+was chosen.
+
+Another option was to support special functions, known to the
+compiler, such as ``Format()``. This seems like too much magic for
+Python: not only is there a chance for collision with existing
+identifiers, the PEP author feels that it's better to signify the
+magic with a string prefix character.
+
+How to specify the location of expressions in f-strings
+*******************************************************
+
+This PEP supports the same syntax as ``str.format()`` for
+distinguishing replacement text inside strings: expressions are
+contained inside braces. There were other options suggested, such as
+``string.Template``'s ``$identifier`` or ``${expression}``.
+
+While ``$identifier`` is no doubt more familiar to shell scripters and
+users of some other languages, in Python ``str.format()`` is heavily
+used. A quick search of Python's standard library shows only a handful
+of uses of ``string.Template``, but hundreds of uses of
+``str.format()``.
+
+Another proposed alternative was to have the substituted text between
+``\\{`` and ``}`` or between ``\\{`` and ``\\}``. While this syntax
+would probably be desirable if all string literals were to support
+interpolation, this PEP only supports strings that are already marked
+with the leading ``'f'``. As such, the PEP is using unadorned braces
+to denoted substituted text, in order to leverage end user familiarity
+with ``str.format()``.
+
+Supporting full Python expressions
+**********************************
+
+Many people on the python-ideas discussion wanted support for either
+only single identifiers, or a limited subset of Python expressions
+(such as the subset supported by ``str.format()``). This PEP supports
+full Python expressions inside the braces. Without full expressions,
+some desirable usage would be cumbersome. For example::
+
+  >>> f'Column={col_idx+1}'
+  >>> f'number of items: {len(items)}'
+
+would become::
+
+  >>> col_number = col_idx+1
+  >>> f'Column={col_number}'
+  >>> n_items = len(items)
+  >>> f'number of items: {n_items}'
+
+While it's true that very ugly expressions could be included in the
+f-strings, this PEP takes the position that such uses should be
+addressed in a linter or code review::
+
+  >>> f'mapping is { {a:b for (a, b) in ((1, 2), (3, 4))}}'
+  'mapping is {1: 2, 3: 4}'
+
+Similar support in other languages
+----------------------------------
+
+Wikipedia has a good discussion of string interpolation in other
+programming languages [#]_. This feature is implemented in many
+languages, with a variety of syntaxes and restrictions.
+
+Differences between f-string and str.format expressions
+-------------------------------------------------------
+
+There is one small difference between the limited expressions allowed
+in ``str.format()`` and the full expressions allowed inside
+f-strings. The difference is in how index lookups are performed. In
+``str.format()``, index values that do not look like numbers are
+converted to strings::
+
+  >>> d = {'a': 10, 'b': 20}
+  >>> 'a={d[a]}'.format(d=d)
+  'a=10'
+
+Notice that the index value is converted to the string ``'a'`` when it
+is looked up in the dict.
+
+However, in f-strings, you would need to use a literal for the value
+of ``'a'``::
+
+  >>> f'a={d["a"]}'
+  'a=10'
+
+This difference is required because otherwise you would not be able to
+use variables as index values::
+
+  >>> a = 'b'
+  >>> f'a={d[a]}'
+  'a=20'
+
+See [#]_ for a further discussion. It was this observation that led to
+full Python expressions being supported in f-strings.
+
+Furthermore, the limited expressions that ``str.format()`` understands
+need not be valid Python expressions. For example::
+
+  >>> '{i[";]}'.format(i={'";':4})
+  '4'
+
+For this reason, the str.format() "expression parser" is not suitable
+for use when implementing f-strings.
+
+Triple-quoted f-strings
+-----------------------
+
+Triple quoted f-strings are allowed. These strings are parsed just as
+normal triple-quoted strings are. After parsing, the normal f-string
+logic is applied, and ``__format__()`` on each value is called.
+
+Raw f-strings
+-------------
+
+Raw and f-strings may be combined. For example they could be used to
+build up regular expressions::
+
+  >>> header = 'Subject'
+  >>> fr'{header}:\s+'
+  'Subject:\\s+'
+
+In addition, raw f-strings may be combined with triple-quoted strings.
+
+No binary f-strings
+-------------------
+
+For the same reason that we don't support ``bytes.format()``, you may
+not combine ``'f'`` with ``'b'`` string literals. The primary problem
+is that an object's ``__format__()`` method may return Unicode data that
+is not compatible with a bytes string.
+
+Binary f-strings would first require a solution for
+``bytes.format()``. This idea has been proposed in the past, most
+recently in PEP 461 [#]_. The discussions of such a feature usually
+suggest either
+
+  - adding a method such as ``__bformat__()`` so an object can control
+    how it is converted to bytes, or
+
+  - having ``bytes.format()`` not be as general purpose or extensible
+    as ``str.format()``.
+
+Both of these remain as options in the future, if such functionality
+is desired.
+
+``!s``, ``!r``, and ``!a`` are redundant
+----------------------------------------
+
+The ``!s``, ``!r``, and ``!a`` conversions are not strictly
+required. Because arbitrary expressions are allowed inside the
+f-strings, this code::
+
+  >>> a = 'some string'
+  >>> f'{a!r}'
+  "'some string'"
+
+Is identical to::
+
+  >>> f'{repr(a)}'
+  "'some string'"
+
+Similarly, ``!s`` can be replaced by calls to ``str()`` and ``!a`` by
+calls to ``ascii()``.
+
+However, ``!s``, ``!r``, and ``!a`` are supported by this PEP in order
+to minimize the differences with ``str.format()``. ``!s``, ``!r``, and
+``!a`` are required in ``str.format()`` because it does not allow the
+execution of arbitrary expressions.
+
+Lambdas inside expressions
+--------------------------
+
+Because lambdas use the ``':'`` character, they cannot appear outside
+of parenthesis in an expression. The colon is interpreted as the start
+of the format specifier, which means the start of the lambda
+expression is seen and is syntactically invalid. As there's no
+practical use for a plain lambda in an f-string expression, this is
+not seen as much of a limitation.
+
+If you feel you must use lambdas, they may be used inside of parens::
+
+  >>> f'{(lambda x: x*2)(3)}'
+  '6'
+
+Examples from Python's source code
+==================================
+
+Here are some examples from Python source code that currently use
+``str.format()``, and how they would look with f-strings. This PEP
+does not recommend wholesale converting to f-strings, these are just
+examples of real-world usages of ``str.format()`` and how they'd look
+if written from scratch using f-strings.
+
+``Lib/asyncio/locks.py``::
+
+  extra = '{},waiters:{}'.format(extra, len(self._waiters))
+  extra = f'{extra},waiters:{len(self._waiters)}'
+
+``Lib/configparser.py``::
+
+  message.append(" [line {0:2d}]".format(lineno))
+  message.append(f" [line {lineno:2d}]")
+
+``Tools/clinic/clinic.py``::
+
+  methoddef_name = "{}_METHODDEF".format(c_basename.upper())
+  methoddef_name = f"{c_basename.upper()}_METHODDEF"
+
+``python-config.py``::
+
+  print("Usage: {0} [{1}]".format(sys.argv[0], '|'.join('--'+opt for opt in valid_opts)), file=sys.stderr)
+  print(f"Usage: {sys.argv[0]} [{'|'.join('--'+opt for opt in valid_opts)}]", file=sys.stderr)
+
+References
+==========
+
+.. [#] %-formatting
+       (https://docs.python.org/3/library/stdtypes.html#printf-style-string-formatting)
+
+.. [#] str.format
+       (https://docs.python.org/3/library/string.html#formatstrings)
+
+.. [#] string.Template documentation
+       (https://docs.python.org/3/library/string.html#template-strings)
+
+.. [#] PEP 215: String Interpolation
+       (https://www.python.org/dev/peps/pep-0215/)
+
+.. [#] PEP 3101: Advanced String Formatting
+       (https://www.python.org/dev/peps/pep-3101/)
+
+.. [#] Formatting using locals() and globals()
+       (https://mail.python.org/pipermail/python-ideas/2015-July/034671.html)
+
+.. [#] Avoid locals() and globals()
+       (https://mail.python.org/pipermail/python-ideas/2015-July/034701.html)
+
+.. [#] str.format_map() documentation
+       (https://docs.python.org/3/library/stdtypes.html#str.format_map)
+
+.. [#] Format string syntax
+       (https://docs.python.org/3/library/string.html#format-string-syntax)
+
+.. [#] String literal description
+       (https://docs.python.org/3/reference/lexical_analysis.html#string-and-bytes-literals)
+
+.. [#] ast.parse() documentation
+       (https://docs.python.org/3/library/ast.html#ast.parse)
+
+.. [#] Start of python-ideas discussion
+       (https://mail.python.org/pipermail/python-ideas/2015-July/034657.html)
+
+.. [#] Wikipedia article on string interpolation
+       (https://en.wikipedia.org/wiki/String_interpolation)
+
+.. [#] Differences in str.format() and f-string expressions
+       (https://mail.python.org/pipermail/python-ideas/2015-July/034726.html)
+
+.. [#] PEP 461 rejects bytes.format()
+       (https://www.python.org/dev/peps/pep-0461/#proposed-variations)
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
+````
+
+</details>
+
+<details><summary><b>Step 7 — revision_7</b> (3477 words)</summary>
+
+````text
+Abstract
+========
+
+Python supports multiple ways to format text strings. These include
+%-formatting [#]_, ``str.format()`` [#]_, and ``string.Template``
+[#]_. Each of these methods have their advantages, but in addition
+have disadvantages that make them cumbersome to use in practice. This
+PEP proposed to add a new string formatting mechanism: Literal String
+Interpolation. In this PEP, such strings will be referred to as
+"f-strings", taken from the leading character used to denote such
+strings, and standing for "formatted strings".
+
+This PEP does not propose to remove or deprecate any of the existing
+string formatting mechanisms.
+
+f-strings provide a way to embed expressions inside string literals,
+using a minimal syntax. It should be noted that an f-string is really
+an expression evaluated at run time, not a constant value. In Python
+source code, an f-string is a literal string, prefixed with 'f', which
+contains expressions inside braces. The expressions are replaced with
+their values. Some examples are::
+
+  >>> import datetime
+  >>> name = 'Fred'
+  >>> age = 50
+  >>> anniversary = datetime.date(1991, 10, 12)
+  >>> f'My name is {name}, my age next year is {age+1}, my anniversary is {anniversary:%A, %B %d, %Y}.'
+  'My name is Fred, my age next year is 51, my anniversary is Saturday, October 12, 1991.'
+  >>> f'He said his name is {name!r}.'
+  "He said his name is 'Fred'."
+
+A similar feature was proposed in PEP 215. PEP 215 proposed to support
+a subset of Python expressions, and did not support the type-specific
+string formatting (the ``__format__()`` method) which was introduced
+with PEP 3101.
+
+Rationale
+=========
+
+This PEP is driven by the desire to have a simpler way to format
+strings in Python. The existing ways of formatting are either error
+prone, inflexible, or cumbersome.
+
+%-formatting is limited as to the types it supports. Only ints, strs,
+and doubles can be formatted. All other types are either not
+supported, or converted to one of these types before formatting. In
+addition, there's a well-known trap where a single value is passed::
+
+  >>> msg = 'disk failure'
+  >>> 'error: %s' % msg
+  'error: disk failure'
+
+But if msg were ever to be a tuple, the same code would fail::
+
+  >>> msg = ('disk failure', 32)
+  >>> 'error: %s' % msg
+  Traceback (most recent call last):
+    File "<stdin>", line 1, in <module>
+  TypeError: not all arguments converted during string formatting
+
+To be defensive, the following code should be used::
+
+  >>> 'error: %s' % (msg,)
+  "error: ('disk failure', 32)"
+
+``str.format()`` was added to address some of these problems with
+%-formatting. In particular, it uses normal function call syntax (and
+therefor supports multiple parameters) and it is extensible through
+the ``__format__()`` method on the object being converted to a
+string. See PEP 3101 for a detailed rationale. This PEP reuses much of
+the ``str.format()`` syntax and machinery, in order to provide
+continuity with an existing Python string formatting mechanism.
+
+However, ``str.format()`` is not without its issues. Chief among them
+is its verbosity. For example, the text ``value`` is repeated here::
+
+  >>> value = 4 * 20
+  >>> 'The value is {value}.'.format(value=value)
+  'The value is 80.'
+
+Even in its simplest form there is a bit of boilerplate, and the value
+that's inserted into the placeholder is sometimes far removed from
+where the placeholder is situated::
+
+  >>> 'The value is {}.'.format(value)
+  'The value is 80.'
+
+With an f-string, this becomes::
+
+  >>> f'The value is {value}.'
+  'The value is 80.'
+
+f-strings provide a concise, readable way to include the value of
+Python expressions inside strings.
+
+In this sense, ``string.Template`` and %-formatting have similar
+shortcomings to ``str.format()``, but also support fewer formatting
+options. In particular, they do not support the ``__format__``
+protocol, so that there is no way to control how a specific object is
+converted to a string, nor can it be extended to additional types that
+want to control how they are converted to strings (such as ``Decimal``
+and ``datetime``). This example is not possible with
+``string.Template``::
+
+  >>> value = 1234
+  >>> f'input={value:#0.6x}'
+  'input=0x04d2'
+
+And neither %-formatting nor ``string.Template`` can control
+formatting such as::
+
+  >>> date = datetime.date(1991, 10, 12)
+  >>> f'{date} was on a {date:%A}'
+  '1991-10-12 was on a Saturday'
+
+No use of globals() or locals()
+-------------------------------
+
+In the discussions on python-dev [#]_, a number of solutions where
+presented that used locals() and globals() or their equivalents. All
+of these have various problems. Among these are referencing variables
+that are not otherwise used in a closure. Consider::
+
+  >>> def outer(x):
+  ...     def inner():
+  ...         return 'x={x}'.format_map(locals())
+  ...     return inner
+  ...
+  >>> outer(42)()
+  Traceback (most recent call last):
+    File "<stdin>", line 1, in <module>
+    File "<stdin>", line 3, in inner
+  KeyError: 'x'
+
+This returns an error because the compiler has not added a reference
+to x inside the closure. You need to manually add a reference to x in
+order for this to work::
+
+  >>> def outer(x):
+  ...     def inner():
+  ...         x
+  ...         return 'x={x}'.format_map(locals())
+  ...     return inner
+  ...
+  >>> outer(42)()
+  'x=42'
+
+In addition, using locals() or globals() introduces an information
+leak. A called routine that has access to the callers locals() or
+globals() has access to far more information than needed to do the
+string interpolation.
+
+Guido stated [#]_ that any solution to better string interpolation
+would not use locals() or globals().
+
+Specification
+=============
+
+In source code, f-strings are string literals that are prefixed by the
+letter 'f' or 'F'. Everywhere this PEP uses 'f', 'F' may also be
+used. 'f' may be combined with 'r', in either order, to produce raw
+f-string literals. 'f' may not be combined with 'b': this PEP does not
+propose to add binary f-strings. 'f' may not be combined with 'u'.
+
+When tokenizing source files, f-strings use the same rules as normal
+strings, raw strings, binary strings, and triple quoted strings. That
+is, the string must end with the same character that it started with:
+if it starts with a single quote it must end with a single quote, etc.
+This implies that any code that currently scans Python code looking
+for strings should be trivially modifiable to recognize f-strings
+(parsing within an f-string is another matter, of course).
+
+Once tokenized, f-strings are decoded. This will convert backslash
+escapes such as ``'\n'``, ``'\"'``, ``"\'"``, ``'\xhh'``,
+``'\uxxxx'``, ``'\Uxxxxxxxx'``, and named unicode characters
+``'\N{name}'`` into their associated Unicode characters [#]_.
+
+Up to this point, the processing of f-strings and normal strings is
+exactly the same.
+
+The difference is that f-strings are further parsed in to literals and
+expressions. Expressions appear within curly braces ``'{'`` and
+``'}'``.  The parts of the string outside of braces are literals.  The
+expressions are evaluated, formatted with the existing __format__
+protocol, then the results are concatenated together with the string
+literals. While scanning the string for expressions, any doubled
+braces ``'{{'`` or ``'}}'`` inside literal portions of an f-string are
+replaced by the corresponding single brace. Doubled opening braces do
+not signify the start of an expression.
+
+Note that ``__format__()`` is not called directly on each value. The
+actual code uses the equivalent of ``type(value).__format__(value,
+format_spec)``, or ``format(value, format_spec)``. See the
+documentation of the builtin ``format()`` function for more details.
+
+Comments, using the ``'#'`` character, are not allowed inside an
+expression.
+
+Following the expression, an optional type conversion may be
+specified.  The allowed conversions are ``'!s'``, ``'!r'``, or
+``'!a'``. These are treated the same as in ``str.format()``: ``'!s'``
+calls ``str()`` on the expression, ``'!r'`` calls ``repr()`` on the
+expression, and ``'!a'`` calls ``ascii()`` on the expression. These
+conversions are applied before the call to ``format()``. The only
+reason to use ``'!s'`` is if you want to specify a format specifier
+that applies to ``str``, not to the type of the expression.
+
+Similar to ``str.format()``, optional format specifiers maybe be
+included inside the f-string, separated from the expression (or the
+type conversion, if specified) by a colon. If a format specifier is
+not provided, an empty string is used.
+
+So, an f-string looks like::
+
+  f ' <text> { <expression> <optional !s, !r, or !a> <optional : format specifier> } <text> ... '
+
+The expression is then formatted using the ``__format__`` protocol,
+using the format specifier as an argument. The resulting value is
+used when building the value of the f-string.
+
+Expressions cannot contain ``':'`` or ``'!'`` outside of strings or
+parentheses, brackets, or braces. The exception is that the ``'!='``
+operator is allowed as a special case.
+
+Escape sequences
+----------------
+
+Scanning an f-string for expressions happens after escape sequences
+are decoded. Because ``hex(ord('{')) == 0x7b``, the f-string
+``f'\u007b4*10}'`` is decoded to ``f'{4*10}'``, which evaluates as
+the integer 40::
+
+  >>> f'\u007b4*10}'
+  '40'
+  >>> f'\x7b4*10}'
+  '40'
+  >>> f'\x7b4*10\N{RIGHT CURLY BRACKET}'
+  '40'
+
+These examples aren't generally useful, they're just to show that
+escape sequences are processed before f-strings are parsed for
+expressions.
+
+Note that the correct way to have a literal brace appear in the
+resulting string value is to double the brace::
+
+  >>> f'{{ {4*10} }}'
+  '{ 40 }'
+  >>> f'{{{4*10}}}'
+  '{40}'
+
+Like all raw strings in Python, no escape processing is done for raw
+f-strings::
+
+  >>> fr'x={4*10}\n'
+  'x=40\\n'
+
+Due to Python's string tokenizing rules, the f-string
+``f'abc {a['x']} def'`` is invalid. The tokenizer parses this as 3
+tokens: ``f'abc {a['``, ``x``, and ``']} def'``. Just like regular
+strings, this cannot be fixed by using raw strings. There are a number
+of correct ways to write this f-string: with escaped single quotes::
+
+  f'abc {a[\'x\']} def'
+
+With a different quote character::
+
+  f"abc {a['x']} def"
+
+Or with triple quotes::
+
+  f'''abc {a['x']} def'''
+
+Code equivalence
+----------------
+
+The exact code used to implement f-strings is not specified. However,
+it is guaranteed that any embedded value that is converted to a string
+will use that value's ``__format__`` method. This is the same
+mechanism that ``str.format()`` uses to convert values to strings.
+
+For example, this code::
+
+  f'abc{expr1:spec1}{expr2!r:spec2}def{expr3}ghi'
+
+Might be evaluated as::
+
+  'abc' + format(expr1, spec1) + format(repr(expr2), spec2) + 'def' + format(expr3) + 'ghi'
+
+Expression evaluation
+---------------------
+
+The expressions that are extracted from the string are evaluated in
+the context where the f-string appeared. This means the expression has
+full access to local and global variables. Any valid Python expression
+can be used, including function and method calls.
+
+Because the f-strings are evaluated where the string appears in the
+source code, there is no additional expressiveness available with
+f-strings. There are also no additional security concerns: you could
+have also just written the same expression, not inside of an
+f-string::
+
+  >>> def foo():
+  ...   return 20
+  ...
+  >>> f'result={foo()}'
+  'result=20'
+
+Is equivalent to::
+
+  >>> 'result=' + str(foo())
+  'result=20'
+
+Expressions are parsed with the equivalent of ``ast.parse('(' +
+expression + ')', '<fstring>', 'eval')`` [#]_.
+
+Note that since the expression is enclosed by implicit parentheses
+before evaluation, expressions can contain newlines. For example::
+
+  >>> x = 0
+  >>> f'''{x
+  ... +1}'''
+  '1'
+
+  >>> d = {0: 'zero'}
+  >>> f'''{d[0
+  ... ]}'''
+  'zero'
+
+Format specifiers
+-----------------
+
+Format specifiers may also contain evaluated expressions. This allows
+code such as::
+
+  >>> width = 10
+  >>> precision = 4
+  >>> value = decimal.Decimal('12.34567')
+  >>> f'result: {value:{width}.{precision}}'
+  'result:      12.35'
+
+Once expressions in a format specifier are evaluated (if necessary),
+format specifiers are not interpreted by the f-string evaluator. Just
+as in ``str.format()``, they are merely passed in to the
+``__format__()`` method of the object being formatted.
+
+Concatenating strings
+---------------------
+
+Adjacent f-strings and regular strings are concatenated. Regular
+strings are concatenated at compile time, and f-strings are
+concatenated at run time. For example, the expression::
+
+  >>> x = 10
+  >>> y = 'hi'
+  >>> 'a' 'b' f'{x}' '{c}' f'str<{y:^4}>' 'd' 'e'
+
+yields the value::
+
+  'ab10{c}str< hi >de'
+
+While the exact method of this run time concatenation is unspecified,
+the above code might evaluate to::
+
+  'ab' + format(x) + '{c}' + 'str<' + format(y, '^4') + '>de'
+
+Each f-string is entirely evaluated before being concatenated to
+adjacent f-strings. That means that this::
+
+  >>> f'{x' f'}'
+
+Is a syntax error, because the first f-string does not contain a
+closing brace.
+
+Error handling
+--------------
+
+Either compile time or run time errors can occur when processing
+f-strings. Compile time errors are limited to those errors that can be
+detected when scanning an f-string. These errors all raise
+``SyntaxError``.
+
+Unmatched braces::
+
+  >>> f'x={x'
+    File "<stdin>", line 1
+  SyntaxError: f-string: expecting '}'
+
+Invalid expressions::
+
+  >>> f'x={!x}'
+    File "<stdin>", line 1
+  SyntaxError: f-string: empty expression not allowed
+
+Run time errors occur when evaluating the expressions inside an
+f-string. Note that an f-string can be evaluated multiple times, and
+work sometimes and raise an error at other times::
+
+  >>> d = {0:10, 1:20}
+  >>> for i in range(3):
+  ...     print(f'{i}:{d[i]}')
+  ...
+  0:10
+  1:20
+  Traceback (most recent call last):
+    File "<stdin>", line 2, in <module>
+  KeyError: 2
+
+or::
+
+  >>> for x in (32, 100, 'fifty'):
+  ...   print(f'x = {x:+3}')
+  ...
+  'x = +32'
+  'x = +100'
+  Traceback (most recent call last):
+    File "<stdin>", line 2, in <module>
+  ValueError: Sign not allowed in string format specifier
+
+Leading and trailing whitespace in expressions is ignored
+---------------------------------------------------------
+
+For ease of readability, leading and trailing whitespace in
+expressions is ignored. This is a by-product of enclosing the
+expression in parentheses before evaluation.
+
+Evaluation order of expressions
+-------------------------------
+
+The expressions in an f-string are evaluated in left-to-right
+order. This is detectable only if the expressions have side effects::
+
+  >>> def fn(l, incr):
+  ...    result = l[0]
+  ...    l[0] += incr
+  ...    return result
+  ...
+  >>> lst = [0]
+  >>> f'{fn(lst,2)} {fn(lst,3)}'
+  '0 2'
+  >>> f'{fn(lst,2)} {fn(lst,3)}'
+  '5 7'
+  >>> lst
+  [10]
+
+Discussion
+==========
+
+python-ideas discussion
+-----------------------
+
+Most of the discussions on python-ideas [#]_ focused on three issues:
+
+- How to denote f-strings,
+- How to specify the location of expressions in f-strings, and
+- Whether to allow full Python expressions.
+
+How to denote f-strings
+***********************
+
+Because the compiler must be involved in evaluating the expressions
+contained in the interpolated strings, there must be some way to
+denote to the compiler which strings should be evaluated. This PEP
+chose a leading ``'f'`` character preceding the string literal. This
+is similar to how ``'b'`` and ``'r'`` prefixes change the meaning of
+the string itself, at compile time. Other prefixes were suggested,
+such as ``'i'``. No option seemed better than the other, so ``'f'``
+was chosen.
+
+Another option was to support special functions, known to the
+compiler, such as ``Format()``. This seems like too much magic for
+Python: not only is there a chance for collision with existing
+identifiers, the PEP author feels that it's better to signify the
+magic with a string prefix character.
+
+How to specify the location of expressions in f-strings
+*******************************************************
+
+This PEP supports the same syntax as ``str.format()`` for
+distinguishing replacement text inside strings: expressions are
+contained inside braces. There were other options suggested, such as
+``string.Template``'s ``$identifier`` or ``${expression}``.
+
+While ``$identifier`` is no doubt more familiar to shell scripters and
+users of some other languages, in Python ``str.format()`` is heavily
+used. A quick search of Python's standard library shows only a handful
+of uses of ``string.Template``, but hundreds of uses of
+``str.format()``.
+
+Another proposed alternative was to have the substituted text between
+``\{`` and ``}`` or between ``\{`` and ``\}``. While this syntax would
+probably be desirable if all string literals were to support
+interpolation, this PEP only supports strings that are already marked
+with the leading ``'f'``. As such, the PEP is using unadorned braces
+to denoted substituted text, in order to leverage end user familiarity
+with ``str.format()``.
+
+Supporting full Python expressions
+**********************************
+
+Many people on the python-ideas discussion wanted support for either
+only single identifiers, or a limited subset of Python expressions
+(such as the subset supported by ``str.format()``). This PEP supports
+full Python expressions inside the braces. Without full expressions,
+some desirable usage would be cumbersome. For example::
+
+  >>> f'Column={col_idx+1}'
+  >>> f'number of items: {len(items)}'
+
+would become::
+
+  >>> col_number = col_idx+1
+  >>> f'Column={col_number}'
+  >>> n_items = len(items)
+  >>> f'number of items: {n_items}'
+
+While it's true that very ugly expressions could be included in the
+f-strings, this PEP takes the position that such uses should be
+addressed in a linter or code review::
+
+  >>> f'mapping is { {a:b for (a, b) in ((1, 2), (3, 4))} }'
+  'mapping is {1: 2, 3: 4}'
+
+Similar support in other languages
+----------------------------------
+
+Wikipedia has a good discussion of string interpolation in other
+programming languages [#]_. This feature is implemented in many
+languages, with a variety of syntaxes and restrictions.
+
+Differences between f-string and str.format expressions
+-------------------------------------------------------
+
+There is one small difference between the limited expressions allowed
+in ``str.format()`` and the full expressions allowed inside
+f-strings. The difference is in how index lookups are performed. In
+``str.format()``, index values that do not look like numbers are
+converted to strings::
+
+  >>> d = {'a': 10, 'b': 20}
+  >>> 'a={d[a]}'.format(d=d)
+  'a=10'
+
+Notice that the index value is converted to the string ``'a'`` when it
+is looked up in the dict.
+
+However, in f-strings, you would need to use a literal for the value
+of ``'a'``::
+
+  >>> f'a={d["a"]}'
+  'a=10'
+
+This difference is required because otherwise you would not be able to
+use variables as index values::
+
+  >>> a = 'b'
+  >>> f'a={d[a]}'
+  'a=20'
+
+See [#]_ for a further discussion. It was this observation that led to
+full Python expressions being supported in f-strings.
+
+Furthermore, the limited expressions that ``str.format()`` understands
+need not be valid Python expressions. For example::
+
+  >>> '{i[";]}'.format(i={'";':4})
+  '4'
+
+For this reason, the str.format() "expression parser" is not suitable
+for use when implementing f-strings.
+
+Triple-quoted f-strings
+-----------------------
+
+Triple quoted f-strings are allowed. These strings are parsed just as
+normal triple-quoted strings are. After parsing and decoding, the
+normal f-string logic is applied, and ``__format__()`` is called on
+each value.
+
+Raw f-strings
+-------------
+
+Raw and f-strings may be combined. For example, they could be used to
+build up regular expressions::
+
+  >>> header = 'Subject'
+  >>> fr'{header}:\s+'
+  'Subject:\\s+'
+
+In addition, raw f-strings may be combined with triple-quoted strings.
+
+No binary f-strings
+-------------------
+
+For the same reason that we don't support ``bytes.format()``, you may
+not combine ``'f'`` with ``'b'`` string literals. The primary problem
+is that an object's ``__format__()`` method may return Unicode data that
+is not compatible with a bytes string.
+
+Binary f-strings would first require a solution for
+``bytes.format()``. This idea has been proposed in the past, most
+recently in PEP 461 [#]_. The discussions of such a feature usually
+suggest either
+
+- adding a method such as ``__bformat__()`` so an object can control
+  how it is converted to bytes, or
+
+- having ``bytes.format()`` not be as general purpose or extensible
+  as ``str.format()``.
+
+Both of these remain as options in the future, if such functionality
+is desired.
+
+``!s``, ``!r``, and ``!a`` are redundant
+----------------------------------------
+
+The ``!s``, ``!r``, and ``!a`` conversions are not strictly
+required. Because arbitrary expressions are allowed inside the
+f-strings, this code::
+
+  >>> a = 'some string'
+  >>> f'{a!r}'
+  "'some string'"
+
+Is identical to::
+
+  >>> f'{repr(a)}'
+  "'some string'"
+
+Similarly, ``!s`` can be replaced by calls to ``str()`` and ``!a`` by
+calls to ``ascii()``.
+
+However, ``!s``, ``!r``, and ``!a`` are supported by this PEP in order
+to minimize the differences with ``str.format()``. ``!s``, ``!r``, and
+``!a`` are required in ``str.format()`` because it does not allow the
+execution of arbitrary expressions.
+
+Lambdas inside expressions
+--------------------------
+
+Because lambdas use the ``':'`` character, they cannot appear outside
+of parenthesis in an expression. The colon is interpreted as the start
+of the format specifier, which means the start of the lambda
+expression is seen and is syntactically invalid. As there's no
+practical use for a plain lambda in an f-string expression, this is
+not seen as much of a limitation.
+
+If you feel you must use lambdas, they may be used inside of parentheses::
+
+  >>> f'{(lambda x: x*2)(3)}'
+  '6'
+
+Can't combine with 'u'
+--------------------------
+
+The 'u' prefix was added to Python 3.3 in PEP 414 as a means to ease
+source compatibility with Python 2.7. Because Python 2.7 will never
+support f-strings, there is nothing to be gained by being able to
+combine the 'f' prefix with 'u'.
+
+Examples from Python's source code
+==================================
+
+Here are some examples from Python source code that currently use
+``str.format()``, and how they would look with f-strings. This PEP
+does not recommend wholesale converting to f-strings, these are just
+examples of real-world usages of ``str.format()`` and how they'd look
+if written from scratch using f-strings.
+
+``Lib/asyncio/locks.py``::
+
+  extra = '{},waiters:{}'.format(extra, len(self._waiters))
+  extra = f'{extra},waiters:{len(self._waiters)}'
+
+``Lib/configparser.py``::
+
+  message.append(" [line {0:2d}]".format(lineno))
+  message.append(f" [line {lineno:2d}]")
+
+``Tools/clinic/clinic.py``::
+
+  methoddef_name = "{}_METHODDEF".format(c_basename.upper())
+  methoddef_name = f"{c_basename.upper()}_METHODDEF"
+
+``python-config.py``::
+
+  print("Usage: {0} [{1}]".format(sys.argv[0], '|'.join('--'+opt for opt in valid_opts)), file=sys.stderr)
+  print(f"Usage: {sys.argv[0]} [{'|'.join('--'+opt for opt in valid_opts)}]", file=sys.stderr)
+
+References
+==========
+
+.. [#] %-formatting
+       (https://docs.python.org/3/library/stdtypes.html#printf-style-string-formatting)
+
+.. [#] str.format
+       (https://docs.python.org/3/library/string.html#formatstrings)
+
+.. [#] string.Template documentation
+       (https://docs.python.org/3/library/string.html#template-strings)
+
+.. [#] Formatting using locals() and globals()
+       (https://mail.python.org/pipermail/python-ideas/2015-July/034671.html)
+
+.. [#] Avoid locals() and globals()
+       (https://mail.python.org/pipermail/python-ideas/2015-July/034701.html)
+
+.. [#] String literal description
+       (https://docs.python.org/3/reference/lexical_analysis.html#string-and-bytes-literals)
+
+.. [#] ast.parse() documentation
+       (https://docs.python.org/3/library/ast.html#ast.parse)
+
+.. [#] Start of python-ideas discussion
+       (https://mail.python.org/pipermail/python-ideas/2015-July/034657.html)
+
+.. [#] Wikipedia article on string interpolation
+       (https://en.wikipedia.org/wiki/String_interpolation)
+
+.. [#] Differences in str.format() and f-string expressions
+       (https://mail.python.org/pipermail/python-ideas/2015-July/034726.html)
+
+.. [#] PEP 461 rejects bytes.format()
+       (https://www.python.org/dev/peps/pep-0461/#proposed-variations)
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
+````
+
+</details>
+
+<details><summary><b>Step 8 — final</b> (3495 words)</summary>
+
+````text
+Abstract
+========
+
+Python supports multiple ways to format text strings. These include
+%-formatting [#]_, ``str.format()`` [#]_, and ``string.Template``
+[#]_. Each of these methods have their advantages, but in addition
+have disadvantages that make them cumbersome to use in practice. This
+PEP proposed to add a new string formatting mechanism: Literal String
+Interpolation. In this PEP, such strings will be referred to as
+"f-strings", taken from the leading character used to denote such
+strings, and standing for "formatted strings".
+
+This PEP does not propose to remove or deprecate any of the existing
+string formatting mechanisms.
+
+F-strings provide a way to embed expressions inside string literals,
+using a minimal syntax. It should be noted that an f-string is really
+an expression evaluated at run time, not a constant value. In Python
+source code, an f-string is a literal string, prefixed with 'f', which
+contains expressions inside braces. The expressions are replaced with
+their values. Some examples are::
+
+  >>> import datetime
+  >>> name = 'Fred'
+  >>> age = 50
+  >>> anniversary = datetime.date(1991, 10, 12)
+  >>> f'My name is {name}, my age next year is {age+1}, my anniversary is {anniversary:%A, %B %d, %Y}.'
+  'My name is Fred, my age next year is 51, my anniversary is Saturday, October 12, 1991.'
+  >>> f'He said his name is {name!r}.'
+  "He said his name is 'Fred'."
+
+A similar feature was proposed in :pep:`215`. :pep:`215` proposed to support
+a subset of Python expressions, and did not support the type-specific
+string formatting (the ``__format__()`` method) which was introduced
+with :pep:`3101`.
+
+Rationale
+=========
+
+This PEP is driven by the desire to have a simpler way to format
+strings in Python. The existing ways of formatting are either error
+prone, inflexible, or cumbersome.
+
+%-formatting is limited as to the types it supports. Only ints, strs,
+and doubles can be formatted. All other types are either not
+supported, or converted to one of these types before formatting. In
+addition, there's a well-known trap where a single value is passed::
+
+  >>> msg = 'disk failure'
+  >>> 'error: %s' % msg
+  'error: disk failure'
+
+But if msg were ever to be a tuple, the same code would fail::
+
+  >>> msg = ('disk failure', 32)
+  >>> 'error: %s' % msg
+  Traceback (most recent call last):
+    File "<stdin>", line 1, in <module>
+  TypeError: not all arguments converted during string formatting
+
+To be defensive, the following code should be used::
+
+  >>> 'error: %s' % (msg,)
+  "error: ('disk failure', 32)"
+
+``str.format()`` was added to address some of these problems with
+%-formatting. In particular, it uses normal function call syntax (and
+therefore supports multiple parameters) and it is extensible through
+the ``__format__()`` method on the object being converted to a
+string. See :pep:`3101` for a detailed rationale. This PEP reuses much of
+the ``str.format()`` syntax and machinery, in order to provide
+continuity with an existing Python string formatting mechanism.
+
+However, ``str.format()`` is not without its issues. Chief among them
+is its verbosity. For example, the text ``value`` is repeated here::
+
+  >>> value = 4 * 20
+  >>> 'The value is {value}.'.format(value=value)
+  'The value is 80.'
+
+Even in its simplest form there is a bit of boilerplate, and the value
+that's inserted into the placeholder is sometimes far removed from
+where the placeholder is situated::
+
+  >>> 'The value is {}.'.format(value)
+  'The value is 80.'
+
+With an f-string, this becomes::
+
+  >>> f'The value is {value}.'
+  'The value is 80.'
+
+F-strings provide a concise, readable way to include the value of
+Python expressions inside strings.
+
+In this sense, ``string.Template`` and %-formatting have similar
+shortcomings to ``str.format()``, but also support fewer formatting
+options. In particular, they do not support the ``__format__``
+protocol, so that there is no way to control how a specific object is
+converted to a string, nor can it be extended to additional types that
+want to control how they are converted to strings (such as ``Decimal``
+and ``datetime``). This example is not possible with
+``string.Template``::
+
+  >>> value = 1234
+  >>> f'input={value:#06x}'
+  'input=0x04d2'
+
+And neither %-formatting nor ``string.Template`` can control
+formatting such as::
+
+  >>> date = datetime.date(1991, 10, 12)
+  >>> f'{date} was on a {date:%A}'
+  '1991-10-12 was on a Saturday'
+
+No use of globals() or locals()
+-------------------------------
+
+In the discussions on python-dev [#]_, a number of solutions where
+presented that used locals() and globals() or their equivalents. All
+of these have various problems. Among these are referencing variables
+that are not otherwise used in a closure. Consider::
+
+  >>> def outer(x):
+  ...     def inner():
+  ...         return 'x={x}'.format_map(locals())
+  ...     return inner
+  ...
+  >>> outer(42)()
+  Traceback (most recent call last):
+    File "<stdin>", line 1, in <module>
+    File "<stdin>", line 3, in inner
+  KeyError: 'x'
+
+This returns an error because the compiler has not added a reference
+to x inside the closure. You need to manually add a reference to x in
+order for this to work::
+
+  >>> def outer(x):
+  ...     def inner():
+  ...         x
+  ...         return 'x={x}'.format_map(locals())
+  ...     return inner
+  ...
+  >>> outer(42)()
+  'x=42'
+
+In addition, using locals() or globals() introduces an information
+leak. A called routine that has access to the callers locals() or
+globals() has access to far more information than needed to do the
+string interpolation.
+
+Guido stated [#]_ that any solution to better string interpolation
+would not use locals() or globals() in its implementation.  (This does
+not forbid users from passing locals() or globals() in, it just
+doesn't require it, nor does it allow using these functions under the
+hood.)
+
+Specification
+=============
+
+In source code, f-strings are string literals that are prefixed by the
+letter 'f' or 'F'. Everywhere this PEP uses 'f', 'F' may also be
+used. 'f' may be combined with 'r' or 'R', in either order, to produce
+raw f-string literals. 'f' may not be combined with 'b': this PEP does
+not propose to add binary f-strings. 'f' may not be combined with 'u'.
+
+When tokenizing source files, f-strings use the same rules as normal
+strings, raw strings, binary strings, and triple quoted strings. That
+is, the string must end with the same character that it started with:
+if it starts with a single quote it must end with a single quote, etc.
+This implies that any code that currently scans Python code looking
+for strings should be trivially modifiable to recognize f-strings
+(parsing within an f-string is another matter, of course).
+
+Once tokenized, f-strings are parsed in to literal strings and
+expressions.  Expressions appear within curly braces ``'{'`` and
+``'}'``.  While scanning the string for expressions, any doubled
+braces ``'{{'`` or ``'}}'`` inside literal portions of an f-string are
+replaced by the corresponding single brace.  Doubled literal opening
+braces do not signify the start of an expression.  A single closing
+curly brace ``'}'`` in the literal portion of a string is an error:
+literal closing curly braces must be doubled ``'}}'`` in order to
+represent a single closing brace.
+
+The parts of the f-string outside of braces are literal
+strings.  These literal portions are then decoded.  For non-raw
+f-strings, this includes converting backslash escapes such as
+``'\n'``, ``'\"'``, ``"\'"``, ``'\xhh'``, ``'\uxxxx'``,
+``'\Uxxxxxxxx'``, and named unicode characters ``'\N{name}'`` into
+their associated Unicode characters [#]_.
+
+Backslashes may not appear anywhere within expressions.  Comments,
+using the ``'#'`` character, are not allowed inside an expression.
+
+Following each expression, an optional type conversion may be
+specified.  The allowed conversions are ``'!s'``, ``'!r'``, or
+``'!a'``. These are treated the same as in ``str.format()``: ``'!s'``
+calls ``str()`` on the expression, ``'!r'`` calls ``repr()`` on the
+expression, and ``'!a'`` calls ``ascii()`` on the expression. These
+conversions are applied before the call to ``format()``. The only
+reason to use ``'!s'`` is if you want to specify a format specifier
+that applies to ``str``, not to the type of the expression.
+
+F-strings use the same format specifier mini-language as ``str.format``.
+Similar to ``str.format()``, optional format specifiers maybe be
+included inside the f-string, separated from the expression (or the
+type conversion, if specified) by a colon. If a format specifier is
+not provided, an empty string is used.
+
+So, an f-string looks like::
+
+  f ' <text> { <expression> <optional !s, !r, or !a> <optional : format specifier> } <text> ... '
+
+The expression is then formatted using the ``__format__`` protocol,
+using the format specifier as an argument. The resulting value is
+used when building the value of the f-string.
+
+Note that ``__format__()`` is not called directly on each value. The
+actual code uses the equivalent of ``type(value).__format__(value,
+format_spec)``, or ``format(value, format_spec)``. See the
+documentation of the builtin ``format()`` function for more details.
+
+Expressions cannot contain ``':'`` or ``'!'`` outside of strings or
+parentheses, brackets, or braces. The exception is that the ``'!='``
+operator is allowed as a special case.
+
+Escape sequences
+----------------
+
+Backslashes may not appear inside the expression portions of
+f-strings, so you cannot use them, for example, to escape quotes
+inside f-strings::
+
+  >>> f'{\'quoted string\'}'
+    File "<stdin>", line 1
+  SyntaxError: f-string expression part cannot include a backslash
+
+You can use a different type of quote inside the expression::
+
+  >>> f'{"quoted string"}'
+  'quoted string'
+
+Backslash escapes may appear inside the string portions of an
+f-string.
+
+Note that the correct way to have a literal brace appear in the
+resulting string value is to double the brace::
+
+  >>> f'{{ {4*10} }}'
+  '{ 40 }'
+  >>> f'{{{4*10}}}'
+  '{40}'
+
+Like all raw strings in Python, no escape processing is done for raw
+f-strings::
+
+  >>> fr'x={4*10}\n'
+  'x=40\\n'
+
+Due to Python's string tokenizing rules, the f-string
+``f'abc {a['x']} def'`` is invalid. The tokenizer parses this as 3
+tokens: ``f'abc {a['``, ``x``, and ``']} def'``. Just like regular
+strings, this cannot be fixed by using raw strings. There are a number
+of correct ways to write this f-string: with a different quote
+character::
+
+  f"abc {a['x']} def"
+
+Or with triple quotes::
+
+  f'''abc {a['x']} def'''
+
+Code equivalence
+----------------
+
+The exact code used to implement f-strings is not specified. However,
+it is guaranteed that any embedded value that is converted to a string
+will use that value's ``__format__`` method. This is the same
+mechanism that ``str.format()`` uses to convert values to strings.
+
+For example, this code::
+
+  f'abc{expr1:spec1}{expr2!r:spec2}def{expr3}ghi'
+
+Might be evaluated as::
+
+  'abc' + format(expr1, spec1) + format(repr(expr2), spec2) + 'def' + format(expr3) + 'ghi'
+
+Expression evaluation
+---------------------
+
+The expressions that are extracted from the string are evaluated in
+the context where the f-string appeared. This means the expression has
+full access to local and global variables. Any valid Python expression
+can be used, including function and method calls.
+
+Because the f-strings are evaluated where the string appears in the
+source code, there is no additional expressiveness available with
+f-strings. There are also no additional security concerns: you could
+have also just written the same expression, not inside of an
+f-string::
+
+  >>> def foo():
+  ...   return 20
+  ...
+  >>> f'result={foo()}'
+  'result=20'
+
+Is equivalent to::
+
+  >>> 'result=' + str(foo())
+  'result=20'
+
+Expressions are parsed with the equivalent of ``ast.parse('(' +
+expression + ')', '<fstring>', 'eval')`` [#]_.
+
+Note that since the expression is enclosed by implicit parentheses
+before evaluation, expressions can contain newlines. For example::
+
+  >>> x = 0
+  >>> f'''{x
+  ... +1}'''
+  '1'
+
+  >>> d = {0: 'zero'}
+  >>> f'''{d[0
+  ... ]}'''
+  'zero'
+
+Format specifiers
+-----------------
+
+Format specifiers may also contain evaluated expressions. This allows
+code such as::
+
+  >>> width = 10
+  >>> precision = 4
+  >>> value = decimal.Decimal('12.34567')
+  >>> f'result: {value:{width}.{precision}}'
+  'result:      12.35'
+
+Once expressions in a format specifier are evaluated (if necessary),
+format specifiers are not interpreted by the f-string evaluator. Just
+as in ``str.format()``, they are merely passed in to the
+``__format__()`` method of the object being formatted.
+
+Concatenating strings
+---------------------
+
+Adjacent f-strings and regular strings are concatenated. Regular
+strings are concatenated at compile time, and f-strings are
+concatenated at run time. For example, the expression::
+
+  >>> x = 10
+  >>> y = 'hi'
+  >>> 'a' 'b' f'{x}' '{c}' f'str<{y:^4}>' 'd' 'e'
+
+yields the value::
+
+  'ab10{c}str< hi >de'
+
+While the exact method of this run time concatenation is unspecified,
+the above code might evaluate to::
+
+  'ab' + format(x) + '{c}' + 'str<' + format(y, '^4') + '>de'
+
+Each f-string is entirely evaluated before being concatenated to
+adjacent f-strings. That means that this::
+
+  >>> f'{x' f'}'
+
+Is a syntax error, because the first f-string does not contain a
+closing brace.
+
+Error handling
+--------------
+
+Either compile time or run time errors can occur when processing
+f-strings. Compile time errors are limited to those errors that can be
+detected when scanning an f-string. These errors all raise
+``SyntaxError``.
+
+Unmatched braces::
+
+  >>> f'x={x'
+    File "<stdin>", line 1
+  SyntaxError: f-string: expecting '}'
+
+Invalid expressions::
+
+  >>> f'x={!x}'
+    File "<stdin>", line 1
+  SyntaxError: f-string: empty expression not allowed
+
+Run time errors occur when evaluating the expressions inside an
+f-string. Note that an f-string can be evaluated multiple times, and
+work sometimes and raise an error at other times::
+
+  >>> d = {0:10, 1:20}
+  >>> for i in range(3):
+  ...     print(f'{i}:{d[i]}')
+  ...
+  0:10
+  1:20
+  Traceback (most recent call last):
+    File "<stdin>", line 2, in <module>
+  KeyError: 2
+
+or::
+
+  >>> for x in (32, 100, 'fifty'):
+  ...   print(f'x = {x:+3}')
+  ...
+  'x = +32'
+  'x = +100'
+  Traceback (most recent call last):
+    File "<stdin>", line 2, in <module>
+  ValueError: Sign not allowed in string format specifier
+
+Leading and trailing whitespace in expressions is ignored
+---------------------------------------------------------
+
+For ease of readability, leading and trailing whitespace in
+expressions is ignored. This is a by-product of enclosing the
+expression in parentheses before evaluation.
+
+Evaluation order of expressions
+-------------------------------
+
+The expressions in an f-string are evaluated in left-to-right
+order. This is detectable only if the expressions have side effects::
+
+  >>> def fn(l, incr):
+  ...    result = l[0]
+  ...    l[0] += incr
+  ...    return result
+  ...
+  >>> lst = [0]
+  >>> f'{fn(lst,2)} {fn(lst,3)}'
+  '0 2'
+  >>> f'{fn(lst,2)} {fn(lst,3)}'
+  '5 7'
+  >>> lst
+  [10]
+
+Discussion
+==========
+
+python-ideas discussion
+-----------------------
+
+Most of the discussions on python-ideas [#]_ focused on three issues:
+
+- How to denote f-strings,
+- How to specify the location of expressions in f-strings, and
+- Whether to allow full Python expressions.
+
+How to denote f-strings
+***********************
+
+Because the compiler must be involved in evaluating the expressions
+contained in the interpolated strings, there must be some way to
+denote to the compiler which strings should be evaluated. This PEP
+chose a leading ``'f'`` character preceding the string literal. This
+is similar to how ``'b'`` and ``'r'`` prefixes change the meaning of
+the string itself, at compile time. Other prefixes were suggested,
+such as ``'i'``. No option seemed better than the other, so ``'f'``
+was chosen.
+
+Another option was to support special functions, known to the
+compiler, such as ``Format()``. This seems like too much magic for
+Python: not only is there a chance for collision with existing
+identifiers, the PEP author feels that it's better to signify the
+magic with a string prefix character.
+
+How to specify the location of expressions in f-strings
+*******************************************************
+
+This PEP supports the same syntax as ``str.format()`` for
+distinguishing replacement text inside strings: expressions are
+contained inside braces. There were other options suggested, such as
+``string.Template``'s ``$identifier`` or ``${expression}``.
+
+While ``$identifier`` is no doubt more familiar to shell scripters and
+users of some other languages, in Python ``str.format()`` is heavily
+used. A quick search of Python's standard library shows only a handful
+of uses of ``string.Template``, but hundreds of uses of
+``str.format()``.
+
+Another proposed alternative was to have the substituted text between
+``\{`` and ``}`` or between ``\{`` and ``\}``. While this syntax would
+probably be desirable if all string literals were to support
+interpolation, this PEP only supports strings that are already marked
+with the leading ``'f'``. As such, the PEP is using unadorned braces
+to denoted substituted text, in order to leverage end user familiarity
+with ``str.format()``.
+
+Supporting full Python expressions
+**********************************
+
+Many people on the python-ideas discussion wanted support for either
+only single identifiers, or a limited subset of Python expressions
+(such as the subset supported by ``str.format()``). This PEP supports
+full Python expressions inside the braces. Without full expressions,
+some desirable usage would be cumbersome. For example::
+
+  >>> f'Column={col_idx+1}'
+  >>> f'number of items: {len(items)}'
+
+would become::
+
+  >>> col_number = col_idx+1
+  >>> f'Column={col_number}'
+  >>> n_items = len(items)
+  >>> f'number of items: {n_items}'
+
+While it's true that very ugly expressions could be included in the
+f-strings, this PEP takes the position that such uses should be
+addressed in a linter or code review::
+
+  >>> f'mapping is { {a:b for (a, b) in ((1, 2), (3, 4))} }'
+  'mapping is {1: 2, 3: 4}'
+
+Similar support in other languages
+----------------------------------
+
+Wikipedia has a good discussion of string interpolation in other
+programming languages [#]_. This feature is implemented in many
+languages, with a variety of syntaxes and restrictions.
+
+Differences between f-string and str.format expressions
+-------------------------------------------------------
+
+There is one small difference between the limited expressions allowed
+in ``str.format()`` and the full expressions allowed inside
+f-strings. The difference is in how index lookups are performed. In
+``str.format()``, index values that do not look like numbers are
+converted to strings::
+
+  >>> d = {'a': 10, 'b': 20}
+  >>> 'a={d[a]}'.format(d=d)
+  'a=10'
+
+Notice that the index value is converted to the string ``'a'`` when it
+is looked up in the dict.
+
+However, in f-strings, you would need to use a literal for the value
+of ``'a'``::
+
+  >>> f'a={d["a"]}'
+  'a=10'
+
+This difference is required because otherwise you would not be able to
+use variables as index values::
+
+  >>> a = 'b'
+  >>> f'a={d[a]}'
+  'a=20'
+
+See [#]_ for a further discussion. It was this observation that led to
+full Python expressions being supported in f-strings.
+
+Furthermore, the limited expressions that ``str.format()`` understands
+need not be valid Python expressions. For example::
+
+  >>> '{i[";]}'.format(i={'";':4})
+  '4'
+
+For this reason, the str.format() "expression parser" is not suitable
+for use when implementing f-strings.
+
+Triple-quoted f-strings
+-----------------------
+
+Triple quoted f-strings are allowed. These strings are parsed just as
+normal triple-quoted strings are. After parsing and decoding, the
+normal f-string logic is applied, and ``__format__()`` is called on
+each value.
+
+Raw f-strings
+-------------
+
+Raw and f-strings may be combined. For example, they could be used to
+build up regular expressions::
+
+  >>> header = 'Subject'
+  >>> fr'{header}:\s+'
+  'Subject:\\s+'
+
+In addition, raw f-strings may be combined with triple-quoted strings.
+
+No binary f-strings
+-------------------
+
+For the same reason that we don't support ``bytes.format()``, you may
+not combine ``'f'`` with ``'b'`` string literals. The primary problem
+is that an object's ``__format__()`` method may return Unicode data that
+is not compatible with a bytes string.
+
+Binary f-strings would first require a solution for
+``bytes.format()``. This idea has been proposed in the past, most
+recently in :pep:`461#proposed-variations`. The discussions of such a feature usually
+suggest either
+
+- adding a method such as ``__bformat__()`` so an object can control
+  how it is converted to bytes, or
+
+- having ``bytes.format()`` not be as general purpose or extensible
+  as ``str.format()``.
+
+Both of these remain as options in the future, if such functionality
+is desired.
+
+``!s``, ``!r``, and ``!a`` are redundant
+----------------------------------------
+
+The ``!s``, ``!r``, and ``!a`` conversions are not strictly
+required. Because arbitrary expressions are allowed inside the
+f-strings, this code::
+
+  >>> a = 'some string'
+  >>> f'{a!r}'
+  "'some string'"
+
+Is identical to::
+
+  >>> f'{repr(a)}'
+  "'some string'"
+
+Similarly, ``!s`` can be replaced by calls to ``str()`` and ``!a`` by
+calls to ``ascii()``.
+
+However, ``!s``, ``!r``, and ``!a`` are supported by this PEP in order
+to minimize the differences with ``str.format()``. ``!s``, ``!r``, and
+``!a`` are required in ``str.format()`` because it does not allow the
+execution of arbitrary expressions.
+
+Lambdas inside expressions
+--------------------------
+
+Because lambdas use the ``':'`` character, they cannot appear outside
+of parentheses in an expression. The colon is interpreted as the start
+of the format specifier, which means the start of the lambda
+expression is seen and is syntactically invalid. As there's no
+practical use for a plain lambda in an f-string expression, this is
+not seen as much of a limitation.
+
+If you feel you must use lambdas, they may be used inside of parentheses::
+
+  >>> f'{(lambda x: x*2)(3)}'
+  '6'
+
+Can't combine with 'u'
+--------------------------
+
+The 'u' prefix was added to Python 3.3 in :pep:`414` as a means to ease
+source compatibility with Python 2.7. Because Python 2.7 will never
+support f-strings, there is nothing to be gained by being able to
+combine the 'f' prefix with 'u'.
+
+Examples from Python's source code
+==================================
+
+Here are some examples from Python source code that currently use
+``str.format()``, and how they would look with f-strings. This PEP
+does not recommend wholesale converting to f-strings, these are just
+examples of real-world usages of ``str.format()`` and how they'd look
+if written from scratch using f-strings.
+
+``Lib/asyncio/locks.py``::
+
+  extra = '{},waiters:{}'.format(extra, len(self._waiters))
+  extra = f'{extra},waiters:{len(self._waiters)}'
+
+``Lib/configparser.py``::
+
+  message.append(" [line {0:2d}]".format(lineno))
+  message.append(f" [line {lineno:2d}]")
+
+``Tools/clinic/clinic.py``::
+
+  methoddef_name = "{}_METHODDEF".format(c_basename.upper())
+  methoddef_name = f"{c_basename.upper()}_METHODDEF"
+
+``python-config.py``::
+
+  print("Usage: {0} [{1}]".format(sys.argv[0], '|'.join('--'+opt for opt in valid_opts)), file=sys.stderr)
+  print(f"Usage: {sys.argv[0]} [{'|'.join('--'+opt for opt in valid_opts)}]", file=sys.stderr)
+
+References
+==========
+
+.. [#] %-formatting
+       (https://docs.python.org/3/library/stdtypes.html#printf-style-string-formatting)
+
+.. [#] str.format
+       (https://docs.python.org/3/library/string.html#formatstrings)
+
+.. [#] string.Template documentation
+       (https://docs.python.org/3/library/string.html#template-strings)
+
+.. [#] Formatting using locals() and globals()
+       (https://mail.python.org/pipermail/python-ideas/2015-July/034671.html)
+
+.. [#] Avoid locals() and globals()
+       (https://mail.python.org/pipermail/python-ideas/2015-July/034701.html)
+
+.. [#] String literal description
+       (https://docs.python.org/3/reference/lexical_analysis.html#string-and-bytes-literals)
+
+.. [#] ast.parse() documentation
+       (https://docs.python.org/3/library/ast.html#ast.parse)
+
+.. [#] Start of python-ideas discussion
+       (https://mail.python.org/pipermail/python-ideas/2015-July/034657.html)
+
+.. [#] Wikipedia article on string interpolation
+       (https://en.wikipedia.org/wiki/String_interpolation)
+
+.. [#] Differences in str.format() and f-string expressions
+       (https://mail.python.org/pipermail/python-ideas/2015-July/034726.html)
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+````
+
+</details>
